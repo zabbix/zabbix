@@ -32,98 +32,6 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 
-typedef struct
-{
-	const char	*macro;
-	int		idx;
-} inventory_field_t;
-
-static inventory_field_t	inventory_fields[] =
-{
-	{MVAR_INVENTORY_TYPE, 0},
-	{MVAR_PROFILE_DEVICETYPE, 0},	/* deprecated */
-	{MVAR_INVENTORY_TYPE_FULL, 1},
-	{MVAR_INVENTORY_NAME, 2},
-	{MVAR_PROFILE_NAME, 2},		/* deprecated */
-	{MVAR_INVENTORY_ALIAS, 3},
-	{MVAR_INVENTORY_OS, 4},
-	{MVAR_PROFILE_OS, 4},		/* deprecated */
-	{MVAR_INVENTORY_OS_FULL, 5},
-	{MVAR_INVENTORY_OS_SHORT, 6},
-	{MVAR_INVENTORY_SERIALNO_A, 7},
-	{MVAR_PROFILE_SERIALNO, 7},	/* deprecated */
-	{MVAR_INVENTORY_SERIALNO_B, 8},
-	{MVAR_INVENTORY_TAG, 9},
-	{MVAR_PROFILE_TAG, 9},		/* deprecated */
-	{MVAR_INVENTORY_ASSET_TAG, 10},
-	{MVAR_INVENTORY_MACADDRESS_A, 11},
-	{MVAR_PROFILE_MACADDRESS, 11},	/* deprecated */
-	{MVAR_INVENTORY_MACADDRESS_B, 12},
-	{MVAR_INVENTORY_HARDWARE, 13},
-	{MVAR_PROFILE_HARDWARE, 13},	/* deprecated */
-	{MVAR_INVENTORY_HARDWARE_FULL, 14},
-	{MVAR_INVENTORY_SOFTWARE, 15},
-	{MVAR_PROFILE_SOFTWARE, 15},	/* deprecated */
-	{MVAR_INVENTORY_SOFTWARE_FULL, 16},
-	{MVAR_INVENTORY_SOFTWARE_APP_A, 17},
-	{MVAR_INVENTORY_SOFTWARE_APP_B, 18},
-	{MVAR_INVENTORY_SOFTWARE_APP_C, 19},
-	{MVAR_INVENTORY_SOFTWARE_APP_D, 20},
-	{MVAR_INVENTORY_SOFTWARE_APP_E, 21},
-	{MVAR_INVENTORY_CONTACT, 22},
-	{MVAR_PROFILE_CONTACT, 22},	/* deprecated */
-	{MVAR_INVENTORY_LOCATION, 23},
-	{MVAR_PROFILE_LOCATION, 23},	/* deprecated */
-	{MVAR_INVENTORY_LOCATION_LAT, 24},
-	{MVAR_INVENTORY_LOCATION_LON, 25},
-	{MVAR_INVENTORY_NOTES, 26},
-	{MVAR_PROFILE_NOTES, 26},	/* deprecated */
-	{MVAR_INVENTORY_CHASSIS, 27},
-	{MVAR_INVENTORY_MODEL, 28},
-	{MVAR_INVENTORY_HW_ARCH, 29},
-	{MVAR_INVENTORY_VENDOR, 30},
-	{MVAR_INVENTORY_CONTRACT_NUMBER, 31},
-	{MVAR_INVENTORY_INSTALLER_NAME, 32},
-	{MVAR_INVENTORY_DEPLOYMENT_STATUS, 33},
-	{MVAR_INVENTORY_URL_A, 34},
-	{MVAR_INVENTORY_URL_B, 35},
-	{MVAR_INVENTORY_URL_C, 36},
-	{MVAR_INVENTORY_HOST_NETWORKS, 37},
-	{MVAR_INVENTORY_HOST_NETMASK, 38},
-	{MVAR_INVENTORY_HOST_ROUTER, 39},
-	{MVAR_INVENTORY_OOB_IP, 40},
-	{MVAR_INVENTORY_OOB_NETMASK, 41},
-	{MVAR_INVENTORY_OOB_ROUTER, 42},
-	{MVAR_INVENTORY_HW_DATE_PURCHASE, 43},
-	{MVAR_INVENTORY_HW_DATE_INSTALL, 44},
-	{MVAR_INVENTORY_HW_DATE_EXPIRY, 45},
-	{MVAR_INVENTORY_HW_DATE_DECOMM, 46},
-	{MVAR_INVENTORY_SITE_ADDRESS_A, 47},
-	{MVAR_INVENTORY_SITE_ADDRESS_B, 48},
-	{MVAR_INVENTORY_SITE_ADDRESS_C, 49},
-	{MVAR_INVENTORY_SITE_CITY, 50},
-	{MVAR_INVENTORY_SITE_STATE, 51},
-	{MVAR_INVENTORY_SITE_COUNTRY, 52},
-	{MVAR_INVENTORY_SITE_ZIP, 53},
-	{MVAR_INVENTORY_SITE_RACK, 54},
-	{MVAR_INVENTORY_SITE_NOTES, 55},
-	{MVAR_INVENTORY_POC_PRIMARY_NAME, 56},
-	{MVAR_INVENTORY_POC_PRIMARY_EMAIL, 57},
-	{MVAR_INVENTORY_POC_PRIMARY_PHONE_A, 58},
-	{MVAR_INVENTORY_POC_PRIMARY_PHONE_B, 59},
-	{MVAR_INVENTORY_POC_PRIMARY_CELL, 60},
-	{MVAR_INVENTORY_POC_PRIMARY_SCREEN, 61},
-	{MVAR_INVENTORY_POC_PRIMARY_NOTES, 62},
-	{MVAR_INVENTORY_POC_SECONDARY_NAME, 63},
-	{MVAR_INVENTORY_POC_SECONDARY_EMAIL, 64},
-	{MVAR_INVENTORY_POC_SECONDARY_PHONE_A, 65},
-	{MVAR_INVENTORY_POC_SECONDARY_PHONE_B, 66},
-	{MVAR_INVENTORY_POC_SECONDARY_CELL, 67},
-	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, 68},
-	{MVAR_INVENTORY_POC_SECONDARY_NOTES, 69},
-	{NULL}
-};
-
 /******************************************************************************
  *                                                                            *
  * Purpose: request host field value by hostid.                               *
@@ -603,30 +511,6 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve a particular value associated with the trigger's         *
- *          N_functionid'th function.                                         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-int	expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid, int request)
-{
-	zbx_uint64_t	itemid;
-	int		ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED == zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid))
-		ret = expr_db_get_item_value(itemid, replace_to, request);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **replace_to)
 {
 	int		ret = SUCCEED;
@@ -646,6 +530,30 @@ int	expr_db_get_trigger_error(const zbx_db_trigger *trigger, char **replace_to)
 
 	zbx_db_free_result(result);
 out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve a particular value associated with the trigger's         *
+ *          N_functionid'th function.                                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	expr_db_get_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid, int request)
+{
+	zbx_uint64_t	itemid;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid))
+		ret = expr_db_get_item_value(itemid, replace_to, request);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -933,6 +841,98 @@ void	expr_db_get_escalation_history(zbx_uint64_t actionid, const zbx_db_event *e
 	*replace_to = buf;
 }
 
+typedef struct
+{
+	const char	*macro;
+	int		idx;
+} inventory_field_t;
+
+static inventory_field_t	inventory_fields[] =
+{
+	{MVAR_INVENTORY_TYPE, 0},
+	{MVAR_PROFILE_DEVICETYPE, 0},	/* deprecated */
+	{MVAR_INVENTORY_TYPE_FULL, 1},
+	{MVAR_INVENTORY_NAME, 2},
+	{MVAR_PROFILE_NAME, 2},		/* deprecated */
+	{MVAR_INVENTORY_ALIAS, 3},
+	{MVAR_INVENTORY_OS, 4},
+	{MVAR_PROFILE_OS, 4},		/* deprecated */
+	{MVAR_INVENTORY_OS_FULL, 5},
+	{MVAR_INVENTORY_OS_SHORT, 6},
+	{MVAR_INVENTORY_SERIALNO_A, 7},
+	{MVAR_PROFILE_SERIALNO, 7},	/* deprecated */
+	{MVAR_INVENTORY_SERIALNO_B, 8},
+	{MVAR_INVENTORY_TAG, 9},
+	{MVAR_PROFILE_TAG, 9},		/* deprecated */
+	{MVAR_INVENTORY_ASSET_TAG, 10},
+	{MVAR_INVENTORY_MACADDRESS_A, 11},
+	{MVAR_PROFILE_MACADDRESS, 11},	/* deprecated */
+	{MVAR_INVENTORY_MACADDRESS_B, 12},
+	{MVAR_INVENTORY_HARDWARE, 13},
+	{MVAR_PROFILE_HARDWARE, 13},	/* deprecated */
+	{MVAR_INVENTORY_HARDWARE_FULL, 14},
+	{MVAR_INVENTORY_SOFTWARE, 15},
+	{MVAR_PROFILE_SOFTWARE, 15},	/* deprecated */
+	{MVAR_INVENTORY_SOFTWARE_FULL, 16},
+	{MVAR_INVENTORY_SOFTWARE_APP_A, 17},
+	{MVAR_INVENTORY_SOFTWARE_APP_B, 18},
+	{MVAR_INVENTORY_SOFTWARE_APP_C, 19},
+	{MVAR_INVENTORY_SOFTWARE_APP_D, 20},
+	{MVAR_INVENTORY_SOFTWARE_APP_E, 21},
+	{MVAR_INVENTORY_CONTACT, 22},
+	{MVAR_PROFILE_CONTACT, 22},	/* deprecated */
+	{MVAR_INVENTORY_LOCATION, 23},
+	{MVAR_PROFILE_LOCATION, 23},	/* deprecated */
+	{MVAR_INVENTORY_LOCATION_LAT, 24},
+	{MVAR_INVENTORY_LOCATION_LON, 25},
+	{MVAR_INVENTORY_NOTES, 26},
+	{MVAR_PROFILE_NOTES, 26},	/* deprecated */
+	{MVAR_INVENTORY_CHASSIS, 27},
+	{MVAR_INVENTORY_MODEL, 28},
+	{MVAR_INVENTORY_HW_ARCH, 29},
+	{MVAR_INVENTORY_VENDOR, 30},
+	{MVAR_INVENTORY_CONTRACT_NUMBER, 31},
+	{MVAR_INVENTORY_INSTALLER_NAME, 32},
+	{MVAR_INVENTORY_DEPLOYMENT_STATUS, 33},
+	{MVAR_INVENTORY_URL_A, 34},
+	{MVAR_INVENTORY_URL_B, 35},
+	{MVAR_INVENTORY_URL_C, 36},
+	{MVAR_INVENTORY_HOST_NETWORKS, 37},
+	{MVAR_INVENTORY_HOST_NETMASK, 38},
+	{MVAR_INVENTORY_HOST_ROUTER, 39},
+	{MVAR_INVENTORY_OOB_IP, 40},
+	{MVAR_INVENTORY_OOB_NETMASK, 41},
+	{MVAR_INVENTORY_OOB_ROUTER, 42},
+	{MVAR_INVENTORY_HW_DATE_PURCHASE, 43},
+	{MVAR_INVENTORY_HW_DATE_INSTALL, 44},
+	{MVAR_INVENTORY_HW_DATE_EXPIRY, 45},
+	{MVAR_INVENTORY_HW_DATE_DECOMM, 46},
+	{MVAR_INVENTORY_SITE_ADDRESS_A, 47},
+	{MVAR_INVENTORY_SITE_ADDRESS_B, 48},
+	{MVAR_INVENTORY_SITE_ADDRESS_C, 49},
+	{MVAR_INVENTORY_SITE_CITY, 50},
+	{MVAR_INVENTORY_SITE_STATE, 51},
+	{MVAR_INVENTORY_SITE_COUNTRY, 52},
+	{MVAR_INVENTORY_SITE_ZIP, 53},
+	{MVAR_INVENTORY_SITE_RACK, 54},
+	{MVAR_INVENTORY_SITE_NOTES, 55},
+	{MVAR_INVENTORY_POC_PRIMARY_NAME, 56},
+	{MVAR_INVENTORY_POC_PRIMARY_EMAIL, 57},
+	{MVAR_INVENTORY_POC_PRIMARY_PHONE_A, 58},
+	{MVAR_INVENTORY_POC_PRIMARY_PHONE_B, 59},
+	{MVAR_INVENTORY_POC_PRIMARY_CELL, 60},
+	{MVAR_INVENTORY_POC_PRIMARY_SCREEN, 61},
+	{MVAR_INVENTORY_POC_PRIMARY_NOTES, 62},
+	{MVAR_INVENTORY_POC_SECONDARY_NAME, 63},
+	{MVAR_INVENTORY_POC_SECONDARY_EMAIL, 64},
+	{MVAR_INVENTORY_POC_SECONDARY_PHONE_A, 65},
+	{MVAR_INVENTORY_POC_SECONDARY_PHONE_B, 66},
+	{MVAR_INVENTORY_POC_SECONDARY_CELL, 67},
+	{MVAR_INVENTORY_POC_SECONDARY_SCREEN, 68},
+	{MVAR_INVENTORY_POC_SECONDARY_NOTES, 69},
+	{NULL}
+};
+
 /******************************************************************************
  *                                                                            *
  * Purpose: request action value by macro.                                    *
@@ -1074,6 +1074,28 @@ fail:
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get root cause of service being in problem state.                 *
+ *                                                                            *
+ ******************************************************************************/
+void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to)
+{
+	int			i;
+	zbx_vector_eventdata_t	rootcauses;
+
+	zbx_vector_eventdata_create(&rootcauses);
+
+	eventdata_compose(&service->events, &rootcauses);
+	zbx_vector_eventdata_sort(&rootcauses, (zbx_compare_func_t)zbx_eventdata_compare);
+	zbx_eventdata_to_str(&rootcauses, replace_to);
+
+	for (i = 0; i < rootcauses.values_num; i++)
+		zbx_eventdata_free(&rootcauses.values[i]);
+
+	zbx_vector_eventdata_destroy(&rootcauses);
+}
+
 void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 {
 	int			i;
@@ -1117,28 +1139,6 @@ void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 	}
 
 	zbx_vector_uint64_destroy(&symptom_eventids);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get root cause of service being in problem state.                 *
- *                                                                            *
- ******************************************************************************/
-void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to)
-{
-	int			i;
-	zbx_vector_eventdata_t	rootcauses;
-
-	zbx_vector_eventdata_create(&rootcauses);
-
-	eventdata_compose(&service->events, &rootcauses);
-	zbx_vector_eventdata_sort(&rootcauses, (zbx_compare_func_t)zbx_eventdata_compare);
-	zbx_eventdata_to_str(&rootcauses, replace_to);
-
-	for (i = 0; i < rootcauses.values_num; i++)
-		zbx_eventdata_free(&rootcauses.values[i]);
-
-	zbx_vector_eventdata_destroy(&rootcauses);
 }
 
 /******************************************************************************

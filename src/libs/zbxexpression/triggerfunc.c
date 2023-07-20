@@ -34,6 +34,191 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 
+static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __func__, triggers->values_num);
+
+	zbx_vector_uint64_reserve(functionids, triggers->values_num);
+
+	for (int i = 0; i < triggers->values_num; i++)
+	{
+		zbx_dc_trigger_t	*tr = triggers->values[i];
+
+		if (NULL != tr->new_error)
+			continue;
+
+		zbx_eval_get_functionids(tr->eval_ctx, functionids);
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
+			zbx_eval_get_functionids(tr->eval_ctx_r, functionids);
+	}
+
+	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() functionids_num:%d", __func__, functionids->values_num);
+}
+
+typedef struct
+{
+	zbx_dc_trigger_t	*trigger;
+	int			start_index;
+	int			count;
+}
+zbx_trigger_func_position_t;
+
+ZBX_PTR_VECTOR_DECL(trigger_func_position, zbx_trigger_func_position_t *)
+ZBX_PTR_VECTOR_IMPL(trigger_func_position, zbx_trigger_func_position_t *)
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: expand macros in a trigger expression.                            *
+ *                                                                            *
+ ******************************************************************************/
+static int	expand_normal_trigger_macros(zbx_eval_context_t *ctx, const zbx_db_event *event, char *error,
+		size_t maxerrlen)
+{
+	int	i;
+
+	for (i = 0; i < ctx->stack.values_num; i++)
+	{
+		zbx_eval_token_t	*token = &ctx->stack.values[i];
+
+		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type)
+		{
+			continue;
+		}
+
+		/* all trigger macros are already extracted into strings */
+		if (ZBX_VARIANT_STR != token->value.type)
+			continue;
+
+		if (FAIL == substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, NULL, NULL,&token->value.data.str, ZBX_MACRO_TYPE_TRIGGER_EXPRESSION, error,
+				(int)maxerrlen))
+		{
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: triggers links with functions.                                    *
+ *                                                                            *
+ * Parameters: triggers_func_pos - [IN/OUT] pointer to the list of triggers   *
+ *                                          with functions position in        *
+ *                                          functionids array                 *
+ *             functionids       - [IN/OUT] array of function IDs             *
+ *             trigger_order     - [IN] array of triggers                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_link_triggers_with_functions(zbx_vector_trigger_func_position_t *triggers_func_pos,
+		zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *trigger_order)
+{
+	zbx_vector_uint64_t	funcids;
+	zbx_dc_trigger_t	*tr;
+	int			i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trigger_order_num:%d", __func__, trigger_order->values_num);
+
+	zbx_vector_uint64_create(&funcids);
+	zbx_vector_uint64_reserve(&funcids, functionids->values_num);
+
+	for (i = 0; i < trigger_order->values_num; i++)
+	{
+		zbx_trigger_func_position_t	*tr_func_pos;
+
+		tr = trigger_order->values[i];
+
+		if (NULL != tr->new_error)
+			continue;
+
+		zbx_eval_get_functionids(tr->eval_ctx, &funcids);
+
+		tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
+		tr_func_pos->trigger = tr;
+		tr_func_pos->start_index = functionids->values_num;
+		tr_func_pos->count = funcids.values_num;
+
+		zbx_vector_uint64_append_array(functionids, funcids.values, funcids.values_num);
+		zbx_vector_trigger_func_position_append(triggers_func_pos, tr_func_pos);
+
+		zbx_vector_uint64_clear(&funcids);
+	}
+
+	zbx_vector_uint64_destroy(&funcids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() triggers_func_pos_num:%d", __func__, triggers_func_pos->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: mark triggers that use one of the items in problem expression     *
+ *          with ZBX_DC_TRIGGER_PROBLEM_EXPRESSION flag.                      *
+ *                                                                            *
+ * Parameters: trigger_order - [IN/OUT] pointer to the list of triggers       *
+ *             itemids       - [IN] array of item IDs                         *
+ *             item_num      - [IN] number of items                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids,
+		int item_num)
+{
+	zbx_vector_trigger_func_position_t	triggers_func_pos;
+	zbx_vector_uint64_t			functionids, itemids_sorted;
+	zbx_dc_function_t			*functions = NULL;
+	int					*errcodes = NULL, t, f;
+
+	zbx_vector_uint64_create(&itemids_sorted);
+	zbx_vector_uint64_append_array(&itemids_sorted, itemids, item_num);
+
+	zbx_vector_trigger_func_position_create(&triggers_func_pos);
+	zbx_vector_trigger_func_position_reserve(&triggers_func_pos, trigger_order->values_num);
+
+	zbx_vector_uint64_create(&functionids);
+	zbx_vector_uint64_reserve(&functionids, item_num);
+
+	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
+
+	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids.values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
+
+	zbx_dc_config_history_sync_get_functions_by_functionids(functions, functionids.values, errcodes,
+			(size_t)functionids.values_num);
+
+	for (t = 0; t < triggers_func_pos.values_num; t++)
+	{
+		zbx_trigger_func_position_t	*func_pos = triggers_func_pos.values[t];
+
+		for (f = func_pos->start_index; f < func_pos->start_index + func_pos->count; f++)
+		{
+			if (SUCCEED == errcodes[f] && FAIL != zbx_vector_uint64_bsearch(&itemids_sorted,
+					functions[f].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				func_pos->trigger->flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
+				break;
+			}
+		}
+	}
+
+	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
+	zbx_free(errcodes);
+	zbx_free(functions);
+
+	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos,
+			(zbx_trigger_func_position_free_func_t)zbx_ptr_free);
+	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);
+
+	zbx_vector_uint64_clear(&functionids);
+	zbx_vector_uint64_destroy(&functionids);
+
+	zbx_vector_uint64_clear(&itemids_sorted);
+	zbx_vector_uint64_destroy(&itemids_sorted);
+}
+
 typedef struct
 {
 	/* input data */
@@ -55,17 +240,6 @@ typedef struct
 	zbx_func_t	*func;
 }
 zbx_ifunc_t;
-
-typedef struct
-{
-	zbx_dc_trigger_t	*trigger;
-	int			start_index;
-	int			count;
-}
-zbx_trigger_func_position_t;
-
-ZBX_PTR_VECTOR_DECL(trigger_func_position, zbx_trigger_func_position_t *)
-ZBX_PTR_VECTOR_IMPL(trigger_func_position, zbx_trigger_func_position_t *)
 
 static zbx_hash_t	func_hash_func(const void *data)
 {
@@ -110,6 +284,82 @@ static void	func_clean(void *ptr)
 	zbx_free(func->error);
 
 	zbx_variant_clear(&func->value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepare hashset of functions to evaluate.                         *
+ *                                                                            *
+ * Parameters: functionids - [IN] function identifiers                        *
+ *             funcs       - [OUT] functions indexed by itemid, name,         *
+ *                                 parameter, timestamp                       *
+ *             ifuncs      - [OUT] function index by functionid               *
+ *             triggers     - [IN] vector of triggers, sorted by triggerid    *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
+		zbx_hashset_t *ifuncs, const zbx_vector_dc_trigger_t *triggers)
+{
+	int			i, j;
+	zbx_dc_trigger_t	*tr;
+	zbx_dc_function_t	*functions = NULL;
+	int			*errcodes = NULL;
+	zbx_ifunc_t		ifunc_local;
+	zbx_func_t		*func, func_local;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __func__, functionids->values_num);
+
+	zbx_variant_set_none(&func_local.value);
+	func_local.error = NULL;
+
+	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids->values_num);
+	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
+
+	zbx_dc_config_history_sync_get_functions_by_functionids(functions, functionids->values, errcodes,
+			(size_t)functionids->values_num);
+
+	for (i = 0; i < functionids->values_num; i++)
+	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
+		func_local.itemid = functions[i].itemid;
+
+		if (FAIL != (j = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)triggers, &functions[i].triggerid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			tr = triggers->values[j];
+			func_local.timespec = tr->timespec;
+		}
+		else
+		{
+			func_local.timespec.sec = 0;
+			func_local.timespec.ns = 0;
+		}
+
+		func_local.function = functions[i].function;
+		func_local.parameter = functions[i].parameter;
+
+		if (NULL == (func = (zbx_func_t *)zbx_hashset_search(funcs, &func_local)))
+		{
+			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
+			func->function = zbx_strdup(NULL, func_local.function);
+			func->parameter = zbx_strdup(NULL, func_local.parameter);
+			func->type = functions[i].type;
+			zbx_variant_set_none(&func->value);
+		}
+
+		ifunc_local.functionid = functions[i].functionid;
+		ifunc_local.func = func;
+		zbx_hashset_insert(ifuncs, &ifunc_local, sizeof(ifunc_local));
+	}
+
+	zbx_dc_config_clean_functions(functions, errcodes, functionids->values_num);
+
+	zbx_free(errcodes);
+	zbx_free(functions);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __func__, ifuncs->num_data);
 }
 
 static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint64_t *history_itemids,
@@ -357,107 +607,6 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_d
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)
-{
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __func__, triggers->values_num);
-
-	zbx_vector_uint64_reserve(functionids, triggers->values_num);
-
-	for (int i = 0; i < triggers->values_num; i++)
-	{
-		zbx_dc_trigger_t	*tr = triggers->values[i];
-
-		if (NULL != tr->new_error)
-			continue;
-
-		zbx_eval_get_functionids(tr->eval_ctx, functionids);
-
-		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
-			zbx_eval_get_functionids(tr->eval_ctx_r, functionids);
-	}
-
-	zbx_vector_uint64_sort(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(functionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() functionids_num:%d", __func__, functionids->values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: prepare hashset of functions to evaluate.                         *
- *                                                                            *
- * Parameters: functionids - [IN] function identifiers                        *
- *             funcs       - [OUT] functions indexed by itemid, name,         *
- *                                 parameter, timestamp                       *
- *             ifuncs      - [OUT] function index by functionid               *
- *             triggers     - [IN] vector of triggers, sorted by triggerid    *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
-		zbx_hashset_t *ifuncs, const zbx_vector_dc_trigger_t *triggers)
-{
-	int			i, j;
-	zbx_dc_trigger_t	*tr;
-	zbx_dc_function_t	*functions = NULL;
-	int			*errcodes = NULL;
-	zbx_ifunc_t		ifunc_local;
-	zbx_func_t		*func, func_local;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() functionids_num:%d", __func__, functionids->values_num);
-
-	zbx_variant_set_none(&func_local.value);
-	func_local.error = NULL;
-
-	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids->values_num);
-	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids->values_num);
-
-	zbx_dc_config_history_sync_get_functions_by_functionids(functions, functionids->values, errcodes,
-			(size_t)functionids->values_num);
-
-	for (i = 0; i < functionids->values_num; i++)
-	{
-		if (SUCCEED != errcodes[i])
-			continue;
-
-		func_local.itemid = functions[i].itemid;
-
-		if (FAIL != (j = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)triggers, &functions[i].triggerid,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-		{
-			tr = triggers->values[j];
-			func_local.timespec = tr->timespec;
-		}
-		else
-		{
-			func_local.timespec.sec = 0;
-			func_local.timespec.ns = 0;
-		}
-
-		func_local.function = functions[i].function;
-		func_local.parameter = functions[i].parameter;
-
-		if (NULL == (func = (zbx_func_t *)zbx_hashset_search(funcs, &func_local)))
-		{
-			func = (zbx_func_t *)zbx_hashset_insert(funcs, &func_local, sizeof(func_local));
-			func->function = zbx_strdup(NULL, func_local.function);
-			func->parameter = zbx_strdup(NULL, func_local.parameter);
-			func->type = functions[i].type;
-			zbx_variant_set_none(&func->value);
-		}
-
-		ifunc_local.functionid = functions[i].functionid;
-		ifunc_local.func = func;
-		zbx_hashset_insert(ifuncs, &ifunc_local, sizeof(ifunc_local));
-	}
-
-	zbx_dc_config_clean_functions(functions, errcodes, functionids->values_num);
-
-	zbx_free(errcodes);
-	zbx_free(functions);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ifuncs_num:%d", __func__, ifuncs->num_data);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute expression functions with their values.                *
@@ -530,40 +679,6 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
 	}
 
 	*result = value.data.dbl;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: expand macros in a trigger expression.                            *
- *                                                                            *
- ******************************************************************************/
-static int	expand_normal_trigger_macros(zbx_eval_context_t *ctx, const zbx_db_event *event, char *error,
-		size_t maxerrlen)
-{
-	int	i;
-
-	for (i = 0; i < ctx->stack.values_num; i++)
-	{
-		zbx_eval_token_t	*token = &ctx->stack.values[i];
-
-		if (ZBX_EVAL_TOKEN_VAR_MACRO != token->type && ZBX_EVAL_TOKEN_VAR_STR != token->type)
-		{
-			continue;
-		}
-
-		/* all trigger macros are already extracted into strings */
-		if (ZBX_VARIANT_STR != token->value.type)
-			continue;
-
-		if (FAIL == substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, NULL,&token->value.data.str, ZBX_MACRO_TYPE_TRIGGER_EXPRESSION, error,
-				(int)maxerrlen))
-		{
-			return FAIL;
-		}
-	}
 
 	return SUCCEED;
 }
@@ -765,119 +880,4 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: triggers links with functions.                                    *
- *                                                                            *
- * Parameters: triggers_func_pos - [IN/OUT] pointer to the list of triggers   *
- *                                          with functions position in        *
- *                                          functionids array                 *
- *             functionids       - [IN/OUT] array of function IDs             *
- *             trigger_order     - [IN] array of triggers                     *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_link_triggers_with_functions(zbx_vector_trigger_func_position_t *triggers_func_pos,
-		zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *trigger_order)
-{
-	zbx_vector_uint64_t	funcids;
-	zbx_dc_trigger_t	*tr;
-	int			i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trigger_order_num:%d", __func__, trigger_order->values_num);
-
-	zbx_vector_uint64_create(&funcids);
-	zbx_vector_uint64_reserve(&funcids, functionids->values_num);
-
-	for (i = 0; i < trigger_order->values_num; i++)
-	{
-		zbx_trigger_func_position_t	*tr_func_pos;
-
-		tr = trigger_order->values[i];
-
-		if (NULL != tr->new_error)
-			continue;
-
-		zbx_eval_get_functionids(tr->eval_ctx, &funcids);
-
-		tr_func_pos = (zbx_trigger_func_position_t *)zbx_malloc(NULL, sizeof(zbx_trigger_func_position_t));
-		tr_func_pos->trigger = tr;
-		tr_func_pos->start_index = functionids->values_num;
-		tr_func_pos->count = funcids.values_num;
-
-		zbx_vector_uint64_append_array(functionids, funcids.values, funcids.values_num);
-		zbx_vector_trigger_func_position_append(triggers_func_pos, tr_func_pos);
-
-		zbx_vector_uint64_clear(&funcids);
-	}
-
-	zbx_vector_uint64_destroy(&funcids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() triggers_func_pos_num:%d", __func__, triggers_func_pos->values_num);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: mark triggers that use one of the items in problem expression     *
- *          with ZBX_DC_TRIGGER_PROBLEM_EXPRESSION flag.                      *
- *                                                                            *
- * Parameters: trigger_order - [IN/OUT] pointer to the list of triggers       *
- *             itemids       - [IN] array of item IDs                         *
- *             item_num      - [IN] number of items                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids,
-		int item_num)
-{
-	zbx_vector_trigger_func_position_t	triggers_func_pos;
-	zbx_vector_uint64_t			functionids, itemids_sorted;
-	zbx_dc_function_t			*functions = NULL;
-	int					*errcodes = NULL, t, f;
-
-	zbx_vector_uint64_create(&itemids_sorted);
-	zbx_vector_uint64_append_array(&itemids_sorted, itemids, item_num);
-
-	zbx_vector_trigger_func_position_create(&triggers_func_pos);
-	zbx_vector_trigger_func_position_reserve(&triggers_func_pos, trigger_order->values_num);
-
-	zbx_vector_uint64_create(&functionids);
-	zbx_vector_uint64_reserve(&functionids, item_num);
-
-	zbx_link_triggers_with_functions(&triggers_func_pos, &functionids, trigger_order);
-
-	functions = (zbx_dc_function_t *)zbx_malloc(functions, sizeof(zbx_dc_function_t) * functionids.values_num);
-	errcodes = (int *)zbx_malloc(errcodes, sizeof(int) * functionids.values_num);
-
-	zbx_dc_config_history_sync_get_functions_by_functionids(functions, functionids.values, errcodes,
-			(size_t)functionids.values_num);
-
-	for (t = 0; t < triggers_func_pos.values_num; t++)
-	{
-		zbx_trigger_func_position_t	*func_pos = triggers_func_pos.values[t];
-
-		for (f = func_pos->start_index; f < func_pos->start_index + func_pos->count; f++)
-		{
-			if (SUCCEED == errcodes[f] && FAIL != zbx_vector_uint64_bsearch(&itemids_sorted,
-					functions[f].itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			{
-				func_pos->trigger->flags |= ZBX_DC_TRIGGER_PROBLEM_EXPRESSION;
-				break;
-			}
-		}
-	}
-
-	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
-	zbx_free(errcodes);
-	zbx_free(functions);
-
-	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos,
-			(zbx_trigger_func_position_free_func_t)zbx_ptr_free);
-	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);
-
-	zbx_vector_uint64_clear(&functionids);
-	zbx_vector_uint64_destroy(&functionids);
-
-	zbx_vector_uint64_clear(&itemids_sorted);
-	zbx_vector_uint64_destroy(&itemids_sorted);
 }
