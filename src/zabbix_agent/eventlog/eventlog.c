@@ -72,8 +72,8 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, int config_eventlog_max_lines_per_second,
-		char **error)
+		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
+		int config_buffer_size, int config_eventlog_max_lines_per_second, char **error)
 {
 	int		rate, ret = FAIL;
 	AGENT_REQUEST	request;
@@ -190,8 +190,8 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 			ret = process_eventslog6(addrs, agent2_result, filename, &eventlog6_render_context,
 					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
 					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
-					config_tls, config_timeout, config_source_ip, config_hostname, metric,
-					lastlogsize_sent, error);
+					config_tls, config_timeout, config_source_ip, config_hostname,
+					config_buffer_send, config_buffer_size, metric, lastlogsize_sent, error);
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -204,7 +204,8 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 	{
 		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
 				key_logeventid, rate, process_value_cb, config_tls, config_timeout, config_source_ip,
-				config_hostname, metric, lastlogsize_sent, error);
+				config_hostname, config_buffer_send, config_buffer_size, metric, lastlogsize_sent,
+				error);
 	}
 out:
 	zbx_free_agent_request(&request);

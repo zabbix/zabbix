@@ -518,7 +518,8 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		*eventlog_name, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
 		const char *key_source, const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		const char *config_hostname, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
+		const char *config_hostname, int config_buffer_send, int config_buffer_size,
+		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	HANDLE		eventlog_handle = NULL;
 	wchar_t		*eventlog_name_w;
@@ -765,7 +766,8 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 							metric->key_orig, value, ITEM_STATE_NORMAL, &lastlogsize,
 							NULL, &timestamp, source, &severity, &logeventid,
 							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-							config_timeout, config_source_ip);
+							config_timeout, config_source_ip, config_buffer_send,
+							config_buffer_size);
 
 					if (SUCCEED == send_err)
 					{
