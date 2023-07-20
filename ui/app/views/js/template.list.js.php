@@ -70,11 +70,6 @@
 					dialogueid: "popup_import",
 					dialogue_class: "modal-popup-generic"
 				});
-
-				overlay.$dialogue[0].addEventListener('submit', (e) => {
-					console.log(e);
-					debugger;
-				})
 			});
 		}
 

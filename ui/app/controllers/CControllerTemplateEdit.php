@@ -273,7 +273,7 @@ class CControllerTemplateEdit extends CController {
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 		// Insert empty row when no macros are present.
-		if (!$data['macros']) {
+		if (!$data['macros'] && $data['show_inherited_macros'] == 0) {
 			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 
 			if ($data['show_inherited_macros']) {

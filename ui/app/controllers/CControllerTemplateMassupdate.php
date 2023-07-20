@@ -19,7 +19,6 @@
 **/
 
 
-//require_once dirname(__FILE__).'/../../include/forms.inc.php';
 require_once __DIR__.'/../../include/forms.inc.php';
 
 class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {

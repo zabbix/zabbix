@@ -168,7 +168,7 @@ else {
 		if (array_key_exists('template', $macro)) {
 			if ($macro['template']['rights'] == PERM_READ_WRITE) {
 				$link = (new CLink($macro['template']['name']))
-					->addClass('js-edit-linked')
+					->addClass('js-edit-linked-template')
 					->setAttribute('data-templateid', $macro['template']['templateid']);
 			}
 			else {

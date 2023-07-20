@@ -26,16 +26,15 @@
 
 window.template_edit_popup = new class {
 
-	init({templateid, linked_templates, readonly, parent_hostid, warnings}) {
+	init({templateid, linked_templates, readonly, warnings}) {
 		this.overlay = overlays_stack.getById('templates-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.templateid = templateid;
-		this.linked_templateids = Object.keys(linked_templates);
+		this.linked_templateids = linked_templates;
 		this.readonly = readonly;
-		this.parent_hostid = parent_hostid;
 
-		if (warnings && warnings.length > 0) {
+		if (warnings.length > 0) {
 			const message_box = warnings.length > 1
 				? makeMessageBox('warning', warnings,
 					<?= json_encode(_('Cloned template parameter values have been modified.')) ?>, true, false
@@ -45,16 +44,15 @@ window.template_edit_popup = new class {
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
 
+		this.#initMacrosTab();
+		this.#updateMultiselect();
 		this.#initActions();
 		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	#initActions() {
-		this.#initMacrosTab();
-		this.#updateMultiselect();
-
 		this.form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-edit-linked')) {
+			if (e.target.classList.contains('js-edit-linked-template')) {
 				this.#editLinkedTemplate({templateid: e.target.dataset.templateid});
 			}
 			else if (e.target.classList.contains('js-unlink')) {
@@ -164,7 +162,7 @@ window.template_edit_popup = new class {
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
 			readonly: this.readonly,
-			parent_hostid: this.parent_hostid,
+			parent_hostid: null,
 			source: 'templates-form'
 		});
 
@@ -270,6 +268,10 @@ window.template_edit_popup = new class {
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response}));
 		});
+	}
+
+	deleteAndClear() {
+		this.delete(true);
 	}
 
 	submit() {

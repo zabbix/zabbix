@@ -63,7 +63,7 @@ if ($data['linked_templates']) {
 	foreach ($data['linked_templates'] as $template) {
 		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
 			$template_link = (new CLink($template['name']))
-				->addClass('js-edit-linked')
+				->addClass('js-edit-linked-template')
 				->setAttribute('data-templateid', $template['templateid']);
 		}
 		else {
@@ -161,12 +161,12 @@ if ($data['vendor']) {
 }
 
 // Tags tab.
-$tags = new CPartial('configuration.tags.tab', [
+$tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
-	'tags_tab_id' => 'tags-tab-template'
+	'tags_tab_id' => 'template-tags-tab'
 ]);
 
 $form->addItem(
@@ -187,15 +187,6 @@ $macros_tab = (new CFormList('macrosFormList'))
 		'macros' => $data['macros'],
 		'readonly' => $data['readonly']
 	]), 'template_macros_container');
-
-// Value mapping tab.
-$valuemap_tab = (new CFormList('valuemap-formlist'))
-	->addRow(null, new CPartial('configuration.valuemap', [
-		'source' => 'template',
-		'valuemaps' => $data['valuemaps'],
-		'readonly' => $data['readonly'],
-		'form' => 'templates'
-	]));
 
 if (!$data['readonly']) {
 	$macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
@@ -270,11 +261,20 @@ if (!$data['readonly']) {
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
 			]))->addClass('form_row')
 		);
-
-	$form
-		->addItem($macro_row_tmpl)
-		->addItem($macro_row_inherited_tmpl);
 }
+
+$macros_tab
+	->addItem($macro_row_tmpl)
+	->addItem($macro_row_inherited_tmpl);
+
+// Value mapping tab.
+$valuemap_tab = (new CFormList('valuemap-formlist'))
+	->addRow(null, new CPartial('configuration.valuemap', [
+		'source' => 'template',
+		'valuemaps' => $data['valuemaps'],
+		'readonly' => $data['readonly'],
+		'form' => 'templates'
+	]));
 
 if ($data['templateid']) {
 	$buttons = [
@@ -305,7 +305,7 @@ if ($data['templateid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'template_edit_popup.delete('.json_encode(['clear' => true]).');'
+			'action' => 'template_edit_popup.deleteAndClear();'
 		]
 	];
 }
@@ -313,7 +313,6 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'template_edit_popup.submit();'
@@ -322,8 +321,8 @@ else {
 }
 
 $tabs = (new CTabView(['id' => 'template-tabs']))
-	->addTab('tmpl-tab', _('Templates'), $template_tab)
-	->addTab('tags-tab-template', _('Tags'), $tags, TAB_INDICATOR_TAGS)
+	->addTab('template-tab', _('Templates'), $template_tab)
+	->addTab('template-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('template-macro-tab', _('Macros'),$macros_tab, TAB_INDICATOR_MACROS)
 	->addTab('template-valuemap-tab', _('Value mapping'), $valuemap_tab, TAB_INDICATOR_TEMPLATE_VALUEMAPS)
 	->setSelected(0);
@@ -334,9 +333,8 @@ $form
 		(new CScriptTag('
 			template_edit_popup.init('.json_encode([
 				'templateid' => $data['templateid'],
-				'linked_templates' => $data['linked_templates'],
+				'linked_templates' => array_keys($data['linked_templates']),
 				'readonly' => $data['readonly'],
-				'parent_hostid' => $data['parent_hostid'] ?? null,
 				'warnings' => $data['warnings']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
