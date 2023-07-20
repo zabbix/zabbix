@@ -96,7 +96,9 @@ class CControllerDiscoveryList extends CController {
 		]);
 
 		if ($data['drules']) {
-			foreach ($data['drules'] as $key => $drule) {
+			$proxyids = [];
+
+			foreach ($data['drules'] as &$drule) {
 				$checks = [];
 
 				foreach ($drule['dchecks'] as $check) {
@@ -105,14 +107,29 @@ class CControllerDiscoveryList extends CController {
 
 				order_result($checks);
 
-				$data['drules'][$key]['checks'] = $checks;
+				$drule['checks'] = $checks;
 
-				$data['drules'][$key]['proxy'] = ($drule['proxyid'] != 0)
-					? API::Proxy()->get([
-						'output' => ['name'],
-						'proxyids' => [$drule['proxyid']]
-					])
-					: '';
+				$drule['proxy'] = '';
+
+				if ($drule['proxyid'] != 0) {
+					$proxyids[] = $drule['proxyid'];
+				}
+			}
+			unset($drule);
+
+			if ($proxyids) {
+				$proxies = API::Proxy()->get([
+					'output' => ['name', 'proxyid'],
+					'proxyids' => $proxyids,
+					'preservekeys' => true
+				]);
+
+				foreach ($data['drules'] as &$drule) {
+					if (array_key_exist($drule['proxyid'], $proxies)) {
+						$drule['proxy'] = $proxies[$drule['proxyid']]['name'];
+					}
+				}
+				unset($drule);
 			}
 
 			CArrayHelper::sort($data['drules'], [['field' => $sort_field, 'order' => $sort_order]]);
