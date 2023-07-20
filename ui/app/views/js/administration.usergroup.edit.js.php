@@ -23,9 +23,9 @@
  * @var CView $this
  */
 ?>
-
 <script>
 	const view = new class {
+
 		init({templategroup_rights, hostgroup_rights, tag_filters}) {
 			this.templategroup_rights = templategroup_rights;
 			this.template_permission_template = new Template(document.getElementById('template-permissions-row-template').innerHTML);
