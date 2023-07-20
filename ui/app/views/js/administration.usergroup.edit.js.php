@@ -87,7 +87,7 @@
 			});
 		}
 
-		#addTemplateRow(templategroup_rights = [], permission = <?= PERM_NONE ?>) {
+		#addTemplateRow(templategroup_rights = [], permission = <?= PERM_DENY ?>) {
 			const rowid = this.template_counter++;
 			const data = {
 				'rowid': rowid
@@ -102,23 +102,18 @@
 			$(ms).multiSelect();
 
 			for (const id in templategroup_rights) {
-				if (templategroup_rights[id]['permission'] == <?= PERM_NONE ?> || templategroup_rights.length == 0) {
-					continue;
+				if (templategroup_rights.hasOwnProperty(id)) {
+					const groups = {
+						'id': id,
+						'name': templategroup_rights[id]['name']
+					};
+					$(ms).multiSelect('addData', [groups]);
 				}
-
-				const groups = {
-					'id': id,
-					'name': templategroup_rights[id]['name']
-				};
-				$(ms).multiSelect('addData', [groups]);
 			}
 
-			if (templategroup_rights.length > 0) {
-				const permission_radio = document
-					.querySelector('input[name="new_templategroup_right[permission][' + rowid + ']"][value="' + permission + '"]')
-					.closest('li');
-				permission_radio.querySelector('input[type="radio"]').checked = true;
-			}
+			const permission_radio = document
+				.querySelector(`input[name="new_templategroup_right[permission][${rowid}]"][value="${permission}"]`);
+			permission_radio.checked = true;
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
 
@@ -129,7 +124,7 @@
 			});
 		}
 
-		#addHostRow(hostgroup_rights = [], permission = <?= PERM_NONE ?>) {
+		#addHostRow(hostgroup_rights = [], permission = <?= PERM_DENY ?>) {
 			const rowid = this.host_counter++;
 			const data = {
 				'rowid': rowid
@@ -144,22 +139,19 @@
 			$(ms).multiSelect();
 
 			for (const id in hostgroup_rights) {
-				if (hostgroup_rights[id]['permission'] == <?= PERM_NONE ?> || hostgroup_rights.length == 0) {
-					continue;
+				if (hostgroup_rights.hasOwnProperty(id)) {
+					const groups = {
+						'id': id,
+						'name': hostgroup_rights[id]['name']
+					};
+					$(ms).multiSelect('addData', [groups]);
 				}
-
-				const groups = {
-					'id': id,
-					'name': hostgroup_rights[id]['name']
-				};
-				$(ms).multiSelect('addData', [groups]);
 			}
 
-			if (hostgroup_rights.length > 0) {
-				const permission_radio = document
-					.querySelector('input[name="new_group_right[permission][' + rowid + ']"][value="' + permission + '"]')
-					.closest('li');
-				permission_radio.querySelector('input[type="radio"]').checked = true;
+			const permission_radio = document
+				.querySelector(`input[name="new_group_right[permission][${rowid}]"][value="${permission}"]`);
+			if (permission_radio) {
+				permission_radio.checked = true;
 			}
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
@@ -196,7 +188,6 @@
 			}
 
 			if (tag_filter_group.length > 0) {
-
 				const tag_id = 'new_tag_filter_tag_'+rowid;
 				document.getElementById(tag_id).value = tag_filter_group[0]['tag'];
 

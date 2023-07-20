@@ -134,6 +134,9 @@ class CControllerUsergroupEdit extends CController {
 
 		$grouped_templategroup_rights = [];
 		foreach ($data['templategroup_rights'] as $id => $right) {
+			if ($right['permission'] == PERM_NONE) {
+				continue;
+			}
 			switch ($right['permission']) {
 				case PERM_DENY:
 					$group = PERM_DENY;
