@@ -957,7 +957,8 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
 						evt_provider, &evt_severity, &evt_eventid,
 						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-						config_timeout, config_source_ip, config_buffer_send, config_buffer_size);
+						config_timeout, config_source_ip, config_buffer_send,
+						config_buffer_size);
 
 				if (SUCCEED == send_err)
 				{

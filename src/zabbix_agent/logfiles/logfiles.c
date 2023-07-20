@@ -2253,7 +2253,10 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					*p_nl = '\0';
 
 					if ('\0' != *encoding)
-						value = zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
+					{
+						value = zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start),
+								encoding);
+					}
 					else
 						value = p_start;
 
