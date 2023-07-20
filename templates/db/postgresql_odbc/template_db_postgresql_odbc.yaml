@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-12T14:52:08Z'
+  date: '2023-07-20T12:19:51Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -25,7 +25,7 @@ zabbix_export:
         
         5. Specify the host name or IP address in the `{$PG.HOST}` macro.
         
-        6. Set the password that you have specified in the step 1 in the macro `{$PG.PASSWORD}`.
+        6. Set the password that you have specified in step 1 in the macro `{$PG.PASSWORD}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
         
@@ -303,7 +303,7 @@ zabbix_export:
           params: 'SELECT 1'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Used to test a connection to see if it is alive. It is being set to 0 if the query is unsuccessful.'
+          description: 'Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -325,7 +325,7 @@ zabbix_export:
               expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"])=0'
               name: 'PostgreSQL: Service is down'
               priority: HIGH
-              description: 'The last test of a connection was unsuccessful.'
+              description: 'Last test of a connection was unsuccessful.'
               tags:
                 - tag: scope
                   value: availability
@@ -400,7 +400,7 @@ zabbix_export:
                 END AS lag
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Replication lag with Master in bytes.'
+          description: 'Replication lag with master, in bytes.'
           tags:
             - tag: component
               value: replication
@@ -418,7 +418,7 @@ zabbix_export:
                 END AS lag
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Replication lag with Master in seconds.'
+          description: 'Replication lag with master, in seconds.'
           tags:
             - tag: component
               value: replication
@@ -492,7 +492,7 @@ zabbix_export:
           params: 'SELECT date_part(''epoch'', now() - pg_postmaster_start_time())'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'The time since the server started.'
+          description: 'Time since the server started.'
           tags:
             - tag: component
               value: application
@@ -541,7 +541,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The cound of archived files.'
+          description: 'Count of archived files.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -558,7 +558,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The cound of files to archive.'
+          description: 'Count of files to archive.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -575,7 +575,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The cound of failed attempts to archive files.'
+          description: 'Count of failed attempts to archive files.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -592,7 +592,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The size of files to archive.'
+          description: 'Size of files to archive.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -818,7 +818,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//pgsql.dbstat.sum.blks_hit.rate) * 100 / (last(//pgsql.dbstat.sum.blks_hit.rate) + last(//pgsql.dbstat.sum.blks_read.rate))'
-          description: 'The cache hit ratio.'
+          description: 'Cache hit ratio.'
           tags:
             - tag: component
               value: cache
@@ -892,7 +892,7 @@ zabbix_export:
           key: pgsql.connections.idle_in_transaction
           delay: '0'
           history: 7d
-          description: 'Total number of connections in a transaction state, but not executing a query.'
+          description: 'Total number of connections in a transaction state but not executing a query.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -908,7 +908,7 @@ zabbix_export:
           key: pgsql.connections.idle_in_transaction_aborted
           delay: '0'
           history: 7d
-          description: 'Total number of connections in a transaction state, but not executing a query and one of the statements in the transaction caused an error.'
+          description: 'Total number of connections in a transaction state but not executing a query, and where one of the statements in the transaction caused an error.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -959,7 +959,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Total number of connections in percentage.'
+          description: 'Total number of connections, in percentage.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1339,7 +1339,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'WAL receive in bytes.'
+          description: 'WAL receive, in bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1359,7 +1359,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'WAL write in bytes.'
+          description: 'WAL write, in bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
