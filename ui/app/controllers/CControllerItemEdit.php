@@ -473,6 +473,16 @@ class CControllerItemEdit extends CController {
 			$form['headers'] = $headers;
 		}
 
+		if ($form['preprocessing']) {
+			foreach ($form['preprocessing'] as &$preprocessing) {
+				$preprocessing += [
+					'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+					'error_handler_params' => ''
+				];
+			}
+			unset($preprocessing);
+		}
+
 		return $form;
 	}
 }
