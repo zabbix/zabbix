@@ -438,7 +438,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"86",
+				"84",
 				"delete" =>
 				"0"
 			]

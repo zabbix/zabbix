@@ -873,7 +873,7 @@ int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 
 	pb_unlock();
 
-	if (PB_DATABASE == state)
+	if (PB_MEMORY != state)
 		ret = pb_history_get_db(j, lastid, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);

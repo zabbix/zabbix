@@ -69,6 +69,7 @@ $form_grid
 			(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
 				->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
 				->setAriaRequired()
+				->disableSpellcheck()
 		)
 	])
 	->addItem([
