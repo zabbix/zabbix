@@ -35,6 +35,7 @@ $trigger_form = (new CForm('post', $url))
 	->setName('trigger_edit_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('hostid', $data['hostid'])
+	->addVar('context', $data['context'])
 	->addVar('expression_full', $data['expression_full'], 'expression-full')
 	->addVar('recovery_expression_full', $data['recovery_expression_full'], 'recovery-expression-full');
 

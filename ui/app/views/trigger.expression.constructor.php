@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-if ($data['error']) {
+if (array_key_exists('error', $data)) {
 	$output['error'] = $data['error'];
 	$output['error']['expression'] = $data['expression'];
 }
@@ -117,7 +117,7 @@ else {
 		$testButton->setEnabled(false);
 	}
 
-	if ($data['expression_formula'] === '' || $data['recovery_expression_formula'] === '') {
+	if ($data['expression_formula'] === '') {
 		$testButton->setEnabled(false);
 	}
 
@@ -127,10 +127,7 @@ else {
 		)
 	);
 
-	$wrapOutline = new CSpan([($data['expression_type'] === TRIGGER_EXPRESSION)
-		? $data['expression_formula']
-		: $data['recovery_expression_formula']
-	]);
+	$wrapOutline = new CSpan([$data['expression_formula']]);
 
 	$table = new CDiv([
 		$wrapOutline,

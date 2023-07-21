@@ -36,6 +36,7 @@ $trigger_form = (new CForm('post', $url))
 	->setName('trigger_edit_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem((new CVar('parent_discoveryid', $data['parent_discoveryid']))->removeId())
+	->addVar('context', $data['context'])
 	->addVar('expression_full', $data['expression_full'], 'expression-full')
 	->addVar('recovery_expression_full', $data['recovery_expression_full'], 'recovery-expression-full');
 
@@ -298,17 +299,21 @@ $trigger_form_grid
 			_('Menu entry name'),
 			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
 		]),
-		(new CTextBox('url_name', $data['url_name'], false, DB::getFieldLength('triggers', 'url_name')))
+		(new CTextBox('url_name', array_key_exists('url_name', $data) ? $data['url_name'] : '', false,
+			DB::getFieldLength('triggers', 'url_name')
+		))
 			->setAttribute('placeholder', _('Trigger URL'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
 	->addItem([
 		new CLabel(_('Menu entry URL')),
-		(new CTextBox('url', $data['url'], false, DB::getFieldLength('triggers', 'url')))
+		(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '', false,
+			DB::getFieldLength('triggers', 'url')
+		))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
 	->addItem([new CLabel(_('Description')),
-		(new CTextArea('comments', $data['comments']))
+		(new CTextArea('comments', array_key_exists('comments', $data) ? $data['comments'] : ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 	])

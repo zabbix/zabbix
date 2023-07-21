@@ -178,18 +178,19 @@ class CMenuHelper {
 					->setUrl(new CUrl('templates.php'), 'templates.php')
 					->setAliases([
 						'template.dashboard.list', 'template.dashboard.edit', 'items.php?context=template',
-						'trigger.list', 'graphs.php?context=template', 'host_discovery.php?context=template',
-						'disc_prototypes.php?context=template', 'trigger_prototypes.php?context=template',
-						'host_prototypes.php?context=template', 'httpconf.php?context=template'
+						'trigger.list?context=template', 'graphs.php?context=template',
+						'host_discovery.php?context=template', 'disc_prototypes.php?context=template',
+						'trigger.prototype.list?context=template', 'host_prototypes.php?context=template',
+						'httpconf.php?context=template'
 					])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 				? (new CMenuItem(_('Hosts')))
 					->setAction('host.list')
 					->setAliases([
-						'items.php?context=host', 'trigger.list', 'graphs.php?context=host',
+						'items.php?context=host', 'trigger.list?context=host', 'graphs.php?context=host',
 						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',
-						'trigger_prototypes.php?context=host', 'host_prototypes.php?context=host',
+						'trigger.prototype.list?context=host', 'host_prototypes.php?context=host',
 						'httpconf.php?context=host', 'host.edit'
 					])
 				: null,
