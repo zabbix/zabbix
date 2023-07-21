@@ -911,12 +911,12 @@ function getConditionFormula(conditions, evalType) {
 
 					return ui;
 				},
-				stop: function(e, ui) {
-					ui.item.find('>td').removeAttr('width');
-					ui.item.removeAttr('style');
-				},
 				start: function(e, ui) {
 					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				},
+				stop: function(e, ui) {
+					ui.item.find('>td').removeAttr('style');
+					ui.item.removeAttr('style');
 				}
 			}, options.sortableOptions);
 		}

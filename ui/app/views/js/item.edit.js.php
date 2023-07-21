@@ -269,13 +269,13 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		this.updateActionButtons();
 		this.#updateCustomIntervalVisibility();
 		this.#updateValueTypeHintVisibility();
-		this.field.key_button.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
-		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
+		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
-		this.label.interfaceid.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
+		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
+		this.field.interfaceid?.toggleAttribute('aria-required', !interface_optional);
+		this.label.interfaceid?.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
-		this.field.interfaceid.toggleAttribute('aria-required', !interface_optional);
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
 	}
 

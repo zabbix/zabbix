@@ -33,6 +33,7 @@ $scripts = [
 ];
 // TODO: when checkInput fail $data will contain only 'main_block' property, no need to render at all.
 $form = (new CForm('post'))
+	->setId('item-form')
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
 	->addItem(getMessages())
 	->addVar('context', $data['form']['context'])
