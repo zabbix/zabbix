@@ -38,6 +38,7 @@ $form = (new CForm('post'))
 	->addVar('context', $data['form']['context'])
 	->addVar('hostid', $data['form']['hostid'])
 	->addVar('itemid', $data['form']['itemid'] ? $data['form']['itemid'] : null)
+	->addVar('discovered', $data['form']['discovered'])
 	->addVar('templateid', $data['form']['itemid'] ? $data['form']['templateid'] : null);
 
 // Enable form submitting on Enter.
@@ -135,7 +136,7 @@ $tabs = (new CTabView())
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $data['readonly'],
+			'readonly' => $data['form']['discovered'],
 			'show_inherited_tags' => $data['form']['show_inherited_tags'],
 			'source' => 'item',
 			'tabs_id' => 'tabs',

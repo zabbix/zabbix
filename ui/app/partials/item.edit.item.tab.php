@@ -23,14 +23,12 @@
  * @var CView $this
  */
 
-// $discovered = $data['item']['flags'] == ZBX_FLAG_DISCOVERY_CREATED;
 $formgrid = (new CFormGrid())
 	->addItem($data['parent_templates'] ? [
-		// originally set by getItemFormData line 916
 		new CLabel(_('Parent items')),
 		new CFormField($data['templates'])
 	] : null)
-	->addItem($data['discovery_rule'] ? [
+	->addItem($data['discovered'] ? [
 		new CLabel(_('Discovered by')),
 		new CFormField(
 			new CLink($data['discovery_rule']['name'], (new CUrl('disc_prototypes.php'))
@@ -614,23 +612,23 @@ $formgrid
 					->setFooter((new CCol(
 						(new CButtonLink(_('Add')))
 							->addClass('element-table-add')
-							->setEnabled(!$data['readonly'])
+							->setEnabled(!$data['discovered'])
 						))->setColSpan($data['discovered'] ? 3 : 4)
 					),
 				new CTemplateTag('delay-flex-row-tmpl', (new CRow([
 						(new CRadioButtonList('delay_flex[#{rowNum}][type]', ITEM_DELAY_FLEXIBLE))
 							->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 							->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
-							->setReadonly($data['readonly'])
+							->setReadonly($data['discovered'])
 							->setModern(true),
 						[
-							(new CTextBox('delay_flex[#{rowNum}][delay]', '#{delay}', $data['readonly']))
+							(new CTextBox('delay_flex[#{rowNum}][delay]', '#{delay}', $data['discovered']))
 								->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
-							(new CTextBox('delay_flex[#{rowNum}][schedule]', '#{schedule}', $data['readonly']))
+							(new CTextBox('delay_flex[#{rowNum}][schedule]', '#{schedule}', $data['discovered']))
 								->addClass(ZBX_STYLE_DISPLAY_NONE)
 								->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
 						],
-						(new CTextBox('delay_flex[#{rowNum}][period]', '#{period}', $data['readonly']))
+						(new CTextBox('delay_flex[#{rowNum}][period]', '#{period}', $data['discovered']))
 							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
 						(new CButtonLink(_('Remove')))
 							->addClass('element-table-remove')

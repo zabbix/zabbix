@@ -68,6 +68,7 @@ class CControllerItemEdit extends CController {
 			'headers'				=> 'array',
 			'delay_flex'			=> 'array',
 			'show_inherited_tags'	=> 'in 0,1',
+			'discovered'			=> 'in 0,1',
 			'form_refresh'			=> 'in 1'
 		];
 
@@ -321,6 +322,7 @@ class CControllerItemEdit extends CController {
 			'trends_mode' => $item['trends'] == ITEM_NO_STORAGE_VALUE ? ITEM_STORAGE_OFF : ITEM_STORAGE_CUSTOM,
 			'context' => $this->getInput('context'),
 			'show_inherited_tags' => 0,
+			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED ? 1 : 0,
 			'key' => $item['key_']
 		];
 		unset($item['key_']);
@@ -482,6 +484,7 @@ class CControllerItemEdit extends CController {
 			'description' => DB::getDefault('items', 'description'),
 			'status' => DB::getDefault('items', 'status'),
 			'show_inherited_tags' => 0,
+			'discovered' => 0,
 			'tags' => [],
 			'preprocessing' => [],
 			'headers' => [],
