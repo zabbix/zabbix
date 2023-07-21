@@ -2112,7 +2112,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/trapper/Makefile
 	src/zabbix_server/vmware/Makefile
 	man/Makefile
-	ui/Makefile
 	])
 AC_OUTPUT
 
