@@ -18,7 +18,7 @@ libzbxexpression_a_SOURCES = \
 	lldfunc.c \
 	macrofunc.c \
 	macrofunc.h \
-	names.c \
+	expression_names.c \
 	triggerfunc.c
 
 libzbxexpression_a_CFLAGS = \
