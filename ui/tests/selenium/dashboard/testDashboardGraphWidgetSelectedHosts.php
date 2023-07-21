@@ -371,7 +371,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	}
 
 	/**
-	 * Function checks using arrow keys if Graph Widget is correctly selecting and displaying hosts, their items
+	 * Function checks using arrow keys and elements if Graph Widget is correctly selecting and displaying hosts, their items
 	 * in suggestion list.
 	 *
 	 * @dataProvider getDatasetData
@@ -395,7 +395,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		}
 
 		$form->fill($field_data);
-		$this->checkSuggestionListCommon($data, $form);
+		$this->checkSuggestionListCommon($data['expected'], $form);
 
 		if ($data['Arrow Key'] === 'yes') {
 			$this->checkSuggestionListWithKeyboardNavigation($data['Data set'], $data, $form);
@@ -404,62 +404,31 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 
 	private function checkSuggestionListCommon ($data, $form) {
 		$this->query('class', 'multiselect-suggest')->waitUntilVisible();
-		$this->assertEquals($data['expected'], $form->getField('xpath://div[@id="ds_0_hosts_"]/..')->getSuggestions());
+		$this->assertEquals($data, $form->getField('xpath://div[@id="ds_0_hosts_"]/..')->getSuggestions());
 	}
 
 	private function checkSuggestionListWithKeyboardNavigation($data_set, $data, $form) {
 		$merged_text = [];
-		/**
-		 * In case created API data under section "Data set" there's more than two or exactly two array keys,
-		 * assign value to the variable $id, which is later used in the query to get text.
-		 */
 		$id = (count($data_set) >= 2) ? 'items' : 'hosts';
-		$get_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
-				->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
-
-		// Count words in text, accept that numbers are words.
-		$count = str_word_count($get_text, 1, '1234567890');
-
-		// Check if third key in string is '20', after that assign index.
-		$word_index = ($count[2] === '20') ? 2 : 0;
-
-		/**
-		 * Since suggestion window contains maximum 20 matches, and the first one is the one which is written,
-		 * extract it from the found matches.
-		 */
-		$found_matches = intval($count[$word_index]) - 1;
-
-		if ($found_matches >= 20) {
-			$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
+		for ($x = 0; $x < (count($data['expected'])); $x++) {
+			$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
+			$option = ($id === 'items') ? 'Graph' : 'widget';
+			$suggestion_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
+					->one()->waitUntilTextPresent($option)->getText();
+			array_push($merged_text, $suggestion_text);
 		}
-		else {
-			/**
-			 * The cycle uses count of found matches, in each iteration on frontend arrow key down is pressed
-			 * in order to read the text from suggestion window, each text read is pushed into array, which is compared
-			 * with expected data from data provider getCheckDependingData.
-			 */
-			for ($x = 0; $x < $found_matches; $x++) {
-				$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
-				$option = ($id === 'items') ? 'Graph' : 'widget';
-				$suggestion_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
-						->one()->waitUntilTextPresent($option)->getText();
-				array_push($merged_text, $suggestion_text);
-			}
-			$this->assertEquals($data['expected'], $merged_text);
-		}
+		$this->assertEquals($data['expected'], $merged_text);
 
 		if (array_key_exists('Focus', $data)) {
 			$this->page->pressKey(WebDriverKeys::ENTER);
 			$this->assertTrue($this->query('xpath://div[@id="ds_0_items_"]//ul[@class="multiselect-list"]//span[@title="'.
-				$data['Focus'].'"]')->exists()
+					$data['Focus'].'"]')->exists()
 			);
 		}
 
 		if (array_key_exists('Not Present', $data)) {
 			$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'item']);
-			$comperable = array_slice($data['expected'],0,9);
-			$this->query('class', 'multiselect-suggest')->waitUntilVisible();
-			$this->assertEquals($comperable, $form->getField('xpath://div[@id="ds_0_hosts_"]/..')->getSuggestions());
+			$this->checkSuggestionListCommon(array_slice($data['expected'],0,9), $form);
 		}
 	}
 }
