@@ -44,16 +44,17 @@ window.template_edit_popup = new class {
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
 
-		this.#initMacrosTab();
-		this.#initTemplateTab();
 		this.#initActions();
+		this.#initTemplateTab();
+		this.#initMacrosTab();
+
 		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	#initActions() {
 		this.form.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-edit-linked-template')) {
-				this.#editLinkedTemplate({templateid: e.target.dataset.templateid});
+				this.#editLinkedTemplate(e.target.dataset.templateid);
 			}
 			else if (e.target.classList.contains('js-unlink')) {
 				e.target.closest('tr').remove();
@@ -85,77 +86,20 @@ window.template_edit_popup = new class {
 		template_name.dispatchEvent(new Event('input'));
 	}
 
-	#unlinkAndClearTemplate(templateid) {
-		const clear_template = document.createElement('input');
+	#initTemplateTab() {
+		const $groups_ms = $('#template_groups_, form[name="templates-form"]');
+		const $template_ms = $('#template_add_templates_, form[name="templates-form"]');
 
-		clear_template.type = 'hidden';
-		clear_template.name = 'clear_templates[]';
-		clear_template.value = templateid;
-		this.form.appendChild(clear_template);
+		$template_ms.on('change', () => {
+			$template_ms.multiSelect('setDisabledEntries', this.#getLinkedTemplates().concat(this.#getNewTemplates()));
+		});
 
-		$('#template_add_templates_, form[name="templates-form"]').trigger('change');
-	}
-
-	#editLinkedTemplate(data) {
-		const form_fields = getFormFields(this.form);
-		const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
-
-		if (!diff) {
-			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-				return;
-			}
-		}
-
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'template.edit');
-
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				response.buttons.push({
-					'title': t('Cancel'),
-					'class': 'btn-alt js-cancel',
-					'cancel': true,
-					'action': function() {}
-				});
-
-				const new_data = {
-					content: response.body,
-					buttons: response.buttons,
-					title: response.header,
-					script_inline: response.script_inline
-				};
-
-				this.overlay.setProperties(new_data);
-			})
-			.catch((exception) =>  {
-				clearMessages();
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title);
-
-				addMessage(message_box);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+		$groups_ms.on('change', () => {
+			$groups_ms.multiSelect('setDisabledEntries',
+				[...document.querySelectorAll('[name^="template_groups["]')]
+					.map((input) => input.value)
+			);
+		});
 	}
 
 	#initMacrosTab() {
@@ -217,21 +161,131 @@ window.template_edit_popup = new class {
 		}
 	}
 
-	#initTemplateTab() {
-		const $groups_ms = $('#template_groups_, form[name="templates-form"]');
-		const $template_ms = $('#template_add_templates_, form[name="templates-form"]');
+	#editLinkedTemplate(templateid) {
+		const form_fields = getFormFields(this.form);
+		const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
 
+		if (!diff) {
+			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+				return;
+			}
+		}
 
-		$template_ms.on('change', () => {
-			$template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates());
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'template.edit');
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({templateid: templateid})
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				response.buttons.push({
+					'title': t('Cancel'),
+					'class': 'btn-alt js-cancel',
+					'cancel': true,
+					'action': function() {}
+				});
+
+				const new_data = {
+					content: response.body,
+					buttons: response.buttons,
+					title: response.header,
+					script_inline: response.script_inline
+				};
+
+				this.overlay.setProperties(new_data);
+			})
+			.catch((exception) =>  {
+				clearMessages();
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title);
+
+				addMessage(message_box);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
+	#unlinkAndClearTemplate(templateid) {
+		const clear_template = document.createElement('input');
+
+		clear_template.type = 'hidden';
+		clear_template.name = 'clear_templates[]';
+		clear_template.value = templateid;
+		this.form.appendChild(clear_template);
+
+		$('#template_add_templates_, form[name="templates-form"]').trigger('change');
+	}
+
+	/**
+	 * Helper to get linked template IDs as an array.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getLinkedTemplates() {
+		const linked_templateids = [];
+
+		this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+			linked_templateids.push(input.value);
 		});
 
-		$groups_ms.on('change', () => {
-			$groups_ms.multiSelect('setDisabledEntries',
-				[...document.querySelectorAll('[name^="template_groups["]')]
-					.map((input) => input.value)
-			);
-		});
+		return linked_templateids;
+	}
+
+	/**
+	 * Helper to get added template IDs as an array.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getNewTemplates() {
+		const $template_multiselect = $('#template_add_templates_, form[name="templates-form"]');
+		const templateids = [];
+
+		// Readonly forms don't have multiselect.
+		if ($template_multiselect.length) {
+			$template_multiselect.multiSelect('getData').forEach(template => {
+				templateids.push(template.id);
+			});
+		}
+
+		return templateids;
+	}
+
+	/**
+	 * Collects IDs selected in "Add templates" multiselect.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getAddTemplates() {
+		const $ms = $('#template_add_templates_, form[name="templates-form"]');
+		let templateids = [];
+
+		// Readonly forms don't have multiselect.
+		if ($ms.length) {
+			// Collect IDs from Multiselect.
+			$ms.multiSelect('getData').forEach(function (template) {
+				templateids.push(template.id);
+			});
+		}
+
+		return templateids;
 	}
 
 	clone() {
@@ -249,19 +303,8 @@ window.template_edit_popup = new class {
 		});
 	}
 
-	#prepareFields(parameters) {
-		const mappings = [
-			{from: 'template_groups', to: 'groups'},
-			{from: 'template_add_templates', to: 'add_templates'},
-			{from: 'show_inherited_template_macros', to: 'show_inherited_macros'}
-		];
-
-		for (const mapping of mappings) {
-			parameters[mapping.to] = parameters[mapping.from];
-			delete parameters[mapping.from];
-		}
-
-		return parameters;
+	deleteAndClear() {
+		this.delete(true);
 	}
 
 	delete(clear = false) {
@@ -284,10 +327,6 @@ window.template_edit_popup = new class {
 		});
 	}
 
-	deleteAndClear() {
-		this.delete(true);
-	}
-
 	submit() {
 		const fields = getFormFields(this.form);
 
@@ -308,6 +347,21 @@ window.template_edit_popup = new class {
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
+	}
+
+	#prepareFields(parameters) {
+		const mappings = [
+			{from: 'template_groups', to: 'groups'},
+			{from: 'template_add_templates', to: 'add_templates'},
+			{from: 'show_inherited_template_macros', to: 'show_inherited_macros'}
+		];
+
+		for (const mapping of mappings) {
+			parameters[mapping.to] = parameters[mapping.from];
+			delete parameters[mapping.from];
+		}
+
+		return parameters;
 	}
 
 	#trimFields(fields) {
@@ -399,68 +453,5 @@ window.template_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
-	}
-
-	/**
-	 * Collects IDs selected in "Add templates" multiselect.
-	 *
-	 * @return {array}  Templateids.
-	 */
-	#getAddTemplates() {
-		const $ms = $('#template_add_templates_, form[name="templates-form"]');
-		let templateids = [];
-
-		// Readonly forms don't have multiselect.
-		if ($ms.length) {
-			// Collect IDs from Multiselect.
-			$ms.multiSelect('getData').forEach(function (template) {
-				templateids.push(template.id);
-			});
-		}
-
-		return templateids;
-	}
-
-	/**
-	 * Collects ids of currently active (linked + new) templates.
-	 *
-	 * @return {array}  Templateids.
-	 */
-	#getAllTemplates() {
-		return this.#getLinkedTemplates().concat(this.#getNewTemplates());
-	}
-
-	/**
-	 * Helper to get linked template IDs as an array.
-	 *
-	 * @return {array}  Templateids.
-	 */
-	#getLinkedTemplates() {
-		const linked_templateids = [];
-
-		this.form.querySelectorAll('[name^="templates["').forEach((input) => {
-			linked_templateids.push(input.value);
-		});
-
-		return linked_templateids;
-	}
-
-	/**
-	 * Helper to get added template IDs as an array.
-	 *
-	 * @return {array}  Templateids.
-	 */
-	#getNewTemplates() {
-		const $template_multiselect = $('#template_add_templates_, form[name="templates-form"]');
-		const templateids = [];
-
-		// Readonly forms don't have multiselect.
-		if ($template_multiselect.length) {
-			$template_multiselect.multiSelect('getData').forEach(template => {
-				templateids.push(template.id);
-			});
-		}
-
-		return templateids;
 	}
 }
