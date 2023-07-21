@@ -545,16 +545,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			unset($metric['items']);
 
-			if ($units_config['units_show'] == PIE_CHART_SHOW_UNITS_ON) {
-				if ($units_config['units_value'] !== '' && isset($metric['item'])) {
-					$metric['item']['units'] = $units_config['units_value'];
-				}
-				else {
-					$metric['item']['units'] = $metric['units'];
-				}
+			if ($units_config['units_show'] == PIE_CHART_SHOW_UNITS_ON && $units_config['units_value'] !== ''
+					&& isset($metric['item'])) {
+				$metric['item']['units'] = $units_config['units_value'];
 			}
 			else {
-				$metric['item']['units'] = '';
+				$metric['item']['units'] = $metric['units'];
 			}
 
 			if ($set_default_unit && isset($metric['item'])) {
