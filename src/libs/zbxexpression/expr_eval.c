@@ -64,9 +64,9 @@ typedef struct
 }
 zbx_expression_query_many_t;
 
-ZBX_PTR_VECTOR_IMPL(expression_group, zbx_expression_group_t *)
-ZBX_PTR_VECTOR_IMPL(expression_item, zbx_expression_item_t *)
-ZBX_PTR_VECTOR_IMPL(expression_query, zbx_expression_query_t *)
+ZBX_PTR_VECTOR_IMPL(expression_group_ptr, zbx_expression_group_t *)
+ZBX_PTR_VECTOR_IMPL(expression_item_ptr, zbx_expression_item_t *)
+ZBX_PTR_VECTOR_IMPL(expression_query_ptr, zbx_expression_query_t *)
 
 static void	expression_query_free_one(zbx_expression_query_one_t *query)
 {
@@ -206,7 +206,7 @@ static zbx_expression_group_t	*expression_get_group(zbx_expression_eval_t *eval,
 	group->name = zbx_strdup(NULL, name);
 	zbx_vector_uint64_create(&group->hostids);
 	zbx_dc_get_hostids_by_group_name(name, &group->hostids);
-	zbx_vector_expression_group_append(&eval->groups, group);
+	zbx_vector_expression_group_ptr_append(&eval->groups, group);
 
 	return group;
 }
@@ -239,7 +239,7 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 	item->itemid = itemid;
 	zbx_vector_item_tag_create(&item->tags);
 	zbx_dc_get_item_tags(itemid, &item->tags);
-	zbx_vector_expression_item_append(&eval->itemtags, item);
+	zbx_vector_expression_item_ptr_append(&eval->itemtags, item);
 
 	return item;
 }
@@ -1957,9 +1957,9 @@ void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_co
 	zbx_vector_str_create(&filters);
 	zbx_eval_extract_item_refs(ctx, &filters);
 
-	zbx_vector_expression_query_create(&eval->queries);
-	zbx_vector_expression_group_create(&eval->groups);
-	zbx_vector_expression_item_create(&eval->itemtags);
+	zbx_vector_expression_query_ptr_create(&eval->queries);
+	zbx_vector_expression_group_ptr_create(&eval->groups);
+	zbx_vector_expression_item_ptr_create(&eval->itemtags);
 	zbx_vector_dc_item_create(&eval->dcitem_refs);
 
 	eval->ctx = ctx;
@@ -1972,7 +1972,7 @@ void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_co
 	for (i = 0; i < filters.values_num; i++)
 	{
 		query = expression_create_query(filters.values[i]);
-		zbx_vector_expression_query_append(&eval->queries, query);
+		zbx_vector_expression_query_ptr_append(&eval->queries, query);
 
 		if (ZBX_ITEM_QUERY_UNSET == query->flags)
 		{
@@ -2013,14 +2013,14 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 
 	zbx_vector_dc_item_destroy(&eval->dcitem_refs);
 
-	zbx_vector_expression_item_clear_ext(&eval->itemtags, expression_item_free);
-	zbx_vector_expression_item_destroy(&eval->itemtags);
+	zbx_vector_expression_item_ptr_clear_ext(&eval->itemtags, expression_item_free);
+	zbx_vector_expression_item_ptr_destroy(&eval->itemtags);
 
-	zbx_vector_expression_group_clear_ext(&eval->groups, expression_group_free);
-	zbx_vector_expression_group_destroy(&eval->groups);
+	zbx_vector_expression_group_ptr_clear_ext(&eval->groups, expression_group_free);
+	zbx_vector_expression_group_ptr_destroy(&eval->groups);
 
-	zbx_vector_expression_query_clear_ext(&eval->queries, expression_query_free);
-	zbx_vector_expression_query_destroy(&eval->queries);
+	zbx_vector_expression_query_ptr_clear_ext(&eval->queries, expression_query_free);
+	zbx_vector_expression_query_ptr_destroy(&eval->queries);
 }
 
 /******************************************************************************

@@ -14500,7 +14500,7 @@ static void	zbx_gather_item_tags(ZBX_DC_ITEM *item, zbx_vector_item_tag_t *item_
 {
 	for (int i = 0; i < item->tags.values_num; i++)
 	{
-		zbx_dc_item_tag_t	*dc_tag = (zbx_dc_item_tag_t *)item->tags.values[i];
+		zbx_dc_item_tag_t	*dc_tag = item->tags.values[i];
 		zbx_item_tag_t		*tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
 
 		tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);

@@ -71,7 +71,7 @@ typedef struct
 }
 zbx_expression_group_t;
 
-ZBX_PTR_VECTOR_DECL(expression_group, zbx_expression_group_t *)
+ZBX_PTR_VECTOR_DECL(expression_group_ptr, zbx_expression_group_t *)
 
 /* item - tags cache */
 typedef struct
@@ -81,7 +81,7 @@ typedef struct
 }
 zbx_expression_item_t;
 
-ZBX_PTR_VECTOR_DECL(expression_item, zbx_expression_item_t *)
+ZBX_PTR_VECTOR_DECL(expression_item_ptr, zbx_expression_item_t *)
 
 /* expression item query */
 typedef struct
@@ -100,16 +100,16 @@ typedef struct
 }
 zbx_expression_query_t;
 
-ZBX_PTR_VECTOR_DECL(expression_query, zbx_expression_query_t *)
+ZBX_PTR_VECTOR_DECL(expression_query_ptr, zbx_expression_query_t *)
 
 typedef struct
 {
-	zbx_eval_context_t		*ctx;
-	zbx_vector_expression_query_t	queries;
-	int				mode;
-	int				one_num;
-	int				many_num;
-	zbx_uint64_t			hostid;
+	zbx_eval_context_t			*ctx;
+	zbx_vector_expression_query_ptr_t	queries;
+	int					mode;
+	int					one_num;
+	int					many_num;
+	zbx_uint64_t				hostid;
 
 	/* cache to resolve one item queries */
 	zbx_host_key_t		*hostkeys;
@@ -117,12 +117,12 @@ typedef struct
 	int			*errcodes_hk;
 
 	/* cache to resolve many item queries */
-	zbx_vector_expression_group_t	groups;
-	zbx_vector_expression_item_t	itemtags;
-	zbx_vector_dc_item_t		dcitem_refs;
-	zbx_dc_item_t			*dcitems;
-	int				*errcodes;
-	int				dcitems_num;
+	zbx_vector_expression_group_ptr_t	groups;
+	zbx_vector_expression_item_ptr_t	itemtags;
+	zbx_vector_dc_item_t			dcitem_refs;
+	zbx_dc_item_t				*dcitems;
+	int					*errcodes;
+	int					dcitems_num;
 }
 zbx_expression_eval_t;
 
