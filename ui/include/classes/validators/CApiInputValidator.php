@@ -2721,6 +2721,21 @@ class CApiInputValidator {
 	 */
 
 	private static function validateHostAddress($rule, &$data, $path, &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
 		if (self::validateIp($rule, $data, $path, $error) || self::validateDns($rule, $data, $path, $error)) {
 			return true;
 		}

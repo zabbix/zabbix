@@ -44,8 +44,7 @@ class CProxy extends CApiService {
 	 */
 	public function get(array $options = []) {
 		$output_fields = ['proxyid', 'name', 'mode', 'description', 'lastaccess', 'tls_connect', 'tls_accept',
-			'tls_issuer', 'tls_subject', 'allowed_addresses', 'version', 'compatibility', 'address',
-			'port'
+			'tls_issuer', 'tls_subject', 'allowed_addresses', 'version', 'compatibility', 'address', 'port'
 		];
 
 		/*

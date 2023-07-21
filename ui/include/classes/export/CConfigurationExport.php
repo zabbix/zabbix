@@ -629,27 +629,26 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function gatherProxies(array $hosts) {
-		$proxy_hostids = [];
-		$db_proxies = [];
+		$proxyids = [];
 
 		foreach ($hosts as $host) {
-			if ($host['proxy_hostid'] != 0) {
-				$proxy_hostids[$host['proxy_hostid']] = true;
+			if ($host['proxyid'] != 0) {
+				$proxyids[$host['proxyid']] = true;
 			}
 		}
 
-		if ($proxy_hostids) {
-			$db_proxies = DBfetchArray(DBselect(
-				'SELECT h.hostid,h.host'.
-				' FROM hosts h'.
-				' WHERE '.dbConditionInt('h.hostid', array_keys($proxy_hostids))
-			));
-			$db_proxies = zbx_toHash($db_proxies, 'hostid');
-		}
+		$db_proxies = $proxyids
+			? DBfetchArray(DBselect(
+				'SELECT p.proxyid,p.name'.
+				' FROM proxy p'.
+				' WHERE '.dbConditionId('p.proxyid', array_keys($proxyids))
+			))
+			: [];
+		$db_proxies = array_column($db_proxies, null, 'proxyid');
 
 		foreach ($hosts as &$host) {
-			$host['proxy'] = ($host['proxy_hostid'] != 0 && array_key_exists($host['proxy_hostid'], $db_proxies))
-				? ['name' => $db_proxies[$host['proxy_hostid']]['host']]
+			$host['proxy'] = ($host['proxyid'] != 0 && array_key_exists($host['proxyid'], $db_proxies))
+				? ['name' => $db_proxies[$host['proxyid']]['name']]
 				: [];
 		}
 		unset($host);
