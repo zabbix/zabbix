@@ -34,12 +34,14 @@
  *                                                                            *
  * Purpose: expand discovery macro in expression.                             *
  *                                                                            *
- * Parameters: data    - [IN/OUT] expression containing lld macro             *
- *             token   - [IN/OUT] token with lld macro location data          *
- *             flags   - [IN] flags passed to subtitute_discovery_macros()    *
- *                            function                                        *
- *             jp_row  - [IN] discovery data                                  *
- *             esc     - [IN] used in autoquoting for trigger prototypes      *
+ * Parameters: data            - [IN/OUT] expression containing lld macro     *
+ *             token           - [IN/OUT] token with lld macro location data  *
+ *             flags           - [IN] flags passed to                         *
+ *                                    subtitute_discovery_macros() function   *
+ *             jp_row          - [IN] discovery data                          *
+ *             lld_macro_paths - [IN]                                         *
+ *             esc             - [IN] used in autoquoting for trigger         *
+ *                                    prototypes                              *
  *                                                                            *
  ******************************************************************************/
 static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
