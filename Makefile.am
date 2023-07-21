@@ -228,6 +228,6 @@ ui/sbom.xml:
 	(cd ${@D} && \
 		composer CycloneDX:make-sbom --omit=dev --no-interaction \
 		--spec-version=1.4 \
-		--output-reproducible --output-format=XML --output-file="$@")
+		--output-reproducible --output-format=XML --output-file="${@F}")
 
 .PHONY: test tests clean modules_build modules_clean sbom sbom-ui
