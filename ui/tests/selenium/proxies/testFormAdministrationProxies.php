@@ -29,11 +29,11 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  *
  * @onBefore prepareProxyData
  *
- * @backup hosts
+ * @backup proxy
  */
 class testFormAdministrationProxies extends CWebTest {
 
-	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
+	private $sql = 'SELECT * FROM proxy ORDER BY proxyid';
 
 	private static $update_proxy = 'Active proxy for update';
 	private static $change_active_proxy = 'Active proxy for refresh cancel simple update';
@@ -56,15 +56,15 @@ class testFormAdministrationProxies extends CWebTest {
 	public function prepareProxyData() {
 		CDataHelper::call('proxy.create', [
 			[
-				'host' => self::$update_proxy,
-				'status' => 5,
+				'name' => self::$update_proxy,
+				'mode' => PROXY_MODE_ACTIVE,
 				'description' => 'Description for update',
 				'tls_connect' => 1,
 				'tls_accept'=> 1
 			],
 			[
-				'host' => self::$change_active_proxy,
-				'status' => 5,
+				'name' => self::$change_active_proxy,
+				'mode' => PROXY_MODE_ACTIVE,
 				'description' => 'Active description for refresh',
 				'tls_connect' => 1,
 				'tls_accept'=> 7,
@@ -72,11 +72,11 @@ class testFormAdministrationProxies extends CWebTest {
 				'tls_psk' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
 				'tls_issuer' => 'activerefreshpsk',
 				'tls_subject' => 'activerefreshpsk',
-				'proxy_address' => '127.0.1.2'
+				'allowed_addresses' => '127.0.1.2'
 			],
 			[
-				'host' => self::$change_passive_proxy,
-				'status' => 6,
+				'name' => self::$change_passive_proxy,
+				'mode' => PROXY_MODE_PASSIVE,
 				'description' => '_Passive description for refresh',
 				'tls_connect' => 4,
 				'tls_accept'=> 1,

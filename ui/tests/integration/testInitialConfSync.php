@@ -1455,25 +1455,21 @@ class testInitialConfSync extends CIntegrationTest
 	private function createProxies()
 	{
 		$response = $this->call('proxy.create', [
-			'host' => 'ProxyA',
-			'status' => PROXY_MODE_ACTIVE,
+			'name' => 'ProxyA',
+			'mode' => PROXY_MODE_ACTIVE,
 			'hosts' => []
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 		self::$proxyid_active = $response['result']['proxyids'][0];
 
 		$response = $this->call('proxy.create', [
-			'host' => 'ProxyP',
-			'status' => PROXY_MODE_PASSIVE,
+			'name' => 'ProxyP',
+			'mode' => PROXY_MODE_PASSIVE,
 			'hosts' => [],
-			'interface' => [
-				"ip" => "127.0.0.1",
-				"dns" => "",
-				"useip" => "1",
-				"port" => "10099"
-			]
+			'address' => '127.0.0.1',
+			'port' => '10099'
 		]);
-		$this->assertArrayHasKey("proxyids", $response['result']);
+		$this->assertArrayHasKey('proxyids', $response['result']);
 		self::$proxyid_passive = $response['result']['proxyids'][0];
 	}
 
@@ -1481,21 +1477,17 @@ class testInitialConfSync extends CIntegrationTest
 	{
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid_active,
-			'proxy_address' => "127.9.9.9"
+			'allowed_addresses' => '127.9.9.9'
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 
 		$response = $this->call('proxy.update', [
 			'proxyid' => self::$proxyid_passive,
-			'host' => "ProxyP1",
-			'interface' => [
-				"ip" => "127.1.30.2",
-				"dns" => "",
-				"useip" => "1",
-				"port" => "10299"
-			]
+			'name' => 'ProxyP1',
+			'address' => '127.1.30.2',
+			'port' => '10299'
 		]);
-		$this->assertArrayHasKey("proxyids", $response['result']);
+		$this->assertArrayHasKey('proxyids', $response['result']);
 	}
 
 	private function createGlobalMacros()

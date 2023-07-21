@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageQueueOverviewByProxy extends CLegacyWebTest {
 	public static function allProxies() {
-		return CDBHelper::getDataProvider("select * from hosts where status in (".PROXY_MODE_ACTIVE.','.PROXY_MODE_PASSIVE.") order by hostid");
+		return CDBHelper::getDataProvider("select * from proxy where mode in (".PROXY_MODE_ACTIVE.','.PROXY_MODE_PASSIVE.") order by proxyid");
 	}
 
 	/**
