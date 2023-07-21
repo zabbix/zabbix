@@ -27,7 +27,7 @@ AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
 AC_PROG_MAKE_SET
 
-AM_CONFIG_HEADER(include/config.h)
+AC_CONFIG_HEADERS(include/config.h)
 
 AC_CANONICAL_HOST
 
@@ -45,15 +45,6 @@ dnl *                                                               *
 dnl *                   Checks for header files                     *
 dnl *                                                               *
 dnl *****************************************************************
-
-m4_warn([obsolete],
-[The preprocessor macro `STDC_HEADERS' is obsolete.
-  Except in unusual embedded environments, you can safely include all
-  ISO C90 headers unconditionally.])dnl
-# Autoupdate added the next two lines to ensure that your configure
-# script's behavior did not change.  They are probably safe to remove.
-AC_CHECK_INCLUDES_DEFAULT
-AC_PROG_EGREP
 
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
@@ -880,16 +871,6 @@ dnl *                 Checks for library functions                  *
 dnl *                                                               *
 dnl *****************************************************************
 
-m4_warn([obsolete],
-[your code may safely assume C89 semantics that RETSIGTYPE is void.
-Remove this warning and the `AC_CACHE_CHECK' when you adjust the code.])dnl
-AC_CACHE_CHECK([return type of signal handlers],[ac_cv_type_signal],[AC_COMPILE_IFELSE(
-[AC_LANG_PROGRAM([#include <sys/types.h>
-#include <signal.h>
-],
-		 [return *(signal (0, 0)) (0) == 1;])],
-		   [ac_cv_type_signal=int],
-		   [ac_cv_type_signal=void])])
 AC_DEFINE_UNQUOTED([RETSIGTYPE],[$ac_cv_type_signal],[Define as the return type of signal handlers
 		    (`int' or `void').])
 
