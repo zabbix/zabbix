@@ -24,7 +24,7 @@
  */
 
 ?><script>
-((config) => {
+(() => {
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_DELAY_SCHEDULING = <?= ITEM_DELAY_SCHEDULING ?>;
@@ -39,7 +39,7 @@ const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 
-(new class {
+window.item_edit_form = new class {
 
 	init({testable_item_types, host_interfaces, interface_types, field_switches, value_type_keys,
 			type_with_key_select, form_data
@@ -142,7 +142,7 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 			class: 'modal-popup position-middle',
 			content: jQuery('<span>').html(body),
 			buttons: [{
-				title: ('Ok'),
+				title: t('Ok'),
 				class: 'btn-alt',
 				focused: true,
 				action: function() {}
@@ -205,24 +205,9 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 
 		// Preprocessing tab events.
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
-
-		// Form actions.
-		this.footer.addEventListener('click', e => {
-			const classList = e.target.classList;
-
-			if (classList.contains('js-update-item')) {
-				this.updateItem();
-			}
-			else if (classList.contains('js-clone-item')) {
-				this.cloneItem();
-			}
-			else if (classList.contains('js-create-item')) {
-				this.createItem();
-			}
-		});
 	}
 
-	cloneItem() {
+	clone() {
 		// TODO: replace title, buttons of overlay, remove id, remove 'latest data'. do not make additional request
 		const action = 'item.edit';
 		const form_refresh = document.createElement('input');
@@ -237,26 +222,19 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		reloadPopup(this.form, action);
 	}
 
-	createItem() {
+	create() {
 		const action = 'item.create';
 		console.warn('createItem not implemented');
 	}
 
-	updateItem() {
+	update() {
 		const action = 'item.update';
+
 		console.warn('updateItem not implemented');
 	}
 
-	isTestableItem() {
-		const key = this.field.key.value;
-		const type = parseInt(this.field.type.value, 10);
-
-		return (type != ITEM_TYPE_SIMPLE || (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping'))
-			|| this.testable_item_types.indexOf(type) != -1;
-	}
-
 	updateActionButtons() {
-		this.footer.querySelector('.js-test-item').toggleAttribute('disabled', !this.isTestableItem());
+		this.footer.querySelector('.js-test-item').toggleAttribute('disabled', !this.#isTestableItem());
 	}
 
 	updateFieldsVisibility() {
@@ -277,6 +255,14 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
+	}
+
+	#isTestableItem() {
+		const key = this.field.key.value;
+		const type = parseInt(this.field.type.value, 10);
+
+		return (type != ITEM_TYPE_SIMPLE || (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping'))
+			|| this.testable_item_types.indexOf(type) != -1;
 	}
 
 	#updateCustomIntervalVisibility() {
@@ -387,15 +373,5 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		reloadPopup(this.form, 'item.edit');
 	}
 
-}).init(config);
-})(<?= json_encode([
-	'field_switches' => $data['field_switches'],
-	'form_data' => $data['form_data'],
-	'host_interfaces' => $data['host_interfaces'],
-	'interface_types' => $data['interface_types'],
-	'testable_item_types' => $data['testable_item_types'],
-	'type_with_key_select' => $data['type_with_key_select'],
-	'value_type_keys' => $data['value_type_keys']
-]) ?>);
-
-// function updateItemFormElements(){}// common.item.edit.js.php TODO: remove when prototype will be moved to popup
+}
+})();

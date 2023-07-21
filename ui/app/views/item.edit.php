@@ -49,41 +49,62 @@ if ($data['form']['itemid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update-item',
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'item_edit_form.update()'
 		],
 		[
 			'title' => _('Clone'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone-item']),
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => false,
+			'action' => 'item_edit_form.clone('.json_encode([
+				'title' => _('New item'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'trigger_edit_popup.create();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => ZBX_STYLE_BTN_ALT,
+						'cancel' => true,
+						'action' => ''
+					]
+				]
+			]).')'
 		],
 		[
 			'title' => _('Execute now'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-execute-item']),
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'throw "Not implemented"'
 		],
 		[
 			'title' => _('Test'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'throw "Not implemented"'
 		],
 		[
 			'title' => _('Clear history and trends'),
 			'confirmation' => _('History clearing can take a long time. Continue?'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clear-item']),
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'throw "Not implemented"'
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected item?'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete-item']),
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'throw "Not implemented"'
 		]
 	];
 }
@@ -91,15 +112,16 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-create-item',
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'trigger_edit_popup.create();'
 		],
 		[
 			'title' => _('Test'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
-			'isSubmit' => true
+			'isSubmit' => true,
+			'action' => 'throw "Not implemented"'
 		]
 	];
 }
@@ -161,22 +183,25 @@ if (!$data['form_refresh']) {
 	$tabs->setSelected(0);
 }
 
-$form->addItem($tabs);
+$form
+	->addItem($tabs)
+	->addItem((new CScriptTag('item_edit_form.init('.json_encode([
+			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
+			'form_data' => $data['form'],
+			'host_interfaces' => array_values($data['host']['interfaces']),
+			'interface_types' => $data['interface_types'],
+			'readonly' => $data['readonly'],
+			'testable_item_types' => $data['testable_item_types'],
+			'type_with_key_select' => $type_with_key_select,
+			'value_type_keys' => $data['value_type_keys']
+		]).');'))->setOnDocumentReady()
+	);
 $output = [
 	'header' => $data['form']['itemid'] ? _('Item') : _('New item'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_ITEM_EDIT),
 	'body' => $form->toString().implode('', $scripts),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php', [
-		'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
-		'form_data' => $data['form'],
-		'host_interfaces' => array_values($data['host']['interfaces']),
-		'interface_types' => $data['interface_types'],
-		'readonly' => $data['readonly'],
-		'testable_item_types' => $data['testable_item_types'],
-		'type_with_key_select' => $type_with_key_select,
-		'value_type_keys' => $data['value_type_keys']
-	])
+	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php')
 ];
 
 // TODO: remove
