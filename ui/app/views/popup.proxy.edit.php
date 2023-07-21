@@ -40,7 +40,7 @@ $interface = (new CTable())
 	->setHeader([_('Address'), _('Port')])
 	->addRow([
 		(new CTextBox('address', $data['form']['address'], false, DB::getFieldLength('proxy', 'address')))
-			->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
+			->setWidth(336),
 		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->setAriaRequired()
