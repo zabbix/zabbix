@@ -1061,7 +1061,7 @@ static int	get_function_by_name(const char *name, size_t len)
  * Parameters: values      - [IN] vector containing history values            *
  *             value_type  - [IN] type of values. Only float/uint64 values    *
  *                                are supported.                              *
- *             result      - [OUT] resulting value                            *
+ *             result      - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1093,7 +1093,7 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
  * Parameters: values      - [IN] vector containing history values            *
  *             value_type  - [IN] type of values. Only float/uint64 values    *
  *                                are supported.                              *
- *             result      - [OUT] resulting value                            *
+ *             result      - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1125,7 +1125,7 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
  * Parameters: values      - [IN] vector containing history values            *
  *             value_type  - [IN] type of values. Only float/uint64 values    *
  *                                are supported.                              *
- *             result      - [OUT] resulting value                            *
+ *             result      - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1153,7 +1153,7 @@ static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int v
  * Parameters: values      - [IN] vector containing history values            *
  *             value_type  - [IN] type of values. Only float/uint64 values    *
  *                                are supported.                              *
- *             result      - [OUT] resulting value                            *
+ *             result      - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1169,7 +1169,7 @@ static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int v
  * Parameters: values      - [IN] vector containing history values            *
  *             value_type  - [IN] type of values. Only float/uint64 values    *
  *                                are supported.                              *
- *             result      - [OUT] resulting value                            *
+ *             result      - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_count(zbx_vector_history_record_t *values, double *result)
@@ -1182,9 +1182,8 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, dou
  * Purpose: calculate the last (newest) value in value vector.                *
  *                                                                            *
  * Parameters: values      - [IN] vector containing history values            *
- *             value_type  - [IN] type of values. Only float/uint64 values    *
- *                                are supported.                              *
- *             result      - [OUT] resulting value                            *
+ *             value_type  - [IN] only float/uint64 values are supported      *
+ *             result      - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1247,7 +1246,7 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
  *                                ZBX_VALUE_FUNC_MAX, ZBX_VALUE_FUNC_SUM,     *
  *                                ZBX_VALUE_FUNC_COUNT, ZBX_VALUE_FUNC_LAST   *
  *                                functions are supported.                    *
- *             result      - [OUT] resulting value                            *
+ *             result      - [OUT]                                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func(zbx_vector_history_record_t *values, int value_type, int func,
