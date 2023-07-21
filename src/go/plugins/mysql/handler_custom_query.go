@@ -21,9 +21,7 @@ package mysql
 
 import (
 	"context"
-	"database/sql"
 	"encoding/json"
-	"strings"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -44,40 +42,15 @@ func customQueryHandler(ctx context.Context, conn MyClient,
 	}
 	defer rows.Close()
 
-	// JSON marshaling
-	var data []string
-
-	columns, err := rows.Columns()
+	res, err := rows2data(rows)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	values := make([]interface{}, len(columns))
-	valuePointers := make([]interface{}, len(values))
-
-	for i := range values {
-		valuePointers[i] = &values[i]
+	jsonRes, err := json.Marshal(res)
+	if err != nil {
+		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
 	}
 
-	results := make(map[string]interface{})
-
-	for rows.Next() {
-		err = rows.Scan(valuePointers...)
-		if err != nil {
-			if err == sql.ErrNoRows {
-				return nil, zbxerr.ErrorEmptyResult.Wrap(err)
-			}
-
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
-		}
-
-		for i, value := range values {
-			results[columns[i]] = value
-		}
-
-		jsonRes, _ := json.Marshal(results)
-		data = append(data, strings.TrimSpace(string(jsonRes)))
-	}
-
-	return "[" + strings.Join(data, ",") + "]", nil
+	return string(jsonRes), nil
 }
