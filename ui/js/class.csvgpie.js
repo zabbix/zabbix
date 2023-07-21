@@ -155,7 +155,7 @@ class CSVGPie {
 
 		this.#radius_inner = this.#config.draw_type === CSVGPie.DRAW_TYPE_PIE
 			? 0
-			: this.#radius_outer - this.#config.width / 100;
+			: this.#radius_outer - this.#config.width * 10;
 
 		this.#createContainers();
 	}
@@ -363,10 +363,10 @@ class CSVGPie {
 				this.#total_value_container = this.#g_scalable
 					.append('svg:text')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
-					.style('font-size', this.#config.total_value.size / 100)
+					.style('font-size', this.#config.total_value.size * 10)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
 					.style('fill', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
-					.attr('y', this.#config.total_value.size / 100 / 2 / CSVGPie.LINE_HEIGHT);
+					.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT);
 			}
 		}
 	}
