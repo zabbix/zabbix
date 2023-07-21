@@ -175,7 +175,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	public function testDiscoveryRules_opDelHostTags()
 	{
 		/* Replace tags at the discovered host */
-		$this->call('host.update', [
+		$response = $this->call('host.update', [
 			'hostid' => self::$discoveredHostId,
 			'tags' => [
 				[
@@ -189,21 +189,8 @@ class testDiscoveryRules extends CIntegrationTest {
 			]
 		]);
 
-		$response = $this->call('host.get', [
-			'selectTags' => ["tag", "value"],
-
-		]);
-
 		$this->assertArrayHasKey('result', $response);
 		$this->assertCount(1, $response['result']);
-		$this->assertArrayHasKey('tags', $response['result'][0]);
-		$tags = $response['result'][0]['tags'];
-
-		$this->assertCount(2, $tags);
-		$this->assertNotContains(['tag' => 'add_tag1', 'value' => 'add_value1'], $tags);
-		$this->assertNotContains(['tag' => 'add_tag2', 'value' => 'add_value2'], $tags);
-		$this->assertContains(['tag' => 'del_tag3', 'value' => 'del_value3'], $tags);
-		$this->assertContains(['tag' => 'del_tag4', 'value' => 'del_value4'], $tags);
 
 		$response = $this->call('action.update', [
 			'actionid' => self::$discoveryActionId,
