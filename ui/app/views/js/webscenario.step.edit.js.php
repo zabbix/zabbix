@@ -159,10 +159,10 @@ window.webscenario_step_edit_popup = new class {
 						$td.attr('width', $td.width());
 					}
 
-					// When dragging element on safari, it jumps out of the table.
+					// When dragging element on Safari, it jumps out of the table.
 					if (SF) {
 						// Move back draggable element to proper position.
-						ui.css('left', (ui.offset().left - 2) + 'px');
+						ui.css('left', '5px');
 					}
 
 					return ui;
