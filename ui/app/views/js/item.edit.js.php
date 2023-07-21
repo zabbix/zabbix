@@ -30,6 +30,7 @@ const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_DELAY_SCHEDULING = <?= ITEM_DELAY_SCHEDULING ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
 const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
+const ITEM_TYPE_IPMI = <?= ITEM_TYPE_IPMI ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
@@ -91,12 +92,14 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 			url: this.form.querySelector('[name="url"]'),
 			username: this.form.querySelector('[name=username]'),
 			value_type: this.form.querySelector('[name="value_type"]'),
-			value_type_steps: this.form.querySelector('[name="value_type_steps"]')
+			value_type_steps: this.form.querySelector('[name="value_type_steps"]'),
+			ipmi_sensor: this.form.querySelector('[name="ipmi_sensor"]')
 		};
 		this.label = {
 			interfaceid: this.form.querySelector('[for=interfaceid]'),
 			value_type_hint: this.form.querySelector('#js-item-type-hint'),// remove id
 			username: this.form.querySelector('[for=username]'),
+			ipmi_sensor: this.form.querySelector('[for="ipmi_sensor"]'),
 			history_hint: this.form.querySelector('#history_mode_hint'),// remove id [for="history"] > :has([data-hintbox])
 			trends_hint: this.form.querySelector('#trends_mode_hint') // remove id
 		};
@@ -260,6 +263,7 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		const type = parseInt(this.field.type.value, 10);
 		const key = this.field.key.value;
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
+		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
 		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
 
 		this.updateActionButtons();
@@ -269,6 +273,8 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.interfaceid.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
+		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
+		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
 		this.field.interfaceid.toggleAttribute('aria-required', !interface_optional);
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
 	}

@@ -150,7 +150,6 @@ class CControllerItemEdit extends CController {
 			'parent_templates' => [],
 			'discovery_rule' => [],
 			'master_item' => [],
-			'host_interfaces' => [],
 			'types' => item_type2str(),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($hostid),
 			'interface_types' => itemTypeInterface(),
@@ -233,6 +232,10 @@ class CControllerItemEdit extends CController {
 				$data['value_type_keys'] += [$type => []];
 				$data['value_type_keys'][$type][$key] = $value_type;
 			}
+		}
+
+		if ($data['form']['templateid']) {
+			$data['readonly'] = true;
 		}
 
 		$response = new CControllerResponseData($data);

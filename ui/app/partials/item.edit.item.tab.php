@@ -431,7 +431,7 @@ $formgrid = (new CFormGrid())
 	]);
 
 if ($data['form']['context'] === 'host') {
-	$interface = $data['form']['interfaceid'] && $data['host']['interfaces'][$data['form']['interfaceid']] ?? [];
+	$interface = $data['host']['interfaces'][$data['form']['interfaceid']] ?? [];
 
 	if ($data['readonly']) {
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
@@ -756,20 +756,17 @@ $formgrid
 		))->setId('js-item-trapper-hosts-field')
 	]);
 
-if (!$data['discovery_rule']) {
-	$select = (new CSelect('inventory_link'))
-		->setFocusableElementId('label-host-inventory')
-		->setValue($data['form']['inventory_link'])
-		->addOption(new CSelectOption(0, '-'._('None').'-'))
-		->addOptions(CSelect::createOptionsFromArray($data['inventory_fields']));
+$select = (new CSelect('inventory_link'))
+	->setFocusableElementId('label-host-inventory')
+	->setValue($data['form']['inventory_link'])
+	->addOption(new CSelectOption(0, '-'._('None').'-'))
+	->addOptions(CSelect::createOptionsFromArray($data['inventory_fields']));
 
-	$formgrid->addItem([
-		(new CLabel(_('Populates host inventory field'), $select->getFocusableElementId()))
-			->setId('js-item-inventory-link-label'),
-		(new CFormField($select))->setId('js-item-inventory-link-field')
-	]);
-}
-
+$formgrid->addItem([
+	(new CLabel(_('Populates host inventory field'), $select->getFocusableElementId()))
+		->setId('js-item-inventory-link-label'),
+	(new CFormField($select))->setId('js-item-inventory-link-field')
+]);
 
 $formgrid
 	->addItem([
