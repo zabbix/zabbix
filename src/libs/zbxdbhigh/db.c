@@ -2932,11 +2932,12 @@ out:
  *                                                                            *
  * Purpose: format bulk operation (insert, update) value list                 *
  *                                                                            *
- * Parameters: fields     - [IN] the field list                               *
- *             values     - [IN] the corresponding value list                 *
- *             values_num - [IN] the number of values to format               *
+ * Parameters: fields     - [IN] field list                                   *
+ *             values     - [IN] corresponding value list                     *
+ *             values_num - [IN] number of values to format                   *
  *                                                                            *
- * Return value: the formatted value list <value1>,<value2>...                *
+ * Return value: formatted value list <value1>,<value2>...                    *
+ *               or NULL if 'values' list was empty                           *
  *                                                                            *
  * Comments: The returned string is allocated by this function and must be    *
  *           freed by the caller later.                                       *
@@ -3363,7 +3364,8 @@ retry_oracle:
 			char	*str;
 
 			str = zbx_db_format_values((ZBX_FIELD **)self->fields.values, values, self->fields.values_num);
-			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(),
+					ZBX_NULL2EMPTY_STR(str));
 			zbx_free(str);
 		}
 	}
