@@ -1,12 +1,33 @@
 Changes for 7.0.0alpha3
 
 New features:
+.........T [ZBXNEXT-8481] added PostgreSQL by ODBC template (drasikhov)
+.........T [ZBXNEXT-8561] added nodata trigger to remote Zabbix proxy and server health templates (drasikhov)
+.......PS. [ZBXNEXT-8560] added messages that Oracle DB is deprecated (akozlovs)
+.........T [ZBXNEXT-8505] added Cisco SD-WAN templates (aiantsen)
+.........T [ZBXNEXT-8482] added integration with OpenStack Nova (knaglis)
+A.F....... [ZBXNEXT-6470,ZBXNEXT-6986] implemented audit logging of LLD rule API object (jfreibergs, vmaksimovs)
+..F....... [ZBXNEXT-8451] disabled spell checking for nondescriptive textareas (dfofanovs)
+.........T [ZBXNEXT-8569] added asynchronous agent and http agent pollers metrics to Zabbix health templates (drasikhov)
+..F....... [ZBXNEXT-743] implemented new Gauge widget (apoga, ashubin, averza, Ivo)
 .......PS. [ZBXNEXT-6144] added proxy data memory cache to avoid using proxy history tables in normal operation (wiper)
 .........T [ZBXNEXT-7944] excluded edgeupdate service from services discovery in Windows by Zabbix agent templates (drasikhov)
 .......PS. [ZBXNEXT-8460] added asynchronous Zabbix agent and HTTP agent pollers (vso)
 .........T [ZBXNEXT-8422] added AWS ECS templates (egordymov)
 
 Bug fixes:
+..F....... [ZBX-23096] fixed fields with key-value pairs being misaligned in web scenario configuration form (agriscenko)
+..F....... [ZBX-22822] fixed displaying the correct threshold color in top hosts widget when value exceeds maximum (Ivo)
+..F....... [ZBX-22777] fixed item test form sending incorrectly resolved macros to server if item uses SNMP interface (Ivo)
+.......PS. [ZBX-23075] fixed processing of network discovery rule with short update interval (asestakovs)
+...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
+A......... [ZBX-23112] fixed runtime errors in the inheritance of the trigger and trigger prototype dependencies (Sasha)
+A......... [ZBX-22539] fixed SLI calculation for days with daylight saving time transitions (averza)
+..F....... [ZBX-22916] fixed action condition type dropdown not reloading the form if mouse is clicked and dragged (Ivo)
+A......... [ZBX-22814] fixed PHP runtime errors in API trigger.get method when using "expandComment" option (Ivo)
+...G...... [ZBX-23037] fixed memory leak in vfs.fs.get[] (Andris)
+..F....... [ZBX-22915] fixed unfocusable dashboard pages in editing mode (apoga)
+...G...... [ZBX-23014] fixed Zabbix agent build on HP-UX (arimdjonoks)
 ........S. [ZBX-23049] fixed default condition for log item macro resolution (kprutkovs)
 .........T [ZBX-21909] updated setup section in README for PHP-FPM templates to include configuration example for Apache (drasikhov)
 ........S. [ZBX-20148] fixed the issue with housekeeper failing to delete some of the events that required deletion (mprihodko)
