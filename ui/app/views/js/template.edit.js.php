@@ -45,7 +45,7 @@ window.template_edit_popup = new class {
 		}
 
 		this.#initMacrosTab();
-		this.#updateMultiselect();
+		this.#initTemplateTab();
 		this.#initActions();
 		this.initial_form_fields = getFormFields(this.form);
 	}
@@ -59,22 +59,21 @@ window.template_edit_popup = new class {
 				e.target.closest('tr').remove();
 
 				this.linked_templateids = this.linked_templateids.filter(value =>
-					value !== e.target.dataset.templateid
+					value != e.target.dataset.templateid
 				);
 
 				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
-				$('#template_add_templates_').trigger('change');
+				$('#template_add_templates_ , form[name="templates-form"]').trigger('change');
 			}
 			else if (e.target.classList.contains('js-unlink-and-clear')) {
 				e.target.closest('tr').remove();
 
 				this.linked_templateids = this.linked_templateids.filter(value =>
-					value !== e.target.dataset.templateid
+					value != e.target.dataset.templateid
 				);
 
 				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
 				this.#unlinkAndClearTemplate(e.target.dataset.templateid);
-				$('#template_add_templates_').trigger('change');
 			}
 		});
 
@@ -94,7 +93,7 @@ window.template_edit_popup = new class {
 		clear_template.value = templateid;
 		this.form.appendChild(clear_template);
 
-		$('#add_templates_').trigger('change');
+		$('#template_add_templates_, form[name="templates-form"]').trigger('change');
 	}
 
 	#editLinkedTemplate(data) {
@@ -166,7 +165,7 @@ window.template_edit_popup = new class {
 			container: $('#template_macros_container .table-forms-td-right')
 		});
 
-		$('#template-tabs').on('tabscreate tabsactivate', (event, ui) => {
+		$('#template-tabs, form[name="templates-form"]').on('tabscreate tabsactivate', (event, ui) => {
 			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'template-macro-tab') {
@@ -185,8 +184,7 @@ window.template_edit_popup = new class {
 						panel.data('templateids', templateids);
 						this.macros_manager.load(
 							this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
-							this.linked_templateids.concat(templateids),
-							'templates-form'
+							this.linked_templateids.concat(templateids)
 						);
 
 						panel.data('macros_initialized', true);
@@ -217,6 +215,23 @@ window.template_edit_popup = new class {
 				this.linked_templateids.concat(this.#getAddTemplates())
 			);
 		}
+	}
+
+	#initTemplateTab() {
+		const $groups_ms = $('#template_groups_, form[name="templates-form"]');
+		const $template_ms = $('#template_add_templates_, form[name="templates-form"]');
+
+
+		$template_ms.on('change', () => {
+			$template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates());
+		});
+
+		$groups_ms.on('change', () => {
+			$groups_ms.multiSelect('setDisabledEntries',
+				[...document.querySelectorAll('[name^="template_groups["]')]
+					.map((input) => input.value)
+			);
+		});
 	}
 
 	clone() {
@@ -386,29 +401,13 @@ window.template_edit_popup = new class {
 			});
 	}
 
-	#updateMultiselect() {
-		const $groups_ms = $('#template_groups_, #template_group_links_');
-		const $template_ms = $('#template_add_templates_');
-
-		$template_ms.on('change', () => {
-			$template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates());
-		});
-
-		$groups_ms.on('change', () => {
-			$groups_ms.multiSelect('setDisabledEntries',
-				[...document.querySelectorAll('[name^="template_groups["], [name^="template_group_links["]')]
-					.map((input) => input.value)
-			)
-		});
-	}
-
 	/**
 	 * Collects IDs selected in "Add templates" multiselect.
 	 *
 	 * @return {array}  Templateids.
 	 */
 	#getAddTemplates() {
-		const $ms = $('#template_add_templates_');
+		const $ms = $('#template_add_templates_, form[name="templates-form"]');
 		let templateids = [];
 
 		// Readonly forms don't have multiselect.
@@ -452,7 +451,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getNewTemplates() {
-		const $template_multiselect = $('#template_add_templates_');
+		const $template_multiselect = $('#template_add_templates_, form[name="templates-form"]');
 		const templateids = [];
 
 		// Readonly forms don't have multiselect.

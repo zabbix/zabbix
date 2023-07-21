@@ -44,7 +44,7 @@ $template_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Visible name')),
+		new CLabel(_('Visible name'), 'visiblename'),
 		new CFormField(
 			(new CTextBox('visiblename', $data['visible_name'], false, DB::getFieldLength('hosts', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -119,7 +119,7 @@ $template_tab
 		)
 	])
 	->addItem([
-		(new CLabel(_('Template groups'), 'groups__ms'))->setAsteriskMark(),
+		(new CLabel(_('Template groups'), 'template_groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
 			'name' => 'template_groups[]',
@@ -142,7 +142,7 @@ $template_tab
 		)
 	])
 	->addItem([
-		new CLabel(_('Description')),
+		new CLabel(_('Description'), 'description'),
 		new CFormField(
 			(new CTextArea('description', $data['description']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
