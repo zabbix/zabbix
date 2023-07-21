@@ -153,10 +153,10 @@ window.webscenario_step_edit_popup = new class {
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
 				opacity: 0.6,
-				helper: function(e, ui) {
-					for (let td of ui.find('>td')) {
+				helper: (e, ui) => {
+					for (const td of ui.find('>td')) {
 						const $td = jQuery(td);
-						$td.attr('width', $td.width());
+						$td.css('width', $td.width());
 					}
 
 					// When dragging element on Safari, it jumps out of the table.
@@ -167,12 +167,15 @@ window.webscenario_step_edit_popup = new class {
 
 					return ui;
 				},
-				stop: function(e, ui) {
-					ui.item.find('>td').removeAttr('width');
-					ui.item.removeAttr('style');
-				},
-				start: function(e, ui) {
+				start: (e, ui) => {
 					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				},
+				stop: (e, ui) => {
+					for (const td of ui.item.find('>td')) {
+						jQuery(td).removeAttr('style');
+					}
+
+					ui.item.removeAttr('style');
 				}
 			})
 			.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
