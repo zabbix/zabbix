@@ -2338,7 +2338,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, const zbx_dc_item
 		{
 			zabbix_log(LOG_LEVEL_INFORMATION, "fail;");
 		}
-	
+
 		snmp_sess_read2(snmp_bulkwalk_config->bulkwalk_contexts.values[i]->ssp,
 				&snmp_bulkwalk_config->bulkwalk_contexts.values[i]->fdset);
 	}
