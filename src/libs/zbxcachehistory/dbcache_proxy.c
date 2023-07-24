@@ -69,18 +69,21 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
  ******************************************************************************/
 static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
 {
-	int	flags;
-	char	buffer[64], *pvalue;
+	int		flags;
+	char		buffer[64];
+	const char	*pvalue;
 
 	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 	{
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
@@ -95,7 +98,7 @@ static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_his
 	else
 	{
 		flags = ZBX_PROXY_HISTORY_FLAG_NOVALUE;
-		pvalue = (char *)"";
+		pvalue = "";
 	}
 
 	zbx_pb_history_write_value(handle, h->itemid, h->state, pvalue, &h->ts, flags, now);
@@ -111,7 +114,8 @@ static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_his
  ******************************************************************************/
 static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
 {
-	char		buffer[64], *pvalue;
+	char		buffer[64];
+	const char	*pvalue;
 	int		flags = ZBX_PROXY_HISTORY_FLAG_META;
 
 	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
@@ -119,10 +123,12 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				pvalue = buffer;
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
@@ -136,7 +142,7 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 	else
 	{
 		flags |= ZBX_PROXY_HISTORY_FLAG_NOVALUE;
-		pvalue = (char *)"";
+		pvalue = "";
 	}
 
 	zbx_pb_history_write_meta_value(handle, h->itemid, h->state, pvalue, &h->ts, flags, h->lastlogsize,

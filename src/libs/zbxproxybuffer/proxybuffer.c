@@ -604,7 +604,7 @@ void	pb_deregister_handle(zbx_vector_uint64_t *handleids, zbx_uint64_t handleid)
  *                                                                            *
  * Purpose: wait for the opened data handles to be closed                     *
  *                                                                            *
- * parameters: handleids - [IN] the handle list to wait on                    *
+ * parameters: handleids - [IN] handle list to wait on                        *
  *                                                                            *
  ******************************************************************************/
 void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
@@ -662,8 +662,8 @@ void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
  *                                                                            *
  * Purpose: initialize proxy  buffer                                          *
  *                                                                            *
- * Return value: size  - [IN] the cache size in bytes                         *
- *               age   - [IN] the maximum allowed data age                    *
+ * Return value: size  - [IN] cache size in bytes                             *
+ *               age   - [IN] maximum allowed data age                        *
  *               error - [OUT] error message                                  *
  *                                                                            *
  * Return value: SUCCEED - cache was initialized successfully                 *

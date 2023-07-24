@@ -224,7 +224,7 @@ try_again:
  *                                                                            *
  * Parameters: j             - [IN/OUT] json output buffer                    *
  *             rows          - [IN] history rows to export                    *
- *             lastid        - [OUT] the id of last added record              *
+ *             lastid        - [OUT] id of last added record                  *
  *                                                                            *
  * Return value: The total number of records exported.                        *
  *                                                                            *
