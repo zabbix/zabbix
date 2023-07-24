@@ -723,17 +723,17 @@ class CImportReferencer {
 	/**
 	 * Get proxy ID by name.
 	 *
-	 * @param string $host
+	 * @param string $name
 	 *
 	 * @return string|null
 	 */
-	public function findProxyidByHost(string $host): ?string {
+	public function findProxyidByName(string $name): ?string {
 		if ($this->db_proxies === null) {
 			$this->selectProxies();
 		}
 
 		foreach ($this->db_proxies as $proxyid => $proxy) {
-			if ($proxy['host'] === $host) {
+			if ($proxy['name'] === $name) {
 				return $proxyid;
 			}
 		}
