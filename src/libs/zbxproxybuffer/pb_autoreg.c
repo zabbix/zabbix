@@ -19,9 +19,13 @@
 
 #include "pb_autoreg.h"
 #include "proxybuffer.h"
-#include "zbxproxybuffer.h"
-#include "zbxdbhigh.h"
 #include "zbxcachehistory.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
 
 static zbx_history_table_t	areg = {
 	"proxy_autoreg_host", "autoreg_host_lastid",

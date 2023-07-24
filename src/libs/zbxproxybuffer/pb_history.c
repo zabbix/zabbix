@@ -18,13 +18,19 @@
 **/
 
 #include "pb_history.h"
-#include "zbxproxybuffer.h"
+#include "proxybuffer.h"
+#include "zbx_host_constants.h"
+#include "zbx_item_constants.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
-#include "proxybuffer.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbx_item_constants.h"
-#include "zbx_host_constants.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
+#include "zbxtime.h"
 
 static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid);
 

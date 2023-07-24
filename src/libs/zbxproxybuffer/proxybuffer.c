@@ -18,16 +18,18 @@
 **/
 
 #include "proxybuffer.h"
-#include "zbxproxybuffer.h"
-#include "pb_discovery.h"
 #include "pb_autoreg.h"
+#include "pb_discovery.h"
 #include "pb_history.h"
-
-#include "zbxcommon.h"
 #include "zbxalgo.h"
-#include "zbxmutexs.h"
-#include "zbxshmem.h"
+#include "zbxcommon.h"
+#include "zbxdb.h"
 #include "zbxdbhigh.h"
+#include "zbxmutexs.h"
+#include "zbxnum.h"
+#include "zbxproxybuffer.h"
+#include "zbxshmem.h"
+#include "zbxstr.h"
 
 #define PB_DB_FLUSH_DISABLED	0
 #define PB_DB_FLUSH_ENABLED	1
