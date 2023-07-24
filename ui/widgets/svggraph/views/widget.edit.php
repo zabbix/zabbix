@@ -252,6 +252,7 @@ function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
 function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 	$legend = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
 	$legend_statistic = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_statistic']));
+	$legend_aggregation = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_aggregation']));
 	$legend_lines = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
 	$legend_columns = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
 
@@ -267,6 +268,10 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 				->addItem([
 					$legend_statistic->getLabel(),
 					new CFormField($legend_statistic->getView())
+				])
+				->addItem([
+					$legend_aggregation->getLabel(),
+					new CFormField($legend_aggregation->getView())
 				])
 		)
 		->addItem(

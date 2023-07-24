@@ -242,6 +242,7 @@ window.widget_svggraph_form = new class {
 					jQuery('#legend_columns').rangeControl('enable');
 				}
 				document.getElementById('legend_statistic').disabled = !e.target.checked;
+				document.getElementById('legend_aggregation').disabled = !e.target.checked;
 			});
 
 		document.getElementById('legend_statistic')
