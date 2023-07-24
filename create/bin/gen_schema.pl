@@ -625,7 +625,7 @@ END;
 
 CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS bigint AS \$\$
 BEGIN
-	RETURN base64_decode(substring(\$1 FROM 1 FOR 8));
+	RETURN base36_decode(substring(\$1 FROM 1 FOR 8));
 END;
 \$\$ LANGUAGE 'plpgsql' IMMUTABLE;
 
