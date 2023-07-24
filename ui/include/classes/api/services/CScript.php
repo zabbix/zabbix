@@ -939,7 +939,7 @@ class CScript extends CApiService {
 
 		$sid = array_key_exists('sessionid', self::$userData)
 			? self::$userData['sessionid']
-			:  self::$userData['token'];
+			: self::$userData['token'];
 
 		$result = $zabbix_server->executeScript($data['scriptid'], $sid,
 			$is_event ? null : $data['hostid'],
