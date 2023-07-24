@@ -92,16 +92,16 @@
 					this.#edit(target, {itemid: target.dataset.itemid});
 				}
 				else if (target.classList.contains('js-enable-item')) {
-					this._enableItems(target, [target.dataset.itemid]);
+					this.#enable(null, [target.dataset.itemid]);
 				}
 				else if (target.classList.contains('js-disable-item')) {
-					this._disableItems(target, [target.dataset.itemid]);
+					this.#disable(null, [target.dataset.itemid]);
 				}
 				else if (target.classList.contains('js-massenable-item')) {
-					this._enableItems(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#enable(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-massdisable-item')) {
-					this._disableItems(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#disable(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-massexecute-item')) {
 					this._executeItems(target, Object.keys(chkbxRange.getSelectedIds()));
@@ -149,18 +149,28 @@
 			});
 		}
 
-		_enableItems(target, itemids) {
+		#enable(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.enable');
 
-			this._confirmWithPost(target, {itemids}, curl);
+			if (target !== null) {
+				this.#confirmPost(curl, {itemids}, target);
+			}
+			else {
+				this.#post(curl, {itemids});
+			}
 		}
 
-		_disableItems(target, itemids) {
+		#disable(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.disable');
 
-			this._confirmWithPost(target, {itemids}, curl);
+			if (target !== null) {
+				this.#confirmPost(curl, {itemids}, target);
+			}
+			else {
+				this.#post(curl, {itemids});
+			}
 		}
 
 		_executeItems(target, itemids) {
@@ -233,7 +243,7 @@
 			this._confirmWithPost(target, {itemids}, curl);
 		}
 
-		_confirmWithPost(target, data, curl) {
+		#confirmPost(curl, data, target) {
 			const confirm = this.confirm_messages[curl.getArgument('action')];
 			const message = confirm[data.itemids.length > 1 ? 1 : 0];
 
@@ -241,11 +251,15 @@
 				return;
 			}
 
-			this._post(target, data, curl);
+			target.classList.add('is-loading');
+			this.#post(curl, data)
+				.finally(() => {
+					target.classList.remove('is-loading');
+					target.blur();
+				});
 		}
 
-		_post(target, data, curl) {
-			target.classList.add('is-loading');
+		#post(curl, data) {
 			data[this.token[0]] = this.token[1];
 
 			return fetch(curl.getUrl(), {
@@ -279,10 +293,6 @@
 					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
 
 					addMessage(message_box);
-				})
-				.finally(() => {
-					target.classList.remove('is-loading');
-					target.blur();
 				});
 		}
 
