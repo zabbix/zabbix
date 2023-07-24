@@ -238,7 +238,7 @@ require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
-require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
+require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
