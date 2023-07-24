@@ -21,7 +21,7 @@
 
 #include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"

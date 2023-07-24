@@ -21,7 +21,7 @@
 #include "zbxdbwrap.h"
 
 #include "zbxcacheconfig.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "audit/zbxaudit_host.h"
 #include "audit/zbxaudit_item.h"
 #include "audit/zbxaudit_trigger.h"
@@ -5665,8 +5665,8 @@ zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsig
 
 			zbx_free(tmp);
 			tmp = strdup(row[4]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == zbx_is_ushort(tmp, &db_port) || db_port != port)
 				continue;
 

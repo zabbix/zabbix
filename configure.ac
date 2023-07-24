@@ -2040,7 +2040,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
-	src/libs/zbxserver/Makefile
+	src/libs/zbxexpression/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
 	src/libs/zbxstr/Makefile
