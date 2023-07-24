@@ -340,7 +340,6 @@ static int	DBpatch_6050029(void)
 
 static int	DBpatch_6050030(void)
 {
-	int		i;
 	const char	*values[] = {
 			"web.hosts.triggers.filter.active", "web.hosts.trigger.list.filter.active",
 			"web.hosts.triggers.filter.evaltype", "web.hosts.trigger.list.filter.evaltype",
