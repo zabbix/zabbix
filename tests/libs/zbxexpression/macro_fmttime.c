@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "macrofunc.h"
 #include "zbxlog.h"
 #include "zbxexpr.h"
@@ -30,18 +30,18 @@
 #include "mocks/valuecache/valuecache_mock.h"
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item,
-		zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
-		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen);
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
+		const zbx_dc_item_t *dc_item, zbx_db_alert *alert, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
+		int macro_type, char *error, int maxerrlen);
 
 int __wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds);
 
 int	__wrap_substitute_simple_macros(zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item,
-		zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
-		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error,
-		int maxerrlen)
+		zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
+		const zbx_dc_item_t *dc_item, zbx_db_alert *alert, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
+		int macro_type, char *error, int maxerrlen)
 {
 	ZBX_UNUSED(actionid);
 	ZBX_UNUSED(event);

@@ -17,10 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "zbxnum.h"
 #include "zbxvariant.h"
+#include "zbxexpr.h"
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *
@@ -55,7 +57,7 @@ static size_t		max_buffer_len;	/* error message buffer size */
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check whether the character delimits a numeric token              *
+ * Purpose: check whether the character delimits a numeric token.             *
  *                                                                            *
  ******************************************************************************/
 static int	is_number_delimiter(char c)
@@ -65,7 +67,7 @@ static int	is_number_delimiter(char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check whether the character delimits a symbolic operator token    *
+ * Purpose: check whether the character delimits a symbolic operator token.   *
  *                                                                            *
  ******************************************************************************/
 static int	is_operator_delimiter(char c)
@@ -75,8 +77,8 @@ static int	is_operator_delimiter(char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate a quoted string like "/etc/passwd"                       *
- * Characters '\' and '"' are expected to be escaped or parsing fails         *
+ * Purpose: evaluate a quoted string like "/etc/passwd". Characters '\' and   *
+ * '"' are expected to be escaped or parsing fails                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_string(zbx_variant_t *res)
@@ -131,7 +133,7 @@ static void	evaluate_string(zbx_variant_t *res)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate a suffixed number like 12.345K                           *
+ * Purpose: evaluate a suffixed number like 12.345K.                          *
  *                                                                            *
  ******************************************************************************/
 static double	evaluate_number(int *unknown_idx)
@@ -178,7 +180,7 @@ static double	evaluate_number(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cast string variant to a double variant                           *
+ * Purpose: cast string variant to a double variant.                          *
  *                                                                            *
  * Parameters: var - [IN/OUT] the variant to cast                             *
  *                                                                            *
@@ -200,16 +202,16 @@ static void	variant_convert_to_double(zbx_variant_t *var)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get variant value in double (float64) format                      *
+ * Purpose: get variant value in double (float64) format.                     *
  *                                                                            *
  * Parameters: var - [IN] the input variant                                   *
  *                                                                            *
- * Return value: Depending on variant type:                                   *
+ * Return value: depending on variant type:                                   *
  *    DBL - the variant value                                                 *
  *    STR - if variant value contains valid float64 string (with supported    *
  *          Zabbix suffixes) the converted value is returned. Otherwise       *
  *          ZBX_INFINITY is returned.                                         *
- *    other types - ZBX_INFINITY
+ *    other types - ZBX_INFINITY                                              *
  *                                                                            *
  ******************************************************************************/
 static double	variant_get_double(const zbx_variant_t *var)
@@ -230,7 +232,7 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx);
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate a suffixed number or a parenthesized expression          *
+ * Purpose: evaluate a suffixed number or a parenthesized expression.         *
  *                                                                            *
  ******************************************************************************/
 static zbx_variant_t	evaluate_term9(int *unknown_idx)
@@ -317,7 +319,7 @@ static zbx_variant_t	evaluate_term9(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "-" (unary)                                              *
+ * Purpose: evaluate "-" (unary).                                             *
  *                                                                            *
  * -0.0     -> -0.0                                                           *
  * -1.2     -> -1.2                                                           *
@@ -348,7 +350,7 @@ static zbx_variant_t	evaluate_term8(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "not"                                                    *
+ * Purpose: evaluate "not".                                                   *
  *                                                                            *
  * not 0.0     ->  1.0                                                        *
  * not 1.2     ->  0.0                                                        *
@@ -379,7 +381,7 @@ static zbx_variant_t	evaluate_term7(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "*" and "/"                                              *
+ * Purpose: evaluate "*" and "/".                                             *
  *                                                                            *
  *     0.0 * Unknown  ->  Unknown (yes, not 0 as we don't want to lose        *
  *                        Unknown in arithmetic operations)                   *
@@ -484,7 +486,7 @@ static zbx_variant_t	evaluate_term6(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "+" and "-"                                              *
+ * Purpose: evaluate "+" and "-".                                             *
  *                                                                            *
  *     0.0 +/- Unknown  ->  Unknown                                           *
  *     1.2 +/- Unknown  ->  Unknown                                           *
@@ -558,7 +560,7 @@ static zbx_variant_t	evaluate_term5(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "<", "<=", ">=", ">"                                     *
+ * Purpose: evaluate "<", "<=", ">=", ">".                                    *
  *                                                                            *
  *     0.0 < Unknown  ->  Unknown                                             *
  *     1.2 < Unknown  ->  Unknown                                             *
@@ -652,7 +654,7 @@ static zbx_variant_t	evaluate_term4(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "=" and "<>"                                             *
+ * Purpose: evaluate "=" and "<>".                                            *
  *                                                                            *
  *      0.0 = Unknown  ->  Unknown                                            *
  *      1.2 = Unknown  ->  Unknown                                            *
@@ -763,7 +765,7 @@ static zbx_variant_t	evaluate_term3(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "and"                                                    *
+ * Purpose: evaluate "and".                                                   *
  *                                                                            *
  *      0.0 and Unknown  -> 0.0                                               *
  *  Unknown and 0.0      -> 0.0                                               *
@@ -851,7 +853,7 @@ static zbx_variant_t	evaluate_term2(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate "or"                                                     *
+ * Purpose: evaluate "or".                                                    *
  *                                                                            *
  *      1.0 or Unknown  -> 1.0                                                *
  *  Unknown or 1.0      -> 1.0                                                *
@@ -950,11 +952,11 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate an expression like "(26.416>10) or (0=1)"                *
+ * Purpose: evaluate an expression like "(26.416>10) or (0=1)".               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_ptr_t *unknown_msgs)
+		zbx_vector_str_t *unknown_msgs)
 {
 	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
 						/* to catch errors */
@@ -1038,20 +1040,20 @@ int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: evaluate an expression like "(26.416>10) and not(0=ZBX_UNKNOWN0)" *
- *                                                                            *
- * Parameters: expression    - [IN]  expression to evaluate                   *
- *             value         - [OUT] expression evaluation result             *
- *             error         - [OUT] error message buffer                     *
- *             max_error_len - [IN]  error buffer size                        *
- *                                                                            *
- * Return value: SUCCEED - expression evaluated successfully,                 *
- *                         or evaluation result is undefined (ZBX_UNKNOWN)    *
- *               FAIL    - expression evaluation failed                       *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: evaluate an expression like "(26.416>10) and not(0=ZBX_UNKNOWN0)". *
+ *                                                                             *
+ * Parameters: expression    - [IN]  expression to evaluate                    *
+ *             value         - [OUT] expression evaluation result              *
+ *             error         - [OUT] error message buffer                      *
+ *             max_error_len - [IN]  error buffer size                         *
+ *                                                                             *
+ * Return value: SUCCEED - expression evaluated successfully,                  *
+ *                         or evaluation result is undefined (ZBX_UNKNOWN)     *
+ *               FAIL    - expression evaluation failed                        *
+ *                                                                             *
+ *******************************************************************************/
 int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len)
 {
 	const char	*__function_name = "evaluate_with_unknown";
@@ -1090,10 +1092,11 @@ int	zbx_evaluate_unknown(const char *expression, double *value, char *error, siz
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cast string to a double, expand suffixes and parse negative sign  *
+ * Purpose: cast string to a double, expand suffixes and parse negative sign. *
  *                                                                            *
  * Parameters: in - [IN] the input string                                     *
- * Return value:  -  the resulting double                                     *
+ *                                                                            *
+ * Return value: resulting double                                             *
  *                                                                            *
  ******************************************************************************/
 double	zbx_evaluate_string_to_double(const char *in)

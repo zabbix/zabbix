@@ -17,11 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "valuemaps_test.h"
+#ifndef ZABBIX_MACROFUNC_H
+#define ZABBIX_MACROFUNC_H
 
-int	evaluate_value_by_map_test(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
-		unsigned char value_type)
-{
-	return evaluate_value_by_map(value, max_len, valuemaps, value_type);
-}
+#include "zbxexpr.h"
 
+const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
+
+#endif

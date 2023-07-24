@@ -21,13 +21,14 @@
 
 #include "zbxnum.h"
 #include "zbxeval.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)
 ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
 
 /*******************************************************************************
  *                                                                             *
- * Purpose: finds how many values in stl remainder are outliers                *
+ * Purpose: finds how many values in stl remainder are outliers.               *
  *                                                                             *
  * Parameters:  remainder        - [IN] stl remainder values vector            *
  *              deviations_count - [IN] how much a value can be away from the  *
@@ -427,28 +428,26 @@ static void	combine_smooth(const zbx_vector_history_record_t *y, int n, int np, 
 		zbx_vector_history_record_t *work1, zbx_vector_history_record_t *work2,
 		zbx_vector_history_record_t *work3, zbx_vector_history_record_t *work4)
 {
-	int	i;
-
-	for (i = 0; i < np; i++)
+	for (int i = 0; i < np; i++)
 	{
-		int				k, m, j, nleft, nright;
+		int				k, m, nleft, nright;
 		double				nval;
 		zbx_vector_history_record_t	work_2_copy;
 
 		k = ((n - i - 1) / np) + 1;
 
-		for (j = 0; j < k; j++)
+		for (int j = 0; j < k; j++)
 			work1->values[j].value.dbl = y->values[j * np + i].value.dbl;
 
 		if (1 == userw)
 		{
-			for (j = 0; j < k; j++)
+			for (int j = 0; j < k; j++)
 				work3->values[i].value.dbl = rw->values[i * np + i].value.dbl;
 		}
 
 		zbx_history_record_vector_create(&work_2_copy);
 
-		for (j = 1; j < work2->values_num; j++)
+		for (int j = 1; j < work2->values_num; j++)
 		{
 			zbx_history_record_t	cp;
 
@@ -459,7 +458,7 @@ static void	combine_smooth(const zbx_vector_history_record_t *y, int n, int np, 
 
 		apply_loess_smoothing(work1, k, ns, isdeg, nsjump, userw, work3, &work_2_copy, work4);
 
-		for (j = 1; j < work2->values_num; j++)
+		for (int j = 1; j < work2->values_num; j++)
 		{
 			work2->values[j].timestamp = work_2_copy.values[j - 1].timestamp;
 			work2->values[j].value.dbl = work_2_copy.values[j - 1].value.dbl;
@@ -605,13 +604,11 @@ static void	step(const zbx_vector_history_record_t *y, int n, int np, int ns, in
 		int ildeg, int nsjump, int ntjump, int nljump, int ni, int userw, zbx_vector_history_record_t *rw,
 		zbx_vector_history_record_t *season, zbx_vector_history_record_t *trend, zbx_vector_VV_t *work)
 {
-	int	i, j;
-
-	for (i = 0; i < ni; i++)
+	for (int i = 0; i < ni; i++)
 	{
 		zbx_vector_history_record_t	work_0_copy, work_1_copy, work_2_copy, work_3_copy, work_4_copy;
 
-		for (j = 0; j < n; j++)
+		for (int j = 0; j < n; j++)
 			work->values[j]->values[0].value.dbl = y->values[j].value.dbl - trend->values[j].value.dbl;
 
 		zbx_history_record_vector_create(&work_0_copy);
@@ -620,7 +617,7 @@ static void	step(const zbx_vector_history_record_t *y, int n, int np, int ns, in
 		zbx_history_record_vector_create(&work_3_copy);
 		zbx_history_record_vector_create(&work_4_copy);
 
-		for (j = 0; j < work->values_num; j++)
+		for (int j = 0; j < work->values_num; j++)
 		{
 			zbx_history_record_t	cp;
 
@@ -654,19 +651,19 @@ static void	step(const zbx_vector_history_record_t *y, int n, int np, int ns, in
 
 		apply_loess_smoothing(&work_2_copy, n, nl, ildeg, nljump, 0, &work_3_copy, &work_0_copy, &work_4_copy);
 
-		for (j = np; j < np + n; j++)
+		for (int j = np; j < np + n; j++)
 		{
 			season->values[j - np].value.dbl = work_1_copy.values[j].value.dbl -
 				work_0_copy.values[j - np].value.dbl;
 		}
 
-		for (j = 0; j < n; j++)
+		for (int j = 0; j < n; j++)
 			work_0_copy.values[j].value.dbl = y->values[j].value.dbl - season->values[j].value.dbl;
 
 		apply_loess_smoothing(&work_0_copy, n, nt, itdeg, ntjump, userw, rw, trend, &work_2_copy);
 
 		/* save changes from copies back into work */
-		for (j = 0; j < work->values_num; j++)
+		for (int j = 0; j < work->values_num; j++)
 		{
 			work->values[j]->values[0].value.dbl = work_0_copy.values[j].value.dbl;
 			work->values[j]->values[1].value.dbl = work_1_copy.values[j].value.dbl;
@@ -688,7 +685,7 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 		int inner, int outer, zbx_vector_history_record_t *trend, zbx_vector_history_record_t *seasonal,
 		zbx_vector_history_record_t *remainder, char **error)
 {
-	int				values_in_len, userw, i, ret = FAIL;
+	int				values_in_len, userw, ret = FAIL;
 	zbx_vector_history_record_t	weights;
 	zbx_vector_VV_t			work;
 	double				tmp;
@@ -749,7 +746,7 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 	zbx_vector_history_record_reserve(&weights, (size_t)values_in_len);
 	zbx_vector_history_record_reserve(remainder, (size_t)values_in_len);
 
-	for (i = 0; i < values_in_len; i++)
+	for (int i = 0; i < values_in_len; i++)
 	{
 		zbx_history_record_t	value1, value2, value3, value4;
 
@@ -773,7 +770,7 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 	zbx_vector_VV_create(&work);
 	zbx_vector_VV_reserve(&work, (size_t)(values_in_len + 2 * freq));
 
-	for (i = 0; i < work.values_alloc; i++)
+	for (int i = 0; i < work.values_alloc; i++)
 	{
 		int				j;
 		zbx_vector_history_record_t	*work_temp;
@@ -812,20 +809,19 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 
 	userw = 1;
 
-	for (i = 0; i < outer; i++)
+	for (int i = 0; i < outer; i++)
 	{
-		int				j;
 		zbx_vector_history_record_t	work_0_copy;
 
 		zbx_history_record_vector_create(&work_0_copy);
 
-		for (j = 0; j < values_in_len; j++)
+		for (int j = 0; j < values_in_len; j++)
 		{
 			work.values[j]->values[0].value.dbl = trend->values[j].value.dbl +
 					seasonal->values[j].value.dbl;
 		}
 
-		for (j = 0; j < work.values_num; j++)
+		for (int j = 0; j < work.values_num; j++)
 		{
 			zbx_history_record_t	cp;
 
@@ -843,11 +839,11 @@ int	zbx_STL(const zbx_vector_history_record_t *values_in, int freq, int is_robus
 
 	if (0 >= outer)
 	{
-		for (i = 0; i < weights.values_num; i++)
+		for (int i = 0; i < weights.values_num; i++)
 			weights.values[i].value.dbl = 1;
 	}
 
-	for (i = 0; i < values_in->values_num; i++)
+	for (int i = 0; i < values_in->values_num; i++)
 	{
 		remainder->values[i].value.dbl = values_in->values[i].value.dbl - trend->values[i].value.dbl -
 				seasonal->values[i].value.dbl;

@@ -24,27 +24,9 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxlog.h"
-
-#define ZBX_VALUEMAP_STRING_LEN	64
-
-typedef struct
-{
-	char	value[ZBX_VALUEMAP_STRING_LEN];
-	char	newvalue[ZBX_VALUEMAP_STRING_LEN];
-	int	type;
-}
-zbx_valuemaps_t;
-
-ZBX_PTR_VECTOR_DECL(valuemaps_ptr, zbx_valuemaps_t *)
-
-#include "valuemaps_test.h"
-
-static void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
-{
-	zbx_free(valuemap);
-}
+#include "evalfunc.h"
 
 void	zbx_mock_test_entry(void **state)
 {
@@ -82,7 +64,7 @@ void	zbx_mock_test_entry(void **state)
 	newvalue = (char *)zbx_mock_get_parameter_string("out.value");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	ret = evaluate_value_by_map_test(value, sizeof(value), &valuemaps, value_type);
+	ret = evaluate_value_by_map(value, sizeof(value), &valuemaps, value_type);
 
 	zbx_mock_assert_int_eq("valuemaps return value", expected_ret, ret);
 	zbx_mock_assert_str_eq("new value", newvalue, value);

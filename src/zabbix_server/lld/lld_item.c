@@ -18,7 +18,7 @@
 **/
 
 #include "lld.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "../db_lengths.h"
 #include "zbxregexp.h"
@@ -1633,7 +1633,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_lld_item_full_t *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_formula_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	int	ret;
 
@@ -1659,7 +1659,7 @@ static int	substitute_formula_macros(char **data, const struct zbx_json_parse *j
  *                                                                            *
  ******************************************************************************/
 static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype,
-		const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_lld_row_t *lld_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	zbx_lld_item_full_t		*item;
 	const struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
@@ -1701,7 +1701,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->key_orig = NULL;
 
 	if (FAIL == (ret = zbx_substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths,
-			MACRO_TYPE_ITEM_KEY, err, sizeof(err))))
+			ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
 	}
@@ -1754,7 +1754,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 
 	if (SUCCEED == ret && ITEM_TYPE_SNMP == item_prototype->type &&
 			FAIL == (ret = zbx_substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths,
-			MACRO_TYPE_SNMP_OID, err, sizeof(err))))
+			ZBX_MACRO_TYPE_SNMP_OID, err, sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in SNMP OID key parameters: %s.\n", err);
 	}
@@ -1887,7 +1887,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
  *                                                                            *
  ******************************************************************************/
 static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
-		const zbx_vector_ptr_t *lld_macro_paths, zbx_lld_item_full_t *item, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_lld_item_full_t *item, char **error)
 {
 	char			*buffer = NULL, err[MAX_STRING_LEN];
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
@@ -1921,7 +1921,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		buffer = zbx_strdup(buffer, item_prototype->key);
 
 		if (SUCCEED == zbx_substitute_key_macros(&buffer, NULL, NULL, jp_row, lld_macro_paths,
-				MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
+				ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
 		{
 			item->key_orig = item->key;
 			item->key = buffer;
@@ -2028,7 +2028,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
 
 	if (ITEM_TYPE_SNMP == item_prototype->type && FAIL == zbx_substitute_key_macros(&buffer, NULL, NULL, jp_row,
-			lld_macro_paths, MACRO_TYPE_SNMP_OID, err, sizeof(err)))
+			lld_macro_paths, ZBX_MACRO_TYPE_SNMP_OID, err, sizeof(err)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot update item, error in SNMP OID key parameters: %s.\n", err);
 	}
@@ -2238,8 +2238,8 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, zbx_hashset_t *items_index,
-		char **error)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items,
+		zbx_hashset_t *items_index, char **error)
 {
 	int				i, j, index;
 	zbx_lld_item_prototype_t	*item_prototype;
@@ -2281,7 +2281,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
 			buffer = zbx_strdup(buffer, item->key_proto);
 
 			if (SUCCEED != zbx_substitute_key_macros(&buffer, NULL, NULL, &lld_row->jp_row, lld_macro_paths,
-					MACRO_TYPE_ITEM_KEY, NULL, 0))
+					ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{
 				continue;
 			}
@@ -2346,7 +2346,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
  *                                                                            *
  ******************************************************************************/
 static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_t *lld_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char **sub_params)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **sub_params)
 {
 	int	params_num = 1, flags1, flags2;
 
@@ -2430,7 +2430,7 @@ static void	substitute_lld_macros_in_preproc_params(int type, const zbx_lld_row_
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
-		const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_t *items)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items)
 {
 	int				i, j, index, preproc_num;
 	zbx_lld_item_full_t		*item;
@@ -2550,7 +2550,7 @@ static void	lld_items_preproc_make(const zbx_vector_ptr_t *item_prototypes,
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
-		const zbx_vector_ptr_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, char **error)
 {
 	int				i, j, index;
 	zbx_lld_item_prototype_t	*item_proto;
@@ -2618,8 +2618,8 @@ static void	lld_items_param_make(const zbx_vector_ptr_t *item_prototypes,
  *             error           - [OUT] error message                          *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes, const zbx_vector_ptr_t *lld_macro_paths,
-		zbx_vector_lld_item_full_t *items, char **error)
+static void	lld_items_tags_make(const zbx_vector_ptr_t *item_prototypes,
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, zbx_vector_lld_item_full_t *items, char **error)
 {
 	int				i, j, index;
 	zbx_lld_item_prototype_t	*item_proto;
@@ -4271,7 +4271,7 @@ static void	lld_link_dependent_items(zbx_vector_lld_item_full_t *items, zbx_hash
  *                                                                            *
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t		item_prototypes, item_dependencies;
 	zbx_hashset_t			items_index;
