@@ -170,7 +170,7 @@ abstract class CWidgetField {
 
 		$validation_rules = ($strict && $this->strict_validation_rules !== null)
 			? $this->strict_validation_rules
-			: $this->validation_rules;
+			: $this->getValidationRules();
 		$validation_rules += $this->ex_validation_rules;
 
 		$value = $this->getValue();
