@@ -31,6 +31,10 @@ class CWidgetFieldMultiSelectGraphView extends CWidgetFieldMultiSelectView {
 		return 'graphs';
 	}
 
+	protected function getObjectLabel(): string {
+		return $this->field->isMultiple() ? _('Graphs') : _('Graph');
+	}
+
 	protected function getPopupParameters(): array {
 		$parameters = $this->popup_parameters + [
 			'srctbl' => 'graphs',

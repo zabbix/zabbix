@@ -173,7 +173,7 @@ abstract class CWidgetField {
 			: $this->validation_rules;
 		$validation_rules += $this->ex_validation_rules;
 
-		$value = $this->value ?? $this->default;
+		$value = $this->getValue();
 
 		if ($this->full_name !== null) {
 			$label = $this->full_name;

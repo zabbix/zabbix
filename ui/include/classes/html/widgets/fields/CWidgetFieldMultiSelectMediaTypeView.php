@@ -31,6 +31,10 @@ class CWidgetFieldMultiSelectMediaTypeView extends CWidgetFieldMultiSelectView {
 		return 'media_types';
 	}
 
+	protected function getObjectLabel(): string {
+		return $this->field->isMultiple() ? _('Media types') : _('Media type');
+	}
+
 	protected function getPopupParameters(): array {
 		return $this->popup_parameters + [
 			'srctbl' => 'media_types',

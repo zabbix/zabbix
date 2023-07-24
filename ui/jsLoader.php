@@ -41,6 +41,7 @@ $available_js = [
 	'class.widget.inaccessible.js' => '',
 	'class.widget.iterator.js' => '',
 	'class.widget.paste-placeholder.js' => '',
+	'class.widget-field.multiselect.js' => '',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',

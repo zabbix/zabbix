@@ -28,6 +28,7 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
+	CWidgetFieldMultiSelectHost,
 	CWidgetFieldUrl
 };
 
@@ -41,6 +42,12 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldUrl('url', _('URL')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldMultiSelectHost('hostid', _('Enable host selection')))
+					->preventDefault()
+					->acceptWidget()
 			)
 			->addField($this->isTemplateDashboard()
 				? null

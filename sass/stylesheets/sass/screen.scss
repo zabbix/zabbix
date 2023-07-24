@@ -479,10 +479,6 @@ form {
 
 	.filter-forms {
 		padding: 0 10px;
-
-		.btn-grey {
-			vertical-align: baseline;
-		}
 	}
 
 	.list-table {
@@ -3403,16 +3399,18 @@ svg {
 }
 
 .btn-split {
-	display: inline-block;
 	position: relative;
+	display: inline-block;
 	margin-right: 10px;
 
 	li {
 		display: inline-block;
 
-		&:first-child button {
-			border-top-right-radius: 0;
-			border-bottom-right-radius: 0;
+		&:first-child {
+			button {
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
 		}
 
 		&:last-child {
@@ -3421,17 +3419,25 @@ svg {
 			button {
 				border-top-left-radius: 0;
 				border-bottom-left-radius: 0;
-
-				&[aria-expanded="true"] {
-					color: $btn-color;
-					background-color: $btn-hover-bg-color;
-					border-color: $btn-hover-border-color;
-				}
 			}
 		}
 
-		&:only-child button {
-			border-radius: 2px;
+		&:only-child {
+			button {
+				border-radius: 2px;
+			}
+		}
+	}
+
+	button {
+		&:focus {
+			z-index: 1;
+		}
+
+		&[aria-expanded="true"] {
+			color: $btn-color;
+			background-color: $btn-hover-bg-color;
+			border-color: $btn-hover-border-color;
 		}
 	}
 }

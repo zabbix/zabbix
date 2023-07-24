@@ -131,7 +131,7 @@
 				if (ms.options.disabled === true) {
 					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
-					$('.multiselect-button > button', $obj.parent()).prop('disabled', false);
+					$('.multiselect-button', $obj.parent()).prop('disabled', false);
 					$obj.append(makeMultiSelectInput($obj));
 
 					ms.options.disabled = false;
@@ -154,13 +154,33 @@
 				if (ms.options.disabled === false) {
 					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
-					$('.multiselect-button > button', $obj.parent()).prop('disabled', true);
+					$('.multiselect-button', $obj.parent()).prop('disabled', true);
 					$('input[type="text"]', $obj).remove();
 
 					ms.options.disabled = true;
 
 					cleanSearch($obj);
 				}
+			});
+		},
+
+		/**
+		 * Remove select object value.
+		 *
+		 * @param {string} id
+		 *
+		 * @return jQuery
+		 */
+		removeSelected: function(id) {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
+
+				removeSelected($obj, id);
+
+				cleanSearch($obj);
+
+				$obj.trigger('change', ms);
 			});
 		},
 
@@ -202,6 +222,8 @@
 					}
 				}
 
+				cleanSearch($obj);
+
 				if (addNew_modified) {
 					/*
 					 * When modifying the "addNew" option, few things must be done:
@@ -210,8 +232,6 @@
 					 *      Note: hidden and disabled items will not submit to the server.
 					 *   3. The "change" trigger must fire.
 					 */
-
-					cleanSearch($obj);
 
 					$('input[name*="[new]"]', $obj)
 						.prop('disabled', !ms.options['addNew'])
@@ -257,7 +277,9 @@
 				var $obj = $(this);
 
 				if ($obj.data('multiSelect') !== undefined) {
-					ret = $obj.data('multiSelect').select_button[0];
+					if ($obj.data('multiSelect').select_button !== null) {
+						ret = $obj.data('multiSelect').select_button[0];
+					}
 
 					return false;
 				}
@@ -269,7 +291,7 @@
 		/**
 		 * @param array entries  IDs to mark disabled.
 		 */
-		setDisabledEntries: function (entries) {
+		setDisabledEntries: function(entries) {
 			this.each(function() {
 				const $obj = $(this);
 				const ms_parameters = $obj.data('multiSelect');
@@ -286,7 +308,31 @@
 
 				$obj.data('multiSelect', ms_parameters);
 			});
-		}
+		},
+
+		addOptionalSelect: function(label, callback) {
+			this.each(function() {
+				const $obj = $(this);
+
+				if ($obj.data('multiSelect') !== undefined) {
+					addOptionalSelect($obj, label, callback);
+
+					return false;
+				}
+			});
+		},
+
+		openSelectPopup: function(event_target) {
+			this.each(function() {
+				const $obj = $(this);
+
+				if ($obj.data('multiSelect') !== undefined) {
+					openSelectPopup($obj, event_target);
+
+					return false;
+				}
+			});
+		},
 	};
 
 	/**
@@ -337,26 +383,28 @@
 		}
 
 		var defaults = {
-				url: '',
-				name: '',
-				labels: {
-					'No matches found': t('No matches found'),
-					'More matches found...': t('More matches found...'),
-					'type here to search': t('type here to search'),
-					'new': t('new'),
-					'Select': t('Select')
-				},
-				placeholder: t('type here to search'),
-				data: [],
-				excludeids: [],
-				addNew: false,
-				defaultValue: null,
-				disabled: false,
-				selectedLimit: 0,
-				limit: 20,
-				popup: {},
-				styles: {}
-			};
+			url: '',
+			name: '',
+			object_label: '',
+			labels: {
+				'No matches found': t('No matches found'),
+				'More matches found...': t('More matches found...'),
+				'type here to search': t('type here to search'),
+				'new': t('new'),
+				'Select': t('Select')
+			},
+			placeholder: t('type here to search'),
+			data: [],
+			excludeids: [],
+			addNew: false,
+			defaultValue: null,
+			custom_select: false,
+			disabled: false,
+			selectedLimit: 0,
+			limit: 20,
+			popup: {},
+			styles: {}
+		};
 
 		options = $.extend({}, defaults, options);
 
@@ -371,23 +419,24 @@
 			$obj.removeAttr('aria-required');
 
 			var ms = {
-					options: options,
-					values: {
-						search: '',
-						searches: {},
-						searching: {},
-						selected: {},
-						available: {},
-						available_div: $('<div>', {'class': 'multiselect-available'}),
+				options: options,
+				values: {
+					search: '',
+					searches: {},
+					searching: {},
+					selected: {},
+					available: {},
+					available_div: $('<div>', {'class': 'multiselect-available'}),
 
-						/*
-						 * Indicates a false click on an available list, but not on some actual item.
-						 * In such case the "focusout" event (IE) of the search input should not be processed.
-						 */
-						available_false_click: false
-					},
-					select_button: null
-				};
+					/*
+					 * Indicates a false click on an available list, but not on some actual item.
+					 * In such case the "focusout" event (IE) of the search input should not be processed.
+					 */
+					available_false_click: false
+				},
+				select_button: null,
+				optional_select_menu: []
+			};
 
 			ms.values.available_div.on('mousedown', 'li', function() {
 				/*
@@ -405,13 +454,13 @@
 			}));
 
 			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {
-					/*
-					 * Focus without options because here it don't matter.
-					 * Click used instead focus because in patternselect listen only click.
-					 */
-					$('input[type="text"]', $obj).click().focus();
-				}),
-				$selected_ul = $('<ul>', {'class': 'multiselect-list'});
+				/*
+				 * Focus without options because here it don't matter.
+				 * Click used instead focus because in patternselect listen only click.
+				 */
+				$('input[type="text"]', $obj).click().focus();
+			}),
+			$selected_ul = $('<ul>', {'class': 'multiselect-list'});
 
 			$obj.append($selected_div.append($selected_ul));
 
@@ -451,37 +500,21 @@
 			if (ms.options.custom_select || ms.options.popup.parameters !== undefined) {
 				ms.select_button = $('<button>', {
 					type: 'button',
-					'class': 'btn-grey',
+					'class': `${ZBX_STYLE_BTN_GREY} multiselect-button`,
 					text: ms.options.labels['Select']
 				});
+			}
+
+			if (ms.select_button !== null) {
+				if (ms.options.popup.parameters !== undefined) {
+					ms.select_button.on('click', (e) => openSelectPopup($obj, e.target));
+				}
 
 				if (ms.options.disabled) {
 					ms.select_button.prop('disabled', true);
 				}
 
-				if (ms.options.popup.parameters !== undefined) {
-					ms.select_button.on('click', function(event) {
-						var parameters = ms.options.popup.parameters;
-
-						if (ms.options.popup.filter_preselect) {
-							parameters = jQuery.extend(parameters, getFilterPreselect($obj, MS_ACTION_POPUP));
-						}
-
-						if (typeof parameters['disable_selected'] !== 'undefined' && parameters['disable_selected']) {
-							parameters['disableids'] = Object.keys(ms.values.selected);
-						}
-
-						// Click used instead focus because in patternselect only click is listened for.
-						$('input[type="text"]', $obj).click();
-
-						return PopUp('popup.generic', parameters, {
-							dialogue_class: 'modal-popup-generic',
-							trigger_element: event.target
-						});
-					});
-				}
-
-				$obj.after($('<div>', {'class': 'multiselect-button'}).append(ms.select_button));
+				addSelectButton($obj, ms.select_button);
 			}
 		});
 	};
@@ -797,6 +830,59 @@
 		}
 
 		$obj.trigger('change', ms);
+	}
+
+	function addSelectButton($obj, $button) {
+		let $container = $obj.siblings('.btn-split');
+
+		if (!$container.length) {
+			$container = $('<ul>', {'class': 'btn-split'});
+			$obj.after($container);
+		}
+
+		$container.append($('<li>').append($button));
+	}
+
+	function addOptionalSelect($obj, label, callback) {
+		const ms = $obj.data('multiSelect');
+
+		if (!ms.optional_select_menu.length) {
+			addSelectButton($obj, $('<button>', {
+				type: 'button',
+				class: `${ZBX_STYLE_BTN_GREY} ${ZBX_ICON_CHEVRON_DOWN_SMALL}`
+			}).on('click', function(event) {
+				jQuery(event.target).menuPopup(
+					[{items: ms.optional_select_menu}],
+					new jQuery.Event(event), {
+						position: {of: event.target, my: 'left top', at: 'left bottom', within: '.wrapper'}
+					}
+				);
+			}));
+		}
+
+		ms.optional_select_menu.push({label, clickCallback: callback});
+	}
+
+	function openSelectPopup($obj, open_trigger_element) {
+		const ms = $obj.data('multiSelect');
+
+		let parameters = ms.options.popup.parameters;
+
+		if (ms.options.popup.filter_preselect) {
+			parameters = jQuery.extend(parameters, getFilterPreselect($obj, MS_ACTION_POPUP));
+		}
+
+		if (parameters['disable_selected'] !== undefined && parameters['disable_selected']) {
+			parameters['disableids'] = Object.keys(ms.values.selected);
+		}
+
+		// Click used instead focus because in pattern select only click is listened for.
+		$('input[type="text"]', $obj).click();
+
+		PopUp('popup.generic', parameters, {
+			dialogue_class: 'modal-popup-generic',
+			trigger_element: open_trigger_element
+		});
 	}
 
 	function addSelected($obj, item) {

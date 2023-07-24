@@ -136,6 +136,10 @@ class CMultiSelect extends CTag {
 		return $this;
 	}
 
+	public function getParams(): array {
+		return $this->params;
+	}
+
 	public function getPostJS() {
 		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect('.json_encode($this->params).');';
 	}

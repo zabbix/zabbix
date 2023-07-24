@@ -19,12 +19,15 @@
 
 const ZBX_STYLE_COLLAPSED = 'collapsed';
 
+const ZBX_STYLE_BTN_ALT = 'btn-alt';
+const ZBX_STYLE_BTN_GREY = 'btn-grey';
 const ZBX_STYLE_BTN_ICON = 'btn-icon';
 
 const ZBX_ICON_BELL = 'zi-bell';
 const ZBX_ICON_BELL_OFF = 'zi-bell-off';
 const ZBX_ICON_CHECK = 'zi-check';
 const ZBX_ICON_CHEVRON_DOWN = 'zi-chevron-down';
+const ZBX_ICON_CHEVRON_DOWN_SMALL = 'zi-chevron-down-small';
 const ZBX_ICON_CHEVRON_LEFT = 'zi-chevron-left';
 const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';

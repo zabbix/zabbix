@@ -31,6 +31,10 @@ class CWidgetFieldMultiSelectHostView extends CWidgetFieldMultiSelectView {
 		return 'hosts';
 	}
 
+	protected function getObjectLabel(): string {
+		return $this->field->isMultiple() ? _('Hosts') : _('Host');
+	}
+
 	protected function getPopupParameters(): array {
 		return $this->popup_parameters + [
 			'srctbl' => 'hosts',

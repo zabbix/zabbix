@@ -31,6 +31,10 @@ class CWidgetFieldMultiSelectGraphPrototypeView extends CWidgetFieldMultiSelectV
 		return 'graph_prototypes';
 	}
 
+	protected function getObjectLabel(): string {
+		return $this->field->isMultiple() ? _('Graph prototypes') : _('Graph prototype');
+	}
+
 	protected function getPopupParameters(): array {
 		$parameters = $this->popup_parameters + [
 			'srctbl' => 'graph_prototypes',

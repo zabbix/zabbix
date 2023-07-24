@@ -3,6 +3,10 @@
 	position: relative;
 	vertical-align: top;
 	white-space: nowrap;
+
+	.btn-split {
+		margin-right: 0;
+	}
 }
 
 .multiselect {
@@ -119,10 +123,6 @@
 		bottom: 0;
 		z-index: -1;
 	}
-}
-
-.multiselect-button {
-	vertical-align: top;
 }
 
 .multiselect-suggest {

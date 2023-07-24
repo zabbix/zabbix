@@ -28,6 +28,10 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	// Is selecting multiple objects or a single one?
 	private bool $is_multiple = true;
 
+	private bool $default_prevented = false;
+	private bool $widget_accepted = false;
+	private bool $dashboard_accepted = false;
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
@@ -69,5 +73,78 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		$this->is_multiple = $is_multiple;
 
 		return $this;
+	}
+
+	public function idDefaultPrevented(): bool {
+		return $this->default_prevented;
+	}
+
+	/**
+	 * Disable exact object selection, like item or host.
+	 *
+	 * @return $this
+	 */
+	public function preventDefault($default_prevented = true): self {
+		$this->default_prevented = $default_prevented;
+
+		$this->setMultiple(false);
+
+		return $this;
+	}
+
+	public function isWidgetAccepted(): bool {
+		return $this->widget_accepted;
+	}
+
+	/**
+	 * Allow selecting widget as reference.
+	 *
+	 * @return $this
+	 */
+	public function acceptWidget($widget_accepted = true): self {
+		$this->widget_accepted = $widget_accepted;
+
+		return $this;
+	}
+
+	public function isDashboardAccepted(): bool {
+		return $this->dashboard_accepted;
+	}
+
+	/**
+	 * Allow selecting dashboard as reference.
+	 *
+	 * @return $this
+	 */
+	public function acceptDashboard($dashboard_accepted = true): self {
+		$this->dashboard_accepted = $dashboard_accepted;
+
+		return $this;
+	}
+
+	protected function getValidationRules(): array {
+		$value = $this->getValue();
+
+		if (is_array($value) && array_key_exists('reference', $value)) {
+			return ['type' => API_OBJECT, 'fields' => [
+				'reference' =>    ['type' => API_STRING_UTF8]
+			]];
+		}
+
+		return parent::getValidationRules();
+	}
+
+	public function toApi(array &$widget_fields = []): void {
+		$value = $this->getValue();
+
+		if ($value !== $this->default) {
+			if (is_array($value) && array_key_exists('reference', $value)) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'[reference]',
+					'value' => $value['reference']
+				];
+			}
+		}
 	}
 }

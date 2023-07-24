@@ -32,4 +32,8 @@ class CWidgetFieldMultiSelectServiceView extends CWidgetFieldMultiSelectView {
 	protected function getObjectName(): string {
 		return 'services';
 	}
+
+	protected function getObjectLabel(): string {
+		return $this->field->isMultiple() ? _('Services') : _('Service');
+	}
 }
