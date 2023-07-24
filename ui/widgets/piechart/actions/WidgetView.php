@@ -480,7 +480,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$values = [];
 
 				foreach ($results as $result) {
-					$values[] = $result['data'][0]['value'];
+					if ($metric['options']['aggregate_function'] == AGGREGATE_COUNT) {
+						$values[] = $result['data'][count($result['data'])-1]['count'];
+					}
+					else {
+						$values[] = $result['data'][count($result['data'])-1]['value'];
+					}
 				}
 
 				if ($metric['options']['dataset_aggregation'] != AGGREGATE_NONE) {
