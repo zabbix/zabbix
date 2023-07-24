@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * Test suite for data collection using both active and passive agents.
  *
- * @backup history
+ * @backup history, hosts, host_rtdata, proxy, proxy_rtdata
  */
 class testDataCollection extends CIntegrationTest {
 
@@ -37,11 +37,11 @@ class testDataCollection extends CIntegrationTest {
 	public function prepareData() {
 		// Create proxy "proxy".
 		CDataHelper::call('proxy.create', [
-			'host' => 'proxy',
-			'status' => PROXY_MODE_ACTIVE
+			'name' => 'proxy',
+			'mode' => PROXY_MODE_ACTIVE
 		]);
 
-		$proxyids = CDataHelper::getIds('host');
+		$proxyids = CDataHelper::getIds('name');
 
 		// Create host "agent", "custom_agent" and "proxy agent".
 		$interfaces = [

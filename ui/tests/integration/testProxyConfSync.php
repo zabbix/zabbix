@@ -29,7 +29,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @backup group_prototype, host_discovery, host_inventory, hostmacro, host_rtdata, hosts, hosts_groups, hosts_templates
  * @backup hstgrp, interface, item_condition, item_discovery, item_parameter, item_preproc, item_rtdata, items
  * @backup lld_macro_path, lld_override, lld_override_condition, lld_override_opdiscover, lld_override_operation
- * @backup lld_override_opstatus
+ * @backup lld_override_opstatus, proxy, proxy_rtdata
  */
 class testProxyConfSync extends CIntegrationTest
 {
@@ -1069,15 +1069,11 @@ class testProxyConfSync extends CIntegrationTest
 	public function createProxy()
 	{
 		$response = $this->call('proxy.create', [
-			'host' => 'Proxy',
-			'status' => PROXY_MODE_PASSIVE,
+			'name' => 'Proxy',
+			'mode' => PROXY_MODE_PASSIVE,
 			'hosts' => [],
-			'interface' => [
-				"ip" => "127.0.0.1",
-				"dns" => "",
-				"useip" => "1",
-				"port" => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
-			]
+			'address' => '127.0.0.1',
+			'port' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 	}
@@ -1097,7 +1093,7 @@ class testProxyConfSync extends CIntegrationTest
 				'VaultURL' => 'https://127.0.0.1:1858'
 			],
 			self::COMPONENT_PROXY => [
-				'ProxyMode' => 1,
+				'ProxyMode' => PROXY_MODE_PASSIVE,
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
 				'Hostname' => 'Proxy',
