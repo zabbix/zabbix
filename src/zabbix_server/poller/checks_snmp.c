@@ -2046,7 +2046,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response, 
 	if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 	{
 		char	err[MAX_STRING_LEN];
-	
+
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, err, sizeof(err));
 		*error = zbx_strdup(NULL, err);
 		goto out;
@@ -2135,8 +2135,7 @@ typedef struct
 }
 zbx_snmp_bulkwalk_config_t;
 
-int	asynch_response(int operation, struct snmp_session *sp, int reqid,
-		    struct snmp_pdu *pdu, void *magic)
+static int	asynch_response(int operation, struct snmp_session *sp, int reqid, struct snmp_pdu *pdu, void *magic)
 {
 	zbx_bulkwalk_context_t		*bulkwalk_context = (zbx_bulkwalk_context_t *)magic;
 	zbx_snmp_bulkwalk_config_t	*snmp_bulkwalk_config = (zbx_snmp_bulkwalk_config_t *)bulkwalk_context->arg;
@@ -2209,11 +2208,11 @@ static int	snmp_bulkwalk_add(zbx_snmp_bulkwalk_config_t *snmp_bulkwalk_config, i
 	}
 
 	struct netsnmp_transport_s	*transport;
-	
+
 	int				numfds = 0, block = 0, count;
 	fd_set				fdset;
 	struct timeval			timeout = {.tv_sec = 3};
-	
+
 	FD_ZERO(&fdset);
 
 	netsnmp_large_fd_set_init(&bulkwalk_context->fdset, FD_SETSIZE);
@@ -2342,7 +2341,6 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, const zbx_dc_item
 	
 		snmp_sess_read2(snmp_bulkwalk_config->bulkwalk_contexts.values[i]->ssp,
 				&snmp_bulkwalk_config->bulkwalk_contexts.values[i]->fdset);
-					
 	}
 
 	SET_TEXT_RESULT(result, NULL != snmp_bulkwalk_config->results ? snmp_bulkwalk_config->results :
