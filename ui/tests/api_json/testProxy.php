@@ -1777,7 +1777,7 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
 			],
-			'Test proxy.create: invalid "address" (too long) for passive proxy' => [
+			'Test proxy.update: invalid "address" (too long) for passive proxy' => [
 				'proxy' => [
 					'proxyid' => 'update_passive_defaults',
 					'address' => str_repeat('a', DB::getFieldLength('proxy', 'address') + 1)
