@@ -23,6 +23,10 @@ require 'include/forms.inc.php';
 
 class CControllerItemEdit extends CController {
 
+	protected function init() {
+		$this->disableCsrfValidation();
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'hostid'				=> 'required|id',
@@ -132,7 +136,11 @@ class CControllerItemEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return true;
+		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN
+			&& API::Host()->get([
+				'hostids' => $this->getInput('hostid'),
+				'editable' => true
+			]);
 	}
 
 	public function doAction() {
@@ -141,11 +149,11 @@ class CControllerItemEdit extends CController {
 		$host = $this->getInput('context') === 'host' ? $this->getHost($hostid) : $this->getTemplate($hostid);
 		$data = [
 			'action' => $this->getAction(),
-			'readonly' => false,// TODO
+			'readonly' => false,
 			'host' => $host,
 			'valuemap' => [],
 			'inventory_fields' => [],
-			'form' => $form_refresh ? $this->getFormData() : $this->getItemData(),
+			'form' => $form_refresh || !$this->hasInput('itemid') ? $this->getFormData() : $this->getItemData(),
 			'form_refresh' => $form_refresh,
 			'display_interfaces' => false,
 			'parent_templates' => [],
@@ -400,26 +408,6 @@ class CControllerItemEdit extends CController {
 			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 		}
 
-		if (!$item['delay_flex']) {
-			$item['delay_flex'] = [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]];
-		}
-
-		if (!$item['parameters']) {
-			$item['parameters'] = [['name' => '', 'value' => '']];
-		}
-
-		if (!$item['query_fields']) {
-			$item['query_fields'] = [['name' => '', 'value' => '']];
-		}
-
-		if (!$item['headers']) {
-			$item['headers'] = [['name' => '', 'value' => '']];
-		}
-
-		if (!$item['tags']) {
-			$item['tags'] = [['tag' => '', 'value' => '']];
-		}
-
 		return $item;
 	}
 
@@ -471,7 +459,7 @@ class CControllerItemEdit extends CController {
 			'privatekey' => DB::getDefault('items', 'privatekey'),
 			'params' => DB::getDefault('items', 'params'),
 			'units' => DB::getDefault('items', 'units'),
-			'delay' => DB::getDefault('items', 'delay'),
+			'delay' => ZBX_ITEM_DELAY_DEFAULT,
 			'history_mode' => ITEM_STORAGE_OFF,
 			'history' => DB::getDefault('items', 'history'),
 			'trends_mode' => ITEM_STORAGE_OFF,

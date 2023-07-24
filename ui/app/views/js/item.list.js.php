@@ -87,6 +87,7 @@
 			});
 			this.form.addEventListener('click', (e) => {
 				const target = e.target;
+				const itemids = Object.keys(chkbxRange.getSelectedIds());
 
 				if (target.classList.contains('js-update-item')) {
 					this.#edit(target, {itemid: target.dataset.itemid});
@@ -98,25 +99,25 @@
 					this.#disable(null, [target.dataset.itemid]);
 				}
 				else if (target.classList.contains('js-massenable-item')) {
-					this.#enable(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#enable(target, itemids);
 				}
 				else if (target.classList.contains('js-massdisable-item')) {
-					this.#disable(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#disable(target, itemids);
 				}
 				else if (target.classList.contains('js-massexecute-item')) {
-					this._executeItems(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#execute(target, itemids);
 				}
 				else if (target.classList.contains('js-massclearhistory-item')) {
-					this._clearItems(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#clear(target, itemids);
 				}
 				else if (target.classList.contains('js-masscopy-item')) {
-					this._copyItems(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#copy(target, itemids);
 				}
 				else if (target.classList.contains('js-massupdate-item')) {
-					this._updateItems(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#massupdate(target, itemids);
 				}
 				else if (target.classList.contains('js-massdelete-item')) {
-					this._deleteItems(target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#delete(target, itemids);
 				}
 			});
 			document.addEventListener('click', (e) => {
@@ -154,7 +155,7 @@
 			curl.setArgument('action', 'item.enable');
 
 			if (target !== null) {
-				this.#confirmPost(curl, {itemids}, target);
+				this.#confirmAction(curl, {itemids}, target);
 			}
 			else {
 				this.#post(curl, {itemids});
@@ -166,84 +167,60 @@
 			curl.setArgument('action', 'item.disable');
 
 			if (target !== null) {
-				this.#confirmPost(curl, {itemids}, target);
+				this.#confirmAction(curl, {itemids}, target);
 			}
 			else {
 				this.#post(curl, {itemids});
 			}
 		}
 
-		_executeItems(target, itemids) {
+		#execute(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
 
-			this._post(target, {itemids}, curl);
+			this.#confirmAction(curl, {itemids}, target);
 		}
 
-		_clearItems(target, itemids) {
+		#clear(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.clear');
 
-			this._confirmWithPost(target, {itemids}, curl);
+			this.#confirmAction(curl, {itemids}, target);
 		}
 
-		_copyItems(target, itemids) {
-			const parameters = {
-				itemids: Object.keys(chkbxRange.getSelectedIds()),
-				source: 'items'
-			};
-			const overlay = PopUp('copy.edit', parameters, {
+		#copy(target, itemids) {
+			this.#popup('copy.edit', {
+				source: 'items',
+				itemids
+			}, {
 				dialogueid: 'copy',
-				dialogue_class: 'modal-popup-static'
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-				uncheckTableRows('item');
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
+				dialogue_class: 'modal-popup-static',
+				trigger_element: target
 			});
 		}
 
-		_updateItems(target, itemids) {
-			let action;
-			let params = {
-				context: target.closest('form').querySelector('[name="context"]').value,
-				prototype: 0
+		#massupdate(target, itemids) {
+			const parameters = {
+				context: this.context,
+				prototype: 0,
+				ids: itemids
 			}
-			params[this.token[0]] = this.token[1];
-			const reloadPage = e => {
-				location.href = location.href;
-			}
+			parameters[this.token.token] = this.token.value;
 
-			if (target.classList.contains('js-massupdate-item')) {
-				action = 'item.massupdate';
-				params.ids = Object.keys(chkbxRange.getSelectedIds());
-			}
-			// else {
-			// 	action = 'item.edit';
-			// 	params.hostid = this.hostids[0];
-			// 	params.itemid = itemids.pop();
-			// }
-
-			const overlay = PopUp(action, params, {
+			this.#popup('item.massupdate', parameters, {
 				dialogue_class: 'modal-popup-preprocessing',
 				trigger_element: target
 			});
 		}
 
-		_deleteItems(target, itemids) {
+		#delete(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.delete');
 
-			this._confirmWithPost(target, {itemids}, curl);
+			this.#confirmAction(curl, {itemids}, target);
 		}
 
-		#confirmPost(curl, data, target) {
+		#confirmAction(curl, data, target) {
 			const confirm = this.confirm_messages[curl.getArgument('action')];
 			const message = confirm[data.itemids.length > 1 ? 1 : 0];
 
@@ -260,7 +237,7 @@
 		}
 
 		#post(curl, data) {
-			data[this.token[0]] = this.token[1];
+			data[this.token.token] = this.token.value;
 
 			return fetch(curl.getUrl(), {
 				method: 'POST',
@@ -294,6 +271,26 @@
 
 					addMessage(message_box);
 				});
+		}
+
+		#popup(action, parameters, overlay_options) {
+			const overlay = PopUp(action, parameters, overlay_options);
+			const responseHandler = (e) => {
+				postMessageOk(e.detail.title);
+				uncheckTableRows('item');
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			}
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', responseHandler);
+			overlay.$dialogue[0].addEventListener('dialogue.create', responseHandler);
+			overlay.$dialogue[0].addEventListener('dialogue.update', responseHandler);
+
+			return overlay;
 		}
 
 		editHost(e, hostid) {

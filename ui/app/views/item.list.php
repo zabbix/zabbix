@@ -304,7 +304,10 @@ $confirm_messages = [
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')],
+		'token' => [
+			'token' => CCsrfTokenHelper::CSRF_TOKEN_NAME,
+			'value' => CCsrfTokenHelper::get('item')
+		],
 		'context' => $data['context'],
 		'confirm_messages' => $confirm_messages,
 		'hostids' => array_column($data['filter_data']['ms_hosts'], 'id'),

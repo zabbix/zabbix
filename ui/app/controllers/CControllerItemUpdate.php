@@ -145,6 +145,18 @@ class CControllerItemUpdate extends CController {
 			$field_map['http_password'] = 'password';
 		}
 
+		if ($this->hasInput('tags')) {
+			$tags = [];
+
+			foreach ($input['tags'] as $tag) {
+				if ($tag['tag'] !== '' || $tag['value'] !== '') {
+					$tags[] = $tag;
+				}
+			}
+
+			$input['tags'] = $tags;
+		}
+
 		$input = CArrayHelper::renameKeys($input, $field_map);
 		$item = ['itemid' => $this->getInput('itemid')];
 		[$db_item] = API::Item()->get([
@@ -152,7 +164,8 @@ class CControllerItemUpdate extends CController {
 			'selectHosts' => ['status'],
 			'itemids' => [$item['itemid']]
 		]);
+		$item += getSanitizedItemFields($input + $db_item);
 
-		return $item + getSanitizedItemFields($input + $db_item);
+		return $item;
 	}
 }
