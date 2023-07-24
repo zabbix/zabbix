@@ -69,21 +69,6 @@
 
 				location.href = location.href;
 			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
 		},
 
 		edit(parameters = {}) {
@@ -95,7 +80,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});

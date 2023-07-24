@@ -150,10 +150,9 @@
 								return;
 							}
 						}
-
 						overlayDialogueDestroy(this.overlay.dialogueid);
 
-						this.editTemplate({templateid: e.target.dataset.templateid});
+						this.editTemplate({templateid: e.target.dataset.templateid}, this.dialogue);
 					}
 					else {
 						this.editTemplate({templateid: e.target.dataset.templateid});
@@ -162,46 +161,37 @@
 			});
 		},
 
-		editTemplate(parameters) {
+		editTemplate(parameters, dialogue = null) {
 			const overlay = PopUp('template.edit', parameters, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
+			if (dialogue) {
+				overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+				);
+			}
+			else {
+				overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+					postMessageOk(e.detail.title);
 
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
+					if ('success' in e.detail) {
+						postMessageOk(e.detail.success.title);
 
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
+						if ('messages' in e.detail.success) {
+							postMessageDetails('success', e.detail.success.messages);
+						}
 					}
-				}
 
-				location.href = location.href;
-			});
+					location.href = location.href;
+				});
 
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				new TabIndicators('host-tabs');
-			});
+				overlay.$dialogue[0].addEventListener('overlay.close', () => {
+					new TabIndicators('host-tabs');
+				});
+			}
 		},
 
 		/**

@@ -69,14 +69,14 @@ window.host_edit_popup = {
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
 				if ('hostid' in fields) {
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 						detail: {
 							success: response.success
 						}
 					}));
 				}
 				else {
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.create', {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 						detail: {
 							success: response.success
 						}
@@ -122,7 +122,7 @@ window.host_edit_popup = {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 					detail: {
 						success: response.success
 					}

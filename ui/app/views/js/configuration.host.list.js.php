@@ -52,22 +52,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('templates');
+				uncheckTableRows('hosts');
 				postMessageOk(e.detail.title);
 
 				if ('success' in e.detail) {
@@ -130,9 +115,7 @@
 				prevent_navigation: true
 			});
 
-			this.overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			this.overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			this.overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
+			this.overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 			this.overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -196,7 +179,7 @@
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

@@ -69,6 +69,8 @@ class CControllerHostMassDelete extends CController {
 				$success['messages'] = array_column($messages, 'message');
 			}
 
+			$success['action'] = 'delete';
+			$success['context'] = 'host';
 			$output['success'] = $success;
 		}
 		else {

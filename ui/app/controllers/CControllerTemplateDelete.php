@@ -115,6 +115,8 @@ class CControllerTemplateDelete extends CController {
 				$success['messages'] = array_column($messages, 'message');
 			}
 
+			$success['action'] = 'delete';
+			$success['context'] = 'template';
 			$output['success'] = $success;
 		}
 		else {

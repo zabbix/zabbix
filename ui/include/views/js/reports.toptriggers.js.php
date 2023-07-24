@@ -40,9 +40,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -56,7 +54,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementSuccess, {once: true});
 		},
 
 		events: {

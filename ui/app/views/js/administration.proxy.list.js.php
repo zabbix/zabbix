@@ -76,8 +76,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.configRefresh', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail));
 		}
 
 		_editHost(hostid) {
@@ -89,9 +87,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.update', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			});

@@ -271,11 +271,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete',
-				this.events.elementDelete.bind(this, 'host.list'), {once: true}
-			);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -290,9 +286,6 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete',
-				this.events.elementDelete.bind(this, 'template.list'), {once: true}
-			);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -320,32 +313,26 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 		events: {
 			elementSuccess(e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
 
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
+					}
+
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('host_discovery.php');
+						curl.setArgument('context', data.success.context);
 					}
 				}
 
-				view.refresh();
-			},
-
-			elementDelete(action, e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-
-					const curl = new Curl('zabbix.php');
-					curl.setArgument('action', action);
-
+				if (curl) {
 					location.href = curl.getUrl();
+				}
+				else {
+					view.refresh();
 				}
 			}
 		}

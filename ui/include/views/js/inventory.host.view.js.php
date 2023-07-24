@@ -43,9 +43,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.elementSuccess);
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.elementSuccess);
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementDelete);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			});
@@ -59,13 +57,13 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementDelete, {once: true});
 		}
 
 		_registerEvents() {
 			this.events = {
 				elementSuccess(e) {
 					const data = e.detail;
+					let curl = null;
 
 					if ('success' in data) {
 						postMessageOk(data.success.title);
@@ -73,21 +71,13 @@
 						if ('messages' in data.success) {
 							postMessageDetails('success', data.success.messages);
 						}
-					}
 
-					location.href = location.href;
-				},
-
-				elementDelete(e) {
-					if ('success' in e.detail) {
-						postMessageOk(e.detail.success.title);
-
-						if ('messages' in e.detail.success) {
-							postMessageDetails('success', e.detail.success.messages);
+						if ('action' in data.success && data.success.action === 'delete') {
+							curl = new Curl('hostinventories.php').getUrl();
 						}
 					}
 
-					location.href = new Curl('hostinventories.php').getUrl();
+					location.href = curl === null ? location.href : curl;
 				}
 			};
 		}

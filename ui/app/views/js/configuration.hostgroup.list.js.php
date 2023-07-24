@@ -68,11 +68,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('hostgroup');
-
-				this._reload(e.detail);
-			});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -125,9 +120,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.update', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail.success));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			});
@@ -141,7 +134,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail.success));
 		},
 
 		_post(target, groupids, url) {
@@ -188,6 +180,7 @@
 		},
 
 		_reload(success) {
+			uncheckTableRows('hostgroup');
 			postMessageOk(success.title);
 
 			if ('messages' in success) {

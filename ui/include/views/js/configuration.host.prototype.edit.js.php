@@ -219,7 +219,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				new TabIndicators('host-tabs');
 				history.replaceState({}, '', original_url);
@@ -237,6 +236,7 @@
 		events: {
 			templateSuccess(e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -244,26 +244,19 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				view.refresh();
-			},
-
-			templateDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('host_discovery.php');
+						curl.setArgument('context', data.success.context);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'template.list');
-
-				location.href = curl.getUrl();
+				if (curl) {
+					location.href = curl.getUrl();
+				}
+				else {
+					view.refresh();
+				}
 			}
 		}
 	}

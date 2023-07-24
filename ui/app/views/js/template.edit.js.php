@@ -171,56 +171,21 @@ window.template_edit_popup = new class {
 			}
 		}
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'template.edit');
+		overlayDialogueDestroy(this.overlay.dialogueid);
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({templateid: templateid})
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
+		const overlay = PopUp('template.edit', {templateid: templateid}, {
+			dialogueid: 'templates-form',
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
+		});
 
-				response.buttons.push({
-					'title': t('Cancel'),
-					'class': 'btn-alt js-cancel',
-					'cancel': true,
-					'action': function() {}
-				});
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}));
+		});
 
-				const new_data = {
-					content: response.body,
-					buttons: response.buttons,
-					title: response.header,
-					script_inline: response.script_inline
-				};
-
-				this.overlay.setProperties(new_data);
-			})
-			.catch((exception) =>  {
-				clearMessages();
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title);
-
-				addMessage(message_box);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+		overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
+		});
 	}
 
 	#unlinkAndClearTemplate(templateid) {
@@ -323,7 +288,7 @@ window.template_edit_popup = new class {
 		this.#post(curl.getUrl(), data, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
