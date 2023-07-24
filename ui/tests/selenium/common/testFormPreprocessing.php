@@ -2668,7 +2668,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	}
 
 	/*
-	 * Inheritance of preprocessing steps for item and item prortotype.
+	 * Inheritance of preprocessing steps for item and item prototype.
 	 */
 	public function getItemInheritancePreprocessing() {
 		$data = $this->getCommonInheritancePreprocessing();

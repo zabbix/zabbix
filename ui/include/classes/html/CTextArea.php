@@ -22,13 +22,6 @@
 class CTextArea extends CTag {
 
 	/**
-	 * The "&" symbol in the textarea should be encoded.
-	 *
-	 * @var int
-	 */
-	protected $encStrategy = self::ENC_ALL;
-
-	/**
 	 * Init textarea.
 	 *
 	 * @param string	$name
@@ -81,6 +74,12 @@ class CTextArea extends CTag {
 
 	public function setMaxlength($maxlength) {
 		$this->setAttribute('maxlength', $maxlength);
+		return $this;
+	}
+
+	public function disableSpellcheck(): self {
+		$this->setAttribute('spellcheck', 'false');
+
 		return $this;
 	}
 

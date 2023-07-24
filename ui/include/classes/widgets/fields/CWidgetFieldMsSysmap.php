@@ -18,21 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageWeb extends CLegacyWebTest {
-	public function testPageWeb_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
-		$this->zbxTestCheckTitle('Web monitoring');
-		$this->zbxTestCheckHeader('Web monitoring');
-		$this->zbxTestTextPresent(['Group', 'Host']);
-		$this->zbxTestTextPresent(['Host', 'Name', 'Number of steps', 'Last check', 'Status']);
-	}
+class CWidgetFieldMsSysmap extends CWidgetFieldMs {
 
-// Check that no real host or template names displayed
-	public function testPageWeb_NoHostNames() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
-		$this->zbxTestCheckTitle('Web monitoring');
-		$this->zbxTestCheckNoRealHostnames();
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
 	}
 }

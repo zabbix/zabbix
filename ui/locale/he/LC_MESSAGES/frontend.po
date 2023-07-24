@@ -1425,6 +1425,10 @@ msgstr "יחוס"
 msgid "Attribution HTML"
 msgstr ""
 
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
 #: include/classes/helpers/CRoleHelper.php:382
@@ -2831,6 +2835,11 @@ msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s�
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "לא ניתן לקשר את התבנית „%1$s” למארח „%2$s” עקב הביטוי של ההקפצה „%3$s”."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -2851,6 +2860,11 @@ msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס ה�
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "לא ניתן לקשר את התבנית „%1$s” לאבטיפוס המארח „%2$s” עקב הביטוי של ההקפצה „%3$s”."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -2882,6 +2896,41 @@ msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "לא ניתן לקשר את התבנית „%1$s” לתבנית „%2$s”, מכיוון שזה יוביל לקישור מעגלי (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3726,6 +3775,15 @@ msgstr "שעון"
 #: include/views/monitoring.sysmap.edit.php:421 jsLoader.php:355
 msgid "Clone"
 msgstr "שכפול"
+
+#: app/views/configuration.host.edit.php:63
+#: app/views/js/popup.host.edit.js.php:47 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:194
+msgid "Cloned template parameter values have been modified."
+msgstr ""
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
@@ -17744,6 +17802,10 @@ msgstr "התרשים לא מתגלה יותר ויימחק תוך %1$s‏ (ב־%
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "התרשים לא מתגלה עוד ויימחק בפעם הבאה שכלל הגילוי יעובד."
 
+#: app/controllers/CControllerHostEdit.php:265 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -17806,6 +17868,10 @@ msgstr "ה־JSON שהתקבל אינו בקשת JSON-RPC תקנית."
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "הפקודה המרוחקת המבוקשת אינה קיימת / זמינה"
+
+#: templates.php:180
+msgid "The template being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/administration.token.view.php:52
 #: app/views/administration.user.token.view.php:51
@@ -21124,6 +21190,10 @@ msgstr "atan()‎ - הטנגנס ההפוך של ערך כזווית, מבוטא
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2()‎ - הארקטנגנס של הנקודות בצירים האנכי והאופקי שמיוצגים כזווית, ברדיאנים"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
 
 #: include/events.inc.php:63
 msgid "autoregistered host"

@@ -143,20 +143,61 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
 
-	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+	$warnings = [];
 
-		warning(_('The cloned host prototype contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
+	// Reset macro type and value.
+	$secret_macro_reset = false;
+
+	foreach ($macros as &$macro) {
+		if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
+			$macro['deny_revert'] = true;
+
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	foreach ($macros as &$macro) {
+		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+			$macro = [
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'value' => ''
+			] + $macro;
+
+			$secret_macro_reset = true;
+
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	if ($secret_macro_reset) {
+		$warnings[] = _('The cloned host prototype contains user defined macros with type "Secret text". The value and type of these macros were reset.');
 	}
 
 	$macros = array_map(function(array $macro): array {
 		return array_diff_key($macro, array_flip(['hostmacroid']));
 	}, $macros);
+
+	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && getRequest('group_links')) {
+		$editable_groups_count = API::HostGroup()->get([
+			'countOutput' => true,
+			'groupids' => getRequest('group_links'),
+			'editable' => true
+		]);
+
+		if ($editable_groups_count != count(getRequest('group_links'))) {
+			$warnings[] = _("The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host.");
+		}
+	}
+
+	if ($warnings) {
+		if (count($warnings) > 1) {
+			CMessageHelper::setWarningTitle(_('Cloned host parameter values have been modified.'));
+		}
+
+		array_map('CMessageHelper::addWarning', $warnings);
+	}
 
 	$_REQUEST['form'] = 'clone';
 }
@@ -374,7 +415,8 @@ if (hasRequest('form')) {
 			$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
 			foreach ($data['host_prototype']['macros'] as &$macro) {
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+						&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
 					$macro['allow_revert'] = true;
 				}
 			}
@@ -467,13 +509,25 @@ if (hasRequest('form')) {
 		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
 	];
 
+	// Editable host groups.
+	$groups_rw = ($data['groups'] && CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+		? API::HostGroup()->get([
+			'output' => [],
+			'groupids' => array_keys($data['groups']),
+			'editable' => true,
+			'preservekeys' => true
+		])
+		: [];
+
 	$data['groups_ms'] = [];
 
 	foreach ($data['groups'] as $group) {
 		$data['groups_ms'][] = [
 			'id' => $group['groupid'],
 			'name' => $group['name'],
-			'inaccessible' => (array_key_exists('inaccessible', $group) && $group['inaccessible'])
+			'inaccessible' => array_key_exists('inaccessible', $group) && $group['inaccessible'],
+			'disabled' => CWebUser::getType() != USER_TYPE_SUPER_ADMIN
+					&& !array_key_exists($group['groupid'], $groups_rw)
 		];
 	}
 

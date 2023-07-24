@@ -383,7 +383,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		// We remove from the result list templates that is not displayed there.
 		if (array_key_exists('absent_problems', $data)) {
-			$filtering = $this->getTableResult('Problem');
+			$filtering = $this->getTableColumnData('Problem');
 			foreach ($data['absent_problems'] as $absence) {
 				if (($key = array_search($absence, $filtering))) {
 					unset($filtering[$key]);
@@ -445,8 +445,9 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('details_0');
 
 		// Apply filter and check result
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->query('name:filter_apply')->one()->click();
-		$this->query('xpath://form[@name="problem"]')->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');

@@ -327,8 +327,7 @@ class CSvgGraph extends CSvg {
 			$this->left_y_max = $options['max'];
 		}
 		if ($options['units'] !== null) {
-			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
-			$this->left_y_units = htmlspecialchars($units);
+			$this->left_y_units = trim(preg_replace('/\s+/', ' ', $options['units']));
 		}
 
 		return $this;
@@ -355,8 +354,7 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $options['max'];
 		}
 		if ($options['units'] !== null) {
-			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
-			$this->right_y_units = htmlspecialchars($units);
+			$this->right_y_units = trim(preg_replace('/\s+/', ' ', $options['units']));
 		}
 
 		return $this;
@@ -560,7 +558,7 @@ class CSvgGraph extends CSvg {
 			$this->left_y_max = $this->max_value_left ? : 1;
 		}
 
-		$this->left_y_is_binary = $this->left_y_units === 'B' || $this->left_y_units === 'Bps';
+		$this->left_y_is_binary = isBinaryUnits($this->left_y_units);
 
 		$calc_power = $this->left_y_units === '' || $this->left_y_units[0] !== '!';
 
@@ -591,8 +589,7 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $this->max_value_right ? : 1;
 		}
 
-		$this->right_y_is_binary = $this->right_y_units === 'B' || $this->right_y_units === 'Bps';
-
+		$this->right_y_is_binary = isBinaryUnits($this->right_y_units);
 		$calc_power = $this->right_y_units === '' || $this->right_y_units[0] !== '!';
 
 		$result = calculateGraphScaleExtremes($this->right_y_min, $this->right_y_max, $this->right_y_is_binary,

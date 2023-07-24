@@ -1389,7 +1389,9 @@ zbx_file_time_t;
 
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
-int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+#define ZBX_READ_ERR		-1
+#define ZBX_READ_WRONG_ENCODING	-2
+int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
 int	zbx_write_all(int fd, const char *buf, size_t n);
@@ -1630,6 +1632,7 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int 
 		zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op);
 
 int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc);
 char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);

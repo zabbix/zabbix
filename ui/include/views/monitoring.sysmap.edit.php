@@ -137,7 +137,7 @@ $icon_mapping_link = (new CLink(_('show icon mappings'), (new CUrl('zabbix.php')
 	))
 	->setTarget('_blank');
 $map_tab->addRow(new CLabel(_('Automatic icon mapping'), $icon_mapping->getFocusableElementId()),
-	[$icon_mapping, SPACE, $icon_mapping_link]
+	[$icon_mapping, NBSP(), $icon_mapping_link]
 );
 
 // Append multiple checkboxes to form list.
@@ -172,6 +172,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append host to form list.
@@ -186,6 +187,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append trigger to form list.
@@ -200,6 +202,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append map to form list.
@@ -214,6 +217,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append image to form list.
@@ -228,6 +232,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append map element label to form list.
