@@ -98,7 +98,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'units_value' => $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
 					? $this->fields_values['units']
 					: null
-			]
+			],
+			'legend_aggregation_show' => $this->fields_values['legend_aggregation'] == PIE_CHART_LEGEND_AGGREGATION_ON
 		];
 
 		$data = [
@@ -137,7 +138,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		self::sortByDataset($metrics);
 		self::getTimePeriod($metrics, $options['time_period']);
 		self::getChartDataSource($metrics, $errors, $options['data_source']);
-		self::getMetricsData($metrics, $options['data_sets']);
+		self::getMetricsData($metrics, $options['data_sets'], $options['legend_aggregation_show']);
 		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
 				$options['units'], $options['templateid']);
 
@@ -415,15 +416,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($metric);
 	}
 
-	private static function getMetricsData(array &$metrics, array $data_sets): void {
+	private static function getMetricsData(array &$metrics, array $data_sets, bool $legend_aggregation_show): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE) {
-				$name = self::aggr_fnc2str($metric['options']['aggregate_function']).
-					'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
+				if ($legend_aggregation_show) {
+					$name = self::aggr_fnc2str($metric['options']['aggregate_function']).
+						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
+				}
+				else {
+					$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+				}
 			}
 			else {
 				$name = $data_sets[$dataset_num]['data_set_label'] !== ''

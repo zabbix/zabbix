@@ -1584,6 +1584,12 @@ class PieLegendTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked) {
+			return true;
+		}
+
 		const legend_lines = document.getElementById('legend_lines');
 
 		if (legend_lines !== null && legend_lines.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_LINES_MIN) {

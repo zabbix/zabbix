@@ -189,6 +189,11 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(PIE_CHART_LEGEND_ON)
 			)
 			->addField(
+				(new CWidgetFieldCheckBox('legend_aggregation', _('Show aggregation function')))
+					->setDefault(PIE_CHART_LEGEND_AGGREGATION_OFF)
+					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
+			)
+			->addField(
 				(new CWidgetFieldRangeControl('legend_lines', _('Number of rows'),
 					PIE_CHART_LEGEND_LINES_MIN, PIE_CHART_LEGEND_LINES_MAX
 				))

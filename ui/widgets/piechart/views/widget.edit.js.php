@@ -681,6 +681,7 @@ window.widget_pie_chart_form = new class {
 				jQuery('#legend_columns').rangeControl(
 					e.target.checked ? 'enable' : 'disable'
 				);
+				document.getElementById('legend_aggregation').disabled = !e.target.checked;
 			});
 
 		// Trigger event to update tab indicators.

@@ -174,22 +174,35 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 		]);
 }
 
-function getLegendTab(CWidgetFormView $form, array $fields): CFormGrid {
+function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 	$show_legend_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
+	$show_aggregation_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_aggregation']));
 	$legend_lines_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
 	$legend_columns_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
 
-	return (new CFormGrid())
-		->addItem([
-			$show_legend_field->getLabel(),
-			new CFormField($show_legend_field->getView())
-		])
-		->addItem([
-			$legend_lines_field->getLabel(),
-			new CFormField($legend_lines_field->getView())
-		])
-		->addItem([
-			$legend_columns_field->getLabel(),
-			new CFormField($legend_columns_field->getView())
-		]);
+	return (new CDiv())
+		->addClass(ZBX_STYLE_GRID_COLUMNS)
+		->addClass(ZBX_STYLE_GRID_COLUMNS_2)
+		->addItem(
+			(new CFormGrid())
+				->addItem([
+					$show_legend_field->getLabel(),
+					new CFormField($show_legend_field->getView())
+				])
+				->addItem([
+					$show_aggregation_field->getLabel(),
+					new CFormField($show_aggregation_field->getView())
+				])
+		)
+		->addItem(
+			(new CFormGrid())
+				->addItem([
+					$legend_lines_field->getLabel(),
+					new CFormField($legend_lines_field->getView())
+				])
+				->addItem([
+					$legend_columns_field->getLabel(),
+					new CFormField($legend_columns_field->getView())
+				])
+		);
 }
