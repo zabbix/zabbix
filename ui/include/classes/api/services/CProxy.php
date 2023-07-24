@@ -458,12 +458,12 @@ class CProxy extends CApiService {
 			'name' =>				['type' => API_H_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('proxy', 'name')],
 			'mode' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE])],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
-			'allowed_addresses' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+			'allowed_addresses' =>	['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'address' => 			['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
-			'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
+			'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')]
 		]];
 		$api_input_rules['fields'] += self::getTlsFieldValidationRules();
 
