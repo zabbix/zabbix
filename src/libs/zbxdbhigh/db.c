@@ -20,9 +20,14 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
+#include "cfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
+
+#ifdef HAVE_POSTGRESQL
+#	include "zbx_dbversion_constants.h"
+#endif
 
 #define ZBX_DB_WAIT_DOWN	10
 
