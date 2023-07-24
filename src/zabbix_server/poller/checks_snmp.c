@@ -2135,20 +2135,6 @@ typedef struct
 }
 zbx_snmp_bulkwalk_config_t;
 
-
-/*
- * poll all hosts in parallel
- */
-// struct session {
-//   struct snmp_session *sess;		/* SNMP session data */
-//   struct oid *current_oid;		/* How far in our poll are we */
-// } sessions[sizeof(hosts)/sizeof(hosts[0])];
-
-// int active_hosts;			/* hosts that we have not completed */
-
-/*
- * response handler
- */
 int	asynch_response(int operation, struct snmp_session *sp, int reqid,
 		    struct snmp_pdu *pdu, void *magic)
 {
@@ -2167,32 +2153,8 @@ int	asynch_response(int operation, struct snmp_session *sp, int reqid,
 				&snmp_bulkwalk_config->results_offset, bulkwalk_context->ssp,
 				&snmp_bulkwalk_config->item->interface, &bulkwalk_context->error);
 	}
-//   struct session *host = (struct session *)magic;
-//   struct snmp_pdu *req;
 
-//   if (operation == NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE) {
-//     if (print_result(STAT_SUCCESS, host->sess, pdu)) {
-//       host->current_oid++;			/* send next GET (if any) */
-//       if (host->current_oid->Name) {
-// 	req = snmp_pdu_create(SNMP_MSG_GET);
-// 	snmp_add_null_var(req, host->current_oid->Oid, host->current_oid->OidLen);
-// 	if (snmp_send(host->sess, req))
-// 	  return 1;
-// 	else {
-// 	  snmp_perror("snmp_send");
-// 	  snmp_free_pdu(req);
-// 	}
-//       }
-//     }
-//   }
-//   else
-//     print_result(STAT_TIMEOUT, host->sess, pdu);
-
-//   /* something went wrong (or end of variables) 
-//    * this host not active any more
-//    */
-//   active_hosts--;
-   return 1;
+	return 1;
 }
 
 
