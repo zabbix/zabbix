@@ -31,31 +31,20 @@
 <script>
 	const view = new class {
 
-		init({form_name, confirm_messages, token, hostids}) {
+		init({form_name, confirm_messages, token, hostids, context}) {
 			this.confirm_messages = confirm_messages;
 			this.token = token;
+			this.context = context;
 			this.hostids = hostids;
 
 			this.form = document.forms[form_name];
+			this.subfilter_form = document.querySelector('form[name="zbx_filter"]');
 
-			this._initFilterForm();
-			this._initActions();
+			this.initForm();
+			this.initEvents();
 		}
 
-		_initFilterForm() {
-			// TODO: bind events on filter+subfilter form only
-			document.querySelector('#filter_state').addEventListener('change', e => {
-				const state = e.target.getAttribute('value');
-
-				document.querySelectorAll('input[name=filter_status]').forEach(checkbox => {
-					checkbox.toggleAttribute('disabled', state != -1);
-				});
-			});
-
-			this._initTagFilter();
-		}
-
-		_initTagFilter() {
+		initForm() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -69,19 +58,44 @@
 			});
 		}
 
-		_initActions() {
-			// TODO: bind events on items list only
+		initEvents() {
+			this.subfilter_form.addEventListener('click', e => {
+				const target = e.target;
+
+				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
+					const subfilter = target.closest('.subfilter');
+
+					if (subfilter.matches('.subfilter-enabled')) {
+						subfilter.querySelector('input[type="hidden"]').remove();
+						this.subfilter_form.submit();
+					}
+					else {
+						const name = target.getAttribute('data-name');
+						const value = target.getAttribute('data-value');
+
+						subfilter.classList.add('subfilter-enabled');
+						submitFormWithParam('zbx_filter', name, value);
+					}
+				}
+				else if (target.matches('[name="filter_state"]')) {
+					const disabled = e.target.getAttribute('value') != -1;
+
+					this.subfilter_form.querySelectorAll('input[name=filter_status]').forEach(checkbox => {
+						checkbox.toggleAttribute('disabled', disabled);
+					});
+				}
+			});
 			this.form.addEventListener('click', (e) => {
 				const target = e.target;
 
-				if (target.classList.contains('js-enable-item')) {
+				if (target.classList.contains('js-update-item')) {
+					this.#edit(target, {itemid: target.dataset.itemid});
+				}
+				else if (target.classList.contains('js-enable-item')) {
 					this._enableItems(target, [target.dataset.itemid]);
 				}
 				else if (target.classList.contains('js-disable-item')) {
 					this._disableItems(target, [target.dataset.itemid]);
-				}
-				else if (target.classList.contains('js-update-item')) {
-					this._updateItems(target, [target.dataset.itemid]);
 				}
 				else if (target.classList.contains('js-massenable-item')) {
 					this._enableItems(target, Object.keys(chkbxRange.getSelectedIds()));
@@ -104,6 +118,34 @@
 				else if (target.classList.contains('js-massdelete-item')) {
 					this._deleteItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
+			});
+			document.addEventListener('click', (e) => {
+				const target = e.target;
+
+				if (target.classList.contains('js-create-item')) {
+					this.#edit(target);
+				}
+			});
+		}
+
+		#edit(target, parameters = {}) {
+			parameters.context = this.context;
+			parameters.hostid = this.hostids[0];
+
+			const overlay = PopUp('item.edit', parameters, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
 			});
 		}
 
@@ -172,11 +214,11 @@
 				action = 'item.massupdate';
 				params.ids = Object.keys(chkbxRange.getSelectedIds());
 			}
-			else {
-				action = 'item.edit';
-				params.hostid = this.hostids[0];
-				params.itemid = itemids.pop();
-			}
+			// else {
+			// 	action = 'item.edit';
+			// 	params.hostid = this.hostids[0];
+			// 	params.itemid = itemids.pop();
+			// }
 
 			const overlay = PopUp(action, params, {
 				dialogue_class: 'modal-popup-preprocessing',

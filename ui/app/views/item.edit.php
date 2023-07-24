@@ -65,12 +65,19 @@ if ($data['form']['itemid']) {
 						'title' => _('Add'),
 						'keepOpen' => true,
 						'isSubmit' => true,
-						'action' => 'trigger_edit_popup.create();'
+						'action' => 'item_edit_form.create();'
+					],
+					[
+						'title' => _('Test'),
+						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
+						'keepOpen' => true,
+						'isSubmit' => false,
+						'action' => 'throw "Not implemented"'
 					],
 					[
 						'title' => _('Cancel'),
 						'class' => ZBX_STYLE_BTN_ALT,
-						'cancel' => true,
+						'cancel' => false,
 						'action' => ''
 					]
 				]
@@ -80,14 +87,14 @@ if ($data['form']['itemid']) {
 			'title' => _('Execute now'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => false,
 			'action' => 'throw "Not implemented"'
 		],
 		[
 			'title' => _('Test'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => false,
 			'action' => 'throw "Not implemented"'
 		],
 		[
@@ -95,7 +102,7 @@ if ($data['form']['itemid']) {
 			'confirmation' => _('History clearing can take a long time. Continue?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => false,
 			'action' => 'throw "Not implemented"'
 		],
 		[
@@ -103,7 +110,7 @@ if ($data['form']['itemid']) {
 			'confirmation' => _('Delete selected item?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => false,
 			'action' => 'throw "Not implemented"'
 		]
 	];
@@ -114,13 +121,13 @@ else {
 			'title' => _('Add'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'trigger_edit_popup.create();'
+			'action' => 'item_edit_form.create();'
 		],
 		[
 			'title' => _('Test'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
-			'isSubmit' => true,
+			'isSubmit' => false,
 			'action' => 'throw "Not implemented"'
 		]
 	];
@@ -138,13 +145,35 @@ $type_with_key_select = [
 	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
 	ITEM_TYPE_SNMPTRAP, ITEM_TYPE_JMX, ITEM_TYPE_IPMI
 ];
+$item = $data['form'];
+
+if (!$item['delay_flex']) {
+	$item['delay_flex'] = [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]];
+}
+
+if (!$item['parameters']) {
+	$item['parameters'] = [['name' => '', 'value' => '']];
+}
+
+if (!$item['query_fields']) {
+	$item['query_fields'] = [['name' => '', 'value' => '']];
+}
+
+if (!$item['headers']) {
+	$item['headers'] = [['name' => '', 'value' => '']];
+}
+
+if (!$item['tags']) {
+	$item['tags'] = [['tag' => '', 'value' => '']];
+}
+
 $tabs = (new CTabView())
 	->addTab('item-tab', _('Item'),
 		new CPartial('item.edit.item.tab', [
 			'config' => $data['config'],
 			'discovery_rule' => $data['discovery_rule'],
 			'discovered' => (bool) $data['discovery_rule'],// make correct check for discovered
-			'form' => $data['form'],
+			'form' => $item,
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
 			'inventory_fields' => $data['inventory_fields'],
@@ -159,19 +188,19 @@ $tabs = (new CTabView())
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $data['form']['discovered'],
-			'show_inherited_tags' => $data['form']['show_inherited_tags'],
+			'readonly' => $item['discovered'],
+			'show_inherited_tags' => $item['show_inherited_tags'],
 			'source' => 'item',
 			'tabs_id' => 'tabs',
-			'tags' => $data['form']['tags'],
+			'tags' => $item['tags'],
 			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
 	)
 	->addTab('processing-tab', _('Preprocessing'),
 		new CPartial('item.edit.preprocessing.tab', [
-			'form' => $data['form'],
-			'preprocessing' => $data['form']['preprocessing'],
+			'form' => $item,
+			'preprocessing' => $item['preprocessing'],
 			'preprocessing_types' => $data['preprocessing_types'],
 			'readonly' => $data['readonly'],
 			'value_types' => $value_types
@@ -187,7 +216,7 @@ $form
 	->addItem($tabs)
 	->addItem((new CScriptTag('item_edit_form.init('.json_encode([
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
-			'form_data' => $data['form'],
+			'form_data' => $item,
 			'host_interfaces' => array_values($data['host']['interfaces']),
 			'interface_types' => $data['interface_types'],
 			'readonly' => $data['readonly'],

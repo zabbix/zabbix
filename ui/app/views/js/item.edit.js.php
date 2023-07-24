@@ -68,6 +68,7 @@ window.item_edit_form = new class {
 		}
 
 		this.overlay = overlays_stack.end();
+		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.footer = this.overlay.$dialogue.$footer[0];
 
@@ -207,34 +208,42 @@ window.item_edit_form = new class {
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
 	}
 
-	clone() {
-		// TODO: replace title, buttons of overlay, remove id, remove 'latest data'. do not make additional request
-		const action = 'item.edit';
-		const form_refresh = document.createElement('input');
-
-		form_refresh.setAttribute('type', 'hidden');
-		form_refresh.setAttribute('name', 'form_refresh');
-		form_refresh.setAttribute('value', 1);
-
-		this.form.append(form_refresh);
-		this.form.querySelector('[name="itemid"]').remove();
-
-		reloadPopup(this.form, action);
+	clone({title, buttons}) {
+		this.overlay.setProperties({title, buttons});
+		this.overlay.unsetLoading();
+		this.overlay.recoverFocus();
 	}
 
 	create() {
-		const action = 'item.create';
-		console.warn('createItem not implemented');
+		const fields = getFormFields(this.form);
+
+		for (let key in fields) {
+			if (typeof fields[key] === 'string' && key !== 'confirmation') {
+				fields[key] = fields[key].trim();
+			}
+		}
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'item.create');
+
+		this.#post(curl.getUrl(), fields);
 	}
 
 	update() {
-		const action = 'item.update';
+		const fields = getFormFields(this.form);
 
-		console.warn('updateItem not implemented');
-	}
+		for (let key in fields) {
+			if (typeof fields[key] === 'string' && key !== 'confirmation') {
+				fields[key] = fields[key].trim();
+			}
+		}
 
-	updateActionButtons() {
-		this.footer.querySelector('.js-test-item').toggleAttribute('disabled', !this.#isTestableItem());
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'item.update');
+
+		this.#post(curl.getUrl(), fields);
 	}
 
 	updateFieldsVisibility() {
@@ -244,7 +253,7 @@ window.item_edit_form = new class {
 		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
 		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
 
-		this.updateActionButtons();
+		this.#updateActionButtons();
 		this.#updateCustomIntervalVisibility();
 		this.#updateValueTypeHintVisibility();
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
@@ -257,12 +266,58 @@ window.item_edit_form = new class {
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
 	}
 
+	#post(url, data) {
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			})
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
+	}
+
 	#isTestableItem() {
 		const key = this.field.key.value;
 		const type = parseInt(this.field.type.value, 10);
 
-		return (type != ITEM_TYPE_SIMPLE || (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping'))
-			|| this.testable_item_types.indexOf(type) != -1;
+		return type == ITEM_TYPE_SIMPLE
+			? key.substr(0, 7) !== 'vmware.' && key.substr(0, 8) !== 'icmpping'
+			: this.testable_item_types.indexOf(type) != -1;
+	}
+
+	#updateActionButtons() {
+		this.footer.querySelector('.js-test-item').toggleAttribute('disabled', !this.#isTestableItem());
 	}
 
 	#updateCustomIntervalVisibility() {
@@ -372,6 +427,5 @@ window.item_edit_form = new class {
 
 		reloadPopup(this.form, 'item.edit');
 	}
-
 }
 })();

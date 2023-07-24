@@ -248,19 +248,17 @@ foreach ($data['subfilter'] as $subfilter) {
 			$value_label = $subfilter['labels'][$value];
 		}
 
-		// TODO: cleanup, use existing html object classes, add disabled state when count == 0
-		$cell[] = (new CLabel(''))
-			->removeId()
-			->addItem([
-				(new CSpan($value_label))->addClass(ZBX_STYLE_LINK_ACTION),
-				(new CInput('checkbox', $subfilter['key'].'[]', $value))
-					->removeId()
-					->setAttribute('checked', $is_selected ? 'checked' : null)
-					// TODO: move onclick to .js file
-					->onClick('this.closest("label").classList.toggle("'.ZBX_STYLE_SUBFILTER_ENABLED.'");this.closest("form").submit();return false')
-					->addClass(ZBX_STYLE_DISPLAY_NONE),
-				new CSup($prefix.$count)
-			])
+		$name = $subfilter['key'].'[]';
+		$cell[] = (new CSpan([
+			$count > 0
+				? (new CLinkAction($value_label))
+					->setAttribute('data-name', $name)
+					->setAttribute('data-value', $value)
+				: (new CSpan($value_label))->addClass(ZBX_STYLE_GREY),
+			$is_selected ? new CInput('hidden', $name, $value) : null,
+			' ',
+			new CSup($prefix.$count)
+		]))
 			->addClass(ZBX_STYLE_SUBFILTER)
 			->addClass($is_selected ? ZBX_STYLE_SUBFILTER_ENABLED : null);
 	}

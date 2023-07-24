@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerItemUpdate extends CController {
+class CControllerItemCreate extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -28,7 +28,7 @@ class CControllerItemUpdate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'hostid'			=> 'required|id',
-			'itemid'			=> 'required|id',
+			'context'			=> 'required|in host,template',
 			'name'				=> 'db items.name',
 			'key'				=> 'db items.key_',
 			'type'				=> 'db items.type',
@@ -96,18 +96,20 @@ class CControllerItemUpdate extends CController {
 
 	protected function checkPermissions(): bool {
 		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN
-			&& API::Item()->get([
-				'itemids' => [$this->getInput('itemid')]
+			&& API::Host()->get([
+				'itemids' => $this->getInput('hostid'),
+				'editable' => true
 			]);
 	}
 
 	public function doAction() {
 		$output = [];
-		$result = API::Item()->update($this->getFormData());
+		$item = $this->getFormData();
+		$result = API::Item()->create($item);
 		$messages = array_column(get_and_clear_messages(), 'message');
 
 		if ($result) {
-			$output['success']['title'] = _('Item updated');
+			$output['success']['title'] = _('Item created');
 
 			if ($messages) {
 				$output['success']['messages'] = $messages;
@@ -115,7 +117,7 @@ class CControllerItemUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot update item'),
+				'title' => _('Cannot create item'),
 				'messages' => $messages
 			];
 		}
@@ -124,7 +126,61 @@ class CControllerItemUpdate extends CController {
 	}
 
 	protected function getFormData(): array {
-		$input = $this->getInputAll();
+		$input = [
+			'interfaceid' => 0,
+			'hostid' => 0,
+			'name' => '',
+			'type' => DB::getDefault('items', 'type'),
+			'key' => '',
+			'value_type' => DB::getDefault('items', 'value_type'),
+			'url' => '',
+			'script' => '',
+			'request_method' => DB::getDefault('items', 'request_method'),
+			'timeout' => DB::getDefault('items', 'timeout'),
+			'post_type' => DB::getDefault('items', 'post_type'),
+			'posts' => DB::getDefault('items', 'posts'),
+			'status_codes' => DB::getDefault('items', 'status_codes'),
+			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
+			'output_format' => DB::getDefault('items', 'output_format'),
+			'http_proxy' => DB::getDefault('items', 'http_proxy'),
+			'http_authtype' => ZBX_HTTP_AUTH_NONE,
+			'http_username' => '',
+			'http_password' => '',
+			'verify_peer' => DB::getDefault('items', 'verify_peer'),
+			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
+			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
+			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
+			'master_itemid' => 0,
+			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
+			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
+			'authtype' => DB::getDefault('items', 'authtype'),
+			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
+			'username' => DB::getDefault('items', 'username'),
+			'password' => DB::getDefault('items', 'password'),
+			'publickey' => DB::getDefault('items', 'publickey'),
+			'privatekey' => DB::getDefault('items', 'privatekey'),
+			'params' => DB::getDefault('items', 'params'),
+			'units' => DB::getDefault('items', 'units'),
+			'delay' => ZBX_ITEM_DELAY_DEFAULT,
+			'history' => DB::getDefault('items', 'history'),
+			'trends' => DB::getDefault('items', 'trends'),
+			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
+			'valuemapid' => 0,
+			'allow_traps' => DB::getDefault('items', 'allow_traps'),
+			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
+			'inventory_link' => 0,
+			'description' => DB::getDefault('items', 'description'),
+			'status' => DB::getDefault('items', 'status'),
+			'tags' => [],
+			'preprocessing' => [],
+			'headers' => [],
+			'delay_flex' => [],
+			'query_fields' => [],
+			'parameters' => [],
+		];
+		$this->getInputs($input, array_keys($input));
 		$field_map = [];
 
 		if ($this->hasInput('key')) {
@@ -145,14 +201,32 @@ class CControllerItemUpdate extends CController {
 			$field_map['http_password'] = 'password';
 		}
 
+		if ($this->hasInput('tags')) {
+			$tags = [];
+
+			foreach ($input['tags'] as $tag) {
+				if ($tag['tag'] !== '' || $tag['value'] !== '') {
+					$tags[] = $tag;
+				}
+			}
+
+			$input['tags'] = $tags;
+		}
+
 		$input = CArrayHelper::renameKeys($input, $field_map);
-		$item = ['itemid' => $this->getInput('itemid')];
-		[$db_item] = API::Item()->get([
-			'output' => ['templateid', 'flags', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
-			'selectHosts' => ['status'],
-			'itemids' => [$item['itemid']]
+		$hosts = API::Host()->get([
+			'output' => ['hostid', 'status'],
+			'hostids' => $this->getInput('hostid'),
+			'templated_hosts' => true,
+			'editable' => true
+		]);
+		$item = ['hostid' => $input['hostid']];
+		$item += getSanitizedItemFields($input + [
+			'templateid' => '0',
+			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+			'hosts' => $hosts
 		]);
 
-		return $item + getSanitizedItemFields($input + $db_item);
+		return $item;
 	}
 }
