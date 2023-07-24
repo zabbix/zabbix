@@ -53,62 +53,58 @@ class CEvent extends CApiService {
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'eventids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'groupids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'hostids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'objectids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'source' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]), 'default' => EVENT_SOURCE_TRIGGERS],
-			'object' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE, EVENT_OBJECT_AUTOREGHOST, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE]), 'default' => EVENT_OBJECT_TRIGGER],
-			'value' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'uniq' => true, 'default' => null],
-			'severities' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
-			'eventid_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'eventid_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'time_from' =>					['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'time_till' =>					['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'problem_time_from' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'problem_time_till' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'acknowledged' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'suppressed' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'symptom' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
-			'evaltype' =>					['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
-			'tags' =>						['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
-				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-				'operator' =>					['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
-				'value' =>						['type' => API_STRING_UTF8]
+			'eventids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'groupids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'hostids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'objectids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'source' =>					['type' => API_INT32, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]), 'default' => EVENT_SOURCE_TRIGGERS],
+			'object' =>					['type' => API_INT32, 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE, EVENT_OBJECT_AUTOREGHOST, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE]), 'default' => EVENT_OBJECT_TRIGGER],
+			'value' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'uniq' => true, 'default' => null],
+			'severities' =>				['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
+			'trigger_severities' =>		['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
+			'eventid_from' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'eventid_till' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'problem_time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'problem_time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'acknowledged' =>			['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'suppressed' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'symptom' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>					['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
+				'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value' =>					['type' => API_STRING_UTF8]
 			]],
-			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'value', 'acknowledged', 'name', 'severity', 'action', 'action_userid', 'cause_eventid']],
-			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
-			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
-			'startSearch' =>				['type' => API_FLAG, 'default' => false],
-			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
-			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'value', 'acknowledged', 'name', 'severity', 'action', 'action_userid', 'cause_eventid']],
+			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
+			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>			['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>	['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
-			'countOutput' =>				['type' => API_FLAG, 'default' => false],
-			'aggregateOutput' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
-				'avg' =>	['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'severity'],
-				'max' =>	['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'severity'],
-				'min' =>	['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'severity']
-			]],
-			'groupBy' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => 'objectid', 'uniq' => true, 'default' => null],
-			'select_acknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
-			'selectAcknowledges' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
-			'select_alerts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],
-			'selectAlerts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $alert_output_fields), 'default' => null],
-			'selectHosts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
-			'selectRelatedObject' =>		['type' => API_MULTIPLE, 'default' => null, 'rules' => [
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_TRIGGER], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CTrigger::OUTPUT_FIELDS)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDHost::OUTPUT_FIELDS)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DSERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDService::OUTPUT_FIELDS)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_AUTOREGHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => ''],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_ITEM], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CItem::OUTPUT_FIELDS)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_LLDRULE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CService::OUTPUT_FIELDS)]
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>			['type' => API_FLAG, 'default' => false],
+			'groupBy' =>				['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => 'objectid', 'uniq' => true, 'default' => null],
+			'select_acknowledges' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
+			'selectAcknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
+			'select_alerts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],
+			'selectAlerts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $alert_output_fields), 'default' => null],
+			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
+			'selectRelatedObject' =>	['type' => API_MULTIPLE, 'default' => null, 'rules' => [
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_TRIGGER], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CTrigger::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDHost::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DSERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDService::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_AUTOREGHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => ''],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_ITEM], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CItem::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_LLDRULE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS)],
+											['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CService::OUTPUT_FIELDS)]
 			]],
 			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			// sort and limit
-			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', array_merge($this->sortColumns, ['rowscount', 'avg_severity', 'max_severity', 'min_severity'])), 'uniq' => true, 'default' => []],
+			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', array_merge($this->sortColumns, ['rowscount'])), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
 			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
@@ -169,7 +165,7 @@ class CEvent extends CApiService {
 			$db_events = $this->getEvents($options);
 		}
 
-		if ($options['countOutput'] || $options['aggregateOutput'] || $options['groupBy']) {
+		if ($options['countOutput'] || $options['groupBy']) {
 			return is_array($db_events) ? $db_events : (string) $db_events;
 		}
 
@@ -206,7 +202,7 @@ class CEvent extends CApiService {
 					$db_events = $event['rowscount'];
 				}
 			}
-			elseif ($options['aggregateOutput'] || $options['groupBy']) {
+			elseif ($options['groupBy']) {
 				$db_events[] = $event;
 			}
 			else {
@@ -395,6 +391,21 @@ class CEvent extends CApiService {
 
 				if ($options['severities'] != range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)) {
 					$sql_parts['where'][] = dbConditionInt('e.severity', $options['severities']);
+				}
+			}
+			// ignore this filter for items and lld rules
+		}
+
+		// trigger_severities
+		if ($options['trigger_severities'] !== null) {
+			// triggers
+			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				sort($options['trigger_severities']);
+
+				if ($options['severities'] != range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)) {
+					$sql_parts['from']['t'] = 'triggers t';
+					$sql_parts['where']['e-t'] = 'e.objectid=t.triggerid';
+					$sql_parts['where'][] = dbConditionInt('t.priority', $options['trigger_severities']);
 				}
 			}
 			// ignore this filter for items and lld rules
@@ -599,7 +610,7 @@ class CEvent extends CApiService {
 	 * ]
 	 */
 	private function applyFilters(array $options, array &$sql_parts): void {
-		if ($options['countOutput'] || $options['aggregateOutput'] || $options['groupBy']) {
+		if ($options['countOutput'] || $options['groupBy']) {
 			return;
 		}
 
@@ -639,7 +650,7 @@ class CEvent extends CApiService {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if ($options['countOutput'] || $options['aggregateOutput'] || $options['groupBy']) {
+		if ($options['countOutput'] || $options['groupBy']) {
 			return $sql_parts;
 		}
 

@@ -133,7 +133,7 @@ foreach ($data['triggers'] as $triggerid => $trigger) {
 	$table->addRow([
 		$hosts,
 		(new CLinkAction($trigger['description']))->setMenuPopup(CMenuPopupHelper::getTrigger($triggerid)),
-		CSeverityHelper::makeSeverityCell((int) $trigger['max_severity']),
+		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$trigger['problem_count']
 	]);
 }

@@ -139,7 +139,6 @@ class CControllerTopTriggersList extends CController {
 
 		$db_problems = API::Event()->get([
 			'countOutput' => true,
-			'aggregateOutput' => ['max' => 'severity'],
 			'groupBy' => ['objectid'],
 			'groupids' => $groupids ?: null,
 			'hostids' => $hostids ?: null,
@@ -151,10 +150,10 @@ class CControllerTopTriggersList extends CController {
 			'search' => [
 				'name' => $filter['problem'] !== '' ? $filter['problem'] : null
 			],
-			'severities' => $filter['severities'] ?: null,
+			'trigger_severities' => $filter['severities'] ?: null,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'] ?: null,
-			'sortfield' => ['rowscount', 'max_severity'],
+			'sortfield' => ['rowscount'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 100
 		]);
@@ -165,7 +164,7 @@ class CControllerTopTriggersList extends CController {
 			$db_problems = array_column($db_problems, null, 'objectid');
 
 			$db_triggers = API::Trigger()->get([
-				'output' => ['description'],
+				'output' => ['description', 'priority'],
 				'selectHosts' => ['hostid', 'name', 'status'],
 				'expandDescription' => true,
 				'triggerids' => array_keys($db_problems),
@@ -174,13 +173,12 @@ class CControllerTopTriggersList extends CController {
 
 			foreach ($db_triggers as $triggerid => &$trigger) {
 				$trigger['problem_count'] = $db_problems[$triggerid]['rowscount'];
-				$trigger['max_severity'] = $db_problems[$triggerid]['max_severity'];
 			}
 			unset($trigger);
 
 			CArrayHelper::sort($db_triggers, [
 				['field' => 'problem_count', 'order' => ZBX_SORT_DOWN],
-				['field' => 'max_severity', 'order' => ZBX_SORT_DOWN],
+				['field' => 'priority', 'order' => ZBX_SORT_DOWN],
 				'description'
 			]);
 		}

@@ -81,7 +81,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$db_problems = API::Event()->get([
 			'countOutput' => true,
-			'aggregateOutput' => ['max' => 'severity'],
 			'groupBy' => ['objectid'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
@@ -93,10 +92,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'search' => [
 				'name' => $this->fields_values['problem'] !== '' ? $this->fields_values['problem'] : null
 			],
-			'severities' => $this->fields_values['severities'] ?: null,
+			'trigger_severities' => $this->fields_values['severities'] ?: null,
 			'evaltype' => $this->fields_values['evaltype'],
 			'tags' => $this->fields_values['tags'] ?: null,
-			'sortfield' => ['rowscount', 'max_severity'],
+			'sortfield' => ['rowscount'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $this->fields_values['show_lines']
 		]);
@@ -108,7 +107,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$db_problems = array_column($db_problems, null, 'objectid');
 
 		$db_triggers = API::Trigger()->get([
-			'output' => ['description'],
+			'output' => ['description', 'priority'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'expandDescription' => true,
 			'triggerids' => array_keys($db_problems),
@@ -117,13 +116,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($db_triggers as $triggerid => &$trigger) {
 			$trigger['problem_count'] = $db_problems[$triggerid]['rowscount'];
-			$trigger['max_severity'] = $db_problems[$triggerid]['max_severity'];
 		}
 		unset($trigger);
 
 		CArrayHelper::sort($db_triggers, [
 			['field' => 'problem_count', 'order' => ZBX_SORT_DOWN],
-			['field' => 'max_severity', 'order' => ZBX_SORT_DOWN],
+			['field' => 'priority', 'order' => ZBX_SORT_DOWN],
 			'description'
 		]);
 

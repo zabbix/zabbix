@@ -516,15 +516,24 @@ class CApiService {
 					$sql_parts['select'][] = $fields;
 				}
 			}
-			else {
-				$this->applyQueryAggregateOutputOptions($table_name, $table_alias, $options, $sql_parts);
-				$this->applyQueryGroupByOptions($table_name, $table_alias, $options, $sql_parts);
+			elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+				foreach ($options['groupBy'] as $field) {
+					$field = $this->fieldId($field, $table_alias);
+
+					array_unshift($sql_parts['select'], $field);
+					$sql_parts['group'][] = $field;
+				}
 			}
 		}
-		elseif ((array_key_exists('aggregateOutput', $options) && $options['aggregateOutput'])
-				|| (array_key_exists('groupBy', $options) && $options['groupBy'])) {
-			$this->applyQueryAggregateOutputOptions($table_name, $table_alias, $options, $sql_parts);
-			$this->applyQueryGroupByOptions($table_name, $table_alias, $options, $sql_parts);
+		elseif (array_key_exists('groupBy', $options) && $options['groupBy']) {
+			$sql_parts['select'] = [];
+
+			foreach ($options['groupBy'] as $field) {
+				$field = $this->fieldId($field, $table_alias);
+
+				array_unshift($sql_parts['select'], $field);
+				$sql_parts['group'][] = $field;
+			}
 		}
 		// custom output
 		elseif (is_array($options['output'])) {
@@ -545,55 +554,6 @@ class CApiService {
 		}
 
 		return $sql_parts;
-	}
-
-	/**
-	 * @param string $table_name
-	 * @param string $table_alias
-	 * @param array  $options
-	 * @param array  $sql_parts
-	 */
-	private function applyQueryAggregateOutputOptions(string $table_name, string $table_alias, array $options,
-			array &$sql_parts): void {
-		if (!array_key_exists('aggregateOutput', $options) || !$options['aggregateOutput']) {
-			return;
-		}
-
-		if (!array_key_exists('countOutput', $options) || !$options['countOutput']) {
-			$sql_parts['select'] = [];
-		}
-
-		foreach ($options['aggregateOutput'] as $function => $fields) {
-			foreach ($fields as $field) {
-				$sql_parts['select'][] = $function.'('.$this->fieldId($field, $table_alias).') AS '.
-					$function.'_'.$field;
-			}
-		}
-	}
-
-	/**
-	 * @param string $table_name
-	 * @param string $table_alias
-	 * @param array  $options
-	 * @param array  $sql_parts
-	 */
-	private function applyQueryGroupByOptions(string $table_name, string $table_alias, array $options,
-			array &$sql_parts): void {
-		if (!array_key_exists('groupBy', $options) || !$options['groupBy']) {
-			return;
-		}
-
-		if ((!array_key_exists('countOutput', $options) || !$options['countOutput'])
-				&& (!array_key_exists('aggregateOutput', $options) || !$options['aggregateOutput'])) {
-			$sql_parts['select'] = [];
-		}
-
-		foreach ($options['groupBy'] as $field) {
-			$field = $this->fieldId($field, $table_alias);
-
-			array_unshift($sql_parts['select'], $field);
-			$sql_parts['group'][] = $field;
-		}
 	}
 
 	/**
@@ -645,25 +605,14 @@ class CApiService {
 	protected function applyQuerySortOptions(string $table_name, string $table_alias, array $options,
 			array $sql_parts): array {
 		$count_output = array_key_exists('countOutput', $options) && $options['countOutput'];
-		$aggregate_output = array_key_exists('aggregateOutput', $options) && $options['aggregateOutput'];
 		$group_by = array_key_exists('groupBy', $options) && $options['groupBy'];
 		$aggregate_sort_columns = [];
 
-		if ($count_output && ($aggregate_output || $group_by)) {
+		if ($count_output && $group_by) {
 			$aggregate_sort_columns[] = 'rowscount';
 		}
 
-		if ($aggregate_output) {
-			foreach ($options['aggregateOutput'] as $function => $fields) {
-				foreach ($fields as $field) {
-					$aggregate_sort_columns[] = $function.'_'.$field;
-				}
-			}
-		}
-
-		$sort_columns = $group_by
-			? array_merge($options['groupBy'], $aggregate_sort_columns)
-			: array_merge($this->sortColumns, $aggregate_sort_columns);
+		$sort_columns = $group_by ? array_merge($options['groupBy'], $aggregate_sort_columns) : $this->sortColumns;
 
 		if ($sort_columns && !zbx_empty($options['sortfield'])) {
 			$options['sortfield'] = is_array($options['sortfield'])
