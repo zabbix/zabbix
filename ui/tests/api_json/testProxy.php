@@ -198,6 +198,7 @@ class testProxy extends CAPITest {
 		];
 
 		$upd_proxy_rtdata = [];
+
 		foreach ($proxy_rtdata as $id_placeholder => $rtdata) {
 			$upd_proxy_rtdata[] = [
 				'values' => [
@@ -608,7 +609,7 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
-					'address' => false,
+					'address' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/address": a character string is expected.'
 			],
@@ -1103,7 +1104,7 @@ class testProxy extends CAPITest {
 					$this->assertEmpty($db_proxy['allowed_addresses']);
 				}
 
-				foreach (['hosts'] as $field) {
+				foreach (['hosts', 'address', 'port'] as $field) {
 					if (array_key_exists($field, $proxies[$num]) && $proxies[$num][$field]) {
 						$this->assertEqualsCanonicalizing($proxies[$num][$field], $db_proxy[$field]);
 					}
@@ -1117,7 +1118,7 @@ class testProxy extends CAPITest {
 						$this->assertEquals($proxies[$num][$field], $db_proxy[$field]);
 					}
 					else {
-						$this->assertSame(DB::getDefault('hosts', $field), $db_proxy[$field]);
+						$this->assertSame(DB::getDefault('proxy', $field), $db_proxy[$field]);
 					}
 				}
 
@@ -1353,7 +1354,7 @@ class testProxy extends CAPITest {
 				'expected_error' => null
 			],
 
-			// Check fields from "host_rtdata" table are returned.
+			// Check fields from "proxy_rtdata" table are returned.
 			'Test proxy.get: "lastaccess", "version", "compatibility"' => [
 				'request' => [
 					'output' => ['lastaccess', 'version', 'compatibility'],
@@ -1391,7 +1392,7 @@ class testProxy extends CAPITest {
 				'expected_result' => [
 					[
 						'name' => 'API test proxy.get - active',
-						'mode' => '0'
+						'mode' => (string) PROXY_MODE_ACTIVE
 					]
 				],
 				'expected_error' => null
@@ -1431,11 +1432,11 @@ class testProxy extends CAPITest {
 				'expected_result' => [
 					[
 						'name' => 'API test proxy.get for filter - version outdated',
-						'compatibility' => '2'
+						'compatibility' => (string) ZBX_PROXY_VERSION_OUTDATED
 					],
 					[
 						'name' => 'API test proxy.get for filter - version unsupported',
-						'compatibility' => '3'
+						'compatibility' => (string) ZBX_PROXY_VERSION_UNSUPPORTED
 					]
 				],
 				'expected_error' => null
@@ -1468,7 +1469,7 @@ class testProxy extends CAPITest {
 			'Test proxy.get: invalid "mode" in "filter"' => [
 				'request' => [
 					'filter' => [
-						'mode' => 999999
+						'mode' => self::INVALID_NUMBER
 					]
 				],
 				'expected_result' => [],
@@ -1748,20 +1749,10 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "interface".
-			'Test proxy.update: unexpected parameter for "interface" 1' => [
+			'Test proxy.update: unexpected parameter "interface"' => [
 				'proxy' => [
 					'proxyid' => 'update_passive_defaults',
 					'interface' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1": unexpected parameter "interface".'
-			],
-			'Test proxy.update: unexpected parameter for "interface" 2' => [
-				'proxy' => [
-					'proxyid' => 'update_passive_defaults',
-					'address' => '127.0.0.1',
-					'interface' => [
-						'abc' => ''
-					]
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "interface".'
 			],
@@ -1814,20 +1805,19 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
 			],
-			'Test proxy.update: invalid "interface" (not empty)' => [
+			'Test proxy.update: invalid "port" (not empty for active proxy)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'port' => 12345
 				],
 				'expected_error' =>	'Invalid parameter "/1/port": should be empty.'
 			],
-			'Test proxy.update: invalid "address" (not empty)' => [
+			'Test proxy.update: invalid "address" (not empty for active proxy)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'address' => 'localhost'
 				],
-				'expected_error' =>
-					'Invalid parameter "/1/address": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/address": should be empty.'
 			],
 
 			// Check "tls_connect".
@@ -2031,9 +2021,7 @@ class testProxy extends CAPITest {
 		}
 		unset($proxy);
 
-		$sql_proxies = 'SELECT NULL FROM proxy p WHERE '.dbConditionInt('p.mode', [
-			PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE
-		]);
+		$sql_proxies = 'SELECT NULL FROM proxy p';
 		$old_hash_proxies = CDBHelper::getHash($sql_proxies);
 
 		if ($expected_error === null) {
@@ -2082,6 +2070,22 @@ class testProxy extends CAPITest {
 				}
 				else {
 					$this->assertSame($db_proxy['allowed_addresses'], $proxy_upd['allowed_addresses']);
+				}
+
+				// Check "address".
+				if (array_key_exists('address', $proxy)) {
+					$this->assertSame($proxy['address'], $proxy_upd['address']);
+				}
+				else {
+					$this->assertSame($db_proxy['address'], $proxy_upd['address']);
+				}
+
+				// Check "port".
+				if (array_key_exists('port', $proxy)) {
+					$this->assertSame($proxy['port'], $proxy_upd['port']);
+				}
+				else {
+					$this->assertSame($db_proxy['port'], $proxy_upd['port']);
 				}
 
 				// Check hosts.
@@ -2190,9 +2194,7 @@ class testProxy extends CAPITest {
 		}
 		unset($proxyid);
 
-		$sql_proxies = 'SELECT NULL FROM proxy p WHERE '.dbConditionInt('p.mode', [
-			PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE
-		]);
+		$sql_proxies = 'SELECT NULL FROM proxy p';
 		$old_hash_proxies = CDBHelper::getHash($sql_proxies);
 
 		$this->call('proxy.delete', $proxyids, $expected_error);
@@ -2206,6 +2208,7 @@ class testProxy extends CAPITest {
 			// proxy.delete checks if given "proxyid" exists, so they need to be removed from self::$data['proxyids']
 			foreach ($proxyids as $proxyid) {
 				$key = array_search($proxyid, self::$data['proxyids']);
+
 				if ($key !== false) {
 					unset(self::$data['proxyids'][$key]);
 				}
@@ -2225,8 +2228,8 @@ class testProxy extends CAPITest {
 	 */
 	private function getProxies(array $proxyids): array {
 		$response = $this->call('proxy.get', [
-			'output' => ['proxyid', 'name', 'mode', 'description', 'tls_connect', 'tls_accept',
-				'tls_issuer', 'tls_subject', 'allowed_addresses', 'address', 'port'
+			'output' => ['proxyid', 'name', 'mode', 'description', 'allowed_addresses', 'address', 'port',
+				'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'lastaccess', 'version', 'compatibility'
 			],
 			'selectHosts' => ['hostid'],
 			'proxyids' => $proxyids,
@@ -2254,7 +2257,21 @@ class testProxy extends CAPITest {
 	 * @param array $proxies
 	 */
 	private function restoreProxies(array $proxies): void {
+		$rtdata_fields = array_flip(['lastaccess', 'version', 'compatibility']);
+		$upd_proxy_rtdata = [];
+
+		foreach ($proxies as &$proxy) {
+			$upd_proxy_rtdata[] = [
+				'values' => array_intersect_key($proxy, $rtdata_fields),
+				'where' => ['proxyid' => $proxy['proxyid']]
+			];
+			$proxy = array_diff_key($proxy, $rtdata_fields);
+		}
+		unset($proxy);
+
 		$this->call('proxy.update', $proxies);
+
+		DB::update('proxy_rtdata', $upd_proxy_rtdata);
 	}
 
 	/**
