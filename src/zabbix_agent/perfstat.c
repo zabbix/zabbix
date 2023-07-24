@@ -751,7 +751,7 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_pe
 		perfs = add_perf_counter(NULL, counterpath, interval, lang, error);
 out:
 	UNLOCK_PERFCOUNTERS;
-
+	//lock perf count refresh 
 	if (SUCCEED != ret && NULL != perfs)
 	{
 		/* request counter value directly from Windows performance counters */
@@ -814,7 +814,6 @@ int	refresh_object_cache(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	LOCK_PERFCOUNTERS;
 
 	if (ppsd.lastrefresh_objects + OBJECT_CACHE_REFRESH_INTERVAL < time(NULL))
 	{
@@ -827,7 +826,6 @@ int	refresh_object_cache(void)
 		ppsd.lastrefresh_objects = time(NULL);
 	}
 out:
-	UNLOCK_PERFCOUNTERS;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
