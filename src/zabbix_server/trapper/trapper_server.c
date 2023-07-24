@@ -19,7 +19,6 @@
 
 #include "trapper_request.h"
 
-#include "cfg.h"
 #include "trapper_auth.h"
 #include "zbxdbhigh.h"
 #include "../zbxreport.h"

@@ -20,12 +20,9 @@
 #include "zbxdbhigh.h"
 
 #include "zbxthreads.h"
-#include "cfg.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
-#include "zbx_trigger_constants.h"
-#include "zbx_dbversion_constants.h"
 
 #define ZBX_DB_WAIT_DOWN	10
 

@@ -29,7 +29,6 @@
 #include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxpreproc.h"
-#include "zbxproxybuffer.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64

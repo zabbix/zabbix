@@ -19,7 +19,6 @@
 
 #include "rtc_proxy.h"
 
-#include "zbxdbwrap.h"
 #include "zbx_rtc_constants.h"
 #include "zbxdiag.h"
 

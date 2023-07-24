@@ -27,7 +27,6 @@
 #include "zbxproxybuffer.h"
 #include "../taskmanager/taskmanager.h"
 #include "zbxcompress.h"
-#include "zbxcachehistory.h"
 
 extern unsigned char	program_type;
 

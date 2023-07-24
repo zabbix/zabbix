@@ -24,7 +24,6 @@
 #include "../db_lengths.h"
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "../zbxreport.h"
 #include "zbxcrypto.h"
 #include "../alerter/alerter.h"
 #include "report_protocol.h"

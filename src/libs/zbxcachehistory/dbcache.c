@@ -34,7 +34,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxpreproc.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"

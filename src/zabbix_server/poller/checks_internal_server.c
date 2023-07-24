@@ -20,7 +20,6 @@
 #include "zbxcommon.h"
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
-#include "zbxjson.h"
 #include "zbxtime.h"
 #include "zbxconnector.h"
 #include "../ha/ha.h"
