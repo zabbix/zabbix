@@ -338,6 +338,36 @@ static int	DBpatch_6050029(void)
 	return SUCCEED;
 }
 
+static int  DBpatch_6050030(void)
+{
+	const zbx_db_table_t table =
+			{"optag", "optagid", 0,
+				{
+					{"optagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int  DBpatch_6050031(void)
+{
+	return DBcreate_index("optag", "optag_1", "operationid", 0);
+}
+
+static int	DBpatch_6050032(void)
+{
+	const zbx_db_field_t	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("optag", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -374,5 +404,8 @@ DBPATCH_ADD(6050026, 0, 1)
 DBPATCH_ADD(6050027, 0, 1)
 DBPATCH_ADD(6050028, 0, 1)
 DBPATCH_ADD(6050029, 0, 1)
+DBPATCH_ADD(6050030, 0, 1)
+DBPATCH_ADD(6050031, 0, 1)
+DBPATCH_ADD(6050032, 0, 1)
 
 DBPATCH_END()
