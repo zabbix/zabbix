@@ -1736,6 +1736,10 @@ class CUser extends CApiService {
 
 		self::$userData = $db_user;
 
+		if ($token !== null) {
+			self::$userData['token'] = $token;
+		}
+
 		return $db_user;
 	}
 
