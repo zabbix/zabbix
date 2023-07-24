@@ -161,6 +161,8 @@ New features:
 .........T [ZBXNEXT-8422] added AWS ECS templates (egordymov)
 
 Bug fixes:
+...G...... [ZBX-23107] fixed small memory leak in Zabbix agent 2 (arimdjonoks)
+...G...PS. [ZBX-22343] removed use of deprecated curl setopt options (jxl)
 ..F....... [ZBX-22822] fixed displaying the correct threshold color in top hosts widget when value exceeds maximum (Ivo)
 ..F....... [ZBX-22777] fixed item test form sending incorrectly resolved macros to server if item uses SNMP interface (Ivo)
 ...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
