@@ -751,7 +751,7 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_pe
 		perfs = add_perf_counter(NULL, counterpath, interval, lang, error);
 out:
 	UNLOCK_PERFCOUNTERS;
-	//lock perf count refresh 
+
 	if (SUCCEED != ret && NULL != perfs)
 	{
 		/* request counter value directly from Windows performance counters */
