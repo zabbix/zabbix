@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-20T12:19:51Z'
+  date: '2023-07-24T07:22:34Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -17,7 +17,7 @@ zabbix_export:
         CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
         GRANT pg_monitor TO zbx_monitor;
         
-        2. Edit `pg_hba.conf` to allow TCP connections for user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
+        2. Edit the `pg_hba.conf` configuration file to allow TCP connections for the user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
         
         3. Install the PostgreSQL ODBC driver.
         
@@ -25,7 +25,7 @@ zabbix_export:
         
         5. Specify the host name or IP address in the `{$PG.HOST}` macro.
         
-        6. Set the password that you have specified in step 1 in the macro `{$PG.PASSWORD}`.
+        6. Set the password that you specified in step 1 in the macro `{$PG.PASSWORD}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
         

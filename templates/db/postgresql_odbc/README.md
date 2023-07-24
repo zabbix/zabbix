@@ -22,12 +22,12 @@ This template has been tested on:
 
 1. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
 
-```bash
+```sql
 CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT pg_monitor TO zbx_monitor;
 ```
 
-2. Edit `pg_hba.conf` to allow TCP connections for user `zbx_monitor`. For example, you could add one of the following rows to allow local connections from the same host:
+2. Edit the `pg_hba.conf` configuration file to allow TCP connections for the user `zbx_monitor`. For example, you could add one of the following rows to allow local connections from the same host:
   
 ```bash
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
@@ -42,9 +42,9 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 4. Set the ODBC driver with the `{$PG.DRIVER}` macro to the name of the driver which will be used for monitoring (from the `odbcinst.ini` file) or specify the path to the driver file (for example `/usr/lib64/psqlodbcw.so`).
 
-5. Specify the host name or IP address in the `{$PG.HOST}` macro.
+5. Specify the host name or IP address in the `{$PG.HOST}` macro. Adjust the port number with `{$PG.PORT}` macro if needed.
 
-6. Set the password that you have specified in the step 1 in the macro `{$PG.PASSWORD}`.
+6. Set the password that you specified in step 1 in the macro `{$PG.PASSWORD}`.
 
 ### Macros used
 
