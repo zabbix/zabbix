@@ -1662,7 +1662,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
           graph_prototypes:
-            - uuid: e36a154719b44cf4a62d1b94b022bdfd
+            - uuid: e4034a72c2834434b5b15f96469e97ff
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: CPU Utilization'
               graph_items:
                 - drawtype: GRADIENT_LINE
@@ -1670,7 +1670,7 @@ zabbix_export:
                   item:
                     host: 'AWS ECS Cluster by HTTP'
                     key: 'aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"]'
-            - uuid: 776990aee2274f92a4b64044046073f5
+            - uuid: 5c5da1e0886740ed80d43597c2b6ee96
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory Utilization'
               graph_items:
                 - drawtype: GRADIENT_LINE
@@ -1678,7 +1678,7 @@ zabbix_export:
                   item:
                     host: 'AWS ECS Cluster by HTTP'
                     key: 'aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"]'
-            - uuid: 7cb022e4d85848b3b14b76b85b1d8d43
+            - uuid: 2057845fb9b641299c7406f1c1127710
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network'
               graph_items:
                 - color: 199C0D
