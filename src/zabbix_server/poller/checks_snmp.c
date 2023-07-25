@@ -2130,7 +2130,6 @@ typedef struct
 	void			*arg;
 	char			*error;
 	netsnmp_large_fd_set	fdset;
-	zbx_snmp_step_t		step;
 }
 zbx_bulkwalk_context_t;
 
@@ -2338,6 +2337,8 @@ static int	agent_task_process(short event, void *data, int *fd)
 {
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
+	char			error[MAX_STRING_LEN];
+	int			ret;
 	/*zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;*/
 
 	bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
@@ -2351,82 +2352,65 @@ static int	agent_task_process(short event, void *data, int *fd)
 	/* initialization */
 	if (0 == event)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_snmp_step_string(bulkwalk_context->step), event, snmp_context->item.itemid);
-
-		bulkwalk_context->step = ZABBIX_AGENT_STEP_RECV;
+		zabbix_log(LOG_LEVEL_INFORMATION, "In %s() event:%d itemid:" ZBX_FS_UI64, __func__, event,
+				snmp_context->item.itemid);
 
 		return ZBX_ASYNC_TASK_READ;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-			get_snmp_step_string(bulkwalk_context->step), event, snmp_context->item.itemid);
+	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() event:%d itemid:" ZBX_FS_UI64, __func__, event,
+			snmp_context->item.itemid);
 
 	if (0 != (event & EV_TIMEOUT))
 	{
 		snmp_context->ret = TIMEOUT_ERROR;
-		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed during %s:"
-				" timed out", get_snmp_step_string(bulkwalk_context->step)));
+		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed:"
+				" timed out"));
 		goto stop;
 	}
 
-	switch (bulkwalk_context->step)
+	if (0 != snmp_sess_read2(bulkwalk_context->ssp, &bulkwalk_context->fdset))
 	{
-		case ZABBIX_AGENT_STEP_RECV:
-			snmp_sess_read2(bulkwalk_context->ssp, &bulkwalk_context->fdset);
+		snmp_context->ret = NETWORK_ERROR;
+		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2() failed"));
+		goto stop;
+	}
 
-			if (0 == bulkwalk_context->running)
-			{
-				snmp_context->i++;
+	if (0 == bulkwalk_context->running)
+	{
+		snmp_context->i++;
 
-				if (snmp_context->i < snmp_context->bulkwalk_contexts.values_num)
-				{
-					bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
-					bulkwalk_context->step = ZABBIX_AGENT_STEP_RECV;
-				}
-				else
-					break;
-			}
+		if (snmp_context->i < snmp_context->bulkwalk_contexts.values_num)
+		{
+			bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
+		}
+		else
+		{
+			SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
+			snmp_context->results = NULL;
+			snmp_context->ret = SUCCEED;
+			goto stop;
+		}
+	}
 
-			char	error[MAX_STRING_LEN];
+	if (SUCCEED != (ret = snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, sizeof(error))))
+	{
+		snmp_context->ret = ret;
+		bulkwalk_context->running = 0;
+		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
+	}
+	else
+	{
+		*fd = bulkwalk_context->sock;
 
-			if (0 > (snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, sizeof(error))))
-			{
-				bulkwalk_context->running = 0;
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-				break;
-			}
-			else
-			{
-				*fd = bulkwalk_context->sock;
-				return ZBX_ASYNC_TASK_READ_NEW;
-			}
-
-			/*if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
-					&agent_context->tcp_recv_context, agent_context->flags, &event_new)))
-			{
-				agent_context->ret = SUCCEED;
-				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->ret,
-						agent_context->interface.addr, &agent_context->result);
-
-				break;
-			}
-
-			if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
-				return state;
-
-			SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed"
-					" during %s: %s", get_agent_step_string(agent_context->step),
-					zbx_socket_strerror()));
-			agent_context->ret = NETWORK_ERROR;*/
-
-			break;
+		return ZBX_ASYNC_TASK_READ_NEW;
 	}
 stop:
-	//zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
-	//zbx_tcp_close(&agent_context->s);
-
 	zbx_snmp_close_session(snmp_context->ssp);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ZBX_ASYNC_TASK_STOP;
 }
@@ -2561,8 +2545,9 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 	event_base_dispatch(base);
 	event_base_free(base);
 
-	SET_TEXT_RESULT(result, NULL != snmp_context->results ? snmp_context->results :
-			zbx_strdup(NULL, ""));
+	*result = snmp_context->item.result;
+	zbx_init_agent_result(&snmp_context->item.result);
+	
 	ret = SUCCEED;
 out:
 	zbx_free_agent_request(&request);
