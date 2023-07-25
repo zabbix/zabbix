@@ -61,7 +61,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'hosts' =>
 			[
-				'insert' => '17',
+				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -101,7 +101,7 @@ class testInitialConfSync extends CIntegrationTest
 		[
 			'interfaces' =>
 			[
-				'insert' => '16',
+				'insert' => '15',
 				'update' => '0',
 				'delete' => '0'
 			]
@@ -331,6 +331,14 @@ class testInitialConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '2',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -372,7 +380,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"16",
+				"14",
 				"delete" =>
 				"0"
 			]
@@ -427,7 +435,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"10",
+				"9",
 				"delete" =>
 				"0"
 			]
@@ -706,6 +714,17 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' =>
 				'0'
 			]
+			],
+		[
+			'proxy' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'2',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -748,7 +767,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"21"
+				"19"
 			]
 		],
 		[
@@ -803,7 +822,7 @@ class testInitialConfSync extends CIntegrationTest
 				"update" =>
 				"0",
 				"delete" =>
-				"16"
+				"15"
 			]
 		],
 		[
@@ -1067,6 +1086,14 @@ class testInitialConfSync extends CIntegrationTest
 				'insert' => '0',
 				'update' => '0',
 				'delete' => '0'
+			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '2'
 			]
 		]
 	];
