@@ -524,6 +524,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			array $total_config, array $units_config, string $templateid): void {
 		$set_default_unit = true;
 		$default_unit = '';
+		$id = 1;
 		$raw_total_value = 0;
 		$others_value = 0;
 		$below_threshold_count = 0;
@@ -578,6 +579,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($formatted_value['is_numeric']);
 
 			$metric = [
+				'id' => $id++,
 				'name' => $metric['name'],
 				'color' => $metric['options']['color'],
 				'value' => $metric['value'],
@@ -640,6 +642,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($others_formatted_value['is_numeric']);
 
 			$others_metric = [
+				'id' => $id,
 				'name' => _('Other'),
 				'color' => $merge_sectors['color'],
 				'value' => $others_value,
