@@ -2237,7 +2237,7 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 	}
 	/* copy session !? */
 	/* create PDU */
-	
+
 	if (NULL == (pdu = snmp_pdu_create(bulkwalk_context->pdu_type)))
 	{
 		zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
@@ -2383,7 +2383,7 @@ static int	agent_task_process(short event, void *data, int *fd)
 			if (1 == bulkwalk_context->running)
 			{
 				char	error[MAX_STRING_LEN];
-		
+
 				if (0 > (snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, sizeof(error))))
 				{
 					//snmp_bulkwalk_config->bulkwalk_contexts.values[i]->running = 0;
