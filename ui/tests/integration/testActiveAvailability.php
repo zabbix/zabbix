@@ -295,7 +295,7 @@ class testActiveAvailability extends CIntegrationTest {
 				]
 			],
 			'address' => '127.0.0.1',
-			'port' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
+			'port' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
 
