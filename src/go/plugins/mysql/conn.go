@@ -62,15 +62,14 @@ func (conn *MyConn) Query(ctx context.Context, query string, args ...interface{}
 }
 
 // QueryByName wraps DB.QueryRowContext.
-func (conn *MyConn) QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error) {
-	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
+func (conn *MyConn) QueryByName(ctx context.Context, name string, args ...interface{}) (rows *sql.Rows, err error) {
+	if sql, ok := (*conn.queryStorage).Get(name + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
 		return conn.Query(ctx, normalizedSQL, args...)
 	}
 
-	return nil, fmt.Errorf("query %s not found", queryName)
-
+	return nil, fmt.Errorf("query %s not found", name)
 }
 
 // QueryRow wraps DB.QueryRowContext.
