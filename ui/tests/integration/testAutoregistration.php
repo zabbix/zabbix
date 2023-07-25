@@ -124,7 +124,7 @@ class testAutoregistration extends CIntegrationTest {
 						'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 						'operator' => CONDITION_OPERATOR_LIKE,
 						'value' => self::HOST_METADATA1
-					],
+					]
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
 			],
