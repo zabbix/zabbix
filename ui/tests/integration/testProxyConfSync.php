@@ -305,6 +305,14 @@ class testProxyConfSync extends CIntegrationTest
 				'update' => '0',
 				'delete' => '0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
 		]
 	];
 
@@ -680,6 +688,17 @@ class testProxyConfSync extends CIntegrationTest
 				'delete' =>
 				'0'
 			]
+		],
+		[
+			'proxy' =>
+			[
+				'insert' =>
+				'0',
+				'update' =>
+				'0',
+				'delete' =>
+				'0'
+			]
 		]
 	];
 
@@ -1037,6 +1056,14 @@ class testProxyConfSync extends CIntegrationTest
 		],
 		[
 			'connector_tag' =>
+			[
+				'insert' => '0',
+				'update' => '0',
+				'delete' => '0'
+			]
+		],
+		[
+			'proxy' =>
 			[
 				'insert' => '0',
 				'update' => '0',
