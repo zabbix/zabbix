@@ -2547,7 +2547,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 
 	*result = snmp_context->item.result;
 	zbx_init_agent_result(&snmp_context->item.result);
-	
+
 	ret = SUCCEED;
 out:
 	zbx_free_agent_request(&request);
