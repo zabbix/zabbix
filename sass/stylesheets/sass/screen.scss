@@ -268,20 +268,9 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		flex-grow: 1;
 		overflow: hidden;
 
-		&.is-scrollable {
-			.dashboard-navigation-controls {
-				button {
-					&.btn-dashboard-previous-page,
-					&.btn-dashboard-next-page {
-						display: inline-block;
-					}
-				}
-			}
-		}
-
 		.host-dashboard-navigation-tabs {
 			// Compensate 2px padding of tabs.
-			margin: -2px 0px -2px 0;
+			margin: -2px 10px -2px 0;
 			overflow: hidden;
 			flex-grow: 1;
 
@@ -348,16 +337,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 						max-width: 300px;
 						color: $font-color;
 					}
-
-					button {
-						margin: -1px -9px -1px 4px;
-					}
-
-					&:not(.selected-tab) {
-						button {
-							display: none;
-						}
-					}
 				}
 			}
 
@@ -376,20 +355,10 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 					color: $font-selected-color;
 				}
 			}
-
-			.sortable-item {
-				&.sortable-dragging > div {
-					@extend %cursor-dragging;
-				}
-			}
 		}
 
 		.host-dashboard-navigation-controls {
 			flex-shrink: 0;
-
-			.btn-host-dashboard-list {
-				margin-left: 10px;
-			}
 		}
 	}
 
