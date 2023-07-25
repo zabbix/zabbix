@@ -19,6 +19,7 @@
 
 #include "checks_snmp.h"
 #include "zbxasyncpoller.h"
+#include "zbxcommon.h"
 #include "zbxtypes.h"
 #include <event2/event.h>
 #include <sys/types.h>
@@ -2168,6 +2169,7 @@ typedef struct
 	size_t				results_alloc;
 	size_t				results_offset;
 	zbx_vector_bulkwalk_context_t	bulkwalk_contexts;
+	int				i;
 }
 zbx_snmp_context_t;
 
@@ -2227,13 +2229,13 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 	struct snmp_pdu	*pdu;
 	int		ret;
 
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	//if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char	buffer[MAX_OID_LEN];
 
 		snprint_objid(buffer, sizeof(buffer), bulkwalk_context->name,  bulkwalk_context->name_length);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() OID: '%s'",__func__, buffer);
+		zabbix_log(LOG_LEVEL_INFORMATION, "In %s() OID: '%s'",__func__, buffer);
 	}
 	/* copy session !? */
 	/* create PDU */
@@ -2296,8 +2298,10 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 
 	bulkwalk_context->sock = transport->sock;
 
-	return SUCCEED;
+	ret = SUCCEED;
 out:
+	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
+
 	return ret;
 }
 
@@ -2332,14 +2336,11 @@ static const char	*get_snmp_step_string(zbx_snmp_step_t step)
 
 static int	agent_task_process(short event, void *data, int *fd)
 {
-	zbx_bulkwalk_context_t	*bulkwalk_context = (zbx_bulkwalk_context_t *)data;
-	zbx_snmp_context_t	*snmp_context = bulkwalk_context->arg;
-	ssize_t			received_len;
-	short			event_new;
-	zbx_async_task_state_t	state;
+	zbx_bulkwalk_context_t	*bulkwalk_context;
+	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	/*zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;*/
-	int			errnum = 0;
-	socklen_t		optlen = sizeof(int);
+
+	bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 
 	/*if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
@@ -2347,25 +2348,12 @@ static int	agent_task_process(short event, void *data, int *fd)
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}*/
 
+	/* initialization */
 	if (0 == event)
-	{
-		/* initialization */
 		bulkwalk_context->step = ZABBIX_AGENT_STEP_RECV;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_snmp_step_string(bulkwalk_context->step), event, snmp_context->item.itemid);
-
-		//zbx_tcp_send_context_init(agent_context->key, strlen(agent_context->key), 0,
-		//			ZBX_TCP_PROTOCOL, &agent_context->tcp_send_context);
-
-		return ZBX_ASYNC_TASK_READ;
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_snmp_step_string(bulkwalk_context->step), event, snmp_context->item.itemid);
-	}
-
+	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+			get_snmp_step_string(bulkwalk_context->step), event, snmp_context->item.itemid);
 
 	if (0 != (event & EV_TIMEOUT))
 	{
@@ -2380,20 +2368,33 @@ static int	agent_task_process(short event, void *data, int *fd)
 		case ZABBIX_AGENT_STEP_RECV:
 			snmp_sess_read2(bulkwalk_context->ssp, &bulkwalk_context->fdset);
 
-			if (1 == bulkwalk_context->running)
+			if (0 == bulkwalk_context->running)
 			{
-				char	error[MAX_STRING_LEN];
+				snmp_context->i++;
 
-				if (0 > (snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, sizeof(error))))
+				if (snmp_context->i < snmp_context->bulkwalk_contexts.values_num)
 				{
-					//snmp_bulkwalk_config->bulkwalk_contexts.values[i]->running = 0;
+					bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
+					bulkwalk_context->step = ZABBIX_AGENT_STEP_RECV;
 				}
 				else
-				{
-					*fd = bulkwalk_context->sock;
-					return ZBX_ASYNC_TASK_READ_NEW;
-				}
+					break;
 			}
+
+			char	error[MAX_STRING_LEN];
+
+			if (0 > (snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, sizeof(error))))
+			{
+				bulkwalk_context->running = 0;
+
+				break;
+			}
+			else
+			{
+				*fd = bulkwalk_context->sock;
+				return ZBX_ASYNC_TASK_READ_NEW;
+			}
+
 			/*if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
 					&agent_context->tcp_recv_context, agent_context->flags, &event_new)))
 			{
@@ -2417,6 +2418,8 @@ static int	agent_task_process(short event, void *data, int *fd)
 stop:
 	//zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
 	//zbx_tcp_close(&agent_context->s);
+
+	zbx_snmp_close_session(snmp_context->ssp);
 
 	return ZBX_ASYNC_TASK_STOP;
 }
@@ -2468,6 +2471,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 	snmp_context->results_alloc = 0;
 	snmp_context->results_offset = 0;
 	snmp_context->ssp = ssp;
+	snmp_context->i = 0;
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
 
 	zbx_init_agent_request(&request);
@@ -2518,12 +2522,6 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 
 		bulkwalk_context = snmp_bulkwalk_contect_create(snmp_context, pdu_type, param_oids.values[i]);
 
-		if (0 > (ret = snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, max_error_len)))
-		{
-			snmp_bulkwalk_context_free(bulkwalk_context);
-			goto out;
-		}
-
 		zbx_vector_bulkwalk_context_append(&snmp_context->bulkwalk_contexts, bulkwalk_context);
 
 		/*if (SUCCEED > (ret = snmp_bulkwalk(ssp, pdu_type, item, param_oids.values[i], &results, &results_alloc,
@@ -2544,48 +2542,19 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 
 	struct event_base	*base = event_base_new();
 
-	for (i = 0; i < snmp_context->bulkwalk_contexts.values_num; i++)
+	if (0 > (ret = snmp_bulkwalk_add(snmp_context->bulkwalk_contexts.values[0], snmp_context, error,
+			max_error_len)))
 	{
-		zbx_bulkwalk_context_t	*bulkwalk_context = snmp_context->bulkwalk_contexts.values[i];
-
-		zbx_async_poller_add_task(base, bulkwalk_context->sock, bulkwalk_context, 3, agent_task_process,
-			process_agent_result);
+		//snmp_bulkwalk_context_free(bulkwalk_context);
+		goto out;
 	}
+
+	zbx_async_poller_add_task(base, snmp_context->bulkwalk_contexts.values[0]->sock, snmp_context, 10,
+			agent_task_process, process_agent_result);
 
 	event_base_dispatch(base);
 	event_base_free(base);
-/*
-	int	running = 1;
 
-	while (1 == running)
-	{
-		running = 0;
-
-		for (i = 0; i < snmp_bulkwalk_config->bulkwalk_contexts.values_num; i++)
-		{
-			struct timeval timeout = {.tv_sec = 3};
-
-			if (1 > netsnmp_large_fd_set_select(snmp_bulkwalk_config->bulkwalk_contexts.values[i]->sock + 1,
-					&snmp_bulkwalk_config->bulkwalk_contexts.values[i]->fdset, NULL, NULL, &timeout))
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "fail;");
-			}
-
-			snmp_sess_read2(snmp_bulkwalk_config->bulkwalk_contexts.values[i]->ssp,
-					&snmp_bulkwalk_config->bulkwalk_contexts.values[i]->fdset);
-
-			if (1 == snmp_bulkwalk_config->bulkwalk_contexts.values[i]->running)
-			{
-				running = 1;
-				if (0 > (ret = snmp_bulkwalk_add(snmp_bulkwalk_config->bulkwalk_contexts.values[i],
-						item, error, max_error_len)))
-				{
-					snmp_bulkwalk_config->bulkwalk_contexts.values[i]->running = 0;
-				}
-			}
-		}
-	}
-*/
 	SET_TEXT_RESULT(result, NULL != snmp_context->results ? snmp_context->results :
 			zbx_strdup(NULL, ""));
 	ret = SUCCEED;
@@ -2982,6 +2951,8 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 
 		err = zbx_snmp_process_discovery(ssp, &items[j], &results[j], &errcodes[j], error, sizeof(error),
 				&max_succeed, &min_fail, max_vars, bulk);
+
+		zbx_snmp_close_session(ssp);
 	}
 	else if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
 	{
@@ -2993,14 +2964,18 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 
 		err = zbx_snmp_process_dynamic(ssp, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
 				&max_succeed, &min_fail, bulk, poller_type);
+
+		zbx_snmp_close_session(ssp);
 	}
 	else
 	{
 		err = zbx_snmp_process_standard(ssp, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
 				&max_succeed, &min_fail, poller_type);
+
+		zbx_snmp_close_session(ssp);
 	}
 
-	zbx_snmp_close_session(ssp);
+	
 exit:
 	if (SUCCEED != err)
 	{
