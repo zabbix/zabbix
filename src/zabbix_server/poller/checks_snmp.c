@@ -2350,7 +2350,14 @@ static int	agent_task_process(short event, void *data, int *fd)
 
 	/* initialization */
 	if (0 == event)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+				get_snmp_step_string(bulkwalk_context->step), event, snmp_context->item.itemid);
+
 		bulkwalk_context->step = ZABBIX_AGENT_STEP_RECV;
+
+		return ZBX_ASYNC_TASK_READ;
+	}
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
 			get_snmp_step_string(bulkwalk_context->step), event, snmp_context->item.itemid);
