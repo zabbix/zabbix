@@ -64,13 +64,12 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},
 
 		openTemplatePopup(template_data) {
-			const original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
@@ -78,9 +77,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
 		},
 
 		massCheckNow(button) {

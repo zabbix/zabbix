@@ -26,7 +26,9 @@
 
 <script>
 	const view = {
-		init() {
+		init({context}) {
+			this.context = context;
+
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-template')) {
 					this.openTemplatePopup({templateid: e.target.dataset.templateid})
@@ -56,28 +58,28 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},
 
 		openTemplatePopup(template_data) {
-			const original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
 		},
 
 		events: {
-			elementSuccess(e) {
+			elementSuccess(context, e) {
 				const data = e.detail;
 				let curl = null;
 
@@ -90,7 +92,7 @@
 
 					if ('action' in data.success && data.success.action === 'delete') {
 						curl = new Curl('host_discovery.php');
-						curl.setArgument('context', data.success.context);
+						curl.setArgument('context', context);
 					}
 				}
 

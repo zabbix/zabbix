@@ -45,14 +45,18 @@
 		/** @type {boolean} */
 		#variables_headers_initialized = false;
 
+		/** @type {string} */
+		#context;
+
 		constructor() {
 			this.#registerEvents();
 		}
 
-		init({is_templated, variables, headers, steps}) {
+		init({is_templated, variables, headers, steps, context}) {
 			this.#form = document.getElementById('webscenario-form');
 			this.#is_templated = is_templated;
 			this.#step_list = document.getElementById('steps');
+			this.#context = context;
 
 			this.#initTemplates();
 
@@ -295,24 +299,24 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.#events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.#events.elementSuccess.bind(this, this.#context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		}
 
 		#openTemplatePopup(template_data) {
-			const original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.#events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.#events.elementSuccess.bind(this, this.#context), {once: true}
+			);
 		}
 
 		refresh() {
@@ -324,7 +328,7 @@
 
 		#registerEvents() {
 			this.#events = {
-				elementSuccess(e) {
+				elementSuccess(context, e) {
 					const data = e.detail;
 					let curl = null;
 
@@ -337,7 +341,7 @@
 
 						if ('action' in data.success && data.success.action === 'delete') {
 							curl = new Curl('host_discovery.php');
-							curl.setArgument('context', data.success.context);
+							curl.setArgument('context', context);
 						}
 					}
 

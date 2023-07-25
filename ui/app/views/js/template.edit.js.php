@@ -183,7 +183,7 @@ window.template_edit_popup = new class {
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}));
 		});
 
-		overlay.$dialogue[0].addEventListener('overlay.close', () => {
+		overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
 		});
 	}

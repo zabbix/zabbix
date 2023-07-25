@@ -217,6 +217,10 @@ $html_page
 	->addItem($itemForm)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'context' => $data['context']
+	]).');
+'))
 	->setOnDocumentReady()
-	->show();
+	->show();;

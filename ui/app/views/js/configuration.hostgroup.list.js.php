@@ -68,7 +68,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},
@@ -121,7 +121,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			});
 		},

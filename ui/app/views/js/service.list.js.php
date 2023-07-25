@@ -147,7 +147,7 @@
 				location.href = parameters.serviceid === this.serviceid ? this.parent_url : location.href;
 			});
 
-			dialogue.addEventListener('overlay.close', () => this._resumeRefresh(), {once: true});
+			dialogue.addEventListener('dialogue.close', () => this._resumeRefresh(), {once: true});
 		}
 
 		_delete(target, serviceids) {

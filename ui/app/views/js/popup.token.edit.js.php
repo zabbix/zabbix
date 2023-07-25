@@ -233,7 +233,7 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAfterUpdate,
+				this.overlay.$dialogue[0].addEventListener('dialogue.close', this.events.overlayCloseAfterUpdate,
 					{once: true}
 				);
 

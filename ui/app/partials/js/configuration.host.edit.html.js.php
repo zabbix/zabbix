@@ -188,7 +188,7 @@
 					location.href = location.href;
 				});
 
-				overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 					new TabIndicators('host-tabs');
 				});
 			}

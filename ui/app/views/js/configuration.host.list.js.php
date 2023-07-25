@@ -116,7 +116,7 @@
 			});
 
 			this.overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			this.overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			this.overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},

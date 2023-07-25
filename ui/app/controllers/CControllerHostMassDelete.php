@@ -70,7 +70,6 @@ class CControllerHostMassDelete extends CController {
 			}
 
 			$success['action'] = 'delete';
-			$success['context'] = 'host';
 			$output['success'] = $success;
 		}
 		else {

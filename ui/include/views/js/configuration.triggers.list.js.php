@@ -30,9 +30,10 @@
 
 <script>
 	const view = {
-		init({checkbox_hash, checkbox_object}) {
+		init({checkbox_hash, checkbox_object, context}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
+			this.context = context;
 
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
@@ -92,8 +93,10 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},
@@ -106,17 +109,15 @@
 		},
 
 		openTemplatePopup(template_data) {
-			const original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
 		},
 
 		openCopyPopup() {
@@ -138,7 +139,7 @@
 		},
 
 		events: {
-			elementSuccess(e) {
+			elementSuccess(context, e) {
 				const data = e.detail;
 				let curl = null;
 
@@ -151,7 +152,7 @@
 
 					if ('action' in data.success && data.success.action === 'delete') {
 						curl = new Curl('triggers.php');
-						curl.setArgument('context', data.success.context);
+						curl.setArgument('context', context);
 					}
 				}
 

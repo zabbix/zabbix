@@ -319,11 +319,15 @@
 	const view = {
 		form_name: null,
 		graphs: null,
+		context: null,
+		parent_discoveryid: null,
 
-		init({form_name, theme_colors, graphs, items}) {
+		init({form_name, theme_colors, graphs, items, context, parent_discoveryid}) {
 			this.form_name = form_name;
 			colorPalette.setThemeColors(theme_colors);
 			this.graphs = graphs;
+			this.context = context;
+			this.is_discovery = parent_discoveryid !== null;
 
 			items.forEach((item, i) => {
 				item.number = i;
@@ -699,8 +703,10 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},
@@ -713,17 +719,15 @@
 		},
 
 		openTemplatePopup(template_data) {
-			const original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
+			);
 		},
 
 		refresh() {
@@ -735,7 +739,7 @@
 		},
 
 		events: {
-			elementSuccess(e) {
+			elementSuccess(context, discovery, e) {
 				const data = e.detail;
 				let curl = null;
 
@@ -747,8 +751,8 @@
 					}
 
 					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('graphs.php');
-						curl.setArgument('context', data.success.context);
+						curl = discovery ? new Curl('host_discovery.php') : new Curl('graphs.php');
+						curl.setArgument('context', context);
 					}
 				}
 

@@ -1112,7 +1112,8 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'trends_default' => $data['trends_default']
+		'trends_default' => $data['trends_default'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()
