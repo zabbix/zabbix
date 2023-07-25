@@ -2229,13 +2229,13 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 	struct snmp_pdu	*pdu;
 	int		ret;
 
-	//if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char	buffer[MAX_OID_LEN];
 
 		snprint_objid(buffer, sizeof(buffer), bulkwalk_context->name,  bulkwalk_context->name_length);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "In %s() OID: '%s'",__func__, buffer);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() OID: '%s'",__func__, buffer);
 	}
 	/* copy session !? */
 	/* create PDU */
@@ -2545,7 +2545,6 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 	if (0 > (ret = snmp_bulkwalk_add(snmp_context->bulkwalk_contexts.values[0], snmp_context, error,
 			max_error_len)))
 	{
-		//snmp_bulkwalk_context_free(bulkwalk_context);
 		goto out;
 	}
 
@@ -2974,8 +2973,6 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 
 		zbx_snmp_close_session(ssp);
 	}
-
-	
 exit:
 	if (SUCCEED != err)
 	{
