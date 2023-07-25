@@ -751,6 +751,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($sectors as $sector) {
 			$legend['data'][] = [
+				'id' => $sector['id'],
 				'name' => $sector['name'],
 				'color' => $sector['color'],
 				'is_total' => $sector['is_total']

@@ -210,7 +210,7 @@ class CSVGPie {
 		const was = this.#prepareTransitionArray(this.#sectors_new, this.#sectors_old, items);
 		const is = this.#prepareTransitionArray(this.#sectors_old, this.#sectors_new, items);
 
-		const key = d => d.data.name;
+		const key = d => d.data.id;
 
 		this.#arcs_container
 			.selectAll('path')
@@ -417,10 +417,10 @@ class CSVGPie {
 	#prepareTransitionArray(arr_old, arr_new, items) {
 		const arr_new_set = new Set();
 
-		arr_new.forEach(element => arr_new_set.add(element.name));
+		arr_new.forEach(element => arr_new_set.add(element.id));
 
 		const arr_old_only = arr_old
-			.filter(element => !arr_new_set.has(element.name))
+			.filter(element => !arr_new_set.has(element.id))
 			.map(element => ({...element, percent_of_total: 0}));
 
 		const merged = d3.merge([arr_new, arr_old_only]);
@@ -436,8 +436,8 @@ class CSVGPie {
 	 */
 	#sortByRef(arr, ref) {
 		return arr.sort((a, b) => {
-			const aIndex = ref.findIndex(i => i.name === a.name);
-			const bIndex = ref.findIndex(i => i.name === b.name);
+			const aIndex = ref.findIndex(i => i.id === a.id);
+			const bIndex = ref.findIndex(i => i.id === b.id);
 
 			return aIndex - bIndex;
 		});
