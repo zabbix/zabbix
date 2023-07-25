@@ -961,8 +961,8 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
 				$url = (new CUrl())
-					->setArgument('action', 'item.list')
-					->setArgument('form', 'update')
+					->setArgument('action', 'item.edit')
+					->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->setArgument('context', 'template');
 			}

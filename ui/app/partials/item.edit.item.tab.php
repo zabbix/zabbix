@@ -24,10 +24,13 @@
  */
 
 $formgrid = (new CFormGrid())
-	->addItem($data['parent_templates'] ? [
-		new CLabel(_('Parent items')),
-		new CFormField($data['templates'])
-	] : null)
+	->addItem($data['parent_items']
+		? [
+			new CLabel(_('Parent items')),
+			(new CFormField($data['parent_items']))->addClass('js-parent-items')
+		]
+		: null
+	)
 	->addItem($data['discovered'] ? [
 		new CLabel(_('Discovered by')),
 		new CFormField(

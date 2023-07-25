@@ -136,11 +136,8 @@ class CControllerItemEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN
-			&& API::Host()->get([
-				'hostids' => $this->getInput('hostid'),
-				'editable' => true
-			]);
+		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN
+			|| $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	public function doAction() {
@@ -156,7 +153,7 @@ class CControllerItemEdit extends CController {
 			'form' => $form_refresh || !$this->hasInput('itemid') ? $this->getFormData() : $this->getItemData(),
 			'form_refresh' => $form_refresh,
 			'display_interfaces' => false,
-			'parent_templates' => [],
+			'parent_items' => [],
 			'discovery_rule' => [],
 			'master_item' => [],
 			'types' => item_type2str(),
@@ -213,6 +210,19 @@ class CControllerItemEdit extends CController {
 				'tags' => $item['tags'],
 				'hostid' => $this->getInput('hostid')
 			]);
+		}
+
+		if ($this->hasInput('itemid')) {
+			$item = [
+				'itemid' => $data['form']['itemid'],
+				'templateid' => $data['form']['templateid']
+			];
+			$data['parent_items'] = makeItemTemplatesHtml(
+				$item['itemid'],
+				getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_NORMAL),
+				ZBX_FLAG_DISCOVERY_NORMAL,
+				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
 		}
 
 		$set_inventory = array_column(API::Item()->get([
@@ -418,65 +428,65 @@ class CControllerItemEdit extends CController {
 	 */
 	protected function getFormData(): array {
 		$form = [
-			'itemid' => 0,
-			'templateid' => 0,
-			'interfaceid' => 0,
-			'hostid' => 0,
+			'allow_traps' => DB::getDefault('items', 'allow_traps'),
+			'authtype' => DB::getDefault('items', 'authtype'),
 			'context' => '',
-			'name' => '',
-			'type' => DB::getDefault('items', 'type'),
+			'delay' => ZBX_ITEM_DELAY_DEFAULT,
+			'delay_flex' => [],
+			'description' => DB::getDefault('items', 'description'),
+			'discovered' => 0,
+			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+			'headers' => [],
+			'history' => DB::getDefault('items', 'history'),
+			'history_mode' => ITEM_STORAGE_CUSTOM,
+			'hostid' => 0,
+			'http_authtype' => ZBX_HTTP_AUTH_NONE,
+			'http_password' => '',
+			'http_proxy' => DB::getDefault('items', 'http_proxy'),
+			'http_username' => '',
+			'interfaceid' => 0,
+			'inventory_link' => 0,
+			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
+			'itemid' => 0,
+			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
 			'key' => '',
-			'value_type' => DB::getDefault('items', 'value_type'),
-			'url' => '',
-			'query_fields' => [],
+			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
+			'master_itemid' => 0,
+			'name' => '',
+			'output_format' => DB::getDefault('items', 'output_format'),
 			'parameters' => [['name' => '', 'value' => '']],
-			'script' => '',
-			'request_method' => DB::getDefault('items', 'request_method'),
-			'timeout' => DB::getDefault('items', 'timeout'),
+			'params' => DB::getDefault('items', 'params'),
+			'password' => DB::getDefault('items', 'password'),
 			'post_type' => DB::getDefault('items', 'post_type'),
 			'posts' => DB::getDefault('items', 'posts'),
-			'status_codes' => DB::getDefault('items', 'status_codes'),
-			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+			'preprocessing' => [],
+			'privatekey' => DB::getDefault('items', 'privatekey'),
+			'publickey' => DB::getDefault('items', 'publickey'),
+			'query_fields' => [],
+			'request_method' => DB::getDefault('items', 'request_method'),
 			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
-			'output_format' => DB::getDefault('items', 'output_format'),
-			'http_proxy' => DB::getDefault('items', 'http_proxy'),
-			'http_authtype' => ZBX_HTTP_AUTH_NONE,
-			'http_username' => '',
-			'http_password' => '',
-			'verify_peer' => DB::getDefault('items', 'verify_peer'),
-			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'script' => '',
+			'show_inherited_tags' => 0,
+			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
 			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
 			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
 			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
-			'master_itemid' => 0,
-			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
-			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
-			'authtype' => DB::getDefault('items', 'authtype'),
-			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
-			'username' => DB::getDefault('items', 'username'),
-			'password' => DB::getDefault('items', 'password'),
-			'publickey' => DB::getDefault('items', 'publickey'),
-			'privatekey' => DB::getDefault('items', 'privatekey'),
-			'params' => DB::getDefault('items', 'params'),
-			'units' => DB::getDefault('items', 'units'),
-			'delay' => ZBX_ITEM_DELAY_DEFAULT,
-			'history_mode' => ITEM_STORAGE_OFF,
-			'history' => DB::getDefault('items', 'history'),
-			'trends_mode' => ITEM_STORAGE_OFF,
-			'trends' => DB::getDefault('items', 'trends'),
-			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
-			'valuemapid' => 0,
-			'allow_traps' => DB::getDefault('items', 'allow_traps'),
-			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
-			'inventory_link' => 0,
-			'description' => DB::getDefault('items', 'description'),
 			'status' => DB::getDefault('items', 'status'),
-			'show_inherited_tags' => 0,
-			'discovered' => 0,
+			'status_codes' => DB::getDefault('items', 'status_codes'),
 			'tags' => [],
-			'preprocessing' => [],
-			'headers' => [],
-			'delay_flex' => []
+			'templateid' => 0,
+			'timeout' => DB::getDefault('items', 'timeout'),
+			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
+			'trends' => DB::getDefault('items', 'trends'),
+			'trends_mode' => ITEM_STORAGE_CUSTOM,
+			'type' => DB::getDefault('items', 'type'),
+			'units' => DB::getDefault('items', 'units'),
+			'url' => '',
+			'username' => DB::getDefault('items', 'username'),
+			'value_type' => DB::getDefault('items', 'value_type'),
+			'valuemapid' => 0,
+			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'verify_peer' => DB::getDefault('items', 'verify_peer')
 		];
 		$this->getInputs($form, array_keys($form));
 

@@ -38,11 +38,13 @@ const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
+const CONFIRM_FORM_NAVIGATION = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
 
 window.item_edit_form = new class {
 
-	init({testable_item_types, host_interfaces, interface_types, field_switches, value_type_keys,
-			type_with_key_select, form_data
+	init({
+			field_switches, form_data, host_interfaces, interface_types, testable_item_types, type_with_key_select,
+			value_type_keys
 		}) {
 		this.form_data = form_data;
 		this.testable_item_types = testable_item_types;
@@ -75,6 +77,8 @@ window.item_edit_form = new class {
 		this.initForm(field_switches);
 		this.initEvents();
 		this.updateFieldsVisibility();
+
+		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	initForm(field_switches) {
@@ -181,14 +185,25 @@ window.item_edit_form = new class {
 						const dynamic_rows = jQuery('#query-fields-table').dynamicRows();
 
 						dynamic_rows.addRows(url.pairs);
-						dynamic_rows.removeRows(row => [...row.querySelectorAll('[type="text"]')]
-							.filter(input => input.value === '').length == 2
+						dynamic_rows.removeRows(row => [].filter.call(
+								row.querySelectorAll('[type="text"]'),
+								input => input.value === ''
+							).length == 2
 						);
 					}
 
 					this.field.url.value = url.url;
 
 					break;
+			}
+
+			if (target.matches('a') && target.closest('.js-parent-items')) {
+				e.preventDefault();
+
+				if (!this.#isFormModified() || window.confirm(CONFIRM_FORM_NAVIGATION)) {
+					const data = new URLSearchParams(target.getAttribute('href').replace(/^.*\?/g, ''));
+					this.#openRelatedItem(Object.fromEntries(data));
+				}
 			}
 		});
 		this.form.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
@@ -309,6 +324,10 @@ window.item_edit_form = new class {
 		return type == ITEM_TYPE_SIMPLE
 			? key.substr(0, 7) !== 'vmware.' && key.substr(0, 8) !== 'icmpping'
 			: this.testable_item_types.indexOf(type) != -1;
+	}
+
+	#isFormModified() {
+		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(getFormFields(this.form));
 	}
 
 	#updateActionButtons() {
@@ -439,6 +458,13 @@ window.item_edit_form = new class {
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+	}
+
+	#openRelatedItem(parameters) {
+		const dialogueid = this.dialogue.dataset.dialogueid;
+		const dialogue_class = this.dialogue.getAttribute('class');
+
+		PopUp(parameters.action, parameters, {dialogueid, dialogue_class});
 	}
 }
 })();
