@@ -39,7 +39,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	protected static $dashboardid;
 
 	public static function prepareSelectedHostdata() {
-		$hostgroupid = CDataHelper::call('hostgroup.create',	[['name' => 'Suggestion list group']])['groupids'][0];
+		$hostgroupid = CDataHelper::call('hostgroup.create', [['name' => 'Suggestion list group']])['groupids'][0];
 
 		CDataHelper::createHosts([
 			[
@@ -268,7 +268,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Host for widget 4',
 						'Host for widget 5'
 					],
-					'Arrow Key' => 'no'
+					'arrow_key' => false,
+					'check_hosts' => true
 				]
 			],
 			[
@@ -284,7 +285,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 1_4',
 						'Item for Graph 1_5'
 					],
-					'Arrow Key' => 'no'
+					'arrow_key' => false,
+					'check_items' => true
 				]
 			],
 			[
@@ -314,7 +316,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 4_3',
 						'Item for Graph 4_4'
 					],
-					'Arrow Key' => 'no'
+					'arrow_key' => false,
+					'check_items' => false
 				]
 			],
 			[
@@ -338,9 +341,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 2_4',
 						'Item for Graph 2_5'
 					],
-					'Arrow Key' => 'yes',
-					'Focus' => 'Item for Graph 2_5',
-					'Not Present' => 'yes'
+					'arrow_key' => true,
+					'check_items' => false
 				]
 			],
 			[
@@ -364,7 +366,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 4_4',
 						'Item for Graph 4_5'
 					],
-					'Arrow Key' => 'no'
+					'arrow_key' => false,
+					'check_items' => false
 				]
 			]
 		];
@@ -383,12 +386,41 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 
 		// Change mapping of associative arrays from data set.
 		if (array_key_exists('item', $data['Data set'])) {
+			if (CTestArrayHelper::get($data, 'check_items')) {
+				$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => 'Host for widget 1']);
+				$form->fill(['xpath:.//div[@id="ds_0_items_"]/..' => 'Item for Graph 1_3']);
+				$expected_items = [
+					'Item for Graph 1_1',
+					'Item for Graph 1_2',
+					'Item for Graph 1_4',
+					'Item for Graph 1_5'
+				];
+				$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'Item for Graph']);
+				$this->checkSuggestionListCommon($expected_items, $form);
+				$this->page->removeFocus();
+				$form->getField('xpath:.//div[@id="ds_0_items_"]/..')->clear();
+			}
+
 			$field_data = [
 				'xpath:.//div[@id="ds_0_hosts_"]/..' => $data['Data set']['host'],
 				'xpath:.//input[@placeholder="item pattern"]' => $data['Data set']['item']
 			];
 		}
 		else {
+			if (CTestArrayHelper::get($data, 'check_hosts')) {
+				$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => 'Host for widget 3']);
+				$expected_hosts = [
+					'Host for widget 1',
+					'Host for widget 2',
+					'Host for widget 4',
+					'Host for widget 5'
+				];
+				$form->fill(['xpath:.//input[@placeholder="host pattern"]' => 'Host for widget']);
+				$this->checkSuggestionListCommon($expected_hosts, $form);
+				$this->page->removeFocus();
+				$form->getField('xpath:.//div[@id="ds_0_hosts_"]/..')->clear();
+			}
+
 			$field_data = [
 				'xpath:.//input[@placeholder="host pattern"]' => $data['Data set']['host']
 			];
@@ -397,19 +429,31 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$form->fill($field_data);
 		$this->checkSuggestionListCommon($data['expected'], $form);
 
-		if ($data['Arrow Key'] === 'yes') {
-			$this->checkSuggestionListWithKeyboardNavigation($data['Data set'], $data, $form);
+		if (CTestArrayHelper::get($data, 'arrow_key')) {
+			$this->checkSuggestionListWithKeyboardNavigation($data, $form);
 		}
 	}
 
+	/**
+	 * Usual way how suggestion list is checked using elements from UI.
+	 *
+	 * @param array			$data		data provider
+	 * @param CFormElement 	$form		form element of dashboard share
+	 */
 	private function checkSuggestionListCommon ($data, $form) {
 		$this->query('class', 'multiselect-suggest')->waitUntilVisible();
-		$this->assertEquals($data, $form->getField('xpath://div[@id="ds_0_hosts_"]/..')->getSuggestions());
+		$this->assertEquals($data, $form->getField('xpath:.//div[@id="ds_0_hosts_"]/..')->getSuggestions());
 	}
 
-	private function checkSuggestionListWithKeyboardNavigation($data_set, $data, $form) {
+	/**
+	 * Complex suggestion list check using keyboard navigation.
+	 *
+	 * @param array			$data		data provider
+	 * @param CFormElement 	$form		form element of dashboard share
+	 */
+	private function checkSuggestionListWithKeyboardNavigation($data, $form) {
 		$merged_text = [];
-		$id = (count($data_set) >= 2) ? 'items' : 'hosts';
+		$id = (CTestArrayHelper::get($data['Data set'], 'item')) ? 'items' : 'hosts';
 		for ($x = 0; $x < (count($data['expected'])); $x++) {
 			$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
 			$option = ($id === 'items') ? 'Graph' : 'widget';
@@ -419,16 +463,12 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		}
 		$this->assertEquals($data['expected'], $merged_text);
 
-		if (array_key_exists('Focus', $data)) {
-			$this->page->pressKey(WebDriverKeys::ENTER);
-			$this->assertTrue($this->query('xpath://div[@id="ds_0_items_"]//ul[@class="multiselect-list"]//span[@title="'.
-					$data['Focus'].'"]')->exists()
-			);
-		}
+		$this->page->pressKey(WebDriverKeys::ENTER);
+		$this->assertTrue($this->query("xpath://div[@id='ds_0_items_']//ul[@class='multiselect-list']//span[@title=".
+				CXPathHelper::escapeQuotes($data['expected'][9])."]")->exists()
+		);
 
-		if (array_key_exists('Not Present', $data)) {
-			$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'item']);
-			$this->checkSuggestionListCommon(array_slice($data['expected'],0,9), $form);
-		}
+		$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'item']);
+		$this->checkSuggestionListCommon(array_slice($data['expected'], 0, 9), $form);
 	}
 }
