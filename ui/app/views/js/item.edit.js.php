@@ -85,10 +85,12 @@ window.item_edit_form = new class {
 
 		this.field = {
 			history: this.form.querySelector('[name="history"]'),
+			history_mode: this.form.querySelectorAll('[name="history_mode"]'),
 			interfaceid: this.form.querySelector('[name="interfaceid"]'),
 			key: this.form.querySelector('[name="key"]'),
 			key_button: this.form.querySelector('[name="key"] ~ .js-select-key'),
 			trends: this.form.querySelector('[name="trends"]'),
+			trends_mode: this.form.querySelectorAll('[name="trends_mode"]'),
 			type: this.form.querySelector('[name="type"]'),
 			url: this.form.querySelector('[name="url"]'),
 			username: this.form.querySelector('[name=username]'),
@@ -160,20 +162,11 @@ window.item_edit_form = new class {
 		this.field.value_type.addEventListener('change', e => this.#valueTypeChangeHandler(e));
 		this.form.addEventListener('click', e => {
 			const target = e.target;
-			const disabled = target.value == ITEM_STORAGE_OFF;
 
 			switch (target.getAttribute('name')) {
 				case 'history_mode':
-					this.field.history.toggleAttribute('disabled', disabled);
-					this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-					this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-
-					break;
-
 				case 'trends_mode':
-					this.field.trends.toggleAttribute('disabled', disabled);
-					this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-					this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+					this.updateFieldsVisibility();
 
 					break;
 
@@ -256,6 +249,8 @@ window.item_edit_form = new class {
 		this.#updateActionButtons();
 		this.#updateCustomIntervalVisibility();
 		this.#updateValueTypeHintVisibility();
+		this.#updateHistoryModeVisibility();
+		this.#updateTrendsModeVisibility();
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
@@ -426,6 +421,24 @@ window.item_edit_form = new class {
 		this.form.append(form_refresh);
 
 		reloadPopup(this.form, 'item.edit');
+	}
+
+	#updateHistoryModeVisibility() {
+		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
+		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+
+		this.field.history.toggleAttribute('disabled', disabled);
+		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+	}
+
+	#updateTrendsModeVisibility() {
+		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
+		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+
+		this.field.trends.toggleAttribute('disabled', disabled);
+		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 	}
 }
 })();

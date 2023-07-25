@@ -46,7 +46,8 @@ class CControllerItemDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return true;
+		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN
+			|| $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	public function doAction() {

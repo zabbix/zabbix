@@ -29,57 +29,63 @@ class CControllerItemUpdate extends CController {
 		$fields = [
 			'hostid'			=> 'required|id',
 			'itemid'			=> 'required|id',
-			'name'				=> 'db items.name',
-			'key'				=> 'db items.key_',
-			'type'				=> 'db items.type',
-			'value_type'		=> 'db items.value_type',
-			'units'				=> 'db items.units',
-			'history_mode'		=> 'int32',
-			'history'			=> 'db items.history',
-			'trends_mode'		=> 'int32',
-			'trends'			=> 'db items.trends',
-			'valuemapid'		=> 'id',
-			'inventory_link'	=> 'db items.inventory_link',
-			'logtimefmt'		=> 'db items.logtimefmt',
-			'description'		=> 'db items.description',
-			'status'			=> 'db items.status',
-			'interfaceid'		=> 'id',
+			'allow_traps'		=> 'db items.allow_traps',
 			'authtype'			=> 'db items.authtype',
-			'username'			=> 'db items.username',
-			'password'			=> 'db items.password',
-			'params'			=> 'db items.params',
-			'timeout'			=> 'db items.timeout',
 			'delay'				=> 'db items.delay',
-			'trapper_hosts'		=> 'db items.trapper_hosts',
+			'delay_flex'		=> 'array',
+			'description'		=> 'db items.description',
+			'follow_redirects'	=> 'db items.follow_redirects',
+			'headers'			=> 'array',
+			'history'			=> 'db items.history',
+			'history_mode'		=> 'int32',
+			'http_proxy'		=> 'db items.http_proxy',
+			'interfaceid'		=> 'id',
+			'inventory_link'	=> 'db items.inventory_link',
+			'ipmi_sensor'		=> 'db items.ipmi_sensor',
+			'jmx_endpoint'		=> 'db items.jmx_endpoint',
+			'key'				=> 'db items.key_',
+			'logtimefmt'		=> 'db items.logtimefmt',
 			'master_itemid'		=> 'id',
-			'url'				=> 'db items.url',
-			'request_method'	=> 'db items.request_method',
+			'name'				=> 'db items.name',
+			'output_format'		=> 'db items.output_format',
+			'parameters'		=> 'array',
+			'params'			=> 'db items.params',
+			'password'			=> 'db items.password',
 			'post_type'			=> 'db items.post_type',
 			'posts'				=> 'db items.posts',
-			'status_codes'		=> 'db items.status_codes',
-			'follow_redirects'	=> 'db items.follow_redirects',
+			'preprocessing'		=> 'array',
+			'privatekey'		=> 'db items.privatekey',
+			'publickey'			=> 'db items.publickey',
+			'query_fields'		=> 'array',
+			'request_method'	=> 'db items.request_method',
 			'retrieve_mode'		=> 'db items.retrieve_mode',
-			'output_format'		=> 'db items.output_format',
-			'http_proxy'		=> 'db items.http_proxy',
-			'verify_peer'		=> 'db items.verify_peer',
-			'verify_host'		=> 'db items.verify_host',
+			'snmp_oid'			=> 'db items.snmp_oid',
 			'ssl_cert_file'		=> 'db items.ssl_cert_file',
 			'ssl_key_file'		=> 'db items.ssl_key_file',
 			'ssl_key_password'	=> 'db items.ssl_key_password',
-			'allow_traps'		=> 'db items.allow_traps',
-			'ipmi_sensor'		=> 'db items.ipmi_sensor',
-			'jmx_endpoint'		=> 'db items.jmx_endpoint',
-			'snmp_oid'			=> 'db items.snmp_oid',
-			'publickey'			=> 'db items.publickey',
-			'privatekey'		=> 'db items.privatekey',
-			'headers'			=> 'array',
-			'parameters'		=> 'array',
-			'preprocessing'		=> 'array',
+			'status'			=> 'db items.status',
+			'status_codes'		=> 'db items.status_codes',
 			'tags'				=> 'array',
-			'query_fields'		=> 'array'
+			'timeout'			=> 'db items.timeout',
+			'trapper_hosts'		=> 'db items.trapper_hosts',
+			'trends'			=> 'db items.trends',
+			'trends_mode'		=> 'int32',
+			'type'				=> 'db items.type',
+			'units'				=> 'db items.units',
+			'url'				=> 'db items.url',
+			'username'			=> 'db items.username',
+			'value_type'		=> 'db items.value_type',
+			'valuemapid'		=> 'id',
+			'verify_host'		=> 'db items.verify_host',
+			'verify_peer'		=> 'db items.verify_peer'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			$custom_intervals = $this->getInput('delay_flex', []);
+			$ret = isValidCustomIntervals($custom_intervals);
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -95,10 +101,8 @@ class CControllerItemUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN
-			&& API::Item()->get([
-				'itemids' => [$this->getInput('itemid')]
-			]);
+		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN
+			|| $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	public function doAction() {
@@ -155,6 +159,12 @@ class CControllerItemUpdate extends CController {
 			}
 
 			$input['tags'] = $tags;
+		}
+
+		if ($this->hasInput('delay_flex')) {
+			$custom_intervals = $this->getInput('delay_flex', []);
+			isValidCustomIntervals($custom_intervals);
+			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
 		}
 
 		$input = CArrayHelper::renameKeys($input, $field_map);
