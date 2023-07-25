@@ -42,7 +42,7 @@ class testDiscoveryRules extends CIntegrationTest {
 		for ($i = 0; $i < $max_attempts; $i++) {
 			try {
 				$response = $this->call('host.get', [
-					'selectTags' => ['tag', 'value'],
+					'selectTags' => ['tag', 'value']
 				]);
 
 				$this->assertArrayHasKey('result', $response, 'Failed to discover host before timeout');
@@ -98,7 +98,7 @@ class testDiscoveryRules extends CIntegrationTest {
 			'dchecks' => [
 				[
 					'type' => SVC_HTTP,
-					'ports' => '80',
+					'ports' => '80'
 				]
 			]
 		]);
@@ -122,7 +122,7 @@ class testDiscoveryRules extends CIntegrationTest {
 						'conditiontype' => CONDITION_TYPE_DSTATUS,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => DOBJECT_STATUS_UP
-					],
+					]
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
 			],
