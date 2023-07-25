@@ -188,8 +188,18 @@ static void	hk_history_enable_compression(int age)
 
 	for (size_t i = 0; i < ARRSIZE(compression_tables); i++)
 	{
-		zbx_db_free_result(zbx_db_select("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
-				compression_tables[i].name));
+		zbx_db_result_t	res;
+
+		res = zbx_db_select("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
+				compression_tables[i].name);
+		if(NULL == res)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Table \"%s\"is not hypertable. Run timescaledb.sql script to "
+					"upgrade configuration.", compression_tables[i].name);
+			continue;
+		}
+
+		zbx_db_free_result(res);
 		hk_check_table_segmentation(compression_tables[i].name, compression_tables[i].segmentby,
 				compression_tables[i].orderby);
 		hk_check_table_compression_age(compression_tables[i].name, age);
