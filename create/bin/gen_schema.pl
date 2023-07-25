@@ -597,6 +597,7 @@ sub process_row($)
 sub timescaledb()
 {
 	print<<EOF
+DROP FUNCTION IF EXISTS base36_decode(character varying);
 CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
 RETURNS bigint AS \$\$
 DECLARE
@@ -623,9 +624,10 @@ BEGIN
 END;
 \$\$ LANGUAGE 'plpgsql' IMMUTABLE;
 
-CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS bigint AS \$\$
+DROP FUNCTION IF EXISTS cuid_timestamp(cuid varchar(25));
+CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS integer AS \$\$
 BEGIN
-	RETURN base36_decode(substring(\$1 FROM 1 FOR 8));
+	RETURN CAST(base36_decode(substring(cuid FROM 2 FOR 8))/1000 AS integer);
 END;
 \$\$ LANGUAGE 'plpgsql' IMMUTABLE;
 
