@@ -464,6 +464,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$this->assertEquals($data['expected'], $merged_text);
 
 		$this->page->pressKey(WebDriverKeys::ENTER);
+		// TODO change quotes back to normal ones, when webhook DEV-2396 is improved.
 		$this->assertTrue($this->query("xpath://div[@id='ds_0_items_']//ul[@class='multiselect-list']//span[@title=".
 				CXPathHelper::escapeQuotes($data['expected'][9])."]")->exists()
 		);
