@@ -18,6 +18,7 @@
 **/
 
 #include "zbxasyncpoller.h"
+#include <event2/event.h>
 
 #ifdef HAVE_LIBEVENT
 
@@ -61,13 +62,14 @@ static const char	*task_state_to_str(zbx_async_task_state_t task_state)
 static void	async_event(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
-	int			ret;
+	int			ret, fd_new;
+	struct event_base	*ev;
 
 	ZBX_UNUSED(fd);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data);
+	ret = task->process_cb(what, task->data, &fd_new);
 
 	switch (ret)
 	{
@@ -75,6 +77,12 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			async_task_remove(task);
 			break;
 		case ZBX_ASYNC_TASK_READ:
+			event_add(task->rx_event, NULL);
+			break;
+		case ZBX_ASYNC_TASK_READ_NEW:
+			ev = event_get_base(task->rx_event);
+			event_free(task->rx_event);
+			task->rx_event = event_new(ev, fd_new, EV_READ, async_event, (void *)task);
 			event_add(task->rx_event, NULL);
 			break;
 		case ZBX_ASYNC_TASK_WRITE:
@@ -96,7 +104,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int ti
 	task->data = data;
 	task->process_cb = process_cb;
 	task->free_cb = clear_cb;
-	task->timeout_event = evtimer_new(ev,  async_event, (void *)task);
+	task->timeout_event = evtimer_new(ev, async_event, (void *)task);
 
 	evtimer_add(task->timeout_event, &tv);
 

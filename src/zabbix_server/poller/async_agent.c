@@ -52,7 +52,7 @@ static zbx_async_task_state_t	get_task_state_for_event(short event)
 	return ZBX_ASYNC_TASK_STOP;
 }
 
-static int	agent_task_process(short event, void *data)
+static int	agent_task_process(short event, void *data, int *fd)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
