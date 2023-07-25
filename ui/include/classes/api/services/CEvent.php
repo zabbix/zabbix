@@ -402,7 +402,8 @@ class CEvent extends CApiService {
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				sort($options['trigger_severities']);
 
-				if ($options['severities'] != range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)) {
+				if ($options['trigger_severities']
+						!= range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)) {
 					$sql_parts['from']['t'] = 'triggers t';
 					$sql_parts['where']['e-t'] = 'e.objectid=t.triggerid';
 					$sql_parts['where'][] = dbConditionInt('t.priority', $options['trigger_severities']);
