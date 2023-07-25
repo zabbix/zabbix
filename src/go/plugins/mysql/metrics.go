@@ -82,7 +82,7 @@ var (
 )
 
 var metrics = metric.MetricSet{
-	keyCustomQuery: metric.New("Returns list of databases in LLD format.",
+	keyCustomQuery: metric.New("Returns result of a custom query.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword,
 			metric.NewParam("QueryName", "Name of a custom query "+
 				"(must be equal to a name of an SQL file without an extension).").SetRequired(),
