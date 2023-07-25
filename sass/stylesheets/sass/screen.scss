@@ -3334,6 +3334,10 @@ svg {
 	overflow: hidden;
 	border-radius: 2px;
 
+	.problem-icon-list-item {
+		border-radius: 0;
+	}
+
 	&:link,
 	&:hover,
 	&:focus {
