@@ -50,7 +50,7 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
-	params, _, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
+	params, extraParams, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 	ctx := context.Background()
 
-	result, err = handleMetric(ctx, conn, params)
+	result, err = handleMetric(ctx, conn, params, extraParams...)
 
 	if err != nil {
 		p.Errf(err.Error())
