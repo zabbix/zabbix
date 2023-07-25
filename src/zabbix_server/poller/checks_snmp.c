@@ -2450,7 +2450,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 	snmp_context->interface = item->interface;
 	snmp_context->interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			snmp_context->interface.dns_orig : snmp_context->interface.ip_orig);
-	
+
 	zbx_strlcpy(snmp_context->host, item->host.host, sizeof(snmp_context->host));
 
 	snmp_context->item.itemid = item->itemid;
@@ -2466,7 +2466,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 	snmp_context->item.key = item->key;
 	item->key = NULL;
 	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
-	
+
 	snmp_context->results = NULL;
 	snmp_context->results_alloc = 0;
 	snmp_context->results_offset = 0;
