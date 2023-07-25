@@ -43,6 +43,11 @@ switch ($data['element_type']) {
 		$form
 			->addVar('triggerids', $data['triggerids'])
 			->addVar('source', 'triggers');
+
+		if (array_key_exists('src_hostid', $data)) {
+			$form->addVar('src_hostid', $data['src_hostid']);
+		}
+
 		$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
 		break;
 

@@ -40,4 +40,22 @@ class CWidgetFieldNumericBox extends CWidgetField {
 			->setValidationRules(['type' => API_NUMERIC])
 			->setMaxLength(255);
 	}
+
+	/**
+	 * Set additional flags, which can be used in configuration form.
+	 */
+	public function setFlags(int $flags): self {
+		parent::setFlags($flags);
+
+		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
+			$strict_validation_rules = $this->getValidationRules();
+			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
+			$this->setStrictValidationRules($strict_validation_rules);
+		}
+		else {
+			$this->setStrictValidationRules();
+		}
+
+		return $this;
+	}
 }

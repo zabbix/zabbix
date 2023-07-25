@@ -399,10 +399,10 @@ zabbix_export:
           master_item:
             key: controlm.services
           lld_macro_paths:
-            - lld_macro: '{#SERVICE.JOB}'
-              path: $.serviceJob
             - lld_macro: '{#SERVICE.NAME}'
               path: $.serviceName
+            - lld_macro: '{#SERVICE.JOB}'
+              path: $.serviceJob
           preprocessing:
             - type: JSONPATH
               parameters:

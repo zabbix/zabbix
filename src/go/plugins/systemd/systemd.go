@@ -29,7 +29,7 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/plugin"
 
-	"github.com/godbus/dbus"
+	"github.com/godbus/dbus/v5"
 )
 
 // Plugin -
