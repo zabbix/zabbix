@@ -953,11 +953,11 @@ class C10ImportConverter extends CConverter {
 		$host['proxy'] = [];
 
 		// If ID is zero, no proxy was assigned to host. Thus it is not name.
-		if ($host['proxyid'] != 0) {
-			$host['proxy']['name'] = $host['proxyid'];
+		if ($host['proxy_hostid'] != 0) {
+			$host['proxy']['name'] = $host['proxy_hostid'];
 		}
 
-		unset($host['proxyid']);
+		unset($host['proxy_hostid']);
 
 		return $host;
 	}

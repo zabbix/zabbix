@@ -1048,7 +1048,7 @@ INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) V
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10010,10019,131001);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10011,10020,131001);
 
--- graph portotype
+-- graph prototype
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (139002,0,'c8aa3b02b1af4b049fcf88be47e5f892','test_graph_prototype',0);
 INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131002,NULL,'item',0,-1,2,'','',NULL,0,0,0,'item',0,NULL,'',1,1,'','','','',0);
 INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131003,NULL,'item_prototype',0,-1,2,'','',NULL,0,0,0,'item_prototype',0,NULL,'',1,1,'','','','',0);

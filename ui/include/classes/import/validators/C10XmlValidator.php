@@ -41,7 +41,7 @@ class C10XmlValidator extends CXmlValidatorGeneral {
 			'hosts' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'host', 'rules' => [
 				'host' =>					['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
-					'proxyid' =>				['type' => XML_STRING],
+					'proxy_hostid' =>			['type' => XML_STRING],
 					'useip' =>					['type' => XML_STRING | XML_REQUIRED],
 					'dns' =>					['type' => XML_STRING | XML_REQUIRED],
 					'ip' =>						['type' => XML_STRING | XML_REQUIRED],

@@ -35,22 +35,22 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'Template 1',
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'Template 2',
 					'status' => HOST_STATUS_TEMPLATE,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'Host 1',
 					'status' => HOST_STATUS_NOT_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'Host 2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				]
 			]
 		]);
@@ -97,12 +97,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'groups' => [
 						'Zabbix server',
 						'Linux server'
@@ -111,7 +111,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'groups' => [
 						'Zabbix server',
 						'My group'
@@ -120,7 +120,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'template',
 					'status' => HOST_STATUS_TEMPLATE,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'groups' => [
 						'Templates'
 					]
@@ -219,12 +219,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => '12345'
+					'proxy_hostid' => '12345'
 				]
 			]
 		]);
@@ -261,13 +261,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				// host with an agent interface
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 					'dns' => 'http://zabbix.com',
@@ -289,7 +289,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'useip' => 1,
 					'ip' => '127.0.0.1'
 				],
@@ -297,7 +297,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'ip' => '127.0.0.1',
 					'ipmi_ip' => '127.0.0.2',
 					'ipmi_port' => '123',
@@ -314,7 +314,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host5',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'ip' => '127.0.0.1',
 					'ipmi_port' => '123',
 					'items' => [
@@ -330,7 +330,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host6',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
 					'dns' => 'http://zabbix.com',
@@ -370,7 +370,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host7',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'items' => [
 						[
 							'key' => 'item1',
@@ -656,19 +656,19 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'host_profile' => [],
 					'host_profiles_ext' => []
 				],
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'host_profile' => [
 						'devicetype' => 'device type',
 						'name' => 'name',
@@ -855,18 +855,18 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'items' => []
 				],
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'items' => [
 						[
 							'key' => 'item',
@@ -1043,18 +1043,18 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => ''
 				],
 				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => [
 						[
 							'description' => 'My trigger',
@@ -1074,7 +1074,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host4',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => [
 						[
 							'description' => 'My trigger',
@@ -1190,12 +1190,12 @@ class C10ImportConverterTest extends CImportConverterTest {
 			'hosts' => [
 				[
 					'name' => 'host1',
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'status' => HOST_STATUS_MONITORED
 				],
 				[
 					'name' => 'host2',
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'status' => HOST_STATUS_MONITORED
 				]
 			],
@@ -1236,13 +1236,13 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => []
 				],
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => [
 						[
 							'description' => 'trigger',
@@ -1253,7 +1253,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => [
 						[
 							'description' => 'trigger2',
@@ -1327,7 +1327,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => [
 						[
 							'description' => 'common-trigger',
@@ -1339,7 +1339,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'triggers' => [
 						[
 							'description' => 'common-trigger',
@@ -1469,18 +1469,18 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'templates' => []
 				],
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'templates' => [
 						'template1',
 						'template2'
@@ -1561,18 +1561,18 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'graphs' => ''
 				],
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'graphs' => [
 						[
 							'name' => 'graph1',
@@ -1633,7 +1633,7 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'graphs' => [
 						[
 							'name' => 'two-host graph',
@@ -1836,18 +1836,18 @@ class C10ImportConverterTest extends CImportConverterTest {
 				[
 					'name' => 'host1',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0
+					'proxy_hostid' => 0
 				],
 				[
 					'name' => 'host2',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'macros' => ''
 				],
 				[
 					'name' => 'host3',
 					'status' => HOST_STATUS_MONITORED,
-					'proxyid' => 0,
+					'proxy_hostid' => 0,
 					'macros' => [
 						[
 							'name' => '{$MACRO}',
