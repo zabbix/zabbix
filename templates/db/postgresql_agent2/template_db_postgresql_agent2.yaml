@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-25T06:37:09Z'
+  date: '2023-07-25T09:53:15Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -362,7 +362,7 @@ zabbix_export:
               parameters:
                 - $.active
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -378,7 +378,7 @@ zabbix_export:
               parameters:
                 - $.disabled
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -394,7 +394,7 @@ zabbix_export:
               parameters:
                 - $.fastpath_function_call
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -410,7 +410,7 @@ zabbix_export:
               parameters:
                 - $.idle
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -426,7 +426,7 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -442,7 +442,7 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction_aborted
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -460,7 +460,7 @@ zabbix_export:
               parameters:
                 - $.prepared
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -476,7 +476,7 @@ zabbix_export:
               parameters:
                 - $.total
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -493,7 +493,7 @@ zabbix_export:
               parameters:
                 - $.total_pct
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
@@ -521,13 +521,13 @@ zabbix_export:
               parameters:
                 - $.waiting
           master_item:
-            key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+            key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           tags:
             - tag: component
               value: connections
         - uuid: e926ecd967f342bf90e9923825147d64
           name: 'PostgreSQL: Get connections sum'
-          key: 'pgsql.connections.sum["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: 'pgsql.connections["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
