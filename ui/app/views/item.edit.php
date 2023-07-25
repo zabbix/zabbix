@@ -26,9 +26,7 @@
 
 $dir = '/../../include/views/js/';
 $scripts = [
-	// $this->readJsFile('common.item.edit.js.php', $data, $dir), all code should be moved to item.edit.js
 	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
-	// $this->readJsFile('editabletable.js.php', $data, $dir), same as for common.item.edit.js.php
 	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['form']['hostid']], $dir)
 ];
 // TODO: when checkInput fail $data will contain only 'main_block' property, no need to render at all.
@@ -178,7 +176,7 @@ $tabs = (new CTabView())
 			'host' => $data['host'],
 			'inventory_fields' => $data['inventory_fields'],
 			'master_item' => $data['master_item'],
-			'parent_templates' => $data['parent_templates'],
+			'parent_items' => $data['parent_items'],
 			'readonly' => $data['readonly'],
 			'types' => $data['types'],
 			'valuemap' => $data['valuemap'],

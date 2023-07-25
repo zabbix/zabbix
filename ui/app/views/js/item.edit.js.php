@@ -39,6 +39,7 @@ const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 const CONFIRM_FORM_NAVIGATION = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
+const ERROR_XHR_SERVER = <?= json_encode(_('Unexpected server error.')) ?>;
 
 window.item_edit_form = new class {
 
@@ -305,7 +306,7 @@ window.item_edit_form = new class {
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+					messages = [ERROR_XHR_SERVER];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
