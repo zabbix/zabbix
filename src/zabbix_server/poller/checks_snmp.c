@@ -2392,7 +2392,11 @@ static int	agent_task_process(short event, void *data, int *fd)
 		}
 		else
 		{
-			SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
+			if (NULL == snmp_context->results)
+				SET_TEXT_RESULT(&snmp_context->item.result, zbx_strdup(NULL, ""));
+			else
+			 	SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
+
 			snmp_context->results = NULL;
 			snmp_context->ret = SUCCEED;
 			goto stop;
@@ -2464,7 +2468,6 @@ static int	zbx_async_check_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *ite
 {
 	int			i, ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
-	zbx_snmp_format_opts_t	default_opts, bulk_opts;
 	zbx_vector_snmp_oid_t	param_oids;
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
