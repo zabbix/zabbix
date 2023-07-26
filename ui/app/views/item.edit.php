@@ -95,23 +95,29 @@ if ($data['form']['itemid']) {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'item_edit_form.test();'
-		],
-		[
-			'title' => _('Clear history and trends'),
-			'confirmation' => _('History clearing can take a long time. Continue?'),
-			'class' => ZBX_STYLE_BTN_ALT,
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'throw "Not implemented"'
-		],
-		[
-			'title' => _('Delete'),
-			'confirmation' => _('Delete selected item?'),
-			'class' => ZBX_STYLE_BTN_ALT,
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'item_edit_form.delete();'
 		]
+	];
+
+	if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+		$confirmation = ($data['config']['compression_status'])
+			? []
+			: ['confirmation' => _('History clearing can take a long time. Continue?')];
+		$buttons[] = $confirmation + [
+			'title' => _('Clear history and trends'),
+			'class' => ZBX_STYLE_BTN_ALT,
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'item_edit_form.clear();'
+		];
+	}
+
+	$buttons[] = [
+		'title' => _('Delete'),
+		'confirmation' => _('Delete selected item?'),
+		'class' => ZBX_STYLE_BTN_ALT,
+		'keepOpen' => true,
+		'isSubmit' => false,
+		'action' => 'item_edit_form.delete();'
 	];
 }
 else {
