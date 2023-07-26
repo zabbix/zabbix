@@ -88,6 +88,13 @@
 				source: 'graphs'
 			};
 
+			const filter_hostids = document.getElementsByName('filter_hostids[]');
+			const context = document.getElementById('context');
+
+			if (filter_hostids.length == 1) {
+				parameters.src_hostid = context === 'host' ? filter_hostids[0].value : 0;
+			}
+
 			return PopUp('copy.edit', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'

@@ -30,7 +30,8 @@ void handleZabbixLog(int level, const char *message);
 
 void zbx_log_go_impl(int level, const char *fmt, va_list args)
 {
-	if (zbx_agent_pid == getpid())
+	// no need to allocate memory for message if level is set to log.None (-1)
+	if (zbx_agent_pid == getpid() && -1 != level)
 	{
 		va_list	tmp;
 

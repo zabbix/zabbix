@@ -312,7 +312,7 @@ class testFormUserPermissions extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user);
 
 		// UI elements that should be DISPLAYED. Other UI elements from Reports, will be disabled. Action checked out.
-		$fields = (['Reports' => ['Notifications', 'Triggers top 100'], 'Create and edit maps' => false]);
+		$fields = (['Reports' => ['Notifications', 'Top 100 triggers'], 'Create and edit maps' => false]);
 		foreach (['status-green', 'status-grey'] as $status) {
 			$this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm()->selectTab('Permissions');
 
@@ -467,9 +467,9 @@ class testFormUserPermissions extends CWebTest {
 	 */
 	public function testFormUserPermissions_Module() {
 		$widget_modules = ['Action log', 'Clock', 'Data overview', 'Discovery status', 'Favorite graphs', 'Favorite maps',
-			'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
+			'Gauge', 'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
 			'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
-			'System information', 'Top hosts', 'Trigger overview', 'URL', 'Web monitoring'
+			'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
 		];
 
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();

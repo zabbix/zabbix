@@ -188,17 +188,21 @@
 			width: auto;
 		}
 
-		.sortable td {
-			padding-bottom: 0;
-			line-height: 24px;
+		.form_row,
+		.sortable {
+			td {
+				line-height: 24px;
+			}
+		}
 
+		.sortable td {
 			&.td-drag-icon {
 				line-height: inherit;
 			}
 
 			&.wordbreak,
 			&.wordwrap {
-				line-height: 1.4;
+				line-height: $body-line-height;
 			}
 		}
 
@@ -259,18 +263,20 @@
 		}
 	}
 
+	.table-forms,
 	.table-forms-separator {
-		display: inline-flex;
-		line-height: 1.4;
+		line-height: $body-line-height;
 
 		td {
 			padding: 5px 5px 0 0;
-		}
 
-		tfoot {
-			td {
-				padding-bottom: 0;
+			&:last-child {
+				padding-right: 0;
 			}
 		}
+	}
+
+	.table-forms-separator {
+		display: inline-flex;
 	}
 }

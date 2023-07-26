@@ -770,7 +770,7 @@ class CControllerMenuPopup extends CController {
 
 				$events = API::Event()->get([
 					'output' => ['eventid', 'r_eventid', 'urls', 'cause_eventid'],
-					'select_acknowledges' => ['action'],
+					'selectAcknowledges' => ['action'],
 					'eventids' => $data['eventid']
 				]);
 
