@@ -2536,6 +2536,8 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 	if (0 > (ret = snmp_bulkwalk_add(snmp_context->bulkwalk_contexts.values[0], snmp_context, error,
 			max_error_len)))
 	{
+		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
+		snmp_context->ret = NETWORK_ERROR;
 		goto out;
 	}
 
@@ -2552,7 +2554,7 @@ static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *it
 out:
 	zbx_free_agent_request(&request);
 
-	if (SUCCEED != (*errcode = ret))
+	if (SUCCEED != (*errcode = snmp_context->ret))
 	{
 		zbx_free(snmp_context->results);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
