@@ -99,6 +99,21 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	unsigned char		value_type;
+	unsigned char		flags;
+	char			*key;
+	char			*key_orig;
+	char			host[ZBX_HOSTNAME_BUF_LEN];
+	zbx_dc_interface_t	interface;
+	int			ret;
+	AGENT_RESULT		result;
+}
+zbx_dc_tem_context_t;
+
 #define ZBX_HOST_IPMI_USERNAME_LEN	16
 #define ZBX_HOST_IPMI_USERNAME_LEN_MAX	(ZBX_HOST_IPMI_USERNAME_LEN + 1)
 #define ZBX_HOST_IPMI_PASSWORD_LEN	20

@@ -70,27 +70,11 @@ ZBX_PTR_VECTOR_DECL(bulkwalk_context, zbx_bulkwalk_context_t*)
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
-	unsigned char	value_type;
-	unsigned char	flags;
-	int		snmp_max_repetitions;
-	char		*snmp_oid;
-	AGENT_RESULT	result;
-	char		*key;
-	char		*key_orig;
-}
-zbx_dc_snmp_item_context_t;
-
-typedef struct
-{
 	void				*arg;
 	void				*arg_action;
-	zbx_dc_snmp_item_context_t	item;
-	char				host[ZBX_HOSTNAME_BUF_LEN];
-	zbx_dc_interface_t		interface;
-	int				ret;
+	zbx_dc_tem_context_t		item;
 	zbx_snmp_sess_t			ssp;
+	int				snmp_max_repetitions;
 	char				*results;
 	size_t				results_alloc;
 	size_t				results_offset;

@@ -2127,7 +2127,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 				bulkwalk_context->pdu_type, bulkwalk_context->name, &bulkwalk_context->name_length,
 				&snmp_context->results, &snmp_context->results_alloc,
 				&snmp_context->results_offset, snmp_context->ssp,
-				&snmp_context->interface, &bulkwalk_context->error);
+				&snmp_context->item.interface, &bulkwalk_context->error);
 	}
 
 	return 1;
@@ -2186,7 +2186,7 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 	if (SNMP_MSG_GETBULK == bulkwalk_context->pdu_type)
 	{
 		pdu->non_repeaters = 0;
-		pdu->max_repetitions = snmp_context->item.snmp_max_repetitions;
+		pdu->max_repetitions = snmp_context->snmp_max_repetitions;
 	}
 
 	if (NULL == snmp_add_null_var(pdu, bulkwalk_context->name, bulkwalk_context->name_length))
@@ -2200,7 +2200,7 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 	if (0 == (bulkwalk_context->reqid = snmp_sess_async_send(snmp_context->ssp, pdu, asynch_response,
 			bulkwalk_context)))
 	{
-		ret = zbx_get_snmp_response_error(snmp_context->ssp, &snmp_context->interface, STAT_ERROR, NULL,
+		ret = zbx_get_snmp_response_error(snmp_context->ssp, &snmp_context->item.interface, STAT_ERROR, NULL,
 				error, max_error_len);
 		snmp_free_pdu(pdu);
 		goto out;
@@ -2283,7 +2283,7 @@ static int	agent_task_process(short event, void *data, int *fd)
 
 	if (0 != (event & EV_TIMEOUT))
 	{
-		snmp_context->ret = TIMEOUT_ERROR;
+		snmp_context->item.ret = TIMEOUT_ERROR;
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed:"
 				" timed out"));
 		goto stop;
@@ -2291,7 +2291,7 @@ static int	agent_task_process(short event, void *data, int *fd)
 
 	if (0 != snmp_sess_read2(snmp_context->ssp, &bulkwalk_context->fdset))
 	{
-		snmp_context->ret = NETWORK_ERROR;
+		snmp_context->item.ret = NETWORK_ERROR;
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2() failed"));
 		goto stop;
 	}
@@ -2312,14 +2312,14 @@ static int	agent_task_process(short event, void *data, int *fd)
 				SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
 
 			snmp_context->results = NULL;
-			snmp_context->ret = SUCCEED;
+			snmp_context->item.ret = SUCCEED;
 			goto stop;
 		}
 	}
 
 	if (SUCCEED != (ret = snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, sizeof(error))))
 	{
-		snmp_context->ret = ret;
+		snmp_context->item.ret = ret;
 		bulkwalk_context->running = 0;
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
 	}
@@ -2343,7 +2343,6 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 {
 	zbx_free(snmp_context->item.key);
 	zbx_free(snmp_context->item.key_orig);
-	zbx_free(snmp_context->item.snmp_oid);
 	zbx_free(snmp_context->results);
 	zbx_free_agent_result(&snmp_context->item.result);
 
@@ -2365,11 +2364,11 @@ static void	process_agent_result(void *data)
 	zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, snmp_context->item.key,
-			snmp_context->host, snmp_context->interface.addr);
+			snmp_context->item.host, snmp_context->item.interface.addr);
 
 	*snmp_result->result = snmp_context->item.result;
 	zbx_init_agent_result(&snmp_context->item.result);
-	snmp_result->errcode = snmp_context->ret;
+	snmp_result->errcode = snmp_context->item.ret;
 
 	zbx_async_check_snmp_clean(snmp_context);
 
@@ -2392,21 +2391,18 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 			item->host.host, item->interface.addr,
 			zbx_tcp_connection_type_name(item->host.tls_connect));
 
-	snmp_context->interface = item->interface;
-	snmp_context->interface.addr = (item->interface.addr == item->interface.dns_orig ?
-			snmp_context->interface.dns_orig : snmp_context->interface.ip_orig);
+	snmp_context->item.interface = item->interface;
+	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
+			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
 
-	zbx_strlcpy(snmp_context->host, item->host.host, sizeof(snmp_context->host));
+	zbx_strlcpy(snmp_context->item.host, item->host.host, sizeof(snmp_context->item.host));
 	snmp_context->arg = arg;
 	snmp_context->item.itemid = item->itemid;
 	snmp_context->item.hostid = item->host.hostid;
 	snmp_context->item.value_type = item->value_type;
 	snmp_context->item.flags = item->flags;
-	snmp_context->item.snmp_max_repetitions = item->snmp_max_repetitions;
+	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
 	zbx_init_agent_result(&snmp_context->item.result);
-
-	snmp_context->item.snmp_oid = item->snmp_oid;
-	item->snmp_oid = NULL;
 
 	snmp_context->item.key = item->key;
 	item->key = NULL;
@@ -2432,7 +2428,7 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 		goto out;
 	}
 
-	if (SUCCEED != zbx_parse_item_key(snmp_context->item.snmp_oid, &request))
+	if (SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
 		ret = CONFIG_ERROR;
