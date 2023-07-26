@@ -617,7 +617,7 @@ class CProxy extends CApiService {
 	 */
 	private function validateUpdate(array &$proxies, ?array &$db_proxies): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['proxyid']], 'fields' => [
-			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
