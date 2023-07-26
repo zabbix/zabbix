@@ -47,7 +47,8 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
-		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout, char **error);
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
+		const char *config_source_ip, const char *config_hostname, char **error);
 
 typedef struct
 {
@@ -247,7 +248,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
 		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
 		C.zbx_process_value_func_t(procValueFunc), &clastLogsizeSent, ctlsConfig_p,
-		(C.int)(agent.Options.Timeout), &cerrmsg)
+		(C.int)(agent.Options.Timeout), nil, nil, &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char

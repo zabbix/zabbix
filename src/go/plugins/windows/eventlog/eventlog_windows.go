@@ -117,9 +117,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	data.lastcheck = now
 
 	if len(logitem.Results) != 0 {
-		if !isCountItem {
-			results := make([]plugin.Result, len(logitem.Results))
-			for i, r := range logitem.Results {
+		results := make([]plugin.Result, len(logitem.Results))
+		for i, r := range logitem.Results {
+			if !isCountItem {
 				results[i].Itemid = ctx.ItemID()
 				results[i].Value = r.Value
 				results[i].EventSource = r.EventSource
@@ -130,12 +130,15 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 				results[i].Ts = r.Ts
 				results[i].LastLogsize = &r.LastLogsize
 				results[i].Persistent = true
+			} else {
+				results[i].Itemid = ctx.ItemID()
+				results[i].Value = r.Value
+				results[i].Ts = r.Ts
+				results[i].Error = r.Error
+				results[i].LastLogsize = &r.LastLogsize
 			}
-
-			result = results
-		} else {
-			result = logitem.Results[0].Value
 		}
+		result = results
 
 		return result, nil
 	}
