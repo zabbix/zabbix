@@ -132,7 +132,12 @@ foreach ($data['triggers'] as $triggerid => $trigger) {
 
 	$table->addRow([
 		$hosts,
-		(new CLinkAction($trigger['description']))->setMenuPopup(CMenuPopupHelper::getTrigger($triggerid)),
+		(new CLinkAction($trigger['description']))->setMenuPopup(CMenuPopupHelper::getTrigger([
+			'triggerid' => $trigger['triggerid'],
+			'backurl' => (new CUrl('zabbix.php'))
+				->setArgument('action', 'toptriggers.list')
+				->getUrl()
+		])),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$trigger['problem_count']
 	]);

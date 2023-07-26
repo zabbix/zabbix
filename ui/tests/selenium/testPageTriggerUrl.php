@@ -52,8 +52,8 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
-						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
+						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host&backurl=tr_events.php%3Ftriggerid%3D100035%26eventid%3D9003',
+						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host&backurl=tr_events.php%3Ftriggerid%3D100035%26eventid%3D9003'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
@@ -69,8 +69,8 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
-						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
+						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host&backurl=tr_events.php%3Ftriggerid%3D100032%26eventid%3D9000',
+						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host&backurl=tr_events.php%3Ftriggerid%3D100032%26eventid%3D9000'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
 						'URL name for menu' => 'tr_events.php?triggerid=100032&eventid=9000',
