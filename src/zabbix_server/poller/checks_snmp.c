@@ -2069,7 +2069,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response, 
 	bulk_opts.no_print_units = 1;
 	bulk_opts.oid_format = NETSNMP_OID_OUTPUT_NUMERIC;
 	snmp_bulkwalk_set_options(&bulk_opts);
-	
+
 	for (var = response->variables; NULL != var; var = var->next_variable)
 	{
 		if (var->name_length < p_oid->root_oid_len ||
@@ -2421,9 +2421,6 @@ stop:
 	return ZBX_ASYNC_TASK_STOP;
 }
 
-//int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
-//		void *arg, void *arg_action, struct event_base *base, int config_timeout, const char *config_source_ip);
-
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 {
 	zbx_free(snmp_context->item.key);
@@ -2461,7 +2458,7 @@ static void	process_agent_result(void *data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int	zbx_snmp_process_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT *result,
+static int	zbx_async_check_snmp_bulkwalk(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
 		int config_timeout, const char *config_source_ip)
 {
@@ -2971,7 +2968,7 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 		struct event_base	*base = event_base_new();
 		zbx_snmp_result_t	snmp_result = {.result = &results[j]};
 
-		if (SUCCEED == (errcodes[j] = zbx_snmp_process_snmp_bulkwalk(ssp, &items[j], &results[j],
+		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp_bulkwalk(ssp, &items[j], &results[j],
 				process_agent_result, &snmp_result, NULL, base, config_timeout, config_source_ip)))
 		{
 			event_base_dispatch(base);
