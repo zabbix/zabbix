@@ -383,7 +383,9 @@ class testProxy extends CAPITest {
 					],
 					[
 						'name' => 'API create proxy',
-						'mode' => PROXY_MODE_PASSIVE
+						'mode' => PROXY_MODE_PASSIVE,
+						'address' => '127.0.0.1',
+						'port' => '12345'
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (name)=(API create proxy) already exists.'
@@ -626,6 +628,7 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
 					'port' => self::INVALID_NUMBER
 				],
 				'expected_error' =>	'Invalid parameter "/1/port": value must be one of 0-'.ZBX_MAX_PORT_NUMBER.'.'
@@ -636,15 +639,23 @@ class testProxy extends CAPITest {
 					'mode' => PROXY_MODE_ACTIVE,
 					'address' => 'localhost'
 				],
-				'expected_error' => 'Invalid parameter "/1/address": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/address": value must be empty.'
 			],
-			'Test proxy.create: invalid "port" (not empty) for active proxy' => [
+			'Test proxy.create: invalid "port" (not empty int) for active proxy' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_ACTIVE,
 					'port' => 12345
 				],
-				'expected_error' =>	'Invalid parameter "/1/port": should be empty.'
+				'expected_error' =>	'Invalid parameter "/1/port": a character string is expected.'
+			],
+			'Test proxy.create: invalid "port" (not empty string) for active proxy' => [
+				'proxy' => [
+					'name' => 'API create proxy',
+					'mode' => PROXY_MODE_ACTIVE,
+					'port' => '12345'
+				],
+				'expected_error' =>	'Invalid parameter "/1/port": value must be empty.'
 			],
 
 			// Check "tls_connect".
@@ -668,6 +679,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be one of '.
@@ -696,6 +709,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_accept' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be '.HOST_ENCRYPTION_NONE.'.'
@@ -740,6 +755,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_psk_identity' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
@@ -748,6 +765,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_psk_identity' => 'abc'
 				],
@@ -757,6 +776,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_psk_identity' => 'abc'
 				],
@@ -775,6 +796,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => ''
 				],
@@ -793,6 +816,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('proxy', 'tls_psk_identity') + 1)
 				],
@@ -834,10 +859,14 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
 			],
+
 			'Test proxy.create: invalid "tls_psk" (string) for passive proxy #1' => [
 				'proxy' => [
 					'name' => 'API create proxy',
-					'mode' => PROXY_MODE_ACTIVE,
+					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
+					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_psk' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
@@ -846,15 +875,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
-					'tls_connect' => HOST_ENCRYPTION_NONE,
-					'tls_psk' => 'abc'
-				],
-				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
-			],
-			'Test proxy.create: invalid "tls_psk" (string) for passive proxy #3' => [
-				'proxy' => [
-					'name' => 'API create proxy',
-					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_psk' => 'abc'
 				],
@@ -874,6 +896,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk' => 'abc'
 				],
@@ -894,6 +918,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk' => str_repeat('a', 33)
 				],
@@ -932,6 +958,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_issuer' => 'abc'
 				],
@@ -941,6 +969,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_issuer' => 'abc'
 				],
@@ -959,6 +989,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_issuer' => str_repeat('i', DB::getFieldLength('proxy', 'tls_issuer') + 1)
 				],
@@ -988,6 +1020,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_subject' => 'abc'
 				],
@@ -997,6 +1031,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_subject' => 'abc'
 				],
@@ -1015,6 +1051,8 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,
+					'address' => '127.0.0.1',
+					'port' => '10050',
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_subject' => str_repeat('i', DB::getFieldLength('proxy', 'tls_subject') + 1)
 				],
@@ -1805,19 +1843,26 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/port": an integer is expected.'
 			],
-			'Test proxy.update: invalid "port" (not empty for active proxy)' => [
+			'Test proxy.update: invalid "port" (not empty int for active proxy)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'port' => 12345
 				],
-				'expected_error' =>	'Invalid parameter "/1/port": should be empty.'
+				'expected_error' =>	'Invalid parameter "/1/port": a character string is expected.'
+			],
+			'Test proxy.update: invalid "port" (not empty string for active proxy)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'port' => '12345'
+				],
+				'expected_error' =>	'Invalid parameter "/1/port": value must be empty.'
 			],
 			'Test proxy.update: invalid "address" (not empty for active proxy)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'address' => 'localhost'
 				],
-				'expected_error' => 'Invalid parameter "/1/address": should be empty.'
+				'expected_error' => 'Invalid parameter "/1/address": value must be empty.'
 			],
 
 			// Check "tls_connect".

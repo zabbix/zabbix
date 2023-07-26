@@ -462,10 +462,63 @@ class CProxy extends CApiService {
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'address' => 			['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
-			'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')]
+			'address' => 			['type' => API_MULTIPLE, 'default' => '', 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'port' =>				['type' => API_MULTIPLE, 'default' => '', 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_PORT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'tls_connect' =>		['type' => API_MULTIPLE, 'default' => HOST_ENCRYPTION_NONE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE],
+										['else' => true, 'type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])]
+			]],
+			'tls_accept' =>			['type' => API_MULTIPLE, 'default' => HOST_ENCRYPTION_NONE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)],
+										['else' => true, 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE]
+			]],
+			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['else' => true, 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+									]],
+			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['else' => true, 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+									]],
+			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_CERTIFICATE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['else' => true, 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+									]],
+			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_CERTIFICATE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['else' => true, 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+									]]
 		]];
-		$api_input_rules['fields'] += self::getTlsFieldValidationRules();
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -473,60 +526,6 @@ class CProxy extends CApiService {
 
 		self::checkDuplicates($proxies);
 		self::checkHosts($proxies);
-		self::checkProxyAddress($proxies, 'create');
-	}
-
-	private static function getTlsFieldValidationRules(): array {
-		return [
-			'tls_connect' =>		['type' => API_MULTIPLE, 'default' => HOST_ENCRYPTION_NONE, 'rules' => [
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE],
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])]
-			]],
-			'tls_accept' =>			['type' => API_MULTIPLE, 'default' => HOST_ENCRYPTION_NONE, 'rules' => [
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)],
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE]
-			]],
-			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]],
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]]
-			]],
-			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]],
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]]
-			]],
-			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_CERTIFICATE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]],
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]]
-			]],
-			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_CERTIFICATE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]],
-										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
-											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
-											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
-										]]
-			]]
-		];
 	}
 
 	/**
@@ -572,32 +571,32 @@ class CProxy extends CApiService {
 	 * @throws APIException
 	 */
 	private static function checkHosts(array $proxies, array $db_proxies = null): void {
-		$hostids = [];
+		$_hostids = [];
 
 		foreach ($proxies as $proxy) {
 			if (!array_key_exists('hosts', $proxy)) {
 				continue;
 			}
 
-			$proxyids = array_column($proxy['hosts'], null, 'hostid');
-			$db_proxyids = $db_proxies !== null
+			$hostids = array_column($proxy['hosts'], null, 'hostid');
+			$db_hostids = $db_proxies !== null
 				? array_column($db_proxies[$proxy['proxyid']]['hosts'], null, 'hostid')
 				: [];
 
-			$hostids += array_diff_key($proxyids, $db_proxyids);
+			$_hostids += array_diff_key($hostids, $db_hostids);
 		}
 
-		if (!$hostids) {
+		if (!$_hostids) {
 			return;
 		}
 
 		$db_hosts = API::Host()->get([
 			'output' => ['hostid', 'host', 'flags'],
-			'hostids' => array_keys($hostids),
+			'hostids' => array_keys($_hostids),
 			'editable' => true
 		]);
 
-		if (count($db_hosts) != count($hostids)) {
+		if (count($db_hosts) != count($_hostids)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
@@ -611,86 +610,14 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * @param array $proxies
-	 *
-	 * @throws APIException
-	 */
-	private static function checkProxyAddress(array &$proxies, string $method): void {
-		foreach ($proxies as $i => &$proxy) {
-			if ($proxy['mode'] == PROXY_MODE_PASSIVE) {
-				$proxy += ['allowed_addresses' => ''];
-
-				if ($proxy['allowed_addresses'] !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/allowed_addresses', _('should be empty'))
-					);
-				}
-
-				if ($method === 'create' && !array_key_exists('address', $proxy)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
-						_s('the parameter "%1$s" is missing', 'address')
-					));
-				}
-
-				if ($method === 'create' && !array_key_exists('port', $proxy)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
-						_s('the parameter "%1$s" is missing', 'port')
-					));
-				}
-
-				$field_names = ['address', 'port'];
-
-				foreach ($field_names as $field_name) {
-					if (!array_key_exists($field_name, $proxy)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i + 1), _s('the parameter "%1$s" is missing', $field_name)
-						));
-					}
-
-					if ($proxy[$field_name] === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i + 1).'/'.$field_name, _('cannot be empty')
-						));
-					}
-				}
-			}
-			else {
-				$proxy += ['address' => '', 'port' => ''];
-
-				if ($proxy['address'] !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/address', _('should be empty'))
-					);
-				}
-				if ($proxy['port'] !== '') {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/port', _('should be empty'))
-					);
-				}
-			}
-		}
-		unset($proxy);
-	}
-
-
-	/**
 	 * @param array      $proxies
 	 * @param array|null $db_proxies
 	 *
 	 * @throws APIException
 	 */
 	private function validateUpdate(array &$proxies, ?array &$db_proxies): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['proxyid'], ['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['proxyid']], 'fields' => [
 			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE])],
-			'name' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('proxy', 'name')],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
-			'allowed_addresses' =>	['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
-			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
-				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'address' => 			['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
-			'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
@@ -712,15 +639,34 @@ class CProxy extends CApiService {
 
 		$proxies = $this->extendObjectsByKey($proxies, $db_proxies, 'proxyid', ['mode']);
 
-		$tls_validation_rules = self::getTlsFieldValidationRules();
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => [
+			'proxyid' =>			['type' => API_ANY],
+			'mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE])],
+			'name' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('proxy', 'name')],
+			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
+			'allowed_addresses' =>	['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
+				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
+			]],
+			'address' => 			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'port' =>				['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_PORT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
+										['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+			]],
+			'tls_connect' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE])]
+			]],
+			'tls_accept' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE.':'.(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)],
+									['else' => true, 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE]
+			]]
+		]];
 
-		$api_input_rules_partial = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED,
-			'fields' => ['mode' => ['type' => API_ANY]]
-				+ array_intersect_key($tls_validation_rules, array_flip(['tls_connect', 'tls_accept']))
-		];
-		$tls_fieldsets = $proxies;
-
-		if (!CApiInputValidator::validate($api_input_rules_partial, $tls_fieldsets, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
@@ -736,23 +682,25 @@ class CProxy extends CApiService {
 		}
 
 		foreach ($proxies as &$proxy) {
+			$db_proxy = $db_proxies[$proxy['proxyid']];
+
 			$proxy += $proxy['mode'] == PROXY_MODE_PASSIVE
 				? [
-					'tls_connect' => $db_proxies[$proxy['proxyid']]['tls_connect'],
+					'tls_connect' => $db_proxy['tls_connect'],
 					'tls_accept' => HOST_ENCRYPTION_NONE
 				]
 				: [
 					'tls_connect' => HOST_ENCRYPTION_NONE,
-					'tls_accept' => $db_proxies[$proxy['proxyid']]['tls_accept']
+					'tls_accept' => $db_proxy['tls_accept']
 				];
 
 			if (($proxy['mode'] == PROXY_MODE_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK)
 					|| ($proxy['mode'] == PROXY_MODE_ACTIVE	&& ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == 0)) {
-				if ($db_proxies[$proxy['proxyid']]['tls_psk_identity'] !== '') {
+				if ($db_proxy['tls_psk_identity'] !== '') {
 					$proxy += ['tls_psk_identity' => ''];
 				}
 
-				if ($db_proxies[$proxy['proxyid']]['tls_psk'] !== '') {
+				if ($db_proxy['tls_psk'] !== '') {
 					$proxy += ['tls_psk' => ''];
 				}
 			}
@@ -765,31 +713,60 @@ class CProxy extends CApiService {
 		}
 		unset($proxy);
 
-		$tls_fieldsets = $proxies;
-		$checked_fields = $api_input_rules['fields'];
-		unset($checked_fields['mode']);
-
-		foreach ($tls_fieldsets as &$tls_fieldset) {
-			$tls_fieldset = array_diff_key($tls_fieldset, $checked_fields);
-		}
-		unset($tls_fieldset);
-
-		$api_input_rules_partial = ['type' => API_OBJECTS,
-			'fields' => ['mode' => ['type' => API_ANY]] + $tls_validation_rules
+		$api_input_rules = [
+			'type' => API_OBJECTS,
+			'fields' => array_fill_keys(array_keys($api_input_rules['fields']), ['type' => API_ANY])
+		];
+		$api_input_rules['fields'] += [
+			'tls_psk_identity' =>	['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['else' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk_identity')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+			]],
+			'tls_psk' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_PSK], 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != 0; }, 'type' => API_PSK, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('proxy', 'tls_psk')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+			]],
+			'tls_issuer' =>			['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_CERTIFICATE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_issuer')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+			]],
+			'tls_subject' =>		['type' => API_MULTIPLE, 'rules' => [
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_PASSIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'tls_connect', 'in' => HOST_ENCRYPTION_CERTIFICATE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]],
+										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_MULTIPLE, 'rules' => [
+											['if' => static function ($data) { return ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != 0; }, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'tls_subject')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+										]]
+			]]
 		];
 
-		if (!CApiInputValidator::validate($api_input_rules_partial, $tls_fieldsets, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		foreach ($tls_fieldsets as $i => $tls_fieldset) {
-			$proxies[$i] += $tls_fieldset;
 		}
 
 		self::addAffectedObjects($proxies, $db_proxies);
 		self::checkDuplicates($proxies, $db_proxies);
 		self::checkHosts($proxies, $db_proxies);
-		self::checkProxyAddress($proxies, 'update');
 	}
 
 	/**
