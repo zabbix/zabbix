@@ -772,7 +772,7 @@ class testItemTest extends CWebTest {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
 
-				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
+				$proxy = CDBHelper::getValue("SELECT name FROM proxy WHERE proxyid IN ".
 						"(SELECT proxyid FROM hosts WHERE host = 'Test item host')");
 
 				// Check test item form fields depending on item type.
