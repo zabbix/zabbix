@@ -83,6 +83,15 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 						'expression_type' => EXPRESSION_TYPE_FALSE
 					]
 				]
+			],
+			[
+				'name' => '0_case_4',
+				'expressions' => [
+					[
+						'expression' => 'test',
+						'expression_type' => EXPRESSION_TYPE_INCLUDED
+					]
+				]
 			]
 		]);
 	}
@@ -162,12 +171,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		return [
 			[
 				[
-					'regex_name' => ['1_regexp_1']
+					'regex_name' => ['0_case_1 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/>']
 				]
 			],
 			[
 				[
-					'regex_name' => ['1_regexp_2', '2_regexp_1', '2_regexp_2']
+					'regex_name' => ['0_case_2', '0_case_3', '0_case_4']
 				]
 			]
 		];
