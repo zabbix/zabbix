@@ -2311,15 +2311,16 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
 					return $comparison;
 				}
 
-				static $exist_operators = [
-					CONDITION_OPERATOR_NOT_EXISTS,
-					CONDITION_OPERATOR_EXISTS
-				];
-				$existcheck_b = in_array($condition_b['operator'], $exist_operators) ? 1 : 0;
-				$existcheck_a = in_array($condition_a['operator'], $exist_operators) ? -1 : 0;
-				$comparison = $existcheck_b + $existcheck_a;
+				$exist_operators = [CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_EXISTS];
 
-				return $comparison == 0 ? strnatcasecmp($condition_a['value'], $condition_b['value']) : $comparison;
+				$comparison = (int) in_array($condition_b['operator'], $exist_operators)
+					- (int) in_array($condition_a['operator'], $exist_operators);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				return strnatcasecmp($condition_a['value'], $condition_b['value']);
 			});
 			break;
 

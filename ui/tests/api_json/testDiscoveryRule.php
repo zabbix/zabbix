@@ -5164,8 +5164,6 @@ class testDiscoveryRule extends CAPITest {
 		$this->assertEquals($db_lld_override['evaltype'], $filter['evaltype'], 'Override evaltype value.');
 
 		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-			CTestArrayHelper::usort($filter['conditions'], ['formulaid']);
-
 			$conditionid_by_formulaid = array_combine(
 				array_column($filter['conditions'], 'formulaid'),
 				array_column($db_lld_conditions, 'lld_override_conditionid')

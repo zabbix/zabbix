@@ -976,7 +976,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$itemids[$key] = $item['itemid'];
 
 			// conditions
-			if (array_key_exists('filter', $item)) {
+			if (isset($item['filter'])) {
 				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 

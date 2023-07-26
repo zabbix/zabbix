@@ -598,7 +598,11 @@ class CConfigurationExportBuilder {
 			}
 
 			self::formatLLDFilter($discoveryRule);
-			self::formatLLDFilter($discoveryRule['overrides']);
+
+			foreach ($discoveryRule['overrides'] as &$override) {
+				self::formatLLDFilter($override);
+			}
+			unset($override);
 
 			$data = [
 				'uuid' => $discoveryRule['uuid'],
@@ -690,7 +694,7 @@ class CConfigurationExportBuilder {
 	 * @param array $filter_object
 	 */
 	private static function formatLLDFilter(array &$filter_object): void {
-		if (!$filter_object || !array_key_exists('filter', $filter_object)) {
+		if (!$filter_object) {
 			return;
 		}
 
