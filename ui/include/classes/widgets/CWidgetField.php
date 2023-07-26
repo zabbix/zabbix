@@ -102,14 +102,16 @@ abstract class CWidgetField {
 	}
 
 	public function setValuesCaptions(array $captions): self {
-		if (array_key_exists($this->save_type, $captions)) {
-			$inaccessible = 0;
+		$values = [];
+		$this->toApi($values);
 
-			foreach ($this->getValue() as $value) {
-				$this->values_captions[$value] = array_key_exists($value, $captions[$this->save_type])
-					? $captions[$this->save_type][$value]
+		$inaccessible = 0;
+		foreach ($values as $value) {
+			if (array_key_exists($value['type'], $captions)) {
+				$this->values_captions[$value['value']] = array_key_exists($value['value'], $captions[$value['type']])
+					? $captions[$value['type']][$value['value']]
 					: [
-						'id' => $value,
+						'id' => $value['value'],
 						'name' => $this->inaccessible_caption.(++$inaccessible > 1 ? ' ('.$inaccessible.')' : ''),
 						'inaccessible' => true
 					];
