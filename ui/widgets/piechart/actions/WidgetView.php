@@ -536,6 +536,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($templateid !== '') {
 				$metric = [
+					'id' => $id++,
 					'name' => $metric['name'],
 					'color' => $metric['options']['color'],
 					'value' => null,
