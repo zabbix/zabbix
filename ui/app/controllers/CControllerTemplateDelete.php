@@ -51,7 +51,6 @@ class CControllerTemplateDelete extends CController {
 	}
 
 	/**
-	 * @throws APIException
 	 * @throws Exception
 	 */
 	protected function doAction(): void {

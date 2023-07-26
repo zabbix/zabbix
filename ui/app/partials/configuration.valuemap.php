@@ -61,5 +61,7 @@ $table->addItem((new CTag('tfoot', true))->addItem([new CCol($buttons)]));
 
 $table->show();
 
-$this->includeJsFile('configuration.valuemap.js.php', ['data' => $data]);
-
+$this->includeJsFile('configuration.valuemap.js.php', [
+	'valuemaps' => $data['valuemaps'],
+	'table_id' => $data['table_id']
+]);

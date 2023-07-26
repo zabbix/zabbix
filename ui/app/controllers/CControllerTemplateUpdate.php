@@ -30,14 +30,14 @@ class CControllerTemplateUpdate extends CController {
 			'templateid' =>			'required|db hosts.hostid',
 			'template_name' =>		'required|db hosts.host|not_empty',
 			'visiblename' =>		'db hosts.name',
+			'templates' =>			'array_db hosts.hostid',
+			'add_templates' =>		'array_db hosts.hostid',
+			'clear_templates' =>	'array_db hosts.hostid',
 			'groups' =>				'required|array',
 			'description' =>		'db hosts.description',
 			'tags' =>				'array',
 			'macros' =>				'array',
-			'valuemaps' =>			'array',
-			'templates' =>			'array_db hosts.hostid',
-			'add_templates' =>		'array_db hosts.hostid',
-			'clear_templates' =>	'array_db hosts.hostid'
+			'valuemaps' =>			'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,12 +57,51 @@ class CControllerTemplateUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function doAction(): void {
 		$templateid = $this->getInput('templateid');
+		$template_name = $this->getInput('template_name', '');
 		$tags = $this->getInput('tags', []);
+
+		// Linked templates.
+		$templates = [];
+
+		foreach (array_merge($this->getInput('templates', []), $this->getInput('add_templates', [])) as $linked_id) {
+			$templates[] = ['templateid' => $linked_id];
+		}
+
+		// Clear templates.
+		$templates_clear = array_diff(
+			$this->getInput('clear_templates', []),
+			$this->getInput('add_templates', [])
+		);
+
+		// Add new group.
+		$groups = $this->getInput('groups', []);
+		$new_groups = [];
+
+		foreach ($groups as $idx => $group) {
+			if (is_array($group) && array_key_exists('new', $group)) {
+				$new_groups[] = ['name' => $group['new']];
+				unset($groups[$idx]);
+			}
+		}
+
+		if ($new_groups) {
+			$new_groupid = API::TemplateGroup()->create($new_groups);
+
+			if (!$new_groupid) {
+				throw new Exception();
+			}
+
+			$groups = array_merge($groups, $new_groupid['groupids']);
+		}
 
 		foreach ($tags as $key => $tag) {
 			// Remove empty new tag lines.
@@ -92,6 +131,7 @@ class CControllerTemplateUpdate extends CController {
 
 		foreach ($macros as &$macro) {
 			unset($macro['discovery_state']);
+			unset($macro['allow_revert']);
 		}
 		unset($macro);
 
@@ -128,60 +168,17 @@ class CControllerTemplateUpdate extends CController {
 			throw new Exception();
 		}
 
-		// Add new group.
-		$groups = $this->getInput('groups', []);
-		$new_groups = [];
-
-		foreach ($groups as $idx => $group) {
-			if (is_array($group) && array_key_exists('new', $group)) {
-				$new_groups[] = ['name' => $group['new']];
-				unset($groups[$idx]);
-			}
-		}
-
-		if ($new_groups) {
-			$new_groupid = API::TemplateGroup()->create($new_groups);
-
-			if (!$new_groupid) {
-				throw new Exception();
-			}
-
-			$groups = array_merge($groups, $new_groupid['groupids']);
-		}
-
-		// Linked templates.
-		$templates = [];
-
-		foreach (array_merge($this->getInput('templates', []), $this->getInput('add_templates', [])) as $linked_id) {
-			$templates[] = ['templateid' => $linked_id];
-		}
-
-		$template_name = $this->getInput('template_name', '');
-
-		$save_macros = $macros;
-
-		foreach ($save_macros as &$macro) {
-			unset($macro['allow_revert']);
-		}
-		unset($macro);
-
 		$template = [
+			'templateid' => $templateid,
 			'host' => $template_name,
-			'name' => ($this->getInput('visiblename', '') === '') ? $template_name : $this->getInput('visiblename'),
-			'description' => $this->getInput('description', ''),
-			'groups' => zbx_toObject($groups, 'groupid'),
+			'name' => $this->getInput('visiblename', '') ?: $template_name,
 			'templates' => $templates,
+			'templates_clear' => zbx_toObject($templates_clear, 'templateid'),
+			'groups' => zbx_toObject($groups, 'groupid'),
+			'description' => $this->getInput('description', ''),
 			'tags' => $tags,
-			'macros' => $save_macros
+			'macros' => $macros
 		];
-
-		$templates_clear = array_diff(
-			$this->getInput('clear_templates', []),
-			$this->getInput('add_templates', [])
-		);
-
-		$template['templateid'] = $templateid;
-		$template['templates_clear'] = zbx_toObject($templates_clear, 'templateid');
 
 		$result = API::Template()->update($template);
 

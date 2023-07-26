@@ -498,7 +498,8 @@ if (!$host_is_discovered) {
 			'source' => 'host',
 			'valuemaps' => $data['host']['valuemaps'],
 			'readonly' => $host_is_discovered,
-			'form' => 'host'
+			'form' => 'host',
+			'table_id' => 'valuemap-table'
 		]));
 }
 

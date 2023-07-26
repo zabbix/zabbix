@@ -273,7 +273,8 @@ $valuemap_tab = (new CFormList('valuemap-formlist'))
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
-		'form' => 'templates'
+		'form' => 'templates',
+		'table_id' => 'template-valuemap-table'
 	]));
 
 if ($data['templateid']) {

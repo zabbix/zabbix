@@ -132,66 +132,7 @@
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
-			this._initActions();
 			this.initial_form_fields = getFormFields(this.form);
-		},
-
-		_initActions() {
-			this.form.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-linked-template')) {
-					if (typeof this.overlay !== 'undefined') {
-						this.dialogue = this.overlay.$dialogue[0];
-
-						const form_fields = getFormFields(this.form);
-						const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
-
-						if (!diff) {
-							if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-								return;
-							}
-						}
-						overlayDialogueDestroy(this.overlay.dialogueid);
-
-						this.editTemplate({templateid: e.target.dataset.templateid}, this.dialogue);
-					}
-					else {
-						this.editTemplate({templateid: e.target.dataset.templateid});
-					}
-				}
-			});
-		},
-
-		editTemplate(parameters, dialogue = null) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			if (dialogue) {
-				overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
-				);
-			}
-			else {
-				overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-					postMessageOk(e.detail.title);
-
-					if ('success' in e.detail) {
-						postMessageOk(e.detail.success.title);
-
-						if ('messages' in e.detail.success) {
-							postMessageDetails('success', e.detail.success.messages);
-						}
-					}
-
-					location.href = location.href;
-				});
-
-				overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-					new TabIndicators('host-tabs');
-				});
-			}
 		},
 
 		/**

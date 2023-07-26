@@ -33,6 +33,7 @@ window.host_edit_popup = {
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.initial_form_fields = getFormFields(this.form);
 
 		history.replaceState({}, '', popup_url);
 
@@ -47,6 +48,36 @@ window.host_edit_popup = {
 
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
+
+		this.form.addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-edit-linked-template')) {
+
+				this.editTemplate({templateid: e.target.dataset.templateid});
+			}
+		})
+	},
+
+	editTemplate(parameters) {
+		const form_fields = getFormFields(this.form);
+		const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
+
+		if (!diff) {
+			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+				return;
+			}
+		}
+
+		overlayDialogueDestroy(this.overlay.dialogueid);
+
+		const overlay = PopUp('template.edit', parameters, {
+			dialogueid: 'templates-form',
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+		);
 	},
 
 	submit() {
