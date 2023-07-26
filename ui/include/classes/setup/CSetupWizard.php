@@ -523,11 +523,11 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_host', 0))->removeId()
 			])
 			->addRow(new CLabel(_('Database type'), 'label-type'), [
-				((new CSelect('type'))
+				(new CSelect('type'))
 					->setId('type')
 					->setFocusableElementId('label-type')
 					->setValue($DB['TYPE'])
-					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))),
+					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases())),
 				makeWarningIcon($db_warning)->setId('db_warning')
 			])
 			->addRow(_('Database host'),
