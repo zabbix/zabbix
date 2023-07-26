@@ -534,7 +534,7 @@ zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, si
 			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
-	
+
 	session.timeout = config_timeout * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
 
