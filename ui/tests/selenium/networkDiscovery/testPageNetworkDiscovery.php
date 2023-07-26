@@ -204,23 +204,71 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$druleid = CDataHelper::getIds('name');
 	}
 
-
 	public function testPageNetworkDiscovery_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=discovery.list');
-		var_dump('test');
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$table = $this->query('class:list-table')->asTable()->one();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 
+		$this->page->assertTitle('Configuration of discovery rules');
+		$this->page->assertHeader('Discovery rules');
+		$this->assertEquals(['', 'Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status'], $table->getHeadersText());
+		$this->assertEquals(['Name', 'Status'], $form->getLabels()->asText());
 
+		// Check if default enabled buttons are clickable.
+		$this->assertEquals(3, $this->query('button', ['Create discovery rule', 'Apply', 'Reset'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
 
+		// Check if default disabled buttons are not clickable.
+		$this->assertEquals(0, $this->query('button', ['Enable', 'Disable', 'Delete'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
 
+		// Check if filter collapses/ expands.
+		foreach (['true', 'false'] as $status) {
+			$this->assertTrue($this->query('xpath://li[@aria-expanded='.CXPathHelper::escapeQuotes($status).']')
+					->one()->isPresent()
+			);
+			$this->query('xpath://a[@id="ui-id-1"]')->one()->click();
+		}
 
+		// Check if fields "Name" length is as expected.
+		$this->assertEquals(255, $form->query('xpath:.//input[@name="filter_name"]')
+				->one()->getAttribute('maxlength')
+		);
 
-/*		$this->zbxTestCheckTitle('Configuration of discovery rules');
-
-		$this->zbxTestCheckHeader('Discovery rules');
-		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(['Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status']);
-		$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);*/
+		/**
+		 * Check if counter displays correct number of rows and check if previously disabled buttons are enabled,
+		 * upon selecting discovery rules.
+		 */
+		$selected_counter = $this->query('id:selected_count')->one();
+		$this->assertEquals('0 selected', $selected_counter->getText());
+		$this->query('id:all_drules')->asCheckbox()->one()->set(true);
+		$this->assertEquals(CDBHelper::getCount('SELECT * FROM drules').' selected', $selected_counter->getText());
+		foreach (['Enable', 'Disable', 'Delete'] as $buttons ){
+			$this->assertTrue($this->query('button:'.$buttons)->one()->isEnabled());
+		}
 	}
+
+	public function testPageNetworkDiscovery_CheckSorting() {
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+
+
+
+
+
+	}
+
+
+
+
+			/*		$this->zbxTestCheckTitle('Configuration of discovery rules');
+
+					$this->zbxTestCheckHeader('Discovery rules');
+					$this->zbxTestTextPresent('Displaying');
+					$this->zbxTestTextPresent(['Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status']);
+					$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);*/
+
 
 /*	// returns all discovery rules
 	public static function allRules() {
