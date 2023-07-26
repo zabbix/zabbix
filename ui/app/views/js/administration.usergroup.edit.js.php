@@ -23,6 +23,7 @@
  * @var CView $this
  */
 ?>
+
 <script>
 	const view = new class {
 
@@ -73,18 +74,6 @@
 			document.querySelector('.add-new-template-row').addEventListener('click', () => this.#addTemplateRow());
 			document.querySelector('.add-new-host-row').addEventListener('click', () => this.#addHostRow());
 			document.querySelector('.add-new-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
-
-			document.getElementById('update').addEventListener('click', function() {
-				let groups = [];
-
-				document.querySelectorAll('.multiselect').forEach(function(multiselect) {
-					let selectedItems = $(multiselect).multiSelect('getSelectedItems');
-					let groupIds = selectedItems.map(function(item) {
-						return item.id;
-					});
-					groups.push(groupIds);
-				});
-			});
 		}
 
 		#addTemplateRow(templategroup_rights = [], permission = <?= PERM_DENY ?>) {
