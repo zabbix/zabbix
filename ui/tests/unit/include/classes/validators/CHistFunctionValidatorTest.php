@@ -479,7 +479,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['nodata(/host/key, 1h, {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['nodata(/host/key, 1h, {#LLDMACRO})', ['lldmacros' => true], ['rc' => true, 'error' => null]],
 			['nodata(/host/key, 1h, "{$MACRO}{#LLDMACRO}")', ['usermacros' => true, 'lldmacros' => true], ['rc' => true, 'error' => null]],
-			['nodata(/host/key, 1h, "foor")', [], ['rc' => false, 'error' => 'invalid third parameter in function "nodata"']],
+			['nodata(/host/key, 1h, "food")', [], ['rc' => false, 'error' => 'invalid third parameter in function "nodata"']],
 			['nodata(/host/key, 1h, "strict",)', [], ['rc' => false, 'error' => 'invalid number of parameters in function "nodata"']],
 
 			['percentile(/host/key)', [], ['rc' => false, 'error' => 'mandatory parameter is missing in function "percentile"']],
