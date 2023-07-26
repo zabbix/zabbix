@@ -43,24 +43,24 @@ class testPageEventCorrelation extends CWebTest {
 		];
 	}
 
-	protected static $correlation_sql = 'SELECT * FROM correlation ORDER BY correlationid';
-	protected static $event_old_operations = 'Event correlation for closing old events';
-	protected static $event_new_operations = 'Event correlation for closing new events';
-	protected static $event_both_operations = 'Both operations';
-	protected static $event_hostgroup = 'Event for host group';
-	protected static $event_pair = 'event tag pair';
-	protected static $event_old_value = 'Old event tag value';
-	protected static $event_new_value = 'New event tag value';
-	protected static $multiple_conditions = 'Conditions';
-	protected static $event_for_filter = '€√Σnt correlation for filter and deletion';
+	const CORRELATION_SQL = 'SELECT * FROM correlation ORDER BY correlationid';
+	const EVENT_OLD_OPERATIONS = 'Event correlation for closing old events';
+	const EVENT_NEW_OPERATIONS = 'Event correlation for closing new events';
+	const EVENT_BOTH_OPERATIONS = 'Both operations';
+	const EVENT_HOSTGROUP = 'Event for host group';
+	const EVENT_PAIR = 'event tag pair';
+	const EVENT_OLD_VALUE = 'Old event tag value';
+	const EVENT_NEW_VALUE = 'New event tag value';
+	const MULTIPLE_CONDITIONS = 'Conditions';
+	const EVENT_FOR_FILTER = '📌€√Σnt correlation for filter and deletion';
 
 	public function prepareEventData() {
 		CDataHelper::call('correlation.create', [
 			[
-				'name' => self::$event_old_operations,
+				'name' => self::EVENT_OLD_OPERATIONS,
 				'status' => ZBX_CORRELATION_DISABLED,
 				'filter' => [
-					'evaltype' => '1',
+					'evaltype' => CONDITION_EVAL_TYPE_AND,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
@@ -75,9 +75,9 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$event_new_operations,
+				'name' => self::EVENT_NEW_OPERATIONS,
 				'filter' => [
-					'evaltype' => '0',
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG,
@@ -92,10 +92,10 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$event_both_operations,
+				'name' => self::EVENT_BOTH_OPERATIONS,
 				'status' => ZBX_CORRELATION_DISABLED,
 				'filter' => [
-					'evaltype' => '1',
+					'evaltype' => CONDITION_EVAL_TYPE_AND,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
@@ -113,9 +113,9 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$event_hostgroup,
+				'name' => self::EVENT_HOSTGROUP,
 				'filter' => [
-					'evaltype' => '0',
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
@@ -131,9 +131,9 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$event_pair,
+				'name' => self::EVENT_PAIR,
 				'filter' => [
-					'evaltype' => '0',
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
@@ -149,9 +149,9 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$event_old_value,
+				'name' => self::EVENT_OLD_VALUE,
 				'filter' => [
-					'evaltype' => '0',
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
@@ -168,9 +168,9 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$event_new_value,
+				'name' => self::EVENT_NEW_VALUE,
 				'filter' => [
-					'evaltype' => '0',
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE,
@@ -187,9 +187,9 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$multiple_conditions,
+				'name' => self::MULTIPLE_CONDITIONS,
 				'filter' => [
-					'evaltype' => '2',
+					'evaltype' => CONDITION_EVAL_TYPE_OR,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_NEW_EVENT_TAG,
@@ -230,9 +230,9 @@ class testPageEventCorrelation extends CWebTest {
 				]
 			],
 			[
-				'name' => self::$event_for_filter,
+				'name' => self::EVENT_FOR_FILTER,
 				'filter' => [
-					'evaltype' => '0',
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 					'conditions' => [
 						[
 							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
@@ -254,49 +254,49 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					[
-						'Name' => self::$event_old_operations,
+						'Name' => self::EVENT_OLD_OPERATIONS,
 						'Conditions' => 'Old event tag name equals old event tag',
 						'Operations' => 'Close new event',
 						'Status' => 'Disabled'
 					],
 					[
-						'Name' => self::$event_new_operations,
+						'Name' => self::EVENT_NEW_OPERATIONS,
 						'Conditions' => 'New event tag name equals new event tag',
 						'Operations' => 'Close old events',
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => self::$event_both_operations,
+						'Name' => self::EVENT_BOTH_OPERATIONS,
 						'Conditions' => 'Old event tag name equals old event tag',
 						'Operations' => 'Close old events'."\n".'Close new event',
 						'Status' => 'Disabled'
 					],
 					[
-						'Name' => self::$event_hostgroup,
+						'Name' => self::EVENT_HOSTGROUP,
 						'Conditions' => 'New event host group does not equal Applications',
 						'Operations' => 'Close old events',
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => self::$event_pair,
+						'Name' => self::EVENT_PAIR,
 						'Conditions' => 'Value of old event tag event tag old name equals value of new event tag event tag new name',
 						'Operations' => 'Close old events',
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => self::$event_old_value,
+						'Name' => self::EVENT_OLD_VALUE,
 						'Conditions' => 'Value of old event tag old event tag value contains 777',
 						'Operations' => 'Close old events',
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => self::$event_new_value,
+						'Name' => self::EVENT_NEW_VALUE,
 						'Conditions' => 'Value of new event tag new event tag value does not contain AAA',
 						'Operations' => 'Close new event',
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => self::$multiple_conditions,
+						'Name' => self::MULTIPLE_CONDITIONS,
 						'Conditions' => 'Old event tag name equals test old event tag'."\n".
 								'New event tag name equals test new event tag'."\n".
 								'New event host group does not equal Applications'."\n".
@@ -307,7 +307,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					[
-						'Name' => self::$event_for_filter,
+						'Name' => self::EVENT_FOR_FILTER,
 						'Conditions' => 'Old event tag name equals tag for filter',
 						'Operations' => 'Close old events',
 						'Status' => 'Enabled'
@@ -386,7 +386,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => '€√Σnt'
 					],
 					'expected' => [
-						self::$event_for_filter
+						self::EVENT_FOR_FILTER
 					]
 				]
 			],
@@ -397,7 +397,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => 'Conditions'
 					],
 					'expected' => [
-						self::$multiple_conditions
+						self::MULTIPLE_CONDITIONS
 					]
 				]
 			],
@@ -408,7 +408,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => 'host'
 					],
 					'expected' => [
-						self::$event_hostgroup
+						self::EVENT_HOSTGROUP
 					]
 				]
 			],
@@ -419,14 +419,14 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => ' '
 					],
 					'expected' => [
-						self::$event_both_operations,
-						self::$event_new_operations,
-						self::$event_old_operations,
-						self::$event_hostgroup,
-						self::$event_pair,
-						self::$event_new_value,
-						self::$event_old_value,
-						self::$event_for_filter
+						self::EVENT_BOTH_OPERATIONS,
+						self::EVENT_NEW_OPERATIONS,
+						self::EVENT_OLD_OPERATIONS,
+						self::EVENT_HOSTGROUP,
+						self::EVENT_PAIR,
+						self::EVENT_NEW_VALUE,
+						self::EVENT_OLD_VALUE,
+						self::EVENT_FOR_FILTER
 					]
 				]
 			],
@@ -437,7 +437,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => 'h o'
 					],
 					'expected' => [
-						self::$event_both_operations
+						self::EVENT_BOTH_OPERATIONS
 					]
 				]
 			],
@@ -448,8 +448,8 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => ' closing '
 					],
 					'expected' => [
-						self::$event_new_operations,
-						self::$event_old_operations
+						self::EVENT_NEW_OPERATIONS,
+						self::EVENT_OLD_OPERATIONS
 					]
 				]
 			],
@@ -460,7 +460,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => 'Both OPERATIONS'
 					],
 					'expected' => [
-						self::$event_both_operations
+						self::EVENT_BOTH_OPERATIONS
 					]
 				]
 			],
@@ -479,13 +479,13 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					'expected' => [
-						self::$multiple_conditions,
-						self::$event_new_operations,
-						self::$event_hostgroup,
-						self::$event_pair,
-						self::$event_new_value,
-						self::$event_old_value,
-						self::$event_for_filter
+						self::MULTIPLE_CONDITIONS,
+						self::EVENT_NEW_OPERATIONS,
+						self::EVENT_HOSTGROUP,
+						self::EVENT_PAIR,
+						self::EVENT_NEW_VALUE,
+						self::EVENT_OLD_VALUE,
+						self::EVENT_FOR_FILTER
 					]
 				]
 			],
@@ -497,8 +497,8 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Enabled'
 					],
 					'expected' => [
-						self::$event_new_operations,
-						self::$event_for_filter
+						self::EVENT_NEW_OPERATIONS,
+						self::EVENT_FOR_FILTER
 					]
 				]
 			],
@@ -518,8 +518,8 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Disabled'
 					],
 					'expected' => [
-						self::$event_both_operations,
-						self::$event_old_operations
+						self::EVENT_BOTH_OPERATIONS,
+						self::EVENT_OLD_OPERATIONS
 					]
 				]
 			],
@@ -531,7 +531,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Disabled'
 					],
 					'expected' => [
-						self::$event_both_operations
+						self::EVENT_BOTH_OPERATIONS
 					]
 				]
 			],
@@ -543,12 +543,12 @@ class testPageEventCorrelation extends CWebTest {
 						'Status' => 'Any'
 					],
 					'expected' => [
-						self::$event_new_operations,
-						self::$event_old_operations,
-						self::$event_hostgroup,
-						self::$event_pair,
-						self::$event_new_value,
-						self::$event_old_value
+						self::EVENT_NEW_OPERATIONS,
+						self::EVENT_OLD_OPERATIONS,
+						self::EVENT_HOSTGROUP,
+						self::EVENT_PAIR,
+						self::EVENT_NEW_VALUE,
+						self::EVENT_OLD_VALUE
 					]
 				]
 			]
@@ -580,15 +580,15 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'sort_field' => 'Name',
 					'expected' => [
-						self::$event_for_filter,
-						self::$event_old_value,
-						self::$event_new_value,
-						self::$event_pair,
-						self::$event_hostgroup,
-						self::$event_old_operations,
-						self::$event_new_operations,
-						self::$multiple_conditions,
-						self::$event_both_operations
+						self::EVENT_FOR_FILTER,
+						self::EVENT_OLD_VALUE,
+						self::EVENT_NEW_VALUE,
+						self::EVENT_PAIR,
+						self::EVENT_HOSTGROUP,
+						self::EVENT_OLD_OPERATIONS,
+						self::EVENT_NEW_OPERATIONS,
+						self::MULTIPLE_CONDITIONS,
+						self::EVENT_BOTH_OPERATIONS
 					]
 				]
 			],
@@ -636,7 +636,7 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					'action' => 'Enable',
-					'name' => self::$event_both_operations
+					'name' => self::EVENT_BOTH_OPERATIONS
 				]
 			],
 			[
@@ -647,7 +647,7 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					'action' => 'Disable',
-					'name' => self::$event_for_filter
+					'name' => self::EVENT_FOR_FILTER
 				]
 			],
 			[
@@ -658,7 +658,7 @@ class testPageEventCorrelation extends CWebTest {
 			[
 				[
 					'action' => 'Delete',
-					'name' => self::$event_for_filter
+					'name' => self::EVENT_FOR_FILTER
 				]
 			]
 		];
@@ -668,7 +668,7 @@ class testPageEventCorrelation extends CWebTest {
 	 * @dataProvider getCancelData
 	 */
 	public function testPageEventCorrelation_CancelAction($data) {
-		$old_hash = CDBHelper::getHash(self::$correlation_sql);
+		$old_hash = CDBHelper::getHash(self::CORRELATION_SQL);
 
 		if (!is_array(CTestArrayHelper::get($data, 'name', []))) {
 			$data['name'] = [$data['name']];
@@ -677,18 +677,18 @@ class testPageEventCorrelation extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=correlation.list');
 
 		// Events count that will be selected before Enable/Disable/Delete action.
-		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$correlation_sql);
+		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::CORRELATION_SQL);
 		$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
 		$this->assertSelectedCount($selected_count);
 		$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
 
-		$message = $data['action'].' selected event correlation'.(count(CTestArrayHelper::get($data, 'name', [])) === 1 ? '?' : 's?' );
+		$message = $data['action'].' selected event correlation'.($selected_count === 1 ? '?' : 's?');
 		$this->assertEquals($message, $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$this->page->waitUntilReady();
 
-		$this->assertSelectedCount((array_key_exists('link_button', $data)) ? 0 : $selected_count);
-		$this->assertEquals($old_hash, CDBHelper::getHash(self::$correlation_sql));
+		$this->assertSelectedCount($selected_count);
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::CORRELATION_SQL));
 	}
 
 	public function getStatusData() {
@@ -697,34 +697,34 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'link_button' => true,
 					'action' => 'Disable',
-					'name' => self::$event_for_filter
+					'name' => self::EVENT_FOR_FILTER
 				]
 			],
 			[
 				[
 					'link_button' => true,
 					'action' => 'Enable',
-					'name' => self::$event_both_operations
+					'name' => self::EVENT_BOTH_OPERATIONS
 				]
 			],
 			[
 				[
 					'action' => 'Enable',
-					'name' => self::$event_old_operations
+					'name' => self::EVENT_OLD_OPERATIONS
 				]
 			],
 			[
 				[
 					'action' => 'Disable',
-					'name' => self::$event_new_operations
+					'name' => self::EVENT_NEW_OPERATIONS
 				]
 			],
 			[
 				[
 					'action' => 'Disable',
 					'name' => [
-						self::$multiple_conditions,
-						self::$event_pair
+						self::MULTIPLE_CONDITIONS,
+						self::EVENT_PAIR
 					]
 				]
 			],
@@ -737,8 +737,8 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'action' => 'Enable',
 					'name' => [
-						self::$event_old_value,
-						self::$event_new_value
+						self::EVENT_OLD_VALUE,
+						self::EVENT_NEW_VALUE
 					]
 				]
 			],
@@ -761,13 +761,13 @@ class testPageEventCorrelation extends CWebTest {
 			$data['name'] = [$data['name']];
 		}
 
-		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$correlation_sql);
-		$plural = count(CTestArrayHelper::get($data, 'name', [])) === 1 ? '' : 's';
+		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::CORRELATION_SQL);
+		$plural = ($selected_count === 1) ? '' : 's';
 
 		if (array_key_exists('link_button', $data)) {
 			// Disable or enable event via Enabled/Disabled button.
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name'][0]);
-			$row->getColumn('Status')->query('xpath:.//a')->one()->click();
+			$row->getColumn('Status')->query('tag:a')->one()->click();
 		}
 		else {
 			$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
@@ -805,7 +805,7 @@ class testPageEventCorrelation extends CWebTest {
 	}
 
 	public function testPageEventCorrelation_Delete() {
-		$this->deleteAction([self::$event_for_filter]);
+		$this->deleteAction([self::EVENT_FOR_FILTER]);
 	}
 
 	public function testPageEventCorrelation_MassDelete() {
@@ -819,7 +819,7 @@ class testPageEventCorrelation extends CWebTest {
 	 */
 	protected function deleteAction($names = []) {
 		$plural = (count($names) === 1) ? '' : 's';
-		$all = CDBHelper::getCount(self::$correlation_sql);
+		$all = CDBHelper::getCount(self::CORRELATION_SQL);
 		$this->page->login()->open('zabbix.php?action=correlation.list');
 
 		// Delete event correlation(s).
@@ -833,7 +833,9 @@ class testPageEventCorrelation extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Event correlation'.$plural.' deleted');
 		$this->assertSelectedCount(0);
 		$this->assertTableStats($names === [] ? 0 : $all - count($names));
-		$this->assertEquals(0, ($names === []) ? CDBHelper::getCount(self::$correlation_sql)
-			: CDBHelper::getCount('SELECT NULL FROM correlation WHERE name IN ('.CDBHelper::escape($names).')'));
+		$this->assertEquals(0, ($names === [])
+			? CDBHelper::getCount(self::CORRELATION_SQL)
+			: CDBHelper::getCount('SELECT NULL FROM correlation WHERE name IN ('.CDBHelper::escape($names).')')
+		);
 	}
 }
