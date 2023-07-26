@@ -122,6 +122,8 @@ static char				snmp_rwlock_init_done;
 	if (0 != snmp_rwlock_init_done)				\
 		pthread_rwlock_unlock(&snmp_exec_rwlock)
 
+static void	zbx_init_snmp(void);
+
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 {
 	const zbx_snmpidx_main_key_t	*main_key = (const zbx_snmpidx_main_key_t *)data;
@@ -2384,6 +2386,8 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	zbx_vector_snmp_oid_t	param_oids;
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
+
+	zbx_init_snmp();
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
