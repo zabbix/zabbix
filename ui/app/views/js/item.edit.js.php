@@ -240,6 +240,14 @@ window.item_edit_form = new class {
 		openItemTestDialog(indexes, true, true, this.footer.querySelector('.js-test-item'), -2);
 	}
 
+	delete() {
+		const fields = this.#getFormFields();
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'item.delete');
+		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]});
+	}
+
 	updateFieldsVisibility() {
 		const type = parseInt(this.field.type.value, 10);
 		const key = this.field.key.value;
