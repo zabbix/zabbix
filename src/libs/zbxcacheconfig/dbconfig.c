@@ -244,7 +244,7 @@ static int	cmp_key_id(const char *key_1, const char *key_2)
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
-static unsigned char	poller_by_item(unsigned char type, const char *key)
+static unsigned char	poller_by_item(unsigned char type, const char *key, const char *snmp_oid)
 {
 	switch (type)
 	{
@@ -259,7 +259,6 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				return ZBX_POLLER_TYPE_PINGER;
 			}
 			ZBX_FALLTHROUGH;
-		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
@@ -299,6 +298,19 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				break;
 
 			return ZBX_POLLER_TYPE_AGENT;
+		case ITEM_TYPE_SNMP:
+			if (0 == strncmp(snmp_oid, "walk[", 5))
+			{
+				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
+					break;
+
+				return ZBX_POLLER_TYPE_SNMP;
+			}
+
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_NORMAL;
 	}
 
 	return ZBX_NO_POLLER;
@@ -513,6 +525,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
 	unsigned char	poller_type;
+	const char	*snmp_oid = NULL;
 
 	if (0 != dc_host->proxy_hostid && SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
 	{
@@ -520,7 +533,17 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 		return;
 	}
 
-	poller_type = poller_by_item(dc_item->type, dc_item->key);
+	if (ITEM_TYPE_SNMP == dc_item->type)
+	{
+		ZBX_DC_SNMPITEM	*snmpitem;
+
+		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid)))
+		{
+			snmp_oid = snmpitem->snmp_oid;
+		}
+	}
+
+	poller_type = poller_by_item(dc_item->type, dc_item->key, snmp_oid);
 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
@@ -10714,6 +10737,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 		case ZBX_POLLER_TYPE_AGENT:
+		case ZBX_POLLER_TYPE_SNMP:
 			if (0 == (max_items = config_max_concurrent_checks - processing))
 				goto out;
 

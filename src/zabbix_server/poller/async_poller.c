@@ -527,7 +527,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		poller_config.curl_handle = asynchttppoller_config->curl_handle;
 #endif
 	}
-	else
+	else if (ZBX_POLLER_TYPE_AGENT == poller_type)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);

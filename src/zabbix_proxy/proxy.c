@@ -226,7 +226,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
-	1 /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -464,6 +465,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_AGENT_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
 	}
 	else
 		return FAIL;
@@ -1031,6 +1037,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartHTTPAgentPollers",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartSNMPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
@@ -1736,6 +1744,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
+				thread_args.args = &poller_args;
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_SNMP_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;

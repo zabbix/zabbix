@@ -39,7 +39,8 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_HTTPAGENT	7
 #define	ZBX_POLLER_TYPE_AGENT		8
-#define	ZBX_POLLER_TYPE_COUNT		9	/* number of poller types */
+#define	ZBX_POLLER_TYPE_SNMP		9
+#define	ZBX_POLLER_TYPE_COUNT		10	/* number of poller types */
 
 typedef enum
 {
