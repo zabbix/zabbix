@@ -30,12 +30,11 @@ class CControllerUsergroupCreate extends CController {
 			'debug_mode' =>					'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 			'userdirectoryid' =>			'db usrgrp.userdirectoryid',
 
-			'group_rights' =>				'array',
-			'templategroup_rights' => 		'array',
-			'tag_filters' =>				'array',
-
+			'ms_new_group_right' =>			'array',
 			'new_group_right' =>			'array',
+			'ms_new_templategroup_right' =>	'array',
 			'new_templategroup_right' =>	'array',
+			'ms_new_tag_filter' =>			'array',
 			'new_tag_filter' =>				'array',
 
 			'form_refresh' =>				'int32'
@@ -72,32 +71,61 @@ class CControllerUsergroupCreate extends CController {
 		$user_group = [
 			'users' => zbx_toObject($this->getInput('userids', []), 'userid'),
 			'hostgroup_rights' => [],
-			'templategroup_rights' => []
+			'templategroup_rights' => [],
+			'tag_filters' => []
 		];
 
-		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'tag_filters',
-			'userdirectoryid'
-		]);
+		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userdirectoryid']);
 
-		$group_rights = applyHostGroupRights($this->getInput('group_rights', []));
+		$input = $this->getInputAll();
+		$groupIds = $input['ms_new_group_right']['groupids'] ?? [];
+		$permissions = $input['new_group_right']['permission'] ?? [];
 
-		foreach ($group_rights as $groupid => $group_right) {
-			if ($groupid != 0 && $group_right['permission'] != PERM_NONE) {
-				$user_group['hostgroup_rights'][] = [
-					'id' => (string) $groupid,
-					'permission' => $group_right['permission']
-				];
+		foreach ($groupIds as $index => $group) {
+			foreach ($group as $groupId) {
+				$permission = $permissions[$index] ?? PERM_DENY;
+
+				if ($groupId !== '0') {
+					$user_group['hostgroup_rights'][] = [
+						'id' => (string) $groupId,
+						'permission' => $permission
+					];
+				}
 			}
 		}
 
-		$templategroup_rights = applyTemplateGroupRights($this->getInput('templategroup_rights', []));
+		$template_groupIds = $input['ms_new_templategroup_right']['groupids'] ?? [];
+		$template_permissions = $input['new_templategroup_right']['permission'] ?? [];
 
-		foreach ($templategroup_rights as $groupid => $group_right) {
-			if ($groupid != 0 && $group_right['permission'] != PERM_NONE) {
-				$user_group['templategroup_rights'][] = [
-					'id' => (string) $groupid,
-					'permission' => $group_right['permission']
-				];
+		foreach ($template_groupIds as $index => $group) {
+			foreach ($group as $groupId) {
+				$permission = $template_permissions[$index] ?? PERM_DENY;
+
+				if ($groupId !== '0') {
+					$user_group['templategroup_rights'][] = [
+						'id' => (string) $groupId,
+						'permission' => $permission
+					];
+				}
+			}
+		}
+
+		$tag_filters_groupIds = $input['ms_new_tag_filter']['groupids'] ?? [];
+		$tags = $input['new_tag_filter']['tag'] ?? [];
+		$values = $input['new_tag_filter']['value'] ?? [];
+
+		foreach ($tag_filters_groupIds as $index => $group) {
+			foreach ($group as $groupId) {
+				$tag = $tags[$index] ?? null;
+				$value = $values[$index] ?? null;
+
+				if ($groupId !== '0'&& $tag !== null && $value !== null) {
+					$user_group['tag_filters'][] = [
+						'groupid' => $groupId,
+						'tag' => $tag,
+						'value' => $value,
+					];
+				}
 			}
 		}
 
