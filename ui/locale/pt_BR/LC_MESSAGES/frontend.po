@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-06-22 23:12+0000\n"
+"PO-Revision-Date: 2023-07-13 19:01+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -2259,11 +2259,10 @@ msgid "Cannot delete dependency"
 msgstr "Não é possível excluir dependência"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
-msgstr[0] "A descoberta de rede não pôde ser excluída"
-msgstr[1] "A descoberta de rede não pôde ser excluída"
+msgstr[0] "A regra de descoberta de rede não pôde ser excluída"
+msgstr[1] "As regras de descoberta não puderam ser excluídas"
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -3085,7 +3084,7 @@ msgstr "Não é possível configurar campos do inventário com o inventário des
 
 #: include/classes/core/CCookieSession.php:127
 msgid "Cannot set session cookie."
-msgstr ""
+msgstr "Não é possivel configurar o cookie de sessão."
 
 #: include/classes/api/services/CService.php:1403
 #, c-format
@@ -3747,7 +3746,7 @@ msgstr ""
 
 #: jsLoader.php:330
 msgid "Click to view or edit"
-msgstr ""
+msgstr "Clique para visualizar ou editar"
 
 #: include/classes/widgets/CWidgetConfig.php:53
 msgid "Clock"
@@ -3851,7 +3850,7 @@ msgstr ""
 #: include/views/js/monitoring.sysmaps.js.php:421
 #: include/views/js/monitoring.sysmaps.js.php:791
 msgid "Color"
-msgstr ""
+msgstr "Cor"
 
 #: include/classes/validators/CColorValidator.php:32 jsLoader.php:289
 #, c-format
@@ -4162,7 +4161,7 @@ msgstr "Segurança de conexão"
 
 #: app/views/administration.miscconfig.edit.php:140
 msgid "Connection timeout"
-msgstr ""
+msgstr "Conexão expirada"
 
 #: include/classes/server/CZabbixServer.php:497
 #, c-format
@@ -4194,6 +4193,9 @@ msgid ""
 "1. Incorrect server IP/DNS in the \"zabbix.conf.php\";\n"
 "2. Firewall is blocking TCP connection.\n"
 msgstr ""
+"A conexão com o servidor Zabbix atingiu o tempo limite \"%1$s\". Possíveis motivos:\n"
+"1. IP/DNS do servidor incorreto no \"zabbix.conf.php\";\n"
+"2. O firewall está bloqueando a conexão TCP.\n"
 
 #: include/classes/server/CZabbixServer.php:590
 msgid "Connection to Zabbix server failed. Incorrect configuration."
@@ -22086,7 +22088,7 @@ msgstr "macro(s)"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:770
 msgid "mad() - Median absolute deviation"
-msgstr ""
+msgstr "mad() - Desvio absoluto médio da mediana"
 
 #: include/classes/validators/CHistFunctionValidator.php:93
 #, c-format
@@ -22632,7 +22634,7 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:984
 msgid "skewness() - Measures the asymmetry of the probability distribution"
-msgstr ""
+msgstr "skewness() - Mede a assimetria da distribuição de probabilidades"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:991
 msgid "sqrt() - Square root of a value"

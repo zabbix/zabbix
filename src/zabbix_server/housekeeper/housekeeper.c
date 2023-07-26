@@ -44,6 +44,9 @@ static int	hk_period;
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS		4
 
+#define HK_MIN_CLOCK_UNDEFINED		0
+#define HK_MIN_CLOCK_ALWAYS_RECHECK	-1
+
 /* global configuration data containing housekeeping configuration */
 static zbx_config_t	cfg;
 
@@ -701,7 +704,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		keep_from, id_field_str_type, deleted = 0;
+	int		keep_from, id_field_str_type, deleted = 0, min_clock = rule->min_clock;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
 			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
@@ -713,14 +716,14 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	id_field_str_type = (0 == strcmp("auditid", rule->field_name)) ? 1 : 0;
 
 	/* initialize min_clock with the oldest record timestamp from database */
-	if (0 == rule->min_clock)
+	if (HK_MIN_CLOCK_ALWAYS_RECHECK == min_clock || HK_MIN_CLOCK_UNDEFINED == min_clock)
 	{
 		result = DBselect("select min(clock) from %s%s%s", rule->table,
 				('\0' != *rule->filter ? " where " : ""), rule->filter);
 		if (NULL != (row = DBfetch(result)) && SUCCEED != DBis_null(row[0]))
-			rule->min_clock = atoi(row[0]);
+			min_clock = atoi(row[0]);
 		else
-			rule->min_clock = now;
+			min_clock = now;
 
 		DBfree_result(result);
 	}
@@ -728,7 +731,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	/* Delete the old records from database. Don't remove more than 4 x housekeeping */
 	/* periods worth of data to prevent database stalling.                           */
 	keep_from = now - *rule->phistory;
-	if (keep_from > rule->min_clock)
+	if (keep_from > min_clock)
 	{
 		char			buffer[MAX_STRING_LEN];
 		char			*sql = NULL;
@@ -742,15 +745,15 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		else
 			zbx_vector_str_create(&ids_str);
 
-		rule->min_clock = MIN(keep_from, rule->min_clock + HK_MAX_DELETE_PERIODS * hk_period);
+		min_clock = MIN(keep_from, min_clock + HK_MAX_DELETE_PERIODS * hk_period);
 
 		zbx_snprintf(buffer, sizeof(buffer),
 			"select %s"
 			" from %s"
 			" where clock<%d%s%s"
 			" order by %s",
-			rule->field_name, rule->table, rule->min_clock, '\0' != *rule->filter ? " and " : "",
-			rule->filter, rule->field_name);
+			rule->field_name, rule->table, min_clock, '\0' != *rule->filter ? " and " : "", rule->filter,
+			rule->field_name);
 
 		while (1)
 		{
@@ -821,6 +824,9 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 		else
 			zbx_vector_str_destroy(&ids_str);
 	}
+
+	if (HK_MIN_CLOCK_ALWAYS_RECHECK != rule->min_clock)
+		rule->min_clock = min_clock;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
@@ -1072,7 +1078,8 @@ static int	housekeeping_sessions(int now)
 
 static int	housekeeping_services(int now)
 {
-	static zbx_hk_rule_t	rule = {"service_alarms", "servicealarmid", "", 0, &cfg.hk.services};
+	static zbx_hk_rule_t	rule = {"service_alarms", "servicealarmid", "", HK_MIN_CLOCK_UNDEFINED,
+			&cfg.hk.services};
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.services_mode)
 		return housekeeping_process_rule(now, &rule);
@@ -1082,7 +1089,7 @@ static int	housekeeping_services(int now)
 
 static int	housekeeping_audit(int now)
 {
-	static zbx_hk_rule_t	rule = {"auditlog", "auditid", "", 0, &cfg.hk.audit};
+	static zbx_hk_rule_t	rule = {"auditlog", "auditid", "", HK_MIN_CLOCK_UNDEFINED, &cfg.hk.audit};
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.audit_mode)
 		return housekeeping_process_rule(now, &rule);
@@ -1098,25 +1105,28 @@ static int	housekeeping_events(int now)
 	static zbx_hk_rule_t	rules[] = {
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_trigger},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_trigger},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), HK_MIN_CLOCK_UNDEFINED,
+			&cfg.hk.events_discovery},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), HK_MIN_CLOCK_UNDEFINED,
+			&cfg.hk.events_discovery},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_AUTOREGISTRATION)
-			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
+			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), HK_MIN_CLOCK_UNDEFINED,
+			&cfg.hk.events_autoreg},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_SERVICE)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_SERVICE)
-			ZBX_HK_EVENT_RULE, 0, &cfg.hk.events_service},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_service},
 		{NULL}
 	};
 
