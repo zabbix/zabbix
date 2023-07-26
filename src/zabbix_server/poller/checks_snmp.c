@@ -2395,7 +2395,7 @@ static int	agent_task_process(short event, void *data, int *fd)
 			if (NULL == snmp_context->results)
 				SET_TEXT_RESULT(&snmp_context->item.result, zbx_strdup(NULL, ""));
 			else
-			 	SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
+				SET_TEXT_RESULT(&snmp_context->item.result, snmp_context->results);
 
 			snmp_context->results = NULL;
 			snmp_context->ret = SUCCEED;
