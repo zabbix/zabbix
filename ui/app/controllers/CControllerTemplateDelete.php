@@ -65,7 +65,14 @@ class CControllerTemplateDelete extends CController {
 				'preservekeys' => true
 			]);
 
-			if ($hosts) {
+			$templates = API::Template()->get([
+				'output' => [],
+				'parentTemplateids' => $templateids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			if (count($templates) === $templateids) {
 				$result = API::Host()->massRemove([
 					'hostids' => array_keys($hosts),
 					'templateids' => $templateids
@@ -74,16 +81,7 @@ class CControllerTemplateDelete extends CController {
 				if (!$result) {
 					throw new Exception();
 				}
-			}
 
-			$templates = API::Template()->get([
-				'output' => [],
-				'parentTemplateids' => $templateids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
-			if ($templates) {
 				$result = API::Template()->massRemove([
 					'templateids' => array_keys($templates),
 					'templateids_link' => $templateids
