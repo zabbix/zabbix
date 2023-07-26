@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup drules
@@ -29,6 +30,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 class testPageNetworkDiscovery extends CLegacyWebTest {
 
+	use TableTrait;
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -37,6 +40,11 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 	public function getBehaviors() {
 		return [CMessageBehavior::class];
 	}
+
+	/**
+	 * SQL query which selects all values from table drules.
+	 */
+	private $SQL = 'SELECT * FROM drules';
 
 	/**
 	 * Create discovery rules for testPageNetworkDiscovery autotest.
@@ -244,71 +252,46 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$selected_counter = $this->query('id:selected_count')->one();
 		$this->assertEquals('0 selected', $selected_counter->getText());
 		$this->query('id:all_drules')->asCheckbox()->one()->set(true);
-		$this->assertEquals(CDBHelper::getCount('SELECT * FROM drules').' selected', $selected_counter->getText());
+		$this->assertEquals(CDBHelper::getCount($this->SQL).' selected', $selected_counter->getText());
 		foreach (['Enable', 'Disable', 'Delete'] as $buttons ){
 			$this->assertTrue($this->query('button:'.$buttons)->one()->isEnabled());
 		}
 	}
 
+	/**
+	 * Function which checks sorting by Name column.
+	 */
 	public function testPageNetworkDiscovery_CheckSorting() {
-		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=ASC');
+		$table = $this->query('class:list-table')->asTable()->one();
+		$table->query('xpath:.//a[text()="Name"]')->one()->click();
+		$column_values = $this->getTableColumnData('Name');
 
-
-
-
-
+		foreach (['asc', 'desc'] as $sorting) {
+			$expected = ($sorting === 'asc') ? $column_values : array_reverse($column_values);
+			$this->assertEquals($expected, $this->getTableColumnData('Name'));
+			$table->query('xpath:.//a[text()="Name"]')->one()->click();
+		}
 	}
-
-
-
-
-			/*		$this->zbxTestCheckTitle('Configuration of discovery rules');
-
-					$this->zbxTestCheckHeader('Discovery rules');
-					$this->zbxTestTextPresent('Displaying');
-					$this->zbxTestTextPresent(['Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status']);
-					$this->zbxTestTextPresent(['Enable', 'Disable', 'Delete']);*/
-
-
-/*	// returns all discovery rules
-	public static function allRules() {
-		return CDBHelper::getDataProvider('SELECT druleid,name FROM drules');
-	}*/
 
 	/**
 	*
 	*/
-	public function testPageNetworkDiscovery_SimpleUpdate() {
+	public function testPageNetworkDiscovery_Enable() {
 
-
-
-
-
-
-		/*$sqlDRules = 'SELECT * FROM drules WHERE druleid='.$drule['druleid'];
-		$sqlDChecks = 'SELECT * FROM dchecks WHERE druleid='.$drule['druleid'].' ORDER BY dcheckid';
-		$oldHashDRules = CDBHelper::getHash($sqlDRules);
-		$oldHashDChecks = CDBHelper::getHash($sqlDChecks);
-
-		$this->zbxTestLogin('zabbix.php?action=discovery.list');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestClickLinkText($drule['name']);
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$dialog->query('button:Update')->waitUntilClickable()->one()->click();
-		$dialog->ensureNotPresent();
-
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestTextPresent('Discovery rule updated');
-		$this->zbxTestTextPresent($drule['name']);
-
-		$this->assertEquals($oldHashDRules, CDBHelper::getHash($sqlDRules));
-		$this->assertEquals($oldHashDChecks, CDBHelper::getHash($sqlDChecks));*/
 	}
 
 	/**
 	 *
 	 */
-	public function testPageNetworkDiscovery_MassDelete($drule) {
+	public function testPageNetworkDiscovery_Disable() {
+
+	}
+
+	/**
+	 *
+	 */
+	public function testPageNetworkDiscovery_Delete() {
 
 
 
@@ -325,89 +308,20 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dchecks WHERE druleid='.$drule['druleid']));*/
 	}
 
-	public function testPageNetworkDiscovery_MassDisableAll() {
+	/**
+	 *
+	 */
+	public function testPageNetworkDiscovery_Cancel() {
 
-
-
-		/*DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE);
-
-		$this->zbxTestLogin('zabbix.php?action=discovery.list');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('all_drules');
-		$this->query('button:Disable')->waitUntilClickable()->one()->click();
-		$this->zbxTestAcceptAlert();
-
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->assertMessage(TEST_GOOD, 'Discovery rules disabled');
-
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE status='.DRULE_STATUS_ACTIVE));*/
 	}
+
+
 
 	/**
-	*
-	*/
-	public function testPageNetworkDiscovery_MassDisable() {
+	 *
+	 */
+	public function testPageNetworkDiscovery_Filter() {
 
-
-
-		/*DBexecute('UPDATE drules SET status='.DRULE_STATUS_ACTIVE.' WHERE druleid='.$drule['druleid']);
-
-		$this->zbxTestLogin('zabbix.php?action=discovery.list');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('druleids_'.$drule['druleid']);
-		$this->query('button:Disable')->waitUntilClickable()->one()->click();
-		$this->zbxTestAcceptAlert();
-
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->assertMessage(TEST_GOOD, 'Discovery rule disabled');
-
-		$this->assertEquals(1, CDBHelper::getCount(
-			'SELECT *'.
-			' FROM drules'.
-			' WHERE druleid='.$drule['druleid'].
-				' AND status='.DRULE_STATUS_DISABLED
-		));*/
 	}
 
-	public function testPageNetworkDiscovery_MassEnableAll() {
-
-
-		/*DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED);
-
-		$this->zbxTestLogin('zabbix.php?action=discovery.list');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('all_drules');
-		$this->query('button:Enable')->waitUntilClickable()->one()->click();
-		$this->zbxTestAcceptAlert();
-
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->assertMessage(TEST_GOOD, 'Discovery rules enabled');
-
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE status='.DRULE_STATUS_DISABLED));*/
-	}
-
-	/**
-	*
-	*/
-	public function testPageNetworkDiscovery_MassEnable() {
-
-
-		/*DBexecute('UPDATE drules SET status='.DRULE_STATUS_DISABLED.' WHERE druleid='.$drule['druleid']);
-
-		$this->zbxTestLogin('zabbix.php?action=discovery.list');
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->zbxTestCheckboxSelect('druleids_'.$drule['druleid']);
-		$this->query('button:Enable')->waitUntilClickable()->one()->click();
-		$this->zbxTestAcceptAlert();
-
-		$this->zbxTestCheckTitle('Configuration of discovery rules');
-		$this->assertMessage(TEST_GOOD, 'Discovery rule enabled');
-
-		$this->assertEquals(1, CDBHelper::getCount(
-			'SELECT *'.
-			' FROM drules'.
-			' WHERE druleid='.$drule['druleid'].
-				' AND status='.DRULE_STATUS_ACTIVE
-		));*/
-	}
 }
