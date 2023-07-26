@@ -33,7 +33,7 @@
  * Comments: use 'zbx_db_free_event' function to release allocated memory     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events)
+void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_event_t *events)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -88,11 +88,11 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		if (EVENT_OBJECT_TRIGGER == event->object)
 			zbx_vector_uint64_append(&triggerids, event->objectid);
 
-		zbx_vector_ptr_append(events, event);
+		zbx_vector_db_event_append(events, event);
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_ptr_sort(events, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_db_event_sort(events, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	/* read event_suppress data */
 
@@ -108,7 +108,8 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 		zbx_uint64_t	eventid;
 
 		ZBX_STR2UINT64(eventid, row[0]);
-		if (FAIL == (index = zbx_vector_ptr_bsearch(events, &eventid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)events, &eventid,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
@@ -139,7 +140,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr
 
 			if (NULL == event || eventid != event->eventid)
 			{
-				if (FAIL == (index = zbx_vector_ptr_bsearch(events, &eventid,
+				if (FAIL == (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)events, &eventid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;

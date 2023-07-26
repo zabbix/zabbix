@@ -22,7 +22,7 @@
 #include "proxyconfigread/proxyconfig_read.h"
 #include "../trapper/proxydata.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"
 #include "zbxnix.h"
@@ -604,7 +604,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 			port = zbx_strdup(port, proxy.port_orig);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == zbx_is_ushort(port, &proxy.port))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);

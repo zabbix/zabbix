@@ -19,10 +19,8 @@
 
 #include "zbxdiscovery.h"
 
-#include "zbxserver.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
-#include "zbxserialize.h"
 
 typedef struct
 {

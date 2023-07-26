@@ -973,6 +973,10 @@ msgstr "Pridať od templatu"
 msgid "Add host"
 msgstr "Pridať hosta"
 
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
+
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
@@ -2412,6 +2416,31 @@ msgstr[0] "Nie je možné skopírovať graf"
 msgstr[1] "Nie je možné skopírovať grafy"
 msgstr[2] "Nie je možné skopírovať grafy"
 
+#: include/classes/helpers/CGraphHelper.php:74
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:91
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:92
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:96
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:97
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
@@ -2436,10 +2465,25 @@ msgstr[0] "Nie je možné skopírovať spúšťač"
 msgstr[1] "Nie je možné skopírovať spúšťače"
 msgstr[2] "Nie je možné skopírovať spúšťače"
 
+#: include/classes/helpers/CTriggerGeneralHelper.php:196
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CTriggerGeneralHelper.php:197
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
+msgstr ""
+
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
 msgstr "Nie je možné skopírovať trigger \"%1$s\", pretože má vo výraze viacero hostov."
+
+#: include/classes/helpers/CTriggerHelper.php:75
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
+msgstr ""
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -3348,6 +3392,11 @@ msgstr "Nie je možné zdediť pravidlo LLD s kľúčom „%1$s“ templatu „%
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
 msgstr "Nie je možné zdediť pravidlo LLD s kľúčom „%1$s“ templatu „%2$s“ na hosta „%3$s“, pretože sa vyžaduje hostiteľské rozhranie typu „%4$s“."
 
+#: include/classes/api/services/CItemGeneral.php:834
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
@@ -3368,6 +3417,11 @@ msgstr "Nie je možné zdediť pravidlo LLD s kľúčom „%1$s“ templatu „%
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
 msgstr "Pravidlo LLD s kľúčom „%1$s“ templatu „%2$s“ nemožno zdediť na templat „%3$s“, pretože nájdený item s rovnakým kľúčom už existuje."
+
+#: include/classes/api/services/CItemGeneral.php:835
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
@@ -3410,6 +3464,11 @@ msgstr "Nemožno zdediť prototyp položky s kľúčom „%1$s“ šablóny „%
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "Nemožno zdediť prototyp položky s kľúčom „%1$s“ šablóny „%2$s“ na hostiteľa „%3$s“, pretože pravidlo LLD s rovnakým kľúčom už existuje."
 
+#: include/classes/api/services/CItemGeneral.php:840
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
@@ -3430,6 +3489,11 @@ msgstr "Prototyp položky s kľúčom „%1$s“ šablóny „%2$s“ nie je mo�
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "Prototyp položky s kľúčom „%1$s“ šablóny „%2$s“ nemožno zdediť na šablónu „%3$s“, pretože pravidlo LLD s rovnakým kľúčom už existuje."
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:726
 #, c-format
@@ -9057,6 +9121,16 @@ msgstr "Graf „%1$s“ už existuje na „%2$s“ ako graf vytvorený z prototy
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Graf \"%1$s\" už existuje na \"%2$s\"."
 
+#: include/classes/api/services/CGraph.php:479
+#, c-format
+msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraph.php:480
+#, c-format
+msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:36
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
@@ -9090,6 +9164,16 @@ msgstr "Graf zmazaný"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:167
 msgid "Graph prototype"
 msgstr "Prototyp grafu"
+
+#: include/classes/api/services/CGraphPrototype.php:470
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraphPrototype.php:471
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
@@ -12474,6 +12558,10 @@ msgstr "Makro LLD"
 #: include/views/configuration.host.discovery.edit.php:978
 msgid "LLD macros"
 msgstr "Makrá LLD"
+
+#: app/controllers/CControllerAuditLogList.php:229
+msgid "LLD rule"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneralOld.php:700
 msgid "LLD rule with the same UUID already exists"
@@ -17375,6 +17463,10 @@ msgstr "Zmazať zo skupín"
 msgid "Remove host"
 msgstr "Zmazať host"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -20597,6 +20689,13 @@ msgstr "Dnes zatiaľ"
 msgid "Top"
 msgstr "Hore"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "Top N"
@@ -20604,6 +20703,10 @@ msgstr "Top N"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "Top hosti"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20814,6 +20917,10 @@ msgid_plural "Triggers copied"
 msgstr[0] "Spúšťač skopírovaný"
 msgstr[1] "Spúšťače skopírované"
 msgstr[2] "Spúšťače skopírované"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23959,6 +24066,10 @@ msgstr "špeciálna postava"
 msgid "a string, number or null value is expected"
 msgstr "očakáva sa string, číslo alebo nulová hodnota"
 
+#: include/classes/api/services/CDiscoveryRule.php:1718
+msgid "a template ID is expected"
+msgstr ""
+
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:130
@@ -24443,6 +24554,10 @@ msgstr "nemožno odpojiť"
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
 msgstr "nemožno konvertovať na JSON, výsledná hodnota je príliš dlhá"
+
+#: include/classes/api/services/CDiscoveryRule.php:3026
+msgid "cannot delete inherited LLD rule"
+msgstr ""
 
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
@@ -25259,6 +25374,11 @@ msgstr "min() – Minimálna hodnota pre obdobie T"
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "minimálna dĺžka je %1$s znakov"
+
+#: include/classes/api/services/CDiscoveryRule.php:1630
+#, c-format
+msgid "missing filter condition \"%1$s\""
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "mod() - Division remainder"

@@ -239,18 +239,6 @@ typedef struct
 }
 zbx_db_trigger;
 
-/* temporary cache of trigger related data */
-typedef struct
-{
-	zbx_uint64_t		serviceid;
-	char			*name;
-	char			*description;
-	zbx_vector_uint64_t	eventids;
-	zbx_vector_ptr_t	events;
-	zbx_vector_tags_t	service_tags;
-}
-zbx_db_service;
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -279,6 +267,20 @@ typedef struct
 	zbx_uint64_t		flags;
 }
 zbx_db_event;
+
+ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
+
+/* temporary cache of trigger related data */
+typedef struct
+{
+	zbx_uint64_t		serviceid;
+	char			*name;
+	char			*description;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_db_event_t	events;
+	zbx_vector_tags_t	service_tags;
+}
+zbx_db_service;
 
 /* media types */
 typedef enum
@@ -836,6 +838,8 @@ void	zbx_item_param_free(zbx_item_param_t *param);
 
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
 int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, char **error);
+void	zbx_add_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *addtags);
+void	zbx_del_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *deltags);
 
 typedef enum
 {
