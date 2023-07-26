@@ -2404,6 +2404,7 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 
 	zbx_strlcpy(snmp_context->item.host, item->host.host, sizeof(snmp_context->item.host));
 	snmp_context->arg = arg;
+	snmp_context->arg_action = arg_action;
 	snmp_context->item.itemid = item->itemid;
 	snmp_context->item.hostid = item->host.hostid;
 	snmp_context->item.value_type = item->value_type;
