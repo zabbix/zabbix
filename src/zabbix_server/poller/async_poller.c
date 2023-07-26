@@ -19,6 +19,7 @@
 #include "poller.h"
 #include "async_httpagent.h"
 #include "async_agent.h"
+#include "checks_snmp.h"
 #include "zbxasynchttppoller.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
@@ -127,6 +128,24 @@ static void	process_agent_result(void *data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
+
+static void	process_snmp_result(void *data)
+{
+	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
+	//zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, snmp_context->item.key,
+			snmp_context->host, snmp_context->interface.addr);
+
+	/**snmp_result->result = snmp_context->item.result;
+	zbx_init_agent_result(&snmp_context->item.result);
+	snmp_result->errcode = snmp_context->ret;*/
+
+	zbx_async_check_snmp_clean(snmp_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 #ifdef HAVE_LIBCURL
 static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 {
@@ -301,10 +320,18 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 					" missing cURL library"));
 #endif
 		}
-		else
+		if (ITEM_TYPE_ZABBIX == items[i].type)
+		{
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
 					poller_config, poller_config, poller_config->base,
 					poller_config->config_timeout, poller_config->config_source_ip);
+		}
+		else
+		{
+			zbx_async_check_snmp(NULL, &items[i], &results[i], process_snmp_result,
+					poller_config, poller_config, poller_config->base,
+					poller_config->config_timeout, poller_config->config_source_ip);
+		}
 
 		if (SUCCEED == errcodes[i])
 			poller_config->processing++;
