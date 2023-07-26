@@ -421,7 +421,7 @@ class CRoleHelper {
 
 				$labels += [
 					self::UI_REPORTS_AVAILABILITY_REPORT => _('Availability report'),
-					self::UI_REPORTS_TOP_TRIGGERS => _('Triggers top 100')
+					self::UI_REPORTS_TOP_TRIGGERS => _('Top 100 triggers')
 				];
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
