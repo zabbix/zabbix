@@ -28,17 +28,13 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldMultiSelectUserView($data['fields']['userids'], $data['captions']['users']['userids'])
+		new CWidgetFieldMultiSelectUserView($data['fields']['userids'])
 	)
 	->addField(
-		new CWidgetFieldMultiSelectActionView($data['fields']['actionids'],
-			$data['captions']['actions']['actionids']
-		)
+		new CWidgetFieldMultiSelectActionView($data['fields']['actionids'])
 	)
 	->addField(
-		new CWidgetFieldMultiSelectMediaTypeView($data['fields']['mediatypeids'],
-			$data['captions']['media_types']['mediatypeids']
-		)
+		new CWidgetFieldMultiSelectMediaTypeView($data['fields']['mediatypeids'])
 	)
 	->addField(
 		(new CWidgetFieldCheckBoxListView($data['fields']['statuses']))->setColumns(3)

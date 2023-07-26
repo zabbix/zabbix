@@ -40,6 +40,9 @@ abstract class CWidgetField {
 	protected $value;
 	protected $default;
 
+	protected array $values_captions = [];
+	protected string $inaccessible_caption = '';
+
 	protected int $max_length;
 
 	protected ?string $action = null;
@@ -90,6 +93,28 @@ abstract class CWidgetField {
 
 	public function setValue($value): self {
 		$this->value = $value;
+
+		return $this;
+	}
+
+	public function getValuesCaptions(): array {
+		return $this->values_captions;
+	}
+
+	public function setValuesCaptions(array $captions): self {
+		if (array_key_exists($this->save_type, $captions)) {
+			$inaccessible = 0;
+
+			foreach ($this->getValue() as $value) {
+				$this->values_captions[$value] = array_key_exists($value, $captions[$this->save_type])
+					? $captions[$this->save_type][$value]
+					: [
+						'id' => $value,
+						'name' => $this->inaccessible_caption.(++$inaccessible > 1 ? ' ('.$inaccessible.')' : ''),
+						'inaccessible' => true
+					];
+			}
+		}
 
 		return $this;
 	}

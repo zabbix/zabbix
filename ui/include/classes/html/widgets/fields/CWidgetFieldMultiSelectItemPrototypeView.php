@@ -23,8 +23,8 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectItemPrototype;
 
 class CWidgetFieldMultiSelectItemPrototypeView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectItemPrototype $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectItemPrototype $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {

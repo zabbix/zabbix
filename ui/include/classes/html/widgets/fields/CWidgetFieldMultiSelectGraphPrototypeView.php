@@ -23,8 +23,8 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectGraphPrototype;
 
 class CWidgetFieldMultiSelectGraphPrototypeView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectGraphPrototype $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectGraphPrototype $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {

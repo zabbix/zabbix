@@ -145,6 +145,9 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 					'value' => $value['reference']
 				];
 			}
+			else {
+				parent::toApi($widget_fields);
+			}
 		}
 	}
 }

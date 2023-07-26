@@ -23,8 +23,8 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectHost;
 
 class CWidgetFieldMultiSelectHostView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectHost $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectHost $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {

@@ -28,6 +28,8 @@ class CWidgetFieldMultiSelectMediaType extends CWidgetFieldMultiSelect
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
+		$this->inaccessible_caption = _('Inaccessible media type');
+
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE);
 	}
 }

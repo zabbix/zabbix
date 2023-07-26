@@ -25,16 +25,13 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
 	protected ?CMultiSelect $multiselect = null;
 
-	protected array $data;
-
 	protected bool $custom_select = false;
 
 	protected array $filter_preselect = [];
 	protected array $popup_parameters = [];
 
-	public function __construct(CWidgetFieldMultiSelect $field, array $data) {
+	public function __construct(CWidgetFieldMultiSelect $field) {
 		$this->field = $field;
-		$this->data = $data;
 	}
 
 	public function getId(): string {
@@ -63,7 +60,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 				'name' => $multiselect_name,
 				'object_name' => $this->getObjectName(),
 				'multiple' => $this->field->isMultiple(),
-				'data' => $this->data,
+				'data' => $this->field->getValuesCaptions(),
 				'add_post_js' => false
 			];
 

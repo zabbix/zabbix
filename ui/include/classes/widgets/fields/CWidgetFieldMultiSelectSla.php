@@ -26,6 +26,8 @@ class CWidgetFieldMultiSelectSla extends CWidgetFieldMultiSelect {
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
+		$this->inaccessible_caption = _('Inaccessible SLA');
+
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_SLA);
 	}
 }

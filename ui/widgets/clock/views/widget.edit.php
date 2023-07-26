@@ -33,7 +33,7 @@ $form
 		new CWidgetFieldSelectView($data['fields']['time_type'])
 	)
 	->addField(array_key_exists('itemid', $data['fields'])
-		? (new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid']))
+		? (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,

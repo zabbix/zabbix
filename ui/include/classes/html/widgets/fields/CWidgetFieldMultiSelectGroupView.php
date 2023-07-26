@@ -23,8 +23,8 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectGroup;
 
 class CWidgetFieldMultiSelectGroupView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectGroup $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectGroup $field) {
+		parent::__construct($field);
 	}
 
 	protected function getObjectName(): string {
