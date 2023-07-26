@@ -18,7 +18,7 @@
 **/
 
 #include "scripts.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"
@@ -446,7 +446,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	port = zbx_strdup(port, item.interface.port_orig);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&port, MACRO_TYPE_COMMON, NULL, 0);
+			&port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED != (ret = zbx_is_ushort(port, &item.interface.port)))
 	{
@@ -741,13 +741,13 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 	{
 		case ZBX_SCRIPT_TYPE_SSH:
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &script->publickey, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &script->publickey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &script->privatekey, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			ZBX_FALLTHROUGH;
 		case ZBX_SCRIPT_TYPE_TELNET:
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &script->port, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &script->port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if ('\0' != *script->port && SUCCEED != (ret = zbx_is_ushort(script->port, NULL)))
 			{
@@ -755,10 +755,10 @@ int	zbx_script_prepare(zbx_script_t *script, const zbx_uint64_t *hostid, char *e
 				goto out;
 			}
 
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &script->username, MACRO_TYPE_COMMON, NULL, 0);
-			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL, NULL,
-					NULL, NULL, &script->password, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, &script->username, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, hostid, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, &script->password, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			zbx_dos2unix(script->command);	/* CR+LF (Windows) => LF (Unix) */

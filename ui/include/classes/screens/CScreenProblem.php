@@ -243,13 +243,8 @@ class CScreenProblem extends CScreenBase {
 					$options['time_from'] = time() - $filter['age'] * SEC_PER_DAY + 1;
 				}
 			}
-			if (array_key_exists('severities', $filter)) {
-				$filter_severities = implode(',', $filter['severities']);
-				$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-				if ($filter_severities !== '' && $filter_severities !== $all_severities) {
-					$options['severities'] = $filter['severities'];
-				}
+			if (array_key_exists('severities', $filter) && $filter['severities']) {
+				$options['severities'] = $filter['severities'];
 			}
 			if (array_key_exists('evaltype', $filter)) {
 				$options['evaltype'] = $filter['evaltype'];
@@ -516,11 +511,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
-			'select_acknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -573,11 +568,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
-			'selectAcknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -664,7 +659,7 @@ class CScreenProblem extends CScreenBase {
 		// get additional data
 		$eventids = array_keys($data['problems']);
 
-		$problems_data = ($filter['show'] == TRIGGERS_OPTION_ALL)
+		$problems_data = $filter['show'] == TRIGGERS_OPTION_ALL
 			? self::getExDataEvents($eventids)
 			: self::getExDataProblems($eventids);
 

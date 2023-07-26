@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxserver.h"
 #include "operations.h"
 
 #include "zbx_availability_constants.h"
@@ -26,6 +25,7 @@
 #include "zbxnum.h"
 #include "zbxdbwrap.h"
 #include "zbx_host_constants.h"
+#include "zbx_discoverer_constants.h"
 
 typedef enum
 {
@@ -35,6 +35,13 @@ typedef enum
 	ZBX_DISCOVERY_VALUE
 }
 zbx_dcheck_source_t;
+
+typedef enum
+{
+	ZBX_OP_HOST_TAGS_ADD,
+	ZBX_OP_HOST_TAGS_DEL
+}
+zbx_host_tag_op_t;
 
 /******************************************************************************
  *                                                                            *
@@ -679,6 +686,170 @@ static int	is_discovery_or_autoregistration(const zbx_db_event *event)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: auxiliary function for op_add_del_tags()                          *
+ *                                                                            *
+ * Parameters: op             - [IN] operation type: add or delete            *
+ *             optagids       - [IN] operation tag IDs to add or delete       *
+ *             host_tags      - [IN/OUT]                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64_t *optagids,
+		zbx_vector_db_tag_ptr_t *host_tags)
+{
+	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql = NULL;
+	zbx_vector_db_tag_ptr_t	optags;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_db_tag_ptr_create(&optags);
+
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select tag,value"
+			" from optag"
+			" where");
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "optagid", optagids->values, optagids->values_num);
+
+	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_db_tag_t	*new_tag = zbx_db_tag_create(row[0], row[1]);
+
+		zbx_vector_db_tag_ptr_append(&optags, new_tag);
+	}
+
+	zbx_db_free_result(result);
+
+	if (ZBX_OP_HOST_TAGS_ADD == op)
+		zbx_add_tags(host_tags, &optags);
+	else
+		zbx_del_tags(host_tags, &optags);
+
+	zbx_vector_db_tag_ptr_clear_ext(&optags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&optags);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: auxiliary function for op_add_del_tags()                          *
+ *                                                                            *
+ * Parameters: hostid               - [IN] discovered host ID                 *
+ *             host_tags            - [IN] the new state of host tags to save *
+ *                                         if not saved yet                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags)
+{
+	int			i, new_tags_cnt = 0, res = SUCCEED;
+	zbx_vector_db_tag_ptr_t	upd_tags;
+	zbx_vector_uint64_t	del_tagids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_db_tag_ptr_create(&upd_tags);
+	zbx_vector_uint64_create(&del_tagids);
+
+	for (i = 0; i < host_tags->values_num; i++)
+	{
+		zbx_db_tag_t	*tag = host_tags->values[i];
+
+		if (0 == tag->tagid)
+			new_tags_cnt++;
+		else if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
+			zbx_vector_uint64_append(&del_tagids, tag->tagid);
+	}
+
+	if (0 != new_tags_cnt)
+	{
+		zbx_uint64_t	first_hosttagid, hosttagid;
+		zbx_db_insert_t	db_insert_tag;
+
+		hosttagid = first_hosttagid = zbx_db_get_maxid_num("host_tag", new_tags_cnt);
+
+		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", "automatic",
+				NULL);
+
+		for (i = 0; i < host_tags->values_num; i++)
+		{
+			zbx_db_tag_t	*tag = host_tags->values[i];
+
+			if (0 == tag->tagid)
+			{
+				zbx_db_insert_add_values(&db_insert_tag, hosttagid, hostid, tag->tag, tag->value,
+						ZBX_DB_TAG_NORMAL);
+				hosttagid++;
+			}
+		}
+
+		res = zbx_db_insert_execute(&db_insert_tag);
+
+		zbx_db_insert_clean(&db_insert_tag);
+
+		if (SUCCEED == res)
+		{
+			hosttagid = first_hosttagid;
+
+			for (i = 0; i < host_tags->values_num; i++)
+			{
+				zbx_db_tag_t	*tag = host_tags->values[i];
+
+				if (0 == tag->tagid)
+				{
+					zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
+							ZBX_DB_TAG_NORMAL);
+					hosttagid++;
+				}
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
+					hostid);
+		}
+	}
+
+	if (SUCCEED == res && 0 != del_tagids.values_num)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hosttagid", del_tagids.values,
+				del_tagids.values_num);
+
+		if (ZBX_DB_OK == zbx_db_execute("%s", sql))
+		{
+			for (i = 0; i < host_tags->values_num; i++)
+			{
+				zbx_db_tag_t	*tag = host_tags->values[i];
+
+				if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
+					zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
+					ZBX_FS_UI64, hostid);
+		}
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_db_tag_ptr_destroy(&upd_tags);
+	zbx_vector_uint64_destroy(&del_tagids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: add discovered host                                               *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
@@ -1028,5 +1199,72 @@ void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templat
 	}
 out:
 	zbx_free(hostname);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add and delete tags from discovered host if they are not already  *
+ *          added deleted                                                     *
+ *                                                                            *
+ * Parameters: event           - [IN] source event data                       *
+ *             cfg             - [IN] the global configuration data           *
+ *             new_optagids    - [IN]                                         *
+ *             del_optagids    - [IN]                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
+		zbx_vector_uint64_t *del_optagids)
+{
+	zbx_uint64_t		hostid = 0;
+	int			status;
+	char			*hostname = NULL;
+	zbx_vector_db_tag_ptr_t	host_tags;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (FAIL == is_discovery_or_autoregistration(event))
+		goto out;
+
+	if (0 != new_optagids->values_num)
+		hostid = add_discovered_host(event, &status, cfg);
+	else
+		hostid = select_discovered_host(event, &hostname);
+
+	if (0 == hostid)
+		goto out;
+
+	zbx_vector_db_tag_ptr_create(&host_tags);
+
+	result = zbx_db_select(
+			"select hosttagid,tag,value,automatic"
+			" from host_tag"
+			" where hostid=" ZBX_FS_UI64,
+			hostid);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_db_tag_t	*host_tag = zbx_db_tag_create(row[1], row[2]);
+
+		ZBX_DBROW2UINT64(host_tag->tagid, row[0]);
+		host_tag->automatic = atoi(row[3]);
+		zbx_vector_db_tag_ptr_append(&host_tags, host_tag);
+	}
+
+	zbx_db_free_result(result);
+
+	if (0 != new_optagids->values_num)
+		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_ADD, new_optagids, &host_tags);
+
+	if (0 != del_optagids->values_num)
+		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_DEL, del_optagids, &host_tags);
+
+	discovered_host_tags_save(hostid, &host_tags);
+
+	zbx_vector_db_tag_ptr_clear_ext(&host_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&host_tags);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

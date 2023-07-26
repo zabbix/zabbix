@@ -140,9 +140,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Get problems.
 		$problems = API::Problem()->get([
 			'output' => ['objectid', 'severity'],
-			'symptom' => false,
-			'selectHosts' => ['hostid'],
-			'objectids' => array_keys($triggers)
+			'objectids' => array_keys($triggers),
+			'symptom' => false
 		]);
 
 		// Group problems by hosts.

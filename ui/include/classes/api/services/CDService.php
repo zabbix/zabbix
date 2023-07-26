@@ -32,6 +32,10 @@ class CDService extends CApiService {
 	protected $tableAlias = 'ds';
 	protected $sortColumns = ['dserviceid', 'dhostid', 'ip'];
 
+	public const OUTPUT_FIELDS = ['dserviceid', 'dhostid', 'value', 'port', 'status', 'lastup', 'lastdown', 'dcheckid',
+		'ip', 'dns'
+	];
+
 	/**
 	 * Get discovery service data.
 	 *

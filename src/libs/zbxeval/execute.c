@@ -25,7 +25,7 @@
 #include "zbxnum.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1
