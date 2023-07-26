@@ -890,7 +890,7 @@ class testSID extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[text()="Event correlation for element remove"]'
+							'element' => 'link:Event correlation for element remove'
 						]
 					],
 					'link' => 'zabbix.php?action=correlation.list'
