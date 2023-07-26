@@ -25,7 +25,6 @@
  */
 $table = (new CTable())
 	->setId('valuemap-table')
-	->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE)
 	->setColumns([
 		(new CTableColumn(_('Name')))
 			->addStyle('width: '.ZBX_TEXTAREA_MAPPING_VALUE_WIDTH.'px;')
@@ -36,6 +35,13 @@ $table = (new CTable())
 		(new CTableColumn(_('Action')))
 			->addClass('table-col-handle')
 	]);
+
+if (array_key_exists('with_label', $data) && $data['with_label'] === true) {
+	$table->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+}
+else {
+	$table->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE);
+}
 
 if (array_key_exists('source', $data) && $data['source'] === 'template') {
 	$table->setId('template-valuemap-table');

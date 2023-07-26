@@ -171,8 +171,10 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 	);
 }
 
-$form_grid->addItem(
-	new CFormField($table)
-);
+if (array_key_exists('with_label', $data)) {
+	$form_grid->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+}
 
-$form_grid->show();
+$form_grid
+	->addItem(new CFormField($table))
+	->show();

@@ -161,13 +161,19 @@ if ($data['vendor']) {
 }
 
 // Tags tab.
-$tags_tab = new CPartial('configuration.tags.tab', [
-	'source' => 'template',
-	'tags' => $data['tags'],
-	'readonly' => $data['readonly'],
-	'tabs_id' => 'template-tabs',
-	'tags_tab_id' => 'template-tags-tab'
-]);
+$tags_tab = (new CFormGrid)
+	->addItem([
+		new CLabel(_('Tags')),
+		new CFormField(
+			new CPartial('configuration.tags.tab', [
+			'source' => 'template',
+			'tags' => $data['tags'],
+			'readonly' => $data['readonly'],
+			'tabs_id' => 'template-tabs',
+			'tags_tab_id' => 'template-tags-tab',
+			'with_label' => true
+		]))
+	]);
 
 $form->addItem(
 	(new CTemplateTag('tag-row-tmpl'))
@@ -268,14 +274,17 @@ $macros_tab
 	->addItem($macro_row_inherited_tmpl);
 
 // Value mapping tab.
-$valuemap_tab = (new CFormList('valuemap-formlist'))
-	->addRow(null, new CPartial('configuration.valuemap', [
+$valuemap_tab = (new CFormList('valuemap-formlist'))->addRow(
+	_('Value mapping'),
+	new CPartial('configuration.valuemap', [
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
 		'form' => 'templates',
-		'table_id' => 'template-valuemap-table'
-	]));
+		'table_id' => 'template-valuemap-table',
+		'with_label' => true
+	])
+);
 
 if ($data['templateid']) {
 	$buttons = [
