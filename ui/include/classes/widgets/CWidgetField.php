@@ -127,6 +127,10 @@ abstract class CWidgetField {
 		return $this;
 	}
 
+	public function getReferences(): array {
+		return [];
+	}
+
 	public function getAction(): ?string {
 		return $this->action;
 	}

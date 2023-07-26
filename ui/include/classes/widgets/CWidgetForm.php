@@ -75,6 +75,20 @@ class CWidgetForm {
 		return $this;
 	}
 
+	public function getFieldsReferences(): array {
+		$fields_references = [];
+
+		foreach ($this->fields as $field) {
+			$field_references = $field->getReferences();
+
+			if ($field_references) {
+				$fields_references[$field->getName()] = $field_references;
+			}
+		}
+
+		return $fields_references;
+	}
+
 	public function isTemplateDashboard(): bool {
 		return $this->templateid !== null;
 	}
