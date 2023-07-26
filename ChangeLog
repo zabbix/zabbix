@@ -23,6 +23,7 @@ Bug fixes:
 ..F....... [ZBX-23147] fixed problem count indicators in Monitoring hosts page (ashubin)
 ..F....... [ZBX-23072] fixed web scenario step variable uniqueness validation if multiple variable names are empty (Ivo)
 ..F....... [ZBX-23096] fixed fields with key-value pairs being misaligned in web scenario configuration form (agriscenko)
+...G...... [ZBX-23107] fixed small memory leak in Zabbix agent 2 (arimdjonoks)
 ..F....... [ZBX-22822] fixed displaying the correct threshold color in "Top hosts" widget when value exceeds maximum (Ivo)
 ..F....... [ZBX-22777] fixed item test form sending incorrectly resolved macros to server if item uses SNMP interface (Ivo)
 .......PS. [ZBX-23075] fixed processing of network discovery rule with short update interval (asestakovs)
