@@ -24,7 +24,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite to check if trigger state is updated properly
  * when item state toggles between normal and unsupported
  *
- * @backup hosts, host_rtdata, proxy, proxy_rtdata
+ * @backup hosts, host_rtdata, proxy, proxy_rtdata, auditlog, changelog, config, ha_node, expressions, globalmacro
+ * @backup interface, item_rtdata, items, regexps, task, task_data
  * @hosts test
  */
 class testActiveAvailability extends CIntegrationTest {
@@ -236,7 +237,7 @@ class testActiveAvailability extends CIntegrationTest {
 	 *
 	 * @required-components server,proxy,agent
 	 * @configurationDataProvider activeProxyConfigurationProvider
-	 * @backup hosts,host_rtdata,proxy
+	 * @backup hosts,host_rtdata,proxy,proxy_rtdata
 	 */
 	public function testActiveAvailability_activeProxyActiveAvailCheck() {
 		$response = $this->call('proxy.create', [

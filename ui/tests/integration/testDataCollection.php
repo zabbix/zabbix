@@ -24,7 +24,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * Test suite for data collection using both active and passive agents.
  *
- * @backup history, hosts, host_rtdata, proxy, proxy_rtdata
+ * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, changelog, config, config_autoreg_tls, expressions
+ * @backup globalmacro, hosts, ids, interface, item_rtdata, items, proxy_history, regexps
  */
 class testDataCollection extends CIntegrationTest {
 
