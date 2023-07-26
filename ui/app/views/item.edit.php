@@ -31,6 +31,7 @@ $scripts = [
 ];
 // TODO: when checkInput fail $data will contain only 'main_block' property, no need to render at all.
 $form = (new CForm('post'))
+	->setName('itemForm')
 	->setId('item-form')
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
 	->addItem(getMessages())
@@ -70,7 +71,7 @@ if ($data['form']['itemid']) {
 						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 						'keepOpen' => true,
 						'isSubmit' => false,
-						'action' => 'throw "Not implemented"'
+						'action' => 'item_edit_form.test();'
 					],
 					[
 						'title' => _('Cancel'),
@@ -93,7 +94,7 @@ if ($data['form']['itemid']) {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'throw "Not implemented"'
+			'action' => 'item_edit_form.test();'
 		],
 		[
 			'title' => _('Clear history and trends'),
@@ -126,7 +127,7 @@ else {
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'throw "Not implemented"'
+			'action' => 'item_edit_form.test();'
 		]
 	];
 }

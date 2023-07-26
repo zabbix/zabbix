@@ -112,6 +112,7 @@ window.item_edit_form = new class {
 			trends_hint: this.form.querySelector('#trends_mode_hint') // remove id
 		};
 
+		// TODO: move this code to tags.tab javascript file.
 		if (jQuery('#tabs').tabs('option', 'active') == 1) {
 			// Force dynamicRows event handlers initialization when 'Tags' tab is already active.
 			jQuery(() => jQuery('#tabs').trigger('tabscreate.tags-tab', {panel: $('#tags-tab')}));
@@ -142,20 +143,6 @@ window.item_edit_form = new class {
 			row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 			row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
 		});
-	}
-
-	#showErrorDialog(body, trigger_element) {
-		overlayDialogue({
-			title: t('Error'),
-			class: 'modal-popup position-middle',
-			content: jQuery('<span>').html(body),
-			buttons: [{
-				title: t('Ok'),
-				class: 'btn-alt',
-				focused: true,
-				action: function() {}
-			}]
-		}, jQuery(trigger_element));
 	}
 
 	initEvents() {
@@ -218,41 +205,39 @@ window.item_edit_form = new class {
 	}
 
 	clone({title, buttons}) {
+		// TODO: bug, navigate to item prototype and click clone, title is set to "New item", should be "New item prototype".
+		// Remove itemid to correctly render form when inherited tags changed.
+		this.form.querySelector('[name="itemid"]').remove();
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 	}
 
 	create() {
-		const fields = getFormFields(this.form);
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
-				fields[key] = fields[key].trim();
-			}
-		}
-
+		const fields = this.#getFormFields();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.create');
-
 		this.#post(curl.getUrl(), fields);
 	}
 
 	update() {
-		const fields = getFormFields(this.form);
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
-				fields[key] = fields[key].trim();
-			}
-		}
-
+		const fields = this.#getFormFields();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.update');
-
 		this.#post(curl.getUrl(), fields);
+	}
+
+	test() {
+		const indexes = [].map.call(
+			this.form.querySelectorAll('z-select[name^="preprocessing"][name$="[type]"]'),
+			type => type.getAttribute('name').match(/preprocessing\[(?<step>[\d]+)\]/).groups.step
+		);
+
+		this.overlay.unsetLoading();
+		// Method requires form name to be set to itemForm.
+		openItemTestDialog(indexes, true, true, this.footer.querySelector('.js-test-item'), -2);
 	}
 
 	updateFieldsVisibility() {
@@ -275,6 +260,32 @@ window.item_edit_form = new class {
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
+	}
+
+	#showErrorDialog(body, trigger_element) {
+		overlayDialogue({
+			title: t('Error'),
+			class: 'modal-popup position-middle',
+			content: jQuery('<span>').html(body),
+			buttons: [{
+				title: t('Ok'),
+				class: 'btn-alt',
+				focused: true,
+				action: function() {}
+			}]
+		}, jQuery(trigger_element));
+	}
+
+	#getFormFields() {
+		const fields = getFormFields(this.form);
+
+		for (let key in fields) {
+			if (typeof fields[key] === 'string' && key !== 'confirmation') {
+				fields[key] = fields[key].trim();
+			}
+		}
+
+		return fields;
 	}
 
 	#post(url, data) {
