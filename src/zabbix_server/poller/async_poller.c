@@ -65,7 +65,7 @@ static void	process_async_result(zbx_dc_tem_context_t *item, zbx_poller_config_t
 	zbx_timespec(&timespec);
 
 	/* don't try activating interface if there were no errors detected */
-	if (SUCCEED !=item->ret || ZBX_INTERFACE_AVAILABLE_TRUE != item->interface.available ||
+	if (SUCCEED != item->ret || ZBX_INTERFACE_AVAILABLE_TRUE != item->interface.available ||
 			0 != item->interface.errors_from)
 	{
 		if (NULL == (interface_status = zbx_hashset_search(&poller_config->interfaces,
@@ -110,7 +110,7 @@ static void	process_async_result(zbx_dc_tem_context_t *item, zbx_poller_config_t
 		SET_MSG_RESULT(&item->result, NULL);
 	}
 
-	zbx_vector_uint64_append(&poller_config->itemids,item->itemid);
+	zbx_vector_uint64_append(&poller_config->itemids, item->itemid);
 	zbx_vector_int32_append(&poller_config->errcodes, item->ret);
 	zbx_vector_int32_append(&poller_config->lastclocks, timespec.sec);
 
@@ -318,7 +318,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 					" missing cURL library"));
 #endif
 		}
-		if (ITEM_TYPE_ZABBIX == items[i].type)
+		else if (ITEM_TYPE_ZABBIX == items[i].type)
 		{
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
 					poller_config, poller_config, poller_config->base,
@@ -326,7 +326,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		}
 		else
 		{
-			zbx_async_check_snmp(NULL, &items[i], &results[i], process_snmp_result,
+			errcodes[i] = zbx_async_check_snmp(NULL, &items[i], &results[i], process_snmp_result,
 					poller_config, poller_config, poller_config->base,
 					poller_config->config_timeout, poller_config->config_source_ip);
 		}
@@ -340,7 +340,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
-		if (NOTSUPPORTED == errcodes[i] || CONFIG_ERROR == errcodes[i])
+		if (SUCCEED != errcodes[i])
 		{
 			if (ZBX_IS_RUNNING())
 			{
