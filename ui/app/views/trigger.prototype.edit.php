@@ -361,6 +361,8 @@ $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addIte
 			->addClass('js-related-trigger-edit')
 			->setAttribute('data-triggerid', '#{triggerid}')
 			->setAttribute('data-hostid', $data['hostid'])
+			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+			->setAttribute('data-prototype', '#{prototype}')
 			->setAttribute('data-context', $data['context']),
 		(new CButtonLink(_('Remove')))
 			->addClass('js-remove-dependency')
@@ -431,7 +433,6 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'trigger_edit_popup.clone('.json_encode([
-					'title' => _('New trigger'),
 					'buttons' => [
 						[
 							'title' => _('Add'),

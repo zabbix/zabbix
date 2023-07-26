@@ -266,10 +266,15 @@
 			const dependencies = [];
 
 			Object.values(data).forEach((dependency) => {
-				let hosts = dependency.hosts.map(item => item['name']);
-				let description = hosts.join(', ') + <?= json_encode(NAME_DELIMITER) ?> + dependency.description;
+				const hosts = dependency.hosts.map(item => item['name']);
+				const description = hosts.join(', ') + <?= json_encode(NAME_DELIMITER) ?> + dependency.description;
+				const prototype = dependency.flags == <?= json_encode(ZBX_FLAG_DISCOVERY_PROTOTYPE)?> ? '1' : '0';
 
-				dependencies.push({description: description, triggerid: dependency.triggerid});
+				dependencies.push({
+					description: description,
+					triggerid: dependency.triggerid,
+					prototype: prototype
+				});
 			})
 
 			this.addPopupValues(dependencies);
@@ -547,54 +552,11 @@
 				}
 			}
 
+			const dialogueid = this.dialogue.dataset.dialogueid;
+			const dialogue_class = this.dialogue.getAttribute('class');
 			const action = data.prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit';
 
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', action);
-
-			let fields = {
-				triggerid: data.triggerid,
-				context: data.context
-			}
-
-			if (data.prototype === '1') {
-				fields.parent_discoveryid = data.parent_discoveryid;
-			}
-			else {
-				fields.hostid = data.hostid;
-			}
-
-			fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(fields)
-			})
-				.then((response) => response.json())
-				.then((response) => {
-					if ('error' in response) {
-						throw {error: response.error};
-					}
-
-					response.buttons.push({
-						'title': t('Cancel'),
-						'class': 'btn-alt js-cancel',
-						'cancel': true,
-						'action': function() {}
-					});
-
-					const new_data = {
-						content: response.body,
-						buttons: response.buttons,
-						title: response.header,
-						script_inline: response.script_inline
-					};
-
-					this.overlay.setProperties(new_data);
-				})
-				.catch(this.ajaxExceptionHandler)
-				.finally(() => {
-					this.overlay.unsetLoading();
-				});
+			PopUp(action, data, {dialogueid, dialogue_class});
 		}
 
 		#toggleInheritedTags() {
@@ -673,8 +635,12 @@
 			this.#post(curl.getUrl(), fields);
 		}
 
-		clone({title, buttons}) {
+		clone({buttons}) {
 			this.triggerid = null;
+
+			const title = this.action === 'trigger.edit'
+				? <?= json_encode(_('New trigger')) ?>
+				: <?= json_encode(_('New trigger prototype')) ?>;
 
 			const fields = this.form.querySelectorAll("input[readonly], input[disabled], textarea[readonly]");
 
@@ -710,7 +676,11 @@
 			let template;
 
 			Object.values(data).forEach((dependency) => {
-				const element = {description: dependency.description, triggerid: dependency.triggerid};
+				const element = {
+					description: dependency.description,
+					triggerid: dependency.triggerid,
+					prototype: dependency.prototype
+				};
 
 				template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
 
