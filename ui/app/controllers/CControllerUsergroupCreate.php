@@ -77,9 +77,11 @@ class CControllerUsergroupCreate extends CController {
 
 		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userdirectoryid']);
 
-		$input = $this->getInputAll();
-		$groupIds = $input['ms_new_group_right']['groupids'] ?? [];
-		$permissions = $input['new_group_right']['permission'] ?? [];
+		$new_hostgroup_rights = [];
+		$this->getInputs($new_hostgroup_rights, ['ms_new_group_right', 'new_group_right']);
+
+		$groupIds = $new_hostgroup_rights['ms_new_group_right']['groupids'] ?? [];
+		$permissions = $new_hostgroup_rights['new_group_right']['permission'] ?? [];
 
 		foreach ($groupIds as $index => $group) {
 			foreach ($group as $groupId) {
@@ -94,8 +96,11 @@ class CControllerUsergroupCreate extends CController {
 			}
 		}
 
-		$template_groupIds = $input['ms_new_templategroup_right']['groupids'] ?? [];
-		$template_permissions = $input['new_templategroup_right']['permission'] ?? [];
+		$new_templategroup_rights = [];
+		$this->getInputs($new_templategroup_rights, ['ms_new_templategroup_right', 'new_templategroup_right']);
+
+		$template_groupIds = $new_templategroup_rights['ms_new_templategroup_right']['groupids'] ?? [];
+		$template_permissions = $new_templategroup_rights['new_templategroup_right']['permission'] ?? [];
 
 		foreach ($template_groupIds as $index => $group) {
 			foreach ($group as $groupId) {
@@ -110,9 +115,12 @@ class CControllerUsergroupCreate extends CController {
 			}
 		}
 
-		$tag_filters_groupIds = $input['ms_new_tag_filter']['groupids'] ?? [];
-		$tags = $input['new_tag_filter']['tag'] ?? [];
-		$values = $input['new_tag_filter']['value'] ?? [];
+		$new_tag_filters = [];
+		$this->getInputs($new_tag_filters, ['ms_new_tag_filter', 'new_tag_filter']);
+
+		$tag_filters_groupIds = $new_tag_filters['ms_new_tag_filter']['groupids'] ?? [];
+		$tags = $new_tag_filters['new_tag_filter']['tag'] ?? [];
+		$values = $new_tag_filters['new_tag_filter']['value'] ?? [];
 
 		foreach ($tag_filters_groupIds as $index => $group) {
 			foreach ($group as $groupId) {
