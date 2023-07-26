@@ -100,6 +100,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 				'.json_encode($this->getView()->getParams()).',
 				'.json_encode([
 					'field_name' => $this->field->getName(),
+					'field_value' => $this->field->getValue(),
 					'object_label' => $this->getObjectLabel(),
 					'default_prevented' => $this->field->idDefaultPrevented(),
 					'widget_accepted' => $this->field->isWidgetAccepted(),
@@ -123,9 +124,9 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 			),
 			new CTemplateTag($this->field->getName().'-reference-row-tmpl',
 				new CRow([
-					(new CLink('#{page}:#{name}'))
+					(new CLink('#{prefix}#{name}'))
 						->addClass('js-select-reference')
-						->setAttribute('data-reference', '#{reference}')
+						->setAttribute('data-reference', '#{id}')
 				])
 			)
 		];

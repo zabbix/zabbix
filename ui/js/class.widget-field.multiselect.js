@@ -55,6 +55,7 @@ class CWidgetFieldMultiselect {
 
 	constructor(element, multiselect_params, {
 		field_name,
+		field_value,
 		object_label,
 		default_prevented,
 		widget_accepted,
@@ -91,6 +92,10 @@ class CWidgetFieldMultiselect {
 					this.#multiselect.multiSelect('addOptionalSelect', t('Dashboard'), (e) => this.#selectDashboard(e));
 				}
 			}
+		}
+
+		if ('reference' in field_value) {
+			this.#selectReference(field_value.reference);
 		}
 	}
 
@@ -131,17 +136,7 @@ class CWidgetFieldMultiselect {
 
 		widgets_table.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-select-reference')) {
-				this.#multiselect.multiSelect('modify', {
-					name: `${this.#name}[reference]`,
-					selectedLimit: 1
-				});
-
-				this.#multiselect.multiSelect('addData', [{
-					id: e.target.dataset.reference,
-					name: e.target.innerText
-				}]);
-
-				this.#selected_reference = e.target.dataset.reference;
+				this.#selectReference(e.target.dataset.reference);
 
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 			}
@@ -162,24 +157,41 @@ class CWidgetFieldMultiselect {
 	}
 
 	#selectDashboard() {
-		this.#multiselect.multiSelect('modify', {
-			name: `${this.#name}[reference]`,
-			selectedLimit: 1
-		});
+		this.#selectReference('DASHBOARD');
+	}
 
-		this.#selected_reference = 'DASHBOARD';
+	#selectReference(reference) {
+		let caption = null;
 
-		this.#multiselect.multiSelect('addData', [{
-			id: this.#selected_reference,
-			name: this.#selected_reference
-		}]);
+		if (reference === 'DASHBOARD') {
+			caption = {id: 'DASHBOARD', name: t('Dashboard')}
+		}
+		else {
+			for (const widget of this.DASHBOARD_getWidgets()) {
+				if (widget.id === reference) {
+					caption = widget
+					break;
+				}
+			}
+		}
+
+		if (caption !== null) {
+			this.#multiselect.multiSelect('modify', {
+				name: `${this.#name}[reference]`,
+				selectedLimit: 1
+			});
+
+			this.#selected_reference = reference;
+
+			this.#multiselect.multiSelect('addData', [caption], true);
+		}
 	}
 
 	DASHBOARD_getWidgets() {
 		return [
-			{page: 'Page1', name: 'URL', reference: 'DD56KD'},
-			{page: 'Page1', name: 'Problems', reference: 'AFG87E'},
-			{page: 'Page2', name: 'Problems', reference: '67AFCB'}
+			{id: 'DD56KD', prefix: 'Page1'+': ', name: 'URL'},
+			{id: 'AFG87E', prefix: 'Page1'+': ', name: 'Problems'},
+			{id: '67AFCB', prefix: 'Page2'+': ', name: 'Problems'}
 		];
 	}
 }
