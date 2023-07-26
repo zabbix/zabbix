@@ -21,106 +21,14 @@
 
 require 'include/forms.inc.php';
 
-class CControllerItemEdit extends CController {
+class CControllerItemEdit extends CControllerItem {
 
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'hostid'				=> 'required|id',
-			'context'				=> 'required|in host,template',
-			'interfaceid'			=> 'id',
-			'itemid'				=> 'id',
-			'name'					=> 'db items.name',
-			'description'			=> 'db items.description',
-			'key'					=> 'db items.key_',
-			'master_itemid'			=> 'id',
-			'delay'					=> 'db items.delay',
-			'history_mode'			=> 'int32',
-			'history'				=> 'db items.history',
-			'status'				=> 'db items.status',
-			'type'					=> 'db items.type',
-			'trends_mode'			=> 'int32',
-			'trends'				=> 'db items.trends',
-			'templateid'			=> 'id',
-			'value_type'			=> 'db items.value_type',
-			'valuemapid'			=> 'id',
-			'authtype'				=> 'db items.authtype',
-			'username'				=> 'db items.username',
-			'password'				=> 'db items.password',
-			'http_authtype'			=> 'db items.authtype',
-			'http_username'			=> 'db items.username',
-			'http_password'			=> 'db items.password',
-			'publickey'				=> 'db items.publickey',
-			'privatekey'			=> 'db items.privatekey',
-			'script'				=> 'db items.params',
-			'inventory_link'		=> 'db items.inventory_link',
-			'snmp_oid'				=> 'db items.snmp_oid',
-			'ipmi_sensor'			=> 'db items.ipmi_sensor',
-			'trapper_hosts'			=> 'db items.trapper_hosts',
-			'units'					=> 'db items.units',
-			'logtimefmt'			=> 'db items.logtimefmt',
-			'show_inherited_tags'	=> 'int32',
-			'preprocessing'			=> 'array',
-			'tags'					=> 'array',
-			'delay_flex'			=> 'array',
-			'preprocessing'			=> 'array',
-			'parameters'			=> 'array',
-			'query_fields'			=> 'array',
-			'headers'				=> 'array',
-			'delay_flex'			=> 'array',
-			'show_inherited_tags'	=> 'in 0,1',
-			'discovered'			=> 'in 0,1',
-			'form_refresh'			=> 'in 1'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			foreach ($this->getInput('tags', []) as $tag) {
-				if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)) {
-					$ret = false;
-					break;
-				}
-			}
-		}
-
-		$parameters = $this->getInput('parameters', []);
-
-		if ($ret && $parameters) {
-			$ret = count($parameters) == count(array_column($parameters, 'name'))
-				&& count($parameters) == count(array_column($parameters, 'value'));
-		}
-
-		$query_fields = $this->getInput('query_fields', []);
-
-		if ($ret && $query_fields) {
-			$ret = array_key_exists('sortorder', $query_fields)
-				&& array_key_exists('name', $query_fields)
-				&& array_key_exists('value', $query_fields);
-		}
-
-		$headers = $this->getInput('headers', []);
-
-		if ($ret && $headers) {
-			$ret = array_key_exists('sortorder', $headers)
-				&& array_key_exists('name', $headers)
-				&& array_key_exists('value', $headers);
-		}
-
-		$delay_flex = $this->getInput('delay_flex', []);
-
-		if ($ret && $delay_flex) {
-			foreach ($delay_flex as $interval) {
-				if (!array_key_exists('type', $interval)
-						|| ($interval['type'] != ITEM_DELAY_FLEXIBLE && $interval['type'] != ITEM_DELAY_SCHEDULING)) {
-					$ret = false;
-					break;
-				};
-			}
-		}
+		$ret = $this->validateFormInput(['hostid', 'context']);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -150,11 +58,13 @@ class CControllerItemEdit extends CController {
 			'host' => $host,
 			'valuemap' => [],
 			'inventory_fields' => [],
-			'form' => $form_refresh || !$this->hasInput('itemid') ? $this->getFormData() : $this->getItemData(),
+			'form' => $form_refresh || !$this->hasInput('itemid') ? $this->getInputForForm() : $this->getItem(),
 			'form_refresh' => $form_refresh,
 			'display_interfaces' => false,
 			'parent_items' => [],
+			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
 			'discovery_rule' => [],
+			'discovery_itemid' => 0,
 			'master_item' => [],
 			'types' => item_type2str(),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($hostid),
@@ -188,31 +98,7 @@ class CControllerItemEdit extends CController {
 			$data['master_item'] = $master_items ? reset($master_items) : [];
 		}
 
-		if ($this->getInput('show_inherited_tags', 0)) {
-			$item = $data['form'];
-			$item['discoveryRule'] = [];
-
-			if ($item['itemid']) {
-				$db_items = API::Item()->get([
-					'output' => [],
-					'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
-					'itemids' => [$item['itemid']]
-				]);
-
-				if ($db_items) {
-					$item += reset($db_items);
-				}
-			}
-
-			$data['form']['tags'] = $this->getInheritedTags([
-				'item' => $item,
-				'itemid' => $item['itemid'],
-				'tags' => $item['tags'],
-				'hostid' => $this->getInput('hostid')
-			]);
-		}
-
-		if ($this->hasInput('itemid')) {
+		if ($data['form']['itemid']) {
 			$item = [
 				'itemid' => $data['form']['itemid'],
 				'templateid' => $data['form']['templateid']
@@ -223,6 +109,30 @@ class CControllerItemEdit extends CController {
 				ZBX_FLAG_DISCOVERY_NORMAL,
 				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);
+			[$db_item] = API::Item()->get([
+				'output' => ['flags'],
+				'selectDiscoveryRule' => ['name', 'templateid'],
+				'selectItemDiscovery' => ['parent_itemid'],
+				'itemids' => [$data['form']['itemid']]
+			]);
+
+			if ($db_item) {
+				$data['flags'] = $db_item['flags'];
+				$data['discovery_rule'] = $db_item['discoveryRule'];
+
+				if ($db_item['itemDiscovery']) {
+					$data['discovery_itemid'] = $db_item['itemDiscovery']['parent_itemid'];
+				}
+			}
+		}
+
+		if ($this->getInput('show_inherited_tags', 0)) {
+			$data['form']['tags'] = $this->getInheritedTags([
+				'item' => $data['form'] + ['discoveryRule' => $data['discovery_rule']],
+				'itemid' => $data['form']['itemid'],
+				'tags' => $data['form']['tags'],
+				'hostid' => [$hostid]
+			]);
 		}
 
 		$set_inventory = array_column(API::Item()->get([
@@ -306,7 +216,7 @@ class CControllerItemEdit extends CController {
 	 *
 	 * @return array
 	 */
-	protected function getItemData(): array {
+	protected function getItem(): array {
 		[$item] = API::Item()->get([
 			'ouput' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
@@ -317,7 +227,6 @@ class CControllerItemEdit extends CController {
 				'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
 			'selectInterfaces' => ['interfaceid', 'type', 'ip', 'dns', 'port', 'useip', 'main'],
-			'selectItemDiscovery' => ['itemdiscoveryid ', 'itemid', 'parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectTags' => ['tag', 'value'],
 			'itemids' => $this->getInput('itemid')
@@ -419,130 +328,6 @@ class CControllerItemEdit extends CController {
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Get form data for item from input.
-	 *
-	 * @return array
-	 */
-	protected function getFormData(): array {
-		$form = [
-			'allow_traps' => DB::getDefault('items', 'allow_traps'),
-			'authtype' => DB::getDefault('items', 'authtype'),
-			'context' => '',
-			'delay' => ZBX_ITEM_DELAY_DEFAULT,
-			'delay_flex' => [],
-			'description' => DB::getDefault('items', 'description'),
-			'discovered' => 0,
-			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
-			'headers' => [],
-			'history' => DB::getDefault('items', 'history'),
-			'history_mode' => ITEM_STORAGE_CUSTOM,
-			'hostid' => 0,
-			'http_authtype' => ZBX_HTTP_AUTH_NONE,
-			'http_password' => '',
-			'http_proxy' => DB::getDefault('items', 'http_proxy'),
-			'http_username' => '',
-			'interfaceid' => 0,
-			'inventory_link' => 0,
-			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
-			'itemid' => 0,
-			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
-			'key' => '',
-			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
-			'master_itemid' => 0,
-			'name' => '',
-			'output_format' => DB::getDefault('items', 'output_format'),
-			'parameters' => [['name' => '', 'value' => '']],
-			'params' => DB::getDefault('items', 'params'),
-			'password' => DB::getDefault('items', 'password'),
-			'post_type' => DB::getDefault('items', 'post_type'),
-			'posts' => DB::getDefault('items', 'posts'),
-			'preprocessing' => [],
-			'privatekey' => DB::getDefault('items', 'privatekey'),
-			'publickey' => DB::getDefault('items', 'publickey'),
-			'query_fields' => [],
-			'request_method' => DB::getDefault('items', 'request_method'),
-			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
-			'script' => '',
-			'show_inherited_tags' => 0,
-			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
-			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
-			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
-			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
-			'status' => DB::getDefault('items', 'status'),
-			'status_codes' => DB::getDefault('items', 'status_codes'),
-			'tags' => [],
-			'templateid' => 0,
-			'timeout' => DB::getDefault('items', 'timeout'),
-			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
-			'trends' => DB::getDefault('items', 'trends'),
-			'trends_mode' => ITEM_STORAGE_CUSTOM,
-			'type' => DB::getDefault('items', 'type'),
-			'units' => DB::getDefault('items', 'units'),
-			'url' => '',
-			'username' => DB::getDefault('items', 'username'),
-			'value_type' => DB::getDefault('items', 'value_type'),
-			'valuemapid' => 0,
-			'verify_host' => DB::getDefault('items', 'verify_host'),
-			'verify_peer' => DB::getDefault('items', 'verify_peer')
-		];
-		$this->getInputs($form, array_keys($form));
-
-		if ($form['query_fields']) {
-			$query_fields = [];
-
-			foreach ($form['query_fields']['sortorder'] as $index) {
-				$query_fields[] = [
-					'name' => $form['query_fields']['name'][$index],
-					'value' => $form['query_fields']['value'][$index]
-				];
-			}
-
-			$form['query_fields'] = $query_fields;
-		}
-
-		if ($form['headers']) {
-			$headers = [];
-
-			foreach ($form['headers']['sortorder'] as $index) {
-				$headers[] = [
-					'name' => $form['headers']['name'][$index],
-					'value' => $form['headers']['value'][$index]
-				];
-			}
-
-			$form['headers'] = $headers;
-		}
-
-		if ($form['preprocessing']) {
-			foreach ($form['preprocessing'] as &$preprocessing) {
-				$preprocessing += [
-					'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-					'error_handler_params' => ''
-				];
-			}
-			unset($preprocessing);
-		}
-
-		// Unset inherited tags.
-		if ($this->getInput('show_inherited_tags', 0) == 0) {
-			$tags = [];
-
-			foreach ($form['tags'] as $tag) {
-				if (!array_key_exists('type', $tag) || ($tag['type'] & ZBX_PROPERTY_OWN)) {
-					$tags[] = [
-						'tag' => $tag['tag'],
-						'value' => $tag['value']
-					];
-				}
-
-				$form['tags'] = $tags;
-			}
-		}
-
-		return $form;
 	}
 
 	/**

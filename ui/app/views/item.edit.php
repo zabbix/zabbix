@@ -169,15 +169,16 @@ $tabs = (new CTabView())
 	->addTab('item-tab', _('Item'),
 		new CPartial('item.edit.item.tab', [
 			'config' => $data['config'],
+			'discovered' => $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'discovery_rule' => $data['discovery_rule'],
-			'discovered' => (bool) $data['discovery_rule'],// make correct check for discovered
+			'discovery_itemid' => $data['discovery_itemid'],
 			'form' => $item,
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
 			'inventory_fields' => $data['inventory_fields'],
 			'master_item' => $data['master_item'],
 			'parent_items' => $data['parent_items'],
-			'readonly' => $data['readonly'],
+			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'types' => $data['types'],
 			'valuemap' => $data['valuemap'],
 			'value_types' => $value_types,
@@ -186,7 +187,7 @@ $tabs = (new CTabView())
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $item['discovered'],
+			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'show_inherited_tags' => $item['show_inherited_tags'],
 			'source' => 'item',
 			'tabs_id' => 'tabs',
@@ -200,7 +201,7 @@ $tabs = (new CTabView())
 			'form' => $item,
 			'preprocessing' => $item['preprocessing'],
 			'preprocessing_types' => $data['preprocessing_types'],
-			'readonly' => $data['readonly'],
+			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'value_types' => $value_types
 		]),
 		TAB_INDICATOR_PREPROCESSING

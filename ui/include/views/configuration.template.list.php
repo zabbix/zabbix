@@ -223,7 +223,7 @@ foreach ($data['templates'] as $template) {
 		],
 		[
 			new CLink(_('Items'),
-				(new CUrl())
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'item.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])

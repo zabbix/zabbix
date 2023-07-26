@@ -44,9 +44,9 @@ const ERROR_XHR_SERVER = <?= json_encode(_('Unexpected server error.')) ?>;
 window.item_edit_form = new class {
 
 	init({
-			field_switches, form_data, host_interfaces, interface_types, testable_item_types, type_with_key_select,
-			value_type_keys
-		}) {
+		field_switches, form_data, host_interfaces, interface_types, testable_item_types, type_with_key_select,
+		value_type_keys
+	}) {
 		this.form_data = form_data;
 		this.testable_item_types = testable_item_types;
 		this.interface_types = interface_types;

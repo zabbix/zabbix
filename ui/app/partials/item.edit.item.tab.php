@@ -37,7 +37,7 @@ $formgrid = (new CFormGrid())
 			new CLink($data['discovery_rule']['name'], (new CUrl('disc_prototypes.php'))
 				->setArgument('form', 'update')
 				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-				->setArgument('itemid', $data['item']['itemDiscovery']['parent_itemid'])// TODO
+				->setArgument('itemid', $data['discovery_itemid'])
 				->setArgument('context', 'host')
 		))
 	] : null)
@@ -713,8 +713,8 @@ $formgrid
 		(new CLabel(_('Log time format'), 'logtimefmt'))->setId('js-item-log-time-format-label'),
 		(new CFormField(
 			(new CTextBox('logtimefmt', $data['form']['logtimefmt'], $data['discovered'],
-				DB::getFieldLength('items', 'logtimefmt')))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				DB::getFieldLength('items', 'logtimefmt'))
+			)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-log-time-format-field')
 	])
 	->addItem($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED ? [
@@ -757,17 +757,19 @@ $formgrid
 		))->setId('js-item-trapper-hosts-field')
 	]);
 
-$select = (new CSelect('inventory_link'))
-	->setFocusableElementId('label-host-inventory')
-	->setValue($data['form']['inventory_link'])
-	->addOption(new CSelectOption(0, '-'._('None').'-'))
-	->addOptions(CSelect::createOptionsFromArray($data['inventory_fields']));
+if (!$data['discovered']) {
+	$select = (new CSelect('inventory_link'))
+		->setFocusableElementId('label-host-inventory')
+		->setValue($data['form']['inventory_link'])
+		->addOption(new CSelectOption(0, '-'._('None').'-'))
+		->addOptions(CSelect::createOptionsFromArray($data['inventory_fields']));
 
-$formgrid->addItem([
-	(new CLabel(_('Populates host inventory field'), $select->getFocusableElementId()))
-		->setId('js-item-inventory-link-label'),
-	(new CFormField($select))->setId('js-item-inventory-link-field')
-]);
+	$formgrid->addItem([
+		(new CLabel(_('Populates host inventory field'), $select->getFocusableElementId()))
+			->setId('js-item-inventory-link-label'),
+		(new CFormField($select))->setId('js-item-inventory-link-field')
+	]);
+}
 
 $formgrid
 	->addItem([
