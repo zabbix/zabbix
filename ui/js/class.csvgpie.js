@@ -21,7 +21,8 @@ class CSVGPie {
 
 	static ZBX_STYLE_CLASS =				'svg-pie-chart';
 	static ZBX_STYLE_ARCS =					'svg-pie-chart-arcs';
-	static ZBX_STYLE_ARC_NO_DATA =			'svg-pie-chart-arc-no-data';
+	static ZBX_STYLE_ARC_NO_DATA_OUTER =	'svg-pie-chart-arc-no-data-outer';
+	static ZBX_STYLE_ARC_NO_DATA_INNER =	'svg-pie-chart-arc-no-data-inner';
 	static ZBX_STYLE_TOTAL_VALUE =			'svg-pie-chart-total-value';
 	static ZBX_STYLE_TOTAL_VALUE_NO_DATA =	'svg-pie-chart-total-value-no-data';
 
@@ -32,6 +33,8 @@ class CSVGPie {
 
 	static DRAW_TYPE_PIE = 0;
 	static DRAW_TYPE_DOUGHNUT = 1;
+
+	static TOTAL_VALUE_SIZE_DEFAULT = 10;
 
 	/**
 	 * Widget configuration.
@@ -81,6 +84,13 @@ class CSVGPie {
 	 * @type {SVGTextElement}
 	 */
 	#total_value_container;
+
+	/**
+	 * SVG text element that contains "No data" text.
+	 *
+	 * @type {SVGTextElement}
+	 */
+	#no_data_container;
 
 	/**
 	 * Usable width of widget without padding.
@@ -197,8 +207,16 @@ class CSVGPie {
 
 		if (sectors.length > 0) {
 			this.#arcs_container
-				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA}`)
+				.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 				.style('display', 'none');
+
+			this.#no_data_container
+				.style('display', 'none');
+
+			if (this.#config.total_value?.show) {
+				this.#total_value_container
+					.style('display', '');
+			}
 		}
 
 		this.#sectors_old = this.#sectors_new;
@@ -294,8 +312,16 @@ class CSVGPie {
 
 				if (sectors.length === 0) {
 					this.#arcs_container
-						.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA}`)
+						.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 						.style('display', '');
+
+					this.#no_data_container
+						.style('display', '');
+
+					if (this.#config.total_value?.show) {
+						this.#total_value_container
+							.style('display', 'none');
+					}
 				}
 			})
 			.catch(() => {});
@@ -318,9 +344,6 @@ class CSVGPie {
 
 					return text;
 				});
-
-			this.#total_value_container
-				.classed(CSVGPie.ZBX_STYLE_TOTAL_VALUE_NO_DATA, total_value.value === null);
 		}
 	}
 
@@ -350,25 +373,37 @@ class CSVGPie {
 
 		this.#arcs_container
 			.append('svg:circle')
-			.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA)
+			.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER)
 			.attr('r', this.#radius_outer);
 
 		if (this.#config.draw_type === CSVGPie.DRAW_TYPE_DOUGHNUT) {
 			this.#arcs_container
 				.append('svg:circle')
-				.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA)
+				.attr('class', CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER)
 				.attr('r', this.#radius_inner);
 
 			if (this.#config.total_value?.show) {
 				this.#total_value_container = this.#g_scalable
 					.append('svg:text')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
+					.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT)
 					.style('font-size', `${this.#config.total_value.size * 10}px`)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
 					.style('fill', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
-					.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT);
+					.style('display', 'none');
 			}
 		}
+
+		const total_value_size = this.#config.total_value?.size || CSVGPie.TOTAL_VALUE_SIZE_DEFAULT;
+		const total_value_font_weight = this.#config.total_value?.is_bold ? 'bold' : '';
+
+		this.#no_data_container = this.#g_scalable
+			.append('svg:text')
+			.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE_NO_DATA)
+			.attr('y', total_value_size * 10 / 2 / CSVGPie.LINE_HEIGHT)
+			.style('font-size', `${total_value_size * 10}px`)
+			.style('font-weight', total_value_font_weight)
+			.text(t('No data'));
 	}
 
 	/**

@@ -9,11 +9,12 @@
 			stroke: $ui-bg-color;
 		}
 
-		.svg-pie-chart-arc-no-data {
-			vector-effect: non-scaling-stroke;
-			stroke: $pie-chart-no-data-stroke-color;
-			stroke-width: 1;
-			fill: none;
+		.svg-pie-chart-arc-no-data-outer {
+			fill: $pie-chart-arc-no-data-color;
+		}
+
+		.svg-pie-chart-arc-no-data-inner {
+			fill: $ui-bg-color;
 		}
 	}
 
