@@ -132,7 +132,7 @@ static void	process_agent_result(void *data)
 static void	process_snmp_result(void *data)
 {
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
-	//zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg;
+	/* zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg; */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, snmp_context->item.key,
 			snmp_context->host, snmp_context->interface.addr);
