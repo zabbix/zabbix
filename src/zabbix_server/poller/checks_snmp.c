@@ -25,6 +25,7 @@
 #include <sys/types.h>
 #include <net-snmp/library/large_fd_set.h>
 #include "async_snmp.h"
+#include "zbxself.h"
 
 #ifdef HAVE_NETSNMP
 
@@ -533,7 +534,7 @@ zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, si
 			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
-
+	
 	session.timeout = config_timeout * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
 
@@ -2199,6 +2200,8 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sending", __func__);
+
 	if (0 == (bulkwalk_context->reqid = snmp_sess_async_send(snmp_context->ssp, pdu, asynch_response,
 			bulkwalk_context)))
 	{
@@ -2207,6 +2210,8 @@ static int	snmp_bulkwalk_add(zbx_bulkwalk_context_t *bulkwalk_context, zbx_snmp_
 		snmp_free_pdu(pdu);
 		goto out;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() send completed", __func__);
 
 	struct netsnmp_transport_s	*transport;
 
@@ -2261,15 +2266,15 @@ static int	agent_task_process(short event, void *data, int *fd)
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	char			error[MAX_STRING_LEN];
 	int			ret;
-	/*zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;*/
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg_action;
 
 	bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 
-	/*if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
+	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
 		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
-	}*/
+	}
 
 	/* initialization */
 	if (0 == event)
@@ -2322,7 +2327,6 @@ static int	agent_task_process(short event, void *data, int *fd)
 	if (SUCCEED != (ret = snmp_bulkwalk_add(bulkwalk_context, snmp_context, error, sizeof(error))))
 	{
 		snmp_context->item.ret = ret;
-		bulkwalk_context->running = 0;
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
 	}
 	else
@@ -2350,6 +2354,8 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 
 	zbx_vector_bulkwalk_context_clear_ext(&snmp_context->bulkwalk_contexts, snmp_bulkwalk_context_free);
 	zbx_vector_bulkwalk_context_destroy(&snmp_context->bulkwalk_contexts);
+	zbx_vector_snmp_oid_clear_ext(&snmp_context->param_oids, vector_snmp_oid_free);
+	zbx_vector_snmp_oid_destroy(&snmp_context->param_oids);
 	zbx_free(snmp_context);
 }
 
@@ -2383,18 +2389,15 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 {
 	int			i, ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
-	zbx_vector_snmp_oid_t	param_oids;
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key,
+			item->host.host, item->interface.addr);
 
 	zbx_init_snmp();
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, item->key,
-			item->host.host, item->interface.addr,
-			zbx_tcp_connection_type_name(item->host.tls_connect));
-
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
@@ -2422,7 +2425,7 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 
 	zbx_init_agent_request(&request);
 
-	zbx_vector_snmp_oid_create(&param_oids);
+	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
 
 	if (NULL == ssp && NULL == (snmp_context->ssp = zbx_snmp_open_session(item, error, sizeof(error),
 			config_timeout, config_source_ip)))
@@ -2455,18 +2458,19 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 		goto out;
 	}
 
-	if (SUCCEED != snmp_bulkwalk_parse_params(&request, &param_oids, error, sizeof(error)))
+	if (SUCCEED != snmp_bulkwalk_parse_params(&request, &snmp_context->param_oids, error, sizeof(error)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		ret = CONFIG_ERROR;
 		goto out;
 	}
 
-	for (i = 0; i < param_oids.values_num; i++)
+	for (i = 0; i < snmp_context->param_oids.values_num; i++)
 	{
 		zbx_bulkwalk_context_t	*bulkwalk_context;
 
-		bulkwalk_context = snmp_bulkwalk_contect_create(snmp_context, pdu_type, param_oids.values[i]);
+		bulkwalk_context = snmp_bulkwalk_contect_create(snmp_context, pdu_type,
+				snmp_context->param_oids.values[i]);
 
 		zbx_vector_bulkwalk_context_append(&snmp_context->bulkwalk_contexts, bulkwalk_context);
 
@@ -2503,9 +2507,6 @@ out:
 		zbx_async_check_snmp_clean(snmp_context);
 
 	zbx_free_agent_request(&request);
-
-	zbx_vector_snmp_oid_clear_ext(&param_oids, vector_snmp_oid_free);
-	zbx_vector_snmp_oid_destroy(&param_oids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

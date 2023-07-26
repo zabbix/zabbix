@@ -78,6 +78,7 @@ typedef struct
 	char				*results;
 	size_t				results_alloc;
 	size_t				results_offset;
+	zbx_vector_snmp_oid_t		param_oids;
 	zbx_vector_bulkwalk_context_t	bulkwalk_contexts;
 	int				i;
 }
