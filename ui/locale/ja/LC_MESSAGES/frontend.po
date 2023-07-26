@@ -928,6 +928,10 @@ msgstr "テンプレートから追加"
 msgid "Add host"
 msgstr "ホストを追加"
 
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
+
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
@@ -17174,6 +17178,10 @@ msgstr "ホストグループから削除"
 msgid "Remove host"
 msgstr "ホストを削除"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -20374,6 +20382,13 @@ msgstr "今日(現在まで)"
 msgid "Top"
 msgstr "上"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "上位Nホスト"
@@ -20381,6 +20396,10 @@ msgstr "上位Nホスト"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "上位ホスト"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20589,6 +20608,10 @@ msgstr "トリガーは自身を継承したトリガーと依存関係を持つ
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "トリガーをコピーしました"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"

@@ -972,6 +972,10 @@ msgstr "Добавить с шаблона"
 msgid "Add host"
 msgstr "Добавить узел сети"
 
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
+
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
@@ -17458,6 +17462,10 @@ msgstr "Удалить из групп узлов сети"
 msgid "Remove host"
 msgstr "Удалить узел сети"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -20680,6 +20688,13 @@ msgstr "Сегодня до сих пор"
 msgid "Top"
 msgstr "По верхнему краю"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "Топ N"
@@ -20687,6 +20702,10 @@ msgstr "Топ N"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "Топ узлов сети"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20897,6 +20916,10 @@ msgid_plural "Triggers copied"
 msgstr[0] "Триггер скопирован"
 msgstr[1] "Триггера скопированы"
 msgstr[2] "Триггера скопированы"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
