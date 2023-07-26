@@ -430,21 +430,6 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * Function for utf8mb4 values detection and filling.
-	 *
-	 * @param CElement $element   element to be filled
-	 * @param string   $value     value to be filled in
-	 */
-	protected function setUTFValue($element, $value) {
-		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
-		}
-		else {
-			$element->fill($value);
-		}
-	}
-
-	/**
 	 * Fill form with specified data.
 	 *
 	 * @param array $data    data array where keys are label text and values are values to be put in fields
