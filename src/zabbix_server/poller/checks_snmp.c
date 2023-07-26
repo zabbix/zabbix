@@ -2430,8 +2430,10 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	if (NULL == ssp && NULL == (snmp_context->ssp = zbx_snmp_open_session(item, error, sizeof(error),
 			config_timeout, config_source_ip)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
+		snmp_context->item.ret = NETWORK_ERROR;
 		ret = NETWORK_ERROR;
+		clear_cb(snmp_context);
 		goto out;
 	}
 
@@ -2493,8 +2495,10 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	if (0 > (ret = snmp_bulkwalk_add(snmp_context->bulkwalk_contexts.values[0], snmp_context, error,
 			sizeof(error))))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value failed: %s", error));
+		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
+		snmp_context->item.ret = NETWORK_ERROR;
 		ret = NETWORK_ERROR;
+		clear_cb(snmp_context);
 		goto out;
 	}
 
@@ -2503,9 +2507,6 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 
 	ret = SUCCEED;
 out:
-	if (SUCCEED != ret)
-		zbx_async_check_snmp_clean(snmp_context);
-
 	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -2886,6 +2887,8 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 			event_base_dispatch(base);
 			errcodes[j] = snmp_result.errcode;
 		}
+		else if (NETWORK_ERROR == errcodes[j])
+			errcodes[j] = snmp_result.errcode;
 
 		event_base_free(base);
 		goto out;

@@ -39,6 +39,7 @@
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbxtypes.h"
 
 ZBX_VECTOR_IMPL(int32, int)
 
@@ -59,8 +60,8 @@ static void	process_async_result(zbx_dc_tem_context_t *item, zbx_poller_config_t
 	zbx_interface_status_t	*interface_status;
 	int			ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, item->key,
-			item->host,item->interface.addr);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key, item->host,
+			item->interface.addr);
 
 	zbx_timespec(&timespec);
 
@@ -235,13 +236,16 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 
 	while (NULL != (interface_status = (zbx_interface_status_t *)zbx_hashset_iter_next(&iter)))
 	{
+		int	type = INTERFACE_TYPE_SNMP == interface_status->interface.type ? ITEM_TYPE_SNMP :
+				ITEM_TYPE_ZABBIX;
+
 		switch (interface_status->errcode)
 		{
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 				zbx_activate_item_interface(&timespec, &interface_status->interface,
-						interface_status->itemid, ITEM_TYPE_ZABBIX,
+						interface_status->itemid, type,
 						interface_status->host, &data, &data_alloc, &data_offset);
 				break;
 			case NETWORK_ERROR:
@@ -249,7 +253,7 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 			case TIMEOUT_ERROR:
 				zbx_deactivate_item_interface(&timespec, &interface_status->interface,
 						interface_status->itemid,
-						ITEM_TYPE_ZABBIX, interface_status->host,
+						type, interface_status->host,
 						interface_status->key_orig, &data, &data_alloc, &data_offset,
 						poller_config->config_unavailable_delay,
 						poller_config->config_unreachable_period,
@@ -340,7 +344,8 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
-		if (SUCCEED != errcodes[i])
+		/* network error is handled by process_snmp_result() */
+		if (SUCCEED != errcodes[i] && NETWORK_ERROR != errcodes[i])
 		{
 			if (ZBX_IS_RUNNING())
 			{
