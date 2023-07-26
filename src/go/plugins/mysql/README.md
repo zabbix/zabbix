@@ -108,7 +108,10 @@ Then you will be able to use these names as the 1st parameter (ConnString) in ke
 *Note*: sessions names are case-sensitive.
   
 ## Supported keys
-**mysql.custom.query[\<commonParams\>,queryName[,args...]** — Returns list of databases in LLD format.
+**mysql.custom.query[\<commonParams\>,queryName[,args...]** — Returns the result of a custom query.
+*Parameters:*  
+queryName (required) — the name of a custom query (must be equal to the name of an *sql* file without an extension).
+args (optional) — one or more arguments to pass to a query.
 
 **mysql.db.discovery[\<commonParams\>]** — Returns list of databases in LLD format.
 
