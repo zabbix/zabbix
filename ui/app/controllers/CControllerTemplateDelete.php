@@ -61,6 +61,7 @@ class CControllerTemplateDelete extends CController {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'templateids' => $templateids,
+				'editable' => true,
 				'preservekeys' => true
 			]);
 
@@ -78,6 +79,7 @@ class CControllerTemplateDelete extends CController {
 			$templates = API::Template()->get([
 				'output' => [],
 				'parentTemplateids' => $templateids,
+				'editable' => true,
 				'preservekeys' => true
 			]);
 
