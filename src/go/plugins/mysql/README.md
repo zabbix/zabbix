@@ -132,6 +132,42 @@ database (required) — database name.
 
 **mysql.version[\<commonParams\>]** — Returns MySQL version.      
 
+## Custom queries
+
+It is possible to extend the functionality of the plugin using user-defined queries. In order to do it, you should place all your queries in a specified directory in `Plugins.Mysql.CustomQueriesPath` (there is no default path) as it is for *.sql* files.
+For example, you can have a following tree:
+
+    /etc/zabbix/mysql/sql/  
+    ├── long_tx.sql
+    ├── payment.sql    
+    └── top_proc.sql
+     
+Then, you should set `Plugins.Mysql.CustomQueriesPath=/etc/zabbix/mysql/sql`.
+     
+Finally, when the queries are located in the right place, you can execute them:
+
+    mysql.custom.query[<commonParams>,top_proc]  
+    mysql.custom.query[<commonParams>,long_tx,600]
+          
+You can pass as many parameters to a query as you need.   
+The syntax for the placeholder parameters uses "?" where "?" is the parameter in order as provided. 
+For example: 
+
+```
+/* payment.sql */
+
+SELECT 
+    amount 
+FROM 
+    payment 
+WHERE
+    user = ?
+    AND service_id = ?
+    AND date = ?
+``` 
+
+    mysql.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
+
 ## Troubleshooting
 The plugin uses Zabbix agent's logs. You can increase debugging level of Zabbix Agent if you need more details about 
 what is happening. 
