@@ -179,9 +179,9 @@ class CControllerProxyCreate extends CController {
 		$result = API::Proxy()->create($proxy);
 
 		$output = $result
-			? ['success' => ['title' => _('Proxy updated')]]
+			? ['success' => ['title' => _('Proxy added')]]
 			: ['error' => [
-				'title' => _('Cannot update proxy'),
+				'title' => _('Cannot add proxy'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			]];
 
