@@ -702,7 +702,8 @@ function getMenuPopupDashboard(options, trigger_element) {
  *
  * @param {object} options
  *        {string} options['triggerid']                   Trigger ID.
- *        {bool}   options['allowed...problem_ranking']   Whether user is allowed to change event rank.
+ *        {bool}   options['allowed_actions_change_problem_ranking']
+ *                                                        Whether user is allowed to change event rank.
  *        {bool}   options['allowed_ui_conf_hosts']       Whether user has access to Configuration > Hosts.
  *        {bool}   options['allowed_ui_latest_data']      Whether user has access to Monitoring > Latest data.
  *        {bool}   options['allowed_ui_problems']         Whether user has access to Monitoring > Problems.
