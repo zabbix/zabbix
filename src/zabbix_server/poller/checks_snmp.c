@@ -2107,7 +2107,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response, 
 
 	snmp_bulkwalk_set_options(&default_opts);
 out:
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s running:%d", __func__, zbx_result_string(ret), *running);
 	return ret;
 }
 
@@ -2384,7 +2384,7 @@ static void	process_agent_result(void *data)
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, snmp_context->item.key,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, snmp_context->item.key,
 			snmp_context->item.host, snmp_context->item.interface.addr);
 
 	*snmp_result->result = snmp_context->item.result;
@@ -2487,21 +2487,6 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 				snmp_context->param_oids.values[i]);
 
 		zbx_vector_bulkwalk_context_append(&snmp_context->bulkwalk_contexts, bulkwalk_context);
-
-		/*if (SUCCEED > (ret = snmp_bulkwalk(ssp, pdu_type, item, param_oids.values[i], &results, &results_alloc,
-				&results_offset, error, max_error_len)))
-		{
-			goto out;
-		}*/
-
-		/*if (0 == ret && SNMP_MSG_GETBULK == pdu_type)
-		{
-			if (SUCCEED > (ret = snmp_bulkwalk(ssp, SNMP_MSG_GET, item, param_oids.values[i], &results,
-					&results_alloc, &results_offset, error, max_error_len)))
-			{
-				goto out;
-			}
-		}*/
 	}
 
 	if (0 > (ret = snmp_bulkwalk_add(snmp_context, error, sizeof(error))))
