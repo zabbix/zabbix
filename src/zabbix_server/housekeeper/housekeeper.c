@@ -451,7 +451,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		{
 			/* if item type was changed from numeric to non-numeric use default trends */
 			/* storage period for old trends data removal                              */
-			trends = SEC_PER_DAY * 90;
+			trends = SEC_PER_DAY * 365;
 
 			rule_add = NULL;
 		}
