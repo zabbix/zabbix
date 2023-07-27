@@ -119,7 +119,7 @@ class WidgetProblems extends CTableInfo {
 			'show_recovery_data' => $show_recovery_data
 		];
 
-		$this->addProblemsToTable($this->data['problems'], $this->data);
+		$this->addProblemsToTable($this->data['problems'], $this->data, false);
 
 		if ($this->data['info'] !== '') {
 			$this->setFooter([
@@ -139,7 +139,7 @@ class WidgetProblems extends CTableInfo {
 	 * @param int        $data['today']                         Timestamp of today's date.
 	 * @param array      $data['tasks']                         List of tasks. Used to determine current problem status.
 	 * @param array      $data['users']                         List of users.
-	 * @param array      $data['correlations']                  List of correlations.
+	 * @param array      $data['correlations']                  List of event correlations.
 	 * @param array      $data['fields']                        Problem widget filter fields.
 	 * @param int        $data['fields']['show']                "Show" filter option.
 	 * @param int        $data['fields']['show_tags']           "Show tags" filter option.
@@ -168,7 +168,7 @@ class WidgetProblems extends CTableInfo {
 	 * @param array      $data['tags']                          List of tags.
 	 * @param bool       $nested                                If true, show the symptom rows with indentation.
 	 */
-	private function addProblemsToTable(array $problems, array $data, $nested = false): void {
+	private function addProblemsToTable(array $problems, array $data, $nested): void {
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -248,10 +248,10 @@ class WidgetProblems extends CTableInfo {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
-							? _s('Resolved by correlation rule "%1$s".',
+							? _s('Resolved by event correlation rule "%1$s".',
 								$data['correlations'][$problem['correlationid']]['name']
 							)
-							: _('Resolved by correlation rule.')
+							: _('Resolved by event correlation rule.')
 					);
 				}
 				elseif ($problem['userid'] != 0) {
@@ -438,7 +438,7 @@ class WidgetProblems extends CTableInfo {
 
 			if ($data['show_timeline']) {
 				if ($data['last_clock'] != 0) {
-					CScreenProblem::addTimelineBreakpoint($this, $data, $problem, $nested);
+					CScreenProblem::addTimelineBreakpoint($this, $data, $problem, $nested, false);
 				}
 				$data['last_clock'] = $problem['clock'];
 

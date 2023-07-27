@@ -243,13 +243,8 @@ class CScreenProblem extends CScreenBase {
 					$options['time_from'] = time() - $filter['age'] * SEC_PER_DAY + 1;
 				}
 			}
-			if (array_key_exists('severities', $filter)) {
-				$filter_severities = implode(',', $filter['severities']);
-				$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-				if ($filter_severities !== '' && $filter_severities !== $all_severities) {
-					$options['severities'] = $filter['severities'];
-				}
+			if (array_key_exists('severities', $filter) && $filter['severities']) {
+				$options['severities'] = $filter['severities'];
 			}
 			if (array_key_exists('evaltype', $filter)) {
 				$options['evaltype'] = $filter['evaltype'];
@@ -516,11 +511,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
-			'select_acknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -573,11 +568,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
-			'selectAcknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
+			'selectTags' => ['tag', 'value'],
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
@@ -664,7 +659,7 @@ class CScreenProblem extends CScreenBase {
 		// get additional data
 		$eventids = array_keys($data['problems']);
 
-		$problems_data = ($filter['show'] == TRIGGERS_OPTION_ALL)
+		$problems_data = $filter['show'] == TRIGGERS_OPTION_ALL
 			? self::getExDataEvents($eventids)
 			: self::getExDataProblems($eventids);
 
@@ -737,8 +732,10 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $problem['clock']            Timestamp of the current record.
 	 * @param int    $problem['symptom_count']    Problem symptom count.
 	 * @param bool   $nested                      True if this is a nested block.
+	 * @param bool   $has_checkboxes              True if this is block is represented in Problem view with checkboxes.
+	 *                                            It will add additional colspan for timeline breakpoint.
 	 */
-	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested): void {
+	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested, $has_checkboxes): void {
 		if ($data['sortorder'] === ZBX_SORT_UP) {
 			[$problem['clock'], $data['last_clock']] = [$data['last_clock'], $problem['clock']];
 		}
@@ -769,7 +766,6 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($breakpoint !== null) {
-
 			$colspan = 1;
 
 			if ($data['show_three_columns']) {
@@ -781,7 +777,7 @@ class CScreenProblem extends CScreenBase {
 				$colspan = 2;
 			}
 
-			if (!($table instanceof widgets\problems\includes\WidgetProblems)) {
+			if ($has_checkboxes) {
 				$colspan++;
 			}
 
@@ -1156,7 +1152,7 @@ class CScreenProblem extends CScreenBase {
 			];
 
 			// Add problems to table.
-			self::addProblemsToTable($table, $data['problems'], $data);
+			self::addProblemsToTable($table, $data['problems'], $data, false);
 
 			$footer = new CActionButtonList('action', 'eventids', [
 				'popup.acknowledge.edit' => [
@@ -1308,7 +1304,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['triggers']                      List of triggers.
 	 * @param int        $data['today']                         Timestamp of today's date.
 	 * @param array      $data['users']                         List of users.
-	 * @param array      $data['correlations']                  List of correlations.
+	 * @param array      $data['correlations']                  List of event correlations.
 	 * @param array      $data['dependencies']                  List of trigger dependencies.
 	 * @param array      $data['filter']                        Problem filter.
 	 * @param int        $data['filter']['show']                "Show" filter option.
@@ -1338,7 +1334,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['tags']                          List of tags.
 	 * @param bool       $nested                                If true, show the symptom rows with indentation.
 	 */
-	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested = false): void {
+	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested): void {
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -1405,10 +1401,10 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
-							? _s('Resolved by correlation rule "%1$s".',
+							? _s('Resolved by event correlation rule "%1$s".',
 								$data['correlations'][$problem['correlationid']]['name']
 							)
-							: _('Resolved by correlation rule.')
+							: _('Resolved by event correlation rule.')
 					);
 				}
 				elseif ($problem['userid'] != 0) {
@@ -1621,7 +1617,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($data['show_timeline']) {
 				if ($data['last_clock'] != 0) {
-					self::addTimelineBreakpoint($table, $data, $problem, $nested);
+					self::addTimelineBreakpoint($table, $data, $problem, $nested, true);
 				}
 				$data['last_clock'] = $problem['clock'];
 

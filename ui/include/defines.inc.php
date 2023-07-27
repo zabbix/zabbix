@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha2');
+define('ZABBIX_VERSION',		'7.0.0alpha4');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050024);
+define('ZABBIX_DB_VERSION',		6050033);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -125,11 +125,11 @@ define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 define('ZBX_SCRIPT_EXECUTE_ON_PROXY',	2);
 
+define('ZBX_PROXY_VERSION_ANY_OUTDATED', -2);
 define('ZBX_PROXY_VERSION_UNDEFINED', 0);
 define('ZBX_PROXY_VERSION_CURRENT', 1);
 define('ZBX_PROXY_VERSION_OUTDATED', 2);
 define('ZBX_PROXY_VERSION_UNSUPPORTED', 3);
-define('ZBX_PROXY_VERSION_ALL_OUTDATED', 4);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
@@ -850,6 +850,8 @@ define('OPERATION_TYPE_HOST_DISABLE',		9);
 define('OPERATION_TYPE_HOST_INVENTORY',		10);
 define('OPERATION_TYPE_RECOVERY_MESSAGE',	11);
 define('OPERATION_TYPE_UPDATE_MESSAGE',		12);
+define('OPERATION_TYPE_HOST_TAGS_ADD',		13);
+define('OPERATION_TYPE_HOST_TAGS_REMOVE',	14);
 
 define('ACTION_OPERATION',			0);
 define('ACTION_RECOVERY_OPERATION',	1);
@@ -1373,9 +1375,15 @@ define('ZBX_TIME_SUFFIX_MULTIPLIERS', [
 	'y' => SEC_PER_YEAR
 ]);
 
-// Byte suffixes and multipliers.
-define('ZBX_BYTE_SUFFIXES', 'KMGT');
-define('ZBX_BYTE_SUFFIX_MULTIPLIERS', [
+// Size suffixes and multipliers.
+define('ZBX_SIZE_SUFFIXES', 'KMGT');
+define('ZBX_SIZE_SUFFIX_MULTIPLIERS', [
+	'K' => 1000,
+	'M' => 1000**2,
+	'G' => 1000**3,
+	'T' => 1000**4
+]);
+define('ZBX_SIZE_SUFFIX_MULTIPLIERS_BINARY', [
 	'K' => ZBX_KIBIBYTE,
 	'M' => ZBX_MEBIBYTE,
 	'G' => ZBX_GIBIBYTE,
@@ -1773,9 +1781,8 @@ define('ITEM_NO_STORAGE_VALUE',	0);
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // Condition popup types.
-define('ZBX_POPUP_CONDITION_TYPE_EVENT_CORR', 0);
-define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
-define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION', 0);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 
 // Tab indicator names.
 define('TAB_INDICATOR_AUTH_HTTP', 'http');

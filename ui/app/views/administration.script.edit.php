@@ -30,7 +30,8 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('script-form')
 	->setName('scripts')
-	->addVar('scriptid', $data['scriptid']);
+	->addVar('scriptid', $data['scriptid'])
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $parameters_table = (new CTable())
 	->setId('parameters-table')
@@ -191,6 +192,7 @@ $form_grid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('scripts', 'command'))
 				->setAriaRequired()
+				->disableSpellcheck()
 		))->setId('commands')
 	])
 	->addItem([

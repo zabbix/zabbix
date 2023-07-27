@@ -381,6 +381,10 @@ class CConfigurationImportcompare {
 			'graphs' => 'graphs'
 		];
 
+		if (!array_key_exists($option_key_map[$entity_key], $options)) {
+			return [];
+		}
+
 		$entity_options = $options[$option_key_map[$entity_key]];
 		$stored_changes = [];
 
@@ -394,10 +398,11 @@ class CConfigurationImportcompare {
 				if (!$has_before_templates && !$has_after_templates) {
 					continue;
 				}
-				elseif ($has_before_templates && !$has_after_templates) {
+
+				if ($has_before_templates && !$has_after_templates) {
 					$entity['after']['templates'] = [];
 
-					// Make sure, processed entry is last in both arrays. Otherwise it will break the comparison.
+					// Make sure that processed entry is last in both arrays. Otherwise, it will break the comparison.
 					$before_templates = $entity['before']['templates'];
 					unset($entity['before']['templates']);
 					$entity['before']['templates'] = $before_templates;

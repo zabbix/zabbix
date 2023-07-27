@@ -101,7 +101,9 @@ $item_form_list
 	// Append ITEM_TYPE_HTTPAGENT Request body.
 	->addRow(
 		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))->setLabel(_('Request body')),
-		(new CTextArea('posts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('posts', ''))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append ITEM_TYPE_HTTPAGENT Headers fields.

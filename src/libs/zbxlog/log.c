@@ -20,14 +20,15 @@
 #include "zbxlog.h"
 
 #include "zbxmutexs.h"
-#include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcommon.h"
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"
 #	include "zbxsysinfo.h"
+#	include <strsafe.h> /* StringCchPrintf */
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
@@ -258,7 +259,7 @@ void	zbx_handle_log(void)
 	UNLOCK_LOG;
 }
 
-int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
+int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
 {
 	const char	*filename = log_file_cfg->log_file_name;
 	int		type = log_file_cfg->log_type;
@@ -323,7 +324,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 	return SUCCEED;
 }
 
-void	zabbix_close_log(void)
+void	zbx_close_log(void)
 {
 	if (ZBX_LOG_TYPE_SYSTEM == log_type)
 	{
@@ -575,7 +576,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_f
 	return SUCCEED;
 }
 
-char	*strerror_from_system(zbx_syserror_t error)
+char	*zbx_strerror_from_system(zbx_syserror_t error)
 {
 #ifdef _WINDOWS
 	size_t		offset = 0;
@@ -608,7 +609,7 @@ char	*strerror_from_system(zbx_syserror_t error)
 }
 
 #ifdef _WINDOWS
-char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
+char	*zbx_strerror_from_module(zbx_syserror_t error, const wchar_t *module)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
@@ -626,7 +627,7 @@ char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
-				"unable to find message text: %s", strerror_from_system(GetLastError()));
+				"unable to find message text: %s", zbx_strerror_from_system(GetLastError()));
 
 		return utf8_string;
 	}
@@ -643,13 +644,13 @@ char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
  *                                                                            *
  * Purpose: log the message optionally appending to a string buffer           *
  *                                                                            *
- * Parameters: level      - [IN] the log level                                *
- *             out        - [OUT] the output buffer (optional)                *
- *             out_alloc  - [OUT] the output buffer size                      *
- *             out_offset - [OUT] the output buffer offset                    *
- *             format     - [IN] the format string                            *
+ * Parameters: level      - [IN] log level                                    *
+ *             out        - [OUT] output buffer (optional)                    *
+ *             out_alloc  - [OUT] output buffer size                          *
+ *             out_offset - [OUT] output buffer offset                        *
+ *             format     - [IN] format string                                *
  *                                                                            *
- * Return value: SUCCEED - the socket was successfully opened                 *
+ * Return value: SUCCEED - socket was successfully opened                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -724,7 +725,7 @@ static void	update_resolver_conf(void)
  * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
  *          log file after rotation                                           *
  *                                                                            *
- * Parameters: time_now - [IN] the time for compare in seconds                *
+ * Parameters: time_now - [IN] time for compare in seconds                    *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_update_env(double time_now)

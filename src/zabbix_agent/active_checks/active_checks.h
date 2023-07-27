@@ -30,12 +30,14 @@
 typedef struct
 {
 	zbx_vector_addr_ptr_t	addrs;
-	char			*hostname;
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	char			*config_file;
 	int			config_timeout;
 	const char		*config_source_ip;
+	const char		*config_hostname;
+	const char		*config_host_metadata;
+	const char		*config_host_metadata_item;
 }
 zbx_thread_activechk_args;
 

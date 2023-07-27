@@ -444,10 +444,10 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('acknowledgement_status_1_0');
 		// Check Show details
 		$this->zbxTestCheckboxSelect('details_0');
-
 		// Apply filter and check result
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('name:filter_apply')->one()->click();
-		$this->query('xpath://form[@name="problem"]')->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');

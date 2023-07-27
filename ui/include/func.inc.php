@@ -781,7 +781,7 @@ function convertUnitsRaw(array $options): array {
 	$unit_base = $options['unit_base'];
 
 	if ($unit_base != 1000 && $unit_base != ZBX_KIBIBYTE) {
-		$unit_base = ($units === 'B' || $units === 'Bps') ? ZBX_KIBIBYTE : 1000;
+		$unit_base = isBinaryUnits($units) ? ZBX_KIBIBYTE : 1000;
 	}
 
 	if ($options['power'] === null) {
@@ -1591,8 +1591,8 @@ function formatFloat(float $number, array $options = []): string {
 * @return float
 */
 function truncateFloat(float $number): float {
-	if ($number == INF) {
-		return INF;
+	if (is_infinite($number)) {
+		return $number;
 	}
 
 	return (float) sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number);

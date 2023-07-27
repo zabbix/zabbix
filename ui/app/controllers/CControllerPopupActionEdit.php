@@ -90,7 +90,7 @@ class CControllerPopupActionEdit extends CController {
 				'actionids' => $this->getInput('actionid'),
 				'selectOperations' => ['operationtype', 'esc_step_from', 'esc_step_to', 'esc_period', 'evaltype',
 					'opcommand', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'opmessage', 'optemplate', 'opinventory',
-					'opconditions', 'opmessage_usr', 'opmessage_grp'
+					'opconditions', 'opmessage_usr', 'opmessage_grp', 'optag'
 				],
 				'selectRecoveryOperations' => $operation_options,
 				'selectUpdateOperations' => $operation_options,

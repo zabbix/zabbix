@@ -307,7 +307,9 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_CONNECTORMANAGER	37
 #define ZBX_PROCESS_TYPE_CONNECTORWORKER	38
 #define ZBX_PROCESS_TYPE_DISCOVERYMANAGER	39
-#define ZBX_PROCESS_TYPE_COUNT			40	/* number of process types */
+#define ZBX_PROCESS_TYPE_HTTPAGENT_POLLER	40
+#define ZBX_PROCESS_TYPE_AGENT_POLLER		41
+#define ZBX_PROCESS_TYPE_COUNT			42	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -408,6 +410,12 @@ void	*zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char	*zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 void	*zbx_guaranteed_memset(void *v, int c, size_t n);
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	define zbx_get_thread_id()	(long int)GetCurrentThreadId()
+#else
+#	define zbx_get_thread_id()	(long int)getpid()
+#endif
 
 #define zbx_free(ptr)		\
 				\
@@ -750,16 +758,16 @@ char	*zbx_strerror(int errnum);
 #	endif
 #endif
 
-#define ZBX_PROPERTY_DECL(type, varname, defvalue) \
+#define ZBX_GET_CONFIG_VAR(type, varname, defvalue) \
 static type	varname = defvalue; \
 static type	get_##varname(void) \
 { \
 	return varname; \
 }
 
-#define ZBX_PROPERTY_DECL_CONST(type, varname, defvalue) \
-static type	varname = defvalue; \
-static const type	get_##varname(void) \
+#define ZBX_GET_CONFIG_VAR2(type1, type2, varname, defvalue) \
+static	type1	varname = defvalue; \
+static	type2	get_##varname(void) \
 { \
 	return varname; \
 }

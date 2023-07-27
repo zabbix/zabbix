@@ -452,10 +452,10 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/availability'
 				]
 			],
-			// #41 Triggers top 100 report view.
+			// #41 Top 100 triggers report view.
 			[
 				[
-					'url' => 'toptriggers.php',
+					'url' => 'zabbix.php?action=toptriggers.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/triggers_top'
 				]
 			],
@@ -913,11 +913,11 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[@id="tab_stepTab"]'
+							'element' => 'xpath://a[@id="tab_steps-tab"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+							'element' => 'xpath://div[@id="steps-tab"]//button[text()="Add"]'
 						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'
@@ -1266,11 +1266,11 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[@id="tab_stepTab"]'
+							'element' => 'xpath://a[@id="tab_steps-tab"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+							'element' => 'xpath://div[@id="steps-tab"]//button[text()="Add"]'
 						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'
@@ -1451,14 +1451,26 @@ class testDocumentationLinks extends CWebTest {
 			// #150 Create event correlation form view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.edit',
+					'url' => 'zabbix.php?action=correlation.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create event correlation'
+						]
+					],
 					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
 				]
 			],
 			// #151 Edit event correlation form view.
 			[
 				[
-					'url' => 'zabbix.php?correlationid=99002&action=correlation.edit',
+					'url' => 'zabbix.php?action=correlation.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Event correlation for update'
+						]
+					],
 					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
 				]
 			],
@@ -1801,21 +1813,33 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/mediatypes'
 				]
 			],
-			// #193 Administration -> Media type -> Create form view.
+			// #193 Alerts -> Media type -> Create form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create media type'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #194 Administration -> Media type -> Edit form view.
+			// #194 Alerts -> Media type -> Edit form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Email'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #195 Administration -> Media type -> Import view.
+			// #195 Alerts -> Media type -> Import view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
@@ -1828,14 +1852,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/media#importing'
 				]
 			],
-			// #196 Administration -> Scripts list view.
+			// #196 Alerts -> Scripts list view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts'
 				]
 			],
-			// #197 Administration -> Scripts -> Create form view.
+			// #197 Alerts -> Scripts -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
@@ -1848,7 +1872,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts#configuring-a-global-script'
 				]
 			],
-			// #198 Administration -> Scripts -> Edit form view.
+			// #198 Alerts -> Scripts -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
@@ -2287,7 +2311,25 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_hosts'
 				]
 			],
-			// #228 Start creating Trigger overview widget.
+			// #228 Start creating Top triggers widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Top triggers',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_triggers'
+				]
+			],
+			// #229 Start creating Trigger overview widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2305,7 +2347,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/trigger_overview'
 				]
 			],
-			// #229 Start creating URL widget.
+			// #230 Start creating URL widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2323,7 +2365,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/url'
 				]
 			],
-			// #230 Start creating Web monitoring widget.
+			// #231 Start creating Web monitoring widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2341,7 +2383,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/web_monitoring'
 				]
 			],
-			// #231 Start creating Data overview widget.
+			// #232 Start creating Data overview widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2359,14 +2401,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/data_overview'
 				]
 			],
-			// #232 Connectors list view.
+			// #233 Connectors list view.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#connectors'
 				]
 			],
-			// #233 Create connectors popup.
+			// #234 Create connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
@@ -2379,7 +2421,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #234 Edit connectors popup.
+			// #235 Edit connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
