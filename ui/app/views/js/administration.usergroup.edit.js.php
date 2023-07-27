@@ -29,15 +29,15 @@
 
 		init({templategroup_rights, hostgroup_rights, tag_filters}) {
 			this.templategroup_rights = templategroup_rights;
-			this.template_permission_template = new Template(document.getElementById('template-permissions-row-template').innerHTML);
+			this.template_permission_template = new Template(document.getElementById('templategroup-right-row-template').innerHTML);
 			this.template_counter = 0;
 
 			this.hostgroup_rights = hostgroup_rights;
-			this.host_permission_template = new Template(document.getElementById('host-permissions-row-template').innerHTML);
+			this.host_permission_template = new Template(document.getElementById('hostgroup-right-row-template').innerHTML);
 			this.host_counter = 0;
 
 			this.tag_filters = tag_filters;
-			this.tag_filter_template = new Template(document.getElementById('tab-filter-row-template').innerHTML);
+			this.tag_filter_template = new Template(document.getElementById('tag-filter-row-template').innerHTML);
 			this.tag_filter_counter = 0;
 
 			const permission_types = [<?= PERM_READ_WRITE ?>, <?= PERM_READ ?>, <?= PERM_DENY ?>];
@@ -71,9 +71,9 @@
 				this.#addTagFilterRow(group);
 			});
 
-			document.querySelector('.add-new-template-row').addEventListener('click', () => this.#addTemplateRow());
-			document.querySelector('.add-new-host-row').addEventListener('click', () => this.#addHostRow());
-			document.querySelector('.add-new-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
+			document.querySelector('.js-add-templategroup-right-row').addEventListener('click', () => this.#addTemplateRow());
+			document.querySelector('.js-add-hostgroup-right-row').addEventListener('click', () => this.#addHostRow());
+			document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 		}
 
 		#addTemplateRow(templategroup_rights = [], permission = <?= PERM_DENY ?>) {
@@ -84,7 +84,7 @@
 
 			const new_row = this.template_permission_template.evaluate(data);
 
-			const placeholder_row = document.querySelector('.templategroup-placeholder-row');
+			const placeholder_row = document.querySelector('.js-templategroup-right-row-placeholder');
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById('ms_templategroup_right_groupids_'+rowid+'_');
@@ -107,7 +107,7 @@
 			document.dispatchEvent(new Event('tab-indicator-update'));
 
 			document.getElementById('user-group-form').addEventListener('click', event => {
-				if (event.target.classList.contains('element-table-remove')) {
+				if (event.target.classList.contains('js-remove-table-row')) {
 					this.#removeRow(event.target);
 				}
 			});
@@ -121,7 +121,7 @@
 
 			const new_row = this.host_permission_template.evaluate(data);
 
-			const placeholder_row = document.querySelector('.group-placeholder-row');
+			const placeholder_row = document.querySelector('.js-hostgroup-right-row-placeholder');
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById('ms_hostgroup_right_groupids_'+rowid+'_');
@@ -146,7 +146,7 @@
 			document.dispatchEvent(new Event('tab-indicator-update'));
 
 			document.getElementById('user-group-form').addEventListener('click', event => {
-				if (event.target.classList.contains('element-table-remove')) {
+				if (event.target.classList.contains('js-remove-table-row')) {
 					this.#removeRow(event.target);
 				}
 			});
@@ -160,7 +160,7 @@
 
 			const new_row = this.tag_filter_template.evaluate(data);
 
-			const placeholder_row = document.querySelector('.tag-filter-placeholder-row');
+			const placeholder_row = document.querySelector('.js-tag-filter-row-placeholder');
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById('ms_tag_filter_groupids_'+rowid+'_');
@@ -187,7 +187,7 @@
 			document.dispatchEvent(new Event('tab-indicator-update'));
 
 			document.getElementById('user-group-form').addEventListener('click', event => {
-				if (event.target.classList.contains('element-table-remove')) {
+				if (event.target.classList.contains('js-remove-table-row')) {
 					this.#removeRow(event.target);
 				}
 			});

@@ -1007,7 +1007,7 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#new-tag-filter-table .form_row')]
+		return [...document.querySelectorAll('#tag-filter-table .form_row')]
 			.filter((row) => {
 				const liElements = row.querySelectorAll('.multiselect-list li');
 
@@ -1017,7 +1017,7 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.getElementById('new-tag-filter-table');
+		const target_node = document.getElementById('tag-filter-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
@@ -1428,7 +1428,7 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#new-templategroup-right-table .form_row')]
+		return [...document.querySelectorAll('#templategroup-right-table .form_row')]
 			.filter((row) => {
 				const liElements = row.querySelectorAll('.multiselect-list li');
 
@@ -1438,7 +1438,7 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.getElementById('new-templategroup-right-table');
+		const target_node = document.getElementById('templategroup-right-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
@@ -1462,7 +1462,7 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#new-group-right-table .form_row')]
+		return [...document.querySelectorAll('#hostgroup-right-table .form_row')]
 			.filter((row) => {
 				const liElements = row.querySelectorAll('.multiselect-list li');
 
@@ -1472,7 +1472,7 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.getElementById('new-group-right-table');
+		const target_node = document.getElementById('hostgroup-right-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {

@@ -142,21 +142,21 @@ $form_grid
 
 $template_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
 
-$new_templategroup_right_table = (new CTable())
-	->setId('new-templategroup-right-table')
+$templategroup_right_table = (new CTable())
+	->setId('templategroup-right-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Template groups'), _('Permissions')])
-	->addRow((new CRow())->addClass('templategroup-placeholder-row'))
+	->addRow((new CRow())->addClass('js-templategroup-right-row-placeholder'))
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->addClass('add-new-template-row')
+			->addClass('js-add-templategroup-right-row')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
 $template_permissions_form_grid
 	->addItem(
 		new CFormField(
-			(new CDiv($new_templategroup_right_table))
+			(new CDiv($templategroup_right_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
@@ -177,7 +177,7 @@ $templates_multiselect = (new CMultiSelect([
 ]))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$template_permissions_row_template = (new CTemplateTag('template-permissions-row-template'))->addItem(
+$templategroup_right_row_template = (new CTemplateTag('templategroup-right-row-template'))->addItem(
 	(new CRow([
 		$templates_multiselect,
 		(new CCol(
@@ -188,33 +188,33 @@ $template_permissions_row_template = (new CTemplateTag('template-permissions-row
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CButton('template_permission_rights_remove', _('Remove')))
+			(new CButton('templategroup_right_row_remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+				->addClass('js-remove-table-row')
 		))->setAttribute('style', 'vertical-align: top')
 	]))
 		->addClass('form_row')
 );
 
-$template_permissions_form_grid->addItem($template_permissions_row_template);
+$template_permissions_form_grid->addItem($templategroup_right_row_template);
 
 $host_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
 
-$new_group_right_table = (new CTable())
-	->setId('new-group-right-table')
+$hostgroup_right_table = (new CTable())
+	->setId('hostgroup-right-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Host groups'), _('Permissions')])
-	->addRow((new CRow())->addClass('group-placeholder-row'))
+	->addRow((new CRow())->addClass('js-hostgroup-right-row-placeholder'))
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->addClass('add-new-host-row')
+			->addClass('js-add-hostgroup-right-row')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
 $host_permissions_form_grid
 	->addItem(
 		new CFormField(
-			(new CDiv($new_group_right_table))
+			(new CDiv($hostgroup_right_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
@@ -235,7 +235,7 @@ $hosts_multiselect = (new CMultiSelect([
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$host_permissions_row_template = (new CTemplateTag('host-permissions-row-template'))->addItem(
+$host_permissions_row_template = (new CTemplateTag('hostgroup-right-row-template'))->addItem(
 	(new CRow([
 		$hosts_multiselect,
 		(new CCol(
@@ -246,9 +246,9 @@ $host_permissions_row_template = (new CTemplateTag('host-permissions-row-templat
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CButton('host_permission_rights_remove', _('Remove')))
+			(new CButton('hostgroup_right_row_remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+				->addClass('js-remove-table-row')
 		))->setAttribute('style', 'vertical-align: top')
 	]))
 		->addClass('form_row')
@@ -258,21 +258,21 @@ $host_permissions_form_grid->addItem($host_permissions_row_template);
 
 $tag_filter_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
 
-$new_tag_filter_table = (new CTable())
-	->setId('new-tag-filter-table')
+$tag_filter_table = (new CTable())
+	->setId('tag-filter-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Host groups'), _('Tags')])
-	->addRow((new CRow())->addClass('tag-filter-placeholder-row'))
+	->addRow((new CRow())->addClass('js-tag-filter-row-placeholder'))
 	->addRow([
 		(new CSimpleButton(_('Add')))
-			->addClass('add-new-tag-filter-row')
+			->addClass('js-add-tag-filter-row')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
 
 $tag_filter_form_grid
 	->addItem(
 		new CFormField(
-			(new CDiv($new_tag_filter_table))
+			(new CDiv($tag_filter_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
@@ -293,7 +293,7 @@ $tag_filter_multiselect = (new CMultiSelect([
 		]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$tag_filter_row_template = (new CTemplateTag('tab-filter-row-template'))->addItem(
+$tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
 	(new CRow([
 		$tag_filter_multiselect,
 		(new CCol(
@@ -307,9 +307,9 @@ $tag_filter_row_template = (new CTemplateTag('tab-filter-row-template'))->addIte
 				->setAttribute('placeholder', _('value'))
 		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CButton('tag_filter_remove', _('Remove')))
+			(new CButton('tag_filter_row_remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+				->addClass('js-remove-table-row')
 		))->setAttribute('style', 'vertical-align: top')
 	]))
 		->addClass('form_row')
@@ -319,8 +319,12 @@ $tag_filter_form_grid->addItem($tag_filter_row_template);
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_grid)
-	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid, TAB_INDICATOR_TEMPLATE_PERMISSIONS)
-	->addTab('permissions_tab', _('Host permissions'), $host_permissions_form_grid, TAB_INDICATOR_HOST_PERMISSIONS)
+	->addTab('template_permissions_tab', _('Template permissions'), $template_permissions_form_grid,
+		TAB_INDICATOR_TEMPLATE_PERMISSIONS
+	)
+	->addTab('host_permissions_tab', _('Host permissions'), $host_permissions_form_grid,
+		TAB_INDICATOR_HOST_PERMISSIONS
+	)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER);
 if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
