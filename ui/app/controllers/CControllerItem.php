@@ -269,17 +269,12 @@ abstract class CControllerItem extends CController {
 			$input['preprocessing'] = $preprocessings;
 		}
 
-		if ($input['tags']) {
+		if ($input['tags'] && $input['show_inherited_tags'] == 0) {
+			// Unset inherited tags.
 			$tags = [];
 
 			foreach ($input['tags'] as $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					continue;
-				}
-
-				// Unset inherited tags.
-				if ($input['show_inherited_tags'] == 0
-						&& array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
 					continue;
 				}
 
@@ -326,6 +321,58 @@ abstract class CControllerItem extends CController {
 			$custom_intervals = $this->getInput('delay_flex', []);
 			isValidCustomIntervals($custom_intervals);
 			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
+		}
+
+		if ($input['query_fields']) {
+			$query_fields = [];
+
+			foreach ($input['query_fields'] as $query_field) {
+				if ($query_field['name'] === '' && $query_field['value'] === '') {
+					continue;
+				}
+
+				$query_fields[] = [
+					'name' => $query_field['name'],
+					'value' => $query_field['value']
+				];
+			}
+
+			$input['query_fields'] = $query_fields;
+		}
+
+		if ($input['headers']) {
+			$headers = [];
+
+			foreach ($input['headers'] as $header) {
+				if ($header['name'] === '' && $header['value'] === '') {
+					continue;
+				}
+
+				$headers[$header['name']] = $header['value'];
+			}
+
+			$input['headers'] = $headers;
+		}
+
+		if ($input['preprocessing']) {
+			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
+		}
+
+		if ($input['tags']) {
+			$tags = [];
+
+			foreach ($input['tags'] as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$tags[] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+
+			$input['tags'] = $tags;
 		}
 
 		$input = CArrayHelper::renameKeys($input, $field_map);

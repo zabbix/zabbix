@@ -43,11 +43,6 @@ class CControllerItemEdit extends CControllerItem {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN
-			|| $this->getUserType() == USER_TYPE_SUPER_ADMIN;
-	}
-
 	public function doAction() {
 		$form_refresh = $this->hasInput('form_refresh');
 		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
