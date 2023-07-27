@@ -571,7 +571,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 			proxy.addr = zbx_strdup(NULL, proxy.addr_orig);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &proxy.addr, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &proxy.addr, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			port = zbx_strdup(port, proxy.port_orig);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,

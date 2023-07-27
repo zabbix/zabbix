@@ -3806,7 +3806,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 			}
 		}
-		else if (0 != (macro_type & (MACRO_TYPE_COMMON | MACRO_TYPE_SNMP_OID)))
+		else if (0 != (macro_type & (ZBX_MACRO_TYPE_COMMON | MACRO_TYPE_SNMP_OID)))
 		{
 			if (ZBX_TOKEN_USER_MACRO == token.type)
 			{
