@@ -178,6 +178,8 @@ $translate_strings = [
 			_s('Widget is too small for the specified number of columns and rows.')
 	],
 	'functions.js' => [
+		'Error' => _('Error'),
+		'Ok' => _('Ok'),
 		'Cancel' => _('Cancel'),
 		'S_CLOSE' => _('Close'),
 		'Execute' => _('Execute'),
