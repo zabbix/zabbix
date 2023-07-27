@@ -464,18 +464,18 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#GROUP}'
-              path: $.resourceGroup
             - lld_macro: '{#ID}'
               path: $.id
-            - lld_macro: '{#LOCATION}'
-              path: $.location
             - lld_macro: '{#NAME}'
               path: $.name
+            - lld_macro: '{#LOCATION}'
+              path: $.location
             - lld_macro: '{#TYPE}'
               path: $.type
             - lld_macro: '{#VERSION}'
               path: $.kind
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -555,20 +555,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#GROUP}'
-              path: $.resourceGroup
             - lld_macro: '{#ID}'
               path: $.id
-            - lld_macro: '{#LOCATION}'
-              path: $.location
             - lld_macro: '{#NAME}'
               path: $.name
-            - lld_macro: '{#SIZE}'
-              path: $.sku.name
+            - lld_macro: '{#LOCATION}'
+              path: $.location
             - lld_macro: '{#TYPE}'
               path: $.type
+            - lld_macro: '{#SIZE}'
+              path: $.sku.name
             - lld_macro: '{#VERSION}'
               path: $.kind
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -577,18 +577,6 @@ zabbix_export:
               parameters:
                 - 6h
           overrides:
-            - name: Server
-              step: '2'
-              filter:
-                conditions:
-                  - macro: '{#VERSION}'
-                    value: '^((?!serverless).)*$'
-                    formulaid: A
-              operations:
-                - operationobject: HOST_PROTOTYPE
-                  operator: REGEXP
-                  templates:
-                    - name: 'Azure Microsoft SQL Database by HTTP'
             - name: Serverless
               step: '1'
               filter:
@@ -601,6 +589,18 @@ zabbix_export:
                   operator: REGEXP
                   templates:
                     - name: 'Azure Microsoft SQL Serverless Database by HTTP'
+            - name: Server
+              step: '2'
+              filter:
+                conditions:
+                  - macro: '{#VERSION}'
+                    value: '^((?!serverless).)*$'
+                    formulaid: A
+              operations:
+                - operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  templates:
+                    - name: 'Azure Microsoft SQL Database by HTTP'
         - uuid: 7fafbef68f8b46d083eb43da7cd1e2cc
           name: 'MySQL servers discovery'
           type: DEPENDENT
@@ -656,20 +656,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#GROUP}'
-              path: $.resourceGroup
             - lld_macro: '{#ID}'
               path: $.id
-            - lld_macro: '{#LOCATION}'
-              path: $.location
             - lld_macro: '{#NAME}'
               path: $.name
-            - lld_macro: '{#SIZE}'
-              path: $.sku.name
+            - lld_macro: '{#LOCATION}'
+              path: $.location
             - lld_macro: '{#TYPE}'
               path: $.type
+            - lld_macro: '{#SIZE}'
+              path: $.sku.name
             - lld_macro: '{#VERSION}'
               path: $.properties.version
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -757,20 +757,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#GROUP}'
-              path: $.resourceGroup
             - lld_macro: '{#ID}'
               path: $.id
-            - lld_macro: '{#LOCATION}'
-              path: $.location
             - lld_macro: '{#NAME}'
               path: $.name
-            - lld_macro: '{#SIZE}'
-              path: $.sku.name
+            - lld_macro: '{#LOCATION}'
+              path: $.location
             - lld_macro: '{#TYPE}'
               path: $.type
+            - lld_macro: '{#SIZE}'
+              path: $.sku.name
             - lld_macro: '{#VERSION}'
               path: $.properties.version
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2257,14 +2257,14 @@ zabbix_export:
           master_item:
             key: azure.get.storage.acc
           lld_macro_paths:
-            - lld_macro: '{#GROUP}'
-              path: $.resourceGroup
             - lld_macro: '{#ID}'
               path: $.id
-            - lld_macro: '{#LOCATION}'
-              path: $.location
             - lld_macro: '{#NAME}'
               path: $.name
+            - lld_macro: '{#LOCATION}'
+              path: $.location
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
             - lld_macro: '{#TOKEN}'
               path: $.token
           preprocessing:
@@ -2328,20 +2328,20 @@ zabbix_export:
           master_item:
             key: azure.get.resources
           lld_macro_paths:
-            - lld_macro: '{#GROUP}'
-              path: $.resourceGroup
             - lld_macro: '{#ID}'
               path: $.id
-            - lld_macro: '{#LOCATION}'
-              path: $.location
             - lld_macro: '{#NAME}'
               path: $.name
-            - lld_macro: '{#OS}'
-              path: $.properties.storageProfile.osDisk.osType
-            - lld_macro: '{#SIZE}'
-              path: $.properties.hardwareProfile.vmSize
+            - lld_macro: '{#LOCATION}'
+              path: $.location
             - lld_macro: '{#TYPE}'
               path: $.type
+            - lld_macro: '{#SIZE}'
+              path: $.properties.hardwareProfile.vmSize
+            - lld_macro: '{#OS}'
+              path: $.properties.storageProfile.osDisk.osType
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
           preprocessing:
             - type: JSONPATH
               parameters:

@@ -360,53 +360,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		// clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'clone') {
-
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
 			 * item.
 			 */
-			if (!copyHttpTests($cloneTemplateId, $input_templateid)) {
+			if (!copyHttpTests($cloneTemplateId, $input_templateid)
+					|| !CItemHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)
+					|| !CTriggerHelper::cloneTemplateTriggers($cloneTemplateId, $input_templateid)
+					|| !CGraphHelper::cloneTemplateGraphs($cloneTemplateId, $input_templateid)
+					|| !CLldRuleHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)) {
 				throw new Exception();
-			}
-
-			if (!copyItemsToHosts('templateids', [$cloneTemplateId], true, [$input_templateid])) {
-				throw new Exception();
-			}
-
-			// copy triggers
-			if (!copyTriggersToHosts([$input_templateid], $cloneTemplateId)) {
-				throw new Exception();
-			}
-
-			// copy graphs
-			$dbGraphs = API::Graph()->get([
-				'output' => ['graphid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			foreach ($dbGraphs as $dbGraph) {
-				copyGraphToHost($dbGraph['graphid'], $input_templateid);
-			}
-
-			// copy discovery rules
-			$dbDiscoveryRules = API::DiscoveryRule()->get([
-				'output' => ['itemid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			if ($dbDiscoveryRules) {
-				if (!API::DiscoveryRule()->copy([
-					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
-					'hostids' => [$input_templateid]
-				])) {
-					$result = false;
-				}
-
-				if (!$result) {
-					throw new Exception();
-				}
 			}
 
 			// Copy template dashboards.

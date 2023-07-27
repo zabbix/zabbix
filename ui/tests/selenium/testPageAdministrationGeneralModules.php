@@ -80,6 +80,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'associated components.',
 		'Top hosts' => 'Displays top N hosts that have the highest or the lowest item value (for example, CPU load) '.
 				'with an option to add progress-bar visualizations and customize report columns.',
+		'Top triggers' => 'Displays top N triggers that have the most problems within the period of evaluation,'.
+				' sorted by the number of problems.',
 		'Trigger overview' => 'Displays trigger states for selected hosts.',
 		'URL' => 'Displays the content retrieved from the specified URL.',
 		'Web monitoring' => 'Displays the status summary of the active web monitoring scenarios.'
@@ -371,7 +373,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			]
 		];
 
-		// Create an array with widgt modules that should be present by default.
+		// Create an array with widget modules that should be present by default.
 		$widget_modules = [];
 		$i = 0;
 

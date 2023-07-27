@@ -752,30 +752,30 @@ zabbix_export:
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
-              path: $.db_type
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
-              path: $.ext_ip
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-              path: $.high_availability
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
-              path: $.ip
+            - lld_macro: '{#MSSQL.AUDITED}'
+              path: $.audited
             - lld_macro: '{#CLOUD_SQL.INSTANCE.NAME}'
               path: $.name
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.TIER}'
-              path: $.tier
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
-              path: $.inst_type
             - lld_macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
               path: $.zone
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
+              path: $.ip
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
+              path: $.inst_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
+              path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.TIER}'
+              path: $.tier
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
+              path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.MASTER}'
               path: $.master
             - lld_macro: '{#GCP.AUTH.TOKEN}'
               path: $.token
             - lld_macro: '{#GCP.PROJECT.ID}'
               path: $.project_id
-            - lld_macro: '{#MSSQL.AUDITED}'
-              path: $.audited
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -881,22 +881,22 @@ zabbix_export:
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
-              path: $.db_type
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
-              path: $.ext_ip
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-              path: $.high_availability
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
-              path: $.ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.NAME}'
               path: $.name
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.TIER}'
-              path: $.tier
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
-              path: $.inst_type
             - lld_macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
               path: $.zone
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
+              path: $.ip
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
+              path: $.inst_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
+              path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.TIER}'
+              path: $.tier
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
+              path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.MASTER}'
               path: $.master
             - lld_macro: '{#GCP.AUTH.TOKEN}'
@@ -1008,22 +1008,22 @@ zabbix_export:
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
-              path: $.db_type
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
-              path: $.ext_ip
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-              path: $.high_availability
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
-              path: $.ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.NAME}'
               path: $.name
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.TIER}'
-              path: $.tier
-            - lld_macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
-              path: $.inst_type
             - lld_macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
               path: $.zone
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
+              path: $.ip
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
+              path: $.inst_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
+              path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.TIER}'
+              path: $.tier
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
+              path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.MASTER}'
               path: $.master
             - lld_macro: '{#GCP.AUTH.TOKEN}'
@@ -1125,22 +1125,22 @@ zabbix_export:
           master_item:
             key: gcp.gce.instances.get
           lld_macro_paths:
-            - lld_macro: '{#GCE.INSTANCE.EXT.IP}'
-              path: $.ext_ip
             - lld_macro: '{#GCE.INSTANCE.ID}'
               path: $.id
-            - lld_macro: '{#GCE.INSTANCE.IP}'
-              path: $.ip
             - lld_macro: '{#GCE.INSTANCE.NAME}'
               path: $.name
-            - lld_macro: '{#GCE.INSTANCE.TYPE}'
-              path: $.i_type
             - lld_macro: '{#GCE.INSTANCE.ZONE}'
               path: $.zone
-            - lld_macro: '{#GCE.INTEGRITY.STATE}'
-              path: $.integrity
             - lld_macro: '{#GCE.MACHINE.TYPE}'
               path: $.m_type
+            - lld_macro: '{#GCE.INSTANCE.TYPE}'
+              path: $.i_type
+            - lld_macro: '{#GCE.INTEGRITY.STATE}'
+              path: $.integrity
+            - lld_macro: '{#GCE.INSTANCE.IP}'
+              path: $.ip
+            - lld_macro: '{#GCE.INSTANCE.EXT.IP}'
+              path: $.ext_ip
             - lld_macro: '{#GCP.AUTH.TOKEN}'
               path: $.token
             - lld_macro: '{#GCP.PROJECT.ID}'
@@ -1305,12 +1305,12 @@ zabbix_export:
           master_item:
             key: gcp.gce.quotas.get
           lld_macro_paths:
-            - lld_macro: '{#GCE.QUOTA.LIMIT}'
-              path: $.limit
             - lld_macro: '{#GCE.QUOTA.NAME}'
               path: $.metric
             - lld_macro: '{#GCE.QUOTA.USAGE}'
               path: $.usage
+            - lld_macro: '{#GCE.QUOTA.LIMIT}'
+              path: $.limit
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -8793,10 +8793,10 @@ zabbix_export:
           master_item:
             key: gcp.gce.disks.get
           lld_macro_paths:
-            - lld_macro: '{#GCE.DISK.DEV_TYPE}'
-              path: $.device_type
             - lld_macro: '{#GCE.DISK.NAME}'
               path: $.disk_name
+            - lld_macro: '{#GCE.DISK.DEV_TYPE}'
+              path: $.device_type
             - lld_macro: '{#GCE.DISK.STOR_TYPE}'
               path: $.storage_type
           preprocessing:

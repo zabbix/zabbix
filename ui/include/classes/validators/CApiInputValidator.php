@@ -4069,7 +4069,7 @@ class CApiInputValidator {
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 1],
 					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 1],
-					'3' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER])]
+					'3' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER])]
 				]];
 				break;
 
@@ -4083,12 +4083,22 @@ class CApiInputValidator {
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
+					'2' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
 				]];
 				break;
 
 			case ZBX_PREPROC_SNMP_WALK_TO_JSON:
-				$api_input_rules = ['type' => API_STRINGS_UTF8, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'length' => 255];
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
+
+				foreach (array_chunk($params, 3, true) as $_params) {
+					$index = key($_params);
+
+					$api_input_rules['fields'] += [
+						$index++ =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+						$index++ =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+						$index =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UNCHANGED, ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
+					];
+				}
 				break;
 		}
 

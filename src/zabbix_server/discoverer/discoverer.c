@@ -23,7 +23,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -38,6 +38,7 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 #include "zbxproxybuffer.h"
+#include "zbx_discoverer_constants.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
@@ -468,26 +469,29 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 					SVC_SNMPv3 == dcheck_ptr->type)
 			{
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community, MACRO_TYPE_COMMON,
-						NULL, 0);
+						NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community,
+						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_key_macros(&dcheck_ptr->key_, NULL, NULL, NULL, NULL,
-						MACRO_TYPE_SNMP_OID, NULL, 0);
+						ZBX_MACRO_TYPE_SNMP_OID, NULL, 0);
 
 				if (SVC_SNMPv3 == dcheck_ptr->type)
 				{
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL,
+							&dcheck_ptr->snmpv3_securityname, ZBX_MACRO_TYPE_COMMON, NULL,
 							0);
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+							&dcheck_ptr->snmpv3_authpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
+							0);
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
+							&dcheck_ptr->snmpv3_privpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
+							0);
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, NULL, NULL, NULL,
+							&dcheck_ptr->snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL,
+							0);
 				}
 			}
 
@@ -953,24 +957,50 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts)
 {
-	int			rule_count = 0, delay, i;
-	char			*delay_str = NULL;
-	zbx_uint64_t		queue_checks_count = 0;
-	zbx_dc_um_handle_t	*um_handle;
-	time_t			now;
-	zbx_dc_drule_t		*drule;
+	int				rule_count = 0, delay, i, k;
+	char				*delay_str = NULL;
+	zbx_uint64_t			queue_checks_count = 0;
+	zbx_dc_um_handle_t		*um_handle;
+	time_t				now;
+	zbx_vector_dc_drule_ptr_t	drules;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
 
+	zbx_vector_dc_drule_ptr_create(&drules);
+	zbx_dc_drules_get(now, &drules, nextcheck);
+
 	um_handle = zbx_dc_open_user_macros();
 
-	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
+	for (k = 0; ZBX_IS_RUNNING() && k < drules.values_num; k++)
 	{
-		zbx_uint64_t		queue_capacity, queue_capacity_local;
-		zbx_discoverer_job_t	cmp = {.druleid = drule->druleid};
+		zbx_uint64_t			queue_capacity, queue_capacity_local;
+		zbx_hashset_t			tasks, drule_check_counts;
+		zbx_hashset_iter_t		iter;
+		zbx_discoverer_task_t		*task, *task_out;
+		zbx_discoverer_check_count_t	*count;
+		zbx_discoverer_job_t		*job, cmp;
+		zbx_dc_drule_t			*drule = drules.values[k];
 
+		now = time(NULL);
+
+		delay_str = zbx_strdup(delay_str, drule->delay_str);
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				&delay_str, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
+					drule->delay_str, delay_str);
+
+			delay = ZBX_DEFAULT_INTERVAL;
+			goto next;
+		}
+
+		drule->delay = delay;
+
+		cmp.druleid = drule->druleid;
 		discoverer_queue_lock(&dmanager.queue);
 		i = zbx_vector_discoverer_jobs_ptr_bsearch(&dmanager.job_refs, &cmp,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -978,12 +1008,8 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 		discoverer_queue_unlock(&dmanager.queue);
 		queue_capacity_local = queue_capacity - queue_checks_count;
 
-		if (i != FAIL || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
-		{
-			zbx_dc_drule_queue(now, drule->druleid, drule->delay);
-			zbx_discovery_drule_free(drule);
-			continue;
-		}
+		if (FAIL != i || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
+			goto next;
 
 		for (i = 0; i < drule->dchecks.values_num; i++)
 		{
@@ -996,81 +1022,57 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 			}
 		}
 
-		delay_str = zbx_strdup(delay_str, drule->delay_str);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&delay_str, MACRO_TYPE_COMMON, NULL, 0);
+		zbx_hashset_create(&tasks, 1, discoverer_task_hash, discoverer_task_compare);
+		zbx_hashset_create(&drule_check_counts, 1, discoverer_check_count_hash,
+				discoverer_check_count_compare);
 
-		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
+		process_rule(drule, &queue_capacity_local, &tasks, &drule_check_counts);
+		zbx_hashset_iter_reset(&tasks, &iter);
+
+		if (0 == queue_capacity_local)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid update interval \"%s\"",
-					drule->delay_str, delay_str);
-
-			delay = ZBX_DEFAULT_INTERVAL;
-		}
-		else
-		{
-			zbx_discoverer_job_t		*job;
-			zbx_discoverer_task_t		*task, *task_out;
-			zbx_hashset_t			tasks, drule_check_counts;
-			zbx_hashset_iter_t		iter;
-			zbx_discoverer_check_count_t	*count;
-
-			drule->delay = delay;
-
-			zbx_hashset_create(&tasks, 1, discoverer_task_hash, discoverer_task_compare);
-			zbx_hashset_create(&drule_check_counts, 1, discoverer_check_count_hash,
-					discoverer_check_count_compare);
-
-			process_rule(drule, &queue_capacity_local, &tasks, &drule_check_counts);
-			zbx_hashset_iter_reset(&tasks, &iter);
-
-			if (0 == queue_capacity_local)
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "discoverer queue is full, skipping discovery rule '%s'",
-						drule->name);
-
-				while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
-					discoverer_task_clear(task);
-
-				zbx_hashset_destroy(&tasks);
-				zbx_hashset_destroy(&drule_check_counts);
-				goto next;
-			}
-
-			queue_checks_count = queue_capacity - queue_capacity_local;
-
-			job = discoverer_job_create(drule, config_timeout);
+			zabbix_log(LOG_LEVEL_WARNING, "discoverer queue is full, skipping discovery rule '%s'", drule->name);
 
 			while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
-			{
-				task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
-				memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
-				(void)zbx_list_append(&job->tasks, task_out, NULL);
-			}
+				discoverer_task_clear(task);
 
 			zbx_hashset_destroy(&tasks);
-			zbx_hashset_iter_reset(&drule_check_counts, &iter);
-
-			while (NULL != (count = (zbx_discoverer_check_count_t *)zbx_hashset_iter_next(&iter)))
-				zbx_hashset_insert(check_counts, count, sizeof(zbx_discoverer_check_count_t));
-
 			zbx_hashset_destroy(&drule_check_counts);
-			zbx_vector_discoverer_jobs_ptr_append(jobs, job);
-			rule_count++;
+			goto next;
 		}
-next:
-		zbx_dc_drule_queue(now, drule->druleid, delay);
-		zbx_free(delay_str);
 
+		queue_checks_count = queue_capacity - queue_capacity_local;
+
+		job = discoverer_job_create(drule, config_timeout);
+
+		while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
+		{
+			task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
+			memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
+			(void)zbx_list_append(&job->tasks, task_out, NULL);
+		}
+
+		zbx_hashset_destroy(&tasks);
+		zbx_hashset_iter_reset(&drule_check_counts, &iter);
+
+		while (NULL != (count = (zbx_discoverer_check_count_t *)zbx_hashset_iter_next(&iter)))
+			zbx_hashset_insert(check_counts, count, sizeof(zbx_discoverer_check_count_t));
+
+		zbx_hashset_destroy(&drule_check_counts);
+		zbx_vector_discoverer_jobs_ptr_append(jobs, job);
+		rule_count++;
+next:
 		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(drule->druleid);
 
-		zbx_discovery_drule_free(drule);
-
-		now = time(NULL);
+		zbx_dc_drule_queue(now, drule->druleid, delay);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
+	zbx_free(delay_str);
+
+	zbx_vector_dc_drule_ptr_clear_ext(&drules, zbx_discovery_drule_free);
+	zbx_vector_dc_drule_ptr_destroy(&drules);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rule_count:%d", __func__, rule_count);
 
