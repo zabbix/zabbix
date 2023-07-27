@@ -24,9 +24,23 @@ namespace Zabbix\Core;
 use CControllerDashboardWidgetEdit,
 	CControllerDashboardWidgetView;
 
-use Zabbix\Widgets\CWidgetForm;
+use Zabbix\Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
 
-use Zabbix\Widgets\Fields\CWidgetFieldSelect;
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldMultiSelectGraph,
+	CWidgetFieldMultiSelectGraphPrototype,
+	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectHost,
+	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectItemPrototype,
+	CWidgetFieldMultiSelectMap,
+	CWidgetFieldMultiSelectService,
+	CWidgetFieldMultiSelectSla,
+	CWidgetFieldSelect
+};
 
 /**
  * Base class for user widgets. If Widget.php is not provided by user widget, this class will be instantiated instead.
@@ -61,9 +75,35 @@ class CWidget extends CModule {
 			))->setDefault(-1)
 		);
 
-		return $form
-			->addFields()
-			->setFieldsValues();
+		$in_params = $this->getIn();
+
+		if ($form_class === CWidgetForm::class) {
+			foreach ($in_params as $name => $param) {
+				$form->addField($this->makeField($name, $param));
+			}
+		}
+		else {
+			$form->addFields();
+		}
+
+		/** @var CWidgetField $field */
+		foreach ($form->getFields() as $field) {
+			if (array_key_exists($field->getName(), $in_params)) {
+				if (in_array($in_params[$field->getName()]['type'], ['_host', '_hosts'])) {
+					$field->acceptDashboard();
+				}
+
+				$field->acceptWidget();
+
+				if (array_key_exists('prevent_default', $in_params[$field->getName()])) {
+					$field->preventDefault();
+				}
+			}
+		}
+
+		$form->setFieldsValues();
+
+		return $form;
 	}
 
 	final public function getActions(): array {
@@ -165,5 +205,45 @@ class CWidget extends CModule {
 			600 => _n('%1$s minute', '%1$s minutes', 10),
 			900 => _n('%1$s minute', '%1$s minutes', 15)
 		];
+	}
+
+	private function makeField($name, $param): ?CWidgetField {
+		switch ($param['type']) {
+			case '_hostgroupid':
+				return (new CWidgetFieldMultiSelectGroup($name, _('Host group')))->setMultiple(false);
+
+			case '_hostgroupids':
+				return new CWidgetFieldMultiSelectGroup($name, _('Host groups'));
+
+			case '_hostid':
+				return (new CWidgetFieldMultiSelectHost($name, _('Host')))->setMultiple(false);
+
+			case '_hostids':
+				return new CWidgetFieldMultiSelectHost($name, _('Hosts'));
+
+			case '_itemid':
+				return (new CWidgetFieldMultiSelectItem($name, _('Item')))->setMultiple(false);
+
+			case '_itemprototypeid':
+				return (new CWidgetFieldMultiSelectItemPrototype($name, _('Item prototype')))->setMultiple(false);
+
+			case '_graphid':
+				return (new CWidgetFieldMultiSelectGraph($name, _('Graph')))->setMultiple(false);
+
+			case '_graphprototypeid':
+				return (new CWidgetFieldMultiSelectGraphPrototype($name, _('Graph prototype')))->setMultiple(false);
+
+			case '_mapid':
+				return (new CWidgetFieldMultiSelectMap($name, _('Map')))->setMultiple(false);
+
+			case '_serviceid':
+				return (new CWidgetFieldMultiSelectService($name, _('Service')))->setMultiple(false);
+
+			case '_slaid':
+				return (new CWidgetFieldMultiSelectSla($name, _('SLA')))->setMultiple(false);
+
+			default:
+				return null;
+		}
 	}
 }

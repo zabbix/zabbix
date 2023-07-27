@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldTags extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldTagsView::class;
 	public const DEFAULT_VALUE = [];
 	public const DEFAULT_TAG = ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''];
 

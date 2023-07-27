@@ -28,10 +28,6 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	// Is selecting multiple objects or a single one?
 	private bool $is_multiple = true;
 
-	private bool $default_prevented = false;
-	private bool $widget_accepted = false;
-	private bool $dashboard_accepted = false;
-
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
@@ -75,51 +71,12 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		return $this;
 	}
 
-	public function idDefaultPrevented(): bool {
-		return $this->default_prevented;
-	}
-
-	/**
-	 * Disable exact object selection, like item or host.
-	 *
-	 * @return $this
-	 */
 	public function preventDefault($default_prevented = true): self {
-		$this->default_prevented = $default_prevented;
+		if ($default_prevented) {
+			$this->setMultiple(false);
+		}
 
-		$this->setMultiple(false);
-
-		return $this;
-	}
-
-	public function isWidgetAccepted(): bool {
-		return $this->widget_accepted;
-	}
-
-	/**
-	 * Allow selecting widget as reference.
-	 *
-	 * @return $this
-	 */
-	public function acceptWidget($widget_accepted = true): self {
-		$this->widget_accepted = $widget_accepted;
-
-		return $this;
-	}
-
-	public function isDashboardAccepted(): bool {
-		return $this->dashboard_accepted;
-	}
-
-	/**
-	 * Allow selecting dashboard as reference.
-	 *
-	 * @return $this
-	 */
-	public function acceptDashboard($dashboard_accepted = true): self {
-		$this->dashboard_accepted = $dashboard_accepted;
-
-		return $this;
+		return parent::preventDefault($default_prevented);
 	}
 
 	protected function getValidationRules(): array {

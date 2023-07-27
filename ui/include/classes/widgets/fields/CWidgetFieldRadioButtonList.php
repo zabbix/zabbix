@@ -25,6 +25,8 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldRadioButtonList extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldRadioButtonListView::class;
+
 	private array $values;
 
 	/**

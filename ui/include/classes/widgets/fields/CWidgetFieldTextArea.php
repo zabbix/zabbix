@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldTextArea extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldTextAreaView::class;
 	public const DEFAULT_VALUE = '';
 
 	public function __construct(string $name, string $label = null) {

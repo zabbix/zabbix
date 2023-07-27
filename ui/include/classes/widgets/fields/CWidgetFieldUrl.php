@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldUrl extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldUrlView::class;
 	public const DEFAULT_VALUE = '';
 
 	public function __construct(string $name, string $label = null) {

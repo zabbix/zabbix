@@ -26,6 +26,8 @@ use CApiInputValidator,
 
 abstract class CWidgetField {
 
+	public const DEFAULT_VIEW = null;
+
 	public const FLAG_ACKNOWLEDGES = 0x01;
 	public const FLAG_NOT_EMPTY = 0x02;
 	public const FLAG_LABEL_ASTERISK = 0x04;
@@ -54,6 +56,10 @@ abstract class CWidgetField {
 	protected array $ex_validation_rules = [];
 
 	private $templateid = null;
+
+	private bool $default_prevented = false;
+	private bool $widget_accepted = false;
+	private bool $dashboard_accepted = false;
 
 	/**
 	 * @param string      $name   Field name in form.
@@ -123,6 +129,51 @@ abstract class CWidgetField {
 
 	public function setDefault($value): self {
 		$this->default = $value;
+
+		return $this;
+	}
+
+	public function idDefaultPrevented(): bool {
+		return $this->default_prevented;
+	}
+
+	/**
+	 * Disable exact object selection, like item or host.
+	 *
+	 * @return $this
+	 */
+	public function preventDefault($default_prevented = true): self {
+		$this->default_prevented = $default_prevented;
+
+		return $this;
+	}
+
+	public function isWidgetAccepted(): bool {
+		return $this->widget_accepted;
+	}
+
+	/**
+	 * Allow selecting widget as reference.
+	 *
+	 * @return $this
+	 */
+	public function acceptWidget($widget_accepted = true): self {
+		$this->widget_accepted = $widget_accepted;
+
+		return $this;
+	}
+
+	public function isDashboardAccepted(): bool {
+		return $this->dashboard_accepted;
+	}
+
+	/**
+	 * Allow selecting dashboard as reference.
+	 *
+	 * @return $this
+	 */
+	public function acceptDashboard($dashboard_accepted = true): self {
+		$this->dashboard_accepted = $dashboard_accepted;
 
 		return $this;
 	}

@@ -21,17 +21,17 @@
 
 namespace Zabbix\Widgets\Fields;
 
-use CArrayHelper,
-	CNumberParser,
+use CNumberParser,
 	CParser;
 
 use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldThresholds extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldThresholdsView::class;
 	public const DEFAULT_VALUE = [];
 
-	private bool $is_binary_units = false;
+	private bool $is_binary_units;
 
 	/**
 	 * Create widget field for Thresholds selection.

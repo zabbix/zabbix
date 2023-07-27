@@ -25,6 +25,8 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldColumnsList extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldColumnsListView::class;
+
 	// Source of value to display in column.
 	public const DATA_ITEM_VALUE = 1;
 	public const DATA_HOST_NAME = 2;

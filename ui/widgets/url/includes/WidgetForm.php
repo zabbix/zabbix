@@ -45,12 +45,6 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: (new CWidgetFieldMultiSelectHost('hostid', _('Enable host selection')))
-					->preventDefault()
-					->acceptWidget()
-			)
-			->addField($this->isTemplateDashboard()
-				? null
 				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 			);
 	}

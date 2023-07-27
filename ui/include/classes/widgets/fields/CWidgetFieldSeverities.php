@@ -23,6 +23,8 @@ namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
 
+	public const DEFAULT_VIEW = \CWidgetFieldSeveritiesView::class;
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 

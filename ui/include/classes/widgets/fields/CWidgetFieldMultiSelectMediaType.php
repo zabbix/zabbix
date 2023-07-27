@@ -22,8 +22,9 @@ declare(strict_types=0);
 
 namespace Zabbix\Widgets\Fields;
 
-class CWidgetFieldMultiSelectMediaType extends CWidgetFieldMultiSelect
-{
+class CWidgetFieldMultiSelectMediaType extends CWidgetFieldMultiSelect {
+
+	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectMediaTypeView::class;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);

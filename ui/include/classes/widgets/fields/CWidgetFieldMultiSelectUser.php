@@ -22,8 +22,9 @@ declare(strict_types=0);
 
 namespace Zabbix\Widgets\Fields;
 
-class CWidgetFieldMultiSelectUser extends CWidgetFieldMultiSelect
-{
+class CWidgetFieldMultiSelectUser extends CWidgetFieldMultiSelect {
+
+	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectUserView::class;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);

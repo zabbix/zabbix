@@ -28,6 +28,7 @@ use Zabbix\Widgets\CWidgetField;
  */
 class CWidgetFieldGraphOverride extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldGraphOverrideView::class;
 	public const DEFAULT_VALUE = [];
 
 	public function __construct(string $name, string $label = null) {

@@ -31,10 +31,6 @@
 		new CWidgetFieldUrlView($data['fields']['url'])
 	)
 	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldMultiSelectHostView($data['fields']['hostid'])
-		: null
-	)
-	->addField(array_key_exists('dynamic', $data['fields'])
 		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
 		: null
 	)

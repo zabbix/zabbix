@@ -147,12 +147,4 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 	protected function getPopupParameters(): array {
 		return $this->popup_parameters;
 	}
-
-	protected function getObjectName(): string {
-		return '';
-	}
-
-	protected function getObjectLabel(): string {
-		return '';
-	}
 }

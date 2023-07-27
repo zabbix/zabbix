@@ -9,9 +9,6 @@
 	"description": "Displays the content retrieved from the specified URL.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/url",
 	"widget": {
-		"in": {
-			"hostid": {"type": "_hostid", "prevent_default":  true}
-		},
 		"js_class": "CWidgetUrl",
 		"refresh_rate": 0
 	},

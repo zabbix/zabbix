@@ -23,13 +23,13 @@ namespace Zabbix\Widgets\Fields;
 
 use CAbsoluteTimeParser,
 	CParser,
-	CRelativeTimeParser,
-	DB;
+	CRelativeTimeParser;
 
 use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldDatePicker extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldDatePickerView::class;
 	public const DEFAULT_VALUE = '';
 
 	private bool $is_date_only;

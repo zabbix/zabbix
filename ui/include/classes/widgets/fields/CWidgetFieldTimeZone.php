@@ -25,6 +25,7 @@ use CTimezoneHelper;
 
 class CWidgetFieldTimeZone extends CWidgetFieldSelect {
 
+	public const DEFAULT_VIEW = \CWidgetFieldTimeZoneView::class;
 	public const DEFAULT_VALUE = '';
 
 	public function __construct(string $name, string $label = null, array $values = null) {

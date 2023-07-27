@@ -25,6 +25,8 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldIntegerBox extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldIntegerBoxView::class;
+
 	private int $max;
 
 	/**

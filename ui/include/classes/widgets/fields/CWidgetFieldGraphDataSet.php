@@ -31,6 +31,7 @@ use Zabbix\Widgets\CWidgetField;
  */
 class CWidgetFieldGraphDataSet extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldGraphDataSetView::class;
 	public const DEFAULT_VALUE = [];
 
 	public const DATASET_TYPE_SINGLE_ITEM = 0;

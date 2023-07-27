@@ -23,6 +23,8 @@ namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldMultiSelectSla extends CWidgetFieldMultiSelect {
 
+	public const DEFAULT_VIEW = \CWidgetFieldMultiSelectSlaView::class;
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 

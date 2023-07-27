@@ -32,6 +32,8 @@ class CWidgetFormView {
 
 	private CFormGrid $form_grid;
 
+	private array $registered_fields = [];
+
 	public function __construct(array $data, string $name = 'widget_dialogue_form') {
 		$this->data = $data;
 		$this->name = $name;
@@ -77,7 +79,7 @@ class CWidgetFormView {
 	 * Add configuration row based on single CWidgetFieldView.
 	 */
 	public function addField(?CWidgetFieldView $field): self {
-		if ($field === null) {
+		if ($field === null || in_array($field->getName(), $this->registered_fields, true)) {
 			return $this;
 		}
 
@@ -114,6 +116,8 @@ class CWidgetFormView {
 	}
 
 	public function registerField(CWidgetFieldView $field): CWidgetFieldView {
+		$this->registered_fields[] = $field->getName();
+
 		$field->setFormName($this->name);
 
 		$this->addJavaScript($field->getJavaScript());

@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldWidgetSelect extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldWidgetSelectView::class;
 	public const DEFAULT_VALUE = '';
 
 	private string $search_by_value;

@@ -25,6 +25,8 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldRangeControl extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldRangeControlView::class;
+
 	private int $min;
 	private int $max;
 	private int $step;

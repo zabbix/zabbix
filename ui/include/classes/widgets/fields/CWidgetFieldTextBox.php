@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldTextBox extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldTextBoxView::class;
 	public const DEFAULT_VALUE = '';
 
 	/**

@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldColor extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldColorView::class;
 	public const DEFAULT_VALUE = '';
 
 	private bool $allow_inherited = false;

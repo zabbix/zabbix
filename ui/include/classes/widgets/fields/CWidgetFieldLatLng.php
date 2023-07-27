@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldLatLng extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldLatLngView::class;
 	public const DEFAULT_VALUE = '';
 
 	/**

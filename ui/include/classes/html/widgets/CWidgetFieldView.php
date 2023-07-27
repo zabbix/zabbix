@@ -59,6 +59,10 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
+	public function getName(): string {
+		return $this->field->getName();
+	}
+
 	public function getLabel(): ?CLabel {
 		$label = $this->field->getLabel();
 
