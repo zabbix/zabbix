@@ -481,13 +481,18 @@ class CControllerItemList extends CController {
 		];
 
 		if ($filter['filter_hostids']) {
-			$service = $context === 'host' ? API::Host() : API::Template();
-			$primary_field = $context === 'host' ? 'hostid' : 'templateid';
-			$filter['ms_valuemaps'] = [];
-			$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys($service->get([
-				'output' => [$primary_field, 'name'],
-				'hostids' => $filter['filter_hostids']
-			]), [$primary_field => 'id']);
+			if ($context === 'host') {
+				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'hostids' => $filter['filter_hostids']
+				]), ['hostid' => 'id']);
+			}
+			else {
+				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
+					'output' => ['hostid', 'name'],
+					'templateids' => $filter['filter_hostids']
+				]), ['templateid' => 'id']);
+			}
 
 			if ($filter['ms_hosts'] && $filter['filter_valuemapids']) {
 				$filter['ms_valuemaps'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
@@ -561,11 +566,11 @@ class CControllerItemList extends CController {
 		}
 
 		return API::Trigger()->get([
-			'triggerids' => array_values($triggerids),
 			'output' => ['triggerid', 'description', 'expression', 'recovery_mode', 'recovery_expression', 'priority',
 				'status', 'state', 'error', 'templateid', 'flags'
 			],
 			'selectHosts' => ['hostid', 'name', 'host'],
+			'triggerids' => array_values($triggerids),
 			'preservekeys' => true
 		]);
 	}
