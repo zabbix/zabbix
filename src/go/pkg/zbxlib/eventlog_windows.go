@@ -134,12 +134,20 @@ static void free_eventlog_result(eventlog_result_t *result)
 	zbx_free(result);
 }
 
-int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
-		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
-		unsigned char flags)
+int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
+		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
+		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
+		int config_timeout, const char *config_source_ip)
 {
 	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(host);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(mtime);
+	ZBX_UNUSED(flags);
+	ZBX_UNUSED(config_tls);
+	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(config_source_ip);
 
 	eventlog_result_t *result = (eventlog_result_t *)agent2_result;
 	if (result->values.values_num == result->slots)
@@ -149,13 +157,21 @@ int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 
 	return SUCCEED;
 }
-
-int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
-		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
-		unsigned char flags)
+int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
+		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
+		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
+		int config_timeout, const char *config_source_ip)
 {
 	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(host);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(mtime);
+	ZBX_UNUSED(flags);
+	ZBX_UNUSED(config_tls);
+	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(config_source_ip);
+
 	ZBX_UNUSED(source);
 	ZBX_UNUSED(logeventid);
 	ZBX_UNUSED(severity);
