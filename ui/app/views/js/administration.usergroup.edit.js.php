@@ -87,7 +87,7 @@
 			const placeholder_row = document.querySelector('.templategroup-placeholder-row');
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
-			const ms = document.getElementById('ms_new_templategroup_right_groupids_'+rowid+'_');
+			const ms = document.getElementById('ms_templategroup_right_groupids_'+rowid+'_');
 			$(ms).multiSelect();
 
 			for (const id in templategroup_rights) {
@@ -101,7 +101,7 @@
 			}
 
 			const permission_radio = document
-				.querySelector(`input[name="new_templategroup_right[permission][${rowid}]"][value="${permission}"]`);
+				.querySelector(`input[name="templategroup_right[permission][${rowid}]"][value="${permission}"]`);
 			permission_radio.checked = true;
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
@@ -124,7 +124,7 @@
 			const placeholder_row = document.querySelector('.group-placeholder-row');
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
-			const ms = document.getElementById('ms_new_group_right_groupids_'+rowid+'_');
+			const ms = document.getElementById('ms_hostgroup_right_groupids_'+rowid+'_');
 			$(ms).multiSelect();
 
 			for (const id in hostgroup_rights) {
@@ -138,7 +138,7 @@
 			}
 
 			const permission_radio = document
-				.querySelector(`input[name="new_group_right[permission][${rowid}]"][value="${permission}"]`);
+				.querySelector(`input[name="hostgroup_right[permission][${rowid}]"][value="${permission}"]`);
 			if (permission_radio) {
 				permission_radio.checked = true;
 			}
@@ -163,7 +163,7 @@
 			const placeholder_row = document.querySelector('.tag-filter-placeholder-row');
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
-			const ms = document.getElementById('ms_new_tag_filter_groupids_'+rowid+'_');
+			const ms = document.getElementById('ms_tag_filter_groupids_'+rowid+'_');
 			$(ms).multiSelect();
 
 			for (const id in tag_filter_group) {
@@ -177,10 +177,10 @@
 			}
 
 			if (tag_filter_group.length > 0) {
-				const tag_id = 'new_tag_filter_tag_'+rowid;
+				const tag_id = 'tag_filter_tag_'+rowid;
 				document.getElementById(tag_id).value = tag_filter_group[0]['tag'];
 
-				const value_id = 'new_tag_filter_value_'+rowid;
+				const value_id = 'tag_filter_value_'+rowid;
 				document.getElementById(value_id).value = tag_filter_group[0]['value'];
 			}
 

@@ -163,14 +163,14 @@ $template_permissions_form_grid
 	);
 
 $templates_multiselect = (new CMultiSelect([
-	'name' => 'ms_new_templategroup_right[groupids][#{rowid}][]',
+	'name' => 'ms_templategroup_right[groupids][#{rowid}][]',
 	'object_name' => 'templateGroup',
 	'popup' => [
 		'parameters' => [
 			'srctbl' => 'template_groups',
 			'srcfld1' => 'groupid',
 			'dstfrm' => $form->getName(),
-			'dstfld1' => 'ms_new_templategroup_right_groupids_#{rowid}_'
+			'dstfld1' => 'ms_templategroup_right_groupids_#{rowid}_'
 		]
 	],
 	'add_post_js' => false
@@ -181,7 +181,7 @@ $template_permissions_row_template = (new CTemplateTag('template-permissions-row
 	(new CRow([
 		$templates_multiselect,
 		(new CCol(
-			(new CRadioButtonList('new_templategroup_right[permission][#{rowid}]', PERM_DENY))
+			(new CRadioButtonList('templategroup_right[permission][#{rowid}]', PERM_DENY))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
@@ -221,14 +221,14 @@ $host_permissions_form_grid
 	);
 
 $hosts_multiselect = (new CMultiSelect([
-			'name' => 'ms_new_group_right[groupids][#{rowid}][]',
+			'name' => 'ms_hostgroup_right[groupids][#{rowid}][]',
 			'object_name' => 'hostGroup',
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'ms_new_group_right_groupids_#{rowid}_'
+					'dstfld1' => 'ms_hostgroup_right_groupids_#{rowid}_'
 				]
 			],
 			'add_post_js' => false
@@ -239,7 +239,7 @@ $host_permissions_row_template = (new CTemplateTag('host-permissions-row-templat
 	(new CRow([
 		$hosts_multiselect,
 		(new CCol(
-			(new CRadioButtonList('new_group_right[permission][#{rowid}]', PERM_DENY))
+			(new CRadioButtonList('hostgroup_right[permission][#{rowid}]', PERM_DENY))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
@@ -279,14 +279,14 @@ $tag_filter_form_grid
 	);
 
 $tag_filter_multiselect = (new CMultiSelect([
-			'name' => 'ms_new_tag_filter[groupids][#{rowid}][]',
+			'name' => 'ms_tag_filter[groupids][#{rowid}][]',
 			'object_name' => 'hostGroup',
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'ms_new_tag_filter_groupids_#{rowid}_'
+					'dstfld1' => 'ms_tag_filter_groupids_#{rowid}_'
 				]
 			],
 			'add_post_js' => false
@@ -297,12 +297,12 @@ $tag_filter_row_template = (new CTemplateTag('tab-filter-row-template'))->addIte
 	(new CRow([
 		$tag_filter_multiselect,
 		(new CCol(
-			(new CTextBox('new_tag_filter[tag][#{rowid}]'))
+			(new CTextBox('tag_filter[tag][#{rowid}]'))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAttribute('placeholder', _('tag'))
 		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CTextBox('new_tag_filter[value][#{rowid}]'))
+			(new CTextBox('tag_filter[value][#{rowid}]'))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAttribute('placeholder', _('value'))
 		))->setAttribute('style', 'vertical-align: top'),
@@ -359,7 +359,7 @@ $form->addItem($tabs);
 $form->addItem(
 	(new CScriptTag('view.init('.json_encode([
 		'templategroup_rights' => $data['templategroup_rights'],
-		'hostgroup_rights' => $data['group_rights'],
+		'hostgroup_rights' => $data['hostgroup_rights'],
 		'tag_filters' => $data['tag_filters']
 	]).');'))->setOnDocumentReady()
 );

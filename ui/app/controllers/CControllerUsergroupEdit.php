@@ -32,8 +32,16 @@ class CControllerUsergroupEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'usrgrpid' =>					'db usrgrp.usrgrpid',
-			'form_refresh' =>				'int32'
+			'usrgrpid' =>				'db usrgrp.usrgrpid',
+
+			'ms_hostgroup_right' =>		'array',
+			'hostgroup_right' =>		'array',
+			'ms_templategroup_right' =>	'array',
+			'templategroup_right' =>	'array',
+			'ms_tag_filter' =>			'array',
+			'tag_filter' =>			    'array',
+
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -89,7 +97,7 @@ class CControllerUsergroupEdit extends CController {
 			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
 		}
 
-		$data['group_rights'] = $this->getGroupRights();
+		$data['hostgroup_rights'] = $this->getGroupRights();
 		$data['templategroup_rights'] = $this->getTemplategroupRights();
 		$data['tag_filters'] = $this->getTagFilters();
 

@@ -23,21 +23,21 @@ class CControllerUsergroupCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'name' =>						'required|not_empty|db usrgrp.name',
-			'userids' =>					'array_db users.userid',
-			'gui_access' =>					'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
-			'users_status' =>				'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
-			'debug_mode' =>					'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
-			'userdirectoryid' =>			'db usrgrp.userdirectoryid',
+			'name' =>					'required|not_empty|db usrgrp.name',
+			'userids' =>				'array_db users.userid',
+			'gui_access' =>				'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
+			'users_status' =>			'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode' =>				'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
+			'userdirectoryid' =>		'db usrgrp.userdirectoryid',
 
-			'ms_new_group_right' =>			'array',
-			'new_group_right' =>			'array',
-			'ms_new_templategroup_right' =>	'array',
-			'new_templategroup_right' =>	'array',
-			'ms_new_tag_filter' =>			'array',
-			'new_tag_filter' =>				'array',
+			'ms_hostgroup_right' =>		'array',
+			'hostgroup_right' =>		'array',
+			'ms_templategroup_right' =>	'array',
+			'templategroup_right' =>	'array',
+			'ms_tag_filter' =>			'array',
+			'tag_filter' =>				'array',
 
-			'form_refresh' =>				'int32'
+			'form_refresh' =>			'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -77,11 +77,11 @@ class CControllerUsergroupCreate extends CController {
 
 		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userdirectoryid']);
 
-		$new_hostgroup_rights = [];
-		$this->getInputs($new_hostgroup_rights, ['ms_new_group_right', 'new_group_right']);
+		$hostgroup_rights = [];
+		$this->getInputs($hostgroup_rights, ['ms_hostgroup_right', 'hostgroup_right']);
 
-		$groupIds = $new_hostgroup_rights['ms_new_group_right']['groupids'] ?? [];
-		$permissions = $new_hostgroup_rights['new_group_right']['permission'] ?? [];
+		$groupIds = $hostgroup_rights['ms_hostgroup_right']['groupids'] ?? [];
+		$permissions = $hostgroup_rights['hostgroup_right']['permission'] ?? [];
 
 		foreach ($groupIds as $index => $group) {
 			foreach ($group as $groupId) {
@@ -96,11 +96,11 @@ class CControllerUsergroupCreate extends CController {
 			}
 		}
 
-		$new_templategroup_rights = [];
-		$this->getInputs($new_templategroup_rights, ['ms_new_templategroup_right', 'new_templategroup_right']);
+		$templategroup_rights = [];
+		$this->getInputs($templategroup_rights, ['ms_templategroup_right', 'templategroup_right']);
 
-		$template_groupIds = $new_templategroup_rights['ms_new_templategroup_right']['groupids'] ?? [];
-		$template_permissions = $new_templategroup_rights['new_templategroup_right']['permission'] ?? [];
+		$template_groupIds = $templategroup_rights['ms_templategroup_right']['groupids'] ?? [];
+		$template_permissions = $templategroup_rights['templategroup_right']['permission'] ?? [];
 
 		foreach ($template_groupIds as $index => $group) {
 			foreach ($group as $groupId) {
@@ -115,12 +115,12 @@ class CControllerUsergroupCreate extends CController {
 			}
 		}
 
-		$new_tag_filters = [];
-		$this->getInputs($new_tag_filters, ['ms_new_tag_filter', 'new_tag_filter']);
+		$tag_filters = [];
+		$this->getInputs($tag_filters, ['ms_tag_filter', 'tag_filter']);
 
-		$tag_filters_groupIds = $new_tag_filters['ms_new_tag_filter']['groupids'] ?? [];
-		$tags = $new_tag_filters['new_tag_filter']['tag'] ?? [];
-		$values = $new_tag_filters['new_tag_filter']['value'] ?? [];
+		$tag_filters_groupIds = $tag_filters['ms_tag_filter']['groupids'] ?? [];
+		$tags = $tag_filters['tag_filter']['tag'] ?? [];
+		$values = $tag_filters['tag_filter']['value'] ?? [];
 
 		foreach ($tag_filters_groupIds as $index => $group) {
 			foreach ($group as $groupId) {
