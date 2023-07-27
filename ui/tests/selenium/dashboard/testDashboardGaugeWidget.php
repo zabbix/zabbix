@@ -25,14 +25,17 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config, widget
  *
+ * @dataSource AllItemTypes
+ *
  * @onBefore prepareDashboardData
  */
 class testDashboardGaugeWidget extends CWebTest {
 
 	use TableTrait;
 
-	const HOST = 'Host for gauge widget';
+	const HOST = 'Host for all item types';
 	const DELETE_GAUGE = 'Gauge for deleting';
+	const GAUGE_ITEM = '0 Float item';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -65,31 +68,6 @@ class testDashboardGaugeWidget extends CWebTest {
 	}
 
 	public function prepareDashboardData() {
-		CDataHelper::call('host.create', [
-			'host' => self::HOST,
-			'groups' => [['groupid' => 4]]
-		]);
-		$hostids = CDataHelper::getIds('host');
-
-		// Create items.
-		$items_data = [];
-		$value_types = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
-				ITEM_VALUE_TYPE_TEXT
-		];
-
-		foreach ($value_types as $type) {
-			$items_data[] = [
-				'hostid' => $hostids[self::HOST],
-				'name' => $type.' Item for gauge widget',
-				'key_' => 'trap'.$type,
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => $type
-			];
-		}
-
-		CDataHelper::call('item.create', $items_data);
-		$itemids = CDataHelper::getIds('name');
-
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Gauge widget dashboard',
 			'auto_start' => 0,
@@ -107,7 +85,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => $itemids[ITEM_VALUE_TYPE_FLOAT.' Item for gauge widget']
+									'value' => CDataHelper::get('AllItemTypes.0 Float item')
 								]
 							]
 						],
@@ -123,17 +101,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => $itemids[ITEM_VALUE_TYPE_FLOAT.' Item for gauge widget']
-								],
-								[
-									'type' => '1',
-									'name' => 'min',
-									'value' => '0'
-								],
-								[
-									'type' => '1',
-									'name' => 'max',
-									'value' => '100'
+									'value' => CDataHelper::get('AllItemTypes.0 Float item')
 								]
 							]
 						]
@@ -254,6 +222,11 @@ class testDashboardGaugeWidget extends CWebTest {
 			'Position' => 'Position is ignored for s, uptime and unixtime units.'
 		];
 
+		// Check Position dropdown options.
+		$this->assertEquals(['Before value', 'Above value', 'After value', 'Below value'],
+				$form->getField('id:units_pos')->getOptions()->asText()
+		);
+
 		foreach ($hints as $label => $text) {
 			// Force click is needed because the label might be hidden under the scrolled part of the form.
 			$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click(true);
@@ -348,7 +321,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 0,
 						'Max' => 0
 					],
@@ -362,7 +335,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 0,
 						'Max' => 0,
 						'id:desc_size' => 0,
@@ -391,7 +364,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => str_repeat(9,255),
 						'Max' => str_repeat(9,255)
 					],
@@ -403,7 +376,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 10,
 						'Max' => 3
 					],
@@ -415,7 +388,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => '',
 						'Max' => '',
 						'id:desc_size' => '',
@@ -448,7 +421,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 'text',
 						'Max' => 'test',
 						'id:desc_size' => 'abc',
@@ -481,7 +454,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => '2t',
 						'Max' => '3y',
 						'id:desc_size' => '1a',
@@ -508,7 +481,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 'そこ',
 						'Max' => 'ߘ',
 						'id:desc_size' => '۞',
@@ -543,7 +516,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => '𒀐',
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => '😁',
 						'Max' => '🙂',
 						'id:desc_size' => '😅',
@@ -577,7 +550,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'id:decimal_places' => '900',
 						'id:scale_decimal_places' => '900'
 					],
@@ -592,7 +565,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => '😁🙂𒀐',
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Min' => 99,
 						'Max' => 88888,
 						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
@@ -639,7 +612,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'Min' => 15,
 						'Max' => 200,
 						'Refresh interval' => '30 seconds',
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'id:units_pos' => 'Before value'
 					],
 					'Thresholds' => [
@@ -653,7 +626,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'False default checkboxes',
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget',
+						'Item' => self::GAUGE_ITEM,
 						'Show header' => false,
 						'id:value_arc' => false,
 						'id:units_show' => false,
@@ -670,7 +643,7 @@ class testDashboardGaugeWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Item' => ITEM_VALUE_TYPE_UINT64.' Item for gauge widget'
+						'Item' => self::GAUGE_ITEM
 					]
 				]
 			]
@@ -973,8 +946,8 @@ class testDashboardGaugeWidget extends CWebTest {
 		$table->waitUntilReloaded();
 
 		$visible_items = [
-			ITEM_VALUE_TYPE_FLOAT.' Item for gauge widget',
-			ITEM_VALUE_TYPE_UINT64.' Item for gauge widget'
+			'0 Float item',
+			'3 Unsigned item'
 		];
 
 		$this->assertTableDataColumn($visible_items);
