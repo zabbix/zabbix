@@ -58,8 +58,6 @@ class testAuditlogProxy extends testAuditlogCommon {
 			'proxy.allowed_addresses' => ['add', 'localhost'],
 			'proxy.tls_psk_identity' => ['add', '******'],
 			'proxy.tls_psk' => ['add', '******'],
-			'proxy.address' => ['add', ''],
-			'proxy.port' => ['add', ''],
 			'proxy.proxyid' => ['add', self::$resourceid]
 		]);
 
