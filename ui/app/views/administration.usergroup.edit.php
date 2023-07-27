@@ -188,9 +188,7 @@ $templategroup_right_row_template = (new CTemplateTag('templategroup-right-row-t
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CButton('templategroup_right_row_remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-remove-table-row')
+			(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
 		))->setAttribute('style', 'vertical-align: top')
 	]))
 		->addClass('form_row')
@@ -246,9 +244,7 @@ $host_permissions_row_template = (new CTemplateTag('hostgroup-right-row-template
 				->setModern(true)
 		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CButton('hostgroup_right_row_remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-remove-table-row')
+			(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
 		))->setAttribute('style', 'vertical-align: top')
 	]))
 		->addClass('form_row')
@@ -307,9 +303,7 @@ $tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addIte
 				->setAttribute('placeholder', _('value'))
 		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CButton('tag_filter_row_remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-remove-table-row')
+			(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
 		))->setAttribute('style', 'vertical-align: top')
 	]))
 		->addClass('form_row')
