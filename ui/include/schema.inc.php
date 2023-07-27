@@ -9721,7 +9721,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 64,
-				'default' => '10050'
+				'default' => '10051'
 			]
 		]
 	],

@@ -639,7 +639,7 @@ class testProxy extends CAPITest {
 					'mode' => PROXY_MODE_ACTIVE,
 					'address' => 'localhost'
 				],
-				'expected_error' => 'Invalid parameter "/1/address": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/address": value must be "127.0.0.1".'
 			],
 			'Test proxy.create: invalid "port" (not empty int) for active proxy' => [
 				'proxy' => [
@@ -655,7 +655,7 @@ class testProxy extends CAPITest {
 					'mode' => PROXY_MODE_ACTIVE,
 					'port' => '12345'
 				],
-				'expected_error' =>	'Invalid parameter "/1/port": value must be empty.'
+				'expected_error' =>	'Invalid parameter "/1/port": value must be "10051".'
 			],
 
 			// Check "tls_connect".
@@ -1137,34 +1137,70 @@ class testProxy extends CAPITest {
 					$this->assertSame($proxies[$num]['allowed_addresses'], $db_proxy['allowed_addresses']);
 				}
 				else {
-					$this->assertEmpty($db_proxy['allowed_addresses']);
+					$this->assertSame($db_proxy['allowed_addresses'], DB::getDefault('proxy', 'allowed_addresses'));
 				}
 
-				foreach (['hosts', 'address', 'port'] as $field) {
-					if (array_key_exists($field, $proxies[$num]) && $proxies[$num][$field]) {
-						$this->assertEqualsCanonicalizing($proxies[$num][$field], $db_proxy[$field]);
-					}
-					elseif ($field === 'hosts') {
-						$this->assertEmpty($db_proxy[$field]);
-					}
+				if (array_key_exists('address', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['address'], $db_proxy['address']);
+				}
+				else {
+					$this->assertSame($db_proxy['address'], DB::getDefault('proxy', 'address'));
 				}
 
-				foreach (['tls_connect', 'tls_accept'] as $field) {
-					if (array_key_exists($field, $proxies[$num])) {
-						$this->assertEquals($proxies[$num][$field], $db_proxy[$field]);
-					}
-					else {
-						$this->assertSame(DB::getDefault('proxy', $field), $db_proxy[$field]);
-					}
+				if (array_key_exists('port', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['port'], $db_proxy['port'], 'port should match request');
+				}
+				else {
+					$this->assertSame($db_proxy['port'], DB::getDefault('proxy', 'port'), 'port shoud match db');
 				}
 
-				foreach (['tls_issuer', 'tls_subject', 'tls_psk_identity', 'tls_psk'] as $field) {
-					if (array_key_exists($field, $proxies[$num])) {
-						$this->assertSame($proxies[$num][$field], $db_proxy[$field]);
-					}
-					else {
-						$this->assertEmpty($db_proxy[$field]);
-					}
+				if (array_key_exists('tls_accept', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['tls_accept'], $db_proxy['tls_accept']);
+				}
+				else {
+					$this->assertSame($db_proxy['tls_accept'], DB::getDefault('proxy', 'tls_accept'));
+				}
+
+				if (array_key_exists('tls_connect', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['tls_connect'], $db_proxy['tls_connect']);
+				}
+				else {
+					$this->assertSame($db_proxy['tls_connect'], DB::getDefault('proxy', 'tls_connect'));
+				}
+
+				if (array_key_exists('tls_issuer', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['tls_issuer'], $db_proxy['tls_issuer']);
+				}
+				else {
+					$this->assertSame($db_proxy['tls_issuer'], DB::getDefault('proxy', 'tls_issuer'));
+				}
+
+				if (array_key_exists('tls_subject', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['tls_subject'], $db_proxy['tls_subject']);
+				}
+				else {
+					$this->assertSame($db_proxy['tls_subject'], DB::getDefault('proxy', 'tls_subject'));
+				}
+
+				if (array_key_exists('tls_psk_identity', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['tls_psk_identity'], $db_proxy['tls_psk_identity']);
+				}
+				else {
+					$this->assertSame($db_proxy['tls_psk_identity'], DB::getDefault('proxy', 'tls_psk_identity'));
+				}
+
+				if (array_key_exists('tls_psk', $proxies[$num])) {
+					$this->assertSame($proxies[$num]['tls_psk'], $db_proxy['tls_psk']);
+				}
+				else {
+					$this->assertSame($db_proxy['tls_psk'], DB::getDefault('proxy', 'tls_psk'));
+				}
+
+				if (array_key_exists('hosts', $proxies[$num])) {
+					$this->assertEqualsCanonicalizing($proxies[$num]['hosts'], $db_proxy['hosts']);
+				}
+				else {
+					$this->assertEmpty($db_proxy['hosts']);
 				}
 			}
 		}
@@ -1848,19 +1884,19 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' =>	'Invalid parameter "/1/port": a character string is expected.'
 			],
-			'Test proxy.update: invalid "port" (not empty string for active proxy)' => [
-				'proxy' => [
-					'proxyid' => 'update_active_defaults',
-					'port' => '12345'
-				],
-				'expected_error' =>	'Invalid parameter "/1/port": value must be empty.'
-			],
 			'Test proxy.update: invalid "address" (not empty for active proxy)' => [
 				'proxy' => [
 					'proxyid' => 'update_active_defaults',
 					'address' => 'localhost'
 				],
-				'expected_error' => 'Invalid parameter "/1/address": value must be empty.'
+				'expected_error' => 'Invalid parameter "/1/address": value must be "127.0.0.1".'
+			],
+			'Test proxy.update: invalid "port" (not empty string for active proxy)' => [
+				'proxy' => [
+					'proxyid' => 'update_active_defaults',
+					'port' => '12345'
+				],
+				'expected_error' =>	'Invalid parameter "/1/port": value must be "10051".'
 			],
 
 			// Check "tls_connect".
@@ -2287,17 +2323,8 @@ class testProxy extends CAPITest {
 		$db_proxies = DBselect(DB::makeSql('proxy', $options));
 
 		while ($db_proxy = DBfetch($db_proxies)) {
-			$proxy = $response['result'][$db_proxy['proxyid']];
-
-			if ($proxy['mode'] == PROXY_MODE_ACTIVE) {
-				$proxy['address'] = '';
-				$proxy['port'] = '';
-			}
-
-			$proxy['tls_psk_identity'] = $db_proxy['tls_psk_identity'];
-			$proxy['tls_psk'] = $db_proxy['tls_psk'];
-
-			$response['result'][$db_proxy['proxyid']] = $proxy;
+			$response['result'][$db_proxy['proxyid']]['tls_psk_identity'] = $db_proxy['tls_psk_identity'];
+			$response['result'][$db_proxy['proxyid']]['tls_psk'] = $db_proxy['tls_psk'];
 		}
 
 		return $response['result'];
