@@ -103,12 +103,15 @@ abstract class CControllerItem extends CController {
 			$fields[$field] = 'required|'.$fields[$field];
 		}
 
+		$field = '';
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
 			foreach ($this->getInput('tags', []) as $tag) {
 				if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)) {
-					return false;
+					$ret = false;
+					$field = 'tags';
+					break;
 				}
 			}
 		}
@@ -118,6 +121,7 @@ abstract class CControllerItem extends CController {
 		if ($ret && $parameters) {
 			$ret = count($parameters) == count(array_column($parameters, 'name'))
 				&& count($parameters) == count(array_column($parameters, 'value'));
+			$field = 'parameters';
 		}
 
 		$query_fields = $this->getInput('query_fields', []);
@@ -126,6 +130,7 @@ abstract class CControllerItem extends CController {
 			$ret = array_key_exists('sortorder', $query_fields)
 				&& array_key_exists('name', $query_fields)
 				&& array_key_exists('value', $query_fields);
+			$field = 'query_fields';
 		}
 
 		$headers = $this->getInput('headers', []);
@@ -134,12 +139,23 @@ abstract class CControllerItem extends CController {
 			$ret = array_key_exists('sortorder', $headers)
 				&& array_key_exists('name', $headers)
 				&& array_key_exists('value', $headers);
+			$field = 'headers';
 		}
 
 		$delay_flex = $this->getInput('delay_flex', []);
 
 		if ($ret && $delay_flex) {
 			$ret = isValidCustomIntervals($delay_flex);
+			$field = 'delay_flex';
+		}
+
+		if ($ret) {
+			$ret = $this->hasInput('itemid') || $this->hasInput('hostid');
+			$field = $this->hasInput('hostid') ? 'itemid' : 'hostid';
+		}
+
+		if (!$ret && $field !== '') {
+			error(_s('Incorrect value for "%1$s" field.', $field));
 		}
 
 		return $ret;

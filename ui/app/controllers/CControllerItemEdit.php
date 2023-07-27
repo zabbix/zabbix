@@ -28,15 +28,15 @@ class CControllerItemEdit extends CControllerItem {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateFormInput(['hostid', 'context']);
+		$ret = $this->validateFormInput(['context']);
 
 		if (!$ret) {
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
+				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
-				])])
+				])]))->disableView()
 			);
 		}
 
@@ -49,9 +49,9 @@ class CControllerItemEdit extends CControllerItem {
 	}
 
 	public function doAction() {
-		$hostid = $this->getInput('hostid');
 		$form_refresh = $this->hasInput('form_refresh');
-		$host = $this->getInput('context') === 'host' ? $this->getHost($hostid) : $this->getTemplate($hostid);
+		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
+		$hostid = $host['hostid'];
 		$data = [
 			'action' => $this->getAction(),
 			'readonly' => false,
@@ -174,15 +174,15 @@ class CControllerItemEdit extends CControllerItem {
 
 	/**
 	 * Get host data.
-	 *
-	 * @param string $hostid
 	 */
-	protected function getHost($hostid): array {
+	protected function getHost(): array {
+		$conditions = $this->hasInput('hostid')
+			? ['hostids' => [$this->getInput('hostid')]]
+			: ['itemids' => [$this->getInput('itemid')]];
 		[$host] = API::Host()->get([
 			'output' => ['name', 'flags', 'status'],
-			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
-			'hostids' => [$hostid]
-		]);
+			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main']
+		] + $conditions);
 
 		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		// Sort interfaces to be listed starting with one selected as 'main'.
@@ -199,14 +199,18 @@ class CControllerItemEdit extends CControllerItem {
 	 *
 	 * @param string $templateid
 	 */
-	protected function getTemplate($templateid): array {
-		$options = [
-			'output' => ['name', 'flags'],
-			'templateids' => [$templateid]
+	protected function getTemplate(): array {
+		$conditions = $this->hasInput('hostid')
+			? ['templateids' => [$this->getInput('hostid')]]
+			: ['itemids' => [$this->getInput('itemid')]];
+		[$template] = API::Template()->get([
+			'output' => ['name', 'flags']
+		] + $conditions);
+		$template += [
+			'hostid' => $template['templateid'],
+			'status' => HOST_STATUS_TEMPLATE,
+			'interfaces' => []
 		];
-
-		[$template] = API::Template()->get($options);
-		$template['interfaces'] = [];
 
 		return $template;
 	}

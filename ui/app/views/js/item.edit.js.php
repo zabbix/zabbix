@@ -373,8 +373,8 @@ window.item_edit_form = new class {
 		const is_testable = this.#isTestableItem();
 		const is_executable = this.host.status == HOST_STATUS_MONITORED && is_testable;
 
-		this.footer.querySelector('.js-test-item').toggleAttribute('disabled', !is_testable);
-		this.footer.querySelector('.js-execute-item').toggleAttribute('disabled', !is_executable);
+		this.footer.querySelector('.js-test-item')?.toggleAttribute('disabled', !is_testable);
+		this.footer.querySelector('.js-execute-item')?.toggleAttribute('disabled', !is_executable);
 	}
 
 	#updateCustomIntervalVisibility() {

@@ -310,7 +310,7 @@ $confirm_messages = [
 		],
 		'context' => $data['context'],
 		'confirm_messages' => $confirm_messages,
-		'hostids' => array_column($data['filter_data']['ms_hosts'], 'id'),
+		'hostids' => $data['filter_data']['filter_hostids'],
 		'form_name' => $form->getName()
 	]).');
 '))
