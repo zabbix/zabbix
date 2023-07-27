@@ -89,9 +89,9 @@ class CProxy extends CApiService {
 		}
 
 		$sql_parts = [
-			'select'	=> ['proxyid' => 'p.proxy'],
+			'select'	=> ['proxyid' => 'p.proxyid'],
 			'from'		=> ['proxy' => 'proxy p'],
-			'where'		=> ['mode' => 'p.mode IN ('.PROXY_MODE_ACTIVE.','.PROXY_MODE_PASSIVE.')'],
+			'where'		=> [],
 			'order'		=> []
 		];
 
@@ -116,7 +116,7 @@ class CProxy extends CApiService {
 
 		// proxyids
 		if ($options['proxyids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('p.proxyid', $options['proxyids']);
+			$sql_parts['where'][] = dbConditionId('p.proxyid', $options['proxyids']);
 		}
 
 		// filter
