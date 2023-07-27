@@ -81,43 +81,11 @@ class CControllerUsergroupUpdate extends CController {
 			'userdirectoryid'
 		]);
 
-		$hostgroup_rights = [];
-		$this->getInputs($hostgroup_rights, ['ms_hostgroup_right', 'hostgroup_right']);
+		$hostgroup_rights = $this->processRights('ms_hostgroup_right', 'hostgroup_right');
+		$templategroup_rights = $this->processRights('ms_templategroup_right', 'templategroup_right');
 
-		$groupIds = $hostgroup_rights['ms_hostgroup_right']['groupids'] ?? [];
-		$permissions = $hostgroup_rights['hostgroup_right']['permission'] ?? [];
-
-		foreach ($groupIds as $index => $group) {
-			foreach ($group as $groupId) {
-				$permission = $permissions[$index] ?? PERM_DENY;
-
-				if ($groupId !== '0') {
-					$user_group['hostgroup_rights'][] = [
-						'id' => (string) $groupId,
-						'permission' => $permission
-					];
-				}
-			}
-		}
-
-		$templategroup_rights = [];
-		$this->getInputs($templategroup_rights, ['ms_templategroup_right', 'templategroup_right']);
-
-		$template_groupIds = $templategroup_rights['ms_templategroup_right']['groupids'] ?? [];
-		$template_permissions = $templategroup_rights['templategroup_right']['permission'] ?? [];
-
-		foreach ($template_groupIds as $index => $group) {
-			foreach ($group as $groupId) {
-				$permission = $template_permissions[$index] ?? PERM_DENY;
-
-				if ($groupId !== '0') {
-					$user_group['templategroup_rights'][] = [
-						'id' => (string) $groupId,
-						'permission' => $permission
-					];
-				}
-			}
-		}
+		$user_group['hostgroup_rights'] = $hostgroup_rights;
+		$user_group['templategroup_rights'] = $templategroup_rights;
 
 		$tag_filters = [];
 		$this->getInputs($tag_filters, ['ms_tag_filter', 'tag_filter']);
@@ -161,5 +129,33 @@ class CControllerUsergroupUpdate extends CController {
 		}
 
 		$this->setResponse($response);
+	}
+
+	/**
+	 * Returns host or template group rights formatted for writing in the database.
+	 *
+	 * @return array
+	 */
+	private function processRights($groupId_key, $permission_key) {
+		$rights = [];
+		$processed_rights = [];
+		$this->getInputs($rights, [$groupId_key, $permission_key]);
+
+		$groupIds = $rights[$groupId_key]['groupids'] ?? [];
+		$permissions = $rights[$permission_key]['permission'] ?? [];
+
+		foreach ($groupIds as $index => $group) {
+			foreach ($group as $groupId) {
+				$permission = $permissions[$index] ?? PERM_DENY;
+
+				if ($groupId !== '0') {
+					$processed_rights[] = [
+						'id' => (string) $groupId,
+						'permission' => $permission
+					];
+				}
+			}
+		}
+		return $processed_rights;
 	}
 }
