@@ -311,6 +311,9 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	for (i = 0; i < num; i++)
 	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
 		if (ITEM_TYPE_HTTPAGENT == items[i].type)
 		{
 #ifdef HAVE_LIBCURL
