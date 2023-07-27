@@ -308,7 +308,17 @@ class CApiInputValidatorTest extends TestCase {
 		$tests_host_address = array_merge($tests_dns, $tests_ip);
 
 		foreach ($tests_host_address as &$test) {
-			$test['type'] = API_HOST_ADDRESS;
+			if ($test[0]['type'] == API_DNS && $test[3] === 'Invalid parameter "/1/dns": a DNS name is expected.') {
+				$test[3] = 'Invalid parameter "/1/dns": an IP or DNS is expected.';
+			}
+
+			if ($test[0]['type'] == API_IP && $test[3] === 'Invalid parameter "/1/ip": an IP address is expected.') {
+				$test[3] = CApiInputValidator::validate(['type' => API_DNS] + $test[0], $test[1], $test[2], $error)
+					? $test[1]
+					: 'Invalid parameter "/1/ip": an IP or DNS is expected.';
+			}
+
+			$test[0]['type'] = API_HOST_ADDRESS;
 		}
 		unset($test);
 

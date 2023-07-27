@@ -2765,6 +2765,8 @@ class CApiInputValidator {
 		}
 
 		if (self::checkIp($flags, $data, $path, $error) || self::checkDns($flags, $data, $path, $error)) {
+			$error = '';
+
 			return true;
 		}
 
