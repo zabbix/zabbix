@@ -2042,11 +2042,15 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response, 
 	if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 	{
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len);
+		*running = 0;
 		goto out;
 	}
 
 	if (SNMP_ERR_NOSUCHNAME == response->errstat)
+	{
+		*running = 0;
 		goto out;
+	}
 
 	zbx_snmp_format_opts_t	default_opts, bulk_opts;
 
@@ -2128,7 +2132,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 		bulkwalk_context = (zbx_bulkwalk_context_t *)magic;
 		snmp_context = (zbx_snmp_context_t *)bulkwalk_context->arg;
 
-		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(STAT_SUCCESS, pdu, &bulkwalk_context->p_oid,
+		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(STAT_SUCCESS, pdu, bulkwalk_context->p_oid,
 				&bulkwalk_context->running, &bulkwalk_context->vars_num, bulkwalk_context->pdu_type,
 				bulkwalk_context->name, &bulkwalk_context->name_length,
 				&snmp_context->results, &snmp_context->results_alloc, &snmp_context->results_offset,
@@ -2148,7 +2152,7 @@ static zbx_bulkwalk_context_t	*snmp_bulkwalk_contect_create(zbx_snmp_context_t *
 
 	bulkwalk_context = zbx_malloc(NULL, sizeof(zbx_bulkwalk_context_t));
 
-	bulkwalk_context->p_oid = *p_oid;
+	bulkwalk_context->p_oid = p_oid;
 	memcpy(bulkwalk_context->name, p_oid->root_oid, p_oid->root_oid_len * sizeof(oid));
 	bulkwalk_context->name_length = p_oid->root_oid_len;
 	bulkwalk_context->pdu_type = pdu_type;
@@ -2441,8 +2445,8 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 
 	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
 
-	if (NULL == (snmp_context->ssp = zbx_snmp_open_session(item, error, sizeof(error),
-			config_timeout, config_source_ip)))
+	if (NULL == (snmp_context->ssp = zbx_snmp_open_session(item, error, sizeof(error), config_timeout,
+			config_source_ip)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value failed: %s", error));
 		ret = CONFIG_ERROR;

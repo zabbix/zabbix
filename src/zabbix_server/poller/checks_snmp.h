@@ -55,7 +55,7 @@ typedef struct
 	int			reqid;
 	int			sock;
 	int			pdu_type;
-	zbx_snmp_oid_t		p_oid;
+	zbx_snmp_oid_t		*p_oid;
 	oid			name[MAX_OID_LEN];
 	size_t			name_length;
 	int			running;
