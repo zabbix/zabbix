@@ -212,6 +212,7 @@
 
 		$form.submit(function() {
 			$form.trimValues(['#name']);
+			trimTagFilters();
 		});
 
 		/**
@@ -226,6 +227,17 @@
 			else {
 				$userdirectory.removeAttr('disabled');
 			}
+		}
+
+		function trimTagFilters() {
+			let tag_filter_tags = document.querySelectorAll('[id^="tag_filter_tag_"]');
+			let tag_filter_values = document.querySelectorAll('[id^="tag_filter_value_"]');
+			let tag_filter_fields = [...tag_filter_tags, ...tag_filter_values];
+
+			tag_filter_fields.forEach(function(input) {
+				let inputId = '#' + input.id;
+				$form.trimValues([inputId]);
+			});
 		}
 	});
 </script>
