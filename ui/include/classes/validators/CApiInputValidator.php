@@ -2601,6 +2601,20 @@ class CApiInputValidator {
 			return false;
 		}
 
+		return self::checkIp($flags, $data, $path, $error);
+	}
+
+	/**
+	 * Check IP syntax.
+	 *
+	 * @param int    $flags  API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkIp($flags, &$data, $path, &$error) {
 		$ip_parser = new CIPParser([
 			'v6' => ZBX_HAVE_IPV6,
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
@@ -2692,6 +2706,20 @@ class CApiInputValidator {
 			return false;
 		}
 
+		return self::checkDns($flags, $data, $path, $error);
+	}
+
+	/**
+	 * Check DNS syntax.
+	 *
+	 * @param int    $flags  API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkDns($flags, &$data, $path, &$error) {
 		$dns_parser = new CDnsParser([
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
@@ -2736,7 +2764,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		if (self::validateIp($rule, $data, $path, $error) || self::validateDns($rule, $data, $path, $error)) {
+		if (self::checkIp($flags, $data, $path, $error) || self::checkDns($flags, $data, $path, $error)) {
 			return true;
 		}
 
