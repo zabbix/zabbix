@@ -62,14 +62,12 @@ static const char	*task_state_to_str(zbx_async_task_state_t task_state)
 static void	async_event(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
-	int			ret, fd_new;
+	int			ret;
 	struct event_base	*ev;
-
-	ZBX_UNUSED(fd);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data, &fd_new);
+	ret = task->process_cb(what, task->data, &fd);
 
 	switch (ret)
 	{
@@ -82,7 +80,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 		case ZBX_ASYNC_TASK_READ_NEW:
 			ev = event_get_base(task->rx_event);
 			event_free(task->rx_event);
-			task->rx_event = event_new(ev, fd_new, EV_READ, async_event, (void *)task);
+			task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
 			event_add(task->rx_event, NULL);
 			break;
 		case ZBX_ASYNC_TASK_WRITE:
