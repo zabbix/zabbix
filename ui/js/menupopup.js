@@ -724,7 +724,6 @@ function getMenuPopupDashboard(options, trigger_element) {
  *        {bool}   options['show_rank_change_cause']      (optional) Whether to show "Mark as cause".
  *        {bool}   options['show_rank_change_symptom']    (optional) Whether to show "Mark selected as symptoms".
  *        {array}  options['urls']                        (optional) Links.
- *
  * @param {object} trigger_element                        UI element which triggered opening of overlay dialogue.
  *
  * @return array
