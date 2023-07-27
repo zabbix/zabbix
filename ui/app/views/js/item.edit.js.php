@@ -25,29 +25,31 @@
 
 ?><script>
 (() => {
+const CONFIRM_FORM_NAVIGATION = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
+const ERROR_XHR_SERVER = <?= json_encode(_('Unexpected server error.')) ?>;
+const HOST_STATUS_MONITORED = <?= HOST_STATUS_MONITORED ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_DELAY_SCHEDULING = <?= ITEM_DELAY_SCHEDULING ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
-const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
+const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
 const ITEM_TYPE_IPMI = <?= ITEM_TYPE_IPMI ?>;
+const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
+const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
-const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
-const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
-const CONFIRM_FORM_NAVIGATION = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
-const ERROR_XHR_SERVER = <?= json_encode(_('Unexpected server error.')) ?>;
 
 window.item_edit_form = new class {
 
 	init({
-		field_switches, form_data, host_interfaces, interface_types, testable_item_types, type_with_key_select,
+		field_switches, form_data, host, interface_types, testable_item_types, type_with_key_select,
 		value_type_keys
 	}) {
 		this.form_data = form_data;
+		this.host = host;
 		this.testable_item_types = testable_item_types;
 		this.interface_types = interface_types;
 		this.optional_interfaces = [];
@@ -61,7 +63,7 @@ window.item_edit_form = new class {
 			}
 		}
 
-		for (const host_interface of host_interfaces) {
+		for (const host_interface of Object.values(host.interfaces)) {
 			if (host_interface.type in this.type_interfaceids) {
 				this.type_interfaceids[host_interface.type].push(host_interface.interfaceid);
 			}
@@ -236,6 +238,7 @@ window.item_edit_form = new class {
 		);
 
 		this.overlay.unsetLoading();
+		this.#updateActionButtons();
 		// Method requires form name to be set to itemForm.
 		openItemTestDialog(indexes, true, true, this.footer.querySelector('.js-test-item'), -2);
 	}
@@ -253,6 +256,14 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.clear');
+		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]});
+	}
+
+	execute() {
+		const fields = this.#getFormFields();
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'item.execute');
 		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]});
 	}
 
@@ -359,7 +370,11 @@ window.item_edit_form = new class {
 	}
 
 	#updateActionButtons() {
-		this.footer.querySelector('.js-test-item').toggleAttribute('disabled', !this.#isTestableItem());
+		const is_testable = this.#isTestableItem();
+		const is_executable = this.host.status == HOST_STATUS_MONITORED && is_testable;
+
+		this.footer.querySelector('.js-test-item').toggleAttribute('disabled', !is_testable);
+		this.footer.querySelector('.js-execute-item').toggleAttribute('disabled', !is_executable);
 	}
 
 	#updateCustomIntervalVisibility() {

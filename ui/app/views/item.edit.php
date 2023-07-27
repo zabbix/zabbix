@@ -43,8 +43,41 @@ $form = (new CForm('post'))
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$item = $data['form'];
+$value_types = [
+	ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
+	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
+	ITEM_VALUE_TYPE_STR => _('Character'),
+	ITEM_VALUE_TYPE_LOG => _('Log'),
+	ITEM_VALUE_TYPE_TEXT => _('Text'),
+	ITEM_VALUE_TYPE_BINARY => _('Binary')
+];
+$type_with_key_select = [
+	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
+	ITEM_TYPE_SNMPTRAP, ITEM_TYPE_JMX, ITEM_TYPE_IPMI
+];
 
-if ($data['form']['itemid']) {
+if (!$item['delay_flex']) {
+	$item['delay_flex'] = [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]];
+}
+
+if (!$item['parameters']) {
+	$item['parameters'] = [['name' => '', 'value' => '']];
+}
+
+if (!$item['query_fields']) {
+	$item['query_fields'] = [['name' => '', 'value' => '']];
+}
+
+if (!$item['headers']) {
+	$item['headers'] = [['name' => '', 'value' => '']];
+}
+
+if (!$item['tags']) {
+	$item['tags'] = [['tag' => '', 'value' => '']];
+}
+
+if ($item['itemid']) {
 	$buttons = [
 		[
 			'title' => _('Update'),
@@ -81,21 +114,25 @@ if ($data['form']['itemid']) {
 					]
 				]
 			]).')'
-		],
-		[
-			'title' => _('Execute now'),
-			'class' => ZBX_STYLE_BTN_ALT,
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'throw "Not implemented"'
-		],
-		[
-			'title' => _('Test'),
-			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'item_edit_form.test();'
 		]
+	];
+
+	if ($data['host']['status'] != HOST_STATUS_TEMPLATE) {
+		$buttons[] = [
+			'title' => _('Execute now'),
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-execute-item']),
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'item_edit_form.execute();'
+		];
+	}
+
+	$buttons[] = [
+		'title' => _('Test'),
+		'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
+		'keepOpen' => true,
+		'isSubmit' => false,
+		'action' => 'item_edit_form.test();'
 	];
 
 	if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
@@ -136,40 +173,6 @@ else {
 			'action' => 'item_edit_form.test();'
 		]
 	];
-}
-
-$value_types = [
-	ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
-	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
-	ITEM_VALUE_TYPE_STR => _('Character'),
-	ITEM_VALUE_TYPE_LOG => _('Log'),
-	ITEM_VALUE_TYPE_TEXT => _('Text'),
-	ITEM_VALUE_TYPE_BINARY => _('Binary')
-];
-$type_with_key_select = [
-	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
-	ITEM_TYPE_SNMPTRAP, ITEM_TYPE_JMX, ITEM_TYPE_IPMI
-];
-$item = $data['form'];
-
-if (!$item['delay_flex']) {
-	$item['delay_flex'] = [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]];
-}
-
-if (!$item['parameters']) {
-	$item['parameters'] = [['name' => '', 'value' => '']];
-}
-
-if (!$item['query_fields']) {
-	$item['query_fields'] = [['name' => '', 'value' => '']];
-}
-
-if (!$item['headers']) {
-	$item['headers'] = [['name' => '', 'value' => '']];
-}
-
-if (!$item['tags']) {
-	$item['tags'] = [['tag' => '', 'value' => '']];
 }
 
 $tabs = (new CTabView())
@@ -223,7 +226,7 @@ $form
 	->addItem((new CScriptTag('item_edit_form.init('.json_encode([
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
 			'form_data' => $item,
-			'host_interfaces' => array_values($data['host']['interfaces']),
+			'host' => $data['host'],
 			'interface_types' => $data['interface_types'],
 			'readonly' => $data['readonly'],
 			'testable_item_types' => $data['testable_item_types'],
