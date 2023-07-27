@@ -1103,9 +1103,7 @@ class testProxy extends CAPITest {
 			$proxies = zbx_toArray($proxies);
 		}
 
-		$sql_proxies = 'SELECT NULL FROM proxy p WHERE '.dbConditionInt('p.mode', [
-			PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE
-		]);
+		$sql_proxies = 'SELECT NULL FROM proxy p';
 		$old_hash_proxies = CDBHelper::getHash($sql_proxies);
 
 		$result = $this->call('proxy.create', $proxies, $expected_error);
@@ -1146,7 +1144,7 @@ class testProxy extends CAPITest {
 					if (array_key_exists($field, $proxies[$num]) && $proxies[$num][$field]) {
 						$this->assertEqualsCanonicalizing($proxies[$num][$field], $db_proxy[$field]);
 					}
-					else {
+					elseif ($field === 'hosts') {
 						$this->assertEmpty($db_proxy[$field]);
 					}
 				}
@@ -2289,8 +2287,17 @@ class testProxy extends CAPITest {
 		$db_proxies = DBselect(DB::makeSql('proxy', $options));
 
 		while ($db_proxy = DBfetch($db_proxies)) {
-			$response['result'][$db_proxy['proxyid']]['tls_psk_identity'] = $db_proxy['tls_psk_identity'];
-			$response['result'][$db_proxy['proxyid']]['tls_psk'] = $db_proxy['tls_psk'];
+			$proxy = $response['result'][$db_proxy['proxyid']];
+
+			if ($proxy['mode'] == PROXY_MODE_ACTIVE) {
+				$proxy['address'] = '';
+				$proxy['port'] = '';
+			}
+
+			$proxy['tls_psk_identity'] = $db_proxy['tls_psk_identity'];
+			$proxy['tls_psk'] = $db_proxy['tls_psk'];
+
+			$response['result'][$db_proxy['proxyid']] = $proxy;
 		}
 
 		return $response['result'];

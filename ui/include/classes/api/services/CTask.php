@@ -267,7 +267,6 @@ class CTask extends CApiService {
 					break;
 			}
 		}
-
 		unset($proxyids[0]);
 
 		if (self::$userData['type'] < $min_permissions) {

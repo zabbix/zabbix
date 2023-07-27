@@ -545,9 +545,6 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 
 			$data['proxies'] = API::Proxy()->get([
 				'output' => ['proxyid', 'name'],
-				'filter' => [
-					'status' => [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE]
-				],
 				'sortfield' => 'name'
 			]);
 
