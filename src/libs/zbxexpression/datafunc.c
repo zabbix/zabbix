@@ -481,7 +481,7 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					ret = SUCCEED;
 				}
 				else
-					ret = expr_db_get_proxy_value(proxyid, replace_to, "host");
+					ret = expr_db_get_proxy_value(proxyid, replace_to, "name");
 				break;
 			case ZBX_REQUEST_PROXY_DESCRIPTION:
 				ZBX_DBROW2UINT64(proxyid, row[0]);
