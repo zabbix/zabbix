@@ -192,6 +192,7 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/dns": a DNS name is expected.'
 			]
 		];
+
 		$tests_ip = [
 			[
 				['type' => API_IP],
@@ -301,7 +302,7 @@ class CApiInputValidatorTest extends TestCase {
 				'{HOST.HOST}',
 				'/1/ip',
 				'Invalid parameter "/1/ip": an IP address is expected.'
-			],
+			]
 		];
 
 		$tests_host_address = array_merge($tests_dns, $tests_ip);
