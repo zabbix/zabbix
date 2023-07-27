@@ -93,7 +93,7 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
 		int config_timeout, const char *config_source_ip);
-int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT *result,
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
 		int config_timeout, const char *config_source_ip);
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);

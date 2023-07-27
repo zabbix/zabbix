@@ -2351,8 +2351,6 @@ static int	agent_task_process(short event, void *data, int *fd)
 		return ZBX_ASYNC_TASK_READ_NEW;
 	}
 stop:
-	zbx_snmp_close_session(snmp_context->ssp);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ZBX_ASYNC_TASK_STOP;
@@ -2360,6 +2358,9 @@ stop:
 
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 {
+	if (NULL != snmp_context->ssp)
+		zbx_snmp_close_session(snmp_context->ssp);
+
 	zbx_free(snmp_context->item.key);
 	zbx_free(snmp_context->item.key_orig);
 	zbx_free(snmp_context->results);
@@ -2396,7 +2397,7 @@ static void	process_agent_result(void *data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT *result,
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
 		int config_timeout, const char *config_source_ip)
 {
@@ -2432,7 +2433,6 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	snmp_context->results = NULL;
 	snmp_context->results_alloc = 0;
 	snmp_context->results_offset = 0;
-	snmp_context->ssp = ssp;
 	snmp_context->i = 0;
 
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
@@ -2441,11 +2441,12 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 
 	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
 
-	if (NULL == ssp && NULL == (snmp_context->ssp = zbx_snmp_open_session(item, error, sizeof(error),
+	if (NULL == (snmp_context->ssp = zbx_snmp_open_session(item, error, sizeof(error),
 			config_timeout, config_source_ip)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value failed: %s", error));
 		ret = CONFIG_ERROR;
+		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2453,6 +2454,7 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
 		ret = CONFIG_ERROR;
+		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2460,6 +2462,7 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid parameters: at least one OID is expected."));
 		ret = CONFIG_ERROR;
+		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2469,6 +2472,7 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid max repetition count: it should be at least 1."));
 		ret = CONFIG_ERROR;
+		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2476,6 +2480,7 @@ int	zbx_async_check_snmp(zbx_snmp_sess_t ssp, zbx_dc_item_t *item, AGENT_RESULT 
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		ret = CONFIG_ERROR;
+		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2855,15 +2860,15 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 
 	SNMP_MT_EXECLOCK;
 
-	if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
-	{
-		err = NETWORK_ERROR;
-		goto exit;
-	}
-
 	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
 	{
 		int	max_vars;
+
+		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
+		{
+			err = NETWORK_ERROR;
+			goto exit;
+		}
 
 		max_vars = zbx_dc_config_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
 
@@ -2877,7 +2882,7 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 		struct event_base	*base = event_base_new();
 		zbx_snmp_result_t	snmp_result = {.result = &results[j]};
 
-		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(ssp, &items[j], &results[j],
+		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j],
 				process_agent_result, &snmp_result, NULL, base, config_timeout, config_source_ip)))
 		{
 			event_base_dispatch(base);
@@ -2891,6 +2896,12 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{
+		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
+		{
+			err = NETWORK_ERROR;
+			goto exit;
+		}
+
 		(void)zbx_dc_config_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
 
 		err = zbx_snmp_process_dynamic(ssp, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
@@ -2900,6 +2911,12 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 	}
 	else
 	{
+		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
+		{
+			err = NETWORK_ERROR;
+			goto exit;
+		}
+
 		err = zbx_snmp_process_standard(ssp, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
 				&max_succeed, &min_fail, poller_type);
 

@@ -339,7 +339,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 				poller_config->state = ZBX_PROCESS_STATE_BUSY;
 			}
 
-			errcodes[i] = zbx_async_check_snmp(NULL, &items[i], &results[i], process_snmp_result,
+			errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 					poller_config, poller_config, poller_config->base,
 					poller_config->config_timeout, poller_config->config_source_ip);
 
