@@ -101,6 +101,98 @@ class CControllerUsergroupEdit extends CController {
 		$data['templategroup_rights'] = $this->getTemplategroupRights();
 		$data['tag_filters'] = $this->getTagFilters();
 
+		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
+
+		$new_hostgroup_rights = [];
+		$this->getInputs($new_hostgroup_rights, ['ms_hostgroup_right', 'hostgroup_right']);
+
+		$groupIds = $new_hostgroup_rights['ms_hostgroup_right']['groupids'] ?? [];
+		$permissions = $new_hostgroup_rights['hostgroup_right']['permission'] ?? [];
+
+		$hostgroup_rights = [];
+
+		foreach ($groupIds as $index => $group) {
+			foreach ($group as $groupId) {
+				$permission = $permissions[$index] ?? PERM_DENY;
+
+				if ($groupId !== '0') {
+					$key = array_search($groupId, array_column($host_groups, 'groupid'));
+					$name = $key !== false ? $host_groups[$key]['name'] : '';
+
+					$hostgroup_rights[$groupId] = [
+						'permission' => $permission,
+						'name' => $name
+					];
+				}
+			}
+		}
+
+		if (count($hostgroup_rights) > 0) {
+			$data['hostgroup_rights'] = $this->sortGroupRights($hostgroup_rights);
+		}
+
+		$template_groups = API::TemplateGroup()->get(['output' => ['groupid', 'name']]);
+
+		$new_templategroup_rights = [];
+		$this->getInputs($new_templategroup_rights, ['ms_templategroup_right', 'templategroup_right']);
+
+		$template_groupIds = $new_templategroup_rights['ms_templategroup_right']['groupids'] ?? [];
+		$template_permissions = $new_templategroup_rights['templategroup_right']['permission'] ?? [];
+
+		$templategroup_rights = [];
+
+		foreach ($template_groupIds as $index => $group) {
+			foreach ($group as $groupId) {
+				$permission = $template_permissions[$index] ?? PERM_DENY;
+
+				if ($groupId !== '0') {
+					$key = array_search($groupId, array_column($template_groups, 'groupid'));
+					$name = $key !== false ? $template_groups[$key]['name'] : '';
+
+					$templategroup_rights[$groupId] = [
+						'permission' => $permission,
+						'name' => $name
+					];
+				}
+			}
+		}
+
+		if (count($templategroup_rights) > 0) {
+			$data['templategroup_rights'] = $this->sortGroupRights($templategroup_rights);
+		}
+
+		$new_tag_filters = [];
+		$this->getInputs($new_tag_filters, ['ms_tag_filter', 'tag_filter']);
+
+		$tag_filters_groupIds = $new_tag_filters['ms_tag_filter']['groupids'] ?? [];
+		$tags = $new_tag_filters['tag_filter']['tag'] ?? [];
+		$values = $new_tag_filters['tag_filter']['value'] ?? [];
+
+		$tag_filters = [];
+
+		foreach ($tag_filters_groupIds as $index => $group) {
+			foreach ($group as $groupId) {
+				$tag = $tags[$index] ?? null;
+				$value = $values[$index] ?? null;
+
+				if ($groupId !== '0'&& $tag !== null && $value !== null) {
+					$key = array_search($groupId, array_column($host_groups, 'groupid'));
+					$name = $key !== false ? $host_groups[$key]['name'] : '';
+
+					$tag_filters[] = [
+						'groupid' => $groupId,
+						'tag' => $tag,
+						'value' => $value,
+						'name' => $name
+					];
+				}
+			}
+		}
+
+		if (count($tag_filters) > 0) {
+			$data['tag_filters'] = $tag_filters;
+		}
+
 		$data['users_ms'] = $this->getUsersMs();
 
 		$data['can_update_group'] = (
