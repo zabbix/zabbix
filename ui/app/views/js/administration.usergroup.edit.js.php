@@ -29,11 +29,15 @@
 
 		init({templategroup_rights, hostgroup_rights, tag_filters}) {
 			this.templategroup_rights = templategroup_rights;
-			this.template_permission_template = new Template(document.getElementById('templategroup-right-row-template').innerHTML);
+			this.template_permission_template = new Template(
+				document.getElementById('templategroup-right-row-template').innerHTML
+			);
 			this.template_counter = 0;
 
 			this.hostgroup_rights = hostgroup_rights;
-			this.host_permission_template = new Template(document.getElementById('hostgroup-right-row-template').innerHTML);
+			this.host_permission_template = new Template(
+				document.getElementById('hostgroup-right-row-template').innerHTML
+			);
 			this.host_counter = 0;
 
 			this.tag_filters = tag_filters;
@@ -44,12 +48,12 @@
 
 			permission_types.forEach(permission_type => {
 				if (this.templategroup_rights[permission_type]) {
-					this.#addTemplateRow(this.templategroup_rights[permission_type], permission_type)
+					this.#addRightRow('templategroup', this.templategroup_rights[permission_type], permission_type);
 				}
 				if (this.hostgroup_rights[permission_type]) {
-					this.#addHostRow(this.hostgroup_rights[permission_type], permission_type)
+					this.#addRightRow('hostgroup', this.hostgroup_rights[permission_type], permission_type);
 				}
-			})
+			});
 
 			const grouped_tag_filters = [];
 
@@ -71,77 +75,45 @@
 				this.#addTagFilterRow(group);
 			});
 
-			document.querySelector('.js-add-templategroup-right-row').addEventListener('click', () => this.#addTemplateRow());
-			document.querySelector('.js-add-hostgroup-right-row').addEventListener('click', () => this.#addHostRow());
+			document.querySelector('.js-add-templategroup-right-row').addEventListener('click', () =>
+				this.#addRightRow('templategroup')
+			);
+			document.querySelector('.js-add-hostgroup-right-row').addEventListener('click', () =>
+				this.#addRightRow('hostgroup')
+			);
 			document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 		}
 
-		#addTemplateRow(templategroup_rights = [], permission = <?= PERM_DENY ?>) {
-			const rowid = this.template_counter++;
+		#addRightRow(group_type = '', groups = [], permission = <?= PERM_DENY ?>) {
+			const rowid = group_type === 'templategroup' ? this.template_counter++ : this.host_counter++;
 			const data = {
 				'rowid': rowid
 			};
+			const template = group_type === 'templategroup'
+				? this.template_permission_template
+				: this.host_permission_template;
 
-			const new_row = this.template_permission_template.evaluate(data);
+			const new_row = template.evaluate(data);
 
-			const placeholder_row = document.querySelector('.js-templategroup-right-row-placeholder');
+			const placeholder_row = document.querySelector(`.js-${group_type}-right-row-placeholder`);
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
-			const ms = document.getElementById('ms_templategroup_right_groupids_'+rowid+'_');
+			const ms = document.getElementById(`ms_${group_type}_right_groupids_${rowid}_`);
 			$(ms).multiSelect();
 
-			for (const id in templategroup_rights) {
-				if (templategroup_rights.hasOwnProperty(id)) {
-					const groups = {
+			for (const id in groups) {
+				if (groups.hasOwnProperty(id)) {
+					const group = {
 						'id': id,
-						'name': templategroup_rights[id]['name']
+						'name': groups[id]['name']
 					};
-					$(ms).multiSelect('addData', [groups]);
+					$(ms).multiSelect('addData', [group]);
 				}
 			}
 
 			const permission_radio = document
-				.querySelector(`input[name="templategroup_right[permission][${rowid}]"][value="${permission}"]`);
+				.querySelector(`input[name="${group_type}_right[permission][${rowid}]"][value="${permission}"]`);
 			permission_radio.checked = true;
-
-			document.dispatchEvent(new Event('tab-indicator-update'));
-
-			document.getElementById('user-group-form').addEventListener('click', event => {
-				if (event.target.classList.contains('js-remove-table-row')) {
-					this.#removeRow(event.target);
-				}
-			});
-		}
-
-		#addHostRow(hostgroup_rights = [], permission = <?= PERM_DENY ?>) {
-			const rowid = this.host_counter++;
-			const data = {
-				'rowid': rowid
-			};
-
-			const new_row = this.host_permission_template.evaluate(data);
-
-			const placeholder_row = document.querySelector('.js-hostgroup-right-row-placeholder');
-			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
-
-			const ms = document.getElementById('ms_hostgroup_right_groupids_'+rowid+'_');
-			$(ms).multiSelect();
-
-			for (const id in hostgroup_rights) {
-				if (hostgroup_rights.hasOwnProperty(id)) {
-					const groups = {
-						'id': id,
-						'name': hostgroup_rights[id]['name']
-					};
-					$(ms).multiSelect('addData', [groups]);
-				}
-			}
-
-			const permission_radio = document
-				.querySelector(`input[name="hostgroup_right[permission][${rowid}]"][value="${permission}"]`);
-			if (permission_radio) {
-				permission_radio.checked = true;
-			}
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
 
