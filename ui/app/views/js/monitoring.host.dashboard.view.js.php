@@ -30,20 +30,6 @@
 			this.host = host;
 			this.dashboardid = dashboard.dashboardid;
 
-			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
-				this.host_dashboards = host_dashboards;
-				this.host_dashboard_navigation_tabs = document.querySelector('.<?= ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS ?>');
-				this.previous_dashboard = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD ?>');
-				this.next_dashboard = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD ?>');
-				this.host_dashboard_list = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_LIST ?>');
-				this.host_dashboard_tabs = new Map();
-				this.selected_dashboard_tab = null;
-
-				this._activateHostDashboardNavigation();
-				this._addHostDashboardTabs();
-				this._addEventListeners();
-			}
-
 			if (dashboard.pages.length > 1
 					|| dashboard.pages.length === 1 && dashboard.pages[0].widgets.length !== 0) {
 				timeControl.refreshPage = false;
@@ -105,6 +91,20 @@
 			}
 
 			jqBlink.blink();
+
+			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
+				this.host_dashboards = host_dashboards;
+				this.host_dashboard_navigation_tabs = document.querySelector('.<?= ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS ?>');
+				this.previous_dashboard = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD ?>');
+				this.next_dashboard = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD ?>');
+				this.host_dashboard_list = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_LIST ?>');
+				this.host_dashboard_tabs = new Map();
+				this.selected_dashboard_tab = null;
+
+				this._activateHostDashboardNavigation();
+				this._addHostDashboardTabs();
+				this._addEventListeners();
+			}
 		},
 
 		_activateHostDashboardNavigation() {
