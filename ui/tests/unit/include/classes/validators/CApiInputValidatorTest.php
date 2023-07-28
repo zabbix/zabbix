@@ -8260,250 +8260,177 @@ class CApiInputValidatorTest extends TestCase {
 			[
 				['type' => API_HOST_ADDRESS],
 				'',
-				'/1/dns',
+				'/1/address',
 				''
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY],
 				'',
-				'/1/dns',
-				'Invalid parameter "/1/dns": cannot be empty.'
+				'/1/address',
+				'Invalid parameter "/1/address": cannot be empty.'
 			],
 			[
 				['type' => API_HOST_ADDRESS],
 				[],
-				'/1/dns',
-				'Invalid parameter "/1/dns": a character string is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": a character string is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS],
 				true,
-				'/1/dns',
-				'Invalid parameter "/1/dns": a character string is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": a character string is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS],
 				null,
-				'/1/dns',
-				'Invalid parameter "/1/dns": a character string is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": a character string is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
 				// Broken UTF-8 byte sequence.
 				'{$MACRO: "'."\xd1".'"}',
-				'/1/dns',
-				'Invalid parameter "/1/dns": invalid byte sequence in UTF-8.'
+				'/1/address',
+				'Invalid parameter "/1/address": invalid byte sequence in UTF-8.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO: "context"}',
-				'/1/dns',
+				'/1/address',
 				'{$MACRO: "context"}'
 			],
 			[
 				['type' => API_HOST_ADDRESS],
 				'%%%',
-				'/1/dns',
-				'Invalid parameter "/1/dns": an IP or DNS is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS],
 				'3.3.3.3',
-				'/1/dns',
+				'/1/address',
 				'3.3.3.3'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'length' => 15],
 				'www.example.com',
-				'/1/dns',
+				'/1/address',
 				'www.example.com'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'length' => 14],
 				'www.example.com',
-				'/1/dns',
-				'Invalid parameter "/1/dns": value is too long.'
+				'/1/address',
+				'Invalid parameter "/1/address": value is too long.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$}',
-				'/1/dns',
-				'Invalid parameter "/1/dns": an IP or DNS is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO2}',
-				'/1/dns',
+				'/1/address',
 				'{$MACRO2}'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#}',
-				'/1/dns',
-				'Invalid parameter "/1/dns": an IP or DNS is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#MACRO2}',
-				'/1/dns',
+				'/1/address',
 				'{#MACRO2}'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#MACRO3}{#MACRO4}',
-				'/1/dns',
+				'/1/address',
 				'{#MACRO3}{#MACRO4}'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
 				'{HOST.IP}',
-				'/1/dns',
+				'/1/address',
 				'{HOST.IP}'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO3}{$MACRO4}',
-				'/1/dns',
+				'/1/address',
 				'{$MACRO3}{$MACRO4}'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
 				'{$MACRO}',
-				'/1/dns',
-				'Invalid parameter "/1/dns": an IP or DNS is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
 				'{HOST.HOST}',
-				'/1/dns',
-				'Invalid parameter "/1/dns": an IP or DNS is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO],
 				'a{HOST.HOST}b{$MACRO5}c{#MACRO5}d{HOST.NAME}e{$MACRO6}',
-				'/1/dns',
+				'/1/address',
 				'a{HOST.HOST}b{$MACRO5}c{#MACRO5}d{HOST.NAME}e{$MACRO6}'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
 				'a{HOST.HOST}b{HOST.IP}c',
-				'/1/dns',
+				'/1/address',
 				'a{HOST.HOST}b{HOST.IP}c'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
 				'a{$MACRO7}b{#MACRO6}c{HOST.NAME}d{$MACRO8}',
-				'/1/dns',
-				'Invalid parameter "/1/dns": an IP or DNS is expected.'
-			],
-			[
-				['type' => API_HOST_ADDRESS],
-				'',
-				'/1/ip',
-				''
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY],
-				'',
-				'/1/ip',
-				'Invalid parameter "/1/ip": cannot be empty.'
-			],
-			[
-				['type' => API_HOST_ADDRESS],
-				[],
-				'/1/ip',
-				'Invalid parameter "/1/ip": a character string is expected.'
-			],
-			[
-				['type' => API_HOST_ADDRESS],
-				true,
-				'/1/ip',
-				'Invalid parameter "/1/ip": a character string is expected.'
-			],
-			[
-				['type' => API_HOST_ADDRESS],
-				null,
-				'/1/ip',
-				'Invalid parameter "/1/ip": a character string is expected.'
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
-				// Broken UTF-8 byte sequence.
-				'{$MACRO: "'."\xd1".'"}',
-				'/1/ip',
-				'Invalid parameter "/1/ip": invalid byte sequence in UTF-8.'
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
-				'{$MACRO: "context"}',
-				'/1/ip',
-				'{$MACRO: "context"}'
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
 			],
 			[
 				['type' => API_HOST_ADDRESS],
 				'0.0.0.x',
-				'/1/ip',
+				'/1/address',
 				'0.0.0.x'
 			],
 			[
 				['type' => API_HOST_ADDRESS],
 				'1.1.1.1',
-				'/1/ip',
+				'/1/address',
 				'1.1.1.1'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'length' => 11],
 				'192.168.3.5',
-				'/1/ip',
+				'/1/address',
 				'192.168.3.5'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'length' => 10],
 				'192.168.3.5',
-				'/1/ip',
-				'Invalid parameter "/1/ip": value is too long.'
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
-				'{$}',
-				'/1/ip',
-				'Invalid parameter "/1/ip": an IP or DNS is expected.'
+				'/1/address',
+				'Invalid parameter "/1/address": value is too long.'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
 				'{$MACRO1}',
-				'/1/ip',
+				'/1/address',
 				'{$MACRO1}'
 			],
 			[
 				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
-				'{#}',
-				'/1/ip',
-				'Invalid parameter "/1/ip": an IP or DNS is expected.'
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
 				'{#MACRO1}',
-				'/1/ip',
+				'/1/address',
 				'{#MACRO1}'
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
-				'{HOST.IP}',
-				'/1/ip',
-				'{HOST.IP}'
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
-				'{$MACRO}',
-				'/1/ip',
-				'Invalid parameter "/1/ip": an IP or DNS is expected.'
-			],
-			[
-				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
-				'{HOST.HOST}',
-				'/1/ip',
-				'Invalid parameter "/1/ip": an IP or DNS is expected.'
 			]
 		];
 	}
