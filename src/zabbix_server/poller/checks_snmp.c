@@ -2206,7 +2206,7 @@ static void	snmp_bulkwalk_context_free(zbx_bulkwalk_context_t *bulkwalk_context)
 	zbx_free(bulkwalk_context);
 }
 
-static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, char *error, size_t max_error_len)
+static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *error, size_t max_error_len)
 {
 	struct snmp_pdu		*pdu;
 	int			ret;
@@ -2285,7 +2285,7 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, char *error, size
 		goto out;
 	}
 
-	bulkwalk_context->sock = transport->sock;
+	*fd = transport->sock;
 
 	ret = SUCCEED;
 out:
@@ -2344,7 +2344,7 @@ static int	snmp_task_process(short event, void *data, int *fd)
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() event:%d fd:%d itemid:" ZBX_FS_UI64, __func__, event, *fd,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event:%d fd:%d itemid:" ZBX_FS_UI64, __func__, event, *fd,
 			snmp_context->item.itemid);
 
 	/* initialization */
@@ -2410,15 +2410,13 @@ static int	snmp_task_process(short event, void *data, int *fd)
 		}
 	}
 
-	if (SUCCEED != (ret = snmp_bulkwalk_add(snmp_context, error, sizeof(error))))
+	if (SUCCEED != (ret = snmp_bulkwalk_add(snmp_context, fd, error, sizeof(error))))
 	{
 		snmp_context->item.ret = ret;
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
 	}
 	else
 	{
-		*fd = bulkwalk_context->sock;
-
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 		return ZBX_ASYNC_TASK_READ_NEW;
