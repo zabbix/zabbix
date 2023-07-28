@@ -26,7 +26,7 @@ class CHost extends CHostGeneral {
 
 	protected $sortColumns = ['hostid', 'host', 'name', 'status'];
 
-	public const OUTPUT_FIELDS = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
+	public const OUTPUT_FIELDS = ['hostid', 'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
 		'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
 		'maintenance_from', 'name', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
 		'inventory_mode', 'active_available'
