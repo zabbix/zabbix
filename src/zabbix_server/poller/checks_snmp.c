@@ -2109,16 +2109,17 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context;
 	int			ret = FAIL;
+	int			stat;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()",__func__);
 
 	bulkwalk_context = (zbx_bulkwalk_context_t *)magic;
 	snmp_context = (zbx_snmp_context_t *)bulkwalk_context->arg;
 
-	if (reqid != bulkwalk_context->reqid && pdu && pdu->command != SNMP_MSG_REPORT)
+	if (reqid != bulkwalk_context->reqid && NULL != pdu && pdu->command != SNMP_MSG_REPORT)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "unexpected response request id:%d expected request id:%d command:%d",
-				reqid, bulkwalk_context->reqid, pdu->command);
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected response request id:%d expected request id:%d command:%d"
+				" operation:%d", reqid, bulkwalk_context->reqid, pdu->command, operation);
 		return 0;
 	}
 
@@ -2126,20 +2127,48 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 
 	bulkwalk_context->waiting = 0;
 
-	if (NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE == operation && pdu)
+	switch (operation)
+	{
+		case NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE:
+			stat = STAT_SUCCESS;
+			break;
+		case NETSNMP_CALLBACK_OP_TIMED_OUT:
+			stat = STAT_TIMEOUT;
+			break;
+		case NETSNMP_CALLBACK_OP_SEND_FAILED:
+			ZBX_FALLTHROUGH;
+		case NETSNMP_CALLBACK_OP_DISCONNECT:
+			ZBX_FALLTHROUGH;
+		case NETSNMP_CALLBACK_OP_SEC_ERROR:
+			stat = STAT_ERROR;
+			break;
+		case NETSNMP_CALLBACK_OP_CONNECT:
+			ZBX_FALLTHROUGH;
+		case NETSNMP_CALLBACK_OP_RESEND:
+			ZBX_FALLTHROUGH;
+		default:
+			goto out;
+	}
+
+	if (NULL != pdu)
 	{
 		char	error[MAX_STRING_LEN];
 
-		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(STAT_SUCCESS, pdu, bulkwalk_context->p_oid,
+		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(stat, pdu, bulkwalk_context->p_oid,
 				&bulkwalk_context->running, &bulkwalk_context->vars_num, bulkwalk_context->pdu_type,
-				bulkwalk_context->name, &bulkwalk_context->name_length,
-				&snmp_context->results, &snmp_context->results_alloc, &snmp_context->results_offset,
+				bulkwalk_context->name, &bulkwalk_context->name_length, &snmp_context->results,
+				&snmp_context->results_alloc, &snmp_context->results_offset,
 				snmp_context->ssp, &snmp_context->item.interface, error, sizeof(error))))
 		{
 			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
 	}
-
+	else
+	{
+		zbx_free(bulkwalk_context->error);
+		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "SNMP error: [%d]", stat);
+	}
+out:
 	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return 1;
@@ -2213,7 +2242,7 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, char *error, size
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sending", __func__);
-
+	bulkwalk_context->reqid = -1;
 	if (0 == (bulkwalk_context->reqid = snmp_sess_async_send(snmp_context->ssp, pdu, asynch_response,
 			bulkwalk_context)))
 	{
