@@ -438,7 +438,7 @@
 
 			const overlay = PopUp('trigger.edit', trigger_data, {
 				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-medium',
+				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 

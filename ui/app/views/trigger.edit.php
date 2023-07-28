@@ -378,6 +378,7 @@ $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addIte
 	(new CRow([
 		(new CLink(['#{description}']))
 			->addClass('js-related-trigger-edit')
+			->addClass(ZBX_STYLE_WORDWRAP)
 			->setAttribute('data-triggerid', '#{triggerid}')
 			->setAttribute('data-hostid', $data['hostid'])
 			->setAttribute('data-context', $data['context']),

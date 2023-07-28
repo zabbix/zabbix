@@ -150,16 +150,19 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 		case 'trigger_prototype':
 			$btn_labels = [_('Trigger tags'), _('Inherited and trigger tags')];
 			$on_change = '';
+			$label = new CLabel(_('Tags'));
 			break;
 
 		case 'httptest':
 			$btn_labels = [_('Scenario tags'), _('Inherited and scenario tags')];
 			$on_change = 'this.form.submit()';
+			$label = '';
 			break;
 
 		case 'item':
 			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
 			$on_change = 'this.form.submit()';
+			$label = '';
 			break;
 	}
 
@@ -173,8 +176,8 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 	);
 }
 
-$form_grid->addItem(
-	new CFormField($table)
-);
+$form_grid->addItem([$label,
+	new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
+]);
 
 $form_grid->show();

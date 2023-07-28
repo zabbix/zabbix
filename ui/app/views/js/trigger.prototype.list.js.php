@@ -82,7 +82,7 @@
 		#edit(action, parameters) {
 			const overlay = PopUp(action, parameters, {
 				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-medium',
+				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
