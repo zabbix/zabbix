@@ -209,15 +209,13 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 }
 
-.host-dashboard-header-navigation {
-	display: flex;
-	max-width: 100%;
+.host-dashboard-header-navigation,
+.header-navigation {
 	min-height: 24px;
 
 	& > ul {
-	display: flex;
-	flex-shrink: 0;
-	align-items: baseline;
+		display: flex;
+		align-items: baseline;
 
 		& > li {
 			margin-right: 5px;
@@ -262,22 +260,24 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			}
 		}
 	}
+}
+
+.host-dashboard-header-navigation {
+	display: grid;
+	grid-template-columns: max-content 1fr max-content;
+	column-gap: 10px;
 
 	.host-dashboard-navigation {
-		display: flex;
-		flex-grow: 1;
-		overflow: hidden;
+		display: grid;
+		grid-template-columns: max-content 1fr max-content;
+		column-gap: 10px;
 
 		.host-dashboard-navigation-tabs {
-			// Compensate 2px padding of tabs.
-			margin: -2px 10px -2px 0;
+			margin: -2px 0;
 			overflow: hidden;
-			flex-grow: 1;
 
 			.sortable {
-				// Accommodate 2px shadow of focused tabs.
 				padding: 2px 0;
-				// Hide the invisible tab paddings.
 				margin: 0 -1.5px;
 			}
 
@@ -358,12 +358,18 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		}
 
 		.host-dashboard-navigation-controls {
-			flex-shrink: 0;
+			.btn-icon:not(:first-child) {
+				margin-left: 5px;
+			}
 		}
 	}
 
 	.filter-space {
-		flex-shrink: 0;
+		display: contents;
+
+		form {
+			grid-column: 1 / -1;
+		}
 
 		li .ui-tabs-anchor {
 			vertical-align: top;
@@ -399,35 +405,11 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	margin: 0 0 5px;
 	z-index: 3;
 	max-width: calc(100% - 200px);
-	min-height: 24px;
 
 	& > ul {
-		display: flex;
 		flex-wrap: wrap;
-		align-items: baseline;
 
 		& > li {
-			margin-right: 5px;
-			line-height: 24px;
-
-			> ul {
-				display: flex;
-				align-items: baseline;
-				flex-wrap: wrap;
-
-				li {
-					margin-right: 5px;
-				}
-
-				&.breadcrumbs > li {
-					margin-right: 0;
-
-					&:not(:last-child)::after {
-						content: "/";
-					}
-				}
-			}
-
 			.status-container {
 				margin-right: 5px;
 				vertical-align: text-bottom;
@@ -435,21 +417,10 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		}
 
 		li > span {
-			display: inline-block;
 			padding: 2px 7px;
 			line-height: 18px;
-			white-space: nowrap;
-			vertical-align: top;
-			text-overflow: ellipsis;
-			overflow: hidden;
-			max-width: 250px;
 
 			a {
-				vertical-align: top;
-				text-overflow: ellipsis;
-				overflow: hidden;
-				max-width: 200px;
-				display: inline-block;
 				margin-top: 2px;
 				line-height: 14px;
 			}
@@ -654,7 +625,6 @@ form {
 .filter-container {
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	margin: 0 0 10px;
 	padding: 10px 0;
 	position: relative;
 
