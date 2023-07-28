@@ -2136,7 +2136,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 				&snmp_context->results, &snmp_context->results_alloc, &snmp_context->results_offset,
 				snmp_context->ssp, &snmp_context->item.interface, error, sizeof(error))))
 		{
-
+			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
 	}
 
@@ -2161,6 +2161,7 @@ static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *
 	bulkwalk_context->running = 1;
 	bulkwalk_context->vars_num = 0;
 	bulkwalk_context->arg = snmp_context;
+	bulkwalk_context->error = NULL;
 
 	netsnmp_large_fd_set_init(&bulkwalk_context->fdset, FD_SETSIZE);
 
@@ -2170,6 +2171,7 @@ static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *
 static void	snmp_bulkwalk_context_free(zbx_bulkwalk_context_t *bulkwalk_context)
 {
 	netsnmp_large_fd_set_cleanup(&bulkwalk_context->fdset);
+	zbx_free(bulkwalk_context->error);
 	zbx_free(bulkwalk_context);
 }
 
@@ -2334,6 +2336,14 @@ static int	agent_task_process(short event, void *data, int *fd)
 	{
 		snmp_context->item.ret = NETWORK_ERROR;
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2() failed"));
+		goto stop;
+	}
+
+	if (NULL != bulkwalk_context->error)
+	{
+		snmp_context->item.ret = NETWORK_ERROR;
+		SET_MSG_RESULT(&snmp_context->item.result, bulkwalk_context->error);
+		bulkwalk_context->error = NULL;
 		goto stop;
 	}
 
