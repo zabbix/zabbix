@@ -35,8 +35,8 @@ abstract class CControllerItem extends CController {
 	 */
 	protected function validateFormInput(array $required_fields): bool {
 		$fields = [
-			'authtype'				=> 'db items.authtype',
 			'allow_traps'			=> 'in 0,1',
+			'authtype'				=> 'db items.authtype',
 			'context'				=> 'in host,template',
 			'delay'					=> 'db items.delay',
 			'delay_flex'			=> 'array',
@@ -62,8 +62,10 @@ abstract class CControllerItem extends CController {
 			'master_itemid'			=> 'id',
 			'name'					=> 'db items.name',
 			'output_format'			=> 'in 0,1',
-			'params'				=> 'string',
 			'parameters'			=> 'array',
+			'params_ap'				=> 'db items.params',
+			'params_es'				=> 'db items.params',
+			'params_f'				=> 'db items.params',
 			'password'				=> 'db items.password',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'string',
@@ -71,9 +73,9 @@ abstract class CControllerItem extends CController {
 			'preprocessing'			=> 'array',
 			'privatekey'			=> 'db items.privatekey',
 			'publickey'				=> 'db items.publickey',
+			'query_fields'			=> 'array',
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
-			'query_fields'			=> 'array',
 			'script'				=> 'db items.params',
 			'show_inherited_tags'	=> 'in 0,1',
 			'show_inherited_tags'	=> 'in 0,1',
@@ -81,8 +83,8 @@ abstract class CControllerItem extends CController {
 			'ssl_cert_file'			=> 'string',
 			'ssl_key_file'			=> 'string',
 			'ssl_key_password'		=> 'string',
-			'status_codes'			=> 'string',
 			'status'				=> 'db items.status',
+			'status_codes'			=> 'db items.status_codes',
 			'tags'					=> 'array',
 			'templateid'			=> 'id',
 			'timeout'				=> 'string',
@@ -90,13 +92,13 @@ abstract class CControllerItem extends CController {
 			'trends'				=> 'db items.trends',
 			'trends_mode'			=> 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
 			'type'					=> 'db items.type',
-			'url'					=> 'string',
 			'units'					=> 'db items.units',
+			'url'					=> 'db items.url',
 			'username'				=> 'db items.username',
 			'value_type'			=> 'db items.value_type',
 			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
-			'verify_peer'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
+			'verify_peer'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])
 		];
 
 		foreach ($required_fields as $field) {
@@ -195,7 +197,9 @@ abstract class CControllerItem extends CController {
 			'name' => '',
 			'output_format' => DB::getDefault('items', 'output_format'),
 			'parameters' => [['name' => '', 'value' => '']],
-			'params' => DB::getDefault('items', 'params'),
+			'params_ap' => DB::getDefault('items', 'params'),
+			'params_es' => DB::getDefault('items', 'params'),
+			'params_f' => DB::getDefault('items', 'params'),
 			'password' => DB::getDefault('items', 'password'),
 			'post_type' => DB::getDefault('items', 'post_type'),
 			'posts' => DB::getDefault('items', 'posts'),
@@ -205,7 +209,7 @@ abstract class CControllerItem extends CController {
 			'query_fields' => [],
 			'request_method' => DB::getDefault('items', 'request_method'),
 			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
-			'script' => '',
+			'script' => DB::getDefault('items', 'params'),
 			'show_inherited_tags' => 0,
 			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
 			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
@@ -285,6 +289,20 @@ abstract class CControllerItem extends CController {
 			}
 
 			$input['tags'] = $tags;
+		}
+
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+		$input['params'] = '';
+
+		if (array_key_exists($input['type'], $params_field)) {
+			$field = $params_field[$input['type']];
+			$input['params'] = $input[$field];
 		}
 
 		return $input;

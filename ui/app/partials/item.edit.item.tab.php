@@ -186,7 +186,7 @@ $formgrid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('js-item-script-label'),
 		(new CFormField(
-			(new CMultilineInput('script', $data['form']['script'], [
+			(new CMultilineInput('script', $data['form']['params'], [
 				'title' => _('JavaScript'),
 				'placeholder' => _('script'),
 				'placeholder_textarea' => 'return value',

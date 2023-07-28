@@ -235,7 +235,6 @@ class CControllerItemEdit extends CControllerItem {
 		unset($step);
 
 		$item += [
-			'script' => '',
 			'http_authtype' => '',
 			'http_username' => '',
 			'http_password' => '',
@@ -248,38 +247,30 @@ class CControllerItemEdit extends CControllerItem {
 		];
 		unset($item['key_']);
 
-		switch ($item['type']) {
-			case ITEM_TYPE_SCRIPT:
-				$item['script'] = $item['params'];
+		if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+			$item['http_authtype'] = $item['authtype'];
+			$item['http_username'] = $item['username'];
+			$item['http_password'] = $item['password'];
+			$query_fields = [];
 
-				break;
+			foreach ($item['query_fields'] as $query_field) {
+				$query_fields[] = [
+					'name' => key($query_field),
+					'value' => reset($query_field)
+				];
+			}
 
-			case ITEM_TYPE_HTTPAGENT:
-				$item['http_authtype'] = $item['authtype'];
-				$item['http_username'] = $item['username'];
-				$item['http_password'] = $item['password'];
-				$query_fields = [];
+			$item['query_fields'] = $query_fields;
+			$headers = [];
 
-				foreach ($item['query_fields'] as $query_field) {
-					$query_fields[] = [
-						'name' => key($query_field),
-						'value' => reset($query_field)
-					];
-				}
+			foreach ($item['headers'] as $header => $value) {
+				$headers[] = [
+					'name' => $header,
+					'value' => $value
+				];
+			}
 
-				$item['query_fields'] = $query_fields;
-				$headers = [];
-
-				foreach ($item['headers'] as $header => $value) {
-					$headers[] = [
-						'name' => $header,
-						'value' => $value
-					];
-				}
-
-				$item['headers'] = $headers;
-
-				break;
+			$item['headers'] = $headers;
 		}
 
 		$item['delay_flex'] = [];
