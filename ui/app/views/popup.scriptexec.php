@@ -31,6 +31,7 @@ if ($data['success']) {
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->addClass('monospace-font')
 			->addClass('active-readonly')
+			->disableSpellcheck()
 			->setReadonly(true)
 	];
 

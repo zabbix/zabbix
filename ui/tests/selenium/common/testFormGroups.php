@@ -178,7 +178,7 @@ class testFormGroups extends CWebTest {
 			'key_' => 'lld.hostgroup',
 			'hostid' => $hostid,
 			'type' => ITEM_TYPE_TRAPPER,
-			'delay' => 30
+			'delay' => 0
 		]);
 		$lldid = $lld['itemids'][0];
 		CDataHelper::call('hostprototype.create', [

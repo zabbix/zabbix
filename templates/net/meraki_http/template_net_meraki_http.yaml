@@ -204,22 +204,21 @@ zabbix_export:
                   value: '{#SERIAL}'
           master_item:
             key: meraki.get.data
-          timeout: 30s
           lld_macro_paths:
-            - lld_macro: '{#MAC}'
-              path: $.mac
-            - lld_macro: '{#MODEL}'
-              path: $.model
             - lld_macro: '{#NAME}'
               path: $.name
             - lld_macro: '{#NETWORK.ID}'
               path: $.networkId
+            - lld_macro: '{#MAC}'
+              path: $.mac
+            - lld_macro: '{#MODEL}'
+              path: $.model
+            - lld_macro: '{#SERIAL}'
+              path: $.serial
             - lld_macro: '{#ORGANIZATION_ID}'
               path: $.organizationId
             - lld_macro: '{#PRODUCT_TYPE}'
               path: $.productType
-            - lld_macro: '{#SERIAL}'
-              path: $.serial
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -260,10 +259,10 @@ zabbix_export:
               path: $.id
             - lld_macro: '{#NAME}'
               path: $.name
-            - lld_macro: '{#REGION}'
-              path: $.cloud.region.name
             - lld_macro: '{#URL}'
               path: $.url
+            - lld_macro: '{#REGION}'
+              path: $.cloud.region.name
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -621,16 +620,15 @@ zabbix_export:
                     key: 'meraki.device.loss.pct[{#IP},{#UPLINK}]'
           master_item:
             key: meraki.get.device
-          timeout: 30s
           lld_macro_paths:
-            - lld_macro: '{#IP}'
-              path: $.ip
             - lld_macro: '{#NETWORK.ID}'
               path: $.networkId
-            - lld_macro: '{#SERIAL}'
-              path: $.serial
             - lld_macro: '{#UPLINK}'
               path: $.uplink
+            - lld_macro: '{#IP}'
+              path: $.ip
+            - lld_macro: '{#SERIAL}'
+              path: $.serial
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1323,20 +1321,19 @@ zabbix_export:
                       value: availability
           master_item:
             key: meraki.get.networks
-          timeout: 30s
           lld_macro_paths:
             - lld_macro: '{#INTERFACE}'
               path: $.interface
             - lld_macro: '{#NETWORK.NAME}'
               path: $.networkName
+            - lld_macro: '{#UPLINK.ROLE}'
+              path: $.role
+            - lld_macro: '{#UPLINK.DEVICE.SERIAL}'
+              path: $.serial
             - lld_macro: '{#PRIVATE.IP}'
               path: $.ip
             - lld_macro: '{#PUBLIC.IP}'
               path: $.publicIp
-            - lld_macro: '{#UPLINK.DEVICE.SERIAL}'
-              path: $.serial
-            - lld_macro: '{#UPLINK.ROLE}'
-              path: $.role
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1626,20 +1623,19 @@ zabbix_export:
                     key: 'meraki.vpn.stat.loss.min[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}]'
           master_item:
             key: meraki.get.vpn.stats
-          timeout: 30s
           lld_macro_paths:
-            - lld_macro: '{#NETWORK.ID}'
-              path: $.networkId
-            - lld_macro: '{#NETWORK.NAME}'
-              path: $.networkName
-            - lld_macro: '{#PEER.NETWORK.ID}'
-              path: $.peerNetworkId
-            - lld_macro: '{#PEER.NETWORK.NAME}'
-              path: $.peerNetworkName
-            - lld_macro: '{#RECEIVER.UPLINK}'
-              path: $.receiverUplink
             - lld_macro: '{#SENDER.UPLINK}'
               path: $.senderUplink
+            - lld_macro: '{#RECEIVER.UPLINK}'
+              path: $.receiverUplink
+            - lld_macro: '{#NETWORK.NAME}'
+              path: $.networkName
+            - lld_macro: '{#PEER.NETWORK.NAME}'
+              path: $.peerNetworkName
+            - lld_macro: '{#NETWORK.ID}'
+              path: $.networkId
+            - lld_macro: '{#PEER.NETWORK.ID}'
+              path: $.peerNetworkId
           preprocessing:
             - type: JSONPATH
               parameters:

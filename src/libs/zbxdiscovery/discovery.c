@@ -19,10 +19,10 @@
 
 #include "zbxdiscovery.h"
 
-#include "zbxserver.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxserialize.h"
+#include "zbx_discoverer_constants.h"
 
 typedef struct
 {

@@ -359,6 +359,7 @@ $item_tab
 		(new CLabel(_('Request body'), 'posts'))->setId('js-item-posts-label'),
 		(new CFormField((new CTextArea('posts', $data['posts'], compact('readonly')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 		))->setId('js-item-posts-field')
 	]);
 
@@ -716,8 +717,9 @@ $item_tab
 		(new CFormField((new CTextArea('params_es', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly($discovered_item)
 			->setAriaRequired()
+			->disableSpellcheck()
+			->setReadonly($discovered_item)
 		))->setId('js-item-executed-script-field')
 	])
 	->addItem([
@@ -728,6 +730,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 			->setReadonly($discovered_item)
 		))->setId('js-item-sql-query-field')
 	])
@@ -739,6 +742,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 			->setReadonly($discovered_item)
 		))->setId('js-item-formula-field')
 	])

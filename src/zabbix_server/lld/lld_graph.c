@@ -18,7 +18,7 @@
 **/
 
 #include "lld.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "zbxdbwrap.h"
 #include "audit/zbxaudit.h"
@@ -667,7 +667,8 @@ out:
  ******************************************************************************/
 static void	lld_graph_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
-		unsigned char discover_proto, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths)
+		unsigned char discover_proto, const zbx_lld_row_t *lld_row,
+		const zbx_vector_lld_macro_path_t *lld_macro_paths)
 {
 	zbx_lld_graph_t			*graph = NULL;
 	const struct zbx_json_parse	*jp_row = &lld_row->jp_row;
@@ -764,7 +765,7 @@ out:
 static void	lld_graphs_make(const zbx_vector_ptr_t *gitems_proto, zbx_vector_ptr_t *graphs, zbx_vector_ptr_t *items,
 		const char *name_proto, zbx_uint64_t ymin_itemid_proto, zbx_uint64_t ymax_itemid_proto,
 		unsigned char discover_proto, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths)
 {
 	int	i;
 
@@ -1466,7 +1467,7 @@ static	void	get_graph_info(const void *object, zbx_uint64_t *id, int *discovery_
  *                                                                            *
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
