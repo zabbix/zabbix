@@ -2449,7 +2449,7 @@ typedef struct
 }
 zbx_snmp_result_t;
 
-static void	process_agent_result(void *data)
+static void	process_snmp_result(void *data)
 {
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg;
@@ -2943,7 +2943,7 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 		zbx_set_snmp_bulkwalk_options();
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j],
-				process_agent_result, &snmp_result, NULL, base, config_timeout, config_source_ip)))
+				process_snmp_result, &snmp_result, NULL, base, config_timeout, config_source_ip)))
 		{
 			event_base_dispatch(base);
 			errcodes[j] = snmp_result.errcode;
