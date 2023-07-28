@@ -2113,6 +2113,8 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()",__func__);
 
+	ZBX_UNUSED(sp);
+
 	bulkwalk_context = (zbx_bulkwalk_context_t *)magic;
 	snmp_context = (zbx_snmp_context_t *)bulkwalk_context->arg;
 
@@ -2157,8 +2159,8 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(stat, pdu, bulkwalk_context->p_oid,
 				&bulkwalk_context->running, &bulkwalk_context->vars_num, bulkwalk_context->pdu_type,
 				bulkwalk_context->name, &bulkwalk_context->name_length, &snmp_context->results,
-				&snmp_context->results_alloc, &snmp_context->results_offset,
-				snmp_context->ssp, &snmp_context->item.interface, error, sizeof(error))))
+				&snmp_context->results_alloc, &snmp_context->results_offset, snmp_context->ssp,
+				&snmp_context->item.interface, error, sizeof(error))))
 		{
 			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
