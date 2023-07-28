@@ -2244,7 +2244,10 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, char *error, size
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sending", __func__);
+
 	bulkwalk_context->reqid = -1;
+	bulkwalk_context->waiting = 1;
+
 	if (0 == (bulkwalk_context->reqid = snmp_sess_async_send(snmp_context->ssp, pdu, asynch_response,
 			bulkwalk_context)))
 	{
@@ -2253,8 +2256,6 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, char *error, size
 		snmp_free_pdu(pdu);
 		goto out;
 	}
-
-	bulkwalk_context->waiting = 1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() send completed", __func__);
 
