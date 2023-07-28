@@ -2139,7 +2139,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 
 		}
 	}
- 
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return 1;
