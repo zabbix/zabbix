@@ -175,7 +175,6 @@ class testPageConnectors extends CWebTest {
 
 		// Check the count of returned Connectors and the count of selected Connectors.
 		$this->assertTableStats($connectors_count);
-		$selected_count = $this->query('id:selected_count')->one();
 		$this->assertSelectedCount(0);
 		$all_connectors = $this->query('id:all_connectors')->asCheckbox()->one();
 		$all_connectors->check();

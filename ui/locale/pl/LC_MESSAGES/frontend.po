@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-06-21 15:36+0000\n"
+"PO-Revision-Date: 2023-07-21 19:46+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -972,6 +972,10 @@ msgstr "Dodaj z szablonu"
 msgid "Add host"
 msgstr "Dodaj host"
 
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
+
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
@@ -1374,7 +1378,7 @@ msgstr "I/Lub"
 
 #: widgets/gauge/includes/WidgetForm.php:173
 msgid "Angle"
-msgstr ""
+msgstr "Kąt"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
@@ -1453,16 +1457,16 @@ msgstr "Kwiecień"
 
 #: widgets/gauge/includes/WidgetForm.php:221
 msgid "Arc"
-msgstr ""
+msgstr "Łuk"
 
 #: widgets/gauge/includes/WidgetForm.php:240
 msgid "Arc background"
-msgstr ""
+msgstr "Tło łuku"
 
 #: widgets/gauge/includes/WidgetForm.php:232
 #: widgets/gauge/includes/WidgetForm.php:305
 msgid "Arc size"
-msgstr ""
+msgstr "Rozmiar łuku"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4751,7 +4755,7 @@ msgstr "Kolor (OK)"
 
 #: widgets/gauge/views/widget.edit.php:81
 msgid "Colors"
-msgstr ""
+msgstr "Kolory"
 
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
@@ -6853,7 +6857,7 @@ msgstr "Opis"
 
 #: widgets/gauge/includes/WidgetForm.php:195
 msgid "Description size"
-msgstr ""
+msgstr "Rozmiar opisu"
 
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -8962,7 +8966,7 @@ msgstr "Dostęp do GUI wyłączony."
 
 #: widgets/gauge/Widget.php:39
 msgid "Gauge"
-msgstr ""
+msgstr "Skala"
 
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
@@ -14303,7 +14307,7 @@ msgstr "Nawiguj do widoku początkowego"
 #: widgets/gauge/includes/WidgetForm.php:271
 #: widgets/gauge/views/widget.edit.php:186
 msgid "Needle"
-msgstr ""
+msgstr "Wskazówka"
 
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
@@ -17458,6 +17462,10 @@ msgstr "Usuń z grup hostów"
 msgid "Remove host"
 msgstr "Usuń hosta"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -17842,7 +17850,7 @@ msgstr "Zwraca ilość gniazd UDP pasujących do wyrażenia. Zwraca liczbę cał
 
 #: include/classes/data/CItemData.php:2839
 msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
-msgstr ""
+msgstr "Zwraca liczbę zmian stanu z trybu dysk/pamięć od momentu uruchomienia. Częste zmiany stanu wskazują, że należy zwiększyć rozmiar lub wiek bufora pamięci."
 
 #: include/classes/data/CItemData.php:850
 msgid "Returns percentage of lost ICMP ping packets."
@@ -18296,11 +18304,11 @@ msgstr "Zapisz jako \"%1$s\""
 #: widgets/gauge/includes/WidgetForm.php:277
 #: widgets/gauge/views/widget.edit.php:198
 msgid "Scale"
-msgstr ""
+msgstr "Skala"
 
 #: widgets/gauge/includes/WidgetForm.php:288
 msgid "Scale size"
-msgstr ""
+msgstr "Rozmiar skali"
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -19002,7 +19010,7 @@ msgstr "Wyświetl"
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
-msgstr ""
+msgstr "Pokaż łuk"
 
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
@@ -19026,7 +19034,7 @@ msgstr "Wyświetl hosty w utrzymaniu"
 
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
-msgstr ""
+msgstr "Pokaż etykiety"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -19122,7 +19130,7 @@ msgstr "Pokaż niedostępne mapy"
 
 #: widgets/gauge/includes/WidgetForm.php:292
 msgid "Show units"
-msgstr ""
+msgstr "Pokaż jednostki"
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -19423,7 +19431,7 @@ msgstr "Stan"
 
 #: include/classes/data/CItemData.php:2832
 msgid "State of proxy memory buffer."
-msgstr ""
+msgstr "Stan bufora pamięci proxy."
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
@@ -20680,6 +20688,13 @@ msgstr "Dzisiaj jak dotąd"
 msgid "Top"
 msgstr "Na górze"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "Pierwsze N"
@@ -20687,6 +20702,10 @@ msgstr "Pierwsze N"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "TOP hosty"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20897,6 +20916,10 @@ msgid_plural "Triggers copied"
 msgstr[0] "Wyzwalacz skopiowany"
 msgstr[1] "Wyzwalacze skopiowane"
 msgstr[2] "Wyzwalacze skopiowane"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"

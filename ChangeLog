@@ -1,6 +1,17 @@
+Changes for 7.0.0alpha4
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0alpha3
 
 New features:
+A.F.I..... [ZBXNEXT-6974] implemented new "Top triggers" widget; added new filtering options to "Top triggers" report page (agriscenko)
+A.F.I...S. [ZBXNEXT-6524] added operations "Add host tags", "Remove host tags" for autoregistration and discovery actions (Ivo, mprihodko)
+..F....PS. [ZBXNEXT-8190] increased MariaDB maximum supported version to 11.0 (mprihodko)
+..F....PS. [ZBXNEXT-8582] increased MySQL maximum supported version to 8.1 (mprihodko)
 .........T [ZBXNEXT-8481] added PostgreSQL by ODBC template (drasikhov)
 .........T [ZBXNEXT-8561] added nodata trigger to remote Zabbix proxy and server health templates (drasikhov)
 .......PS. [ZBXNEXT-8560] added messages that Oracle DB is deprecated (akozlovs)
@@ -8,15 +19,18 @@ New features:
 .........T [ZBXNEXT-8482] added integration with OpenStack Nova (knaglis)
 A.F....... [ZBXNEXT-6470,ZBXNEXT-6986] implemented audit logging of LLD rule API object (jfreibergs, vmaksimovs)
 ..F....... [ZBXNEXT-8451] disabled spell checking for nondescriptive textareas (dfofanovs)
-.........T [ZBXNEXT-8569] added asynchronous agent and http agent pollers metrics to Zabbix health templates (drasikhov)
-..F....... [ZBXNEXT-743] implemented new Gauge widget (apoga, ashubin, averza, Ivo)
+.........T [ZBXNEXT-8569] added asynchronous agent and HTTP agent poller metrics to Zabbix health templates (drasikhov)
+..F....... [ZBXNEXT-743] implemented new "Gauge" widget (apoga, ashubin, averza, Ivo)
 .......PS. [ZBXNEXT-6144] added proxy data memory cache to avoid using proxy history tables in normal operation (wiper)
 .........T [ZBXNEXT-7944] excluded edgeupdate service from services discovery in Windows by Zabbix agent templates (drasikhov)
 .......PS. [ZBXNEXT-8460] added asynchronous Zabbix agent and HTTP agent pollers (vso)
 .........T [ZBXNEXT-8422] added AWS ECS templates (egordymov)
 
 Bug fixes:
+..F....... [ZBX-23147] fixed problem count indicators in Monitoring hosts page (ashubin)
+..F....... [ZBX-23072] fixed web scenario step variable uniqueness validation if multiple variable names are empty (Ivo)
 ..F....... [ZBX-23096] fixed fields with key-value pairs being misaligned in web scenario configuration form (agriscenko)
+...G...... [ZBX-23107] fixed small memory leak in Zabbix agent 2 (arimdjonoks)
 ..F....... [ZBX-22822] fixed displaying the correct threshold color in "Top hosts" widget when value exceeds maximum (Ivo)
 ..F....... [ZBX-22777] fixed item test form sending incorrectly resolved macros to server if item uses SNMP interface (Ivo)
 .......PS. [ZBX-23075] fixed processing of network discovery rule with short update interval (asestakovs)
