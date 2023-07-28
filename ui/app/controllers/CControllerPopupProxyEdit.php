@@ -75,11 +75,6 @@ class CControllerPopupProxyEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$default_interface = [
-			'address' => '127.0.0.1',
-			'port' => '10051'
-		];
-
 		if ($this->proxy !== null) {
 			$data = [
 				'proxyid' => $this->getInput('proxyid'),
@@ -88,16 +83,16 @@ class CControllerPopupProxyEdit extends CController {
 					'mode' => (int) $this->proxy['mode'],
 					'address' => $this->proxy['mode'] == PROXY_MODE_PASSIVE
 						? $this->proxy['address']
-						: $default_interface['address'],
+						: DB::getDefault('proxy', 'address'),
 					'port' => $this->proxy['mode'] == PROXY_MODE_PASSIVE
 						? $this->proxy['port']
-						: $default_interface['port'],
+						: DB::getDefault('proxy', 'port'),
 					'allowed_addresses' => $this->proxy['allowed_addresses'],
 					'description' => $this->proxy['description'],
 					'tls_connect' => (int) $this->proxy['tls_connect'],
 					'tls_accept' => (int) $this->proxy['tls_accept'],
-					'tls_psk_identity' => '',
-					'tls_psk' => '',
+					'tls_psk_identity' => DB::getDefault('proxy', 'tls_psk_identity'),
+					'tls_psk' => DB::getDefault('proxy', 'tls_psk'),
 					'tls_issuer' => $this->proxy['tls_issuer'],
 					'tls_subject' => $this->proxy['tls_subject']
 				]
@@ -107,18 +102,18 @@ class CControllerPopupProxyEdit extends CController {
 			$data = [
 				'proxyid' => null,
 				'form' => [
-					'name' => '',
-					'mode' => PROXY_MODE_ACTIVE,
-					'allowed_addresses' => '',
-					'address' => $default_interface['address'],
-					'port' => $default_interface['port'],
-					'description' => '',
-					'tls_connect' => HOST_ENCRYPTION_NONE,
-					'tls_accept' => HOST_ENCRYPTION_NONE,
-					'tls_psk_identity' => '',
-					'tls_psk' => '',
-					'tls_issuer' => '',
-					'tls_subject' => ''
+					'name' => DB::getDefault('proxy', 'name'),
+					'mode' => (int) DB::getDefault('proxy', 'mode'),
+					'allowed_addresses' => DB::getDefault('proxy', 'allowed_addresses'),
+					'address' => DB::getDefault('proxy', 'address'),
+					'port' => DB::getDefault('proxy', 'port'),
+					'description' => DB::getDefault('proxy', 'description'),
+					'tls_connect' => (int) DB::getDefault('proxy', 'tls_connect'),
+					'tls_accept' => (int) DB::getDefault('proxy', 'tls_connect'),
+					'tls_psk_identity' => DB::getDefault('proxy', 'tls_psk_identity'),
+					'tls_psk' => DB::getDefault('proxy', 'tls_psk_identity'),
+					'tls_issuer' => DB::getDefault('proxy', 'tls_issuer'),
+					'tls_subject' => DB::getDefault('proxy', 'tls_subject')
 				]
 			];
 		}
