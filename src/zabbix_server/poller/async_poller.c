@@ -333,21 +333,9 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		}
 		else
 		{
-			if (ZBX_PROCESS_STATE_IDLE == poller_config->state)
-			{
-				zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
-				poller_config->state = ZBX_PROCESS_STATE_BUSY;
-			}
-
 			errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 					poller_config, poller_config, poller_config->base,
 					poller_config->config_timeout, poller_config->config_source_ip);
-
-			if (ZBX_PROCESS_STATE_BUSY == poller_config->state)
-			{
-				zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_IDLE);
-				poller_config->state = ZBX_PROCESS_STATE_IDLE;
-			}
 		}
 
 		if (SUCCEED == errcodes[i])
