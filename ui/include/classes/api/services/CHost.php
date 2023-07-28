@@ -26,6 +26,12 @@ class CHost extends CHostGeneral {
 
 	protected $sortColumns = ['hostid', 'host', 'name', 'status'];
 
+	public const OUTPUT_FIELDS = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
+		'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
+		'maintenance_from', 'name', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
+		'inventory_mode', 'active_available'
+	];
+
 	/**
 	 * Get host data.
 	 *
@@ -1484,14 +1490,17 @@ class CHost extends CHostGeneral {
 		$hostids = array_keys($db_hosts);
 
 		// delete the discovery rules first
-		$del_rules = API::DiscoveryRule()->get([
-			'output' => [],
-			'hostids' => $hostids,
-			'nopermissions' => true,
+		$db_lld_rules = DB::select('items', [
+			'output' => ['itemid', 'name'],
+			'filter' => [
+				'hostid' => $hostids,
+				'flags' => ZBX_FLAG_DISCOVERY_RULE
+			],
 			'preservekeys' => true
 		]);
-		if ($del_rules) {
-			CDiscoveryRuleManager::delete(array_keys($del_rules));
+
+		if ($db_lld_rules) {
+			CDiscoveryRule::deleteForce($db_lld_rules);
 		}
 
 		// delete the items

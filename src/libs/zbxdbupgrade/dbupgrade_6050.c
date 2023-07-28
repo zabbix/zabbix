@@ -20,9 +20,6 @@
 #include "dbupgrade.h"
 
 #include "zbxdbschema.h"
-#include "zbxexpr.h"
-#include "zbxeval.h"
-#include "zbxalgo.h"
 #include "zbxdbhigh.h"
 
 /*
@@ -300,196 +297,89 @@ static int	DBpatch_6050025(void)
 	return SUCCEED;
 }
 
-static char	*fix_hist_param_escaping(const char *param, size_t left, size_t right)
-{
-	size_t escaped_len = 0;
-	/* resulting string cannot be more than 2 times longer than original string */
-	char *escaped = zbx_malloc(NULL, 2 * (right - left + 1) * sizeof(char) + 1);
-
-	for (size_t i = left; i <= right; i++)
-	{
-		escaped[escaped_len++] = param[i];
-		if (i < right && '\\' == param[i] && '"' != param[i + 1])
-			escaped[escaped_len++] = '\\';
-	}
-	escaped[escaped_len++] = '\0';
-
-	return escaped;
-}
-
 static int	DBpatch_6050026(void)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret = SUCCEED;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	return DBdrop_field_autoincrement("proxy_history", &field);
 
-	/* functions table contains history functions used in trigger expressions */
-	result = zbx_db_select("select functionid,parameter from functions where length(parameter) > 1");
-
-	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
-	{
-		const char	*ptr;
-		char		*buf, *tmp, *param = NULL;
-		size_t		param_pos, param_len, sep_pos, buf_alloc, buf_offset = 0;
-
-		buf_alloc  = strlen(row[1]);
-		buf = zbx_malloc(NULL, buf_alloc);
-
-		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
-		{
-			zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-
-			if (param_pos < sep_pos)
-			{
-				param = fix_hist_param_escaping(ptr, param_pos, sep_pos - 1);
-				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
-			}
-
-			if (',' == ptr[sep_pos])
-				zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, ',');
-			zbx_free(param);
-		}
-
-		tmp = zbx_db_dyn_escape_string(buf);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
-		zbx_free(tmp);
-		zbx_free(buf);
-
-		if (SUCCEED == ret)
-			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-	}
-
-	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			ret = FAIL;
-	}
-
-	zbx_free(sql);
-
-	return ret;
+	return SUCCEED;
 }
-
-typedef struct {
-	zbx_uint32_t	op_num;
-	char		is_hist;
-} expr_fun_call;
-
-ZBX_VECTOR_DECL(fun_stack, expr_fun_call)
-ZBX_VECTOR_IMPL(fun_stack, expr_fun_call)
 
 static int	DBpatch_6050027(void)
 {
-	int			ret = SUCCEED;
-	zbx_eval_context_t	ctx;
-	int			token_num;
-	const zbx_eval_token_t	*token;
-	zbx_vector_fun_stack_t	fun_stack;
-	zbx_vector_ptr_t	hist_param_tokens;
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	char			*tmp, *substitute = NULL, *sql = NULL, *error = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
-	zbx_vector_fun_stack_create(&fun_stack);
-	zbx_vector_ptr_create(&hist_param_tokens);
+	return DBdrop_field_autoincrement("proxy_dhistory", &field);
 
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	return SUCCEED;
+}
 
-	if (NULL == (result = zbx_db_select("select itemid,params from items where type = 15")))
-		goto clean;
+static int	DBpatch_6050028(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	return DBdrop_field_autoincrement("proxy_autoreg_host", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050029(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'gauge','widgets/gauge',%d,'[]')", zbx_db_get_maxid("module"), 1))
 	{
-		ret = zbx_eval_parse_expression_str_v64_compat(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error);
-		if (FAIL == ret)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Failed to parse calculated item expression \"%s\" for"
-					" item with id %s, error: %s", row[1], row[0], error);
-			goto clean;
-		}
-		zbx_free(error);
-
-		zbx_vector_fun_stack_clear(&fun_stack);
-		zbx_vector_ptr_clear(&hist_param_tokens);
-		substitute = zbx_strdup(NULL, ctx.expression);
-
-		/* finding string parameters of history functions */
-		for (token_num = ctx.stack.values_num - 1; token_num >= 0; token_num--)
-		{
-			token = &ctx.stack.values[token_num];
-
-			if (0 < fun_stack.values_num) {
-				expr_fun_call	*cur_call = &(fun_stack.values[fun_stack.values_num - 1]);
-
-				if (ZBX_EVAL_TOKEN_VAR_STR == token->type && cur_call->is_hist)
-					zbx_vector_ptr_append(&hist_param_tokens, (void *)token);
-
-				if (0 == --(cur_call->op_num))
-					fun_stack.values_num--;
-			}
-
-			if (0 < token->opt)
-			{
-				expr_fun_call	call = {token->opt, ZBX_EVAL_TOKEN_HIST_FUNCTION == token->type};
-
-				zbx_vector_fun_stack_append(&fun_stack, call);
-			}
-		}
-
-		/* Substitution logic relies on replacing further-most tokens first */
-		zbx_vector_ptr_sort(&hist_param_tokens, zbx_eval_compare_tokens_by_loc);
-
-		/* adding necessary escaping to the the string parameters of history functions */
-		for (token_num = 0; token_num < hist_param_tokens.values_num; token_num++)
-		{
-			size_t	right_pos;
-
-			token = hist_param_tokens.values[token_num];
-			right_pos = token->loc.r;
-			tmp = fix_hist_param_escaping(substitute, token->loc.l, right_pos);
-			zbx_replace_string(&substitute, token->loc.l, &right_pos, tmp);
-
-			zbx_free(tmp);
-		}
-
-		tmp = zbx_db_dyn_escape_string(substitute);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set params='%s' where itemid=%s;\n",
-				tmp, row[0]);
-		zbx_free(tmp);
-		zbx_free(substitute);
-		zbx_eval_clear(&ctx);
-
-		if (SUCCEED == ret)
-			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		return FAIL;
 	}
 
-	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+	return SUCCEED;
+}
 
-	if (SUCCEED == ret && 16 < sql_offset)
+static int	DBpatch_6050030(void)
+{
+	const zbx_db_table_t table =
+			{"optag", "optagid", 0,
+				{
+					{"optagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int  DBpatch_6050031(void)
+{
+	return DBcreate_index("optag", "optag_1", "operationid", 0);
+}
+
+static int	DBpatch_6050032(void)
+{
+	const zbx_db_field_t	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("optag", 1, &field);
+}
+
+static int	DBpatch_6050033(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'toptriggers','widgets/toptriggers',%d,'[]')", zbx_db_get_maxid("module"), 1))
 	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			ret = FAIL;
+		return FAIL;
 	}
 
-clean:
-	zbx_free(error);
-	zbx_free(substitute);
-
-	zbx_vector_fun_stack_destroy(&fun_stack);
-	zbx_vector_ptr_destroy(&hist_param_tokens);
-	zbx_free(sql);
-
-	return ret;
+	return SUCCEED;
 }
 
 #endif
@@ -526,5 +416,11 @@ DBPATCH_ADD(6050024, 0, 1)
 DBPATCH_ADD(6050025, 0, 1)
 DBPATCH_ADD(6050026, 0, 1)
 DBPATCH_ADD(6050027, 0, 1)
+DBPATCH_ADD(6050028, 0, 1)
+DBPATCH_ADD(6050029, 0, 1)
+DBPATCH_ADD(6050030, 0, 1)
+DBPATCH_ADD(6050031, 0, 1)
+DBPATCH_ADD(6050032, 0, 1)
+DBPATCH_ADD(6050033, 0, 1)
 
 DBPATCH_END()

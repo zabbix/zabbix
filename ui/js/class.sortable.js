@@ -722,7 +722,11 @@ class CSortable extends CBaseComponent {
 					return;
 				}
 
+				// Prevent content selection while dragging the item.
 				e.preventDefault();
+
+				// Re-focus the item.
+				mouse_down_item.focus();
 
 				// Save initial mouse position.
 				mouse_down_pos = this._is_vertical ? e.clientY : e.clientX;

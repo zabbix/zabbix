@@ -428,60 +428,6 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 	return $result;
 }
 
-/**
- * Copy specified graph to specified host.
- *
- * @param string $graphid
- * @param string $hostid
- *
- * @return array
- */
-function copyGraphToHost($graphid, $hostid) {
-	$graphs = API::Graph()->get([
-		'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period', 'show_triggers',
-			'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type', 'ymax_type',
-			'ymin_itemid', 'ymax_itemid'
-		],
-		'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-		'selectHosts' => ['hostid', 'name'],
-		'graphids' => $graphid
-	]);
-	$graph = reset($graphs);
-	$host = reset($graph['hosts']);
-
-	if ($host['hostid'] == $hostid) {
-		error(_s('Graph "%1$s" already exists on "%2$s".', $graph['name'], $host['name']));
-
-		return false;
-	}
-
-	$graph['gitems'] = getSameGraphItemsForHost(
-		$graph['gitems'],
-		$hostid,
-		true,
-		[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-	);
-
-	if (!$graph['gitems']) {
-		$host = get_host_by_hostid($hostid);
-
-		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
-
-		return false;
-	}
-
-	// retrieve actual ymax_itemid and ymin_itemid
-	if ($graph['ymax_itemid'] && $itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
-		$graph['ymax_itemid'] = $itemid;
-	}
-
-	if ($graph['ymin_itemid'] && $itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
-		$graph['ymin_itemid'] = $itemid;
-	}
-
-	return API::Graph()->create($graph);
-}
-
 function get_next_color($palettetype = 0) {
 	static $prev_color = ['dark' => true, 'color' => 0, 'grad' => 0];
 

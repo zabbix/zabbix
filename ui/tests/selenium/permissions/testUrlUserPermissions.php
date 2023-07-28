@@ -199,9 +199,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'toptriggers.php',
-				'title' =>	'100 busiest triggers',
-				'header' =>	'100 busiest triggers',
+				'url' => 'zabbix.php?action=toptriggers.list',
+				'title' =>	'Top 100 triggers',
+				'header' =>	'Top 100 triggers',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,

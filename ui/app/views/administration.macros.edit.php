@@ -44,7 +44,8 @@ foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextAreaFlexible('macros['.$i.'][macro]', $macro['macro']))
 		->addClass('macro')
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-		->setAttribute('placeholder', '{$MACRO}');
+		->setAttribute('placeholder', '{$MACRO}')
+		->disableSpellcheck();
 
 	if ($i == 0) {
 		$macro_input->setAttribute('autofocus', 'autofocus');

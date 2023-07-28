@@ -4570,7 +4570,7 @@ class testScripts extends CAPITest {
 				],
 				'expected_error' => 'Script "API test script.update both - A, custom path (fail)" already exists.'
 			],
-			'Test script.update existing name and menu_path with both leading and traling slashes' => [
+			'Test script.update existing name and menu_path with both leading and trailing slashes' => [
 				'script' => [
 					'scriptid' => 'update_existing_both_two_fail',
 					'name' => 'API test script.update both - A, custom path (fail)',
@@ -5589,7 +5589,7 @@ class testScripts extends CAPITest {
 						'host_access' => PERM_READ_WRITE,
 						'usrgrpid' => 'user',
 						'groupid' => 'r',
-						'description' => 'Check successful update SSH with publick key',
+						'description' => 'Check successful update SSH with public key',
 						'confirmation' => 'Do you want to shutdown?',
 						'port' => '{$MACRO}',
 						'username' => 'Jill',
@@ -7314,7 +7314,7 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	 * Test script.create, script.update, script.delete, script.execute with various users and premissions.
+	 * Test script.create, script.update, script.delete, script.execute with various users and permissions.
 	 *
 	 * @dataProvider getScriptPermissions
 	 */
@@ -10363,7 +10363,7 @@ class testScripts extends CAPITest {
 		CDataHelper::call('host.delete', self::$data['hostids']);
 
 		/*
-		 * All events and newly insterted housekeepter data (created by trigger.delete and item.delete) have to be
+		 * All events and newly inserted housekeepter data (created by trigger.delete and item.delete) have to be
 		 * deleted manually.
 		 */
 		DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
@@ -10374,7 +10374,7 @@ class testScripts extends CAPITest {
 		// Delete hosts groups.
 		CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
-		// The "ids" table should be restored using the standart backup after tests are complete.
+		// The "ids" table should be restored using the standard backup after tests are complete.
 	}
 
 	/**

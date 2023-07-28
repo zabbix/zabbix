@@ -293,7 +293,9 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_SERVICEMAN */
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
 	0, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
-	0 /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
+	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
+	0, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
+	0 /* ZBX_PROCESS_TYPE_AGENT_POLLER */
 };
 
 static char	*config_file	= NULL;
@@ -752,14 +754,13 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 		zbx_vector_addr_ptr_create(&config_active_args[forks].addrs);
 		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
-		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
-				hostnames->values[i] : "");
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
 		config_active_args[forks].config_timeout = zbx_config_timeout;
 		config_active_args[forks].config_file = config_file;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 		config_active_args[forks].config_source_ip = zbx_config_source_ip;
-		config_active_args[forks].config_hostname = zbx_config_hostname;
+		config_active_args[forks].config_hostname = zbx_config_hostname = zbx_strdup(NULL,
+				0 < hostnames->values_num ? hostnames->values[i] : "");
 		config_active_args[forks].config_host_metadata = zbx_config_host_metadata;
 		config_active_args[forks].config_host_metadata_item = zbx_config_host_metadata_item;
 	}
