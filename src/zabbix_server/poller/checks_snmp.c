@@ -2108,16 +2108,27 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 {
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context;
+	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() operation:%d", __func__, operation);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()",__func__);
 
-	if (NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE == operation)
+	bulkwalk_context = (zbx_bulkwalk_context_t *)magic;
+	snmp_context = (zbx_snmp_context_t *)bulkwalk_context->arg;
+
+	if (reqid != bulkwalk_context->reqid && pdu && pdu->command != SNMP_MSG_REPORT)
 	{
-		int	ret;
-		char	error[MAX_STRING_LEN];
+		zabbix_log(LOG_LEVEL_DEBUG, "unexpected response request id:%d expected request id:%d command:%d",
+				reqid, bulkwalk_context->reqid, pdu->command);
+		return 0;
+	}
 
-		bulkwalk_context = (zbx_bulkwalk_context_t *)magic;
-		snmp_context = (zbx_snmp_context_t *)bulkwalk_context->arg;
+	zabbix_log(LOG_LEVEL_DEBUG, "operation:%d response id:%d command:%d",operation, reqid, pdu ? pdu->command : -1);
+
+	bulkwalk_context->waiting = 0;
+
+	if (NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE == operation && pdu)
+	{
+		char	error[MAX_STRING_LEN];
 
 		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(STAT_SUCCESS, pdu, bulkwalk_context->p_oid,
 				&bulkwalk_context->running, &bulkwalk_context->vars_num, bulkwalk_context->pdu_type,
@@ -2128,11 +2139,15 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 
 		}
 	}
+ 
+	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return 1;
 }
 
-static zbx_bulkwalk_context_t	*snmp_bulkwalk_contect_create(zbx_snmp_context_t *snmp_context,
+
+
+static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *snmp_context,
 		int pdu_type, zbx_snmp_oid_t *p_oid)
 {
 	zbx_bulkwalk_context_t	*bulkwalk_context;
@@ -2206,12 +2221,14 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, char *error, size
 		goto out;
 	}
 
+	bulkwalk_context->waiting = 1;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() send completed", __func__);
 
 	struct netsnmp_transport_s	*transport;
 
 	int				numfds = 0, block = 0;
-	struct timeval			timeout = {.tv_sec = 3};
+	struct timeval			timeout = {.tv_sec = snmp_context->config_timeout};
 	fd_set				fdset;
 
 	FD_ZERO(&fdset);
@@ -2302,7 +2319,7 @@ static int	agent_task_process(short event, void *data, int *fd)
 		return ZBX_ASYNC_TASK_READ;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() event:%d itemid:" ZBX_FS_UI64, __func__, event,
+	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() event:%d fd:%d itemid:" ZBX_FS_UI64, __func__, event, *fd,
 			snmp_context->item.itemid);
 
 	if (0 != (event & EV_TIMEOUT))
@@ -2318,6 +2335,12 @@ static int	agent_task_process(short event, void *data, int *fd)
 		snmp_context->item.ret = NETWORK_ERROR;
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2() failed"));
 		goto stop;
+	}
+
+	if (1 == bulkwalk_context->waiting)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot process PDU result for itemid:" ZBX_FS_UI64,
+				snmp_context->item.itemid);
 	}
 
 	if (0 == bulkwalk_context->running)
@@ -2445,6 +2468,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	snmp_context->results_alloc = 0;
 	snmp_context->results_offset = 0;
 	snmp_context->i = 0;
+	snmp_context->config_timeout = config_timeout;
 
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
 
@@ -2499,7 +2523,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	{
 		zbx_bulkwalk_context_t	*bulkwalk_context;
 
-		bulkwalk_context = snmp_bulkwalk_contect_create(snmp_context, pdu_type,
+		bulkwalk_context = snmp_bulkwalk_context_create(snmp_context, pdu_type,
 				snmp_context->param_oids.values[i]);
 
 		zbx_vector_bulkwalk_context_append(&snmp_context->bulkwalk_contexts, bulkwalk_context);

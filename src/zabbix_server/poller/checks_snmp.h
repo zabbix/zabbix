@@ -53,6 +53,7 @@ ZBX_PTR_VECTOR_DECL(snmp_oid, zbx_snmp_oid_t *)
 typedef struct
 {
 	int			reqid;
+	int			waiting;
 	int			sock;
 	int			pdu_type;
 	zbx_snmp_oid_t		*p_oid;
@@ -81,6 +82,7 @@ typedef struct
 	zbx_vector_snmp_oid_t		param_oids;
 	zbx_vector_bulkwalk_context_t	bulkwalk_contexts;
 	int				i;
+	int				config_timeout;
 }
 zbx_snmp_context_t;
 
