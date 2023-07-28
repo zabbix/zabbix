@@ -2328,7 +2328,7 @@ void	zbx_unset_snmp_bulkwalk_options(void)
 	snmp_bulkwalk_set_options(&default_opts);
 }
 
-static int	agent_task_process(short event, void *data, int *fd)
+static int	snmp_task_process(short event, void *data, int *fd)
 {
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
@@ -2566,7 +2566,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_vector_bulkwalk_context_append(&snmp_context->bulkwalk_contexts, bulkwalk_context);
 	}
 
-	zbx_async_poller_add_task(base, -1, snmp_context, config_timeout, agent_task_process, clear_cb);
+	zbx_async_poller_add_task(base, -1, snmp_context, config_timeout, snmp_task_process, clear_cb);
 
 	ret = SUCCEED;
 out:
