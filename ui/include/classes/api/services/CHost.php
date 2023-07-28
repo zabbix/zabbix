@@ -927,7 +927,7 @@ class CHost extends CHostGeneral {
 	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
 	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
 	 * @param int    $hosts['fields']['details']		Details. OPTIONAL
-	 * @param int    $hosts['fields']['proxyid']	    Proxy ID. OPTIONAL
+	 * @param int    $hosts['fields']['proxyid']		Proxy ID. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL

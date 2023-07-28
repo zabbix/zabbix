@@ -171,6 +171,10 @@ class testProxy extends CAPITest {
 			'delete_used_in_discovery' => [
 				'name' => 'API test proxy.delete - used in discovery rules',
 				'mode' => PROXY_MODE_ACTIVE
+			],
+			'select_hosts_extend' => [
+				'name' => 'API test proxy - verify fields returned wth selectHosts extend',
+				'mode' => PROXY_MODE_ACTIVE
 			]
 		];
 		$db_proxies = CDataHelper::call('proxy.create', array_values($proxies));
@@ -252,6 +256,16 @@ class testProxy extends CAPITest {
 			'without_proxy_2' => [
 				'host' => 'api_test_host_without_proxy_2',
 				'name' => 'API test host - without proxy 2',
+				'groups' => [
+					[
+						'groupid' => self::$data['groupids'][0]
+					]
+				]
+			],
+			'select_fields_host' => [
+				'host' => 'host_fields_host',
+				'name' => 'API test host - for selectHosts with extend',
+				'proxyid' => self::$data['proxyids']['select_hosts_extend'],
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]
@@ -1326,7 +1340,7 @@ class testProxy extends CAPITest {
 					'selectHosts' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/selectHosts/1": value must be one of "hostid", "proxyid", "host", "status", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "name", "flags", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "inventory_mode", "active_available".'
+				'expected_error' => 'Invalid parameter "/selectHosts/1": value must be one of "hostid", "host", "status", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "name", "flags", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "inventory_mode", "active_available".'
 			],
 
 			// Check common fields that are not flags, but require strict validation.
@@ -1599,6 +1613,38 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_result' => [],
+				'expected_error' => null
+			],
+			'Test proxy.get: selectHosts=extend excludes proxyid' => [
+				'request' => [
+					'output' => [],
+					'proxyids' => 'select_hosts_extend',
+					'selectHosts' => API_OUTPUT_EXTEND
+				],
+				'expected_result' => [[
+					'hosts' => [[
+						'hostid' => 'select_fields_host',
+						'host' => 'host_fields_host',
+						'status' => DB::getDefault('hosts', 'status'),
+						'ipmi_authtype' => DB::getDefault('hosts', 'ipmi_authtype'),
+						'ipmi_privilege' => DB::getDefault('hosts', 'ipmi_privilege'),
+						'ipmi_username' => DB::getDefault('hosts', 'ipmi_username'),
+						'ipmi_password' => DB::getDefault('hosts', 'ipmi_password'),
+						'maintenanceid' => '0',
+						'maintenance_status' => DB::getDefault('hosts', 'maintenance_status'),
+						'maintenance_type' => DB::getDefault('hosts', 'maintenance_type'),
+						'maintenance_from' => DB::getDefault('hosts', 'maintenance_from'),
+						'name' => 'API test host - for selectHosts with extend',
+						'flags' => DB::getDefault('hosts', 'flags'),
+						'description' => DB::getDefault('hosts', 'description'),
+						'tls_connect' => DB::getDefault('hosts', 'tls_connect'),
+						'tls_accept' => DB::getDefault('hosts', 'tls_accept'),
+						'tls_issuer' => DB::getDefault('hosts', 'tls_issuer'),
+						'tls_subject' => DB::getDefault('hosts', 'tls_subject'),
+						'inventory_mode' => (string) HOST_INVENTORY_DISABLED,
+						'active_available' => '0'
+					]]
+				]],
 				'expected_error' => null
 			]
 		];
