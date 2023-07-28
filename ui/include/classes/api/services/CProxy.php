@@ -35,6 +35,10 @@ class CProxy extends CApiService {
 	protected $tableAlias = 'p';
 	protected $sortColumns = ['proxyid', 'name', 'mode'];
 
+	public const OUTPUT_FIELDS = ['proxyid', 'name', 'mode', 'description', 'allowed_addresses', 'address', 'port',
+		'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'lastaccess', 'version', 'compatibility'
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -43,9 +47,7 @@ class CProxy extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = []) {
-		$output_fields = ['proxyid', 'name', 'mode', 'description', 'lastaccess', 'tls_connect', 'tls_accept',
-			'tls_issuer', 'tls_subject', 'allowed_addresses', 'version', 'compatibility', 'address', 'port'
-		];
+		$output_fields = self::OUTPUT_FIELDS;
 
 		/*
 		 * For internal calls, it is possible to get the write-only fields if they were specified in output.
@@ -55,12 +57,6 @@ class CProxy extends CApiService {
 			$output_fields[] = 'tls_psk_identity';
 			$output_fields[] = 'tls_psk';
 		}
-
-		$host_fields = ['hostid', 'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
-			'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type', 'maintenance_from', 'name',
-			'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject', 'inventory_mode',
-			'active_available'
-		];
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'proxyids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -73,7 +69,7 @@ class CProxy extends CApiService {
 			// output
 			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
-			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_fields), 'default' => null],
+			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
 			// sort and limit
 			'sortfield' =>				['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
 			'sortorder' =>				['type' => API_SORTORDER, 'default' => []],

@@ -1294,7 +1294,7 @@ class testProxy extends CAPITest {
 					'output' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "mode", "description", "lastaccess", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "allowed_addresses", "version", "compatibility", "address", "port".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "lastaccess", "version", "compatibility".'
 			],
 
 			// Check write-only fields are not returned.
@@ -1303,14 +1303,14 @@ class testProxy extends CAPITest {
 					'output' => ['tls_psk_identity']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "mode", "description", "lastaccess", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "allowed_addresses", "version", "compatibility", "address", "port".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "lastaccess", "version", "compatibility".'
 			],
 			'Test proxy.get: write-only field "tls_psk"' => [
 				'request' => [
 					'output' => ['tls_psk']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "mode", "description", "lastaccess", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "allowed_addresses", "version", "compatibility", "address", "port".'
+				'expected_error' => 'Invalid parameter "/output/1": value must be one of "proxyid", "name", "mode", "description", "allowed_addresses", "address", "port", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "lastaccess", "version", "compatibility".'
 			],
 
 			// Check "selectHosts" option.
