@@ -2383,8 +2383,6 @@ static int	snmp_task_process(short event, void *data, int *fd)
 		{
 			if (0 == bulkwalk_context->vars_num && SNMP_MSG_GETBULK == bulkwalk_context->pdu_type)
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "SNMP_MSG_GETBULK returned none variables retry with"
-					" SNMP_MSG_GET");
 				bulkwalk_context->pdu_type = SNMP_MSG_GET;
 			}
 			else
