@@ -97,6 +97,10 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
 		int config_timeout, const char *config_source_ip);
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
+
+void	zbx_set_snmp_bulkwalk_options(void);
+void	zbx_unset_snmp_bulkwalk_options(void);
+
 #endif
 
 #endif

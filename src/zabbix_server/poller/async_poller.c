@@ -553,6 +553,8 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	}
+	else
+		zbx_set_snmp_bulkwalk_options();
 
 	while (ZBX_IS_RUNNING())
 	{
