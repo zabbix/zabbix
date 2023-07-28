@@ -65,8 +65,8 @@ class testFormUserMedia extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'SMS',
-						'Send to' => '+371 66600666'
+						'Type' => 'MS Teams',
+						'Send to' => 'test.channel'
 					],
 					'additional media' => [
 						[
@@ -89,8 +89,8 @@ class testFormUserMedia extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Type' => 'SMS',
-						'Send to' => '+371 66600666',
+						'Type' => 'Jira',
+						'Send to' => 'path.2.Jira',
 						'When active' => '{$DATE.TIME};6-7,09:00-15:00',
 						'Enabled' => false
 					]
