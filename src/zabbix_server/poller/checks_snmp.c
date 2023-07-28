@@ -2258,7 +2258,7 @@ static zbx_async_task_state_t	get_task_state_for_event(short event)
 static ZBX_THREAD_LOCAL zbx_snmp_format_opts_t	default_opts;
 
 void	zbx_set_snmp_bulkwalk_options(void)
-{	
+{
 	zbx_snmp_format_opts_t	bulk_opts;
 
 	snmp_bulkwalk_get_options(&default_opts);
@@ -2273,7 +2273,7 @@ void	zbx_set_snmp_bulkwalk_options(void)
 }
 
 void	zbx_unset_snmp_bulkwalk_options(void)
-{	
+{
 	snmp_bulkwalk_set_options(&default_opts);
 }
 
