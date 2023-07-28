@@ -85,10 +85,11 @@ window.item_edit_form = new class {
 	}
 
 	initForm(field_switches) {
-		new CViewSwitcher('authtype', 'change', field_switches.for_authtype);
-		new CViewSwitcher('type', 'change', field_switches.for_type);
-		new CViewSwitcher('http_authtype', 'change', field_switches.for_http_auth_type);
 		new CViewSwitcher('allow_traps', 'change', field_switches.for_traps);
+		new CViewSwitcher('authtype', 'change', field_switches.for_authtype);
+		new CViewSwitcher('http_authtype', 'change', field_switches.for_http_auth_type);
+		new CViewSwitcher('type', 'change', field_switches.for_type);
+		new CViewSwitcher('value_type', 'change', field_switches.for_value_type);
 
 		this.field = {
 			history: this.form.querySelector('[name="history"]'),

@@ -712,7 +712,7 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Log time format'), 'logtimefmt'))->setId('js-item-log-time-format-label'),
 		(new CFormField(
-			(new CTextBox('logtimefmt', $data['form']['logtimefmt'], $data['discovered'],
+			(new CTextBox('logtimefmt', $data['form']['logtimefmt'], $data['readonly'],
 				DB::getFieldLength('items', 'logtimefmt'))
 			)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-log-time-format-field')
@@ -723,7 +723,7 @@ $formgrid
 			(new CMultiSelect([
 				'name' => 'valuemapid',
 				'object_name' => $data['form']['context'] === 'host' ? 'valuemaps' : 'template_valuemaps',
-				'disabled' => $data['discovered'],
+				'disabled' => $data['readonly'],
 				'multiple' => false,
 				'data' => $data['valuemap'] ? [$data['valuemap']] : [],
 				'popup' => [
