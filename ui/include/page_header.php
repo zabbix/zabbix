@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+global $page;
 
 if (!isset($page['type'])) {
 	$page['type'] = PAGE_TYPE_HTML;
@@ -143,7 +144,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 			}
 		}
 	}
-	$pageHeader->addCssFile('assets/styles/'.CHtml::encode($theme).'.css');
+	$pageHeader->addCssFile('assets/styles/'.$theme.'.css');
 
 	if ($page['file'] == 'sysmap.php') {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');

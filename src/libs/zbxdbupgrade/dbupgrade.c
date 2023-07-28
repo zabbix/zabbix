@@ -837,6 +837,7 @@ static void	DBget_version(int *mandatory, int *optional)
 
 int	DBcheck_version(void)
 {
+#define ZBX_DB_WAIT_UPGRADE	10
 	const char		*dbversion_table_name = "dbversion";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_db_version_t	*dbversion;
@@ -944,6 +945,8 @@ int	DBcheck_version(void)
 		for (i = 0; 0 != patches[i].version; i++)
 		{
 			static sigset_t	orig_mask, mask;
+			DB_RESULT	result;
+			DB_ROW		row;
 
 			if (db_optional >= patches[i].version)
 				continue;
@@ -959,11 +962,26 @@ int	DBcheck_version(void)
 
 			DBbegin();
 
-			/* skipping the duplicated patches */
-			if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
-					SUCCEED == (ret = patches[i].function()))
+			result = DBselect("select optional,mandatory from dbversion" ZBX_FOR_UPDATE);
+			if (NULL != (row = DBfetch(result)))
+				db_optional = atoi(row[0]);
+
+			DBfree_result(result);
+			if (db_optional >= patches[i].version)
 			{
-				ret = DBset_version(patches[i].version, patches[i].mandatory);
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot perform database upgrade:"
+						" patch with version %08d was already performed by other node",
+						patches[i].version);
+				ret = FAIL;
+			}
+			else
+			{
+				/* skipping the duplicated patches */
+				if ((0 != patches[i].duplicates && patches[i].duplicates <= db_optional) ||
+						SUCCEED == (ret = patches[i].function()))
+				{
+					ret = DBset_version(patches[i].version, patches[i].mandatory);
+				}
 			}
 
 			ret = DBend(ret);
@@ -991,7 +1009,11 @@ int	DBcheck_version(void)
 	if (SUCCEED == ret)
 		zabbix_log(LOG_LEVEL_WARNING, "database upgrade fully completed");
 	else
-		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed");
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "database upgrade failed on patch %08d, exiting in %d seconds",
+				patches[i].version, ZBX_DB_WAIT_UPGRADE);
+		sleep(ZBX_DB_WAIT_UPGRADE);
+	}
 #endif	/* not HAVE_SQLITE3 */
 
 out:
@@ -1000,6 +1022,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef ZBX_DB_WAIT_UPGRADE
 }
 
 int	DBcheck_double_type(void)

@@ -93,7 +93,7 @@ foreach ($this->data['roles'] as $role) {
 	}
 
 	if (count($role['users']) != $role['user_cnt']) {
-		$users[] = ' &hellip;';
+		$users[] = [' ', HELLIP()];
 	}
 
 	$name = new CLink($role['name'], (new CUrl('zabbix.php'))

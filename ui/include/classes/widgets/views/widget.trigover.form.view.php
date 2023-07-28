@@ -38,18 +38,14 @@ $scripts = [];
 $form_list->addRow(CWidgetHelper::getLabel($fields['show']), CWidgetHelper::getRadioButtonList($fields['show']));
 
 // Host groups.
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'],
-	$data['captions']['ms']['groups']['groupids'],
+$field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['groups']['groupids'],
 	$form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
 $scripts[] = $field_groupids->getPostJS();
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
-	$form->getName()
-);
+$field_hostids = CWidgetHelper::getHost($fields['hostids'], $data['captions']['hosts']['hostids'], $form->getName());
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
 $scripts[] = $field_hostids->getPostJS();
 

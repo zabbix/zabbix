@@ -25,7 +25,10 @@ use Facebook\WebDriver\Remote\HttpCommandExecutor;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\WebDriverCommand;
 use Facebook\WebDriver\Exception\Internal\WebDriverCurlException;
-use \Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Exception\WebDriverException;
+use Facebook\WebDriver\Exception\StaleElementReferenceException;
+use Facebook\WebDriver\Exception\UnknownErrorException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 /**
  * Helper class that allows custom command execution.
@@ -59,7 +62,12 @@ class CommandExecutor extends HttpCommandExecutor {
 		catch (WebDriverCurlException $exception) {
 			// Code is not missing here
 		}
-		// Workaraund for communication errors present on Jenkins
+		catch (UnknownErrorException|NoSuchElementException $exception) {
+			if (strpos($exception->getMessage(), 'ode with given id') !== false) {
+				throw new StaleElementReferenceException($exception->getMessage());
+			}
+		}
+		// Workaround for communication errors present on Jenkins
 		catch (WebDriverException $exception) {
 			if (strpos($exception->getMessage(), 'START_MAP') === false) {
 				throw $exception;

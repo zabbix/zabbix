@@ -446,9 +446,11 @@ class CPage {
 
 	/**
 	 * Wait until page is ready.
+	 *
+	 * @param integer $timeout    timeout in seconds
 	 */
-	public function waitUntilReady() {
-		return (new CElementQuery(null))->waitUntilReady();
+	public function waitUntilReady($timeout = null) {
+		return (new CElementQuery(null))->waitUntilReady($timeout);
 	}
 
 	/**
@@ -495,7 +497,7 @@ class CPage {
 	 *
 	 * @param array|string $keys   keys to be pressed
 	 */
-	public function keyPress($keys) {
+	public function pressKey($keys) {
 		if (!is_array($keys)) {
 			$keys = [$keys];
 		}

@@ -276,7 +276,7 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 					],
 					'date' => [
 						'relative' => true,
-						// Less thant 2 month ago.
+						// Less than 2 month ago.
 						'from' => 501120,
 						'to' => 'now-1d/d'
 					]

@@ -653,21 +653,17 @@ char	*zbx_str_printable_dyn(const char *text)
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
 {
-	size_t	len = strlen(src);
+	const char	*s = src;
 
-	if (len + 1 <= siz)
+	if (0 != siz)
 	{
-		memcpy(dst, src, len + 1);
-		return len;
+		while (0 != --siz && '\0' != *s)
+			*dst++ = *s++;
+
+		*dst = '\0';
 	}
 
-	if (0 == siz)
-		return 0;
-
-	memcpy(dst, src, siz - 1);
-	dst[siz - 1] = '\0';
-
-	return siz - 1;
+	return s - src;	/* count does not include null */
 }
 
 /******************************************************************************
@@ -4385,6 +4381,25 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 			break;
 		case CONDITION_OPERATOR_NOT_LIKE:
 			if (NULL == strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+	}
+
+	return ret;
+}
+
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op)
+{
+	int	ret = FAIL;
+
+	switch (op)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			if (value == pattern)
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (value != pattern)
 				ret = SUCCEED;
 			break;
 	}
