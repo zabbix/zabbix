@@ -37,8 +37,12 @@ static void	async_task_remove(zbx_async_task_t *task)
 {
 	task->free_cb(task->data);
 
-	event_free(task->rx_event);
-	event_free(task->tx_event);
+	if (NULL != task->rx_event)
+		event_free(task->rx_event);
+
+	if (NULL != task->tx_event)
+		event_free(task->tx_event);
+
 	event_free(task->timeout_event);
 
 	zbx_free(task);
@@ -80,8 +84,11 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			event_add(task->rx_event, NULL);
 			break;
 		case ZBX_ASYNC_TASK_READ_NEW:
-			ev = event_get_base(task->rx_event);
-			event_free(task->rx_event);
+			ev = event_get_base(task->timeout_event);
+
+			if (NULL != task->rx_event)
+				event_free(task->rx_event);
+
 			task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
 			event_add(task->rx_event, NULL);
 			break;
@@ -108,8 +115,16 @@ void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int ti
 
 	evtimer_add(task->timeout_event, &tv);
 
-	task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
-	task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
+	if (-1 != fd)
+	{
+		task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
+		task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
+	}
+	else
+	{
+		task->rx_event = NULL;
+		task->tx_event = NULL;
+	}
 
 	/* call initialization event */
 	async_event(fd, 0, task);

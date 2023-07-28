@@ -360,7 +360,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	for (i = 0; i < num; i++)
 	{
 		/* network error is handled by process_snmp_result() */
-		if (SUCCEED != errcodes[i] && NETWORK_ERROR != errcodes[i])
+		if (SUCCEED != errcodes[i])
 		{
 			if (ZBX_IS_RUNNING())
 			{
