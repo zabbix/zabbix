@@ -403,19 +403,20 @@ window.item_edit_form = new class {
 
 	#getInferredValueType(key) {
 		const type = this.field.type.value;
+		const search = key.split('[')[0].trim().toLowerCase();
 
 		if (!(type in this.value_type_keys)) {
 			return null;
 		}
 
-		if (key in this.value_type_keys[type]) {
-			return this.value_type_keys[type][key];
+		if (search in this.value_type_keys[type]) {
+			return this.value_type_keys[type][search];
 		}
 
 		const matches = Object.entries(this.value_type_keys[type])
-							.filter(([key_name, value_type]) => key_name.startsWith(key));
+							.filter(([key_name, value_type]) => key_name.startsWith(search));
 
-		return (matches.length && matches.every(([_, value_type]) => value_type == matches[0][1]))
+		return (matches.length || matches.every(([_, value_type]) => value_type == matches[0][1]))
 			? matches[0][1] : null;
 	}
 

@@ -148,11 +148,6 @@ class CControllerItemEdit extends CControllerItem {
 		foreach (CItemData::getKeysByItemType() as $type => $keys) {
 			foreach ($keys as $key) {
 				$value_type = $key_value_type[$key];
-
-				if ($value_type === null) {
-					continue;
-				}
-
 				$data['value_type_keys'] += [$type => []];
 				$data['value_type_keys'][$type][$key] = $value_type;
 			}
