@@ -103,7 +103,7 @@ class CControllerUsergroupUpdate extends CController {
 					$user_group['tag_filters'][] = [
 						'groupid' => $groupId,
 						'tag' => $tag,
-						'value' => $value,
+						'value' => $value
 					];
 				}
 			}
