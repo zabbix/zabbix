@@ -276,9 +276,10 @@ window.item_edit_form = new class {
 
 		this.#updateActionButtons();
 		this.#updateCustomIntervalVisibility();
-		this.#updateValueTypeHintVisibility();
 		this.#updateHistoryModeVisibility();
 		this.#updateTrendsModeVisibility();
+		this.#updateValueTypeHintVisibility();
+		this.#updateValueTypeOptionVisibility();
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
@@ -421,16 +422,6 @@ window.item_edit_form = new class {
 	}
 
 	#typeChangeHandler(e) {
-		const disable_binary = e.target.value != ITEM_TYPE_DEPENDENT;
-
-		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
-			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
-
-			this.field.value_type.value = value;
-		}
-
-		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
-		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 		this.updateFieldsVisibility();
 	}
 
@@ -502,6 +493,20 @@ window.item_edit_form = new class {
 		this.field.trends.toggleAttribute('disabled', disabled);
 		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+	}
+
+	#updateValueTypeOptionVisibility() {
+		const disable_binary = this.field.type.value != ITEM_TYPE_DEPENDENT;
+
+		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
+			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
+
+			this.field.value.value = value;
+			this.field.value_type.value = value;
+		}
+
+		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 	}
 
 	#openRelatedItem(parameters) {
