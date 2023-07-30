@@ -114,13 +114,6 @@ window.item_edit_form = new class {
 			history_hint: this.form.querySelector('#history_mode_hint'),// remove id [for="history"] > :has([data-hintbox])
 			trends_hint: this.form.querySelector('#trends_mode_hint') // remove id
 		};
-
-		// TODO: move this code to tags.tab javascript file.
-		if (jQuery('#tabs').tabs('option', 'active') == 1) {
-			// Force dynamicRows event handlers initialization when 'Tags' tab is already active.
-			jQuery(() => jQuery('#tabs').trigger('tabscreate.tags-tab', {panel: $('#tags-tab')}));
-		}
-
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
 			rows: this.form_data.parameters
