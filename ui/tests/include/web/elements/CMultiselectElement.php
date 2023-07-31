@@ -375,6 +375,8 @@ class CMultiselectElement extends CElement {
 
 	/**
 	 *	Get list of suggested values.
+	 *
+	 * @return array
 	 */
 	public function getSuggestions() {
 		return $this->query('xpath://ul[@class="multiselect-suggest"]/li[not(@class="suggest-hover")]')->all()->asText();
