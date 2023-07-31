@@ -111,6 +111,13 @@ typedef struct
 }
 zbx_snmpidx_mapping_t;
 
+typedef struct
+{
+	AGENT_RESULT	*result;
+	int		errcode;
+}
+zbx_snmp_result_t;
+
 ZBX_PTR_VECTOR_IMPL(snmp_oid, zbx_snmp_oid_t *)
 
 static ZBX_THREAD_LOCAL zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
@@ -2435,33 +2442,8 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 	zbx_free(snmp_context);
 }
 
-typedef struct
-{
-	AGENT_RESULT	*result;
-	int		errcode;
-}
-zbx_snmp_result_t;
-
-static void	process_snmp_result(void *data)
-{
-	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
-	zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, snmp_context->item.key,
-			snmp_context->item.host, snmp_context->item.interface.addr);
-
-	*snmp_result->result = snmp_context->item.result;
-	zbx_init_agent_result(&snmp_context->item.result);
-	snmp_result->errcode = snmp_context->item.ret;
-
-	zbx_async_check_snmp_clean(snmp_context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_async_task_clear_cb_t clear_cb, void *arg, void *arg_action, struct event_base *base,
-		int config_timeout, const char *config_source_ip)
+int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
+		void *arg, void *arg_action, struct event_base *base, int config_timeout, const char *config_source_ip)
 {
 	int			i, ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
@@ -2505,9 +2487,8 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	if (NULL == (snmp_context->ssp = zbx_snmp_open_session(item, error, sizeof(error), config_timeout,
 			config_source_ip)))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value failed: %s", error));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open SNMP session: %s", error));
 		ret = CONFIG_ERROR;
-		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2515,7 +2496,6 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
 		ret = CONFIG_ERROR;
-		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2523,7 +2503,6 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid parameters: at least one OID is expected."));
 		ret = CONFIG_ERROR;
-		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2533,7 +2512,6 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid max repetition count: it should be at least 1."));
 		ret = CONFIG_ERROR;
-		zbx_async_check_snmp_clean(snmp_context);
 		goto out;
 	}
 
@@ -2541,7 +2519,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		ret = CONFIG_ERROR;
-		zbx_async_check_snmp_clean(snmp_context);
+		
 		goto out;
 	}
 
@@ -2559,6 +2537,9 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 
 	ret = SUCCEED;
 out:
+	if (SUCCEED != ret)
+		zbx_async_check_snmp_clean(snmp_context);
+
 	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -2887,6 +2868,23 @@ void	zbx_shutdown_library_mt_snmp(void)
 	zbx_shutdown_snmp();
 }
 
+static void	process_snmp_result(void *data)
+{
+	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
+	zbx_snmp_result_t	*snmp_result = (zbx_snmp_result_t *)snmp_context->arg;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, snmp_context->item.key,
+			snmp_context->item.host, snmp_context->item.interface.addr);
+
+	*snmp_result->result = snmp_context->item.result;
+	zbx_init_agent_result(&snmp_context->item.result);
+	snmp_result->errcode = snmp_context->item.ret;
+
+	zbx_async_check_snmp_clean(snmp_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
 		unsigned char poller_type, int config_timeout, const char *config_source_ip)
 {
@@ -2915,7 +2913,8 @@ void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *err
 	{
 		int	max_vars;
 
-		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
+		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout,
+				config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
