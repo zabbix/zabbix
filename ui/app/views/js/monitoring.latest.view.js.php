@@ -111,6 +111,14 @@
 			}
 		},
 
+		initListActions() {
+			let form = this.getCurrentForm().get(0);
+
+			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
+				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
+			});
+		},
+
 		createCountersRefresh(timeout) {
 			if (this.refresh_counters) {
 				clearTimeout(this.refresh_counters);
@@ -242,14 +250,6 @@
 			this.getCurrentSubfilter().replaceWith(subfilter);
 			chkbxRange.init();
 			this.initListActions();
-		},
-
-		initListActions() {
-			let form = this.getCurrentForm().get(0);
-
-			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
-				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
-			});
 		},
 
 		bindDataEvents(deferred) {

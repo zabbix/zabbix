@@ -250,7 +250,7 @@ foreach ($data['subfilter'] as $subfilter) {
 
 		$name = $subfilter['key'].'[]';
 		$cell[] = (new CSpan([
-			$count > 0
+			($count > 0 || $is_selected)
 				? (new CLinkAction($value_label))
 					->setAttribute('data-name', $name)
 					->setAttribute('data-value', $value)

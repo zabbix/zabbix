@@ -719,20 +719,16 @@ class CControllerItemList extends CController {
 		unset($subfilter);
 
 		foreach ($items_values as $item_index => $item_values) {
-
-			$match_values = $item_values;
 			$discard = [];
 
 			foreach ($subfilters_input as $column => $subfilter_input) {
-				$match_values[$column] = array_intersect($match_values[$column], $subfilter_input);
-
-				if (!$match_values[$column]) {
+				if (!array_intersect($item_values[$column], $subfilter_input)) {
 					$discard[$column] = true;
 				}
 			}
 
 			foreach ($item_values as $column => $values) {
-				if ($discard && array_diff_key([$column => true], $discard)) {
+				if ($discard && array_diff_key($discard, [$column => true])) {
 					continue;
 				}
 
