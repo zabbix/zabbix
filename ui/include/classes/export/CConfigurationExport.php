@@ -483,8 +483,6 @@ class CConfigurationExport {
 		// Collect IDs.
 		foreach ($dashboard_pages as $dashboard_page) {
 			foreach ($dashboard_page['widgets'] as $widget) {
-				CArrayHelper::sort($widget['fields'], ['name', 'type', 'value']);
-
 				foreach ($widget['fields'] as $field) {
 					switch ($field['type']) {
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
