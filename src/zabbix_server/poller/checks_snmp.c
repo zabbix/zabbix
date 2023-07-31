@@ -25,7 +25,6 @@
 #define SNMP_NO_DEBUGGING
 #include "zbxasyncpoller.h"
 #include "zbxcommon.h"
-#include "async_snmp.h"
 #include "zbxtypes.h"
 #include <event2/event.h>
 #include <sys/types.h>
