@@ -136,9 +136,9 @@ static void	process_agent_result(void *data)
 static void	process_snmp_result(void *data)
 {
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
-	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg;
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)zbx_async_check_snmp_get_arg(snmp_context);
 
-	process_async_result(&snmp_context->item, poller_config);
+	process_async_result(zbx_async_check_snmp_get_item_context(snmp_context), poller_config);
 
 	zbx_async_check_snmp_clean(snmp_context);
 }

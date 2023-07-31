@@ -93,6 +93,8 @@
  ******************************************************************************/
 typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *snmp_oid, const char *index, const char *value);
 
+typedef void*	zbx_snmp_sess_t;
+
 typedef struct
 {
 	char		*addr;
@@ -117,6 +119,50 @@ typedef struct
 	int		errcode;
 }
 zbx_snmp_result_t;
+
+typedef struct
+{
+	oid	root_oid[MAX_OID_LEN];
+	size_t	root_oid_len;
+	char	*str_oid;
+}
+zbx_snmp_oid_t;
+
+ZBX_PTR_VECTOR_DECL(snmp_oid, zbx_snmp_oid_t *)
+
+typedef struct
+{
+	int			reqid;
+	int			waiting;
+	int			pdu_type;
+	zbx_snmp_oid_t		*p_oid;
+	oid			name[MAX_OID_LEN];
+	size_t			name_length;
+	int			running;
+	int			vars_num;
+	void			*arg;
+	char			*error;
+	netsnmp_large_fd_set	fdset;
+}
+zbx_bulkwalk_context_t;
+
+ZBX_PTR_VECTOR_DECL(bulkwalk_context, zbx_bulkwalk_context_t*)
+
+struct zbx_snmp_context
+{
+	void				*arg;
+	void				*arg_action;
+	zbx_dc_tem_context_t		item;
+	zbx_snmp_sess_t			ssp;
+	int				snmp_max_repetitions;
+	char				*results;
+	size_t				results_alloc;
+	size_t				results_offset;
+	zbx_vector_snmp_oid_t		param_oids;
+	zbx_vector_bulkwalk_context_t	bulkwalk_contexts;
+	int				i;
+	int				config_timeout;
+};
 
 ZBX_PTR_VECTOR_IMPL(snmp_oid, zbx_snmp_oid_t *)
 
@@ -500,7 +546,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	return ret;
 }
 
-zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
+static zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
 		int config_timeout, const char *config_source_ip)
 {
 /* item snmpv3 privacy protocol */
@@ -2309,12 +2355,13 @@ out:
 	return ret;
 }
 
-
 static ZBX_THREAD_LOCAL zbx_snmp_format_opts_t	default_opts;
 
 void	zbx_set_snmp_bulkwalk_options(void)
 {
 	zbx_snmp_format_opts_t	bulk_opts;
+
+	zbx_init_snmp();
 
 	snmp_bulkwalk_get_options(&default_opts);
 
@@ -2425,6 +2472,16 @@ stop:
 	return ZBX_ASYNC_TASK_STOP;
 }
 
+zbx_dc_tem_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context)
+{
+	return &snmp_context->item;
+}
+
+void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context)
+{
+	return snmp_context->arg;
+}
+
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 {
 	if (NULL != snmp_context->ssp)
@@ -2452,8 +2509,6 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key,
 			item->host.host, item->interface.addr);
-
-	zbx_init_snmp();
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 	snmp_context->item.interface = item->interface;
