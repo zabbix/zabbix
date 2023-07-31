@@ -131,9 +131,10 @@ static int	agent_task_process(short event, void *data, int *fd)
 					if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
 						return state;
 
-					SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
-						" failed: TCP successful, cannot establish TLS to [[%s]:%hu]: %s",
-						agent_context->item.interface.addr, agent_context->item.interface.port, error));
+					SET_MSG_RESULT(&agent_context->item.result,
+						zbx_dsprintf(NULL, "Get value from agent failed: TCP successful, cannot"
+						" establish TLS to [[%s]:%hu]: %s", agent_context->item.interface.addr,
+						agent_context->item.interface.port,error));
 					zbx_free(error);
 					agent_context->item.ret = NETWORK_ERROR;
 					break;
@@ -155,8 +156,8 @@ static int	agent_task_process(short event, void *data, int *fd)
 				if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
 					return state;
 
-				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed"
-					" during %s: %s", get_agent_step_string(agent_context->step),
+				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
+				" failed during %s: %s", get_agent_step_string(agent_context->step),
 					zbx_socket_strerror()));
 				agent_context->item.ret = NETWORK_ERROR;
 				break;

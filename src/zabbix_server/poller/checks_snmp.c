@@ -28,7 +28,6 @@
 #include "zbxcommon.h"
 #include "zbxtypes.h"
 #include <event2/event.h>
-#include <sys/types.h>
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/library/large_fd_set.h>
@@ -2348,7 +2347,7 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s fd:%d", __func__, zbx_result_string(ret), *fd);
 
 	return ret;
 }
