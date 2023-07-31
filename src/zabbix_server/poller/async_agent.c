@@ -62,6 +62,8 @@ static int	agent_task_process(short event, void *data, int *fd)
 	int			errnum = 0;
 	socklen_t		optlen = sizeof(int);
 
+	ZBX_UNUSED(fd);
+
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
 		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
