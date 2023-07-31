@@ -2179,7 +2179,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "SNMP error: [%d]", stat);
 	}
 out:
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return 1;
 }
@@ -2297,7 +2297,7 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -2386,11 +2386,7 @@ static int	snmp_task_process(short event, void *data, int *fd)
 			{
 				snmp_context->i++;
 
-				if (snmp_context->i < snmp_context->bulkwalk_contexts.values_num)
-				{
-					bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
-				}
-				else
+				if (snmp_context->i >= snmp_context->bulkwalk_contexts.values_num)
 				{
 					if (NULL == snmp_context->results)
 						SET_TEXT_RESULT(&snmp_context->item.result, zbx_strdup(NULL, ""));
