@@ -684,6 +684,23 @@ static int	DBpatch_6050061(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050062(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update profiles"
+			" set value_str='name'"
+			" where value_str='host'"
+				" and idx='web.proxies.php.sort'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -752,5 +769,6 @@ DBPATCH_ADD(6050058, 0, 1)
 DBPATCH_ADD(6050059, 0, 1)
 DBPATCH_ADD(6050060, 0, 1)
 DBPATCH_ADD(6050061, 0, 1)
+DBPATCH_ADD(6050062, 0, 1)
 
 DBPATCH_END()
