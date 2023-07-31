@@ -2071,7 +2071,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 				SNMP_NOSUCHINSTANCE != var->type)
 		{
 			char	buffer[MAX_STRING_LEN];
-			bulkwalk_context->running++;
+
+			bulkwalk_context->vars_num++;
 
 			if (SNMP_MSG_GET != bulkwalk_context->pdu_type)
 			{
