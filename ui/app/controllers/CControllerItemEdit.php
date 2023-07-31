@@ -276,7 +276,7 @@ class CControllerItemEdit extends CControllerItem {
 		$item['delay_flex'] = [];
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
-			'lldmacros' => false // TODO: for prototypes should be true
+			'lldmacros' => false
 		]);
 
 		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
