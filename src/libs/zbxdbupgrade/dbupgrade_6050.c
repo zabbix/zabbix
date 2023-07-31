@@ -21,7 +21,6 @@
 
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
-#include "zbx_host_constants.h"
 #include "zbxtypes.h"
 
 /*
@@ -471,7 +470,7 @@ static int	DBpatch_6050039(void)
 
 			zbx_db_insert_add_values(&db_insert_proxies,
 				proxyid, row[1], status, row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9],
-				row[10], NULL, NULL);
+				row[10], "127.0.0.1", "10051");
 		}
 		else if (DEPRECATED_STATUS_PROXY_PASSIVE == status)
 		{
@@ -482,7 +481,7 @@ static int	DBpatch_6050039(void)
 
 			zbx_db_insert_add_values(&db_insert_proxies,
 				proxyid, row[1], status, row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9],
-				row[10], (1 == useip ? row[12] : row[13]), row[14]
+				NULL, (1 == useip ? row[12] : row[13]), row[14]
 			);
 		}
 
@@ -692,7 +691,6 @@ DBPATCH_START(6050)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6050000, 0, 1)
-
 DBPATCH_ADD(6050001, 0, 1)
 DBPATCH_ADD(6050002, 0, 1)
 DBPATCH_ADD(6050003, 0, 1)
