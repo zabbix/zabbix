@@ -52,7 +52,6 @@ class ViewHelper {
 			->addClass(CSeverityHelper::getStyle((int) $trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE))
 			->addClass(ZBX_STYLE_CURSOR_POINTER);
 
-		$eventid = 0;
 		$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
 		$duration = time() - $trigger['lastchange'];
 
@@ -62,21 +61,13 @@ class ViewHelper {
 			$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
 		}
 
-		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$eventid = $trigger['problem']['eventid'];
-			$show_update_problem = true;
-		}
-		else {
-			$show_update_problem = false;
-		}
-
 		$column->setMenuPopup(CMenuPopupHelper::getTrigger([
 			'triggerid' => $trigger['triggerid'],
 			'backurl' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
 				->getUrl(),
-			'eventid' => $eventid,
-			'show_update_problem' => $show_update_problem
+			'eventid' => $trigger['problem']['eventid'],
+			'show_update_problem' => true
 		]));
 
 		return $column;
