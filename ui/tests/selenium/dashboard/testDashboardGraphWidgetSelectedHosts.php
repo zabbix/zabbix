@@ -264,12 +264,11 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					'expected' => [
 						'Host for widget 1',
 						'Host for widget 2',
-						'Host for widget 3',
 						'Host for widget 4',
 						'Host for widget 5'
 					],
-					'arrow_key' => false,
-					'check_hosts' => true
+					'select' => 'Host for widget 3',
+					'keyboard_navigation' => true,
 				]
 			],
 			[
@@ -281,12 +280,10 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					'expected' => [
 						'Item for Graph 1_1',
 						'Item for Graph 1_2',
-						'Item for Graph 1_3',
 						'Item for Graph 1_4',
 						'Item for Graph 1_5'
 					],
-					'arrow_key' => false,
-					'check_items' => true
+					'select' => 'Item for Graph 1_3'
 				]
 			],
 			[
@@ -315,9 +312,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 4_2',
 						'Item for Graph 4_3',
 						'Item for Graph 4_4'
-					],
-					'arrow_key' => false,
-					'check_items' => false
+					]
 				]
 			],
 			[
@@ -341,8 +336,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 2_4',
 						'Item for Graph 2_5'
 					],
-					'arrow_key' => true,
-					'check_items' => false
+					'keyboard_navigation' => true,
 				]
 			],
 			[
@@ -365,17 +359,15 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 4_3',
 						'Item for Graph 4_4',
 						'Item for Graph 4_5'
-					],
-					'arrow_key' => false,
-					'check_items' => false
+					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * Function checks using arrow keys and elements if Graph Widget is correctly selecting and displaying hosts, their items
-	 * in suggestion list.
+	 * Function checks using keyboard navigation and elements if Graph Widget is correctly selecting and displaying hosts,
+	 * their items in suggestion list.
 	 *
 	 * @dataProvider getDatasetData
 	 */
@@ -386,90 +378,77 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 
 		// Change mapping of associative arrays from data set.
 		if (array_key_exists('item', $data['Data set'])) {
-			if (CTestArrayHelper::get($data, 'check_items')) {
-				$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => 'Host for widget 1']);
-				$form->fill(['xpath:.//div[@id="ds_0_items_"]/..' => 'Item for Graph 1_3']);
-				$expected_items = [
-					'Item for Graph 1_1',
-					'Item for Graph 1_2',
-					'Item for Graph 1_4',
-					'Item for Graph 1_5'
-				];
-				$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'Item for Graph']);
-				$this->checkSuggestionListCommon($expected_items, $form);
-				$this->page->removeFocus();
-				$form->getField('xpath:.//div[@id="ds_0_items_"]/..')->clear();
+			$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => $data['Data set']['host']]);
+
+			if (CTestArrayHelper::get($data, 'select')) {
+				$form->fill(['xpath:.//div[@id="ds_0_items_"]/..' => $data['select']]);
 			}
 
-			$field_data = [
-				'xpath:.//div[@id="ds_0_hosts_"]/..' => $data['Data set']['host'],
-				'xpath:.//input[@placeholder="item pattern"]' => $data['Data set']['item']
-			];
+			$field_data = ['xpath:.//input[@placeholder="item pattern"]' => $data['Data set']['item']];
 		}
 		else {
-			if (CTestArrayHelper::get($data, 'check_hosts')) {
-				$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => 'Host for widget 3']);
-				$expected_hosts = [
-					'Host for widget 1',
-					'Host for widget 2',
-					'Host for widget 4',
-					'Host for widget 5'
-				];
-				$form->fill(['xpath:.//input[@placeholder="host pattern"]' => 'Host for widget']);
-				$this->checkSuggestionListCommon($expected_hosts, $form);
-				$this->page->removeFocus();
-				$form->getField('xpath:.//div[@id="ds_0_hosts_"]/..')->clear();
+			if (CTestArrayHelper::get($data, 'select')) {
+				$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => $data['select']]);
 			}
 
-			$field_data = [
-				'xpath:.//input[@placeholder="host pattern"]' => $data['Data set']['host']
-			];
+			$field_data = ['xpath:.//input[@placeholder="host pattern"]' => $data['Data set']['host']];
 		}
 
 		$form->fill($field_data);
 		$this->checkSuggestionListCommon($data['expected'], $form);
 
-		if (CTestArrayHelper::get($data, 'arrow_key')) {
+		if (CTestArrayHelper::get($data, 'keyboard_navigation')) {
 			$this->checkSuggestionListWithKeyboardNavigation($data, $form);
 		}
 	}
 
 	/**
-	 * Usual way how suggestion list is checked using elements from UI.
+	 * Check contents of the suggestions list.
 	 *
 	 * @param array			$data		data provider
 	 * @param CFormElement 	$form		form element of dashboard share
 	 */
-	private function checkSuggestionListCommon ($data, $form) {
+	protected function checkSuggestionListCommon ($data, $form) {
 		$this->query('class', 'multiselect-suggest')->waitUntilVisible();
 		$this->assertEquals($data, $form->getField('xpath:.//div[@id="ds_0_hosts_"]/..')->getSuggestions());
 	}
 
 	/**
-	 * Complex suggestion list check using keyboard navigation.
+	 * Suggestion list check using keyboard navigation.
 	 *
 	 * @param array			$data		data provider
 	 * @param CFormElement 	$form		form element of dashboard share
 	 */
-	private function checkSuggestionListWithKeyboardNavigation($data, $form) {
-		$merged_text = [];
+	protected function checkSuggestionListWithKeyboardNavigation($data, $form) {
+		$actual_suggestions = [];
 		$id = (CTestArrayHelper::get($data['Data set'], 'item')) ? 'items' : 'hosts';
+
+		// Go through the whole suggestion list using keyboard navigation and collect values that were in focus.
 		for ($x = 0; $x < (count($data['expected'])); $x++) {
 			$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
 			$option = ($id === 'items') ? 'Graph' : 'widget';
 			$suggestion_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
 					->one()->waitUntilTextPresent($option)->getText();
-			array_push($merged_text, $suggestion_text);
+			array_push($actual_suggestions, $suggestion_text);
 		}
-		$this->assertEquals($data['expected'], $merged_text);
 
+		// Check that using keyboard navigation all suggestions were reachable.
+		$this->assertEquals($data['expected'], $actual_suggestions);
+
+		// Submit the last entry in the array and check that it was selected.
 		$this->page->pressKey(WebDriverKeys::ENTER);
-		// TODO change quotes back to normal ones, when webhook DEV-2396 is improved.
-		$this->assertTrue($this->query("xpath://div[@id='ds_0_items_']//ul[@class='multiselect-list']//span[@title=".
-				CXPathHelper::escapeQuotes($data['expected'][9])."]")->exists()
-		);
 
-		$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'item']);
-		$this->checkSuggestionListCommon(array_slice($data['expected'], 0, 9), $form);
+		// Check that the last value is selected.
+		$selected = end($data['expected']);
+		$this->assertTrue($this->query('xpath://li[@data-id='.CXPathHelper::escapeQuotes($selected).']')->one()->isValid());
+
+		// Check that selected value is not in the list of suggestions.
+		if ($id === 'items') {
+			$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'Graph']);
+		}
+		else {
+			$form->fill(['xpath:.//input[@placeholder="host pattern"]' => 'Host for widget']);
+		}
+		$this->checkSuggestionListCommon(array_diff($data['expected'], [$selected]), $form);
 	}
 }
