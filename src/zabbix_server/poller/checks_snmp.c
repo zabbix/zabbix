@@ -2519,7 +2519,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		ret = CONFIG_ERROR;
-		
+
 		goto out;
 	}
 
