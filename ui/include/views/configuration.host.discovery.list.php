@@ -225,7 +225,7 @@ foreach ($data['discoveries'] as $discovery) {
 		}
 		else {
 			$description[] = (new CLink($discovery['master_item']['name'],
-				(new CUrl())
+				(new CUrl('zabbix.php'))
 					->setArgument('action', 'item.list')
 					->setArgument('form', 'update')
 					->setArgument('itemid', $discovery['master_item']['itemid'])

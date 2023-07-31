@@ -1209,7 +1209,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 										? (new CLink('/'.$function['host'].'/'.$function['key_'],
-											(new CUrl())
+											(new CUrl('zabbix.php'))
 												->setArgument('action', 'item.list')
 												->setArgument('form', 'update')
 												->setArgument('itemid', $function['itemid'])

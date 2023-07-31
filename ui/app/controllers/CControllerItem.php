@@ -40,7 +40,6 @@ abstract class CControllerItem extends CController {
 			'context'				=> 'in host,template',
 			'delay'					=> 'db items.delay',
 			'delay_flex'			=> 'array',
-			'delay_flex'			=> 'array',
 			'description'			=> 'db items.description',
 			'follow_redirects'		=> 'in 0,1',
 			'form_refresh'			=> 'in 1',
@@ -56,7 +55,7 @@ abstract class CControllerItem extends CController {
 			'inventory_link'		=> 'db items.inventory_link',
 			'ipmi_sensor'			=> 'db items.ipmi_sensor',
 			'itemid'				=> 'id',
-			'jmx_endpoint'			=> 'string',
+			'jmx_endpoint'			=> 'db items.jmx_endpoint',
 			'key'					=> 'db items.key_',
 			'logtimefmt'			=> 'db items.logtimefmt',
 			'master_itemid'			=> 'id',
@@ -68,8 +67,7 @@ abstract class CControllerItem extends CController {
 			'params_f'				=> 'db items.params',
 			'password'				=> 'db items.password',
 			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
-			'posts'					=> 'string',
-			'preprocessing'			=> 'array',
+			'posts'					=> 'db items.posts',
 			'preprocessing'			=> 'array',
 			'privatekey'			=> 'db items.privatekey',
 			'publickey'				=> 'db items.publickey',
@@ -80,14 +78,14 @@ abstract class CControllerItem extends CController {
 			'show_inherited_tags'	=> 'in 0,1',
 			'show_inherited_tags'	=> 'in 0,1',
 			'snmp_oid'				=> 'db items.snmp_oid',
-			'ssl_cert_file'			=> 'string',
-			'ssl_key_file'			=> 'string',
-			'ssl_key_password'		=> 'string',
+			'ssl_cert_file'			=> 'db items.ssl_cert_file',
+			'ssl_key_file'			=> 'db items.ssl_key_file',
+			'ssl_key_password'		=> 'db items.ssl_key_password',
 			'status'				=> 'db items.status',
 			'status_codes'			=> 'db items.status_codes',
 			'tags'					=> 'array',
 			'templateid'			=> 'id',
-			'timeout'				=> 'string',
+			'timeout'				=> 'db items.timeout',
 			'trapper_hosts'			=> 'db items.trapper_hosts',
 			'trends'				=> 'db items.trends',
 			'trends_mode'			=> 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
@@ -349,10 +347,7 @@ abstract class CControllerItem extends CController {
 					continue;
 				}
 
-				$query_fields[] = [
-					'name' => $query_field['name'],
-					'value' => $query_field['value']
-				];
+				$query_fields[] = [$query_field['name'] => $query_field['value']];
 			}
 
 			$input['query_fields'] = $query_fields;

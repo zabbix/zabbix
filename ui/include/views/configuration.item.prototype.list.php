@@ -93,7 +93,7 @@ foreach ($data['items'] as $item) {
 				? (new CUrl('disc_prototypes.php'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->setArgument('context', $data['context'])
-				: (new CUrl())
+				: (new CUrl('zabbix.php'))
 					->setArgument('action', 'item.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$item['hostid']])

@@ -564,7 +564,7 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url = (new CUrl())
+			$url = (new CUrl('zabbix.php'))
 				->setArgument('action', 'item.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])

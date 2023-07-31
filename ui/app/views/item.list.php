@@ -213,44 +213,44 @@ foreach ($data['items'] as $item) {
 $form->addItem([$item_list, $data['paging']]);
 
 $buttons = [
-	'item.massenable' => [
+	[
 		'content' => (new CSimpleButton(_('Enable')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massenable-item')
 			->addClass('js-no-chkbxrange')
 	],
-	'item.massdisable' => [
+	[
 		'content' => (new CSimpleButton(_('Disable')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdisable-item')
 			->addClass('js-no-chkbxrange')
 	],
-	'item.massexecute' => [
+	'execute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massexecute-item')
 			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	],
-	'item.massclearhistory' => [
+	'clearhistory' => [
 		'content' => (new CSimpleButton(_('Clear history')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massclearhistory-item')
 			->addClass('js-no-chkbxrange')
 	],
-	'item.masscopy' => [
+	[
 		'content' => (new CSimpleButton(_('Copy')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-masscopy-item')
 			->addClass('js-no-chkbxrange')
 	],
-	'item.massupdate' => [
+	[
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-item')
 			->addClass('js-no-chkbxrange')
 	],
-	'item.massdelete' => [
+	[
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdelete-item')
@@ -259,7 +259,7 @@ $buttons = [
 ];
 
 if ($data['context'] === 'template') {
-	unset($buttons['item.massexecute'], $buttons['item.massclearhistory']);
+	unset($buttons['execute'], $buttons['clearhistory']);
 }
 
 $form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item'));

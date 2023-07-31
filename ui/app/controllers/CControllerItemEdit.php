@@ -55,7 +55,6 @@ class CControllerItemEdit extends CControllerItem {
 			'inventory_fields' => [],
 			'form' => $form_refresh || !$this->hasInput('itemid') ? $this->getInputForForm() : $this->getItem(),
 			'form_refresh' => $form_refresh,
-			'display_interfaces' => false,
 			'parent_items' => [],
 			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
 			'discovery_rule' => [],

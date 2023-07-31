@@ -383,7 +383,7 @@ class CControllerItemMassupdate extends CController {
 		}
 		else {
 			$data += [
-				'location_url' => (new CUrl())
+				'location_url' => (new CUrl('zabbix.php'))
 					->setArgument('action', 'item.list')
 					->setArgument('context', $this->getInput('context'))
 					->getUrl(),

@@ -524,7 +524,6 @@ class CControllerItemList extends CController {
 	 * @return array
 	 */
 	protected function sortItems(array $items, array $sort): array {
-		// TODO: use subfilters [sort] values to sort array with CArrayHelper::sort instead of multiple functions.
 		switch ($sort['sort']) {
 			case 'delay':
 				orderItemsByDelay($items, $sort['sortorder'], ['usermacros' => true]);
@@ -701,7 +700,7 @@ class CControllerItemList extends CController {
 	 * @param array $items   Array of items returned by API.
 	 * @param array $schema  Array of arrays with subfilter schema.
 	 *
-	 * @return array
+	 * @return array of two elements, filtered items array and subfilter schema array.
 	 */
 	protected function getItemsAndSubfilter(array $items, array $schema): array {
 		$items_values = $this->getSubfilterColumnsData($items, array_keys($schema));
