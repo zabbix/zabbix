@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-19T21:58:46Z'
+  date: '2023-07-31T19:31:01Z'
   media_types:
     - name: MantisBT
       type: WEBHOOK
@@ -59,8 +59,7 @@ zabbix_export:
                 Mantisbt.HTTPProxy = HTTPProxy;
             },
         
-            urlCheckFormat: function (url) {
-        
+            checkUrlFormat: function (url) {
                 if (typeof url === 'string' && !url.endsWith('/')) {
                     url += '/';
                 }
@@ -72,7 +71,7 @@ zabbix_export:
                 return url;
             },
         
-            createProblemURL: function (zabbix_url, triggerid, eventid, event_source) {
+            getProblemURL: function (zabbix_url, triggerid, eventid, event_source) {
                 var problem_url = zabbix_url;
         
                 if (event_source === '0') {
@@ -85,14 +84,14 @@ zabbix_export:
             request: function (method, url, data) {
                 ['token', 'url', 'category'].forEach(function (field) {
                     if (typeof Mantisbt.params !== 'object' || typeof Mantisbt.params[field] === 'undefined' || Mantisbt.params[field] === '') {
-                        throw 'Required Mantisbt param is not set: "' + field + '".';
+                        throw 'Required MantisBT param is not set: "' + field + '".';
                     }
                 });
         
                 var response,
                     request = new HttpRequest();
         
-                request.addHeader('User-Agent: ' + Mantisbt.params.user_agent);
+                request.addHeader('User-Agent: Zabbix server');
                 request.addHeader('Content-Type: application/json');
                 request.addHeader('Authorization: ' + Mantisbt.params.token);
         
@@ -104,7 +103,7 @@ zabbix_export:
                     data = JSON.stringify(data);
                 }
         
-                Zabbix.log(4, '[ Mantisbt Webhook ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
+                Zabbix.log(4, '[ MantisBT Webhook ] Sending request: ' + url + ((typeof data === 'string') ? ('\n' + data) : ''));
         
                 switch (method) {
                     case 'post':
@@ -119,25 +118,30 @@ zabbix_export:
                         throw 'Unsupported HTTP request method: ' + method;
                 }
         
-                Zabbix.log(4, '[ Mantisbt Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
+                Zabbix.log(4, '[ MantisBT Webhook ] Received response with status code ' + request.getStatus() + '\n' + response);
         
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        Zabbix.log(4, '[ Mantisbt Webhook ] Failed to parse response received from Mantisbt');
+                        Zabbix.log(4, '[ MantisBT Webhook ] Failed to parse the response received from MantisBT');
                         response = null;
                     }
                 }
         
                 if (typeof response !== 'object') {
-                    throw 'Failed to process response received from Mantisbt. Check debug log for more information.';
+                    throw 'Failed to process the response received from MantisBT. Check debug log for more information.';
                 }
         
                 if (request.getStatus() < 200 || request.getStatus() >= 300) {
                     var message = 'Request failed with status code ' + request.getStatus();
-                    throw message + response;
+        
+                    if (typeof response.message !== 'undefined') {
+                        message += ' and response error - "' + response.message + '"';
+                    }
+        
+                    throw message;
                 }
         
                 return response;
@@ -166,7 +170,7 @@ zabbix_export:
                         mantisbt[key.substring(9)] = params[key];
                     }
                     else if (required_params.indexOf(key) !== -1 && params[key] === '') {
-                        throw 'Parameter "' + key + '" can\'t be empty.';
+                        throw 'Parameter "' + key + '" cannot be empty.';
                     }
                 });
         
@@ -185,7 +189,7 @@ zabbix_export:
             }
         
             if (params.event_source !== '0' && params.event_recovery_value === '0') {
-                throw 'Recovery operations are supported only for trigger-based actions.';
+                throw 'Recovery operations are supported for trigger-based actions only.';
             }
         
             if (typeof params.zabbix_url !== 'string' || params.zabbix_url.trim() === '' || params.zabbix_url === '{$ZABBIX.URL}') {
@@ -193,8 +197,8 @@ zabbix_export:
             }
         
             // Check for backslash in the end of url and schema.
-            mantisbt.url = Mantisbt.urlCheckFormat(mantisbt.url);
-            params.zabbix_url = Mantisbt.urlCheckFormat(params.zabbix_url);
+            mantisbt.url = Mantisbt.checkUrlFormat(mantisbt.url);
+            params.zabbix_url = Mantisbt.checkUrlFormat(params.zabbix_url);
         
             // In case of resolve event.
             if (params.event_source === '0' && params.event_value === '0') {
@@ -246,7 +250,7 @@ zabbix_export:
                     }
                 };
                 if (params.event_source === '0') {
-                    problem_url = Mantisbt.createProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source);
+                    problem_url = Mantisbt.getProblemURL(params.zabbix_url, params.trigger_id, params.event_id, params.event_source);
                     data.description += '\n' + problem_url;
         
                     if (mantisbt.use_zabbix_tags === "true") {
@@ -267,11 +271,11 @@ zabbix_export:
                 result.tags.__zbx_mantisbt_link = mantisbt.url + 'view.php?id=' + response.issue.id;
             }
         
-            Zabbix.log(4, '[ Mantisbt Webhook ] Result: ' + JSON.stringify(result));
+            Zabbix.log(4, '[ MantisBT Webhook ] Result: ' + JSON.stringify(result));
             return JSON.stringify(result);
         }
         catch (error) {
-            Zabbix.log(4, '[ Mantisbt Webhook ] ERROR: ' + error);
+            Zabbix.log(4, '[ MantisBT Webhook ] ERROR: ' + error);
             throw 'Sending failed: ' + error;
         }
       process_tags: 'YES'
