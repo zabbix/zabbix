@@ -268,7 +268,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Host for widget 5'
 					],
 					'select' => 'Host for widget 3',
-					'keyboard_navigation' => true,
+					'keyboard_navigation' => true
 				]
 			],
 			[
@@ -336,7 +336,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 2_4',
 						'Item for Graph 2_5'
 					],
-					'keyboard_navigation' => true,
+					'keyboard_navigation' => true
 				]
 			],
 			[
@@ -366,8 +366,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	}
 
 	/**
-	 * Function checks using keyboard navigation and elements if Graph Widget is correctly selecting and displaying hosts,
-	 * their items in suggestion list.
+	 * Check host and item suggestion lists in Graph widget.
 	 *
 	 * @dataProvider getDatasetData
 	 */
