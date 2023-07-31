@@ -134,11 +134,6 @@ PDH_STATUS	zbx_PdhAddCounter(const char *function, zbx_perf_counter_data_t *coun
 	ZBX_THREAD_LOCAL static ADD_ENG_COUNTER add_eng_counter;
 	ZBX_THREAD_LOCAL static int 		first_call = 1;
 
-	add_eng_counter++;
-	while (1)
-	{
-		sleep(1);
-	}
 	need_english = PERF_COUNTER_LANG_DEFAULT != lang ||
 			(NULL != counter && PERF_COUNTER_LANG_DEFAULT != counter->lang);
 

@@ -18,16 +18,21 @@
 **/
 
 #include "checks_snmp.h"
+
+
+#ifdef HAVE_NETSNMP
+
+#define SNMP_NO_DEBUGGING
 #include "zbxasyncpoller.h"
 #include "zbxcommon.h"
+#include "async_snmp.h"
 #include "zbxtypes.h"
 #include <event2/event.h>
 #include <sys/types.h>
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/library/large_fd_set.h>
-#include "async_snmp.h"
 #include "zbxself.h"
-
-#ifdef HAVE_NETSNMP
 
 #include "zbxcomms.h"
 #include "zbxalgo.h"
@@ -2294,17 +2299,6 @@ out:
 	return ret;
 }
 
-
-static zbx_async_task_state_t	get_task_state_for_event(short event)
-{
-	if (POLLIN & event)
-		return ZBX_ASYNC_TASK_READ;
-
-	if (POLLOUT & event)
-		return ZBX_ASYNC_TASK_WRITE;
-
-	return ZBX_ASYNC_TASK_STOP;
-}
 
 static ZBX_THREAD_LOCAL zbx_snmp_format_opts_t	default_opts;
 

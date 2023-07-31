@@ -814,6 +814,7 @@ int	refresh_object_cache(void)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	LOCK_PERFCOUNTERS;
 
 	if (ppsd.lastrefresh_objects + OBJECT_CACHE_REFRESH_INTERVAL < time(NULL))
 	{
@@ -826,6 +827,7 @@ int	refresh_object_cache(void)
 		ppsd.lastrefresh_objects = time(NULL);
 	}
 out:
+	UNLOCK_PERFCOUNTERS;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

@@ -18,7 +18,6 @@
 **/
 
 #include "zbxasyncpoller.h"
-#include <event2/event.h>
 
 #ifdef HAVE_LIBEVENT
 

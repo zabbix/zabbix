@@ -299,6 +299,9 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, const c
 
 			return ZBX_POLLER_TYPE_AGENT;
 		case ITEM_TYPE_SNMP:
+			if (NULL == snmp_oid)
+				break;
+
 			if (0 == strncmp(snmp_oid, "walk[", 5))
 			{
 				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
@@ -538,9 +541,7 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 		ZBX_DC_SNMPITEM	*snmpitem;
 
 		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid)))
-		{
 			snmp_oid = snmpitem->snmp_oid;
-		}
 	}
 
 	poller_type = poller_by_item(dc_item->type, dc_item->key, snmp_oid);

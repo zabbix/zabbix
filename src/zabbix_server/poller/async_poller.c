@@ -58,7 +58,6 @@ static void	process_async_result(zbx_dc_tem_context_t *item, zbx_poller_config_t
 {
 	zbx_timespec_t		timespec;
 	zbx_interface_status_t	*interface_status;
-	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key, item->host,
 			item->interface.addr);
@@ -119,9 +118,8 @@ static void	process_async_result(zbx_dc_tem_context_t *item, zbx_poller_config_t
 	poller_config->processed++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, item->itemid);
-	ret = item->ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(item->ret));
 }
 
 static void	process_agent_result(void *data)
@@ -347,7 +345,6 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
-		/* network error is handled by process_snmp_result() */
 		if (SUCCEED != errcodes[i])
 		{
 			if (ZBX_IS_RUNNING())
