@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-25T09:53:15Z'
+  date: '2023-07-31T05:25:14Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -13,7 +13,7 @@ zabbix_export:
         
         Setup:
         
-        1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/6.0/manual/extensions/plugins/build).
+        1. Deploy Zabbix agent 2 with the PostgreSQL plugin. Starting with Zabbix versions 6.0.10 / 6.2.4 / 6.4 PostgreSQL metrics are moved to a loadable plugin and require installation of a separate package or [`compilation of the plugin from sources`](https://www.zabbix.com/documentation/6.0/manual/config/items/plugins/build).
         
         2. Create the PostgreSQL user for monitoring (`<password>` at your discretion) and inherit permissions from the default role `pg_monitor`:
         CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
@@ -544,7 +544,7 @@ zabbix_export:
           trends: '0'
           status: DISABLED
           value_type: TEXT
-          description: 'Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration)'
+          description: 'Execute custom queries from file *.sql (check for option Plugins.Postgres.CustomQueriesPath at agent configuration).'
           tags:
             - tag: component
               value: application
@@ -671,7 +671,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 0106dfc55ace4dacaff00ce2c98de2ea
-          name: 'Dbstat: ConflictsConflicts per second'
+          name: 'Dbstat: Conflicts per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.conflicts.rate
           delay: '0'
@@ -1077,7 +1077,7 @@ zabbix_export:
           key: pgsql.wal.count
           delay: '0'
           history: 7d
-          description: 'Number of WAL segments'
+          description: 'Number of WAL segments.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1094,7 +1094,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'WAL receive in bytes'
+          description: 'WAL receive, in bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1125,7 +1125,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'WAL write in bytes'
+          description: 'WAL write, in bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1290,7 +1290,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of data page checksum failures detected in this database'
+              description: 'Number of data page checksum failures detected in this database.'
               valuemap:
                 name: 'PostgreSQL checksum failure status'
               preprocessing:

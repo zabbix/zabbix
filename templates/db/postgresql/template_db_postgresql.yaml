@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-25T06:37:07Z'
+  date: '2023-07-31T05:25:04Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -35,7 +35,7 @@ zabbix_export:
         mkdir -m u=rwx,g=rwx,o= -p /var/lib/zabbix
         chown zabbix:zabbix /var/lib/zabbix
         
-        3. Copy the `template_db_postgresql.conf` file, containing user parameters to the Zabbix agent configuration directory `/etc/zabbix/zabbix_agentd.d/` and restart Zabbix agent service.
+        3. Copy the `template_db_postgresql.conf` file, containing user parameters, to the Zabbix agent configuration directory `/etc/zabbix/zabbix_agentd.d/` and restart Zabbix agent service.
         
         4. Edit the `pg_hba.conf` configuration file to allow connections for the user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
         
@@ -176,8 +176,8 @@ zabbix_export:
           triggers:
             - uuid: 65e7954489854ad3ad1698dead7c4c02
               expression: 'last(/PostgreSQL by Zabbix agent/pgsql.bgwriter.checkpoints_req.rate) > {$PG.CHECKPOINTS_REQ.MAX.WARN}'
-              name: 'PostgreSQL: Required checkpoints occurs too frequently'
-              event_name: 'PostgreSQL: Required checkpoints occurs too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})'
+              name: 'PostgreSQL: Required checkpoints occur too frequently'
+              event_name: 'PostgreSQL: Required checkpoints occur too frequently (over {$PG.CHECKPOINTS_REQ.MAX.WARN})'
               priority: AVERAGE
               description: |
                 Checkpoints are points in the sequence of transactions at which it is guaranteed that the heap and index data files have been updated with all information written before that checkpoint. At checkpoint time, all dirty data pages are flushed to disk and a special checkpoint record is written to the log file.
@@ -314,7 +314,7 @@ zabbix_export:
               name: 'PostgreSQL: Cache hit ratio too low'
               event_name: 'PostgreSQL: Cache hit ratio too low (under {$PG.CACHE_HITRATIO.MIN.WARN} in 5m)'
               priority: WARNING
-              description: 'Cache hit ration is lower than {$PG.CACHE_HITRATIO.MIN.WARN} for 5m.'
+              description: 'Cache hit ratio is lower than {$PG.CACHE_HITRATIO.MIN.WARN} for 5m.'
               tags:
                 - tag: scope
                   value: performance
@@ -431,7 +431,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: '%'
-          description: 'Total number of connections in percentage'
+          description: 'Total number of connections, in percentage.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -531,7 +531,7 @@ zabbix_export:
               name: 'PostgreSQL: Response too long'
               event_name: 'PostgreSQL: Response too long (over {$PG.PING_TIME.MAX.WARN})'
               priority: AVERAGE
-              description: 'Response it taking too long (over {$PG.PING_TIME.MAX.WARN} for 5m).'
+              description: 'Response is taking too long (over {$PG.PING_TIME.MAX.WARN} for 5m).'
               dependencies:
                 - name: 'PostgreSQL: Service is down'
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0'
@@ -767,7 +767,7 @@ zabbix_export:
           key: pgsql.wal.count
           delay: '0'
           history: 7d
-          description: 'Number of WAL segments'
+          description: 'Number of WAL segments.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -795,7 +795,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: B
-          description: 'WAL write in bytes'
+          description: 'WAL write, in bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1165,7 +1165,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: df9dd9bac2a54f1085b29fb22b394a1f
-              name: 'DB [{#DBNAME}]: Frozen XID before avtovacuum, %'
+              name: 'DB [{#DBNAME}]: Frozen XID before autovacuum, %'
               type: DEPENDENT
               key: 'pgsql.frozenxid.prc_before_av["{#DBNAME}"]'
               delay: '0'
@@ -1676,7 +1676,7 @@ zabbix_export:
           description: 'Minimum cache hit ratio percentage for trigger expression.'
         - macro: '{$PG.CHECKPOINTS_REQ.MAX.WARN}'
           value: '5'
-          description: 'Maximum required checkpoints occurrences for trigger expression.'
+          description: 'Maximum required checkpoint occurrences for trigger expression.'
         - macro: '{$PG.CONFLICTS.MAX.WARN}'
           value: '0'
           description: 'Maximum number of recovery conflicts for trigger expression.'
