@@ -295,6 +295,22 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(events);
+#ifdef HAVE_NETSNMP
+	if (1 == poller_config->clear_cache)
+	{
+		if (0 != poller_config->processing)
+		{
+			num = 0;
+			goto exit;
+		}
+		else
+		{
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
+			zbx_set_snmp_bulkwalk_options();
+			poller_config->clear_cache = 0;
+		}
+	}
+#endif
 
 	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
 			poller_config->processing, poller_config->config_max_concurrent_checks_per_poller, &items);
@@ -405,7 +421,7 @@ static void	zbx_interface_status_clean(zbx_interface_status_t *interface_status)
 }
 
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
-		event_callback_fn async_check_items_callback)
+		int process_num, event_callback_fn async_check_items_callback)
 {
 	struct timeval	tv = {1, 0};
 
@@ -431,6 +447,8 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	poller_config->config_unreachable_delay = poller_args_in->config_unreachable_delay;
 	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
 	poller_config->config_max_concurrent_checks_per_poller = poller_args_in->config_max_concurrent_checks_per_poller;
+	poller_config->clear_cache = 0;
+	poller_config->process_num = process_num;
 
 	if (NULL == (poller_config->async_check_items_timer = event_new(poller_config->base, -1, EV_PERSIST,
 		async_check_items_callback, poller_config)))
@@ -500,9 +518,12 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	unsigned char			poller_type = poller_args_in->poller_type;
 	zbx_poller_config_t		poller_config = {.queued = 0, .processed = 0};
 	struct event			*rtc_event;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
+	int				msgs_num;
 #ifdef HAVE_LIBCURL
 	zbx_asynchttppoller_config	*asynchttppoller_config;
 #endif
+	msgs_num = ZBX_POLLER_TYPE_SNMP == poller_type ? 1 : 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -513,9 +534,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, msgs_num, poller_args_in->config_comms->config_timeout,
+			&rtc);
 
-	async_poller_init(&poller_config, poller_args_in, async_check_items);
+	async_poller_init(&poller_config, poller_args_in, process_num, async_check_items);
 	rtc_event = event_new(poller_config.base, zbx_ipc_client_get_fd(rtc.client), EV_READ | EV_PERSIST,
 			socket_read_event_cb, NULL);
 	event_add(rtc_event, NULL);
@@ -573,6 +595,13 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		{
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
+#ifdef HAVE_NETSNMP
+			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
+			{
+				if (ZBX_POLLER_TYPE_SNMP == poller_type)
+					poller_config.clear_cache = 1;
+			}
+#endif
 		}
 	}
 
