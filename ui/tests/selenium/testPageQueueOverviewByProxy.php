@@ -46,7 +46,7 @@ class testPageQueueOverviewByProxy extends CLegacyWebTest {
 				'More than 10 minutes'
 			]
 		);
-		$this->zbxTestTextPresent($proxy['host']);
+		$this->zbxTestTextPresent($proxy['name']);
 		$this->zbxTestTextPresent('Server');
 	}
 
