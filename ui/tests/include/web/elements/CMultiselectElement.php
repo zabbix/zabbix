@@ -374,7 +374,7 @@ class CMultiselectElement extends CElement {
 	}
 
 	/**
-	 *	Get list of suggested values.
+	 * Get list of suggested values.
 	 *
 	 * @return array
 	 */
