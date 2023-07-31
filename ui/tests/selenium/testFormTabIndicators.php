@@ -675,6 +675,9 @@ class testFormTabIndicators extends CWebTest {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		}
+		elseif ($data['form'] === 'name:triggersForm') {
+			$form = $this->query($data['form'])->asForm(['normalized' => true])->one()->waitUntilVisible();
+		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 		}

@@ -143,13 +143,15 @@ $scenario_tab
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(2000)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
@@ -180,13 +182,15 @@ $scenario_tab
 						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(2000)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
@@ -251,7 +255,9 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]),
 						(new CSpan(':'))->addClass('list-numbered-item'),
-						(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step'),
+						(new CCol(
+							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
+						))->addClass(ZBX_STYLE_WORDBREAK),
 						'#{timeout}',
 						'#{url}',
 						'#{required}',
@@ -275,7 +281,9 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CSpan(':'))->addClass('list-numbered-item'),
-						(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step'),
+						(new CCol(
+							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
+						))->addClass(ZBX_STYLE_WORDBREAK),
 						'#{timeout}',
 						'#{url}',
 						'#{required}',

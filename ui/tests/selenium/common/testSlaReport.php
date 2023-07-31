@@ -461,19 +461,24 @@ class testSlaReport extends CWebTest {
 			if (array_key_exists('SLI', $data['expected']) && $period['end'] > self::$actual_creation_time) {
 				$this->assertEquals($data['expected']['SLI'], $row->getColumn('SLI')->getText());
 
-				// Check Uptime and Error budget values. These values are calcullated only from the actual SLA creation time.
+				// Check Uptime and Error budget values. These values are calculated only from the actual SLA creation time.
 				$uptime = $row->getColumn('Uptime')->getText();
 				if ($period['end'] > $load_time) {
 					$reference_uptime = [];
 					// If SLA created in current period, calculation starts from creation timestamp, else from period start.
 					$start_time = max($period['start'], min(self::$actual_creation_time, self::$service_creation_time));
 
-					// Get array of Utime possible values and check that the correct one is there.
-					for ($i = 0; $i <= 3; $i++) {
+					/**
+					 * Get array of Uptime possible values and check that the correct one is there.
+					 * Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
+					 */
+					for ($i = -1; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($load_time - $start_time + $i);
 					}
 
-					$this->assertTrue(in_array($uptime, $reference_uptime));
+					$this->assertTrue(in_array($uptime, $reference_uptime), 'Uptime '.$uptime.' is not among values '.
+							implode(', ', $reference_uptime)
+					);
 
 					// Calculate the error budet based on the actual uptime and compare with actual error budget.
 					$uptime_seconds = 0;
@@ -488,15 +493,21 @@ class testSlaReport extends CWebTest {
 						);
 					}
 
-					$this->assertTrue(in_array($row->getColumn('Error budget')->getText(), $error_budget));
+					$this->assertTrue(in_array($actual_budget = $row->getColumn('Error budget')->getText(), $error_budget),
+							'Error budget '.$actual_budget.' is not present among values '.implode(', ', $error_budget)
+					);
 				}
 				else {
 					$reference_uptime = [];
 					$uptime_start = min(self::$actual_creation_time, self::$service_creation_time);
-					for ($i = 0; $i <= 3; $i++) {
+
+					// Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
+					for ($i = -1; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($period['end'] - $uptime_start + $i);
 					}
-					$this->assertTrue(in_array($uptime, $reference_uptime));
+					$this->assertTrue(in_array($uptime, $reference_uptime), 'Uptime '.$uptime.' is not among values '.
+							implode(', ', $reference_uptime)
+					);
 
 					// Error budget is always 0 for periods that have already passed.
 					$this->assertEquals('0', $row->getColumn('Error budget')->getText());
@@ -591,7 +602,7 @@ class testSlaReport extends CWebTest {
 				}
 			}
 
-			$this->assertTrue($match_found);
+			$this->assertTrue($match_found, 'Downtime "'.$downtime.'" is not present in downtime reference array');
 		}
 	}
 

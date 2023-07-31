@@ -17,6 +17,7 @@ COMMON_LIBS1 = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
 
 COMMON_LIBS2 = \
+	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
@@ -62,6 +63,7 @@ server_module_load_CFLAGS = \
 
 server_module_load_LDADD = $(COMMON_LIBS1) \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(COMMON_LIBS2) @SERVER_LIBS@
 
 endif
@@ -83,6 +85,7 @@ proxy_module_load_CFLAGS = \
 
 proxy_module_load_LDADD = $(COMMON_LIBS1) \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(COMMON_LIBS2) @PROXY_LIBS@
 
 endif
@@ -110,6 +113,7 @@ agent_module_load_LDADD = $(COMMON_LIBS1) \
 	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	@AGENT_LIBS@
 
 endif

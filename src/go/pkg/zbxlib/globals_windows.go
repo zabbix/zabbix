@@ -70,6 +70,8 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_dir.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/sysinfo_alias.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/eventlog.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/process_eventslog.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/process_eventslog6.o
 #cgo openssl LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/tls_version.o
 #cgo LDFLAGS: -lDbghelp -lpsapi -lws2_32 -lWevtapi -ldnsapi
 #cgo pcre  LDFLAGS: -lpcre
@@ -79,7 +81,6 @@ package zbxlib
 
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = 20;
-char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
