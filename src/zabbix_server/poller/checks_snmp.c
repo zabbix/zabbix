@@ -93,8 +93,6 @@
  ******************************************************************************/
 typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *snmp_oid, const char *index, const char *value);
 
-typedef void*	zbx_snmp_sess_t;
-
 typedef struct
 {
 	char		*addr;
@@ -115,13 +113,6 @@ zbx_snmpidx_mapping_t;
 
 typedef struct
 {
-	AGENT_RESULT	*result;
-	int		errcode;
-}
-zbx_snmp_result_t;
-
-typedef struct
-{
 	oid	root_oid[MAX_OID_LEN];
 	size_t	root_oid_len;
 	char	*str_oid;
@@ -129,6 +120,9 @@ typedef struct
 zbx_snmp_oid_t;
 
 ZBX_PTR_VECTOR_DECL(snmp_oid, zbx_snmp_oid_t *)
+ZBX_PTR_VECTOR_IMPL(snmp_oid, zbx_snmp_oid_t *)
+
+typedef void*	zbx_snmp_sess_t;
 
 typedef struct
 {
@@ -147,6 +141,7 @@ typedef struct
 zbx_bulkwalk_context_t;
 
 ZBX_PTR_VECTOR_DECL(bulkwalk_context, zbx_bulkwalk_context_t*)
+ZBX_PTR_VECTOR_IMPL(bulkwalk_context, zbx_bulkwalk_context_t*)
 
 struct zbx_snmp_context
 {
@@ -164,7 +159,12 @@ struct zbx_snmp_context
 	int				config_timeout;
 };
 
-ZBX_PTR_VECTOR_IMPL(snmp_oid, zbx_snmp_oid_t *)
+typedef struct
+{
+	AGENT_RESULT	*result;
+	int		errcode;
+}
+zbx_snmp_result_t;
 
 static ZBX_THREAD_LOCAL zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 static char				zbx_snmp_init_done;
@@ -2164,8 +2164,6 @@ out:
 
 	return ret;
 }
-
-ZBX_PTR_VECTOR_IMPL(bulkwalk_context, zbx_bulkwalk_context_t*)
 
 static int	asynch_response(int operation, struct snmp_session *sp, int reqid, struct snmp_pdu *pdu, void *magic)
 {
