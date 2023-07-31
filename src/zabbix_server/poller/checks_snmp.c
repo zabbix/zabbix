@@ -2034,35 +2034,36 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 	return SUCCEED;
 }
 
-static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response, zbx_snmp_oid_t *p_oid,
-		int *running, int *vars_num, int pdu_type, oid *name, size_t *name_length, char **results,
-		size_t *results_alloc, size_t *results_offset, const zbx_snmp_sess_t ssp,
-		const zbx_dc_interface_t *interface, char *error, size_t max_error_len)
+static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
+		zbx_bulkwalk_context_t *bulkwalk_context, char **results, size_t *results_alloc,
+		size_t *results_offset, const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface, char *error,
+		size_t max_error_len)
 {
 	struct variable_list	*var;
 	int			ret = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 	{
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len);
-		*running = 0;
+		bulkwalk_context->running = 0;
 		goto out;
 	}
 
 	if (SNMP_ERR_NOSUCHNAME == response->errstat)
 	{
-		*running = 0;
+		bulkwalk_context->running = 0;
 		goto out;
 	}
 
 	for (var = response->variables; NULL != var; var = var->next_variable)
 	{
-		if (var->name_length < p_oid->root_oid_len ||
-				0 != memcmp(p_oid->root_oid, var->name, p_oid->root_oid_len * sizeof(oid)))
+		if (var->name_length < bulkwalk_context->p_oid->root_oid_len ||
+				0 != memcmp(bulkwalk_context->p_oid->root_oid, var->name,
+				bulkwalk_context->p_oid->root_oid_len * sizeof(oid)))
 		{
-			*running = 0;
+			bulkwalk_context->running = 0;
 			break;
 		}
 
@@ -2070,18 +2071,19 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response, 
 				SNMP_NOSUCHINSTANCE != var->type)
 		{
 			char	buffer[MAX_STRING_LEN];
-			(*vars_num)++;
+			bulkwalk_context->running++;
 
-			if (SNMP_MSG_GET != pdu_type)
+			if (SNMP_MSG_GET != bulkwalk_context->pdu_type)
 			{
-				if (0 <= snmp_oid_compare(name, *name_length, var->name, var->name_length))
+				if (0 <= snmp_oid_compare(bulkwalk_context->name, bulkwalk_context->name_length,
+						var->name, var->name_length))
 				{
-					*running = 0;
+					bulkwalk_context->running = 0;
 					break;
 				}
 			}
 			else
-				*running = 0;
+				bulkwalk_context->running = 0;
 
 			snprint_variable(buffer, sizeof(buffer), var->name, var->name_length, var);
 
@@ -2092,18 +2094,20 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response, 
 
 			if (NULL == var->next_variable)
 			{
-				memcpy(name, var->name, var->name_length * sizeof(oid));
-				*name_length = var->name_length;
+				memcpy(bulkwalk_context->name, var->name, var->name_length * sizeof(oid));
+				bulkwalk_context->name_length = var->name_length;
 			}
 		}
 		else
 		{
-			*running = 0;
+			bulkwalk_context->running = 0;
 			break;
 		}
 	}
 out:
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s():%s running:%d", __func__, zbx_result_string(ret), *running);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s running:%d", __func__, zbx_result_string(ret),
+			bulkwalk_context->running);
+
 	return ret;
 }
 
@@ -2161,9 +2165,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 	{
 		char	error[MAX_STRING_LEN];
 
-		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(stat, pdu, bulkwalk_context->p_oid,
-				&bulkwalk_context->running, &bulkwalk_context->vars_num, bulkwalk_context->pdu_type,
-				bulkwalk_context->name, &bulkwalk_context->name_length, &snmp_context->results,
+		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(stat, pdu, bulkwalk_context, &snmp_context->results,
 				&snmp_context->results_alloc, &snmp_context->results_offset, snmp_context->ssp,
 				&snmp_context->item.interface, error, sizeof(error))))
 		{
