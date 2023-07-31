@@ -70,7 +70,7 @@ $formgrid = (new CFormGrid())
 			$data['readonly']
 				? null
 				: [
-					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),// TODO: replace with margin
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 					(new CSimpleButton(_('Select')))
 						->addClass('js-select-key')
 						->addClass(ZBX_STYLE_BTN_GREY)
@@ -405,14 +405,12 @@ $formgrid = (new CFormGrid())
 				'object_name' => 'items',
 				'multiple' => false,
 				'disabled' => $data['readonly'],
-				'data' => $data['master_item'] // TODO: prepare data in controller?
-					? [
-						[
+				'data' => $data['master_item']
+					? [[
 							'id' => $data['master_item']['itemid'],
 							'prefix' => $data['host']['name'].NAME_DELIMITER,
 							'name' => $data['master_item']['name']
-						]
-					]
+					]]
 					: [],
 				'popup' => [
 					'parameters' => [

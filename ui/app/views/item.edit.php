@@ -242,9 +242,6 @@ $output = [
 	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php')
 ];
 
-// TODO: remove
-$output['script_inline'] = str_replace('<script>', '', $output['script_inline']);
-
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	$output['debug'] = CProfiler::getInstance()->make()->toString();

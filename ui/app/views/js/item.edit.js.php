@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-?><script>
+?>
 (() => {
 const CONFIRM_FORM_NAVIGATION = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
 const ERROR_XHR_SERVER = <?= json_encode(_('Unexpected server error.')) ?>;
@@ -201,7 +201,6 @@ window.item_edit_form = new class {
 	}
 
 	clone({title, buttons}) {
-		// TODO: bug, navigate to item prototype and click clone, title is set to "New item", should be "New item prototype".
 		// Remove itemid to correctly render form when inherited tags changed.
 		this.form.querySelector('[name="itemid"]').remove();
 		this.overlay.setProperties({title, buttons});
