@@ -54,7 +54,7 @@ class CControllerQueueOverviewProxy extends CController {
 		}
 		else {
 			$queue_data = array_column($queue_data, null, 'proxyid');
-			$proxies = API::proxy()->get([
+			$proxies = API::Proxy()->get([
 				'output' => ['name'],
 				'preservekeys' => true
 			]);

@@ -75,26 +75,20 @@ class CControllerQueueDetails extends CController {
 
 			$hosts = API::Host()->get([
 				'output' => ['proxyid'],
-				'hostids' => array_column($items, 'hostid', 'hostid'),
+				'hostids' => array_unique(array_column($items, 'hostid')),
 				'preservekeys' => true
 			]);
 
-			$proxyids = [];
-			foreach ($hosts as $host) {
-				if ($host['proxyid']) {
-					$proxyids[$host['proxyid']] = true;
-				}
-			}
+			$proxyids = array_flip(array_column($hosts, 'proxyid'));
+			unset($proxies[0]);
 
-			$proxies = [];
-
-			if ($proxyids) {
-				$proxies = API::Proxy()->get([
-					'proxyids' => array_keys($proxyids),
+			$proxies = $proxyids
+				? API::Proxy()->get([
 					'output' => ['proxyid', 'name'],
+					'proxyids' => array_keys($proxyids),
 					'preservekeys' => true
-				]);
-			}
+				])
+				: [];
 		}
 
 		$response = new CControllerResponseData([

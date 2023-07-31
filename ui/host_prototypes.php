@@ -407,7 +407,7 @@ if (hasRequest('form')) {
 
 	if ($parentHost['proxyid']) {
 		$proxy = API::Proxy()->get([
-			'output' => ['host', 'proxyid'],
+			'output' => ['proxyid', 'name'],
 			'proxyids' => $parentHost['proxyid'],
 			'limit' => 1
 		]);

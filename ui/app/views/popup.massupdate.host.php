@@ -118,7 +118,7 @@ $proxy_select = (new CSelect('proxyid'))
 	->addOption(new CSelectOption(0, _('(no proxy)')));
 
 foreach ($data['proxies'] as $proxy) {
-	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['host']));
+	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['name']));
 }
 
 $host_tab->addRow(
