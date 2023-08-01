@@ -165,6 +165,13 @@ Bug fixes:
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.4.6rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 6.4.5
 
 6.4.5rc1 was released as 6.4.5 without any changes
