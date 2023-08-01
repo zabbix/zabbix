@@ -709,7 +709,7 @@ static int	DBpatch_6050063(void)
 #define TM_DATA_TYPE_PROXYIDS	2
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	int		rc, ret = SUCCEED;
+	int		rc = ZBX_DB_OK, ret = SUCCEED;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -739,7 +739,8 @@ static int	DBpatch_6050063(void)
 		else
 			data = zbx_string_replace(row[2], "\"proxy_hostids\"", "\"proxyids\"");
 
-		rc = zbx_db_execute("update task_data set data='%s' where taskid=" ZBX_FS_UI64, data, taskid);
+		if (0 != strcmp(row[2], data))
+			rc = zbx_db_execute("update task_data set data='%s' where taskid=" ZBX_FS_UI64, data, taskid);
 
 		zbx_free(data);
 
