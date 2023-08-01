@@ -1126,7 +1126,7 @@ static int	housekeeping_audit(int now)
 	static zbx_hk_rule_t	rule = {"auditlog", "auditid", "", HK_MIN_CLOCK_UNDEFINED, &cfg.hk.audit_mode,
 			&cfg.hk.audit};
 
-	if (ZBX_HK_OPTION_ENABLED == cfg.hk.audit_mode)
+	if (ZBX_HK_MODE_DISABLED != cfg.hk.audit_mode)
 		return housekeeping_process_rule(now, &rule);
 
 	return 0;
