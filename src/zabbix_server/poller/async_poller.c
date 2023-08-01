@@ -132,7 +132,7 @@ static void	process_agent_result(void *data)
 	zbx_async_check_agent_clean(agent_context);
 	zbx_free(agent_context);
 }
-
+#ifdef HAVE_NETSNMP
 static void	process_snmp_result(void *data)
 {
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
@@ -142,7 +142,7 @@ static void	process_snmp_result(void *data)
 
 	zbx_async_check_snmp_clean(snmp_context);
 }
-
+#endif
 #ifdef HAVE_LIBCURL
 static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 {
@@ -335,7 +335,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 					poller_config->config_source_ip, poller_config->curl_handle);
 #else
 			errcodes[i] = NOTSUPPORTED;
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL,"Support for HTTP agent was not compiled in:"
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for HTTP agent was not compiled in:"
 					" missing cURL library"));
 #endif
 		}
@@ -347,9 +347,14 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		}
 		else
 		{
+#ifdef HAVE_NETSNMP
 			errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 					poller_config, poller_config, poller_config->base,
 					poller_config->config_timeout, poller_config->config_source_ip);
+#else
+			errcodes[i] = NOTSUPPORTED;
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
+#endif
 		}
 
 		if (SUCCEED == errcodes[i])
@@ -560,8 +565,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	}
+#ifdef HAVE_NETSNMP
 	else
 		zbx_set_snmp_bulkwalk_options();
+#endif
 
 	while (ZBX_IS_RUNNING())
 	{
