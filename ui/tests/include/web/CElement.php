@@ -344,7 +344,7 @@ class CElement extends CBaseElement implements IWaitable {
 			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
 		}
 		else {
-			return $this->overwrite($value);
+			return $element->overwrite($value);
 		}
 	}
 
