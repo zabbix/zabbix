@@ -728,13 +728,15 @@
 
 						case KEY_ARROW_UP:
 						case KEY_ARROW_DOWN:
-							var $collection = $('li', ms.values.available_div.filter(':visible')),
-								$selected = $collection.filter('.suggest-hover').removeClass('suggest-hover');
+							var $collection = $('li[data-id]', ms.values.available_div.filter(':visible')),
+								$selected = $collection.filter('.suggest-hover');
 
 							if ($selected.length) {
+								$selected.removeClass('suggest-hover');
+
 								$selected = (e.which == KEY_ARROW_UP)
-									? ($selected.is(':first-child') ? $collection.last() : $selected.prev())
-									: ($selected.is(':last-child') ? $collection.first() : $selected.next());
+									? ($selected.is($collection.first()) ? $collection.last() : $selected.prevAll('[data-id]').first())
+									: ($selected.is($collection.last()) ? $collection.first() : $selected.nextAll('[data-id]').first());
 
 								$selected.addClass('suggest-hover');
 								$aria_live.text($selected.data('label'));
@@ -838,10 +840,10 @@
 		var ms = $obj.data('multiSelect');
 
 		if (ms.options.custom_suggest_select_handler !== null) {
-			ms.options.custom_suggest_select_handler(ms.values.available.get(id));
+			ms.options.custom_suggest_select_handler(ms.values.available.get(id.toString()));
 		}
 		else {
-			addSelected($obj, ms.values.available.get(id));
+			addSelected($obj, ms.values.available.get(id.toString()));
 		}
 
 		if (isSearchFieldVisible($obj)) {
@@ -1255,9 +1257,9 @@
 			$('.selected li.selected', $obj).removeClass('selected');
 
 			// Pre-select first available item.
-			if ($('li', $available).length > 0) {
+			if ($('li[data-id]', $available).length > 0) {
 				$('li.suggest-hover', $available).removeClass('suggest-hover');
-				$('li:first-child', $available).addClass('suggest-hover');
+				$('li[data-id]', $available).first().addClass('suggest-hover');
 			}
 		}
 
@@ -1304,7 +1306,7 @@
 				selected_top = 0,
 				selected_height = $selected.outerHeight(true);
 
-			if ($('.multiselect-matches', $available)) {
+			if ($('.multiselect-matches', $available).length > 0) {
 				selected_top += $('.multiselect-matches', $available).outerHeight(true);
 			}
 
