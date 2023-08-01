@@ -515,17 +515,21 @@ function convertUnitsUptime($value) {
  *
  * @param int  $value            Time period in seconds.
  * @param bool $ignore_millisec  Without ms (1s 200 ms = 1.2s).
+ * @param int  $decimals         Max number of first non-zero decimals to display. If null is specified,
+ *                               ZBX_UNITS_ROUNDOFF_SUFFIXED will be used.
+ * @param bool $decimals_exact   Display exactly this number of decimals instead of first non-zeros.
+ *                               Default: false.
  *
  * @return string
  */
-function convertUnitsS($value, $ignore_millisec = false, $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
-		$decimals_exact = false) {
+function convertUnitsS($value, $ignore_millisec = false, $decimals = null, $decimals_exact = false) {
 	$value = (float) $value;
 	$value_abs = abs($value);
 
 	$parts = [];
 	$start = null;
 
+	$decimals = $decimals !== null ? $decimals : ZBX_UNITS_ROUNDOFF_SUFFIXED;
 	$value_abs_int = floor($value_abs);
 
 	if (($v = floor($value_abs_int / SEC_PER_YEAR)) > 0) {
@@ -601,10 +605,8 @@ function convertUnitsS($value, $ignore_millisec = false, $decimals = ZBX_UNITS_R
 	$result = [];
 
 	foreach (array_filter($parts) as $part_unit => $part_value) {
-		$result[] = formatFloat($part_value, [
-				'decimals' => $decimals !== null ? $decimals : ZBX_UNITS_ROUNDOFF_SUFFIXED,
-				'decimals_exact' => $decimals_exact
-			]).$units[$part_unit];
+		$result[] = formatFloat($part_value, ['decimals' => $decimals, 'decimals_exact' => $decimals_exact])
+			.$units[$part_unit];
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
