@@ -31,6 +31,7 @@
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/library/large_fd_set.h>
+#include <net-snmp/library/snmp_secmod.h>
 #include "zbxself.h"
 
 #include "zbxcomms.h"
@@ -156,6 +157,7 @@ struct zbx_snmp_context
 	zbx_vector_bulkwalk_context_t	bulkwalk_contexts;
 	int				i;
 	int				config_timeout;
+	int				probe;
 };
 
 typedef struct
@@ -2185,9 +2187,16 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 		return 0;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "operation:%d response id:%d command:%d",operation, reqid, pdu ? pdu->command : -1);
+	zabbix_log(LOG_LEVEL_DEBUG, "operation:%d response id:%d command:%d probe:%d",operation, reqid,
+			pdu ? pdu->command : -1, snmp_context->probe);
 
 	bulkwalk_context->waiting = 0;
+
+	if (1 == snmp_context->probe)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
 
 	switch (operation)
 	{
@@ -2234,7 +2243,21 @@ out:
 	return 1;
 }
 
+static netsnmp_pdu	*usm_probe_pdu_create(void)
+{
+	netsnmp_pdu	*pdu;
 
+	if (NULL == (pdu = snmp_pdu_create(SNMP_MSG_GET)))
+		return NULL;
+
+	pdu->version = SNMP_VERSION_3;
+	pdu->securityName = strdup("");
+	pdu->securityNameLen = 0;
+	pdu->securityLevel = SNMP_SEC_LEVEL_NOAUTH;
+	pdu->securityModel = SNMP_SEC_MODEL_USM;
+
+	return pdu;
+}
 
 static zbx_bulkwalk_context_t	*snmp_bulkwalk_context_create(zbx_snmp_context_t *snmp_context,
 		int pdu_type, zbx_snmp_oid_t *p_oid)
@@ -2279,26 +2302,42 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() OID: '%s'",__func__, buffer);
 	}
 
-	/* create PDU */
-	if (NULL == (pdu = snmp_pdu_create(bulkwalk_context->pdu_type)))
+	if (1 == snmp_context->probe)
 	{
-		zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
-		ret = CONFIG_ERROR;
-		goto out;
-	}
+		netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
 
-	if (SNMP_MSG_GETBULK == bulkwalk_context->pdu_type)
-	{
-		pdu->non_repeaters = 0;
-		pdu->max_repetitions = snmp_context->snmp_max_repetitions;
-	}
+		session->flags |= SNMP_FLAGS_DONT_PROBE;
 
-	if (NULL == snmp_add_null_var(pdu, bulkwalk_context->name, bulkwalk_context->name_length))
+		if (NULL == (pdu = usm_probe_pdu_create()))
+		{
+			zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+	}
+	else
 	{
-		zbx_strlcpy(error, "snmp_add_null_var(): cannot add null variable.", max_error_len);
-		ret = CONFIG_ERROR;
-		snmp_free_pdu(pdu);
-		goto out;
+		/* create PDU */
+		if (NULL == (pdu = snmp_pdu_create(bulkwalk_context->pdu_type)))
+		{
+			zbx_strlcpy(error, "snmp_pdu_create(): cannot create PDU object.", max_error_len);
+			ret = CONFIG_ERROR;
+			goto out;
+		}
+
+		if (SNMP_MSG_GETBULK == bulkwalk_context->pdu_type)
+		{
+			pdu->non_repeaters = 0;
+			pdu->max_repetitions = snmp_context->snmp_max_repetitions;
+		}
+
+		if (NULL == snmp_add_null_var(pdu, bulkwalk_context->name, bulkwalk_context->name_length))
+		{
+			zbx_strlcpy(error, "snmp_add_null_var(): cannot add null variable.", max_error_len);
+			ret = CONFIG_ERROR;
+			snmp_free_pdu(pdu);
+			goto out;
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() sending", __func__);
@@ -2401,8 +2440,7 @@ static int	snmp_task_process(short event, void *data, int *fd)
 		if (0 != (event & EV_TIMEOUT))
 		{
 			snmp_context->item.ret = TIMEOUT_ERROR;
-			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed:"
-					" timed out"));
+			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "timed out"));
 			goto stop;
 		}
 
@@ -2411,6 +2449,23 @@ static int	snmp_task_process(short event, void *data, int *fd)
 			snmp_context->item.ret = NETWORK_ERROR;
 			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2() failed"));
 			goto stop;
+		}
+
+		if (1 == snmp_context->probe)
+		{
+			netsnmp_session		*session = snmp_sess_session(snmp_context->ssp);
+			struct snmp_secmod_def	*sptr = find_sec_mod(session->securityModel);
+
+			if (NULL != sptr && NULL != sptr->post_probe_engineid)
+			{
+				if (SNMPERR_SUCCESS != (*sptr->post_probe_engineid)(snmp_context->ssp, session))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot process probing result for itemid:"
+							ZBX_FS_UI64, snmp_context->item.itemid);
+				}
+			}
+
+			snmp_context->probe = 0;
 		}
 
 		if (NULL != bulkwalk_context->error)
@@ -2558,6 +2613,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
+	snmp_context->probe = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? 0 : 1;
 	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 
 	if (SNMP_MSG_GETBULK == pdu_type && 1 > item->snmp_max_repetitions)
@@ -2834,7 +2890,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_
 	return ret;
 }
 
-int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
+int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
 		const char *config_source_ip)
 {
 	int	errcode = SUCCEED;
@@ -2937,7 +2993,7 @@ static void	process_snmp_result(void *data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
+void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
 		unsigned char poller_type, int config_timeout, const char *config_source_ip)
 {
 	zbx_snmp_sess_t		ssp;

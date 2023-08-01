@@ -37,9 +37,9 @@ typedef struct zbx_snmp_context	zbx_snmp_context_t;
 
 void	zbx_init_library_mt_snmp(void);
 void	zbx_shutdown_library_mt_snmp(void);
-int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
+int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
 		const char *config_source_ip);
-void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
+void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
 		unsigned char poller_type, int config_timeout, const char *config_source_ip);
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
 
