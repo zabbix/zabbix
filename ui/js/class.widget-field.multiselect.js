@@ -222,8 +222,6 @@ class CWidgetFieldMultiselect {
 	}
 
 	#selectSuggested(entity) {
-		console.log(entity)
-		console.log(entity.source)
 		if (entity.source !== undefined) {
 			this.#selectReference(entity.id);
 		}
