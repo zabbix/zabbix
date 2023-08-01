@@ -727,7 +727,8 @@ class CConfigurationExportBuilder {
 				if (array_key_exists('tags', $operation)) {
 					CArrayHelper::sort($operation['tags'], ['tag', 'value']);
 				}
-				elseif (array_key_exists('templates', $operation)) {
+
+				if (array_key_exists('templates', $operation)) {
 					CArrayHelper::sort($operation['templates'], ['name']);
 				}
 			}
