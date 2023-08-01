@@ -968,7 +968,6 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 
 #ifdef HAVE_POSTGRESQL
 	if (ZBX_HK_MODE_DISABLED != config->config->hk.audit_mode &&
-			ZBX_HK_OPTION_ENABLED == config->config->hk.audit &&
 			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
 		if (ZBX_HK_MODE_PARTITION != config->config->hk.audit_mode)
