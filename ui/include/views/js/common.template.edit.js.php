@@ -31,7 +31,8 @@
 					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-						->setAttribute('placeholder', '{$MACRO}'),
+						->setAttribute('placeholder', '{$MACRO}')
+						->disableSpellcheck(),
 					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
@@ -77,6 +78,7 @@
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 						->setAttribute('placeholder', '{$MACRO}')
+						->disableSpellcheck()
 				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
 					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
