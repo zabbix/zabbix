@@ -703,32 +703,52 @@ static int	DBpatch_6050062(void)
 
 static int	DBpatch_6050063(void)
 {
-#define TM_STATUS_DONE		3
-#define TM_STATUS_EXPIRED	4
-#define TM_DATA_TYPE_TEST_ITEM	0
-#define TM_DATA_TYPE_PROXYIDS	2
+#define ZBX_TM_DATA_TYPE_TEST_ITEM	0
+#define ZBX_TM_DATA_TYPE_PROXYIDS	2
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		rc, ret = SUCCEED;
+
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > zbx_db_execute(
-			"update task t set status=%i"
-			" where t.status not in (%i,%i) and"
-			" exists ("
-				" select null"
-				" from task_data td"
-				" where t.taskid=td.taskid"
-				" and td.type in (%i,%i)"
-			")", TM_STATUS_EXPIRED, TM_STATUS_DONE, TM_STATUS_EXPIRED, TM_DATA_TYPE_TEST_ITEM,
-					TM_DATA_TYPE_PROXYIDS))
+	if (NULL == (result = zbx_db_select("select taskid,type,data"
+			" from task_data"
+			" where type in (%i,%i)", ZBX_TM_DATA_TYPE_TEST_ITEM, ZBX_TM_DATA_TYPE_PROXYIDS)))
 	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from table 'task_data'", __func__);
 		return FAIL;
 	}
 
-	return SUCCEED;
-#undef TM_STATUS_DONE
-#undef TM_STATUS_EXPIRED
-#undef TM_DATA_TYPE_TEST_ITEM
-#undef TM_DATA_TYPE_PROXYIDS
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	taskid;
+		int		type;
+		char		*data;
+
+		ZBX_STR2UINT64(taskid, row[0]);
+		type = atoi(row[1]);
+
+		if (ZBX_TM_DATA_TYPE_TEST_ITEM == type)
+			data = zbx_string_replace(row[2], "\"proxy_hostid\"", "\"proxyid\"");
+		else
+			data = zbx_string_replace(row[2], "\"proxy_hostids\"", "\"proxyids\"");
+
+		rc = zbx_db_execute("update task_data set data='%s' where taskid=" ZBX_FS_UI64, data, taskid);
+
+		zbx_free(data);
+
+		if (ZBX_DB_OK > rc)
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+	zbx_db_free_result(result);
+
+	return ret;
+#undef ZBX_TM_DATA_TYPE_TEST_ITEM
+#undef ZBX_TM_DATA_TYPE_PROXYIDS
 }
 
 #endif
