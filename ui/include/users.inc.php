@@ -354,7 +354,7 @@ function collapseTagFilters(array $tag_filters) {
 		]);
 
 		$sorted_tag_filters = [];
-		foreach ($tag_filters as $key => $tag_filter) {
+		foreach ($tag_filters as $tag_filter) {
 			if (array_key_exists($tag_filter['groupid'], $groups)) {
 				$tag_filter['name'] = $groups[$tag_filter['groupid']]['name'];
 				$sorted_tag_filters[] = $tag_filter;

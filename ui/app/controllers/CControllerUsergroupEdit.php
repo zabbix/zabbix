@@ -99,7 +99,9 @@ class CControllerUsergroupEdit extends CController {
 
 		$data['hostgroup_rights'] = $this->getGroupRights();
 		$data['templategroup_rights'] = $this->getTemplategroupRights();
-		$data['tag_filters'] = $this->getTagFilters();
+
+		// Get the sorted list of unique tag filters and hostgroup names.
+		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 
 		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
 		$template_groups = API::TemplateGroup()->get(['output' => ['groupid', 'name']]);
@@ -264,19 +266,6 @@ class CControllerUsergroupEdit extends CController {
 		}
 
 		return $sorted_group_rights;
-	}
-
-	/**
-	 * Returns the sorted list of the unique tag filters and group names.
-	 *
-	 * @return array
-	 */
-	private function getTagFilters() {
-		if ($this->hasInput('tag_filters')) {
-			return collapseTagFilters($this->getInput('tag_filters'));
-		}
-
-		return collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 	}
 
 	/**
