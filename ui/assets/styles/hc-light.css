@@ -2259,6 +2259,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       z-index: 2; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #ffffff;
+      -webkit-text-fill-color: #ffffff;
       border-color: #333333;
       background-color: #333333;
       position: relative;
