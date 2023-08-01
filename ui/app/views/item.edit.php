@@ -197,7 +197,7 @@ $tabs = (new CTabView())
 	)
 	->addTab('tags-tab', _('Tags'),
 		new CPartial('configuration.tags.tab', [
-			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'readonly' => $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'show_inherited_tags' => $item['show_inherited_tags'],
 			'source' => 'item',
 			'tabs_id' => 'tabs',
