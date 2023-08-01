@@ -432,7 +432,7 @@ $formgrid = (new CFormGrid())
 if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED) {
 	$interface = $data['host']['interfaces'][$data['form']['interfaceid']] ?? [];
 
-	if ($data['readonly'] && !($data['host']['flags'] & ZBX_FLAG_DISCOVERY_CREATED)) {
+	if ($data['discovered']) {
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
 		$select_interface = (new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true))
 			->setAttribute('disabled', 'disabled');
