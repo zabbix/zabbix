@@ -178,9 +178,7 @@ class CControllerUsergroupEdit extends CController {
 	 * @return array
 	 */
 	private function getGroupRights() {
-		$group_rights = collapseGroupRights(
-			getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
-		);
+		$group_rights = getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : []);
 
 		return $this->sortGroupRights($group_rights);
 	}
@@ -191,9 +189,7 @@ class CControllerUsergroupEdit extends CController {
 	 * @return array
 	 */
 	private function getTemplategroupRights() {
-		$group_rights = collapseGroupRights(
-			getTemplateGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
-		);
+		$group_rights = getTemplateGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : []);
 
 		return $this->sortGroupRights($group_rights);
 	}
