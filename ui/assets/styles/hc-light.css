@@ -2931,6 +2931,11 @@ output {
     cursor: pointer;
     overflow: hidden;
     text-overflow: ellipsis; }
+  .multiselect-suggest.multiselect-suggest-grouped li, .multiselect-suggest-grouped.multiselect-matches li {
+    padding-left: 25px; }
+    .multiselect-suggest.multiselect-suggest-grouped li.suggest-group, .multiselect-suggest-grouped.multiselect-matches li.suggest-group {
+      padding-left: 5px;
+      font-weight: bold; }
   .multiselect-suggest .suggest-hover, .multiselect-matches .suggest-hover {
     background-color: #f4f4f4; }
   .multiselect-suggest .suggest-new, .multiselect-matches .suggest-new {

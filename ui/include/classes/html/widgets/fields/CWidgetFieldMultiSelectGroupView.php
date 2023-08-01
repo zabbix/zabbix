@@ -31,8 +31,8 @@ class CWidgetFieldMultiSelectGroupView extends CWidgetFieldMultiSelectView {
 		return 'hostGroup';
 	}
 
-	protected function getObjectLabel(): string {
-		return $this->field->isMultiple() ? _('Host groups') : _('Host group');
+	protected function getObjectLabels(): array {
+		return ['object' => _('Host group'), 'objects' => _('Host groups')];
 	}
 
 	protected function getPopupParameters(): array {

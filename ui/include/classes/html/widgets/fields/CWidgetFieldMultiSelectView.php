@@ -101,7 +101,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 				'.json_encode([
 					'field_name' => $this->field->getName(),
 					'field_value' => $this->field->getValue(),
-					'object_label' => $this->getObjectLabel(),
+					'object_labels' => $this->getObjectLabels(),
 					'default_prevented' => $this->field->idDefaultPrevented(),
 					'widget_accepted' => $this->field->isWidgetAccepted(),
 					'dashboard_accepted' => $this->field->isDashboardAccepted()

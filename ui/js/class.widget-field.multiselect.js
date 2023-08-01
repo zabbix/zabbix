@@ -39,6 +39,11 @@ class CWidgetFieldMultiselect {
 	#name;
 
 	/**
+	 * Field labels for single and multiple objects.
+	 */
+	#labels;
+
+	/**
 	 * @type {string|null}
 	 */
 	#selected_reference = null;
@@ -53,16 +58,43 @@ class CWidgetFieldMultiselect {
 	 */
 	#selected_limit;
 
+	/**
+	 * @type {boolean}
+	 */
+	#default_prevented;
+
+	/**
+	 * @type {boolean}
+	 */
+	#widget_accepted;
+
+	/**
+	 * @type {boolean}
+	 */
+	#dashboard_accepted;
+
 	constructor(element, multiselect_params, {
 		field_name,
 		field_value,
-		object_label,
+		object_labels,
 		default_prevented,
 		widget_accepted,
 		dashboard_accepted
 	}) {
 		this.#name = field_name;
-		this.#multiselect = jQuery(element).multiSelect(multiselect_params);
+		this.#labels = object_labels;
+		this.#default_prevented = default_prevented;
+		this.#widget_accepted = widget_accepted;
+		this.#dashboard_accepted = dashboard_accepted;
+
+		const has_optional_sources = widget_accepted && (!default_prevented || dashboard_accepted);
+
+		this.#multiselect = jQuery(element).multiSelect({
+			...multiselect_params,
+			suggest_list_modifier: has_optional_sources ? (entities) => this.#modifySuggestedList(entities) : null,
+			custom_suggest_select_handler: has_optional_sources ? (entity) => this.#selectSuggested(entity) : null
+		});
+
 		this.#selected_limit = this.#multiselect.multiSelect('getOption', 'selectedLimit');
 		this.#is_multiple = this.#selected_limit != 1;
 
@@ -72,25 +104,30 @@ class CWidgetFieldMultiselect {
 			$(select_button).off('click');
 			select_button.addEventListener('click', (e) => {
 				if (!default_prevented) {
-					this.#selectEntity(e);
+					this.#selectDefaultPopup(e);
 				}
 				else if(widget_accepted) {
-					this.#selectWidget(e);
+					this.#selectWidgetPopup(e);
 				}
 			});
 		}
 
-		if (widget_accepted) {
-			if (!default_prevented || dashboard_accepted) {
-				if (!default_prevented) {
-					this.#multiselect.multiSelect('addOptionalSelect', object_label, (e) => this.#selectEntity(e));
-				}
+		if (has_optional_sources) {
+			if (!default_prevented) {
+				this.#multiselect.multiSelect('addOptionalSelect',
+					this.#is_multiple ? object_labels.objects : object_labels.object,
+					(e) => this.#selectDefaultPopup(e)
+				);
+			}
 
-				this.#multiselect.multiSelect('addOptionalSelect', t('Widget'), (e) => this.#selectWidget(e));
+			this.#multiselect.multiSelect('addOptionalSelect', t('Widget'), (e) => {
+				this.#selectWidgetPopup(e);
+			});
 
-				if (dashboard_accepted) {
-					this.#multiselect.multiSelect('addOptionalSelect', t('Dashboard'), (e) => this.#selectDashboard(e));
-				}
+			if (dashboard_accepted) {
+				this.#multiselect.multiSelect('addOptionalSelect', t('Dashboard'), () => {
+					this.#selectReference('DASHBOARD');
+				});
 			}
 		}
 
@@ -99,7 +136,7 @@ class CWidgetFieldMultiselect {
 		}
 	}
 
-	#selectEntity(e) {
+	#selectDefaultPopup(e) {
 		this.#multiselect.multiSelect('modify', {
 			name: `${this.#name}${this.#is_multiple ? '[]' : ''}`,
 			selectedLimit: this.#selected_limit
@@ -107,12 +144,13 @@ class CWidgetFieldMultiselect {
 
 		if (this.#selected_reference !== null) {
 			this.#multiselect.multiSelect('removeSelected', this.#selected_reference);
+			this.#selected_reference = null;
 		}
 
 		this.#multiselect.multiSelect('openSelectPopup', e.target);
 	}
 
-	#selectWidget(e) {
+	#selectWidgetPopup(e) {
 		const widgets_table = new Template(
 			document.getElementById(`${this.#name}-reference-table-tmpl`).innerHTML
 		).evaluateToElement();
@@ -156,10 +194,6 @@ class CWidgetFieldMultiselect {
 		});
 	}
 
-	#selectDashboard() {
-		this.#selectReference('DASHBOARD');
-	}
-
 	#selectReference(reference) {
 		let caption = null;
 
@@ -183,9 +217,67 @@ class CWidgetFieldMultiselect {
 
 			this.#selected_reference = reference;
 
-			this.#multiselect.multiSelect('addData', [caption], true);
+			this.#multiselect.multiSelect('addData', [caption]);
 		}
 	}
+
+	#selectSuggested(entity) {
+		console.log(entity)
+		console.log(entity.source)
+		if (entity.source !== undefined) {
+			this.#selectReference(entity.id);
+		}
+		else {
+			this.#multiselect.multiSelect('modify', {
+				name: `${this.#name}${this.#is_multiple ? '[]' : ''}`,
+				selectedLimit: this.#selected_limit
+			});
+
+			if (this.#selected_reference !== null) {
+				this.#multiselect.multiSelect('removeSelected', this.#selected_reference);
+				this.#selected_reference = null;
+			}
+
+			this.#multiselect.multiSelect('addData', [entity]);
+		}
+	}
+
+	#modifySuggestedList(entities) {
+		const search = this.#multiselect.multiSelect('getSearch');
+
+		const result_entities = new Map();
+
+		if (this.#dashboard_accepted && t('Dashboard').toLowerCase().includes(search)) {
+			result_entities.set('DASHBOARD', {id: 'DASHBOARD', name: t('Dashboard'), source: 'dashboard'})
+		}
+
+		if (this.#widget_accepted) {
+			const widgets = [];
+			for (const widget of this.DASHBOARD_getWidgets()) {
+				if (widget.name.toLowerCase().includes(search)) {
+					widgets.push({...widget, source: 'widget'});
+				}
+			}
+
+			if (widgets.length > 0) {
+				result_entities.set('widgets', {group_label: t('Widgets')});
+				for (const widget of widgets) {
+					result_entities.set(widget.id, widget);
+				}
+			}
+		}
+
+		if (!this.#default_prevented && entities.size > 0) {
+			result_entities.set('entities', {group_label: this.#labels.objects});
+
+			for (const [id, entity] of entities.entries()) {
+				result_entities.set(id, entity);
+			}
+		}
+
+		return result_entities;
+	}
+
 
 	DASHBOARD_getWidgets() {
 		return [

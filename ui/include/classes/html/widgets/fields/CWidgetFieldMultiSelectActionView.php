@@ -31,8 +31,8 @@ class CWidgetFieldMultiSelectActionView extends CWidgetFieldMultiSelectView {
 		return 'actions';
 	}
 
-	protected function getObjectLabel(): string {
-		return $this->field->isMultiple() ? _('Actions') : _('Action');
+	protected function getObjectLabels(): array {
+		return ['object' => _('Action'), 'objects' => _('Actions')];
 	}
 
 	protected function getPopupParameters(): array {

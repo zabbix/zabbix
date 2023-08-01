@@ -31,8 +31,8 @@ class CWidgetFieldMultiSelectItemPrototypeView extends CWidgetFieldMultiSelectVi
 		return 'item_prototypes';
 	}
 
-	protected function getObjectLabel(): string {
-		return $this->field->isMultiple() ? _('Item prototypes') : _('Item prototype');
+	protected function getObjectLabels(): array {
+		return ['object' => _('Item prototype'), 'objects' => _('Item prototypes')];
 	}
 
 	protected function getPopupParameters(): array {

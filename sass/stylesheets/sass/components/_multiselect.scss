@@ -147,6 +147,17 @@
 		}
 	}
 
+	&.multiselect-suggest-grouped {
+		li {
+			padding-left: 25px;
+
+			&.suggest-group {
+				padding-left: 5px;
+				font-weight: bold;
+			}
+		}
+	}
+
 	.suggest-hover {
 		background-color: $action-hover-color;
 	}

@@ -31,8 +31,8 @@ class CWidgetFieldMultiSelectSlaView extends CWidgetFieldMultiSelectView {
 		return 'sla';
 	}
 
-	protected function getObjectLabel(): string {
-		return $this->field->isMultiple() ? _('SLAs') : _('SLA');
+	protected function getObjectLabels(): array {
+		return ['object' => _('SLA'), 'objects' => _('SLAs')];
 	}
 
 	protected function getPopupParameters(): array {

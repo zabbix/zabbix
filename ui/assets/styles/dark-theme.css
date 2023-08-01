@@ -2978,6 +2978,11 @@ output {
     overflow: hidden;
     text-overflow: ellipsis;
     transition: background-color 0.2s ease-out; }
+  .multiselect-suggest.multiselect-suggest-grouped li, .multiselect-suggest-grouped.multiselect-matches li {
+    padding-left: 25px; }
+    .multiselect-suggest.multiselect-suggest-grouped li.suggest-group, .multiselect-suggest-grouped.multiselect-matches li.suggest-group {
+      padding-left: 5px;
+      font-weight: bold; }
   .multiselect-suggest .suggest-hover, .multiselect-matches .suggest-hover {
     background-color: #454545; }
   .multiselect-suggest .suggest-new, .multiselect-matches .suggest-new {
