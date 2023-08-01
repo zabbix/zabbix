@@ -277,67 +277,128 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 		}
 	}
 
-	public function getStatusData() {
+	public function getFilterData() {
 		return [
 			[
 				[
-					'name' => 'Local network',
-					'default status' => DRULE_STATUS_DISABLED,
-					'link' => true,
-					'single' => false
-
+					'filter' => [
+						'Name' => 'network'
+					],
+					'expected' => [
+						'External network',
+						'Local network'
+					]
 				]
 			],
 			[
 				[
-					'name' => 'External network',
-					'default status' => DRULE_STATUS_ACTIVE,
-					'link' => true,
-					'single' => false
+					'filter' => [
+						'Name' => '',
+						'Status' => 'Enabled'
+					],
+					'expected' => [
+						'Discovery rule for update',
+						'External network'
+					]
 				]
 			],
 			[
 				[
-
-					'name' => 'Discovery rule to check delete',
-					'default status' => DRULE_STATUS_DISABLED,
-					'link' => false,
-					'single' => true
+					'filter' => [
+						'Name' => '',
+						'Status' => 'Disabled'
+					],
+					'expected' => [
+						'Disabled discovery rule for update',
+						'Discovery rule to check delete',
+						'Local network'
+					]
 				]
 			],
 			[
 				[
-					'name' => 'Discovery rule for update',
-					'default status' => DRULE_STATUS_ACTIVE,
-					'link' => false,
-					'single' => true
-				]
-			],
-			[
-				[
-					'name' => 'Disabled discovery rule for update',
-					'default status' => DRULE_STATUS_DISABLED,
-					'link' => false,
-					'single' => false
+					'filter' => [
+						'Name' => ''
+					],
+					'expected' => [
+						'Disabled discovery rule for update',
+						'Discovery rule for update',
+						'Discovery rule to check delete',
+						'External network',
+						'Local network'
+					]
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getStatusData
+	 * Check Network Discovery pages filter.
 	 *
-	 * Function which checks that Network Discovery statuses are changed correctly.
+	 * @dataProvider getFilterData
 	 */
-	public function testPageNetworkDiscovery_ChangeStatus($data) {
+	public function testPageNetworkDiscovery_CheckFilter($data) {
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$form->fill(CTestArrayHelper::get($data, 'filter'));
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
+		$this->query('button:Reset')->one()->click();
+		$this->assertTableStats(CDBHelper::getCount($this->SQL));
+	}
+
+
+	/**
+	 *
+	 */
+	public function testPageNetworkDiscovery_SingleLink() {
+
+	}
+
+	/**
+	 *
+	 */
+	public function testPageNetworkDiscovery_SingleActions() {
+
+	}
+
+	/**
+	 *
+	 */
+	public function testPageNetworkDiscovery_MassActions() {
+
+	}
+
+
+
+
+
+
+
+
+
+
+
+	/**
+	 * Function for all possible actions.
+	 *
+	 * @param array $name 		name of Discovery Rule
+	 * @param array $default	default status of Discovery Rule
+	 * @param array $link		if Discovery Rule's status will be changed by link
+	 * @param array $single		single Discovery Rule or no
+	 * @param array $cancel		if cancel action is expected
+	 */
+	protected function allActions($name, $default, $link, $single, $cancel) {
+		$old_hash = CDBHelper::getHash($this->SQL);
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$count = CDBHelper::getCount($this->SQL);
 
-		if ($data['link'] === true) {
-			$row = $table->findRow('Name', $data['name']);
+		if ($link === true) {
+			$row = $table->findRow('Name', $name);
 			$row->getColumn('Status')->query('xpath:.//a')->one()->click();
-			if ($data['default status'] === DRULE_STATUS_DISABLED) {
+			if ($default === DRULE_STATUS_DISABLED) {
 				$this->assertMessage(TEST_GOOD, 'Discovery rule enabled');
 			}
 			else {
@@ -345,10 +406,10 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 			}
 		}
 		else {
-			foreach (['Enable', 'Disable'] as $status) {
-				if ($data['single'] === true) {
+			foreach (['Enable', 'Disable', 'Delete'] as $status) {
+				if ($single === true) {
 					$plural = '';
-					$this->selectTableRows($data['name']);
+					$this->selectTableRows($name);
 					$this->assertSelectedCount(1);
 				}
 				else {
@@ -358,10 +419,32 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 				}
 				$this->query('button:'.$status)->one()->waitUntilClickable()->click();
 				$this->assertEquals($status.' selected discovery rule'.$plural.'?', $this->page->getAlertText());
-				$this->page->acceptAlert();
-				$this->page->waitUntilReady();
-				$this->assertMessage(TEST_GOOD, 'Discovery rule'.$plural.' '.lcfirst($status).'d');
-				CMessageElement::find()->one()->close();
+
+				if ($cancel === true) {
+					$this->page->dismissAlert();
+					$this->page->waitUntilReady();
+
+					if ($single === true) {
+						$this->assertSelectedCount(1);
+					}
+					else {
+						$this->assertSelectedCount($count);
+					}
+					$this->assertEquals($old_hash, CDBHelper::getHash($this->SQL));
+				}
+				else {
+					$this->page->acceptAlert();
+					$this->page->waitUntilReady();
+					$this->assertMessage(TEST_GOOD, 'Discovery rule'.$plural.' '.lcfirst($status).'d');
+					CMessageElement::find()->one()->close();
+					if ($status === 'Delete') {
+						$this->assertSelectedCount(0);
+						$this->assertTableStats($single === false ? 0 : $count - count($name));
+						$this->assertEquals(0, ($single === false) ? $count
+							: CDBHelper::getCount('SELECT NULL FROM drule WHERE name IN ('.CDBHelper::escape($name).')')
+						);
+					}
+				}
 			}
 		}
 	}
@@ -384,13 +467,5 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 
 
 
-
-
-	/**
-	 *
-	 */
-	public function testPageNetworkDiscovery_Filter() {
-
-	}
 
 }
