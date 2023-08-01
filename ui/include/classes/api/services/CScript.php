@@ -937,11 +937,8 @@ class CScript extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$sid = array_key_exists('sessionid', self::$userData)
-			? self::$userData['sessionid']
-			: self::$userData['token'];
-
-		$result = $zabbix_server->executeScript($data['scriptid'], $sid,
+		$result = $zabbix_server->executeScript($data['scriptid'],
+			array_key_exists('sessionid', self::$userData) ? self::$userData['sessionid'] : self::$userData['token'],
 			$is_event ? null : $data['hostid'],
 			$is_event ? $data['eventid'] : null
 		);
