@@ -2456,6 +2456,12 @@ static int	snmp_task_process(short event, void *data, int *fd)
 			netsnmp_session		*session = snmp_sess_session(snmp_context->ssp);
 			struct snmp_secmod_def	*sptr = find_sec_mod(session->securityModel);
 
+			if (0 != session->engineBoots || 0 != session->engineTime)
+			{
+				set_enginetime(session->securityEngineID, session->securityEngineIDLen,
+						session->engineBoots, session->engineTime, TRUE);
+			}
+
 			if (NULL != sptr && NULL != sptr->post_probe_engineid)
 			{
 				if (SNMPERR_SUCCESS != (*sptr->post_probe_engineid)(snmp_context->ssp, session))
