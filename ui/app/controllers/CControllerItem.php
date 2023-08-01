@@ -194,7 +194,7 @@ abstract class CControllerItem extends CController {
 			'master_itemid' => 0,
 			'name' => '',
 			'output_format' => DB::getDefault('items', 'output_format'),
-			'parameters' => [['name' => '', 'value' => '']],
+			'parameters' => [],
 			'params_ap' => DB::getDefault('items', 'params'),
 			'params_es' => DB::getDefault('items', 'params'),
 			'params_f' => DB::getDefault('items', 'params'),
@@ -387,6 +387,18 @@ abstract class CControllerItem extends CController {
 
 			$input['tags'] = $tags;
 		}
+
+		$parameters = [];
+
+		foreach ($input['parameters'] as $parameter) {
+			if ($parameter['name'] === '' || $parameter['value'] === '') {
+				continue;
+			}
+
+			$parameters[] = $parameter;
+		}
+
+		$input['parameters'] = $parameters;
 
 		$input = CArrayHelper::renameKeys($input, $field_map);
 
