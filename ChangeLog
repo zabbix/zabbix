@@ -1,15 +1,38 @@
+Changes for 6.0.21rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.20
+
+6.0.20rc1 was released as 6.0.20 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.20rc1
 
 New features:
+.........T [ZBXNEXT-8481] added PostgreSQL by ODBC template (drasikhov)
+.........T [ZBXNEXT-8561] added nodata trigger to remote Zabbix proxy and server health templates (drasikhov)
+.........T [ZBXNEXT-8482] added integration with OpenStack Nova (knaglis)
+..F....... [ZBXNEXT-8451] disabled spell checking for nondescriptive textareas (dfofanovs)
+.........T [ZBXNEXT-8505] added Cisco SD-WAN templates (aiantsen)
 .........T [ZBXNEXT-7944] excluded edgeupdate service from services discovery in Windows by Zabbix agent templates (drasikhov)
 .........T [ZBXNEXT-8422] added AWS ECS templates (egordymov)
 
 Bug fixes:
+..F....... [ZBX-22822] fixed displaying the correct threshold color in "Top hosts" widget when value exceeds maximum (Ivo)
+..F....... [ZBX-22777] fixed item test form sending incorrectly resolved macros to server if item uses SNMP interface (Ivo)
+...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
+A......... [ZBX-23112] fixed runtime errors in the inheritance of the trigger and trigger prototype dependencies (Sasha)
+A......... [ZBX-22539] fixed SLI calculation for days with daylight-saving-time transitions (averza)
+A......... [ZBX-22814] fixed PHP runtime errors in API trigger.get method when using "expandComment" option (Ivo)
 ........S. [ZBX-23049] fixed default condition for log item macro resolution (kprutkovs)
 .........T [ZBX-21909] updated setup section in README for PHP-FPM templates to include configuration example for Apache (drasikhov)
 ...G...... [ZBX-21547] fixed reading of non-UTF-8 encoded files in Zabbix agent 2 (arimdjonoks)
 ........S. [ZBX-20148] fixed the issue with housekeeper failing to delete some of the events that required deletion (mprihodko)
-..F....... [ZBX-21970] fixed console error in map nav tree widget; disabled add button on a 10th depth level (acikuns, ashubin)
+..F....... [ZBX-21970] fixed console error in "Map navigation tree" widget; disabled add button on a 10th depth level (acikuns, ashubin)
 A......... [ZBX-19393] fixed undefined index errors in configuration.importcompare (agriscenko)
 ..F....... [ZBX-22290] fixed generation of double page headers when general warning appears (epulke)
 ...G...... [ZBX-21845] fixed Zabbix agent 2 systemd plugin failing with newer dbus (esneiders)
@@ -2641,6 +2664,7 @@ Changes for 5.0.37rc1
 New features:
 
 Bug fixes:
+...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
 ...G...... [ZBX-22830] fixed free bytes calculation for temporary tablespace in Oracle Zabbix agent 2 plugin (esneiders)
 
 --------------------------------------------------------------------------------
