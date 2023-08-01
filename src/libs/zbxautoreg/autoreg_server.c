@@ -46,7 +46,7 @@ static void	autoreg_process_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_str_t	hosts;
-	zbx_uint64_t		current_proxy_hostid;
+	zbx_uint64_t		current_proxyid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
@@ -83,9 +83,9 @@ static void	autoreg_process_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 					continue;
 
 				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
-				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
+				ZBX_DBROW2UINT64(current_proxyid, row[2]);
 
-				if (current_proxy_hostid != proxyid || SUCCEED == zbx_db_is_null(row[8]) ||
+				if (current_proxyid != proxyid || SUCCEED == zbx_db_is_null(row[8]) ||
 						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
 						autoreg_host->flag != atoi(row[7]))
 				{

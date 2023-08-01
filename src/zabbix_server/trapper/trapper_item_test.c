@@ -462,7 +462,7 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	zbx_json_init(&json, 1024);
 
-	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXY_HOSTID, tmp, sizeof(tmp), NULL))
+	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
 	else
 		proxyid = 0;

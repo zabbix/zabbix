@@ -701,6 +701,36 @@ static int	DBpatch_6050062(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050063(void)
+{
+#define TM_STATUS_DONE		3
+#define TM_STATUS_EXPIRED	4
+#define TM_DATA_TYPE_TEST_ITEM	0
+#define TM_DATA_TYPE_PROXYIDS	2
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update task t set status=%i"
+			" where t.status not in (%i,%i) and"
+			" exists ("
+				" select null"
+				" from task_data td"
+				" where t.taskid=td.taskid"
+				" and td.type in (%i,%i)"
+			")", TM_STATUS_EXPIRED, TM_STATUS_DONE, TM_STATUS_EXPIRED, TM_DATA_TYPE_TEST_ITEM,
+					TM_DATA_TYPE_PROXYIDS))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+#undef TM_STATUS_DONE
+#undef TM_STATUS_EXPIRED
+#undef TM_DATA_TYPE_TEST_ITEM
+#undef TM_DATA_TYPE_PROXYIDS
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -770,5 +800,6 @@ DBPATCH_ADD(6050059, 0, 1)
 DBPATCH_ADD(6050060, 0, 1)
 DBPATCH_ADD(6050061, 0, 1)
 DBPATCH_ADD(6050062, 0, 1)
+DBPATCH_ADD(6050063, 0, 1)
 
 DBPATCH_END()

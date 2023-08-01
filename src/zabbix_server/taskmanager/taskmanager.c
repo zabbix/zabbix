@@ -869,10 +869,10 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		return;
 	}
 
-	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXY_HOSTIDS, &jp_data))
+	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXYIDS, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload task data: field "
-				ZBX_PROTO_TAG_PROXY_HOSTIDS " not found");
+				ZBX_PROTO_TAG_PROXYIDS " not found");
 		return;
 	}
 
@@ -1178,11 +1178,11 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				tm_process_diaginfo(taskid, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
-			case ZBX_TM_DATA_TYPE_PROXY_HOSTIDS:
+			case ZBX_TM_DATA_TYPE_PROXYIDS:
 				tm_process_proxy_config_reload_task(rtc, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
-			case ZBX_TM_DATA_TYPE_PROXY_HOSTNAME:
+			case ZBX_TM_DATA_TYPE_PROXYNAME:
 				tm_process_passive_proxy_cache_reload_request(rtc, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
