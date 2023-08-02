@@ -144,6 +144,8 @@ $table->setFooter(new CCol(
 		->setEnabled(!$data['readonly'])
 ));
 
+$label = '';
+
 if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
 	switch ($data['source']) {
 		case 'trigger':
@@ -156,13 +158,11 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 		case 'httptest':
 			$btn_labels = [_('Scenario tags'), _('Inherited and scenario tags')];
 			$on_change = 'this.form.submit()';
-			$label = '';
 			break;
 
 		case 'item':
 			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
 			$on_change = 'this.form.submit()';
-			$label = '';
 			break;
 	}
 
