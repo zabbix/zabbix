@@ -162,18 +162,19 @@ $formgrid = (new CFormGrid())
 						))->setColSpan(3)
 					),
 				new CTemplateTag('parameter-row-tmpl', (new CRow([
-						(new CTextBox('parameters[#{rowNum}][name]', '#{name}', false,
+						(new CTextBox('parameters[#{rowNum}][name]', '#{name}', $data['readonly'],
 							DB::getFieldLength('item_parameter', 'name')
 						))
 							->setAttribute('style', 'width: 100%;')
 							->removeId(),
-						(new CTextBox('parameters[#{rowNum}][value]', '#{value}', false,
+						(new CTextBox('parameters[#{rowNum}][value]', '#{value}', $data['readonly'],
 							DB::getFieldLength('item_parameter', 'value')
 						))
 							->setAttribute('style', 'width: 100%;')
 							->removeId(),
 						(new CButtonLink(_('Remove')))
 							->addClass('element-table-remove')
+							->setEnabled(!$data['readonly'])
 					]))->addClass('form_row')
 				)
 			]))
