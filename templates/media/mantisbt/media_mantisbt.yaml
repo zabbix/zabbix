@@ -91,7 +91,6 @@ zabbix_export:
                 var response,
                     request = new HttpRequest();
         
-                request.addHeader('User-Agent: Zabbix server');
                 request.addHeader('Content-Type: application/json');
                 request.addHeader('Authorization: ' + Mantisbt.params.token);
         
