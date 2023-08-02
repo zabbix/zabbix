@@ -209,7 +209,6 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 				]
 			]
 		]);
-		$druleid = CDataHelper::getIds('name');
 	}
 
 	/**
@@ -311,7 +310,7 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 					'expected' => [
 						'Local network',
 						'Discovery rule to check delete',
-						'Disabled discovery rule for update',
+						'Disabled discovery rule for update'
 					]
 				]
 			],
@@ -438,10 +437,10 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 					CMessageElement::find()->one()->close();
 					if ($status === 'Delete') {
 						$this->assertSelectedCount(0);
-						$this->assertTableStats($single === false ? 0 : $count - 1);
-						$this->assertEquals(0, ($single === false) ? CDBHelper::getCount('SELECT NULL FROM drules')
-							: CDBHelper::getCount('SELECT NULL FROM drules WHERE name IN ('.CDBHelper::escape($name).')')
-
+						$this->assertTableStats($single === true ? $count - 1 : 0);
+						$this->assertEquals(0, ($single === true)
+							? CDBHelper::getCount('SELECT NULL FROM drules WHERE name IN ('.CDBHelper::escape($name).')')
+							: CDBHelper::getCount('SELECT NULL FROM drules')
 						);
 					}
 				}
