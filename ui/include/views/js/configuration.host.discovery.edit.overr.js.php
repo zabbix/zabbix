@@ -828,7 +828,7 @@
 
 		var form_data = this.$form.serializeJSON();
 
-		if (form_data.overrides_filters === undefined || Object.keys(form_data.overrides_filters).length <= 1) {
+		if (!('overrides_filters' in form_data) || Object.keys(form_data.overrides_filters).length <= 1) {
 			delete form_data.overrides_formula;
 			delete form_data.overrides_evaltype;
 		}
