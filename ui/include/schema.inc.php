@@ -1905,6 +1905,35 @@ return [
 			]
 		]
 	],
+	'optag' => [
+		'key' => 'optagid',
+		'fields' => [
+			'optagid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'operations',
+				'ref_field' => 'operationid'
+			],
+			'tag' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			]
+		]
+	],
 	'opmessage' => [
 		'key' => 'operationid',
 		'fields' => [

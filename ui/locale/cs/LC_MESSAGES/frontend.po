@@ -972,6 +972,10 @@ msgstr "Přidat ze šablony"
 msgid "Add host"
 msgstr "Přidat hostitele"
 
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
+
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
@@ -17458,6 +17462,10 @@ msgstr "Odstranit ze skupin"
 msgid "Remove host"
 msgstr "Smazat hostitele"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -19718,6 +19726,10 @@ msgstr "Super admin"
 msgid "Support"
 msgstr "Podpora"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr "Podpora pro staré číselné typy je zastaralá. Prosím aktualizujte číselné hodnoty rozšířeného rozsahu."
@@ -20680,6 +20692,13 @@ msgstr "Dnes prozatím"
 msgid "Top"
 msgstr "Nahoře"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "Prvních N"
@@ -20687,6 +20706,10 @@ msgstr "Prvních N"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "Top hosté"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20897,6 +20920,10 @@ msgid_plural "Triggers copied"
 msgstr[0] "Spouštěč zkopírován"
 msgstr[1] "Spouštěče zkopírovány"
 msgstr[2] "Spouštěče zkopírovány"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23288,6 +23315,10 @@ msgstr "Varování"
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
 msgstr "Varovná zpráva"
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."

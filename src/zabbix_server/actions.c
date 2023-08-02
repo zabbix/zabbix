@@ -2694,9 +2694,9 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_uint64_t		groupid, templateid;
-	zbx_vector_uint64_t	lnk_templateids, del_templateids,
-				new_groupids, del_groupids;
+	zbx_uint64_t		groupid, templateid, optagid;
+	zbx_vector_uint64_t	lnk_templateids, del_templateids, new_groupids, del_groupids, new_optagids,
+			del_optagids;
 	int			i;
 	zbx_config_t		cfg;
 
@@ -2706,13 +2706,16 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_create(&del_templateids);
 	zbx_vector_uint64_create(&new_groupids);
 	zbx_vector_uint64_create(&del_groupids);
+	zbx_vector_uint64_create(&new_optagids);
+	zbx_vector_uint64_create(&del_optagids);
 
 	result = zbx_db_select(
-			"select o.operationtype,g.groupid,t.templateid,oi.inventory_mode"
+			"select o.operationtype,g.groupid,t.templateid,oi.inventory_mode,ot.optagid"
 			" from operations o"
 				" left join opgroup g on g.operationid=o.operationid"
 				" left join optemplate t on t.operationid=o.operationid"
 				" left join opinventory oi on oi.operationid=o.operationid"
+				" left join optag ot on ot.operationid=o.operationid"
 			" where o.actionid=" ZBX_FS_UI64
 			" order by o.operationid",
 			actionid);
@@ -2730,6 +2733,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 		ZBX_DBROW2UINT64(groupid, row[1]);
 		ZBX_DBROW2UINT64(templateid, row[2]);
 		inventory_mode = (SUCCEED == zbx_db_is_null(row[3]) ? 0 : atoi(row[3]));
+		ZBX_DBROW2UINT64(optagid, row[4]);
 
 		switch (operationtype)
 		{
@@ -2780,6 +2784,14 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 			case ZBX_OPERATION_TYPE_HOST_INVENTORY:
 				op_host_inventory_mode(event, &cfg, inventory_mode);
 				break;
+			case ZBX_OPERATION_TYPE_HOST_TAGS_ADD:
+				if (0 != optagid)
+					zbx_vector_uint64_append(&new_optagids, optagid);
+				break;
+			case ZBX_OPERATION_TYPE_HOST_TAGS_REMOVE:
+				if (0 != optagid)
+					zbx_vector_uint64_append(&del_optagids, optagid);
+				break;
 			default:
 				;
 		}
@@ -2814,10 +2826,15 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 		op_groups_del(event, &del_groupids);
 	}
 
+	if (0 != new_optagids.values_num || 0 != del_optagids.values_num)
+		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids);
+
 	zbx_vector_uint64_destroy(&del_groupids);
 	zbx_vector_uint64_destroy(&new_groupids);
 	zbx_vector_uint64_destroy(&del_templateids);
 	zbx_vector_uint64_destroy(&lnk_templateids);
+	zbx_vector_uint64_destroy(&new_optagids);
+	zbx_vector_uint64_destroy(&del_optagids);
 
 	zbx_audit_flush();
 
