@@ -146,7 +146,7 @@ struct zbx_snmp_context
 {
 	void				*arg;
 	void				*arg_action;
-	zbx_dc_tem_context_t		item;
+	zbx_dc_item_context_t		item;
 	zbx_snmp_sess_t			ssp;
 	int				snmp_max_repetitions;
 	char				*results;
@@ -2525,7 +2525,7 @@ stop:
 	return ZBX_ASYNC_TASK_STOP;
 }
 
-zbx_dc_tem_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context)
+zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context)
 {
 	return &snmp_context->item;
 }

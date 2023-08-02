@@ -113,7 +113,7 @@ typedef struct
 	int			ret;
 	AGENT_RESULT		result;
 }
-zbx_dc_tem_context_t;
+zbx_dc_item_context_t;
 
 #define ZBX_HOST_IPMI_USERNAME_LEN	16
 #define ZBX_HOST_IPMI_USERNAME_LEN_MAX	(ZBX_HOST_IPMI_USERNAME_LEN + 1)

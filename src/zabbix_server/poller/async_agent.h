@@ -34,7 +34,7 @@ zbx_zabbix_agent_step_t;
 
 typedef struct
 {
-	zbx_dc_tem_context_t	item;
+	zbx_dc_item_context_t	item;
 	void			*arg;
 	void			*arg_action;
 	zbx_socket_t		s;
