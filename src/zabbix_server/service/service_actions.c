@@ -18,7 +18,7 @@
 **/
 
 #include "service_actions.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "zbxnum.h"
 

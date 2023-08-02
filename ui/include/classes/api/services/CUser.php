@@ -40,6 +40,11 @@ class CUser extends CApiService {
 	protected $tableAlias = 'u';
 	protected $sortColumns = ['userid', 'username'];
 
+	public const OUTPUT_FIELDS = ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout',
+		'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone',
+		'roleid', 'userdirectoryid', 'ts_provisioned'
+	];
+
 	protected const PROVISIONED_FIELDS = ['username', 'name', 'surname', 'usrgrps', 'medias', 'roleid', 'passwd'];
 
 	/**

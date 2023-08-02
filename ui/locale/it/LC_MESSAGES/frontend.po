@@ -950,6 +950,10 @@ msgstr ""
 msgid "Add host"
 msgstr "Aggiungi host"
 
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
+
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
@@ -2385,6 +2389,31 @@ msgid_plural "Cannot copy graphs"
 msgstr[0] "Non è possibile copiare il grafico"
 msgstr[1] "Non è possibile copiare i grafici"
 
+#: include/classes/helpers/CGraphHelper.php:74
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:91
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:92
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:96
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:97
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
@@ -2407,9 +2436,24 @@ msgid_plural "Cannot copy triggers"
 msgstr[0] "Non è possibile copiare il trigger"
 msgstr[1] "Non è possibile copiare i trigger"
 
+#: include/classes/helpers/CTriggerGeneralHelper.php:196
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CTriggerGeneralHelper.php:197
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
+msgstr ""
+
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr ""
+
+#: include/classes/helpers/CTriggerHelper.php:75
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
 msgstr ""
 
 #: include/triggers.inc.php:226
@@ -3267,6 +3311,11 @@ msgstr ""
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:834
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
@@ -3286,6 +3335,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:835
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:711
@@ -3329,6 +3383,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:840
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
@@ -3348,6 +3407,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:726
@@ -8932,6 +8996,16 @@ msgstr ""
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Il grafico \"%1$s\" esiste già su \"%2$s\"."
 
+#: include/classes/api/services/CGraph.php:479
+#, c-format
+msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraph.php:480
+#, c-format
+msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:36
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
@@ -8964,6 +9038,16 @@ msgstr "Grafico rimosso"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:167
 msgid "Graph prototype"
 msgstr "Prototipo grafico"
+
+#: include/classes/api/services/CGraphPrototype.php:470
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraphPrototype.php:471
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
@@ -12335,6 +12419,10 @@ msgstr ""
 #: include/views/configuration.host.discovery.edit.php:925
 #: include/views/configuration.host.discovery.edit.php:978
 msgid "LLD macros"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:229
+msgid "LLD rule"
 msgstr ""
 
 #: include/classes/api/services/CItemGeneralOld.php:700
@@ -17217,6 +17305,10 @@ msgstr "Rimuovi dai gruppi host"
 msgid "Remove host"
 msgstr "Rimuovi host"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -19470,6 +19562,10 @@ msgstr ""
 msgid "Support"
 msgstr "Supporto"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr ""
@@ -20429,12 +20525,23 @@ msgstr ""
 msgid "Top"
 msgstr "In alto"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr ""
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
+msgstr ""
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
 msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
@@ -20645,6 +20752,10 @@ msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "Trigger copiato"
 msgstr[1] "Trigger copiati"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23028,6 +23139,10 @@ msgstr "Attenzione"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
 msgstr ""
@@ -23773,6 +23888,10 @@ msgstr ""
 msgid "a string, number or null value is expected"
 msgstr ""
 
+#: include/classes/api/services/CDiscoveryRule.php:1718
+msgid "a template ID is expected"
+msgstr ""
+
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:130
@@ -24256,6 +24375,10 @@ msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:3026
+msgid "cannot delete inherited LLD rule"
 msgstr ""
 
 #: include/classes/api/services/CItem.php:899
@@ -25073,6 +25196,11 @@ msgstr ""
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "lunghezza carattari minima è %1$s"
+
+#: include/classes/api/services/CDiscoveryRule.php:1630
+#, c-format
+msgid "missing filter condition \"%1$s\""
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "mod() - Division remainder"

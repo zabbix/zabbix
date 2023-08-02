@@ -122,7 +122,7 @@ Additional points to consider:
 |Etcd: Server version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.server.version,#1)<>last(/Etcd by HTTP/etcd.server.version,#2) and length(last(/Etcd by HTTP/etcd.server.version))>0`|Info|**Manual close**: Yes|
 |Etcd: Cluster version has changed|<p>Etcd version has changed. Acknowledge to close the problem manually.</p>|`last(/Etcd by HTTP/etcd.cluster.version,#1)<>last(/Etcd by HTTP/etcd.cluster.version,#2) and length(last(/Etcd by HTTP/etcd.cluster.version))>0`|Info|**Manual close**: Yes|
 |Etcd: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Etcd by HTTP/etcd.uptime)<10m`|Info|**Manual close**: Yes|
-|Etcd: Current number of open files is too high|<p>Heavy usage of a file descriptor (i.e., near the limit of the process's file descriptor) indicates a potential file descriptor exhaustion issue.If the file descriptors are exhausted, `etcd` may panic because it cannot create new WAL files.</p>|`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}`|Warning||
+|Etcd: Current number of open files is too high|<p>Heavy usage of a file descriptor (i.e., near the limit of the process's file descriptor) indicates a potential file descriptor exhaustion issue.<br>If the file descriptors are exhausted, `etcd` may panic because it cannot create new WAL files.</p>|`min(/Etcd by HTTP/etcd.open.fds,5m)/last(/Etcd by HTTP/etcd.max.fds)*100>{$ETCD.OPEN.FDS.MAX.WARN}`|Warning||
 
 ### LLD rule gRPC codes discovery
 

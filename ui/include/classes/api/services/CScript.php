@@ -1364,9 +1364,10 @@ class CScript extends CApiService {
 
 		// Adding actions.
 		if ($options['selectActions'] !== null && $options['selectActions'] !== API_OUTPUT_COUNT) {
-			foreach ($result as $scriptid => &$row) {
+			foreach ($result as &$row) {
 				$row['actions'] = [];
 			}
+			unset($row);
 
 			$action_scriptids = [];
 

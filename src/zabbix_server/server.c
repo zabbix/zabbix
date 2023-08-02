@@ -2007,6 +2007,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
+#ifdef HAVE_ORACLE
+	zabbix_log(LOG_LEVEL_INFORMATION, "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in "
+			"future versions");
+#endif
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())
 	{
