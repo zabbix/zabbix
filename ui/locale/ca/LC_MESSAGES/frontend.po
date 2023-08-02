@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-07-18 09:32+0000\n"
+"PO-Revision-Date: 2023-07-26 13:49+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -948,6 +948,10 @@ msgstr "Afegir des d'una plantilla"
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Afegir equip"
+
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr "Afegeix etiquetes d'equip"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -2387,27 +2391,27 @@ msgstr[1] "No es poden pas copiar els gràfics"
 #: include/classes/helpers/CGraphHelper.php:74
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
-msgstr ""
+msgstr "No es pot copiar el gràfic \"%1$s\", perquè té elements dels equips múltiples."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:91
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "No es pot copiar el gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a l'equip \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:92
 #, c-format
 msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "No es pot copiar el gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a la plantilla \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:96
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
-msgstr ""
+msgstr "No es pot copiar el prototip de gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a l'equip \"%3$s\"."
 
 #: include/classes/helpers/CGraphGeneralHelper.php:97
 #, c-format
 msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
-msgstr ""
+msgstr "No es pot copiar el prototip de gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a la plantilla \"%3$s\"."
 
 #: items.php:965
 msgid "Cannot copy item"
@@ -2434,12 +2438,12 @@ msgstr[1] "No es poden pas copiar els triggers"
 #: include/classes/helpers/CTriggerGeneralHelper.php:196
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
-msgstr ""
+msgstr "No es pot copiar el trigger \"%1$s\" sense el trigger \"%2$s\", del que depèn, a l'equip \"%3$s\"."
 
 #: include/classes/helpers/CTriggerGeneralHelper.php:197
 #, c-format
 msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
-msgstr ""
+msgstr "No es pot copiar el trigger \"%1$s\" sense el trigger \"%2$s\", del que depèn, a la plantilla \"%3$s\"."
 
 #: include/triggers.inc.php:246
 #, c-format
@@ -2449,7 +2453,7 @@ msgstr "No es pot copiar el trigger \"%1$s\", perquè té diversos equips a l'ex
 #: include/classes/helpers/CTriggerHelper.php:75
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
-msgstr ""
+msgstr "No es pot copiar el trigger \"%1$s\", perquè té diverses plantilles a l'expressió."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -3306,7 +3310,7 @@ msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla 
 #: include/classes/api/services/CItemGeneral.php:834
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
@@ -3332,7 +3336,7 @@ msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla 
 #: include/classes/api/services/CItemGeneral.php:835
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
@@ -3378,7 +3382,7 @@ msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plan
 #: include/classes/api/services/CItemGeneral.php:840
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas heretar el prototip d'element amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
@@ -3404,7 +3408,7 @@ msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plan
 #: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "No es pot pas heretar el prototip d'element amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:726
 #, c-format
@@ -9010,12 +9014,12 @@ msgstr "El gràfic \"%1$s\" ja existeix a \"%2$s\"."
 #: include/classes/api/services/CGraph.php:479
 #, c-format
 msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "El gràfic \"%1$s\" ja existeix a l'equip \"%2$s\"."
 
 #: include/classes/api/services/CGraph.php:480
 #, c-format
 msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "El gràfic \"%1$s\" ja existeix a la plantilla \"%2$s\"."
 
 #: include/classes/api/services/CGraph.php:36
 #, c-format
@@ -9053,12 +9057,12 @@ msgstr "Prototip de gràfic"
 #: include/classes/api/services/CGraphPrototype.php:470
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
-msgstr ""
+msgstr "El prototip de gràfic \"%1$s\" ja existeix a la regla LLD amb la clau \"%2$s\" de l'equip \"%3$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #, c-format
 msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
-msgstr ""
+msgstr "El prototip de gràfic \"%1$s\" ja existeix a la regla LLD amb la clau \"%2$s\" de la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
@@ -12434,7 +12438,7 @@ msgstr "Macros LLD"
 
 #: app/controllers/CControllerAuditLogList.php:229
 msgid "LLD rule"
-msgstr ""
+msgstr "Regla LLD"
 
 #: include/classes/api/services/CItemGeneralOld.php:700
 msgid "LLD rule with the same UUID already exists"
@@ -17315,6 +17319,10 @@ msgstr "Esborra dels grups d'equips"
 msgid "Remove host"
 msgstr "Esborra l'equip"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr "Esborra etiquetes d'equip"
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -19567,6 +19575,10 @@ msgstr "Super administrador"
 msgid "Support"
 msgstr "Suport"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr "El suport per al tipus numèric antic és obsolet. Si et plau, actualitza a valors numèrics per a un rang estès."
@@ -20526,6 +20538,13 @@ msgstr "El que duem de dia"
 msgid "Top"
 msgstr "Top"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr "Els 100 triggers principals"
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "Top N"
@@ -20533,6 +20552,10 @@ msgstr "Top N"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "Els equips top"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr "Triggers principals"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20742,6 +20765,10 @@ msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "Trigger copiat"
 msgstr[1] "Triggers copiats"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr "Recompte de triggers"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23125,6 +23152,10 @@ msgstr "Avís"
 msgid "Warning message"
 msgstr "Missatge d'avís"
 
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
 msgstr "Avís! No es pot pas recuperar la versió de la base de dades."
@@ -23878,7 +23909,7 @@ msgstr "s'espera una cadena, un nombre o un valor nul"
 
 #: include/classes/api/services/CDiscoveryRule.php:1718
 msgid "a template ID is expected"
-msgstr ""
+msgstr "s'espera un ID de plantilla"
 
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
@@ -24367,7 +24398,7 @@ msgstr "no es pot convertir a JSON, el valor del resultat és massa llarg"
 
 #: include/classes/api/services/CDiscoveryRule.php:3026
 msgid "cannot delete inherited LLD rule"
-msgstr ""
+msgstr "No es pot pas esborrar la regla LLD heretada"
 
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
@@ -25188,7 +25219,7 @@ msgstr "la longitud mínima és de %1$s caràcters"
 #: include/classes/api/services/CDiscoveryRule.php:1630
 #, c-format
 msgid "missing filter condition \"%1$s\""
-msgstr ""
+msgstr "hi manca la condició de filtre \"%1$s\""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "mod() - Division remainder"
