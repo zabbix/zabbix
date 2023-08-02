@@ -640,6 +640,10 @@ class CConfigurationExportBuilder {
 				'overrides' => self::formatLldOverrides($discoveryRule['overrides'])
 			];
 
+			if (!$data['filter']['conditions']) {
+				unset($data['filter']);
+			}
+
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
 			}
@@ -685,9 +689,7 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	private static function formatLldFilter(array $filter): array {
-		if (array_key_exists('conditions', $filter) && $filter['conditions']) {
-			$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
-		}
+		$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
 
 		return $filter;
 	}
@@ -717,8 +719,10 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($overrides, ['step']);
 
 		foreach ($overrides as &$override) {
-			if (array_key_exists('filter', $override)) {
-				$override['filter'] = self::formatLldFilter($override['filter']);
+			$override['filter'] = self::formatLldFilter($override['filter']);
+
+			if (!$override['filter']['conditions']) {
+				unset($override['filter']);
 			}
 
 			CArrayHelper::sort($override['operations'], ['operationobject', 'operator', 'value']);
@@ -1421,47 +1425,44 @@ class CConfigurationExportBuilder {
 	 */
 	private static function sortWidgetFields(array &$fields): void {
 		usort($fields, static function(array $widget_field_a, array $widget_field_b): int {
-			$compare_fields = ['name', 'type'];
+			$comparison = strnatcasecmp($widget_field_a['name'], $widget_field_b['name']);
+
+			if ($comparison != 0) {
+				return $comparison;
+			}
+
+			$comparison = strnatcasecmp($widget_field_a['type'], $widget_field_b['type']);
+
+			if ($comparison != 0) {
+				return $comparison;
+			}
 
 			switch ($widget_field_a['type']) {
 				case ZBX_WIDGET_FIELD_TYPE_HOST:
-					$compare_fields['value'] = 'host';
+					$value_fields = ['host'];
 					break;
 
 				case ZBX_WIDGET_FIELD_TYPE_ITEM:
 				case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-					$compare_fields['value'] = ['host', 'key'];
+					$value_fields = ['host', 'key'];
 					break;
 
 				case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 				case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-					$compare_fields['value'] = ['host', 'name'];
+					$value_fields = ['host', 'name'];
 					break;
 
 				default:
-					$compare_fields[] = 'value';
+					return strnatcasecmp($widget_field_a['value'], $widget_field_b['value']);
 			}
 
-			foreach ($compare_fields as $key => $compare_field) {
-				if (is_array($compare_field)) {
-					$_compare_fields = $compare_field;
+			foreach ($value_fields as $value_field) {
+				$comparison = strnatcasecmp($widget_field_a['value'][$value_field],
+					$widget_field_b['value'][$value_field]
+				);
 
-					foreach ($_compare_fields as $compare_field) {
-						$comparison = strnatcasecmp($widget_field_a[$key][$compare_field],
-							$widget_field_b[$key][$compare_field]
-						);
-
-						if ($comparison != 0) {
-							return $comparison;
-						}
-					}
-				}
-				else {
-					$comparison = strnatcasecmp($widget_field_a[$compare_field], $widget_field_b[$compare_field]);
-
-					if ($comparison != 0) {
-						return $comparison;
-					}
+				if ($comparison != 0) {
+					return $comparison;
 				}
 			}
 
