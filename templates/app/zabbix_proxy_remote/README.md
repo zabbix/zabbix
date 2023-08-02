@@ -5,10 +5,11 @@
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.PROXY.ADDRESS}|<p>IP/DNS/network mask list of proxies to be remotely queried (default is 127.0.0.1).</p>|`127.0.0.1`|
-|{$ZABBIX.PROXY.PORT}|<p>Port of proxy to be remotely queried (default is 10051).</p>|`10051`|
+|{$ZABBIX.PROXY.ADDRESS}|<p>IP/DNS/network mask list of proxies to be remotely queried (default is 127.0.0.1).</p>||
+|{$ZABBIX.PROXY.PORT}|<p>Port of proxy to be remotely queried (default is 10051).</p>||
 |{$ZABBIX.PROXY.UTIL.MAX}|<p>Maximum average percentage of time processes busy in the last minute (default is 75).</p>|`75`|
 |{$ZABBIX.PROXY.UTIL.MIN}|<p>Minimum average percentage of time processes busy in the last minute (default is 65).</p>|`65`|
+|{$ZABBIX.PROXY.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expression.</p>|`5m`|
 
 ### Items
 
@@ -85,6 +86,7 @@
 |Remote Zabbix proxy: Utilization of unreachable poller processes is high||`avg(/Remote Zabbix proxy health/process.unreachable_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}`|Average|**Manual close**: Yes|
 |Remote Zabbix proxy: Utilization of vmware collector processes is high||`avg(/Remote Zabbix proxy health/process.vmware_collector.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}`|Average|**Manual close**: Yes|
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache|<p>Consider increasing CacheSize in the zabbix_server.conf configuration file.</p>|`max(/Remote Zabbix proxy health/rcache.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
+|Remote Zabbix proxy: Failed to fetch stats data|<p>Zabbix has not received statistics data for {$ZABBIX.PROXY.NODATA_TIMEOUT}.</p>|`nodata(/Remote Zabbix proxy health/rcache.buffer.pused,{$ZABBIX.PROXY.NODATA_TIMEOUT})=1`|Warning||
 |Remote Zabbix proxy: Version has changed|<p>Zabbix proxy version has changed. Acknowledge to close the problem manually.</p>|`last(/Remote Zabbix proxy health/version,#1)<>last(/Remote Zabbix proxy health/version,#2) and length(last(/Remote Zabbix proxy health/version))>0`|Info|**Manual close**: Yes|
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache|<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</p>|`max(/Remote Zabbix proxy health/vmware.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history cache|<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</p>|`max(/Remote Zabbix proxy health/wcache.history.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
