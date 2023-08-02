@@ -14057,9 +14057,9 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
  *                                                                            *
  * Purpose: reschedules items that are processed by the target daemon         *
  *                                                                            *
- * Parameter: itemids       - [IN] the item identifiers                       *
- *            nextcheck     - [IN] the scheduled time                         *
- *            proxyids - [OUT] the proxyids of the given itemids              *
+ * Parameter: itemids       - [IN]  the item identifiers                      *
+ *            nextcheck     - [IN]  the scheduled time                        *
+ *            proxyids      - [OUT] the proxyids of the given itemids         *
  *                                  (optional, can be NULL)                   *
  *                                                                            *
  * Comments: On server this function reschedules items monitored by server.   *
@@ -15622,7 +15622,7 @@ void	zbx_dc_update_received_revision(zbx_uint64_t revision)
  *                                                                            *
  * Purpose: get hosts/httptests for proxy configuration update                *
  *                                                                            *
- * Parameters: proxyid    - [IN]                                         *
+ * Parameters: proxyid         - [IN]                                         *
  *             revision        - [IN] the current proxy configuration revision*
  *             hostids         - [OUT] the monitored hosts                    *
  *             updated_hostids - [OUT] the hosts updated since specified      *
