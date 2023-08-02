@@ -2206,16 +2206,12 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 			stat = STAT_TIMEOUT;
 			break;
 		case NETSNMP_CALLBACK_OP_SEND_FAILED:
-			ZBX_FALLTHROUGH;
 		case NETSNMP_CALLBACK_OP_DISCONNECT:
-			ZBX_FALLTHROUGH;
 		case NETSNMP_CALLBACK_OP_SEC_ERROR:
 			stat = STAT_ERROR;
 			break;
 		case NETSNMP_CALLBACK_OP_CONNECT:
-			ZBX_FALLTHROUGH;
 		case NETSNMP_CALLBACK_OP_RESEND:
-			ZBX_FALLTHROUGH;
 		default:
 			goto out;
 	}
@@ -2288,9 +2284,13 @@ static void	snmp_bulkwalk_context_free(zbx_bulkwalk_context_t *bulkwalk_context)
 
 static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *error, size_t max_error_len)
 {
-	struct snmp_pdu		*pdu;
-	int			ret;
-	zbx_bulkwalk_context_t	*bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
+	struct snmp_pdu			*pdu;
+	int				ret;
+	zbx_bulkwalk_context_t		*bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
+	struct netsnmp_transport_s	*transport;
+	int				numfds = 0, block = 0;
+	struct timeval			timeout = {.tv_sec = snmp_context->config_timeout};
+	fd_set				fdset;
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -2354,12 +2354,6 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() send completed", __func__);
-
-	struct netsnmp_transport_s	*transport;
-
-	int				numfds = 0, block = 0;
-	struct timeval			timeout = {.tv_sec = snmp_context->config_timeout};
-	fd_set				fdset;
 
 	FD_ZERO(&fdset);
 
