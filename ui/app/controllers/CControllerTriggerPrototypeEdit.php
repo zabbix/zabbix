@@ -255,6 +255,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 
+		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
 	}
