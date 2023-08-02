@@ -77,13 +77,13 @@
 					this.#copy();
 				}
 				else if (e.target.classList.contains('js-massenable-trigger')) {
-					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-enable-trigger')) {
 					this.#enable(e.target, [e.target.dataset.triggerid]);
 				}
 				else if (e.target.classList.contains('js-massdisable-trigger')) {
-					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-disable-trigger')) {
 					this.#disable(e.target, [e.target.dataset.triggerid]);
@@ -145,13 +145,15 @@
 			});
 		}
 
-		#enable(target, triggerids) {
-			const confirmation = triggerids.length > 1
-				? <?= json_encode(_('Enable selected triggers?')) ?>
-				: <?= json_encode(_('Enable selected trigger?')) ?>;
+		#enable(target, triggerids, massenable = false) {
+			if (massenable) {
+				const confirmation = triggerids.length > 1
+					? <?= json_encode(_('Enable selected triggers?')) ?>
+					: <?= json_encode(_('Enable selected trigger?')) ?>;
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');
@@ -160,13 +162,15 @@
 			this.#post(target, triggerids, curl);
 		}
 
-		#disable(target, triggerids) {
-			const confirmation = triggerids.length > 1
-				? <?= json_encode(_('Disable selected triggers?')) ?>
-				: <?= json_encode(_('Disable selected trigger?')) ?>;
+		#disable(target, triggerids, massdisable = false) {
+			if (massdisable) {
+				const confirmation = triggerids.length > 1
+					? <?= json_encode(_('Disable selected triggers?')) ?>
+					: <?= json_encode(_('Disable selected trigger?')) ?>;
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');

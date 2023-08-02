@@ -65,10 +65,10 @@
 					this.#disable(e.target, [e.target.dataset.triggerid]);
 				}
 				else if (e.target.classList.contains('js-massenable-trigger')) {
-					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-massdisable-trigger')) {
-					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-massupdate-trigger')) {
 					this.#massupdate(e.target);
@@ -107,8 +107,8 @@
 			});
 		}
 
-		#enable(target, triggerids) {
-			if (target.dataset.status !== null && target.classList.contains('js-massenable-trigger')) {
+		#enable(target, triggerids, massenable = false) {
+			if (massenable) {
 				const confirmation = triggerids.length > 1
 					? <?= json_encode(_('Create triggers from selected prototypes as enabled?')) ?>
 					: <?= json_encode(_('Create triggers from selected prototype as enabled?')) ?>;
@@ -124,8 +124,8 @@
 			this.#post(target, triggerids, curl);
 		}
 
-		#disable(target, triggerids) {
-			if (target.dataset.status !== null && target.classList.contains('js-massdisable-trigger')) {
+		#disable(target, triggerids, massdisable = false) {
+			if (massdisable) {
 				const confirmation = triggerids.length > 1
 					? <?= json_encode(_('Create triggers from selected prototypes as disabled?')) ?>
 					: <?= json_encode(_('Create triggers from selected prototype as disabled?')) ?>;
