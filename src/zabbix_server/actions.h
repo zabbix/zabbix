@@ -57,8 +57,8 @@ typedef struct
 }
 zbx_condition_t;
 
-int	check_action_condition(const zbx_db_event *event, zbx_condition_t *condition);
-void	process_actions(const zbx_vector_ptr_t *events, const zbx_vector_uint64_pair_t *closed_events);
+int	check_action_condition(zbx_db_event *event, zbx_condition_t *condition);
+void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events);
 int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks);
 void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actions);
 void	free_db_action(zbx_db_action *action);

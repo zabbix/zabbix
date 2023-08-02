@@ -121,7 +121,7 @@ class CMacroValue extends CInput {
 		$name = $this->getAttribute('name');
 		$value_type = $this->getAttribute('type');
 		$value = $this->getAttribute('value');
-		$readonly = $this->getAttribute('readonly');
+		$readonly = (bool) $this->getAttribute('readonly');
 		$elements = [];
 
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
@@ -131,6 +131,7 @@ class CMacroValue extends CInput {
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
+				->disableSpellcheck()
 				->setReadonly($readonly);
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
@@ -140,6 +141,7 @@ class CMacroValue extends CInput {
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
+				->disableSpellcheck()
 				->setReadonly($readonly);
 		}
 		else {
@@ -148,7 +150,7 @@ class CMacroValue extends CInput {
 
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
-				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
+				->setAttribute('disabled', $readonly ? 'disabled' : null)
 				->setAttribute('placeholder', _('value'));
 		}
 
@@ -157,13 +159,13 @@ class CMacroValue extends CInput {
 		}
 
 		$elements[] = (new CButtonDropdown($name.'[type]',  $value_type, [
-				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_ICON_TEXT],
-				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_ICON_EYE_OFF],
-				['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_ICON_LOCK]
-			]))
-				->addClass($dropdown_btn_class)
-				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
-				->setAttribute('aria-label', _('Change type'));
+			['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_ICON_TEXT],
+			['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_ICON_EYE_OFF],
+			['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_ICON_LOCK]
+		]))
+			->addClass($dropdown_btn_class)
+			->setAttribute('disabled', $readonly ? 'disabled' : null)
+			->setAttribute('aria-label', _('Change type'));
 
 		$node = (new CDiv())
 			->addClass($wrapper_class)

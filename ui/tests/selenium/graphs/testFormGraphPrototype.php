@@ -186,7 +186,8 @@ class testFormGraphPrototype extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Graph with name "Duplicated graph prototype" already exists in graphs or graph prototypes.'
+						'Graph prototype "Duplicated graph prototype" already exists on the LLD rule with '.
+								'key "discovery-rule-form" of the host "Simple form test host".'
 					]
 				]
 			],

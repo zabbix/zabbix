@@ -19,13 +19,12 @@
 
 #include "nodecommand.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "trapper_auth.h"
 
 #include "../scripts/scripts.h"
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"
-#include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 
@@ -245,7 +244,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
 	zbx_vector_uint64_t	eventids;
-	zbx_vector_ptr_t	events;
+	zbx_vector_db_event_t	events;
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
@@ -258,7 +257,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	*error = '\0';
 	memset(&host, 0, sizeof(host));
 	zbx_vector_uint64_create(&eventids);
-	zbx_vector_ptr_create(&events);
+	zbx_vector_db_event_create(&events);
 	zbx_vector_ptr_pair_create(&webhook_params);
 
 	zbx_script_init(&script);
@@ -308,7 +307,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 
 		zbx_vector_uint64_reserve(&eventids, 2);
-		zbx_vector_ptr_reserve(&events, 2);
+		zbx_vector_db_event_reserve(&events, 2);
 
 		zbx_vector_uint64_append(&eventids, eventid);	/* problem event in element [0]*/
 
@@ -326,7 +325,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		switch (events.values_num)
 		{
 			case 1:
-				if (eventid == ((zbx_db_event *)(events.values[0]))->eventid)
+				if (eventid == (events.values[0])->eventid)
 				{
 					problem_event = events.values[0];
 				}
@@ -337,7 +336,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				}
 				break;
 			case 2:
-				if (r_eventid == ((zbx_db_event *)(events.values[0]))->eventid)
+				if (r_eventid == ((events.values[0]))->eventid)
 				{
 					problem_event = events.values[1];
 					recovery_event = events.values[0];
@@ -387,14 +386,14 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		goto fail;
 	}
 
-	user_timezone = get_user_timezone(user->userid);
+	user_timezone = zbx_db_get_user_timezone(user->userid);
 
 	/* substitute macros in script body and webhook parameters */
 
 	if (0 != hostid)	/* script on host */
-		macro_type = MACRO_TYPE_SCRIPT;
+		macro_type = ZBX_MACRO_TYPE_SCRIPT;
 	else
-		macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
+		macro_type = (NULL != recovery_event) ? ZBX_MACRO_TYPE_SCRIPT_RECOVERY : ZBX_MACRO_TYPE_SCRIPT_NORMAL;
 
 	um_handle = zbx_dc_open_user_macros();
 
@@ -480,9 +479,64 @@ fail:
 	}
 
 	zbx_vector_ptr_pair_destroy(&webhook_params);
-	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
-	zbx_vector_ptr_destroy(&events);
+	zbx_vector_db_event_clear_ext(&events, zbx_db_free_event);
+	zbx_vector_db_event_destroy(&events);
 	zbx_vector_uint64_destroy(&eventids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/* user role permissions */
+typedef enum
+{
+	ROLE_PERM_DENY = 0,
+	ROLE_PERM_ALLOW = 1,
+}
+zbx_user_role_permission_t;
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if the user has specific or default access for              *
+ *          administration actions                                            *
+ *                                                                            *
+ * Return value:  SUCCEED - the access is granted                             *
+ *                FAIL    - the access is denied                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
+		const char *role_rule)
+{
+	int		ret = FAIL;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
+
+	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
+			" and (name='%s' or name='%s')", user->roleid, role_rule,
+			role_rule_default);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(role_rule, row[1]))
+		{
+			if (ROLE_PERM_ALLOW == atoi(row[0]))
+				ret = SUCCEED;
+			else
+				ret = FAIL;
+			break;
+		}
+		else if (0 == strcmp(role_rule_default, row[1]))
+		{
+			if (ROLE_PERM_ALLOW == atoi(row[0]))
+				ret = SUCCEED;
+		}
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -517,14 +571,14 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
 
-	if (SUCCEED != check_perm2system(user.userid))
+	if (SUCCEED != zbx_db_check_user_perm2system(user.userid))
 	{
 		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
 		goto finish;
 	}
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS		"actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS	"actions.execute_scripts"
-	if (SUCCEED != zbx_check_user_administration_actions_permissions(&user,
+	if (SUCCEED != check_user_administration_actions_permissions(&user,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_DEFAULT_ACCESS,
 			ZBX_USER_ROLE_PERMISSION_ACTIONS_EXECUTE_SCRIPTS))
 	{

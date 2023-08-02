@@ -138,7 +138,7 @@ class testFormGraph extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Graph with name "Duplicated graph" already exists in graphs or graph prototypes.'
+						'Graph "Duplicated graph" already exists on the host "Simple form test host".'
 					]
 				]
 			],

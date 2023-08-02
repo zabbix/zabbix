@@ -18,7 +18,7 @@
 **/
 
 #include "trapper_item_test.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "../poller/poller.h"
 #include "zbxtasks.h"
@@ -296,9 +296,9 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_MAINTENANCE_TYPE, table_hosts, "maintenance_type",
 			&item.host.maintenance_type);
 	if (SUCCEED == zbx_json_value_by_name(&jp_host, ZBX_PROTO_TAG_IPMI_AUTHTYPE, tmp, sizeof(tmp), NULL))
-		item.host.ipmi_authtype = atoi(tmp);
+		item.host.ipmi_authtype = (char)atoi(tmp);
 	else
-		item.host.ipmi_authtype = atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
+		item.host.ipmi_authtype = (char)atoi(zbx_db_get_field(table_hosts, "ipmi_authtype")->default_value);
 	db_uchar_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_PRIVILEGE, table_hosts, "ipmi_privilege",
 			&item.host.ipmi_privilege);
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_IPMI_USERNAME, table_hosts, "ipmi_username",
@@ -349,7 +349,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 		zbx_vector_ptr_create(&add_results);
 
-		zbx_prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
+		zbx_prepare_items(&item, &errcode, 1, &result, ZBX_MACRO_EXPAND_NO);
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);

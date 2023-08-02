@@ -59,6 +59,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Discovery status' => 'Displays the status summary of the active network discovery rules.',
 		'Favorite graphs' => 'Displays shortcuts to the most needed graphs (marked as favorite).',
 		'Favorite maps' => 'Displays shortcuts to the most needed network maps (marked as favorite).',
+		'Gauge' => 'Displays the value of a single item as gauge.',
 		'Geomap' => 'Displays hosts as markers on a geographical map.',
 		'Graph' => 'Displays data of up to 50 items as line, points, staircase, or bar charts.',
 		'Graph (classic)' => 'Displays a single custom graph or a simple graph.',
@@ -79,6 +80,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'associated components.',
 		'Top hosts' => 'Displays top N hosts that have the highest or the lowest item value (for example, CPU load) '.
 				'with an option to add progress-bar visualizations and customize report columns.',
+		'Top triggers' => 'Displays top N triggers that have the most problems within the period of evaluation,'.
+				' sorted by the number of problems.',
 		'Trigger overview' => 'Displays trigger states for selected hosts.',
 		'URL' => 'Displays the content retrieved from the specified URL.',
 		'Web monitoring' => 'Displays the status summary of the active web monitoring scenarios.'
@@ -370,7 +373,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			]
 		];
 
-		// Create an array with widgt modules that should be present by default.
+		// Create an array with widget modules that should be present by default.
 		$widget_modules = [];
 		$i = 0;
 
