@@ -138,7 +138,7 @@ zabbix_export:
                     var message = 'Request failed with status code ' + request.getStatus();
         
                     if (typeof response.message !== 'undefined') {
-                        message += ' and response error - "' + response.message + '"';
+                        message += ': ' + response.message;
                     }
         
                     throw message;
