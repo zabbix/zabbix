@@ -495,6 +495,7 @@ $trigger_form
 
 $output = [
 	'header' => $data['triggerid'] === null ? _('New trigger') : _('Trigger'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TRIGGERS_EDIT),
 	'body' => $trigger_form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('trigger.edit.js.php')
