@@ -1,13 +1,13 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-07T14:24:48Z'
+  date: '2023-08-02T14:33:51Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
   templates:
     - uuid: dce23cdaef364e139efa580d8a304ffe
       template: 'AWS Cost Explorer by HTTP'
-      name: 'AWS Cost by HTTP'
+      name: 'AWS Cost Explorer by HTTP'
       description: |
         The template gets AWS Cost Explorer metrics and uses the script item to make HTTP requests to the Cost Explorer API.
         The Cost Explorer API can access the historical data over up to 12 months and the data for current month.
