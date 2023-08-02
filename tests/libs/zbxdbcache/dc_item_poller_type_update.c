@@ -208,6 +208,21 @@ void	zbx_mock_test_entry(void **state)
 		item.type = test_config.type;
 		item.key = test_config.key;
 		item.poller_type = test_config.poller_type;
+		item.itemid = 1;
+
+		if (ITEM_TYPE_SNMP == item.type)
+		{
+			int	found;
+			char	*snmp_oid = "1.3.6.1.2.1.1";
+
+			ZBX_DC_SNMPITEM	*snmpitem = (ZBX_DC_SNMPITEM *)DCfind_id(&config->snmpitems, item.itemid,
+					sizeof(ZBX_DC_SNMPITEM), &found);
+
+			if (0 == found)
+				snmpitem->snmp_oid = NULL;
+
+			snmpitem->snmp_oid = zbx_strdup(snmpitem->snmp_oid, snmp_oid);
+		}
 
 		if (PROXY == test_config.monitored)
 		{
