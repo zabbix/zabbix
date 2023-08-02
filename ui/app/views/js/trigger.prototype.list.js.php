@@ -87,6 +87,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows(this.parent_discoveryid);
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
@@ -97,6 +98,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows(this.parent_discoveryid);
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {

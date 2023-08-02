@@ -105,6 +105,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('trigger');
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
@@ -115,6 +116,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('trigger');
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {
