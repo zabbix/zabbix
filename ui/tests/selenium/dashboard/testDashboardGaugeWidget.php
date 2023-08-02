@@ -68,11 +68,15 @@ class testDashboardGaugeWidget extends CWebTest {
 	}
 
 	public function prepareDashboardData() {
+		// Add item data to move needle on Gauge.
+		CDataHelper::addItemData(CDataHelper::get('AllItemTypes.0 Float item'), 50);
+
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Gauge widget dashboard',
 			'auto_start' => 0,
 			'pages' => [
 				[
+					'name' => 'Gauge test page',
 					'widgets' => [
 						[
 							'type' => 'gauge',
@@ -106,6 +110,9 @@ class testDashboardGaugeWidget extends CWebTest {
 							]
 						]
 					]
+				],
+				[
+					'name' => 'Screenshot page'
 				]
 			]
 		]);
@@ -595,8 +602,6 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_show_arc' => true,
 						'id:th_arc_size' => 85,
 						'id:th_show_labels' => true,
-						'id:th_show_arc' => true,
-						'id:th_arc_size' => 99,
 						'Enable host selection' => true
 					],
 					'Thresholds' => [
@@ -931,7 +936,7 @@ class testDashboardGaugeWidget extends CWebTest {
 	}
 
 	/**
-	 * Test function for assuring that text, log and char items are not available in Gauge widget.
+	 * Test function for assuring that text, log, binary and char items are not available in Gauge widget.
 	 */
 	public function testDashboardGaugeWidget_CheckAvailableItems() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -951,5 +956,146 @@ class testDashboardGaugeWidget extends CWebTest {
 		];
 
 		$this->assertTableDataColumn($visible_items);
+	}
+
+	public static function getScreenshotsData() {
+		return [
+			// #0 Minimal settings with value.
+			[
+				[
+					'screenshot_id' => 'Empty gauge with data',
+					'fields' => [
+						'Item' => self::GAUGE_ITEM
+					]
+				]
+			],
+			// #0 Minimal settings No data.
+			[
+				[
+					'screenshot_id' => 'Empty gauge with no data',
+					'fields' => [
+						'Item' => '3 Unsigned item'
+					]
+				]
+			],
+			// #1 All settings + Threshold default color.
+			[
+				[
+					'screenshot_id' => 'Full gauge',
+					'fields' => [
+						'Name' => 'All settings',
+						'Item' => self::GAUGE_ITEM,
+						'Min' => 20,
+						'Max' => 300,
+						'xpath:.//input[@id="value_arc_color"]/..' => 'FFCDD2',
+						'xpath:.//input[@id="empty_color"]/..' => '26C6DA',
+						'xpath:.//input[@id="bg_color"]/..' => 'FFF9C4',
+						'Angle' => '270°',
+						'id:description' => 'Screenshot Description 😁🙂😁🙂',
+						'id:desc_size' => 8,
+						'id:desc_bold' => true,
+						'id:desc_v_pos' => 'Top',
+						'xpath:.//input[@id="desc_color"]/..' => '303F9F',
+						'id:decimal_places' => 3,
+						'id:value_size' => 17,
+						'id:value_bold' => true,
+						'xpath:.//input[@id="value_color"]/..' => '00796B',
+						'id:value_arc' => true,
+						'id:value_arc_size' => 35,
+						'id:units' => 'Bytes 😁',
+						'id:units_size' => 12,
+						'id:units_bold' => true,
+						'id:units_pos' => 'Below value',
+						'xpath:.//input[@id="units_color"]/..' => '6D4C41',
+						'id:needle_show' => true,
+						'xpath:.//input[@id="needle_color"]/..' => 'FF0000',
+						'id:scale_size' => 11,
+						'id:scale_decimal_places' => 2,
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 40,
+						'id:th_show_labels' => true
+					],
+					'Thresholds' => [
+						['value' => '100']
+					]
+				]
+			],
+			// #2 Macros in description + Thresholds with color.
+			[
+				[
+					'screenshot_id' => 'Gauge with two thresholds',
+					'fields' => [
+						'Name' => 'All settings',
+						'Item' => self::GAUGE_ITEM,
+						'Min' => 1,
+						'Max' => 300,
+						'id:description' => '{HOST.NAME} {ITEM.NAME}',
+						'id:desc_size' => 5,
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 40,
+						'id:th_show_labels' => true
+					],
+					'Thresholds' => [
+						['value' => '100', 'color' => '4000FF'],
+						['value' => '200', 'color' => 'E91E63']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test function for assuring that form settings affect Gauge image.
+	 *
+	 * @backup widget
+	 *
+	 * @dataProvider getScreenshotsData
+	 */
+	public function testDashboardGaugeWidget_Screenshots($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		$dashboard->selectPage('Screenshot page');
+		$dashboard->invalidate();
+		$dashboard->edit()->addWidget()->asForm();
+		$dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$dialog->fill([
+			'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+			'Advanced configuration' => true
+		]);
+
+		if (array_key_exists('Thresholds', $data)) {
+			foreach ($data['Thresholds'] as $i => $threshold) {
+				$dialog->getField('Thresholds')->query('button:Add')->one()->waitUntilClickable()->click();
+
+				if (array_key_exists('value', $threshold)) {
+					$dialog->fill(['id:thresholds_'.$i.'_threshold' => $threshold['value']]);
+				}
+
+				if (array_key_exists('color', $threshold)) {
+					$dialog->query('xpath:.//input[@id="thresholds_'.$i.'_color"]/..')->asColorPicker()->one()
+						->fill($threshold['color']);
+				}
+			}
+		}
+
+		$dialog->fill($data['fields']);
+		$dialog->submit();
+		COverlayDialogElement::ensureNotPresent();
+
+		$header = array_key_exists('Name', $data['fields'])
+			?  $data['fields']['Name']
+			:  self::HOST.': '.$data['fields']['Item'];
+
+		// Wait until widget with header appears on the Dashboard.
+		$dashboard->waitUntilReady()->getWidget($header);
+		$dashboard->save();
+
+		// Wait until loader disappears.
+		$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($header).
+				"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
+		$this->page->removeFocus();
+		$screenshot_area = $this->query('class:dashboard-grid-widget')->one();
+		$screenshot_area->query('xpath:.//div[contains(@class, "dashboard-grid-iterator-focus")]')->waitUntilNotVisible();
+		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
 	}
 }
