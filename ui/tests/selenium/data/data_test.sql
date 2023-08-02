@@ -1,7 +1,7 @@
 -- Activate Zabbix Server, set visible name and make it a more unique name
 UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WHERE host='Zabbix server';
 
--- More medias for user 'Admin'
+-- More media for user 'Admin'
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-24:00');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (2,1,1,'test2@zabbix.com',1,60,'1-7,00:00-24:00');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00');
@@ -1169,27 +1169,6 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (95,95,'Service'
 -- Tag based permissions: Read-write permissions to host group
 INSERT INTO rights (rightid,groupid,permission,id) VALUES (1,90,3,50004);
 INSERT INTO rights (rightid,groupid,permission,id) VALUES (2,91,3,50004);
-
--- event correlation
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'delete tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99000, 99000, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99001, 'Event correlation for update', 'Test description update', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99001, 99001, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99001, 'update tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99001, 99001, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for cancel', 'Test description cancel', 1, 1, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99002, 99002, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'cancel tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99002, 99002, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99003, 'Event correlation for clone', 'Test description clone', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
 
 -- host prototypes
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90001, 'Host for host prototype tests', 'Host for host prototype tests', 0, '', 0);

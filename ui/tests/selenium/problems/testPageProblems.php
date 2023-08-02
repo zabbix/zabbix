@@ -408,7 +408,6 @@ class testPageProblems extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
 		$this->zbxTestClickButtonText('Reset');
 		$form->waitUntilReloaded();
@@ -446,6 +445,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('details_0');
 
 		// Apply filter and check result
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->query('name:filter_apply')->one()->click();
 		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
