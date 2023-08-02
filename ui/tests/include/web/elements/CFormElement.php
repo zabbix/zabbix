@@ -408,7 +408,7 @@ class CFormElement extends CElement {
 
 				foreach ($values as $name => $value) {
 					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
-					$this->setUTFValue($container->query('xpath', $xpath)->one()->detect(), $value);
+					$element->fill($value);
 				}
 			}
 
@@ -424,7 +424,7 @@ class CFormElement extends CElement {
 			return $this;
 		}
 
-		$this->setUTFValue($element, $values);
+		$element->fill($values);
 
 		return $this;
 	}

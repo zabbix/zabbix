@@ -330,21 +330,11 @@ class CElement extends CBaseElement implements IWaitable {
 	 * @return $this
 	 */
 	public function fill($text) {
-		return $this->setUTFValue($this, $text);
-	}
-
-	/**
-	 * Function for utf8mb4 values detection and filling.
-	 *
-	 * @param CElement $element   element to be filled
-	 * @param string   $value     value to be filled in
-	 */
-	public function setUTFValue($element, $value) {
-		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+		if (!is_array($text) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $text) === 1) {
+			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($text).';', [$this]);
 		}
 		else {
-			return $element->overwrite($value);
+			return $this->overwrite($text);
 		}
 	}
 
