@@ -31,7 +31,6 @@
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>
 #include <net-snmp/library/large_fd_set.h>
-#include <net-snmp/library/snmp_secmod.h>
 #include "zbxself.h"
 
 #include "zbxcomms.h"
@@ -2453,8 +2452,7 @@ static int	snmp_task_process(short event, void *data, int *fd)
 
 		if (1 == snmp_context->probe)
 		{
-			netsnmp_session		*session = snmp_sess_session(snmp_context->ssp);
-			struct snmp_secmod_def	*sptr = find_sec_mod(session->securityModel);
+			netsnmp_session	*session = snmp_sess_session(snmp_context->ssp);
 
 			if (0 != session->engineBoots || 0 != session->engineTime)
 			{
@@ -2462,13 +2460,10 @@ static int	snmp_task_process(short event, void *data, int *fd)
 						session->engineBoots, session->engineTime, TRUE);
 			}
 
-			if (NULL != sptr && NULL != sptr->post_probe_engineid)
+			if (SNMPERR_SUCCESS != create_user_from_session(session))
 			{
-				if (SNMPERR_SUCCESS != (*sptr->post_probe_engineid)(snmp_context->ssp, session))
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "cannot process probing result for itemid:"
-							ZBX_FS_UI64, snmp_context->item.itemid);
-				}
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot process probing result for itemid:"
+						ZBX_FS_UI64, snmp_context->item.itemid);
 			}
 
 			snmp_context->probe = 0;
