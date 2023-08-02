@@ -800,7 +800,10 @@ function getMenuPopupTrigger(options, trigger_element) {
 				e.preventDefault();
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				view.editTrigger({triggerid: options.triggerid});
+				view.editTrigger({
+					triggerid: options.triggerid,
+					context: 'host'
+				});
 			}
 		});
 
