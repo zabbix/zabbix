@@ -120,13 +120,7 @@
 					this.#delete(target, itemids);
 				}
 			});
-			document.addEventListener('click', (e) => {
-				const target = e.target;
-
-				if (target.classList.contains('js-create-item')) {
-					this.#edit(target);
-				}
-			});
+			document.querySelector('.js-create-item').addEventListener('click', (e) => this.#edit(e.target));
 		}
 
 		#edit(target, parameters = {}) {

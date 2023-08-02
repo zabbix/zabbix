@@ -27,9 +27,32 @@
 <script>
 	const view = {
 		init() {
+			this.original_url = location.href;
+
 			$.subscribe("acknowledge.create", function(event, response, overlay) {
 				postMessageOk(response.success.title);
 				location.href = location.href;
+			});
+			document.querySelectorAll('.js-update-item').forEach(link => link.addEventListener('click', e => {
+				this.openItemForm(e.target, e.target.dataset);
+			}));
+		},
+
+		openItemForm(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = this.original_url;
 			});
 		},
 
@@ -40,7 +63,6 @@
 		},
 
 		openHostPopup(host_data) {
-			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
@@ -51,7 +73,7 @@
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
+				history.replaceState({}, '', this.original_url);
 			}, {once: true});
 		},
 

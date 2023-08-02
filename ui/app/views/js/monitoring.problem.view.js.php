@@ -54,6 +54,7 @@
 
 			this.initAcknowledge();
 			this.initExpandables();
+			this.initItemFormEvents(this.getCurrentResultsTable());
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -207,6 +208,16 @@
 			}
 		},
 
+		initItemFormEvents(form) {
+			form.addEventListener('click', e => {
+				const target = e.target;
+
+				if (target.matches('.js-update-item')) {
+					this.openItemForm(target, target.dataset);
+				}
+			});
+		},
+
 		showSymptoms(btn, idx, array) {
 			// Prevent multiple clicking by first disabling button.
 			btn.disabled = true;
@@ -270,6 +281,7 @@
 			);
 			chkbxRange.init();
 			this.initExpandables();
+			this.initItemFormEvents(this.getCurrentResultsTable());
 		},
 
 		refreshDebug(debug) {
@@ -421,6 +433,25 @@
 
 		editHost(hostid) {
 			this.openHostPopup({hostid});
+		},
+
+		openItemForm(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			this.unscheduleRefresh();
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				this.refresh();
+			});
 		},
 
 		openHostPopup(host_data) {

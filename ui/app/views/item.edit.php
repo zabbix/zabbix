@@ -29,7 +29,6 @@ $scripts = [
 	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
 	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['form']['hostid']], $dir)
 ];
-// TODO: when checkInput fail $data will contain only 'main_block' property, no need to render at all.
 $form = (new CForm('post'))
 	->setName('itemForm')
 	->setId('item-form')
@@ -175,7 +174,8 @@ else {
 	];
 }
 
-$tabs = (new CTabView())
+$tabsid = 'items-tab';
+$tabs = (new CTabView(['id' => $tabsid]))
 	->addTab('item-tab', _('Item'),
 		new CPartial('item.edit.item.tab', [
 			'config' => $data['config'],
@@ -200,7 +200,7 @@ $tabs = (new CTabView())
 			'readonly' => $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'show_inherited_tags' => $item['show_inherited_tags'],
 			'source' => 'item',
-			'tabs_id' => 'tabs',
+			'tabs_id' => $tabsid,
 			'tags' => $item['tags'],
 			'tags_tab_id' => 'tags-tab'
 		]),

@@ -32,6 +32,24 @@
 			});
 		},
 
+		openItemForm(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = this.original_url;
+			});
+		},
+
 		editHost(hostid) {
 			this.openHostPopup({hostid});
 		},

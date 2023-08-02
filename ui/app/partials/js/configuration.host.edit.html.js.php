@@ -325,6 +325,40 @@
 					}
 				})
 			});
+			this.form.addEventListener('click', e => {
+				const target = e.target;
+
+				if (!target.matches('.js-update-item')) {
+					return;
+				}
+
+				const overlay = overlays_stack.end();
+
+				if (overlay) {
+					const dialogue = overlay.$dialogue[0];
+					const dialogueid = dialogue.dataset.dialogueid;
+					const dialogue_class = dialogue.getAttribute('class');
+
+					PopUp('item.edit', target.dataset, {dialogueid, dialogue_class});
+				}
+				else {
+					const overlay = PopUp('item.edit', target.dataset, {
+						dialogueid: 'item-edit',
+						dialogue_class: 'modal-popup-large',
+						trigger_element: target
+					});
+
+					overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+						postMessageOk(e.detail.title);
+
+						if ('messages' in e.detail) {
+							postMessageDetails('success', e.detail.messages);
+						}
+
+						location.href = location.href;
+					});
+				}
+			});
 		},
 
 		/**

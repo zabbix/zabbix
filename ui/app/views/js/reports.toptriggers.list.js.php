@@ -65,6 +65,16 @@
 			this.#openHostPopup(host_data);
 		}
 
+		openItemForm(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail));
+		}
+
 		#openHostPopup(host_data) {
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
@@ -73,6 +83,7 @@
 				prevent_navigation: true
 			});
 
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail));
 			overlay.$dialogue[0].addEventListener('dialogue.create', (e) => this.#reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('dialogue.update', (e) => this.#reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this.#reload(e.detail.success));

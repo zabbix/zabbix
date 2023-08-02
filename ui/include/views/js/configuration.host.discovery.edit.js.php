@@ -179,7 +179,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-item`);
 
 			if (button instanceof Element) {
-				button.addEventListener(e => this.executeNow(e.target));
+				button.addEventListener('click', e => this.executeNow(e.target));
 			}
 		},
 
@@ -221,7 +221,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				itemids: [document.querySelector(`[name="${this.form_name}"] [name="itemid"]`).value],
 				discovery_rule: 1
 			};
-			data[token[0]] = token[1];
+			data[this.token[0]] = this.token[1];
 
 			fetch(curl.getUrl(), {
 				method: 'POST',

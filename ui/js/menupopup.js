@@ -533,17 +533,23 @@ function getMenuPopupMapElementTrigger(options) {
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('zabbix.php');
-				url.setArgument('action', 'item.list');
-				url.setArgument('form', 'update');
-				url.setArgument('itemid', item.params.itemid);
-				url.setArgument('context', 'host');
-
-				item_urls.push({
-					label: item.name,
-					disabled: item.params.is_webitem,
-					url: url.getUrl()
-				});
+				if (item.params.is_webitem) {
+					item_urls.push({
+						label: item.name,
+						disabled: true
+					});
+				}
+				else {
+					item_urls.push({
+						label: item.name,
+						clickCallback: () => {
+							view.openItemForm(null, {
+								context: 'host',
+								itemid: item.params.itemid
+							});
+						}
+					});
+				}
 			};
 
 			config_urls.push({
@@ -794,17 +800,23 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 		if (options.items.length) {
 			for (const item of options.items) {
-				url = new Curl('zabbix.php');
-				url.setArgument('action', 'item.list');
-				url.setArgument('form', 'update');
-				url.setArgument('itemid', item.params.itemid);
-				url.setArgument('context', 'host');
-
-				item_urls.push({
-					label: item.name,
-					disabled: item.params.is_webitem,
-					url: url.getUrl()
-				});
+				if (item.params.is_webitem) {
+					item_urls.push({
+						label: item.name,
+						disabled: true
+					});
+				}
+				else {
+					item_urls.push({
+						label: item.name,
+						clickCallback: () => {
+							view.openItemForm(null, {
+								context: 'host',
+								itemid: item.params.itemid
+							});
+						}
+					});
+				}
 			}
 
 			config_urls.push({
@@ -1037,17 +1049,14 @@ function getMenuPopupItem(options) {
 		};
 
 		if (options.isWriteable) {
-			url = new Curl('zabbix.php');
-			url.setArgument('action', 'item.list');
-			url.setArgument('form', 'update');
-			url.setArgument('hostid', options.hostid);
-			url.setArgument('itemid', options.itemid);
-			url.setArgument('backurl', options.backurl);
-			url.setArgument('context', options.context);
-
 			config_urls.push({
 				label: t('Item'),
-				url: url.getUrl()
+				clickCallback: () => {
+					view.openItemForm(null, {
+						context: 'host',
+						itemid: options.itemid
+					});
+				}
 			});
 		}
 
@@ -1086,20 +1095,25 @@ function getMenuPopupItem(options) {
 			disabled: options.binary_value_type
 		});
 
-		url = new Curl('zabbix.php');
-		url.setArgument('action', 'item.list');
-		url.setArgument('form', 'create');
-		url.setArgument('hostid', options.hostid);
-		url.setArgument('type', 18); // ITEM_TYPE_DEPENDENT
-		url.setArgument('master_itemid', options.itemid);
-		url.setArgument('backurl', options.backurl);
-		url.setArgument('context', options.context);
-
-		config_urls.push({
-			label: t('Create dependent item'),
-			url: url.getUrl(),
-			disabled: options.isDiscovery
-		});
+		if (options.isDiscovery) {
+			config_urls.push({
+				label: t('Create dependent item'),
+				disabled: true
+			});
+		}
+		else {
+			config_urls.push({
+				label: t('Create dependent item'),
+				clickCallback: () => {
+					view.openItemForm(null, {
+						context: options.context,
+						hostid: options.hostid,
+						type: 18, // ITEM_TYPE_DEPENDENT
+						master_itemid: options.itemid
+					});
+				}
+			});
+		}
 
 		url = new Curl('host_discovery.php');
 		url.setArgument('form', 'create');

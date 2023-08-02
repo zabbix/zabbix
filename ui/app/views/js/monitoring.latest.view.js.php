@@ -54,6 +54,7 @@
 			this.initTabFilter(filter_options);
 			this.initExpandableSubfilter();
 			this.initListActions();
+			this.initItemFormEvents(this.getCurrentForm().get(0));
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -116,6 +117,35 @@
 
 			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
 				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
+			});
+		},
+
+		initItemFormEvents(form) {
+			form.addEventListener('click', e => {
+				const target = e.target;
+
+				if (!target.matches('.js-update-item')) {
+					return;
+				}
+
+				this._removePopupMessage();
+				this.unscheduleRefresh();
+
+				const overlay = PopUp('item.edit', target.dataset, {
+					dialogueid: 'item-edit',
+					dialogue_class: 'modal-popup-large',
+					trigger_element: target
+				});
+
+				overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+					postMessageOk(e.detail.title);
+
+					if ('messages' in e.detail) {
+						postMessageDetails('success', e.detail.messages);
+					}
+
+					this.refresh();
+				});
 			});
 		},
 
@@ -380,6 +410,29 @@
 					button.classList.remove('is-loading');
 					button.blur();
 				});
+		},
+
+		openItemForm(target, data) {
+			this._removePopupMessage();
+			this.unscheduleRefresh();
+
+			const original_url = location.href;
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				history.replaceState({}, '', original_url);
+				this.refresh();
+			});
 		},
 
 		editHost(hostid) {

@@ -1208,15 +1208,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								}
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_'],
-											(new CUrl('zabbix.php'))
-												->setArgument('action', 'item.list')
-												->setArgument('form', 'update')
-												->setArgument('itemid', $function['itemid'])
-												->setArgument('context', $options['context'])
-										))
+										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass(ZBX_STYLE_LINK_ALT)
+											->addClass('js-update-item')
 											->setAttribute('data-itemid', $function['itemid'])
+											->setAttribute('data-context', $options['context'])
 											->addClass($style)
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);

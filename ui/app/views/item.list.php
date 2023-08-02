@@ -96,7 +96,8 @@ foreach ($data['items'] as $item) {
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL)
 				->addClass('js-update-item')
-				->setAttribute('data-itemid', $item['master_item']['itemid']);
+				->setAttribute('data-itemid', $item['master_item']['itemid'])
+				->setAttribute('data-context', $data['context']);
 		}
 
 		$description[] = NAME_DELIMITER;
@@ -104,7 +105,8 @@ foreach ($data['items'] as $item) {
 
 	$description[] = (new CLink($item['name']))
 		->addClass('js-update-item')
-		->setAttribute('data-itemid', $item['itemid']);
+		->setAttribute('data-itemid', $item['itemid'])
+		->setAttribute('data-context', $data['context']);
 
 	// Trigger information
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -275,7 +277,10 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item'));
 			(new CList())
 				->addItem(
 					$data['hostid'] != 0
-						? (new CSimpleButton(_('Create item')))->addClass('js-create-item')
+						? (new CSimpleButton(_('Create item')))
+								->setAttribute('data-hostid', $data['hostid'])
+								->setAttribute('data-context', $data['context'])
+								->addClass('js-create-item')
 						: (new CSimpleButton(
 							$data['context'] === 'host'
 								? _('Create item (select host first)')
