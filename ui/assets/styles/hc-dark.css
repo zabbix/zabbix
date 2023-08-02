@@ -1393,6 +1393,8 @@ button {
     grid-template-rows: repeat(var(--rows), 1fr);
     grid-auto-flow: column; }
   .checkbox-list li {
+    padding: 0 2px;
+    margin: 0 -2px;
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 24px; }
