@@ -1192,7 +1192,7 @@ class CopyWidgetsDashboards {
 								'name' => 'Test copy item value',
 								'type' => 'item',
 								'x' => 0,
-								'y' => 28,
+								'y' => 12,
 								'width' => 6,
 								'height' => 4,
 								'view_mode' => 0,
@@ -1498,6 +1498,171 @@ class CopyWidgetsDashboards {
 										'type' => 0,
 										'name' => 'column',
 										'value' => 0
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge for copying',
+								'x' => 6,
+								'y' => 12,
+								'width' => 10,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemid',
+										'value' => '99142'
+									],
+									[
+										'type' => 1,
+										'name' => 'min',
+										'value' => '10'
+									],
+									[
+										'type' => 1,
+										'name' => 'max',
+										'value' => '350'
+									],
+									[
+										'type' => 0,
+										'name' => 'angle',
+										'value' => '270',
+									],
+									[
+										'type' => 1,
+										'name' => 'description',
+										'value' => 'Test description',
+									],
+									[
+										'type' => 0,
+										'name' => 'desc_size',
+										'value' => '16',
+									],
+									[
+										'type' => 0,
+										'name' => 'desc_bold',
+										'value' => '1',
+									],
+									[
+										'type' => 0,
+										'name' => 'desc_v_pos',
+										'value' => '0',
+									],
+									[
+										'type' => 1,
+										'name' => 'desc_color',
+										'value' => 'FDD835',
+									],
+									[
+										'type' => 0,
+										'name' => 'decimal_places',
+										'value' => '3',
+									],
+									[
+										'type' => 0,
+										'name' => 'value_bold',
+										'value' => '1',
+									],
+									[
+										'type' => 0,
+										'name' => 'value_size',
+										'value' => '31',
+									],
+									[
+										'type' => 1,
+										'name' => 'value_color',
+										'value' => 'FF6F00',
+									],
+									[
+										'type' => 0,
+										'name' => 'value_arc_size',
+										'value' => '22',
+									],
+									[
+										'type' => 1,
+										'name' => 'value_arc_color',
+										'value' => '0040FF',
+									],
+									[
+										'type' => 1,
+										'name' => 'empty_color',
+										'value' => '00FF00',
+									],
+									[
+										'type' => 1,
+										'name' => 'bg_color',
+										'value' => 'FFECB3',
+									],
+									[
+										'type' => 1,
+										'name' => 'units',
+										'value' => 'bytes',
+									],
+									[
+										'type' => 0,
+										'name' => 'units_size',
+										'value' => '26',
+									],
+									[
+										'type' => 0,
+										'name' => 'units_bold',
+										'value' => '1',
+									],
+									[
+										'type' => 1,
+										'name' => 'units_color',
+										'value' => '42A5F5',
+									],
+									[
+										'type' => 0,
+										'name' => 'needle_show',
+										'value' => '1',
+									],
+									[
+										'type' => 1,
+										'name' => 'needle_color',
+										'value' => '9FA8DA',
+									],
+									[
+										'type' => 0,
+										'name' => 'scale_decimal_places',
+										'value' => '2',
+									],
+									[
+										'type' => 0,
+										'name' => 'scale_size',
+										'value' => '12',
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.color.0',
+										'value' => '26A69A',
+									],
+									[
+										'type' => 1,
+										'name' => 'thresholds.threshold.0',
+										'value' => '123',
+									],
+									[
+										'type' => 0,
+										'name' => 'th_show_labels',
+										'value' => '1',
+									],
+									[
+										'type' => 0,
+										'name' => 'th_show_arc',
+										'value' => '1',
+									],
+									[
+										'type' => 0,
+										'name' => 'th_arc_size',
+										'value' => '56',
+									],
+									[
+										'type' => 0,
+										'name' => 'dynamic',
+										'value' => '1',
 									]
 								]
 							]
