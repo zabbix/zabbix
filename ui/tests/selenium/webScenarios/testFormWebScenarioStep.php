@@ -31,10 +31,10 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testFormWebScenarioStep extends CWebTest {
 
-	private static $templateid;
-	private static $update_step = 'step 2 of clone scenario';
-	private static $impactless_step = 'Первый этап вэб сценария';
+	protected static $templateid;
+	protected static $update_step = 'step 2 of clone scenario';
 
+	const IMPACTLESS_STEP = 'Первый этап вэб сценария';
 	const HOSTID = 40001;
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
 	const UPDATE_SCENARIO = 'Scenario for Clone';
@@ -188,7 +188,7 @@ class testFormWebScenarioStep extends CWebTest {
 			'Raw data' => ['Post fields' => false, 'Raw post' => true]
 		];
 
-		// Check visibility of the post rellated fields based on the initially selected post type.
+		// Check visibility of the post related fields based on the initially selected post type.
 		foreach ([$new_type, $initial_type] as $post_type) {
 			$step_form->getField('Post type')->select($post_type);
 
@@ -259,55 +259,55 @@ class testFormWebScenarioStep extends CWebTest {
 
 	public static function getWebScenarioStepData() {
 		return [
-			// Empty name
+			// #0 Empty name
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => '',
 						'id:url' => 'https://zabbix.com'
 					],
 					'step_error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
-			// Empty space in name
+			// #1 Empty space in name
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => '   ',
 						'id:url' => 'https://zabbix.com'
 					],
 					'step_error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
-			// Empty URL
+			// #2 Empty URL
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Step with empty URL',
 						'id:url' => ''
 					],
 					'step_error' => 'Incorrect value for field "url": cannot be empty.'
 				]
 			],
-			// Blank space in URL
+			// #3 Blank space in URL
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Step with blank space in URL',
 						'id:url' => '   '
 					],
 					'step_error' => 'Incorrect value for field "url": cannot be empty.'
 				]
 			],
-			// Empty Query field name.
+			// #4 Empty Query field name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Step with missing query field name',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -320,11 +320,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/query_fields/1/name": cannot be empty.'
 				]
 			],
-			// Empty Post field name.
+			// #5 Empty Post field name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Step with missing post field name',
 						'Post type' => 'Form data',
 						'id:url' => 'http://zabbix.com'
@@ -338,11 +338,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/posts/1/name": cannot be empty.'
 				]
 			],
-			// Empty Variables field name.
+			// #6 Empty Variables field name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Step with missing variable name',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -355,11 +355,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": cannot be empty.'
 				]
 			],
-			// Variables field name without opening bracket.
+			// #7 Variables field name without opening bracket.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Step with missing variable nameopening bracket',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -371,11 +371,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Variables field name without closing bracket.
+			// #8 Variables field name without closing bracket.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Step with missing variable name closing bracket',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -387,11 +387,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Misplaced brackets in Variables field name.
+			// #9 Misplaced brackets in Variables field name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Misplaced brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -403,11 +403,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Double brackets in Variables field name.
+			// #10 Double brackets in Variables field name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Double brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -419,11 +419,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Only brackets in Variables field name.
+			// #11 Only brackets in Variables field name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Only brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -435,11 +435,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Duplicate Variable names.
+			// #12 Duplicate Variable names.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Duplicate Variable names',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -456,11 +456,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/2": value (name)=({name}) already exists.'
 				]
 			],
-			// Missing Headers name.
+			// #13 Missing Headers name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Missing Headers name',
 						'id:url' => 'http://zabbix.com'
 					],
@@ -473,11 +473,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid parameter "/1/steps/2/headers/1/name": cannot be empty.'
 				]
 			],
-			// Empty timeout.
+			// #14 Empty timeout.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Empty timeout',
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => ''
@@ -485,11 +485,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'step_error' => 'Incorrect value for field "timeout": cannot be empty.'
 				]
 			],
-			// Empty space in timeout.
+			// #15 Empty space in timeout.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Empty space in timeout',
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => '   '
@@ -497,11 +497,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'step_error' => 'Incorrect value for field "timeout": cannot be empty.'
 				]
 			],
-			// Non-numeric timeout.
+			// #16 Non-numeric timeout.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Non-numeric timeout',
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => 'two'
@@ -509,11 +509,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'step_error' => 'Incorrect value for field "timeout": a time unit is expected.'
 				]
 			],
-			// Negative timeout.
+			// #17 Negative timeout.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Negative timeout',
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => '-5s'
@@ -521,11 +521,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'step_error' => 'Incorrect value for field "timeout": a time unit is expected.'
 				]
 			],
-			// Zero timeout.
+			// #18 Zero timeout.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Zero timeout',
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => 0
@@ -533,11 +533,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'step_error' => 'Invalid parameter "timeout": value must be one of 1-3600.'
 				]
 			],
-			// Too big timeout.
+			// #19 Too big timeout.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Too big timeout',
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => 3601
@@ -545,11 +545,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'step_error' => 'Invalid parameter "timeout": value must be one of 1-3600.'
 				]
 			],
-			// Too big timeout with suffix.
+			// #20 Too big timeout with suffix.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Too big timeout with suffix',
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => '2h'
@@ -557,11 +557,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'step_error' => 'Invalid parameter "timeout": value must be one of 1-3600.'
 				]
 			],
-			// Non-numeric status code.
+			// #21 Non-numeric status code.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Non-numeric status code',
 						'id:url' => 'http://zabbix.com',
 						'Required status codes' => 'AAA'
@@ -569,11 +569,11 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid response code "AAA".'
 				]
 			],
-			// Too big status code.
+			// #22 Too big status code.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Too big status code',
 						'id:url' => 'http://zabbix.com',
 						'Required status codes' => '2150000000'
@@ -581,29 +581,29 @@ class testFormWebScenarioStep extends CWebTest {
 					'scenario_error' => 'Invalid response code "2150000000".'
 				]
 			],
-			// Minimal step configuration.
+			// #23 Minimal step configuration.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Min config step',
 						'id:url' => 'http://zabbix.com'
 					]
 				]
 			],
-			// Retrieve mode set to Headers - Disabled post fields.
+			// #24 Retrieve mode set to Headers - Disabled post fields.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'Retrieve headers',
 						'id:url' => 'http://zabbix.com',
 						'Retrieve mode' => 'Headers'
 					]
 				]
 			],
-			// All fields popullated.
+			// #25 All fields populated.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => 'All possible fields specified',
 						'id:url' => '良い一日を',
 						'Retrieve mode' => 'Body and headers',
@@ -646,10 +646,10 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
-			// Maximal allowed length of fields except for timeout since maxlength is 255 but maxvalue is 3600.
+			// #26 Maximal allowed length of fields except for timeout since maxlength is 255 but maxvalue is 3600.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => STRING_64,
 						'id:url' => 'URL has no maxlength',
 						'Post type' => 'Form data',
@@ -699,10 +699,10 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
-			// Trim trailing and leading spaces from step fields.
+			// #27 Trim trailing and leading spaces from step fields.
 			[
 				[
-					'fields' =>  [
+					'fields' => [
 						'Name' => '   Step with trailing and leading spaces   ',
 						'id:url' => '   http://zabbix.com'   ,
 						'Timeout' => '   15   ',
@@ -735,7 +735,7 @@ class testFormWebScenarioStep extends CWebTest {
 	 * @param array		$data		data provider
 	 * @param string	$action		action to be performed
 	 */
-	private function checkStepAction($data, $action) {
+	protected function checkStepAction($data, $action) {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
 		// An attempt to save form is done only in TEST_BAD scenarios with scenario level errors, so only then hash is needed.
@@ -768,7 +768,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$step_form->submit();
 
 		if ($expected === TEST_BAD) {
-			// There are step form level errors and scenario form level errors. They are checked checked differently.
+			// There are step form level errors and scenario form level errors. They are checked differently.
 			if (CTestArrayHelper::get($data, 'step_error')) {
 				$this->assertMessage(TEST_BAD, null, $data['step_error']);
 				$dialog->close();
@@ -801,13 +801,13 @@ class testFormWebScenarioStep extends CWebTest {
 			$step_row = $scenario_form->getField('Steps')->asTable()->findRow('Name', $data['fields']['Name']);
 			$this->assertEquals($data['fields']['id:url'], $step_row->getColumn('URL')->getText());
 
-			$column_mappring = [
+			$column_mapping = [
 				'Required' => 'Required string',
 				'Status codes' => 'Required status codes'
 			];
 
 			foreach (['Timeout' => '15s', 'Required' => '', 'Status codes' => ''] as $column => $value) {
-				$actual_field = ($column === 'Timeout') ? $column : $column_mappring[$column];
+				$actual_field = ($column === 'Timeout') ? $column : $column_mapping[$column];
 
 				if (array_key_exists($actual_field, $data['fields'])) {
 					$value = $data['fields'][$actual_field];
@@ -853,18 +853,18 @@ class testFormWebScenarioStep extends CWebTest {
 	 *
 	 * @param string	$action		action to be checked
 	 */
-	private function checkImpactlessAction($action) {
+	protected function checkImpactlessAction($action) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$scenario_form = $this->getScenarioFormOnStepsTab(self::UPDATE_SCENARIO);
 		$steps = $scenario_form->getField('Steps')->asTable();
 
 		if ($action === 'cancel_delete') {
-			$steps->findRow('Name', self::$impactless_step)->query('button:Remove')->one()->click();
+			$steps->findRow('Name', self::IMPACTLESS_STEP)->query('button:Remove')->one()->click();
 			$scenario_form->query('button:Cancel')->one()->click();
 			$this->page->waitUntilReady();
 		}
 		else {
-			$open_step = ($action === 'cancel_create') ? 'button:Add' : 'link:'.self::$impactless_step;
+			$open_step = ($action === 'cancel_create') ? 'button:Add' : 'link:'.self::IMPACTLESS_STEP;
 			$steps->query($open_step)->waitUntilClickable()->one()->click();
 
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -896,19 +896,19 @@ class testFormWebScenarioStep extends CWebTest {
 	public function testFormWebScenarioStep_Remove() {
 		$form = $this->getScenarioFormOnStepsTab(self::UPDATE_SCENARIO);
 
-		$form->getField('Steps')->asTable()->findRow('Name', self::$impactless_step)->query('button:Remove')->one()->click();
+		$form->getField('Steps')->asTable()->findRow('Name', self::IMPACTLESS_STEP)->query('button:Remove')->one()->click();
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
 
-		$sql = 'SELECT httpstepid FROM httpstep WHERE name='.zbx_dbstr(self::$impactless_step).
+		$sql = 'SELECT httpstepid FROM httpstep WHERE name='.zbx_dbstr(self::IMPACTLESS_STEP).
 				' AND httptestid IN (SELECT httptestid FROM httptest WHERE name='.zbx_dbstr(self::UPDATE_SCENARIO).')';
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 	}
 
 	public static function getStepUrlData() {
 		return [
-			// Plain parsing of URL parameters.
+			// #0 Plain parsing of URL parameters.
 			[
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?login=admin&password=s00p3r%24ecr3%26',
@@ -919,7 +919,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
 			],
-			// Unrellated existing and parsed query parameters.
+			// #1 Unrelated existing and parsed query parameters.
 			[
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?password=s00p3r%24ecr3%26',
@@ -933,7 +933,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
 			],
-			// Duplicate parameters should not be erased during parsing.
+			// #2 Duplicate parameters should not be erased during parsing.
 			[
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?login=user&password=a123%24bcd4%26',
@@ -952,7 +952,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
 			],
-			// Invalid URL part removed duting parsing
+			// #3 Invalid URL part removed during parsing
 			[
 				[
 					'url' => 'http://www.zabbix.com/enterprise_ready#test',
@@ -962,7 +962,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'resulting_url' => 'http://www.zabbix.com/enterprise_ready'
 				]
 			],
-			// Empty query parameter name or value.
+			// #4 Empty query parameter name or value.
 			[
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?=admin&password=',
@@ -973,7 +973,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
 			],
-			// Improper query parameter in URL.
+			// #5 Improper query parameter in URL.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -991,7 +991,6 @@ class testFormWebScenarioStep extends CWebTest {
 		$step_form = $this->getStepForm(self::UPDATE_SCENARIO);
 		$url_field = $step_form->getField('id:url');
 		$url_field->fill($data['url']);
-
 		$query_table = $step_form->getField('Query fields');
 
 		// Fill in exising query fields if such are present in the data provider.
@@ -1003,19 +1002,17 @@ class testFormWebScenarioStep extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			$query_table->invalidate();
-
 			$this->checkTableField($query_table, $data['parsed_query']);
 			$this->assertEquals($data['resulting_url'], $url_field->getValue());
 		}
 		else {
 			$this->checkErrorDialog($data['error']);
 		}
-
 	}
 
 	public static function getStepPostData() {
 		return [
-			// Regular conversion to raw data.
+			// #0 Regular conversion to raw data.
 			[
 				[
 					'post' => [
@@ -1024,7 +1021,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'result_raw' => 'zab%20bix=tes%26t'
 				]
 			],
-			// Other languages to raw data.
+			// #1 Other languages to raw data.
 			[
 				[
 					'post' => [
@@ -1034,7 +1031,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'%E3%81%84%E3%81%A4%E3%82%82%E8%B2%A0%E3%81%91%E3%82%8B'
 				]
 			],
-			// Special symbols to raw data.
+			// #2 Special symbols to raw data.
 			[
 				[
 					'post' => [
@@ -1043,7 +1040,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'result_raw' => '!%40%23%24%25%5E%26*()=!%40%23%24%25%5E%26*()'
 				]
 			],
-			// Converting 2 post fields to raw data.
+			// #3 Converting 2 post fields to raw data.
 			[
 				[
 					'post' => [
@@ -1053,7 +1050,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'result_raw' => 'zabbix=test&%26G%C3%BCnter'
 				]
 			],
-			// Converting raw data to 2 post fields.
+			// #4 Converting raw data to 2 post fields.
 			[
 				[
 					'raw_data' => 'login=Admin&password={{password}.urlencode()}',
@@ -1063,7 +1060,7 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
-			// Converting raw data to post fields with encoding and without value.
+			// #5 Converting raw data to post fields with encoding and without value.
 			[
 				[
 					'raw_data' => 'log+me+in%24&enter=Sign+in%26',
@@ -1073,7 +1070,7 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
-			// Other languages from raw to post fields.
+			// #6 Other languages from raw to post fields.
 			[
 				[
 					'raw_data' => '%E0%A4%B9%E0%A4%B0%E0%A4%B5%E0%A4%B2%E0%A5%87=tap%C4%B1ld%C4%B1',
@@ -1082,7 +1079,7 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
-			// Missing name from raw data to form data.
+			// #7 Missing name from raw data to form data.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1090,7 +1087,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'error' => "Cannot convert POST data:\n\nValues without names are not allowed in form fields."
 				]
 			],
-			// Post data validation percent encoding pair is malformed.
+			// #8 Post data validation percent encoding pair is malformed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1098,7 +1095,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'error' => "Cannot convert POST data:\n\nData is not properly encoded."
 				]
 			],
-			// Non-existing charracter when converting from rwa data to post data.
+			// #9 Non-existing character when converting from rwa data to post data.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1106,7 +1103,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'error' => "Cannot convert POST data:\n\nData is not properly encoded."
 				]
 			],
-			// Unnecessary "=" symbol in raw data when converting to form data.
+			// #10 Unnecessary "=" symbol in raw data when converting to form data.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1114,7 +1111,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'error' => "Cannot convert POST data:\n\nData is not properly encoded."
 				]
 			],
-			// Non-unicode encodings when convertig raw data to post data.
+			// #11 Non-unicode encodings when converting raw data to post data.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1122,7 +1119,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'error' => "Cannot convert POST data:\n\nURIError: URI malformed"
 				]
 			],
-			// Field name exceeds 255 symbols when converting raw data to post data.
+			// #12 Field name exceeds 255 symbols when converting raw data to post data.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1130,7 +1127,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'error' => "Cannot convert POST data:\n\nName of the form field should not exceed 255 characters."
 				]
 			],
-			// Missing name whrn converting post field to raw data.
+			// #13 Missing name when converting post field to raw data.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1180,9 +1177,10 @@ class testFormWebScenarioStep extends CWebTest {
 	 * Return web scenario step configuration form for the specified web scenario.
 	 *
 	 * @param	string			$scenario	name of web scenario for which to open step configuration form
+	 *
 	 * @return	CFormElement
 	 */
-	private function getStepForm($scenario) {
+	protected function getStepForm($scenario) {
 		$scenario_form = $this->getScenarioFormOnStepsTab($scenario);
 		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
 
@@ -1192,10 +1190,11 @@ class testFormWebScenarioStep extends CWebTest {
 	/**
 	 * Return web scenario configuration form with opened Steps tab.
 	 *
-	 * @param	string	$scenario	Name of the scenario to be opened
+	 * @param	string	$scenario	name of the scenario to be opened
+	 *
 	 * @return	CFormElement
 	 */
-	private function getScenarioFormOnStepsTab($scenario) {
+	protected function getScenarioFormOnStepsTab($scenario) {
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host')
 				->waitUntilReady();
 		$this->query('link', $scenario)->waitUntilClickable()->one()->click();
@@ -1212,7 +1211,7 @@ class testFormWebScenarioStep extends CWebTest {
 	 *
 	 * @param string	$error	expected error message text
 	 */
-	private function checkErrorDialog($error) {
+	protected function checkErrorDialog($error) {
 		$error_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 		$this->assertEquals('Error', $error_dialog->getTitle());
@@ -1227,7 +1226,7 @@ class testFormWebScenarioStep extends CWebTest {
 	 * @param	CElement	$table_field	value pair field object
 	 * @param	array		$expected		array with reference values
 	 */
-	private function checkTableField($table_field, $expected) {
+	protected function checkTableField($table_field, $expected) {
 		$obtained_fields = [];
 		$i = 0;
 
@@ -1250,13 +1249,13 @@ class testFormWebScenarioStep extends CWebTest {
 	 * @param	array	$input_data		values to be filled in
 	 * @param	string	$table_field	name of the value pair field
 	 */
-	private function fillTableField($input_data, $table_field) {
+	protected function fillTableField($input_data, $table_field) {
 		$count = count($input_data);
 		$add_button = $table_field->query('button:Add')->one();
 
 		$i = 1;
 		foreach ($input_data as $row) {
-			// Add row in  field table if required
+			// Add row in table if required.
 			if ($table_field->query('xpath:.//tr[@class="sortable"]')->all()->count() !== $count) {
 				$add_button->click();
 			}
