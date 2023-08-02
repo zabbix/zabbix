@@ -46,7 +46,9 @@ class CControllerItemClear extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return true;
+		$itemids = $this->getInput('itemids', []);
+
+		return count($itemids) == API::Item()->get(['countOutput' => true, 'itemids' => $itemids, 'editable' => true]);
 	}
 
 	public function doAction() {

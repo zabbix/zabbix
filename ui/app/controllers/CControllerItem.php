@@ -22,8 +22,18 @@
 abstract class CControllerItem extends CController {
 
 	protected function checkPermissions(): bool {
-		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN
-			|| $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		$status = false;
+
+		if ($this->hasInput('itemid')) {
+			$status = (bool) API::Item()->get(['itemids' => [$this->getInput('itemid')], 'editable' => true]);
+		}
+		else if ($this->hasInput('hostid')) {
+			$status = $this->getInput('context') === 'host'
+				? (bool) API::Host()->get(['hostids' => [$this->getInput('hostid')], 'editable' => true])
+				: (bool) API::Template()->get(['templateids' => [$this->getInput('hostid')], 'editable' => true]);
+		}
+
+		return $status;
 	}
 
 	/**
@@ -37,7 +47,7 @@ abstract class CControllerItem extends CController {
 		$fields = [
 			'allow_traps'			=> 'in 0,1',
 			'authtype'				=> 'db items.authtype',
-			'context'				=> 'in host,template',
+			'context'				=> 'required|in host,template',
 			'delay'					=> 'db items.delay',
 			'delay_flex'			=> 'array',
 			'description'			=> 'db items.description',

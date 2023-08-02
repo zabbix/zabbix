@@ -26,7 +26,7 @@ class CControllerItemCreate extends CControllerItem {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateFormInput(['hostid', 'context']);
+		$ret = $this->validateFormInput(['hostid']);
 
 		if (!$ret) {
 			$this->setResponse(

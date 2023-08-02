@@ -26,7 +26,7 @@ class CControllerItemUpdate extends CControllerItem {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateFormInput(['itemid', 'context']);
+		$ret = $this->validateFormInput(['itemid']);
 
 		if (!$ret) {
 			$this->setResponse(
