@@ -18,7 +18,6 @@
 **/
 
 #include "trapper.h"
-#include "zbxserver.h"
 #include "zbxdbwrap.h"
 
 #include "zbxlog.h"

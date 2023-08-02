@@ -825,9 +825,6 @@ class CHostPrototype extends CHostBase {
 	 * @param array $db_hosts
 	 */
 	private function updateForce(array &$hosts, array &$db_hosts): void {
-		// Helps to avoid deadlocks.
-		CArrayHelper::sort($hosts, ['hostid', 'order' => ZBX_SORT_DOWN]);
-
 		$upd_hosts = [];
 		$upd_hostids = [];
 
@@ -2022,7 +2019,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array $lld_links
 	 * @param array $ruleids
 	 */
-	protected function inheritChunk(array $hosts, array $db_hosts, array $lld_links, array $ruleids): void {
+	private function inheritChunk(array $hosts, array $db_hosts, array $lld_links, array $ruleids): void {
 		$hosts_to_link = [];
 		$hosts_to_update = [];
 

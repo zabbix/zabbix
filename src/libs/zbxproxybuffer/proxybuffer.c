@@ -145,7 +145,7 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 
 			zbx_list_pop(&pb->autoreg, NULL);
 			size_left -= (ssize_t)pb_autoreg_estimate_row_size(arow->host, arow->host_metadata,
-					arow->listen_dns, arow->listen_ip);
+					arow->listen_ip, arow->listen_dns);
 			pb_list_free_autoreg(&pb->autoreg, arow);
 			continue;
 		}
