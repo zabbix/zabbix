@@ -651,6 +651,8 @@
 
 			this.overlay.setProperties({title, buttons});
 			this.overlay.unsetLoading();
+			this.overlay.recoverFocus();
+			this.overlay.containFocus();
 		}
 
 		delete() {
