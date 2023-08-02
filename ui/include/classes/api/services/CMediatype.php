@@ -35,6 +35,13 @@ class CMediatype extends CApiService {
 	protected $tableAlias = 'mt';
 	protected $sortColumns = ['mediatypeid'];
 
+	public const OUTPUT_FIELDS = ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email',
+		'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
+		'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval', 'content_type',
+		'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
+		'provider', 'parameters'
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -505,8 +512,10 @@ class CMediatype extends CApiService {
 				}
 
 				if ($type != $db_mediatype['type']) {
-					$mediatype =
-						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])) + $mediatype;
+					$mediatype = array_merge(
+						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])),
+						$mediatype
+					);
 				}
 			}
 		}
@@ -676,11 +685,15 @@ class CMediatype extends CApiService {
 				continue;
 			}
 
-			$uniq_field = $mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
+			$db_params = [];
 
-			$db_params = ($method === 'update')
-				? array_column($db_mediatypes[$mediatype['mediatypeid']]['parameters'], null, $uniq_field)
-				: [];
+			if ($method === 'update') {
+				$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
+				$db_uniq_field = $db_mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
+				$db_params = array_column($db_mediatype['parameters'], null, $db_uniq_field);
+			}
+
+			$uniq_field = $mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
 
 			foreach ($mediatype['parameters'] as &$param) {
 				if (array_key_exists($param[$uniq_field], $db_params)) {

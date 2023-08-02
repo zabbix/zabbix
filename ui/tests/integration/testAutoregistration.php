@@ -43,7 +43,7 @@ class testAutoregistration extends CIntegrationTest {
 		for ($i = 0; $i < $max_attempts; $i++) {
 			try {
 				$response = $this->call('host.get', [
-					'selectTags' => ['tag', 'value'],
+					'selectTags' => ['tag', 'value']
 				]);
 
 				$this->assertArrayHasKey('result', $response,
@@ -124,7 +124,7 @@ class testAutoregistration extends CIntegrationTest {
 						'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 						'operator' => CONDITION_OPERATOR_LIKE,
 						'value' => self::HOST_METADATA1
-					],
+					]
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
 			],
@@ -141,7 +141,7 @@ class testAutoregistration extends CIntegrationTest {
 						[
 							'tag' => 'tag1',
 							'value' => 'value 1'
-						],
+						]
 					]
 				],
 				[
@@ -154,7 +154,7 @@ class testAutoregistration extends CIntegrationTest {
 						[
 							'tag' => 'tag2',
 							'value' => 'value 2'
-						],
+						]
 					]
 				]
 			]
@@ -174,7 +174,7 @@ class testAutoregistration extends CIntegrationTest {
 						'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 						'operator' => CONDITION_OPERATOR_LIKE,
 						'value' => self::HOST_METADATA2
-					],
+					]
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
 			],
@@ -191,7 +191,7 @@ class testAutoregistration extends CIntegrationTest {
 						[
 							'tag' => 'tag2',
 							'value' => 'value 2'
-						],
+						]
 					]
 				],
 				[
@@ -204,7 +204,7 @@ class testAutoregistration extends CIntegrationTest {
 						[
 							'tag' => 'tag1',
 							'value' => 'value 1'
-						],
+						]
 					]
 				]
 			]
