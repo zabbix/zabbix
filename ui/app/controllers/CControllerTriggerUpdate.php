@@ -32,16 +32,16 @@ class CControllerTriggerUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'comments' =>							'db triggers.comments',
 			'context' =>							'in '.implode(',', ['host', 'template']),
 			'correlation_mode' =>					'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
 			'correlation_tag' =>					'db triggers.correlation_tag',
 			'dependencies' =>						'array',
-			'description' =>						'required|db triggers.description|not_empty',
+			'description' =>						'db triggers.comments',
 			'event_name' =>							'db triggers.event_name',
 			'expression' =>							'required|db triggers.expression|not_empty',
 			'hostid' =>								'db hosts.hostid',
 			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
+			'name' =>								'required|db triggers.description|not_empty',
 			'opdata' =>								'db triggers.opdata',
 			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
 			'recovery_expression' =>				'db triggers.recovery_expression',
@@ -94,7 +94,7 @@ class CControllerTriggerUpdate extends CController {
 		if ($this->db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			if ($this->db_trigger['templateid'] == 0) {
 				$trigger += [
-					'description' => $this->getInput('description'),
+					'description' => $this->getInput('name'),
 					'event_name' => $this->getInput('event_name', ''),
 					'opdata' => $this->getInput('opdata', ''),
 					'expression' => $this->getInput('expression'),
@@ -136,7 +136,7 @@ class CControllerTriggerUpdate extends CController {
 				'url_name' => $this->getInput('url_name', ''),
 				'url' => $this->getInput('url', ''),
 				'priority' => $this->getInput('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-				'comments' => $this->getInput('comments', ''),
+				'comments' => $this->getInput('description', ''),
 				'dependencies' => zbx_toObject($this->getInput('dependencies', []), 'triggerid'),
 				'tags' => $tags
 			];

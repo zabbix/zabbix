@@ -34,7 +34,7 @@
 			this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 			this.expression = this.form.querySelector('#expression');
 			this.expression_full = this.form.querySelector('#expression-full');
-			this.description = this.form.querySelector('#description');
+			this.name = this.form.querySelector('#name');
 
 			window.addPopupValues = (data) => {
 				this.addPopupValues(data.values);
@@ -59,10 +59,10 @@
 
 		#initActions() {
 			['input', 'keydown', 'paste'].forEach((event_type) => {
-				this.description.addEventListener(event_type,
+				this.name.addEventListener(event_type,
 					(e) => this.form.querySelector('#event_name').placeholder = e.target.value
 				);
-				this.description.dispatchEvent(new Event('input'));
+				this.name.dispatchEvent(new Event('input'));
 			});
 
 			this.form.addEventListener('click', (e) => {
@@ -267,11 +267,11 @@
 
 			Object.values(data).forEach((dependency) => {
 				const hosts = dependency.hosts.map(item => item['name']);
-				const description = hosts.join(', ') + <?= json_encode(NAME_DELIMITER) ?> + dependency.description;
+				const name = hosts.join(', ') + <?= json_encode(NAME_DELIMITER) ?> + dependency.description;
 				const prototype = dependency.flags == <?= json_encode(ZBX_FLAG_DISCOVERY_PROTOTYPE)?> ? '1' : '0';
 
 				dependencies.push({
-					description: description,
+					name: name,
 					triggerid: dependency.triggerid,
 					prototype: prototype
 				});
@@ -679,7 +679,7 @@
 
 			Object.values(data).forEach((dependency) => {
 				const element = {
-					description: dependency.description,
+					name: dependency.name,
 					triggerid: dependency.triggerid,
 					prototype: dependency.prototype
 				};

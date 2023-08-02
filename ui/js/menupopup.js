@@ -1105,7 +1105,7 @@ function getMenuPopupItem(options) {
 
 				view.editTrigger({
 					hostid: options.hostid,
-					description: options.name,
+					name: options.name,
 					expression: 'func(/' + options.host + '/' + options.key + ')',
 					context: options.context
 				});
@@ -1250,7 +1250,7 @@ function getMenuPopupItemPrototype(options) {
 
 			view.editTriggerPrototype({
 				parent_discoveryid: options.parent_discoveryid,
-				description: options.name,
+				name: options.name,
 				expression: 'func(/' + options.host + '/' + options.key + ')',
 				context: options.context
 			});

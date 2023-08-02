@@ -79,8 +79,8 @@ if ($discovered_trigger) {
 
 $trigger_form_grid
 	->addItem([
-		(new CLabel(_('Name'), 'description'))->setAsteriskMark(),
-		new CFormField((new CTextBox('description', $data['description'], $readonly))
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
+		new CFormField((new CTextBox('name', $data['description'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -339,7 +339,7 @@ $trigger_form_grid
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
 	->addItem([new CLabel(_('Description')),
-		(new CTextArea('comments', array_key_exists('comments', $data) ? $data['comments'] : ''))
+		(new CTextArea('description', array_key_exists('comments', $data) ? $data['comments'] : ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 			->setReadonly($discovered_trigger)
@@ -376,7 +376,7 @@ $dependencies_table = (new CTable())
 
 $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addItem(
 	(new CRow([
-		(new CLink(['#{description}']))
+		(new CLink(['#{name}']))
 			->addClass('js-related-trigger-edit')
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->setAttribute('data-triggerid', '#{triggerid}')

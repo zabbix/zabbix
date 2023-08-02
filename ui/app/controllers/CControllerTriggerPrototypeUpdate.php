@@ -32,15 +32,15 @@ class CControllerTriggerPrototypeUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'comments' =>							'db triggers.comments',
 			'correlation_mode' =>					'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
 			'correlation_tag' =>					'db triggers.correlation_tag',
 			'dependencies' =>						'array',
-			'description' =>						'required|db triggers.description|not_empty',
+			'description' =>						'db triggers.comments',
 			'discover' =>							'db triggers.discover',
 			'event_name' =>							'db triggers.event_name',
 			'expression' =>							'required|db triggers.expression|not_empty',
 			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
+			'name' =>								'required|db triggers.description|not_empty',
 			'opdata' =>								'db triggers.opdata',
 			'parent_discoveryid' => 				'required|db triggers.triggerid',
 			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
@@ -109,7 +109,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 
 		if ($this->db_trigger_prototype['templateid'] == 0) {
 			$trigger_prototype += [
-				'description' => $this->getInput('description'),
+				'description' => $this->getInput('name'),
 				'event_name' => $this->getInput('event_name', ''),
 				'opdata' => $this->getInput('opdata', ''),
 				'expression' => $this->getInput('expression'),
@@ -157,7 +157,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'url_name' => $this->getInput('url_name', ''),
 			'url' => $this->getInput('url', ''),
 			'priority' => $this->getInput('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-			'comments' => $this->getInput('comments', ''),
+			'comments' => $this->getInput('description', ''),
 			'dependencies' => $dependencies,
 			'tags' => $tags,
 			'status' => $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED,

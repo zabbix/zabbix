@@ -37,7 +37,7 @@ class CControllerTriggerEdit extends CController {
 			'context' =>							'in '.implode(',', ['host', 'template']),
 			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid',
-			'description' =>						'string',
+			'name' =>								'string',
 			'expression' =>							'string',
 			'show_inherited_tags' =>				'in 0,1',
 			'form_refresh' =>						'in 0,1'
@@ -99,7 +99,7 @@ class CControllerTriggerEdit extends CController {
 			'manual_close' => 1,
 			'correlation_mode' => 0,
 			'correlation_tag' => '',
-			'description' => $this->getInput('description', ''),
+			'description' => $this->getInput('name', ''),
 			'opdata' => '',
 			'priority' => '0',
 			'recovery_mode' => 0,
