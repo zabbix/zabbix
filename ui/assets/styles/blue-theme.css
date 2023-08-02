@@ -2842,7 +2842,7 @@ output {
   output.msg-bad {
     border-color: #dc3545; }
     output.msg-bad::before {
-      content: ""; }
+      content: ""; }
     output.msg-bad .msg-buttons button {
       color: #dc3545;
       background-color: transparent;
@@ -2862,7 +2862,7 @@ output {
   output.msg-warning {
     border-color: #ffc107; }
     output.msg-warning::before {
-      content: ""; }
+      content: ""; }
   output.msg-global {
     max-width: 475px;
     margin: 5% auto 0; }

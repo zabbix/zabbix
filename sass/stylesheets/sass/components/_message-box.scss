@@ -81,7 +81,7 @@ output {
 		border-color: $msg-bad-color;
 
 		&::before {
-			content: $zi-circle-info-filled;
+			content: $zi-circle-warning-filled;
 		}
 
 		.msg-buttons {
@@ -118,7 +118,7 @@ output {
 		border-color: $msg-warning-color;
 
 		&::before {
-			content: $zi-circle-info-filled;
+			content: $zi-circle-warning-filled;
 		}
 	}
 
