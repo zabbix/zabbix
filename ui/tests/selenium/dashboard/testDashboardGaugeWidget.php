@@ -1094,8 +1094,10 @@ class testDashboardGaugeWidget extends CWebTest {
 		$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($header).
 				"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 		$this->page->removeFocus();
+
+		// Sleep waits until the gauge is animated.
+		sleep(1);
 		$screenshot_area = $this->query('class:dashboard-grid-widget')->one();
-		$screenshot_area->query('xpath:.//div[contains(@class, "dashboard-grid-iterator-focus")]')->waitUntilNotVisible();
 		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
 	}
 }
