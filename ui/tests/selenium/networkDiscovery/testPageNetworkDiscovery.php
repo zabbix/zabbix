@@ -285,8 +285,8 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 						'Name' => 'network'
 					],
 					'expected' => [
-						'External network',
-						'Local network'
+						'Local network',
+						'External network'
 					]
 				]
 			],
@@ -297,8 +297,8 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 						'Status' => 'Enabled'
 					],
 					'expected' => [
-						'Discovery rule for update',
-						'External network'
+						'External network',
+						'Discovery rule for update'
 					]
 				]
 			],
@@ -309,9 +309,9 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 						'Status' => 'Disabled'
 					],
 					'expected' => [
-						'Disabled discovery rule for update',
+						'Local network',
 						'Discovery rule to check delete',
-						'Local network'
+						'Disabled discovery rule for update',
 					]
 				]
 			],
@@ -321,11 +321,11 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 						'Name' => ''
 					],
 					'expected' => [
-						'Disabled discovery rule for update',
-						'Discovery rule for update',
-						'Discovery rule to check delete',
+						'Local network',
 						'External network',
-						'Local network'
+						'Discovery rule to check delete',
+						'Discovery rule for update',
+						'Disabled discovery rule for update'
 					]
 				]
 			]
@@ -350,35 +350,34 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 
 
 	/**
-	 *
+	 * Check single Discovery rule status change by link, cancel actions.
 	 */
 	public function testPageNetworkDiscovery_SingleLink() {
-
+		$this->allActions('Local network', DRULE_STATUS_DISABLED, true, true, false);
+		$this->allActions('External network', DRULE_STATUS_ACTIVE, true, true, true);
 	}
 
 	/**
-	 *
+	 *	Check single Discovery Rule actions, cancel them.
 	 */
 	public function testPageNetworkDiscovery_SingleActions() {
-
+		$this->allActions('Discovery rule to check delete', DRULE_STATUS_DISABLED, false, true, false);
+		$this->allActions('Discovery rule for update', DRULE_STATUS_ACTIVE, false, true, true);
 	}
 
 	/**
-	 *
+	 * Check Discovery Rule mass action cancellation.
 	 */
-	public function testPageNetworkDiscovery_MassActions() {
-
+	public function testPageNetworkDiscovery_MassActionsCancel() {
+		$this->allActions('', '', false, false, true);
 	}
 
-
-
-
-
-
-
-
-
-
+	/**
+	 * Check Discovery Rule mass actions.
+	 */
+	public function testPageNetworkDiscovery_MassActions() {
+		$this->allActions('', '', false, false, false);
+	}
 
 	/**
 	 * Function for all possible actions.
@@ -439,33 +438,14 @@ class testPageNetworkDiscovery extends CLegacyWebTest {
 					CMessageElement::find()->one()->close();
 					if ($status === 'Delete') {
 						$this->assertSelectedCount(0);
-						$this->assertTableStats($single === false ? 0 : $count - count($name));
-						$this->assertEquals(0, ($single === false) ? $count
-							: CDBHelper::getCount('SELECT NULL FROM drule WHERE name IN ('.CDBHelper::escape($name).')')
+						$this->assertTableStats($single === false ? 0 : $count - 1);
+						$this->assertEquals(0, ($single === false) ? CDBHelper::getCount('SELECT NULL FROM drules')
+							: CDBHelper::getCount('SELECT NULL FROM drules WHERE name IN ('.CDBHelper::escape($name).')')
+
 						);
 					}
 				}
 			}
 		}
 	}
-
-	/**
-	 *
-	 */
-	public function testPageNetworkDiscovery_Cancel() {
-
-	}
-
-
-	/**
-	 *
-	 */
-	public function testPageNetworkDiscovery_Delete() {
-
-
-	}
-
-
-
-
 }
