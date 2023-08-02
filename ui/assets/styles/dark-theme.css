@@ -710,6 +710,8 @@ footer {
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }
+      .form-grid .table-forms-separator td .drag-icon {
+        top: 5px; }
 
 .btn-add,
 .btn-edit,
@@ -1623,6 +1625,8 @@ div.dashboard-grid-widget-item {
 .dashboard-grid-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
 
+form.dashboard-grid-widget-tophosts #list_columns .drag-icon {
+  top: 1px; }
 form.dashboard-grid-widget-tophosts #list_columns .text {
   max-width: 150px; }
 form.dashboard-grid-widget-tophosts #column {
@@ -3521,10 +3525,16 @@ form.is-loading {
     .table-forms td.td-drag-icon {
       padding: 0 11px 0 0;
       vertical-align: middle; }
-    .table-forms td .drag-icon {
-      position: absolute;
-      top: 5px;
-      margin-right: 5px; }
+  .table-forms .drag-icon {
+    position: absolute;
+    top: 1px;
+    margin-right: 5px; }
+  .table-forms .list-vertical-accordion .drag-icon,
+  .table-forms .table-forms-separator .drag-icon {
+    top: 5px; }
+  .table-forms .httpconf-steps-dynamic-row .drag-icon,
+  .table-forms .overrides-list-item .drag-icon {
+    top: 0; }
   .table-forms .table-forms-td-left {
     display: table-cell;
     padding: 5px 0;
@@ -5834,6 +5844,7 @@ svg {
   max-width: 738px;
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
+    position: relative;
     display: table-row; }
     .overrides-list .overrides-list-item .btn-remove {
       position: relative;
