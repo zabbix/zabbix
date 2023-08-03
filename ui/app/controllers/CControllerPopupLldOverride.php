@@ -74,6 +74,14 @@ class CControllerPopupLldOverride extends CController {
 			'overrides_names' => $this->getInput('overrides_names', [])
 		];
 
+		if ($this->hasInput('validate')) {
+			foreach ($page_options['overrides_filters'] as $i => $filter) {
+				if ($filter['macro'] === '' && $filter['value'] === '') {
+					unset($page_options['overrides_filters'][$i]);
+				}
+			}
+		}
+
 		$page_options['overrides_filters'] = $page_options['overrides_filters']
 			? sortLldRuleFilterConditions($page_options['overrides_filters'], $page_options['overrides_evaltype'])
 			: [[
@@ -99,12 +107,6 @@ class CControllerPopupLldOverride extends CController {
 					if ($name === $page_options['name']) {
 						error(_s('Override with name "%1$s" already exists.', $name));
 					}
-				}
-			}
-
-			foreach ($page_options['overrides_filters'] as $i => $filter) {
-				if ($filter['macro'] === '' && $filter['value'] === '') {
-					unset($page_options['overrides_filters'][$i]);
 				}
 			}
 
