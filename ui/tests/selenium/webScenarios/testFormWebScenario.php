@@ -731,6 +731,12 @@ class testFormWebScenario extends CWebTest {
 							'index' => 0,
 							'name' => STRING_255,
 							'value' => STRING_2000
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => 'the 2nd header',
+							'value' => 'the value of the 2nd header'
 						]
 					],
 					'tags' => [
