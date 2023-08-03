@@ -39,7 +39,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 			[
 				'host' => 'Host for web scenarios',
 				'groups' => [
-					'groupid' => '6'
+					'groupid' => 6
 				]
 			]
 		]);
@@ -67,49 +67,59 @@ class testPageMonitoringWebDetails extends CWebTest {
 	public function testPageMonitoringWebDetails_Layout() {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
 
-		// Close Kiosk mode if opened.
-		if ($this->query('xpath://button[@title="Normal view"]')->exists()) {
-			$this->query('xpath://button[@title="Normal view"]')->one()->click();
-			$this->page->waitUntilReady();
-		}
-
-		// If the time selector is not visible - enable it.
-		$filter_button = $this->query('id:ui-id-1')->one();
-		$filter_button_minimized = $this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]');
-		if ($filter_button_minimized->exists()) {
-			$filter_button->click();
-		}
-
 		// Assert title and header.
 		$this->page->assertTitle('Details of web scenario');
 		$this->page->assertHeader('Details of web scenario: Layout');
 
 		// Assert table column names.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'], $table->getHeadersText());
+		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'],
+				$this->query('class:list-table')->asTable()->one()->getHeadersText());
 
 		// Check filter layout and values.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals('now-1h', $form->query('id:from')->one()->getValue());
-		$this->assertEquals('now', $form->query('id:to')->one()->getValue());
-		$this->assertEquals('selected', $form->query('xpath://a[@data-from="now-1h"]')->one()->getAttribute('class'));
-		$this->assertTrue($this->query('xpath://button[@class="btn-time-left"]')->one()->isEnabled());
-		$this->assertTrue($this->query('button:Zoom out')->one()->isEnabled());
-		$this->assertFalse($this->query('xpath://button[@class="btn-time-right"]')->one()->isEnabled());
+		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
+		$this->assertEquals('selected', $form->query('link:Last 1 hour')->one()->getAttribute('class'));
+		$buttons = [
+			'xpath://button[contains(@class, "btn-time-left")]' => true,
+			'xpath://button[contains(@class, "btn-time-right")]' => false,
+			'button:Zoom out' => true,
+			'button:Apply' => true,
+			'id:from_calendar' => true,
+			'id:to_calendar' => true
+		];
+
+		foreach ($buttons as $selector => $enabled) {
+			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
+		}
+	}
+
+	/**
+	 * Change values in the filter section and check the resulting changes in graphs.
+	 */
+	public function testPageMonitoringWebDetails_CheckFilters() {
+		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
+		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Set custom time filter.
 		$form->fill(['id:from' => 'now-2h', 'id:to' => 'now-1h']);
 		$form->query('id:apply')->one()->click();
-		$this->assertGraphSrcContains('from=now-2h&to=now-1h');
+		$this->assertGraphImageSrcContains('from=now-2h&to=now-1h');
 		$this->assertTrue($this->query('xpath://button[@class="btn-time-right"]')->one()->isEnabled());
 
 		// Use time filter preset button.
 		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
-		$this->assertGraphSrcContains('from=now-30d&to=now');
+		$this->assertGraphImageSrcContains('from=now-30d&to=now');
 
 		// Minimize filter section.
-		$filter_button->click();
-		$this->assertTrue($filter_button_minimized->exists());
+		$this->query('id:ui-id-1')->one()->click();
+		$this->assertTrue($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists());
+	}
+
+	/**
+	 * Open and test the Kiosk mode.
+	 */
+	public function testPageMonitoringWebDetails_CheckKioskMode() {
+		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
 
 		// Test Kiosk mode.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
@@ -318,11 +328,11 @@ class testPageMonitoringWebDetails extends CWebTest {
 	}
 
 	/**
-	 * Waits for both graphs to reload after a filter change and asserts that their src strings contain some value.
+	 * Waits for both graphs to reload after a filter change and asserts that their image src attribute contains some value.
 	 *
-	 * @param string $expected_src    the value that should be contained within the src parameter
+	 * @param string $expected_src    the value that should be contained within the graph's image src attribute
 	 */
-	protected function assertGraphSrcContains($expected_src) {
+	protected function assertGraphImageSrcContains($expected_src) {
 		foreach (['graph_in', 'graph_time'] as $i => $graph_id) {
 			$graph = $this->query('id', $graph_id)->one();
 
