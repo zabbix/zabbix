@@ -63,7 +63,7 @@
 			});
 
 			document.getElementById('js-import').addEventListener('click', () => {
-				const overlay = PopUp("popup.import", {
+				PopUp("popup.import", {
 					rules_preset: "template",
 					<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>: "<?=CCsrfTokenHelper::get('import') ?>"
 				}, {
