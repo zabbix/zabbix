@@ -82,7 +82,7 @@ $formgrid = (new CFormGrid())
 		new CLabel([
 			_('Type of information'),
 			(new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
-				->setId('js-item-type-hint')
+				->addClass('js-hint')
 				->addClass(ZBX_STYLE_DISPLAY_NONE)
 			], 'label-value-type'),
 		new CFormField(
@@ -656,7 +656,7 @@ if ($data['config']['hk_history_global']  && ($data['host']['status'] == HOST_ST
 
 	$hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
 		' ('.$data['config']['hk_history'].')'
-	])))->setId('history_mode_hint');
+	])))->addClass('js-hint');
 }
 
 $formgrid->addItem([
@@ -688,7 +688,7 @@ if ($data['config']['hk_trends_global'] && ($data['host']['status'] == HOST_STAT
 
 	$hint = (new CSpan(makeWarningIcon([_x('Overridden by', 'item_form').' ', $link,
 		' ('.$data['config']['hk_trends'].')'
-	])))->setId('trends_mode_hint');
+	])))->addClass('js-hint');
 }
 
 $formgrid

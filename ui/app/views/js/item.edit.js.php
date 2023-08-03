@@ -105,12 +105,12 @@ window.item_edit_form = new class {
 			ipmi_sensor: this.form.querySelector('[name="ipmi_sensor"]')
 		};
 		this.label = {
-			interfaceid: this.form.querySelector('[for=interfaceid]'),
-			value_type_hint: this.form.querySelector('#js-item-type-hint'),// remove id
+			interfaceid: this.form.querySelector('[for="interfaceid"]'),
+			value_type_hint: this.form.querySelector('[for="label-value-type"] .js-hint'),
 			username: this.form.querySelector('[for=username]'),
 			ipmi_sensor: this.form.querySelector('[for="ipmi_sensor"]'),
-			history_hint: this.form.querySelector('#history_mode_hint'),// remove id [for="history"] > :has([data-hintbox])
-			trends_hint: this.form.querySelector('#trends_mode_hint') // remove id
+			history_hint: this.form.querySelector('[for="history"] .js-hint'),
+			trends_hint: this.form.querySelector('[for="trends"] .js-hint')
 		};
 		jQuery('#parameters-table').dynamicRows({
 			template: '#parameter-row-tmpl',
@@ -197,6 +197,13 @@ window.item_edit_form = new class {
 
 		// Preprocessing tab events.
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
+		this.form.querySelector('#processing-tab').addEventListener('click', e => {
+			const target = e.target;
+
+			if (target.matches('.element-table-add') || target.matches('.element-table-remove')) {
+				this.updateFieldsVisibility();
+			}
+		});
 	}
 
 	clone() {
@@ -263,6 +270,7 @@ window.item_edit_form = new class {
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
 		const ipmi_sensor_required = type == ITEM_TYPE_IPMI && key !== 'ipmi.get';
 		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
+		const preprocessing_active = this.form.querySelector('[name^="preprocessing"][name$="[type]"]') !== null;
 
 		this.#updateActionButtons();
 		this.#updateCustomIntervalVisibility();
@@ -278,6 +286,9 @@ window.item_edit_form = new class {
 		this.field.ipmi_sensor[ipmi_sensor_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.ipmi_sensor.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, ipmi_sensor_required);
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
+		this.form.querySelectorAll('.js-item-preprocessing-type').forEach(
+			node => node.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !preprocessing_active)
+		);
 	}
 
 	#showErrorDialog(body, trigger_element) {
