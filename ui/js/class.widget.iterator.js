@@ -168,7 +168,7 @@ class CWidgetIterator extends CWidget {
 		}
 	}
 
-	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
+	_startUpdating({delay_sec = 0} = {}) {
 		if (this._isTooSmall()) {
 			return;
 		}
@@ -179,7 +179,7 @@ class CWidgetIterator extends CWidget {
 			}
 		}
 
-		super._startUpdating(delay_sec, {do_update_once});
+		super._startUpdating({delay_sec});
 	}
 
 	setPos(pos, {is_managed = false} = {}) {

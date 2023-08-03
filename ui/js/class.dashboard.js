@@ -38,6 +38,8 @@ const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated
 
 class CDashboard {
 
+	static REFERENCE_DASHBOARD = 'DASHBOARD';
+
 	constructor(target, {
 		containers,
 		buttons,
@@ -101,11 +103,11 @@ class CDashboard {
 		this._dynamic_hostid = dynamic_hostid;
 		this._csrf_token = csrf_token;
 
-		this._init();
+		this.#initialize();
 		this._registerEvents();
 	}
 
-	_init() {
+	#initialize() {
 		this._state = DASHBOARD_STATE_INITIAL;
 
 		this._dashboard_pages = new Map();
@@ -164,8 +166,6 @@ class CDashboard {
 		this._state = DASHBOARD_STATE_ACTIVE;
 
 		this._activateEvents();
-
-		this._announceWidgets();
 
 		const dashboard_page = this._getInitialDashboardPage();
 
@@ -422,14 +422,6 @@ class CDashboard {
 		}
 	}
 
-	_announceWidgets() {
-		const dashboard_pages = Array.from(this._dashboard_pages.keys());
-
-		for (const dashboard_page of dashboard_pages) {
-			dashboard_page.announceWidgets(dashboard_pages);
-		}
-	}
-
 	_createBusyCondition() {
 		if (this._busy_conditions.size === 0) {
 			this.fire(DASHBOARD_EVENT_BUSY);
@@ -522,7 +514,7 @@ class CDashboard {
 		}
 
 		if (this._state === DASHBOARD_STATE_ACTIVE) {
-			this._announceWidgets();
+			this.#validateFieldsReferences();
 		}
 
 		if (!this._is_kiosk_mode) {
@@ -563,7 +555,7 @@ class CDashboard {
 		}
 
 		if (dashboard_page.getState() !== DASHBOARD_PAGE_STATE_INITIAL) {
-			dashboard_page.destroy();
+			this.#destroyDashboardPage(dashboard_page);
 		}
 
 		if (!this._is_kiosk_mode) {
@@ -572,7 +564,7 @@ class CDashboard {
 
 		this._dashboard_pages.delete(dashboard_page);
 
-		this._announceWidgets();
+		this.#validateFieldsReferences();
 
 		this._target.classList.toggle(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE, this._dashboard_pages.size > 1);
 
@@ -610,6 +602,34 @@ class CDashboard {
 			}
 		}
 
+		const references = this._getReferences();
+		const references_substitution = new Map();
+
+		for (const widget of widgets) {
+			if ('reference' in widget.fields) {
+				const old_reference = widget.fields.reference;
+				const new_reference = this._createReference({references});
+
+				widget.fields.reference = new_reference;
+
+				references.add(new_reference);
+				references_substitution.set(old_reference, new_reference);
+			}
+		}
+
+		for (const widget of widgets) {
+			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(widget.fields, widget.fields_references)) {
+				const reference = accessor.getReference();
+
+				if (references_substitution.has(reference)) {
+					accessor.setReference(references_substitution.get(reference));
+				}
+				else if (!references.has(reference)) {
+					accessor.setReference('');
+				}
+			}
+		}
+
 		const busy_condition = this._createBusyCondition();
 
 		Promise.resolve()
@@ -631,37 +651,9 @@ class CDashboard {
 					if (response.widgets[i] !== null) {
 						sane_widgets.push({
 							...widgets[i],
-							fields: response.widgets[i].fields
+							fields: response.widgets[i].fields,
+							fields_references: response.widgets[i].fields_references
 						});
-					}
-				}
-
-				const used_references = this._getUsedReferences();
-				const reference_substitution = new Map();
-
-				for (const widget of sane_widgets) {
-					const widget_class = eval(this._widget_defaults[widget.type].js_class);
-
-					if (widget_class.hasReferenceField()) {
-						const old_reference = widget.fields.reference;
-						const new_reference = this._createReference({used_references});
-
-						widget.fields.reference = new_reference;
-
-						used_references.add(new_reference);
-						reference_substitution.set(old_reference, new_reference);
-					}
-				}
-
-				for (const widget of sane_widgets) {
-					const widget_class = eval(this._widget_defaults[widget.type].js_class);
-
-					for (const reference_field of widget_class.getForeignReferenceFields()) {
-						const old_reference = widget.fields[reference_field];
-
-						if (reference_substitution.has(old_reference)) {
-							widget.fields[reference_field] = reference_substitution.get(old_reference);
-						}
 					}
 				}
 
@@ -737,24 +729,16 @@ class CDashboard {
 			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
 		}
 
-		const new_widget_class = eval(this._widget_defaults[new_widget_data.type].js_class);
-
-		if (new_widget_class.hasReferenceField()) {
+		if ('reference' in new_widget_data.fields) {
 			new_widget_data.fields.reference = this._createReference();
 		}
 
-		let references = [];
+		const references = this._getReferences();
 
-		for (const widget of dashboard_page.getWidgets()) {
-			if (widget.constructor.hasReferenceField()) {
-				references.push(widget.getFields()['reference']);
-			}
-		}
-
-		for (const reference_field of new_widget_class.getForeignReferenceFields()) {
-			if (reference_field in new_widget_data.fields
-					&& !references.includes(new_widget_data.fields[reference_field])) {
-				new_widget_data.fields[reference_field] = '';
+		for (const accessor of CWidgetBase.getFieldsReferencesAccessors(new_widget_data.fields,
+				new_widget_data.fields_references)) {
+			if (!references.has(accessor.getReference())) {
+				accessor.setReference('');
 			}
 		}
 
@@ -798,11 +782,14 @@ class CDashboard {
 				dashboard_page.replaceWidget(paste_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
+					fields_references: response.widgets[0].fields_references,
 					widgetid: null,
 					pos: new_widget_pos,
 					is_new: true,
 					unique_id: this._createUniqueId()
 				});
+
+				this.#validateFieldsReferences();
 			})
 			.catch((exception) => {
 				dashboard_page.deleteWidget(paste_placeholder_widget);
@@ -978,23 +965,31 @@ class CDashboard {
 
 	_doSelectDashboardPage(dashboard_page) {
 		if (this._selected_dashboard_page !== null) {
-			this._deactivatePage(this._selected_dashboard_page);
+			this._deactivateDashboardPage(this._selected_dashboard_page);
 		}
 
 		this._selected_dashboard_page = dashboard_page;
 
 		if (this._selected_dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
-			this._selected_dashboard_page.start();
+			this.#startDashboardPage(this._selected_dashboard_page);
 		}
 
-		this._activatePage(this._selected_dashboard_page);
+		this._activateDashboardPage(this._selected_dashboard_page);
 
 		if (this._is_kiosk_mode) {
 			this._resetHeaderLines();
 		}
 	}
 
-	_activatePage(dashboard_page) {
+	#startDashboardPage(dashboard_page) {
+		dashboard_page.on(CDashboardPage.EVENT_PRELOAD_OUTER_DATA_SOURCE,
+			this._events.dashboardPagePreloadOuterDataSource
+		);
+
+		dashboard_page.start();
+	}
+
+	_activateDashboardPage(dashboard_page) {
 		dashboard_page.activate();
 		dashboard_page
 			.on(DASHBOARD_PAGE_EVENT_EDIT, this._events.dashboardPageEdit)
@@ -1005,15 +1000,14 @@ class CDashboard {
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.on(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
-			.on(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
-			.on(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets);
+			.on(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste);
 
 		if (this._is_kiosk_mode) {
 			dashboard_page.on(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
 		}
 	}
 
-	_deactivatePage(dashboard_page) {
+	_deactivateDashboardPage(dashboard_page) {
 		dashboard_page.deactivate();
 		dashboard_page
 			.off(DASHBOARD_PAGE_EVENT_EDIT, this._events.dashboardPageEdit)
@@ -1024,12 +1018,19 @@ class CDashboard {
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS, this._events.dashboardPageWidgetActions)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_EDIT, this._events.dashboardPageWidgetEdit)
 			.off(DASHBOARD_PAGE_EVENT_WIDGET_COPY, this._events.dashboardPageWidgetCopy)
-			.off(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste)
-			.off(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS, this._events.dashboardPageAnnounceWidgets);
+			.off(DASHBOARD_PAGE_EVENT_WIDGET_PASTE, this._events.dashboardPageWidgetPaste);
 
 		if (this._is_kiosk_mode) {
 			dashboard_page.off(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, this._events.dashboardPageReserveHeaderLines);
 		}
+	}
+
+	#destroyDashboardPage(dashboard_page) {
+		dashboard_page.off(CDashboardPage.EVENT_PRELOAD_OUTER_DATA_SOURCE,
+			this._events.dashboardPagePreloadOuterDataSource
+		);
+
+		dashboard_page.destroy();
 	}
 
 	_setInitialDashboardPage(dashboard_page) {
@@ -1134,7 +1135,8 @@ class CDashboard {
 
 		const busy_condition = this._createBusyCondition();
 
-		return new Promise((resolve) => resolve(this._promiseApplyProperties(properties)))
+		Promise.resolve()
+			.then(() => this._promiseApplyProperties(properties))
 			.then(() => {
 				this._is_unsaved = true;
 
@@ -1456,13 +1458,13 @@ class CDashboard {
 
 		Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
-			.then((fields) => {
+			.then(({fields, fields_references}) => {
 				this._is_unsaved = true;
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				if (widget !== null && widget.getType() === type) {
-					widget.updateProperties({name, view_mode, fields});
+					widget.updateProperties({name, view_mode, fields, fields_references});
 
 					return;
 				}
@@ -1472,9 +1474,7 @@ class CDashboard {
 					updateUserProfile('web.dashboard.last_widget_type', type, [], PROFILE_TYPE_STR);
 				}
 
-				const widget_class = eval(this._widget_defaults[type].js_class);
-
-				if (widget_class.hasReferenceField()) {
+				if ('reference' in fields) {
 					fields.reference = this._createReference();
 				}
 
@@ -1483,6 +1483,7 @@ class CDashboard {
 					name,
 					view_mode,
 					fields,
+					fields_references,
 					widgetid: null,
 					pos: widget === null ? this._new_widget_pos_reserved : widget.getPos(),
 					is_new: widget === null,
@@ -1509,6 +1510,8 @@ class CDashboard {
 						.then(() => {
 							dashboard_page.replaceWidget(widget, widget_data);
 							dashboard_page.resetWidgetPlaceholder();
+
+							this.#validateFieldsReferences();
 						});
 				}
 			})
@@ -1566,7 +1569,7 @@ class CDashboard {
 					throw {error: response.error};
 				}
 
-				return response.fields;
+				return response;
 			});
 	}
 
@@ -1865,9 +1868,14 @@ class CDashboard {
 		return 'U' + (this._unique_id_index++).toString(36).toUpperCase().padStart(6, '0');
 	}
 
-	_createReference({used_references = null} = {}) {
-		if (used_references === null) {
-			used_references = this._getUsedReferences();
+	/**
+	 * @param {Set|null} references
+	 *
+	 * @returns {string}
+	 */
+	_createReference({references = null} = {}) {
+		if (references === null) {
+			references = this._getReferences();
 		}
 
 		let reference;
@@ -1879,29 +1887,50 @@ class CDashboard {
 				reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
 			}
 		}
-		while (used_references.has(reference));
+		while (references.has(reference));
 
 		return reference;
 	}
 
-	_getUsedReferences() {
-		const used_references = new Set();
+	_getReferences() {
+		const references = new Set();
 
 		for (const dashboard_page of this._dashboard_pages.keys()) {
 			for (const widget of dashboard_page.getWidgets()) {
 				const fields = widget.getFields();
 
-				if (widget.constructor.hasReferenceField()) {
-					used_references.add(fields.reference);
-				}
-
-				for (const reference_field of widget.constructor.getForeignReferenceFields()) {
-					used_references.add(fields[reference_field]);
+				if ('reference' in fields) {
+					references.add(fields.reference);
 				}
 			}
 		}
 
-		return used_references;
+		return references;
+	}
+
+	#validateFieldsReferences() {
+		const references = this._getReferences();
+
+		for (const dashboard_page of this._dashboard_pages.keys()) {
+			for (const widget of dashboard_page.getWidgets()) {
+				const fields = widget.getFields();
+				const fields_references = widget.getFieldsReferences();
+
+				let has_updates = false;
+
+				for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields, fields_references)) {
+					if (!references.has(accessor.getReference())) {
+						accessor.setReference('');
+
+						has_updates = true;
+					}
+				}
+
+				if (has_updates) {
+					widget.updateProperties({fields});
+				}
+			}
+		}
 	}
 
 	// Internal events management methods.
@@ -1911,6 +1940,32 @@ class CDashboard {
 		let user_interaction_animation_frame = null;
 
 		this._events = {
+			dashboardPagePreloadOuterDataSource: (e) => {
+				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
+					return;
+				}
+
+				for (const dashboard_page of this._dashboard_pages.keys()) {
+					if (dashboard_page === e.target) {
+						continue;
+					}
+
+					for (const widget of dashboard_page.getWidgets()) {
+						if (widget.getFields().reference === e.detail.reference) {
+							if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
+								this.#startDashboardPage(dashboard_page);
+							}
+
+							dashboard_page.preloadWidget(widget);
+
+							return;
+						}
+					}
+				}
+
+				console.log('Could not preload outer data source', e.detail.reference);
+			},
+
 			dashboardPageEdit: () => {
 				this.setEditMode({is_internal_call: true});
 			},
@@ -1966,6 +2021,8 @@ class CDashboard {
 
 			dashboardPageWidgetDelete: () => {
 				this._clearWarnings();
+
+				this.#validateFieldsReferences();
 			},
 
 			dashboardPageWidgetPosition: () => {
@@ -2004,10 +2061,6 @@ class CDashboard {
 				const widget = e.detail.widget;
 
 				this.pasteWidget(this.getStoredWidgetDataCopy(), {widget});
-			},
-
-			dashboardPageAnnounceWidgets: () => {
-				this._announceWidgets();
 			},
 
 			dashboardPageReserveHeaderLines: (e) => {

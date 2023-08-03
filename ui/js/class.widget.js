@@ -24,29 +24,6 @@
 class CWidget extends CWidgetBase {
 
 	/**
-	 * Check if widgets of this type implement communication with other widgets. The reference field represents the
-	 * unique ID of the widget. Its name is "reference". The value is generated and regenerated automatically when
-	 * copying widgets or dashboard pages.
-	 *
-	 * @returns {boolean}
-	 */
-	static hasReferenceField() {
-		return false;
-	}
-
-	/**
-	 * Get field names by which widgets of this type refer and store connections to other widgets. These fields have a
-	 * role of foreign keys, referring to the corresponding "reference" fields of target widgets. The widget is
-	 * responsible for setting field values. The values are regenerated automatically when copying widgets or dashboard
-	 * pages.
-	 *
-	 * @returns {string[]}
-	 */
-	static getForeignReferenceFields() {
-		return [];
-	}
-
-	/**
 	 * Define initial state of the widget.
 	 *
 	 * Invoked on widget instantiation. No HTML or data manipulation must be done at this step.
@@ -121,18 +98,6 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
-	 * Make the acquaintance of other widgets on all dashboard pages so that related widgets can establish connections.
-	 *
-	 * Invoked each time when the configuration of widgets is updated.
-	 *
-	 * Possible widget state: WIDGET_STATE_INITIAL, WIDGET_STATE_ACTIVE, WIDGET_STATE_INACTIVE.
-	 *
-	 * @param {CWidget[]} widgets
-	 */
-	announceWidgets(widgets) {
-	}
-
-	/**
 	 * Whether to display small vertical padding for the widget contents' container.
 	 *
 	 * @returns {boolean}
@@ -190,12 +155,15 @@ class CWidget extends CWidgetBase {
 	 * @returns {Object}
 	 */
 	getUpdateRequestData() {
+		const outer_data = this.getOuterData();
+
 		return {
 			templateid: this._dashboard.templateid ?? undefined,
 			dashboardid: this._dashboard.dashboardid ?? undefined,
 			widgetid: this._widgetid ?? undefined,
 			name: this._name !== '' ? this._name : undefined,
 			fields: Object.keys(this._fields).length > 0 ? this._fields : undefined,
+			outer_data: Object.keys(outer_data).length > 0 ? outer_data : undefined,
 			view_mode: this._view_mode,
 			edit_mode: this._is_edit_mode ? 1 : 0,
 			dynamic_hostid: this._dashboard.templateid !== null || this.supportsDynamicHosts()

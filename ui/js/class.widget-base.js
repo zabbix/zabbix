@@ -58,12 +58,6 @@ const WIDGET_EVENT_ENTER = 'widget-enter';
 // Widget leave event: informs the dashboard page to un-focus the widget.
 const WIDGET_EVENT_LEAVE = 'widget-leave';
 
-// Widget before-update event: thrown by a widget immediately before the update cycle has started.
-const WIDGET_EVENT_BEFORE_UPDATE = 'widget-before-update';
-
-// Widget after-update event: thrown by a widget immediately after the update cycle has finished.
-const WIDGET_EVENT_AFTER_UPDATE = 'widget-after-update';
-
 // Widget copy event: informs the dashboard page to copy the widget to the local storage.
 const WIDGET_EVENT_COPY = 'widget-copy';
 
@@ -78,6 +72,18 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
  */
 class CWidgetBase {
 
+	static EVENT_PRELOAD_OUTER_DATA_SOURCE = 'widget-preload-outer-data-source';
+
+	#fields_references_accessors = null;
+
+	#outer_data = new Map();
+
+	#outer_data_subscriptions = [];
+
+	#is_data_exchange_active = false;
+
+	#is_preloaded = false;
+
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
 	 *
@@ -85,6 +91,7 @@ class CWidgetBase {
 	 * @param {string}      name                Widget name to display in the header.
 	 * @param {number}      view_mode           One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
 	 * @param {Object}      fields              Widget field values (widget configuration data).
+	 * @param {Object}      fields_references   Widget field reference descriptor.
 	 *
 	 * @param {Object}      defaults            Widget type defaults.
 	 *        {string}      defaults.name           Default name to display in the header, if no custom name given.
@@ -92,6 +99,8 @@ class CWidgetBase {
 	 *        {number}      defaults.size.width     Default width.
 	 *        {number}      defaults.size.height    Default height
 	 *        {string}      defaults.js_class       JavaScript class name.
+	 *        {Object}      defaults.in             Fields able to receive data from the event hub.
+	 *        {Array}       defaults.out            Fields able to broadcast data to the event hub.
 	 *
 	 * @param {string|null} widgetid            Widget ID stored in the database, or null for new widgets.
 	 *
@@ -136,6 +145,7 @@ class CWidgetBase {
 		name,
 		view_mode,
 		fields,
+		fields_references,
 		defaults,
 		widgetid = null,
 		pos = null,
@@ -159,8 +169,17 @@ class CWidgetBase {
 		this._type = type;
 		this._name = name;
 		this._view_mode = view_mode;
-		this._fields = fields;
-		this._defaults = defaults;
+		this._fields = {...fields};
+		this._fields_references = {...fields_references};
+
+		this._defaults = {
+			name: defaults.name,
+			size: defaults.size,
+			js_class: defaults.js_class,
+			in: {...defaults.in},
+			out: defaults.out
+		};
+
 		this._widgetid = widgetid;
 		this._pos = pos;
 		this._is_new = is_new;
@@ -186,13 +205,13 @@ class CWidgetBase {
 		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
-		this._init();
+		this.#initialize();
 	}
 
 	/**
 	 * Define initial data. Invoked once, upon instantiation.
 	 */
-	_init() {
+	#initialize() {
 		this._css_classes = {
 			actions: 'dashboard-grid-widget-actions',
 			container: 'dashboard-grid-widget-container',
@@ -218,7 +237,6 @@ class CWidgetBase {
 		this._update_retry_sec = 3;
 		this._show_preloader_asap = true;
 		this._resizable_handles = [];
-
 		this._hide_preloader_animation_frame = null;
 
 		this._events = {};
@@ -280,6 +298,8 @@ class CWidgetBase {
 
 		this._state = WIDGET_STATE_ACTIVE;
 
+		this.#startDataExchange();
+
 		this.onActivate();
 
 		this._activateEvents();
@@ -335,6 +355,8 @@ class CWidgetBase {
 
 		this._state = WIDGET_STATE_DESTROYED;
 
+		this.#stopDataExchange();
+
 		this.onDestroy();
 	}
 
@@ -342,6 +364,143 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	onDestroy() {
+	}
+
+	// Widget communication methods.
+
+	/**
+	 * Broadcast data to dependent widgets.
+	 *
+	 * @param {Object} data  Object containing key-value pairs, like { _hostid: "123", _itemid: "789" }.
+	 */
+	broadcast(data) {
+		const declared_types = new Set();
+
+		for (const {type} of this._defaults.out) {
+			declared_types.add(type);
+		}
+
+		for (const type of Object.keys(data)) {
+			if (!declared_types.has(type)) {
+				throw new Error('Cannot broadcast token of undeclared type.');
+			}
+		}
+
+		for (const [type, value] of Object.entries(data)) {
+			ZABBIX.EventHub.publish({
+				data: value,
+				descriptor: {
+					context: 'dashboard',
+					sender_type: 'widget',
+					widget_type: this._type,
+					reference: this._fields.reference,
+					type
+				}
+			});
+		}
+	}
+
+	#broadcastDefaults() {
+		for (const {type} of this._defaults.out) {
+			const descriptor = {
+				context: 'dashboard',
+				sender_type: 'widget',
+				widget_type: this._type,
+				reference: this._fields.reference,
+				type
+			};
+
+			if (!ZABBIX.EventHub.isDataAvailable(descriptor)) {
+				ZABBIX.EventHub.publish({data: null, descriptor});
+			}
+		}
+	}
+
+	#startDataExchange() {
+		if (this.#is_data_exchange_active) {
+			return;
+		}
+
+		this.#is_data_exchange_active = true;
+
+		for (const accessor of this.#getFieldsReferencesAccessors()) {
+			this.preloadOuterDataSource(accessor.getReference());
+
+			const subscription = ZABBIX.EventHub.subscribe({
+				require: {
+					context: 'dashboard',
+					reference: accessor.getReference(),
+					type: accessor.type
+				},
+				callback: ({data}) => {
+					this.#outer_data.set(accessor, data);
+
+					this._startUpdating();
+				}
+			});
+
+			this.#outer_data_subscriptions.push(subscription);
+		}
+	}
+
+	#stopDataExchange() {
+		if (!this.#is_data_exchange_active) {
+			return;
+		}
+
+		this.#is_data_exchange_active = false;
+
+		ZABBIX.EventHub.invalidateData({
+			context: 'dashboard',
+			sender_type: 'widget',
+			widget_type: this._type,
+			reference: this._fields.reference
+		});
+
+		for (const subscription of this.#outer_data_subscriptions) {
+			ZABBIX.EventHub.unsubscribe(subscription);
+		}
+
+		this.#outer_data.clear();
+		this.#outer_data_subscriptions = [];
+
+		this.#resetFieldsReferencesAccessors();
+	}
+
+	preloadOuterDataSource(reference) {
+		this.fire(CWidgetBase.EVENT_PRELOAD_OUTER_DATA_SOURCE, {reference});
+	}
+
+	isOuterDataReady() {
+		return this.#outer_data.size === this.#getFieldsReferencesAccessors().length;
+	}
+
+	getOuterData() {
+		const outer_data = {};
+
+		for (const [accessor, value] of this.#outer_data.entries()) {
+			if (!(accessor.field in outer_data)) {
+				outer_data[accessor.field] = [];
+			}
+
+			outer_data[accessor.field].push({
+				path: accessor.path,
+				value
+			});
+		}
+
+		return outer_data;
+	}
+
+	preload() {
+		if (this.#is_preloaded) {
+			return;
+		}
+
+		this.#is_preloaded = true;
+
+		this.#startDataExchange();
+		this._startUpdating();
 	}
 
 	// External events management methods.
@@ -631,6 +790,64 @@ class CWidgetBase {
 	}
 
 	/**
+	 * Get widget field reference descriptor.
+	 *
+	 * @returns {Object}
+	 */
+	getFieldsReferences() {
+		return this._fields_references;
+	}
+
+	/**
+	 * Set widget field reference descriptor.
+	 *
+	 * @param {Object} fields_references
+	 */
+	_setFieldsReferences(fields_references) {
+		this._fields_references = fields_references;
+	}
+
+	#getFieldsReferencesAccessors() {
+		if (this.#fields_references_accessors === null) {
+			this.#fields_references_accessors = CWidgetBase.getFieldsReferencesAccessors(this._fields,
+				this._fields_references
+			);
+		}
+
+		return this.#fields_references_accessors;
+	}
+
+	#resetFieldsReferencesAccessors() {
+		this.#fields_references_accessors = null;
+	}
+
+	static getFieldsReferencesAccessors(fields, fields_references) {
+		const accessors = [];
+
+		for (const [field, field_references] of Object.entries(fields_references)) {
+			for (const {path, type} of field_references) {
+				let container = fields;
+				let key = field;
+
+				for (const step of path) {
+					container = container[key];
+					key = step;
+				}
+
+				accessors.push({
+					field,
+					path,
+					type,
+					setReference: (reference) => container[key] = reference,
+					getReference: () => container[key]
+				});
+			}
+		}
+
+		return accessors;
+	}
+
+	/**
 	 * Get widget ID.
 	 *
 	 * @returns {string|null}  Widget ID stored in the database, or null for new widgets.
@@ -655,13 +872,15 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Update widget properties and start updating immediately.
+	 * Update widget properties and start updating immediately, if widget is active.
 	 *
-	 * @param {string|undefined} name       Widget name to display in the header.
-	 * @param {number|undefined} view_mode  One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
-	 * @param {Object|undefined} fields     Widget field values (widget configuration data).
+	 * @param {string|undefined} name               Widget name to display in the header.
+	 * @param {number|undefined} view_mode          One of ZBX_WIDGET_VIEW_MODE_NORMAL,
+	 *                                              ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
+	 * @param {Object|undefined} fields             Widget field values (widget configuration data).
+	 * @param {Object|undefined} fields_references  Widget field reference descriptor.
 	 */
-	updateProperties({name, view_mode, fields}) {
+	updateProperties({name, view_mode, fields, fields_references}) {
 		if (name !== undefined) {
 			this._setName(name);
 		}
@@ -670,8 +889,22 @@ class CWidgetBase {
 			this._setViewMode(view_mode);
 		}
 
-		if (fields !== undefined) {
-			this._setFields(fields);
+		if (fields !== undefined || fields_references !== undefined) {
+			if (this._state !== WIDGET_STATE_INITIAL) {
+				this.#stopDataExchange();
+			}
+
+			if (fields !== undefined) {
+				this._setFields(fields);
+			}
+
+			if (fields_references !== undefined) {
+				this._setFieldsReferences(fields_references);
+			}
+
+			if (this._state !== WIDGET_STATE_INITIAL) {
+				this.#startDataExchange();
+			}
 		}
 
 		this._updatePadding();
@@ -736,6 +969,7 @@ class CWidgetBase {
 			name: this._name,
 			view_mode: this._view_mode,
 			fields: this._fields,
+			fields_references: this._fields_references,
 			pos: is_single_copy
 				? {
 					width: this._pos.width,
@@ -854,30 +1088,47 @@ class CWidgetBase {
 	/**
 	 * Start updating the widget. Invoked on activation of the widget or when the update is required immediately.
 	 *
-	 * @param {number}       delay_sec       Delay seconds before the update.
-	 * @param {boolean|null} do_update_once  Whether the widget is required to update once.
+	 * @param {number} delay_sec  Delay seconds before the update.
 	 */
-	_startUpdating(delay_sec = 0, {do_update_once = null} = {}) {
-		if (do_update_once === null) {
-			do_update_once = this._is_edit_mode;
+	_startUpdating({delay_sec = 0} = {}) {
+		if (this._update_timeout_id !== null) {
+			clearTimeout(this._update_timeout_id);
+			this._update_timeout_id = null;
 		}
 
-		this._stopUpdating({do_abort: false});
+		if (this._update_interval_id !== null) {
+			clearInterval(this._update_interval_id);
+			this._update_interval_id = null;
+		}
 
 		if (delay_sec > 0) {
 			this._update_timeout_id = setTimeout(() => {
 				this._update_timeout_id = null;
-				this._startUpdating(0, {do_update_once});
+				this._startUpdating();
 			}, delay_sec * 1000);
+
+			return;
 		}
-		else {
-			if (!do_update_once && this._rf_rate > 0) {
-				this._update_interval_id = setInterval(() => {
-					this._update(do_update_once);
-				}, this._rf_rate * 1000);
+
+		if (!this.isOuterDataReady()) {
+			if (this._state === WIDGET_STATE_ACTIVE) {
+				if (this._show_preloader_asap) {
+					this._showPreloader();
+				}
+				else {
+					this._schedulePreloader();
+				}
 			}
 
-			this._update(do_update_once);
+			return;
+		}
+
+		this._update();
+
+		if (this._state === WIDGET_STATE_ACTIVE && !this._is_edit_mode && this._rf_rate > 0) {
+			this._update_interval_id = setInterval(() => {
+				this._update();
+			}, this._rf_rate * 1000);
 		}
 	}
 
@@ -895,6 +1146,10 @@ class CWidgetBase {
 		if (this._update_interval_id !== null) {
 			clearInterval(this._update_interval_id);
 			this._update_interval_id = null;
+		}
+
+		if (this._update_abort_controller === null) {
+			this._hidePreloader();
 		}
 
 		if (do_abort && this._update_abort_controller !== null) {
@@ -918,46 +1173,49 @@ class CWidgetBase {
 
 	/**
 	 * Organize the update cycle of the widget.
-	 *
-	 * @param {boolean} do_update_once  Whether the widget is required to update once.
 	 */
-	_update(do_update_once) {
+	_update() {
 		if (this._update_abort_controller !== null || this._is_updating_paused || this.isUserInteracting()) {
-			this._startUpdating(1, {do_update_once});
+			this._startUpdating({delay_sec: 1});
 
 			return;
 		}
 
-		this.fire(WIDGET_EVENT_BEFORE_UPDATE);
-
-		this._contents_size = this._getContentsSize();
+		this._contents_size = this._state === WIDGET_STATE_ACTIVE
+			? this._getContentsSize()
+			: {contents_width: 0, contents_height: 0};
 
 		this._update_abort_controller = new AbortController();
 
-		if (this._show_preloader_asap) {
-			this._show_preloader_asap = false;
-			this._showPreloader();
-		}
-		else {
-			this._schedulePreloader();
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			if (this._show_preloader_asap) {
+				this._showPreloader();
+			}
+			else {
+				this._schedulePreloader();
+			}
 		}
 
-		new Promise((resolve) => resolve(this.promiseUpdate()))
-			.then(() => this._hidePreloader())
+		Promise.resolve()
+			.then(() => this.promiseUpdate())
+			.then(() => {
+				this._hidePreloader();
+				this._show_preloader_asap = false;
+
+				this.#broadcastDefaults();
+			})
 			.catch((exception) => {
-				console.log('Could not update widget:', exception);
-
 				if (this._update_abort_controller.signal.aborted) {
 					this._hidePreloader();
 				}
 				else {
-					this._startUpdating(this._update_retry_sec, {do_update_once});
+					console.log('Could not update widget:', exception);
+
+					this._startUpdating({delay_sec: this._update_retry_sec});
 				}
 			})
 			.finally(() => {
 				this._update_abort_controller = null;
-
-				this.fire(WIDGET_EVENT_AFTER_UPDATE);
 			});
 	}
 
@@ -1170,7 +1428,7 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Show data preloader immediately. Invoked before the first update cycle of the widget.
+	 * Show data preloader immediately. Invoked on the first update cycle of the widget.
 	 */
 	_showPreloader() {
 		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.
@@ -1201,7 +1459,7 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Schedule showing data preloader after 15 seconds. Invoked before regular update cycle of the widget.
+	 * Schedule showing data preloader after 15 seconds. Invoked on a regular update cycle of the widget.
 	 */
 	_schedulePreloader() {
 		// Fixed Safari 16 bug: removing preloader classes on animation frame to ensure removal of icons.

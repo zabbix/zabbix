@@ -406,6 +406,7 @@ if (empty($_GET['files'])) {
 	$files = [
 		'jquery.js',
 		'jquery-ui.js',
+		'main.js',
 		'common.js',
 		'component.z-bar-gauge.js',
 		'component.z-select.js',
@@ -424,7 +425,6 @@ if (empty($_GET['files'])) {
 		'class.scrollable.js',
 		'class.sidebar.js',
 		'class.template.js',
-		'main.js',
 		'chkbxrange.js',
 		'functions.js',
 		'menupopup.js',

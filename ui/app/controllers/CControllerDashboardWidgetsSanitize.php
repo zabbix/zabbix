@@ -100,11 +100,11 @@ class CControllerDashboardWidgetsSanitize extends CController {
 
 			foreach ($this->widgets_data as $index => $widget_data) {
 				if ($widget_data !== null) {
-					$widget_form = $widget_data['widget']->getForm($widget_data['fields'],
+					$form = $widget_data['widget']->getForm($widget_data['fields'],
 						$this->hasInput('templateid') ? $this->getInput('templateid') : null
 					);
 
-					$widgets_api[$index] = ['fields' => $widget_form->fieldsToApi()];
+					$widgets_api[$index] = ['fields' => $form->fieldsToApi()];
 				}
 			}
 
@@ -136,12 +136,15 @@ class CControllerDashboardWidgetsSanitize extends CController {
 				continue;
 			}
 
-			$widget_form = $widget_data['widget']->getForm($widgets_fields[$index],
+			$form = $widget_data['widget']->getForm($widgets_fields[$index],
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
-			$widget_form->validate();
+			$form->validate();
 
-			$output['widgets'][$index]['fields'] = $widget_form->getFieldsValues();
+			$output['widgets'][$index] = [
+				'fields' => $form->getFieldsValues(),
+				'fields_references' => $form->getFieldsReferences()
+			];
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));

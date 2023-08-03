@@ -41,7 +41,7 @@ class CEventHub {
 		this.latest_data.set(descriptor_hash, {descriptor, data});
 
 		for (const {require, callback} of this.subscribers.values()) {
-			if (this.constructor.#match(require, descriptor)) {
+			if (CEventHub.#match(require, descriptor)) {
 				callback({descriptor, data});
 			}
 		}
@@ -49,22 +49,40 @@ class CEventHub {
 
 	subscribe({require = {}, callback}) {
 		for (const {descriptor, data} of [...this.latest_data.values()].reverse()) {
-			if (this.constructor.#match(require, descriptor)) {
+			if (CEventHub.#match(require, descriptor)) {
 				callback({descriptor, data});
 
 				break;
 			}
 		}
 
-		const handle = {};
+		const subscription = {};
 
-		this.subscribers.set(handle, {require, callback});
+		this.subscribers.set(subscription, {require, callback});
 
-		return handle;
+		return subscription;
 	}
 
-	unsubscribe(handle) {
-		return this.subscribers.delete(handle);
+	unsubscribe(subscription) {
+		return this.subscribers.delete(subscription);
+	}
+
+	isDataAvailable(require) {
+		for (const {descriptor} of this.latest_data.values()) {
+			if (CEventHub.#match(require, descriptor)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	invalidateData(require) {
+		for (const [descriptor_hash, {descriptor}] of this.latest_data.entries()) {
+			if (CEventHub.#match(require, descriptor)) {
+				this.latest_data.delete(descriptor_hash);
+			}
+		}
 	}
 
 	static #match(require, descriptor) {

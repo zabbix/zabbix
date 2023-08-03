@@ -91,17 +91,20 @@ class CDashboardHelper {
 						'height' => (int) $widget_data['height']
 					],
 					'rf_rate' => 0,
-					'fields' => []
+					'fields' => [],
+					'fields_references' => []
 				];
 
 				/** @var CWidget $widget */
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
 				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
-					$widget_form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
-					$widget_form->validate();
+					$form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
 
-					$prepared_widget['fields'] = $widget_form->getFieldsValues();
+					$form->validate();
+
+					$prepared_widget['fields'] = $form->getFieldsValues();
+					$prepared_widget['fields_references'] = $form->getFieldsReferences();
 
 					if ($with_rf_rate) {
 						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);

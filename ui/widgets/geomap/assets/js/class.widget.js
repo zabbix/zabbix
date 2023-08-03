@@ -59,10 +59,10 @@ class CWidgetGeoMap extends CWidget {
 		this._initial_load = false;
 	}
 
-	updateProperties({name, view_mode, fields}) {
+	updateProperties({name, view_mode, fields, fields_references}) {
 		this._initial_load = true;
 
-		super.updateProperties({name, view_mode, fields});
+		super.updateProperties({name, view_mode, fields, fields_references});
 	}
 
 	_addMarkers(hosts) {

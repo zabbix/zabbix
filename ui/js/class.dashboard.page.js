@@ -32,10 +32,11 @@ const DASHBOARD_PAGE_EVENT_WIDGET_EDIT = 'dashboard-page-widget-edit';
 const DASHBOARD_PAGE_EVENT_WIDGET_ACTIONS = 'dashboard-page-widget-actions';
 const DASHBOARD_PAGE_EVENT_WIDGET_COPY = 'dashboard-page-widget-copy';
 const DASHBOARD_PAGE_EVENT_WIDGET_PASTE = 'dashboard-page-widget-paste';
-const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'dashboard-page-announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'dashboard-page-reserve-header-lines';
 
 class CDashboardPage {
+
+	static EVENT_PRELOAD_OUTER_DATA_SOURCE = 'dashboard-page-preload-outer-data-source';
 
 	constructor(target, {
 		data,
@@ -85,10 +86,10 @@ class CDashboardPage {
 		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
-		this._init();
+		this.#initialize();
 	}
 
-	_init() {
+	#initialize() {
 		this._state = DASHBOARD_PAGE_STATE_INITIAL;
 
 		this._widgets = new Map();
@@ -118,8 +119,14 @@ class CDashboardPage {
 		this._registerEvents();
 
 		for (const widget of this._widgets.keys()) {
-			widget.start();
+			this.#startWidget(widget);
 		}
+	}
+
+	#startWidget(widget) {
+		widget.on(CWidgetBase.EVENT_PRELOAD_OUTER_DATA_SOURCE, this._events.widgetPreloadOuterDataSource);
+
+		widget.start();
 	}
 
 	activate() {
@@ -194,13 +201,25 @@ class CDashboardPage {
 		this._state = DASHBOARD_PAGE_STATE_DESTROYED;
 
 		for (const widget of this._widgets.keys()) {
-			widget.destroy();
+			this.#destroyWidget(widget);
 		}
 
 		this._widgets.clear();
 	}
 
+	#destroyWidget(widget) {
+		widget.off(CWidgetBase.EVENT_PRELOAD_OUTER_DATA_SOURCE, this._events.widgetPreloadOuterDataSource);
+
+		widget.destroy();
+	}
+
 	// External events management methods.
+
+	preloadWidget(widget) {
+		if (this._state === DASHBOARD_PAGE_STATE_INACTIVE && widget.getState() === WIDGET_STATE_INACTIVE) {
+			widget.preload();
+		}
+	}
 
 	isEditMode() {
 		return this._is_edit_mode;
@@ -255,18 +274,6 @@ class CDashboardPage {
 		return false;
 	}
 
-	announceWidgets(dashboard_pages) {
-		let widgets = [];
-
-		for (const dashboard_page of dashboard_pages) {
-			widgets = widgets.concat(Array.from(dashboard_page._widgets.keys()));
-		}
-
-		for (const widget of widgets) {
-			widget.announceWidgets(widgets);
-		}
-	}
-
 	isUnsaved() {
 		return this._is_unsaved;
 	}
@@ -311,7 +318,7 @@ class CDashboardPage {
 		return null;
 	}
 
-	addWidget({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id}) {
+	addWidget({type, name, view_mode, fields, fields_references, widgetid, pos, is_new, rf_rate, unique_id}) {
 		let widget;
 
 		if (type in this._widget_defaults) {
@@ -320,6 +327,7 @@ class CDashboardPage {
 				name,
 				view_mode,
 				fields,
+				fields_references,
 				defaults: this._widget_defaults[type],
 				widgetid,
 				pos,
@@ -352,10 +360,6 @@ class CDashboardPage {
 	_doAddWidget(widget) {
 		this._widgets.set(widget, {});
 
-		if (!this._isHelperWidget(widget)) {
-			this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
-		}
-
 		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL) {
 			widget.start();
 		}
@@ -383,10 +387,6 @@ class CDashboardPage {
 		this._widgets.delete(widget);
 
 		if (!is_batch_mode) {
-			if (!this._isHelperWidget(widget)) {
-				this.fire(DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS);
-			}
-
 			this._resizeGrid();
 		}
 
@@ -399,12 +399,14 @@ class CDashboardPage {
 		return this.addWidget(widget_data);
 	}
 
-	_createWidget(widget_class, {type, name, view_mode, fields, defaults, widgetid, pos, is_new, rf_rate, unique_id}) {
+	_createWidget(widget_class, {type, name, view_mode, fields, fields_references, defaults, widgetid, pos, is_new,
+			rf_rate, unique_id}) {
 		return new widget_class({
 			type,
 			name,
 			view_mode,
 			fields,
+			fields_references,
 			defaults,
 			widgetid,
 			pos,
@@ -436,6 +438,7 @@ class CDashboardPage {
 			name: '',
 			view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
 			fields: {},
+			fields_references: {},
 			defaults: {
 				name: t('Inaccessible widget')
 			},
@@ -453,6 +456,7 @@ class CDashboardPage {
 			name,
 			view_mode,
 			fields: {},
+			fields_references: {},
 			defaults: this._widget_defaults[type],
 			widgetid: null,
 			pos,
@@ -1920,6 +1924,20 @@ class CDashboardPage {
 
 	_registerEvents() {
 		this._events = {
+			widgetPreloadOuterDataSource: (e) => {
+				for (const widget of this._widgets.keys()) {
+					if (widget.getFields().reference === e.detail.reference) {
+						this.preloadWidget(widget);
+
+						return;
+					}
+				}
+
+				this.fire(CDashboardPage.EVENT_PRELOAD_OUTER_DATA_SOURCE, {
+					reference: e.detail.reference
+				});
+			},
+
 			widgetActions: (e) => {
 				const widget = e.detail.target;
 
