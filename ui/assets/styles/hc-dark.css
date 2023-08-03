@@ -3493,6 +3493,8 @@ form.is-loading {
   .table-forms .httpconf-steps-dynamic-row .drag-icon,
   .table-forms .overrides-list-item .drag-icon {
     top: 0; }
+  .table-forms .trigger-list .drag-icon {
+    top: 1px; }
   .table-forms .table-forms-td-left {
     display: table-cell;
     padding: 5px 0;
