@@ -246,7 +246,7 @@ abstract class CControllerItem extends CController {
 			'units' => DB::getDefault('items', 'units'),
 			'url' => '',
 			'username' => DB::getDefault('items', 'username'),
-			'value_type' => DB::getDefault('items', 'value_type'),
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
 			'valuemapid' => 0,
 			'verify_host' => DB::getDefault('items', 'verify_host'),
 			'verify_peer' => DB::getDefault('items', 'verify_peer')
