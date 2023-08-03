@@ -2508,7 +2508,7 @@ static int	snmp_task_process(short event, void *data, int *fd)
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
 	}
 	else
-		task_ret = ZBX_ASYNC_TASK_READ_NEW;
+		task_ret = ZBX_ASYNC_TASK_READ;
 stop:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

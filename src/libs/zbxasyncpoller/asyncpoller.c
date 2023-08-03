@@ -57,8 +57,6 @@ static const char	*task_state_to_str(zbx_async_task_state_t task_state)
 			return "ZBX_ASYNC_TASK_READ";
 		case ZBX_ASYNC_TASK_STOP:
 			return "ZBX_ASYNC_TASK_STOP";
-		case ZBX_ASYNC_TASK_READ_NEW:
-			return "ZBX_ASYNC_TASK_READ_NEW";
 		default:
 			return "unknown";
 	}
@@ -67,7 +65,7 @@ static const char	*task_state_to_str(zbx_async_task_state_t task_state)
 static void	async_event(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
-	int			ret;
+	int			ret, fd_in = fd;
 	struct event_base	*ev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -80,18 +78,27 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			async_task_remove(task);
 			break;
 		case ZBX_ASYNC_TASK_READ:
-			event_add(task->rx_event, NULL);
-			break;
-		case ZBX_ASYNC_TASK_READ_NEW:
-			ev = event_get_base(task->timeout_event);
+			if (fd_in != fd)
+			{
+				ev = event_get_base(task->timeout_event);
 
-			if (NULL != task->rx_event)
-				event_free(task->rx_event);
+				if (NULL != task->rx_event)
+					event_free(task->rx_event);
 
-			task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
+				task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
+			}
 			event_add(task->rx_event, NULL);
 			break;
 		case ZBX_ASYNC_TASK_WRITE:
+			if (fd_in != fd)
+			{
+				ev = event_get_base(task->timeout_event);
+
+				if (NULL != task->tx_event)
+					event_free(task->tx_event);
+
+				task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
+			}
 			event_add(task->tx_event, NULL);
 			break;
 
