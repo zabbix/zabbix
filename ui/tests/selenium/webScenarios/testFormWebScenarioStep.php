@@ -111,6 +111,7 @@ class testFormWebScenarioStep extends CWebTest {
 
 		$this->assertEquals('Step of web scenario', $dialog->getTitle());
 
+		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		$step_fields = [
 			'Name' => ['maxlength' => 64],
 			'id:url' => [],
@@ -131,6 +132,7 @@ class testFormWebScenarioStep extends CWebTest {
 			'Required status codes' => ['maxlength' => 255]
 		];
 
+		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		// Differences between step creation form and update form of templated scenario step should be taken into account.
 		if (array_key_exists('step_name', $data)) {
 			$step_fields['Name'] = ['value' => $data['step_name'], 'enabled' => false, 'maxlength' => 64];
@@ -1260,6 +1262,7 @@ class testFormWebScenarioStep extends CWebTest {
 				$add_button->click();
 			}
 
+			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 			$table_field->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($row['name']);
 
 			if (array_key_exists('value', $row)) {
