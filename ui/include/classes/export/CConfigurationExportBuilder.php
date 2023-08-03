@@ -721,7 +721,7 @@ class CConfigurationExportBuilder {
 		foreach ($overrides as &$override) {
 			$override['filter'] = self::formatLldFilter($override['filter']);
 
-			unset($filter['eval_formula']);
+			unset($override['filter']['eval_formula']);
 
 			if (!$override['filter']['conditions']) {
 				unset($override['filter']);
