@@ -135,10 +135,6 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 
 		// Variables for checks after deletion.
-		$expected_regexps = $this->getTableColumnData('Name');
-		$regex_ids = [];
-
-		// Variables for checks after deletion.
 		$all_regexps = $this->getTableColumnData('Name');
 		$ids = CDBHelper::getAll('SELECT regexpid FROM regexps WHERE name IN ('.CDBHelper::escape($data['regex_name']).')');
 		$regex_ids = array_column($ids, 'regexpid');
