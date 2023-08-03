@@ -85,7 +85,6 @@ class CControllerTemplateEdit extends CController {
 		$clone = $this->hasInput('clone');
 		$templates = [];
 		$warnings = [];
-		$groups = [];
 		$groupids = [];
 
 		if ($clone) {
