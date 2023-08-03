@@ -2082,7 +2082,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 						/* required. */
 
 	/* Corner case: only one record is allowed to be analyzed per log*[] item check. */
-	/* Disable logging runtime erors for this case. */
+	/* Disable logging runtime errors for this case. */
 	int	runtime_error_logging_allowed = (1 < *p_count) ? 1 : 0;
 
 	if (NULL == buf)

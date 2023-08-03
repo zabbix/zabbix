@@ -590,7 +590,7 @@ static int	zbx_regexp2(const char *string, const char *pattern, int flags, char 
 	if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match, err_msg)))
 	{
 		if (NULL != matched_pos)
-			*matched_pos = (char *)string + match.rm_so;
+			*matched_pos = (char *)(uintptr_t)string + match.rm_so;
 
 		if (NULL != len)
 			*len = match.rm_eo - match.rm_so;
