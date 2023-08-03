@@ -470,7 +470,7 @@ void	zbx_regexp_free(zbx_regexp_t *regexp)
  *          returning matching groups                                         *
  *                                                                            *
  * Parameters: string - [IN] string to be matched                             *
- *             regex  - [IN] precompiled regular expression                   *
+ *             regexp - [IN] precompiled regular expression                   *
  *                                                                            *
  * Return value: 0 - successful match                                         *
  *               nonzero - no match                                           *
@@ -490,8 +490,8 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
  *          returning matching groups                                         *
  *                                                                            *
  * Parameters: string - [IN] string to be matched                             *
- *             regex  - [IN] precompiled regular expression                   *
- *           err_msg  - [OUT] dynamically allocated error message             *
+ *             regexp - [IN] precompiled regular expression                   *
+ *            err_msg  - [OUT] dynamically allocated error message            *
  *                                                                            *
  * Return value: ZBX_REGEXP_MATCH     - successful match                      *
  *               ZBX_REGEXP_NO_MATCH  - no match                              *
