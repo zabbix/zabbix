@@ -151,6 +151,7 @@ class testFormWebScenario extends CWebTest {
 		// Check tabs available in the form.
 		$this->assertEquals(['Scenario', 'Steps', 'Authentication'], $form->getTabs());
 
+		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		$scenario_fields = [
 			'Name' => ['autofocus' => 'true', 'maxlength' => 64],
 			'Application' => [],
@@ -839,6 +840,7 @@ class testFormWebScenario extends CWebTest {
 //			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
 			$field = $form->getField(ucfirst($field_name));
 
+			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 			$table_fields[$field_name]['name'] = $field->query("xpath:(//table[@data-type=".
 					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue();
 			$table_fields[$field_name]['value'] = $field->query("xpath:(//table[@data-type=".
@@ -865,6 +867,7 @@ class testFormWebScenario extends CWebTest {
 //			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()->getValue());
 			$field = $form->getField(ucfirst($field_name));
 
+			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 			$this->assertEquals($table_fields[$field_name]['name'], $field->query("xpath:(//table[@data-type=".
 					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue()
 			);
@@ -1016,6 +1019,7 @@ class testFormWebScenario extends CWebTest {
 					$field = $form->getField(ucfirst($field_name));
 
 					$i = 1;
+					// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 					foreach ($data[$field_name] as $field_pair) {
 						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@data-type=".
 								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[1]")->one()->getValue()
@@ -1056,6 +1060,7 @@ class testFormWebScenario extends CWebTest {
 				}
 
 				$i = 1;
+				// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 				foreach ($data[$field_name] as $field_pair) {
 					$field->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
 							$i."]//input)[1]")->one()->fill($field_pair['name']);
