@@ -2413,8 +2413,11 @@ static int	snmp_task_process(short event, void *data, int *fd)
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	char			error[MAX_STRING_LEN];
-	int			ret;
+	int			ret, task_ret = ZBX_ASYNC_TASK_STOP;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)snmp_context->arg_action;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event:%d fd:%d itemid:" ZBX_FS_UI64, __func__, event, *fd,
+			snmp_context->item.itemid);
 
 	bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 
@@ -2423,9 +2426,6 @@ static int	snmp_task_process(short event, void *data, int *fd)
 		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event:%d fd:%d itemid:" ZBX_FS_UI64, __func__, event, *fd,
-			snmp_context->item.itemid);
 
 	/* initialization */
 	if (0 != event)
@@ -2508,15 +2508,11 @@ static int	snmp_task_process(short event, void *data, int *fd)
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "Get value failed: %s", error));
 	}
 	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-		return ZBX_ASYNC_TASK_READ_NEW;
-	}
+		task_ret = ZBX_ASYNC_TASK_READ_NEW;
 stop:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
-	return ZBX_ASYNC_TASK_STOP;
+	return task_ret;
 }
 
 zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context)
