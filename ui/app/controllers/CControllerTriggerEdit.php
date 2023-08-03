@@ -40,7 +40,8 @@ class CControllerTriggerEdit extends CController {
 			'name' =>								'string',
 			'expression' =>							'string',
 			'show_inherited_tags' =>				'in 0,1',
-			'form_refresh' =>						'in 0,1'
+			'form_refresh' =>						'in 0,1',
+			'tags' =>								'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -107,7 +108,7 @@ class CControllerTriggerEdit extends CController {
 			'event_name' => '',
 			'db_dependencies' => [],
 			'limited' => false,
-			'tags' => [],
+			'tags' => $this->getInput('tags', []),
 			'recovery_expression_field_readonly' => false,
 			'triggerid' => null,
 			'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
