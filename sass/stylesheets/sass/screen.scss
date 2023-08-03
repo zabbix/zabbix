@@ -412,6 +412,14 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+
+		span {
+			white-space: normal;
+		}
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;

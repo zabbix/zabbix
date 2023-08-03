@@ -4546,6 +4546,10 @@ form.is-loading {
 .cell {
   display: table-cell;
   vertical-align: top; }
+  .cell.expression-cell {
+    line-height: 24px; }
+    .cell.expression-cell span {
+      white-space: normal; }
   .cell:last-child .dashboard-widget {
     margin: 0 0 10px; }
 

@@ -138,9 +138,7 @@ $action_tab->addItem([
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		]))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
-			(new CSpan(''))
-				->addStyle('white-space: normal;')
-				->setId('expression'),
+			(new CSpan(''))->setId('expression'),
 			$formula
 		]))
 			->addClass(ZBX_STYLE_CELL)

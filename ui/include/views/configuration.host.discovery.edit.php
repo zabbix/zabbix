@@ -751,8 +751,7 @@ $condition_tab->addItem([
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
-			(new CSpan(''))
-				->setId('expression'),
+			(new CSpan(''))->setId('expression'),
 			(new CTextBox('formula', $data['formula']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
