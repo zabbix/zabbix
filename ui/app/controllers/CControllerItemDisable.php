@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerItemDisable extends CController {
+class CControllerItemDisable extends CControllerItem {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -43,12 +43,6 @@ class CControllerItemDisable extends CController {
 		}
 
 		return $ret;
-	}
-
-	protected function checkPermissions(): bool {
-		$itemids = $this->getInput('itemids', []);
-
-		return count($itemids) == API::Item()->get(['countOutput' => true, 'itemids' => $itemids, 'editable' => true]);
 	}
 
 	public function doAction() {

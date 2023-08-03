@@ -22,18 +22,29 @@
 abstract class CControllerItem extends CController {
 
 	protected function checkPermissions(): bool {
-		$status = false;
+		if (!CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+			return false;
+		}
+
+		if ($this->hasInput('itemids')) {
+			$itemids = $this->getInput('itemids', []);
+
+			return count($itemids) == API::Item()->get(['countOutput' => true, 'itemids' => $itemids,
+				'editable' => true
+			]);
+		}
 
 		if ($this->hasInput('itemid')) {
-			$status = (bool) API::Item()->get(['itemids' => [$this->getInput('itemid')], 'editable' => true]);
+			return (bool) API::Item()->get(['itemids' => [$this->getInput('itemid')], 'editable' => true]);
 		}
-		else if ($this->hasInput('hostid')) {
-			$status = $this->getInput('context') === 'host'
+
+		if ($this->hasInput('hostid')) {
+			return $this->getInput('context') === 'host'
 				? (bool) API::Host()->get(['hostids' => [$this->getInput('hostid')], 'editable' => true])
 				: (bool) API::Template()->get(['templateids' => [$this->getInput('hostid')], 'editable' => true]);
 		}
 
-		return $status;
+		return false;
 	}
 
 	/**
