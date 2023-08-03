@@ -1201,7 +1201,7 @@ static int	get_housekeeping_period(double time_slept)
 }
 
 #if defined(HAVE_POSTGRESQL)
-static void	hk_tsdb_check_config()
+static void	hk_tsdb_check_config(void)
 {
 	if (cfg.hk.history_global == ZBX_HK_OPTION_DISABLED && cfg.hk.history_mode == ZBX_HK_OPTION_ENABLED &&
 			1 == db_version_info.history_compressed_chunks)
