@@ -2805,7 +2805,7 @@ output {
   background: #ffffff;
   border-style: solid;
   border-width: 2px 2px 2px 60px;
-  border-radius: 2px;
+  border-radius: 4px;
   transition: grid-template-rows 0.3s, grid-row-gap 0.3s; }
   output::before {
     position: absolute;
