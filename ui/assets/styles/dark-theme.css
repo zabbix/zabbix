@@ -2797,8 +2797,11 @@ button {
 output {
   position: relative;
   box-sizing: border-box;
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  grid-template-rows: 16px 1fr;
+  grid-column-gap: 10px;
+  grid-row-gap: 6px;
   align-items: center;
   flex-shrink: 0;
   min-height: 48px;
@@ -2807,23 +2810,30 @@ output {
   background: #2b2b2b;
   border-style: solid;
   border-width: 2px 2px 2px 60px;
-  border-radius: 2px; }
+  border-radius: 2px;
+  transition: grid-template-rows 0.3s, grid-row-gap 0.3s; }
   output::before {
     position: absolute;
-    top: 8px;
-    left: -44px;
+    top: 7px;
+    left: -43px;
     font-size: 28px;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); }
   output > span {
     font-size: 1.167em; }
   output .link-action {
-    margin-right: 10px;
     line-height: 14px; }
+    output .link-action .arrow-down,
+    output .link-action .arrow-up {
+      margin-left: 3px; }
   output .msg-details {
-    width: 100%; }
+    grid-column: 1 / -1;
+    overflow: hidden;
+    width: 100%;
+    opacity: 1;
+    transform: scaleY(1) translateY(0);
+    transition: padding-top 0.3s, opacity 0.3s, transform 0.3s; }
     output .msg-details:not(:first-child) {
-      margin-top: 6px;
       padding-top: 6px;
       border-top: 1px dashed;
       border-color: inherit; }
@@ -2836,6 +2846,14 @@ output {
         margin-left: 0; }
         output .msg-details li:only-child::before {
           display: none; }
+  output.collapsed {
+    grid-template-rows: 32px 0fr;
+    grid-row-gap: 0; }
+    output.collapsed .msg-details {
+      padding-top: 0;
+      border-top: none;
+      opacity: 0;
+      transform: scaleY(0) translateY(50%); }
   output .msg-buttons {
     width: 100%;
     margin-top: 10px;
