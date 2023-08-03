@@ -1472,7 +1472,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link', $data['object'])->waitUntilClickable()->one()->click();
 
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->fill($data['mediatype_tab']);
 
 		if (array_key_exists('remove_parameters', $data)) {
@@ -1495,5 +1495,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		if (array_key_exists('custom_parameters', $data)) {
 			$form->getField('Parameters')->asMultifieldTable()->checkValue($data['custom_parameters']);
 		}
+
+		COverlayDialogElement::find()->one()->close();
 	}
 }
