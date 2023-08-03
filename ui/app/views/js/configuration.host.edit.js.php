@@ -32,7 +32,7 @@
 			this.form = document.getElementById(form_name);
 			this.form.addEventListener('submit', this.events.submit);
 
-			host_edit.init({form_name, host_interfaces, host_is_discovered});
+			host_edit.init({form_name, host_interfaces, host_is_discovered, source_overlay: null});
 		},
 
 		submit(button) {

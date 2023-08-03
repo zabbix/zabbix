@@ -127,20 +127,10 @@
 			parameters.context = this.context;
 			parameters.hostid = this.hostids[0];
 
-			const overlay = PopUp('item.edit', parameters, {
+			this.#popup('item.edit', parameters, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
 				trigger_element: target
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
 			});
 		}
 
@@ -261,7 +251,7 @@
 				.catch(() => {
 					clearMessages();
 
-					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+					const message_box = makeMessageBox('bad', [t('Unexpected server error.')]);
 
 					addMessage(message_box);
 				});
@@ -269,20 +259,20 @@
 
 		#popup(action, parameters, overlay_options) {
 			const overlay = PopUp(action, parameters, overlay_options);
-			const responseHandler = (e) => {
-				postMessageOk(e.detail.title);
-				uncheckTableRows('item');
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
 				}
 
 				location.href = location.href;
-			}
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', responseHandler);
-			overlay.$dialogue[0].addEventListener('dialogue.create', responseHandler);
-			overlay.$dialogue[0].addEventListener('dialogue.update', responseHandler);
+			});
 
 			return overlay;
 		}
@@ -315,6 +305,7 @@
 				location.href = original_url;
 			}
 
+			overlay.$dialogue[0].addEventListener('dialogue.submit', reloadPage);
 			overlay.$dialogue[0].addEventListener('dialogue.create', reloadPage);
 			overlay.$dialogue[0].addEventListener('dialogue.update', reloadPage);
 			overlay.$dialogue[0].addEventListener('dialogue.delete', e => {

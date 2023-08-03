@@ -124,9 +124,10 @@
 		/**
 		 * Host form setup.
 		 */
-		init({form_name, host_interfaces, host_is_discovered}) {
+		init({form_name, host_interfaces, host_is_discovered, source_overlay}) {
 			this.form_name = form_name;
 			this.form = document.getElementById(form_name);
+			this.source_overlay = source_overlay;
 
 			this.initHostTab(host_interfaces, host_is_discovered);
 			this.initMacrosTab();
@@ -332,31 +333,39 @@
 					return;
 				}
 
-				const overlay = overlays_stack.end();
+				if (this.source_overlay) {
+					overlayDialogueDestroy(this.source_overlay.dialogueid);
+				}
 
-				if (overlay) {
-					const dialogue = overlay.$dialogue[0];
-					const dialogueid = dialogue.dataset.dialogueid;
-					const dialogue_class = dialogue.getAttribute('class');
+				const overlay = PopUp('item.edit', target.dataset, {
+					dialogueid: 'item-edit',
+					dialogue_class: 'modal-popup-large',
+					trigger_element: target
+				});
 
-					PopUp('item.edit', target.dataset, {dialogueid, dialogue_class});
+				if (this.source_overlay) {
+					overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+							this.source_overlay.$dialogue[0].dispatchEvent(
+								new CustomEvent('dialogue.submit', {detail: e.detail})
+							);
+						}, {once: true}
+					);
 				}
 				else {
-					const overlay = PopUp('item.edit', target.dataset, {
-						dialogueid: 'item-edit',
-						dialogue_class: 'modal-popup-large',
-						trigger_element: target
-					});
-
 					overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-						postMessageOk(e.detail.title);
+							const data = e.detail;
 
-						if ('messages' in e.detail) {
-							postMessageDetails('success', e.detail.messages);
-						}
+							if ('success' in data) {
+								postMessageOk(data.success.title);
 
-						location.href = location.href;
-					});
+								if ('messages' in data.success) {
+									postMessageDetails('success', data.success.messages);
+								}
+							}
+
+							location.href = location.href;
+						}, {once: true}
+					);
 				}
 			});
 		},

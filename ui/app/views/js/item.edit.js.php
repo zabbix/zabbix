@@ -319,7 +319,7 @@ window.item_edit_form = new class {
 				}
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {

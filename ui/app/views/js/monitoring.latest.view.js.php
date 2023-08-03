@@ -416,23 +416,13 @@
 			this._removePopupMessage();
 			this.unscheduleRefresh();
 
-			const original_url = location.href;
 			const overlay = PopUp('item.edit', data, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
 				trigger_element: target
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				history.replaceState({}, '', original_url);
-				this.refresh();
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
 		},
 
 		editHost(hostid) {

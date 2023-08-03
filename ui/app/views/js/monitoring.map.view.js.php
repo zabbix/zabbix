@@ -39,15 +39,7 @@
 				trigger_element: target
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = this.original_url;
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
 		},
 
 		editHost(hostid) {
@@ -62,6 +54,7 @@
 				prevent_navigation: true
 			});
 
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});

@@ -43,6 +43,7 @@
 				prevent_navigation: true
 			});
 
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this._events.hostCreate);
 			overlay.$dialogue[0].addEventListener('dialogue.create', this._events.hostCreate);
 			overlay.$dialogue[0].addEventListener('dialogue.update', this._events.hostUpdate);
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this._events.hostDelete);

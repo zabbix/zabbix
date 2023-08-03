@@ -41,6 +41,7 @@
 				prevent_navigation: true
 			});
 
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});

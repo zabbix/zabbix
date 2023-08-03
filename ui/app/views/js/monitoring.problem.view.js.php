@@ -436,22 +436,15 @@
 		},
 
 		openItemForm(target, data) {
+			clearMessages();
+
 			const overlay = PopUp('item.edit', data, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
 				trigger_element: target
 			});
 
-			this.unscheduleRefresh();
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				this.refresh();
-			});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
 		},
 
 		openHostPopup(host_data) {
@@ -464,6 +457,7 @@
 				prevent_navigation: true
 			});
 
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});

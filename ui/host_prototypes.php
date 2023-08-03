@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of host prototypes');
 $page['file'] = 'host_prototypes.php';
-$page['scripts'] = ['effects.js'];
+$page['scripts'] = ['effects.js', 'items.js', 'multilineinput.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 

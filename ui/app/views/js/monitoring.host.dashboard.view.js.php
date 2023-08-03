@@ -102,7 +102,7 @@
 				e.target.closest('form').submit();
 			},
 
-			responseHandler(e) {
+			hostSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -131,9 +131,7 @@
 				trigger_element: target
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				e => this.events.responseHandler({detail: {success: e.detail}})
-			);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
 		},
 
 		editHost(hostid) {
@@ -150,12 +148,10 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				e => this.events.responseHandler({detail: {success: e.detail}})
-			);
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.responseHandler);
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.responseHandler);
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.responseHandler);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => history.replaceState({}, '', original_url));
 		}
 	}

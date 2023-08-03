@@ -72,7 +72,7 @@
 				trigger_element: target
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail.success));
 		}
 
 		#openHostPopup(host_data) {
@@ -83,7 +83,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('dialogue.create', (e) => this.#reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('dialogue.update', (e) => this.#reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this.#reload(e.detail.success));

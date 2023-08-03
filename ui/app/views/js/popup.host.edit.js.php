@@ -36,7 +36,7 @@ window.host_edit_popup = {
 
 		history.replaceState({}, '', popup_url);
 
-		host_edit.init({form_name, host_interfaces, host_is_discovered});
+		host_edit.init({form_name, host_interfaces, host_is_discovered, source_overlay: this.overlay});
 
 		if (warnings.length) {
 			const message_box = warnings.length == 1

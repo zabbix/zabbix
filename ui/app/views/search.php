@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+$this->addJsFile('items.js');
+$this->addJsFile('multilineinput.js');
 $this->includeJsFile('search.js.php');
 
 $sections = [];
