@@ -241,7 +241,7 @@ class testFormGraph extends testFormGraphs {
 					],
 					'yaxis_items' => [
 						'min' => 'Failed step of scenario "Scenario for Clone".',
-						'max' => 'Download speed for scenario "Scenario for Clone".',
+						'max' => 'Download speed for scenario "Scenario for Clone".'
 					],
 					'items' => [
 						[
