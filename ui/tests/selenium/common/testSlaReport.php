@@ -468,8 +468,11 @@ class testSlaReport extends CWebTest {
 					// If SLA created in current period, calculation starts from creation timestamp, else from period start.
 					$start_time = max($period['start'], min(self::$actual_creation_time, self::$service_creation_time));
 
-					// Get array of Uptime possible values and check that the correct one is there.
-					for ($i = 0; $i <= 3; $i++) {
+					/**
+					 * Get array of Uptime possible values and check that the correct one is there.
+					 * Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
+					 */
+					for ($i = -1; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($load_time - $start_time + $i);
 					}
 
@@ -497,10 +500,12 @@ class testSlaReport extends CWebTest {
 				else {
 					$reference_uptime = [];
 					$uptime_start = min(self::$actual_creation_time, self::$service_creation_time);
-					for ($i = 0; $i <= 3; $i++) {
+
+					// Sometimes uptime start is by 1 second larger than obtained 2 rows above, so $i counter starts from -1.
+					for ($i = -1; $i <= 3; $i++) {
 						$reference_uptime[] = convertUnitsS($period['end'] - $uptime_start + $i);
 					}
-					$this->assertTrue(in_array($uptime, $reference_uptime), 'Uptime '.$uptime.' is not among values'.
+					$this->assertTrue(in_array($uptime, $reference_uptime), 'Uptime '.$uptime.' is not among values '.
 							implode(', ', $reference_uptime)
 					);
 
@@ -597,7 +602,7 @@ class testSlaReport extends CWebTest {
 				}
 			}
 
-			$this->assertTrue($match_found);
+			$this->assertTrue($match_found, 'Downtime "'.$downtime.'" is not present in downtime reference array');
 		}
 	}
 
