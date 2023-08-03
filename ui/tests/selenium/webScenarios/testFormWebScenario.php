@@ -31,11 +31,11 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testFormWebScenario extends CWebTest {
 
-	private static $templateid;
-	private static $template_name;
-	private static $template_scenarioid;
-	private static $delete_scenarioid;
-	private static $update_scenario = 'Scenario for Update';
+	protected static $templateid;
+	protected static $template_name;
+	protected static $template_scenarioid;
+	protected static $delete_scenarioid;
+	protected static $update_scenario = 'Scenario for Update';
 
 	const HOSTID = 40001;
 	const TEMPLATE_SCENARIO = 'Template_Web_scenario';
@@ -43,8 +43,8 @@ class testFormWebScenario extends CWebTest {
 	const SQL = 'SELECT * FROM httptest h LEFT JOIN httptest_field hf ON hf.httptestid = h.httptestid ORDER BY h.httptestid, hf.httptest_fieldid';
 	const CLONE_SCENARIO = 'Scenario for Clone';
 
-	private static $all_fields = [
-		'scenario_fields' =>  [
+	protected static $all_fields = [
+		'scenario_fields' => [
 			'Name' => 'All fields specified',
 			'Update interval' => '6h',
 			'Attempts' => 7,
@@ -162,6 +162,7 @@ class testFormWebScenario extends CWebTest {
 		// Check tabs available in the form.
 		$this->assertEquals(['Scenario', 'Steps', 'Tags', 'Authentication'], $form->getTabs());
 
+		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		$scenario_fields = [
 			'Name' => ['autofocus' => 'true', 'maxlength' => 64],
 			'Update interval' => ['value' => '1m', 'maxlength' => 255],
@@ -184,6 +185,7 @@ class testFormWebScenario extends CWebTest {
 			$parent_field = $form->getField('Parent web scenarios');
 			$this->assertTrue($parent_field->isCLickable());
 
+			// Check that link in "Parent web scenarios" field leads to config of this web scenario on template.
 			$this->assertEquals('httpconf.php?form=update&hostid='.self::$templateid.'&httptestid='.self::$template_scenarioid.
 					'&context=template', $parent_field->query('link', self::$template_name)->one()->getAttribute('href')
 			);
@@ -203,7 +205,7 @@ class testFormWebScenario extends CWebTest {
 		// Check the agents dropdown options.
 		$this->assertEquals($agents, $form->getField('Agent')->getOptions()->asText());
 
-		// Check that "User agent string" field is displayed only when Agent is set to other
+		// Check that "User agent string" field is displayed only when Agent is set to other.
 		$user_string = $form->getField('User agent string');
 		$this->assertFalse($user_string->isDisplayed());
 		$form->getField('Agent')->select('other ...');
@@ -220,7 +222,7 @@ class testFormWebScenario extends CWebTest {
 			$row = $table->getRow(0);
 			$this->assertSame($table_layout['headers'], $table->getHeadersText());
 
-			// Check that Add button is clickable and tha Remove button is not.
+			// Check that Add button is clickable and that Remove button is not.
 			$add_button = $table->query('button:Add')->one();
 			$this->assertTrue($add_button->isClickable());
 			$remove_button = $row->query('button:Remove')->one();
@@ -276,7 +278,7 @@ class testFormWebScenario extends CWebTest {
 
 		$tags_table = $form->query('class:tags-table')->one()->asTable();
 
-		// Check tags table headers when viewing scenario tags
+		// Check tags table headers when viewing scenario tags.
 		$this->assertEquals(['Name', 'Value', ''], $tags_table->getHeaders()->asText());
 
 		// Check table tags placeholders and length.
@@ -285,7 +287,7 @@ class testFormWebScenario extends CWebTest {
 			$this->assertEquals($placeholder, $tags_table->query('id:tags_0_'.$placeholder)->one()->getAttribute('placeholder'));
 		}
 
-		// Swith to Inherited and scenario tags and check tags table headers
+		// Switch to Inherited and scenario tags and check tags table headers.
 		$tag_types->select('Inherited and scenario tags');
 		$tags_table->invalidate();
 		$this->assertEquals(['Name', 'Value', '', 'Parent templates'], $tags_table->getHeaders()->asText());
@@ -340,7 +342,7 @@ class testFormWebScenario extends CWebTest {
 	 * @param CFormElement	$form		form element where the passed field attributes should be checked
 	 * @param array			$fields		array of fields and their attributes to be checked
 	 */
-	private function checkFieldAttributes($form, $fields) {
+	protected function checkFieldAttributes($form, $fields) {
 		foreach ($fields as $field => $attributes) {
 			$value = (array_key_exists('value', $attributes)) ? $attributes['value'] : '';
 			$visible = (array_key_exists('visible', $attributes)) ? $attributes['visible'] : true;
@@ -360,33 +362,33 @@ class testFormWebScenario extends CWebTest {
 
 	public static function getWebScenarioData() {
 		return [
-			// Empty name
+			// #0 Empty name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => ''
 					],
 					'error_title' => 'Page received incorrect data',
 					'error_details' => 'Incorrect value for field "Name": cannot be empty.'
 				]
 			],
-			// Empty space in name
+			// #1 Empty space in name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => '   '
 					],
 					'error_title' => 'Page received incorrect data',
 					'error_details' => 'Incorrect value for field "Name": cannot be empty.'
 				]
 			],
-			// Missing steps
+			// #2 Missing steps.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Missing steps'
 					],
 					'no_steps' => true,
@@ -394,55 +396,55 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Field "Steps" is mandatory.'
 				]
 			],
-			// Negative update interval
+			// #3 Negative update interval.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Negative update interval',
 						'Update interval' => '-1'
 					],
 					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
-			// Zero update interval
+			// #4 Zero update interval.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Zero update interval',
 						'Update interval' => 0
 					],
 					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
-			// Too big update interval
+			// #5 Too big update interval.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Too big update interval',
 						'Update interval' => 86401
 					],
 					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
-			// Too big update interval with suffix
+			// #6 Too big update interval with suffix.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Too big update interval with suffix',
 						'Update interval' => '1441h'
 					],
 					'error_details' => 'Invalid parameter "/1/delay": value must be one of 1-86400.'
 				]
 			],
-			// Negative number of retries.
+			// #7 Negative number of retries.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Negative number of retries',
 						'Attempts' => '-1'
 					],
@@ -450,11 +452,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Incorrect value "-1" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
-			// Zero retries
+			// #8 Zero retries.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Zero retries',
 						'Attempts' => 0
 					],
@@ -462,11 +464,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
-			// Too high number of retries
+			// #9 Too high number of retries.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Too high number of retries',
 						'Attempts' => 11
 					],
@@ -474,11 +476,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Incorrect value "11" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
-			// Non-numeric number of retries
+			// #10 Non-numeric number of retries.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Too high number of retries',
 						'Attempts' => 'aa'
 					],
@@ -486,11 +488,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Incorrect value "0" for "Attempts" field: must be between 1 and 10.'
 				]
 			],
-			// Variable without brackets
+			// #11 Variable without brackets.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Variable name without brackets'
 					],
 					'variables' => [
@@ -504,11 +506,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Variable without opening bracket
+			// #12 Variable without opening bracket.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Variable name without opening bracket'
 					],
 					'variables' => [
@@ -522,11 +524,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Variable without closing bracket
+			// #13 Variable without closing bracket.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Variable name without closing bracket'
 					],
 					'variables' => [
@@ -540,11 +542,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Variable with misplaced brackets
+			// #14 Variable with misplaced brackets.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Variable with misplaced brackets'
 					],
 					'variables' => [
@@ -558,11 +560,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
-			// Duplicate variable names
+			// #15 Duplicate variable names.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Duplicate variable names'
 					],
 					'variables' => [
@@ -580,11 +582,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/variables/2": value (name)=({abc}) already exists.'
 				]
 			],
-			// Missing variable name
+			// #16 Missing variable name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Missing variable name'
 					],
 					'variables' => [
@@ -602,11 +604,11 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/variables/1/name": cannot be empty.'
 				]
 			],
-			// Headers - empty name
+			// #17 Headers - empty name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Missing header name'
 					],
 					'headers' => [
@@ -624,21 +626,21 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
 				]
 			],
-			// Duplicate web scenario name
+			// #18 Duplicate web scenario name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => self::TEMPLATE_SCENARIO
 					],
 					'error_details' => 'Web scenario "'.self::TEMPLATE_SCENARIO.'" already exists.'
 				]
 			],
-			// Missing tag name
+			// #19 Missing tag name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Missing tag name'
 					],
 					'tags' => [
@@ -652,20 +654,20 @@ class testFormWebScenario extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
-			// Minimal config
+			// #20 Minimal config.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'Min required configuration'
 					]
 				]
 			],
-			// Web scenario with basic auth with populated username and empty password.
+			// #21 Web scenario with basic auth with populated username and empty password.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'No password'
 					],
 					'auth_fields' => [
@@ -675,11 +677,11 @@ class testFormWebScenario extends CWebTest {
 					]
 				]
 			],
-			// Web scenario with kerberos auth with empty username and populated password.
+			// #22 Web scenario with kerberos auth with empty username and populated password.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => 'No username'
 					],
 					'auth_fields' => [
@@ -689,22 +691,22 @@ class testFormWebScenario extends CWebTest {
 					]
 				]
 			],
-			// All possible fields specified
+			// #23 All possible fields specified.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'scenario_fields' =>  self::$all_fields['scenario_fields'],
+					'scenario_fields' => self::$all_fields['scenario_fields'],
 					'auth_fields' => self::$all_fields['auth_fields'],
 					'variables' => self::$all_fields['variables'],
 					'headers' => self::$all_fields['headers'],
 					'tags' => self::$all_fields['tags']
 				]
 			],
-			// Maximal possible value length in input elements except for update interval.
+			// #24 Maximal possible value length in input elements except for update interval.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => STRING_64,
 						'Update interval' => '999',
 						'Attempts' => 10,
@@ -752,11 +754,11 @@ class testFormWebScenario extends CWebTest {
 					]
 				]
 			],
-			// Trim trailing and leading spaces in fields
+			// #25 Trim trailing and leading spaces in fields.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'scenario_fields' =>  [
+					'scenario_fields' => [
 						'Name' => '   Trim this name   ',
 						'Update interval' => '     1d    ',
 						'Attempts' => '9 ',
@@ -837,6 +839,10 @@ class testFormWebScenario extends CWebTest {
 		$this->checkImpactlessAction('cancel_update');
 	}
 
+	public function testFormWebScenario_CancelClone() {
+		$this->checkImpactlessAction('cancel_clone');
+	}
+
 	public function testFormWebScenario_CancelDelete() {
 		$this->checkImpactlessAction('cancel_delete');
 	}
@@ -876,6 +882,7 @@ class testFormWebScenario extends CWebTest {
 //			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
 			$field = $form->getField(ucfirst($field_name));
 
+			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 			$table_fields[$field_name]['name'] = $field->query("xpath:(//table[@id=".
 					CXPathHelper::escapeQuotes($field_name)."]//textarea)[1]")->one()->getValue();
 			$table_fields[$field_name]['value'] = $field->query("xpath:(//table[@id=".
@@ -903,6 +910,7 @@ class testFormWebScenario extends CWebTest {
 //			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()->getValue());
 			$field = $form->getField(ucfirst($field_name));
 
+			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 			$this->assertEquals($table_fields[$field_name]['name'], $field->query("xpath:(//table[@id=".
 					CXPathHelper::escapeQuotes($field_name)."]//textarea)[1]")->one()->getValue()
 			);
@@ -917,7 +925,7 @@ class testFormWebScenario extends CWebTest {
 	 *
 	 * @param string	$action		action to be checked
 	 */
-	private function checkImpactlessAction($action) {
+	protected function checkImpactlessAction($action) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host')
@@ -933,9 +941,15 @@ class testFormWebScenario extends CWebTest {
 
 			case 'cancel_create':
 			case 'cancel_update':
+			case 'cancel_clone':
 				$button = ($action === 'cancel_create') ? 'button:Create web scenario' : 'link:'.self::CLONE_SCENARIO;
-				$this->query('link:'.self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
+				$this->query($button)->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
+
+				if ($action === 'cancel_clone') {
+					$this->query('button:Clone')->waitUntilClickable()->one()->click();
+					$this->page->waitUntilReady();
+				}
 
 				$form = $this->query('name:webscenario_form')->asForm()->one();
 				$this->fillScenarioForm(self::$all_fields, $form);
@@ -963,7 +977,7 @@ class testFormWebScenario extends CWebTest {
 	 * @param array		$data		data provider
 	 * @param string	$action		action to be performed
 	 */
-	private function checkAction($data, $action = 'create') {
+	protected function checkAction($data, $action = 'create') {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		if ($expected === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
@@ -977,7 +991,7 @@ class testFormWebScenario extends CWebTest {
 		$this->page->waitUntilReady();
 		$form = $this->query('name:webscenario_form')->asForm()->one();
 
-		// Add postfix to scenario name in case of update scenario exept for empty name and template scenario update cases.
+		// Add postfix to scenario name in case of update scenario except for empty name and template scenario update cases.
 		if ($action === 'update' && !in_array($data['scenario_fields']['Name'], ['', '   ', self::TEMPLATE_SCENARIO])) {
 			$data['scenario_fields']['Name'] = ($data['scenario_fields']['Name'] === STRING_64)
 				? $data['scenario_fields']['Name'] = substr(STRING_64, 0, 57).' update'
@@ -988,7 +1002,7 @@ class testFormWebScenario extends CWebTest {
 		$form->submit();
 
 		if ($expected === TEST_BAD) {
-			// In case if something goes wrong and the scenario gets updated, then it shouldnt impact following update cases.
+			// In case if something goes wrong and the scenario gets updated, then it shouldn't impact following update cases.
 			if ($action === 'update' && CMessageElement::find()->one()->isGood()) {
 				self::$update_scenario = $data['scenario_fields']['Name'];
 			}
@@ -1050,6 +1064,7 @@ class testFormWebScenario extends CWebTest {
 					$field = $form->getField(ucfirst($field_name));
 
 					$i = 1;
+					// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 					foreach ($data[$field_name] as $field_pair) {
 						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@id=".
 								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//textarea)[1]")->one()->getValue()
@@ -1081,9 +1096,9 @@ class testFormWebScenario extends CWebTest {
 	 *
 	 * @param array			$data	data provider
 	 * @param CFormElement	$form	form that should be filled in
-	 * @param string		$action	Type of action being performed (create or update)
+	 * @param string		$action	type of action being performed (create or update)
 	 */
-	private function fillScenarioForm($data, $form, $action = 'update') {
+	protected function fillScenarioForm($data, $form, $action = 'update') {
 		$form->fill($data['scenario_fields']);
 
 		foreach (['variables', 'headers'] as $field_name) {
@@ -1097,6 +1112,7 @@ class testFormWebScenario extends CWebTest {
 				}
 
 				$i = 1;
+				// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 				foreach ($data[$field_name] as $field_pair) {
 					$field->query("xpath:(//table[@id=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
 							$i."]//textarea)[1]")->one()->fill($field_pair['name']);
