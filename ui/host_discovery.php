@@ -846,16 +846,6 @@ if (hasRequest('form')) {
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
-
-	if (!$data['conditions']) {
-		$data['conditions'] = [[
-			'macro' => '',
-			'operator' => CONDITION_OPERATOR_REGEXP,
-			'value' => '',
-			'formulaid' => num2letter(0)
-		]];
-	}
-
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $host;
@@ -898,6 +888,15 @@ if (hasRequest('form')) {
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
 		$data['form'] = 'clone';
+	}
+
+	if (!$data['conditions']) {
+		$data['conditions'] = [[
+			'macro' => '',
+			'operator' => CONDITION_OPERATOR_REGEXP,
+			'value' => '',
+			'formulaid' => num2letter(0)
+		]];
 	}
 
 	if ($data['type'] != ITEM_TYPE_JMX) {
