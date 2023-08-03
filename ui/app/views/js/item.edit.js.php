@@ -25,8 +25,6 @@
 
 ?>
 (() => {
-const CONFIRM_FORM_NAVIGATION = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
-const ERROR_XHR_SERVER = <?= json_encode(_('Unexpected server error.')) ?>;
 const HOST_STATUS_MONITORED = <?= HOST_STATUS_MONITORED ?>;
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
@@ -184,7 +182,8 @@ window.item_edit_form = new class {
 			if (target.matches('a') && target.closest('.js-parent-items')) {
 				e.preventDefault();
 
-				if (!this.#isFormModified() || window.confirm(CONFIRM_FORM_NAVIGATION)) {
+				if (!this.#isFormModified()
+						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
 					const data = new URLSearchParams(target.getAttribute('href').replace(/^.*\?/g, ''));
 					this.#openRelatedItem(Object.fromEntries(data));
 				}
@@ -336,7 +335,7 @@ window.item_edit_form = new class {
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [ERROR_XHR_SERVER];
+					messages = [t('Unexpected server error.')];
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
@@ -494,10 +493,16 @@ window.item_edit_form = new class {
 	}
 
 	#openRelatedItem(parameters) {
-		const dialogueid = this.dialogue.dataset.dialogueid;
-		const dialogue_class = this.dialogue.getAttribute('class');
+		overlayDialogueDestroy(this.overlay.dialogueid);
 
-		PopUp(parameters.action, parameters, {dialogueid, dialogue_class});
+		const overlay = PopUp(parameters.action, parameters, {
+			dialogueid: 'item-form',
+			dialogue_class: 'modal-popup-large'
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit',
+			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+		);
 	}
 }
 })();
