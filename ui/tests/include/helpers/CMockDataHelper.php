@@ -326,7 +326,7 @@ class CMockDataHelper {
 								];
 							}
 
-							DB::insert('host_discovery', $discoveries);
+							DB::insert('host_discovery', $discoveries, false);
 
 							DB::update('hosts', [
 								'values' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],

@@ -916,31 +916,3 @@ class testDependentItems extends CAPITest {
 		return $this->call($method, $params, $error);
 	}
 }
-
-if (!function_exists('sdfjson')) {
-	function sdfjson() {
-		static $at;
-
-		if ($at === null) {
-			$at = microtime(true);
-		}
-
-		$prefix = (new DateTime('NOW'))->format('r.u')."\t".number_format(microtime(true) - $at, 3)."\n";
-		$file_handle = @fopen('/tmp/php_errors.log', 'a');
-
-		fwrite($file_handle, $prefix);
-
-		foreach(func_get_args() as $msg) {
-			fwrite($file_handle, json_encode(
-					$msg,
-					JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES
-				)."\n"
-			);
-		}
-
-		fwrite($file_handle, "\n");
-		fclose($file_handle);
-
-		$at = microtime(true);
-	}
-}
