@@ -38,7 +38,8 @@ $form = (new CForm('post'))
 	->addVar('hostid', $data['form']['hostid'])
 	->addVar('itemid', $data['form']['itemid'] ? $data['form']['itemid'] : null)
 	->addVar('discovered', $data['form']['discovered'])
-	->addVar('templateid', $data['form']['itemid'] ? $data['form']['templateid'] : null);
+	->addVar('templateid', $data['form']['itemid'] ? $data['form']['templateid'] : null)
+	->addVar('form_refresh', 1);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

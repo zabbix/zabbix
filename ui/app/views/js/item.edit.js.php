@@ -458,13 +458,6 @@ window.item_edit_form = new class {
 	}
 
 	#inheritedTagsChangeHandler(e) {
-		const form_refresh = document.createElement('input');
-
-		form_refresh.setAttribute('type', 'hidden');
-		form_refresh.setAttribute('name', 'form_refresh');
-		form_refresh.setAttribute('value', 1);
-		this.form.append(form_refresh);
-
 		reloadPopup(this.form, 'item.edit');
 	}
 
