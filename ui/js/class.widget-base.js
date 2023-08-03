@@ -72,6 +72,7 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
  */
 class CWidgetBase {
 
+	// Preload outer data source event: informs the dashboard page to preload the referred outer data source.
 	static EVENT_PRELOAD_OUTER_DATA_SOURCE = 'widget-preload-outer-data-source';
 
 	#fields_references_accessors = null;
@@ -81,8 +82,6 @@ class CWidgetBase {
 	#outer_data_subscriptions = [];
 
 	#is_data_exchange_active = false;
-
-	#is_preloaded = false;
 
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
@@ -400,6 +399,9 @@ class CWidgetBase {
 		}
 	}
 
+	/**
+	 * Broadcast default data (nulls) to dependent widgets. Invoked to ensure that all the declared data is broadcast.
+	 */
 	#broadcastDefaults() {
 		for (const {type} of this._defaults.out) {
 			const descriptor = {
@@ -416,6 +418,20 @@ class CWidgetBase {
 		}
 	}
 
+	/**
+	 * Check if the data exchange is active.
+	 *
+	 * @returns {boolean}
+	 */
+	#isDataExchangeActive() {
+		return this.#is_data_exchange_active;
+	}
+
+	/**
+	 * Start data exchange by preloading all dependent data sources and subscribing to their data events.
+	 *
+	 * Invoked once, either on activation or preload request.
+	 */
 	#startDataExchange() {
 		if (this.#is_data_exchange_active) {
 			return;
@@ -443,6 +459,9 @@ class CWidgetBase {
 		}
 	}
 
+	/**
+	 * Stop data exchange. Invoked when the widget gets deleted.
+	 */
 	#stopDataExchange() {
 		if (!this.#is_data_exchange_active) {
 			return;
@@ -467,14 +486,29 @@ class CWidgetBase {
 		this.#resetFieldsReferencesAccessors();
 	}
 
+	/**
+	 * Preload outer data source.
+	 *
+	 * @param {string} reference
+	 */
 	preloadOuterDataSource(reference) {
 		this.fire(CWidgetBase.EVENT_PRELOAD_OUTER_DATA_SOURCE, {reference});
 	}
 
+	/**
+	 * Check if the outer data has been fully received from all data sources.
+	 *
+	 * @returns {boolean}
+	 */
 	isOuterDataReady() {
 		return this.#outer_data.size === this.#getFieldsReferencesAccessors().length;
 	}
 
+	/**
+	 * Get outer data received from data sources, as specified by fields and field references of the widget.
+	 *
+	 * @returns {Object}
+	 */
 	getOuterData() {
 		const outer_data = {};
 
@@ -492,12 +526,15 @@ class CWidgetBase {
 		return outer_data;
 	}
 
+	/**
+	 * Preload widget which hasn't yet been activated.
+	 *
+	 * Invoked to allow the widget to broadcast the data to the dependent widgets which are currently being activated.
+	 */
 	preload() {
-		if (this.#is_preloaded) {
+		if (this.#isDataExchangeActive()) {
 			return;
 		}
-
-		this.#is_preloaded = true;
 
 		this.#startDataExchange();
 		this._startUpdating();
@@ -807,6 +844,11 @@ class CWidgetBase {
 		this._fields_references = fields_references;
 	}
 
+	/**
+	 * Get accessors to the fields referenced by the field reference descriptor.
+	 *
+	 * @returns {{Object}[]}
+	 */
 	#getFieldsReferencesAccessors() {
 		if (this.#fields_references_accessors === null) {
 			this.#fields_references_accessors = CWidgetBase.getFieldsReferencesAccessors(this._fields,
@@ -817,10 +859,22 @@ class CWidgetBase {
 		return this.#fields_references_accessors;
 	}
 
+	/**
+	 * Reset accessors to the fields referenced by the field reference descriptor.
+	 *
+	 * Invoked when fields or field_references properties are updated.
+	 */
 	#resetFieldsReferencesAccessors() {
 		this.#fields_references_accessors = null;
 	}
 
+	/**
+	 * Get accessors to the fields referenced by the field reference descriptor.
+	 * @param {Object} fields              Widget field values (widget configuration data).
+	 * @param {Object} fields_references   Widget field reference descriptor.
+	 *
+	 * @returns {{Object}[]}
+	 */
 	static getFieldsReferencesAccessors(fields, fields_references) {
 		const accessors = [];
 
