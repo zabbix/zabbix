@@ -89,30 +89,7 @@ if ($item['itemid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'item_edit_form.clone('.json_encode([
-				'title' => _('New item'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'item_edit_form.create();'
-					],
-					[
-						'title' => _('Test'),
-						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-test-item']),
-						'keepOpen' => true,
-						'isSubmit' => false,
-						'action' => 'item_edit_form.test();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => ZBX_STYLE_BTN_ALT,
-						'cancel' => false,
-						'action' => ''
-					]
-				]
-			]).')'
+			'action' => 'item_edit_form.clone()'
 		]
 	];
 

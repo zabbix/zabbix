@@ -200,12 +200,10 @@ window.item_edit_form = new class {
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
 	}
 
-	clone({title, buttons}) {
-		// Remove itemid to correctly render form when inherited tags changed.
+	clone() {
 		this.form.querySelector('[name="itemid"]').remove();
-		this.overlay.setProperties({title, buttons});
-		this.overlay.unsetLoading();
-		this.overlay.recoverFocus();
+		this.form.querySelector('[name="templateid"]').remove();
+		reloadPopup(this.form, 'item.edit');
 	}
 
 	create() {
