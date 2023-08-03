@@ -258,7 +258,7 @@ $formgrid = (new CFormGrid())
 								->setEnabled(!$data['readonly'])
 						))->setColSpan(5)
 					),
-				new CTemplateTag('header-row-tmpl',
+				new CTemplateTag('item-header-row-tmpl',
 					(new CRow([
 						(new CCol([
 							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),

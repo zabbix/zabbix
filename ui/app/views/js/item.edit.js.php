@@ -123,7 +123,7 @@ window.item_edit_form = new class {
 		});
 		jQuery('#headers-table').dynamicRows({
 			sortable: true,
-			template: '#header-row-tmpl',
+			template: '#item-header-row-tmpl',
 			rows: this.form_data.headers
 		});
 		jQuery('#delay-flex-table').dynamicRows({
