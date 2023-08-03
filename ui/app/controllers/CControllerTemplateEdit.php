@@ -85,6 +85,7 @@ class CControllerTemplateEdit extends CController {
 		$clone = $this->hasInput('clone');
 		$templates = [];
 		$warnings = [];
+		$groups = [];
 		$groupids = [];
 
 		if ($clone) {
@@ -263,7 +264,70 @@ class CControllerTemplateEdit extends CController {
 					CArrayHelper::sort($data['linked_templates'], ['name']);
 				}
 			}
+
+			// Prepare groups data based on permissions and accessibility.
+			if ($templateid === null) {
+				$groups = $this->getInput('groupids', []);
+			}
+			else {
+				$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
+			}
+
+			foreach ($groups as $group) {
+				if (is_array($group) && array_key_exists('new', $group)) {
+					continue;
+				}
+
+				$groupids[] = $group;
+			}
 		}
+
+		// Retrieve writable templates.
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys($data['linked_templates']),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		// Groups with R and RW permissions.
+		$groups_all = $groupids
+			? API::TemplateGroup()->get([
+				'output' => ['name'],
+				'groupids' => $groupids,
+				'preservekeys' => true
+			])
+			: [];
+
+		// Groups with RW permissions.
+		$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
+			? API::TemplateGroup()->get([
+				'output' => [],
+				'groupids' => $groupids,
+				'editable' => true,
+				'preservekeys' => true
+			])
+			: [];
+
+		// Prepare data for multiselect.
+		foreach ($groups as $group) {
+			if (is_array($group) && array_key_exists('new', $group)) {
+				$data['groups_ms'][] = [
+					'id' => $group['new'],
+					'name' => $group['new'].' ('._x('new', 'new element in multiselect').')',
+					'isNew' => true
+				];
+			}
+			elseif (array_key_exists($group, $groups_all)) {
+				$data['groups_ms'][] = [
+					'id' => $group,
+					'name' => $groups_all[$group]['name'],
+					'disabled' => CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !array_key_exists($group, $groups_rw)
+				];
+			}
+		}
+
+		CArrayHelper::sort($data['groups_ms'], ['name']);
 
 		// Insert empty tag row when no tags are present.
 		if (!$data['tags']) {
@@ -308,69 +372,6 @@ class CControllerTemplateEdit extends CController {
 			'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
 			'add_templates' => array_map('strval', array_keys($data['add_templates']))
 		];
-
-		// Retrieve writable templates.
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys($data['linked_templates']),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		// Prepare groups data based on permissions and accessibility.
-		if ($templateid === null) {
-			$groups = $this->getInput('groupids', []);
-		}
-		elseif ($templateid !== null && !$clone) {
-			$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
-		}
-
-		foreach ($groups as $group) {
-			if (is_array($group) && array_key_exists('new', $group)) {
-				continue;
-			}
-
-			$groupids[] = $group;
-		}
-
-		// Groups with R and RW permissions.
-		$groups_all = $groupids
-			? API::TemplateGroup()->get([
-				'output' => ['name'],
-				'groupids' => $groupids,
-				'preservekeys' => true
-			])
-			: [];
-
-		// Groups with RW permissions.
-		$groups_rw = $groupids && (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
-			? API::TemplateGroup()->get([
-				'output' => [],
-				'groupids' => $groupids,
-				'editable' => true,
-				'preservekeys' => true
-			])
-			: [];
-
-		// Prepare data for multiselect.
-		foreach ($groups as $group) {
-			if (is_array($group) && array_key_exists('new', $group)) {
-				$data['groups_ms'][] = [
-					'id' => $group['new'],
-					'name' => $group['new'].' ('._x('new', 'new element in multiselect').')',
-					'isNew' => true
-				];
-			}
-			elseif (array_key_exists($group, $groups_all)) {
-				$data['groups_ms'][] = [
-					'id' => $group,
-					'name' => $groups_all[$group]['name'],
-					'disabled' => CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !array_key_exists($group, $groups_rw)
-				];
-			}
-		}
-
-		CArrayHelper::sort($data['groups_ms'], ['name']);
 
 		$data['warnings'] = $warnings;
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
