@@ -94,7 +94,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 	}
 
 	/**
-	 * Chgange values in the filter section and check the resulting changes in graphs.
+	 * Change values in the filter section and check the resulting changes in graphs.
 	 */
 	public function testPageMonitoringWebDetails_CheckFilters() {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
