@@ -294,6 +294,19 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
+		openItemForm(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				e => this.events.dialogueEventHandler({detail: {success: e.detail}}),
+				{once: true}
+			);
+		},
+
 		editHost(hostid) {
 			const host_data = {hostid};
 
@@ -309,9 +322,10 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.dialogueEventHandler, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.dialogueEventHandler, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.dialogueEventHandler, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.dialogueEventHandler, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -426,7 +440,7 @@
 				view.updateBusy();
 			},
 
-			hostSuccess(e) {
+			dialogueEventHandler(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
