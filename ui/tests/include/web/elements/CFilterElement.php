@@ -45,11 +45,11 @@ class CFilterElement extends CElement {
 	 * @param integer $context    CONTEXT_LEFT or CONTEXT_RIGHT
 	 */
 	public function setContext($context) {
-		$this->context = $context;
-
 		if (!in_array($this->context, [self::CONTEXT_LEFT, self::CONTEXT_RIGHT])) {
 			throw new Exception('Unknown context is set for filter element.');
 		}
+
+		$this->context = $context;
 
 		return $this;
 	}
@@ -84,7 +84,7 @@ class CFilterElement extends CElement {
 						']/li['.CXPathHelper::fromClass('selected').']')->one(),
 				'attribute' => 'data-target',
 				'is_expanded' => function ($target) {
-					$target->hasClass('expanded');
+					return $target->hasClass('expanded');
 				}
 			];
 		}
@@ -96,7 +96,7 @@ class CFilterElement extends CElement {
 							'/li['.CXPathHelper::fromClass('selected').']')->one(),
 					'attribute' => 'data-target',
 					'is_expanded' => function ($target) {
-						$target->hasClass('expanded');
+						return $target->hasClass('expanded');
 					}
 				];
 			}
@@ -106,7 +106,7 @@ class CFilterElement extends CElement {
 				'selected_tab' => $this->query('xpath:./ul/li[@tabindex="0"]')->one(),
 				'attribute' => 'aria-controls',
 				'is_expanded' =>  function ($target) {
-					filter_var($target->getAttribute('aria-expanded'), FILTER_VALIDATE_BOOLEAN);
+					return filter_var($target->getAttribute('aria-expanded'), FILTER_VALIDATE_BOOLEAN);
 				}
 			];
 		}
@@ -126,7 +126,7 @@ class CFilterElement extends CElement {
 						->one();
 			}
 
-			// TODO: fix after git-hook improvements DEV-2396
+			// TODO: fix formatting after git-hook improvements DEV-2396
 			$tab = $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
 
 			if (!$tab->isValid() && is_numeric($name)) {
@@ -134,7 +134,7 @@ class CFilterElement extends CElement {
 			}
 		}
 		else {
-			$tab = $this->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+			$tab = $this->query('link', $name)->one(false);
 		}
 
 		if (!$tab->isValid()) {
@@ -152,13 +152,7 @@ class CFilterElement extends CElement {
 	 * @return string
 	 */
 	public function getTabDataCounter($name = null) {
-		$data_counter = $this->getTab($name)->getAttribute('data-counter');
-
-		if ($data_counter === null) {
-			return false;
-		}
-
-		return $data_counter;
+		return $this->getTab($name)->getAttribute('data-counter') ?? false;
 	}
 
 	/**
@@ -166,7 +160,7 @@ class CFilterElement extends CElement {
 	 *
 	 * @return array
 	 */
-	public function getTabTitles() {
+	public function getTabsText() {
 		$tabs = $this->query('xpath:.//a[@class="tabfilter-item-link"]')->all();
 		if ($tabs->count() > 0) {
 			return $tabs->asText();

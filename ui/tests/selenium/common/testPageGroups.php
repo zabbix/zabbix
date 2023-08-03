@@ -177,7 +177,7 @@ class testPageGroups extends CWebTest {
 		else {
 			$this->assertStringContainsString('templates.php?form=update&templateid='.$id, $this->page->getCurrentUrl());
 			$this->page->assertHeader('Templates');
-			$this->query('id:templates-form')->asForm(['normalized' =>true])->waitUntilVisible()->one()
+			$this->query('id:templates-form')->asForm(['normalized' => true])->waitUntilVisible()->one()
 					->checkValue(['Template name' => $links['host_template']]);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertStringContainsString('templates.php', $this->page->getCurrentUrl());
@@ -209,7 +209,7 @@ class testPageGroups extends CWebTest {
 					$this->page->getCurrentUrl()
 			);
 			$this->page->assertHeader('Host prototypes');
-			$this->query('id:host-prototype-form')->asForm(['normalized' =>true])->waitUntilVisible()->one()
+			$this->query('id:host-prototype-form')->asForm(['normalized' => true])->waitUntilVisible()->one()
 					->checkValue(['Host name' => self::HOST_PROTOTYPE]);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=',
