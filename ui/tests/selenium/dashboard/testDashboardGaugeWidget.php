@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup config, widget
  *
- * @dataSource AllItemTypes
+ * @dataSource AllItemValueTypes
  *
  * @onBefore prepareDashboardData
  */
@@ -69,7 +69,7 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	public function prepareDashboardData() {
 		// Add item data to move needle on Gauge.
-		CDataHelper::addItemData(CDataHelper::get('AllItemTypes.0 Float item'), 50);
+		CDataHelper::addItemData(CDataHelper::get('AllItemValueTypes.0 Float item'), 50);
 
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Gauge widget dashboard',
@@ -89,7 +89,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => CDataHelper::get('AllItemTypes.0 Float item')
+									'value' => CDataHelper::get('AllItemValueTypes.0 Float item')
 								]
 							]
 						],
@@ -105,7 +105,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => CDataHelper::get('AllItemTypes.0 Float item')
+									'value' => CDataHelper::get('AllItemValueTypes.0 Float item')
 								]
 							]
 						]

@@ -19,7 +19,7 @@
 **/
 
 
-class AllItemTypes {
+class AllItemValueTypes {
 
 	const HOST = 'Host for all item types';
 
