@@ -1007,30 +1007,15 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#tag-filter-table .form_row')]
-			.filter((row) => {
-				const liElements = row.querySelectorAll('.multiselect-list li');
-
-				return liElements.length > 0;
-			})
-			.length;
+		return document
+			.querySelectorAll('#tag-filter-table tbody tr')
+			.length > 1;
 	}
 
 	initObserver() {
-		const target_node = document.getElementById('tag-filter-table');
-
-		if (target_node !== null) {
-			const observer = new MutationObserver(() => {
-				this.addAttributes();
-			});
-
-			observer.observe(target_node, {
-				childList: true,
-				attributes: true,
-				attributeFilter: ['value', 'style'],
-				subtree: true
-			});
-		}
+		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }
 

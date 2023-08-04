@@ -57,6 +57,11 @@
 			document.querySelector('.js-add-hostgroup-right-row').addEventListener('click', () =>
 				this.#addRightRow('hostgroup')
 			);
+			document.getElementById('user-group-form').addEventListener('click', event => {
+				if (event.target.classList.contains('js-remove-table-row')) {
+					this.#removeRow(event.target);
+				}
+			});
 		}
 
 		#addRightRow(group_type = '', groups = [], permission = <?= PERM_DENY ?>) {
@@ -91,12 +96,6 @@
 			permission_radio.checked = true;
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
-
-			document.getElementById('user-group-form').addEventListener('click', event => {
-				if (event.target.classList.contains('js-remove-table-row')) {
-					this.#removeRow(event.target);
-				}
-			});
 		}
 
 		#removeRow(button) {
