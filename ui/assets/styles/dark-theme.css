@@ -5909,7 +5909,10 @@ svg {
   padding-left: 15px;
   width: calc(100% - 15px); }
   .list-vertical-accordion .list-accordion-item {
+    position: relative;
     display: table-row; }
+    .list-vertical-accordion .list-accordion-item .drag-icon {
+      top: 0; }
     .list-vertical-accordion .list-accordion-item .btn-remove {
       position: relative;
       right: -10px;

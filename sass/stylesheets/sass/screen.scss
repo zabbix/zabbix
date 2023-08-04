@@ -4888,7 +4888,12 @@ svg {
 	width: calc(100% - 15px);
 
 	.list-accordion-item {
+		position: relative;
 		display: table-row;
+
+		.drag-icon {
+			top: 0;
+		}
 
 		.btn-remove {
 			position: relative;
