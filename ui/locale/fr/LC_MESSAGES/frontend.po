@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-07-27 19:34+0000\n"
+"PO-Revision-Date: 2023-07-31 07:53+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -19578,7 +19578,7 @@ msgstr "Support"
 
 #: include/classes/setup/CSetupWizard.php:517
 msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
-msgstr ""
+msgstr "La prise en charge d'Oracle DB est obsolète depuis Zabbix 7.0 et sera supprimée dans les futures versions."
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
@@ -23155,7 +23155,7 @@ msgstr "Message d'alerte"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
-msgstr ""
+msgstr "Attention ! La prise en charge d'Oracle DB est obsolète depuis Zabbix 7.0 et sera supprimée dans les futures versions."
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
