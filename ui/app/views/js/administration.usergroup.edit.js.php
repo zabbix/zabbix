@@ -40,10 +40,6 @@
 			);
 			this.host_counter = 0;
 
-			this.tag_filters = tag_filters;
-			this.tag_filter_template = new Template(document.getElementById('tag-filter-row-template').innerHTML);
-			this.tag_filter_counter = 0;
-
 			const permission_types = [<?= PERM_READ_WRITE ?>, <?= PERM_READ ?>, <?= PERM_DENY ?>];
 
 			permission_types.forEach(permission_type => {
@@ -55,33 +51,12 @@
 				}
 			});
 
-			const grouped_tag_filters = [];
-
-			tag_filters.forEach(tag_filter => {
-				const matching_index = grouped_tag_filters.findIndex(grouped_filter => (
-					grouped_filter.some(filter => (
-						filter.tag === tag_filter.tag && filter.value === tag_filter.value
-					))
-				));
-
-				if (matching_index !== -1) {
-					grouped_tag_filters[matching_index].push(tag_filter);
-				} else {
-					grouped_tag_filters.push([tag_filter]);
-				}
-			});
-
-			grouped_tag_filters.forEach(group => {
-				this.#addTagFilterRow(group);
-			});
-
 			document.querySelector('.js-add-templategroup-right-row').addEventListener('click', () =>
 				this.#addRightRow('templategroup')
 			);
 			document.querySelector('.js-add-hostgroup-right-row').addEventListener('click', () =>
 				this.#addRightRow('hostgroup')
 			);
-			document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 		}
 
 		#addRightRow(group_type = '', groups = [], permission = <?= PERM_DENY ?>) {
@@ -124,47 +99,6 @@
 			});
 		}
 
-		#addTagFilterRow(tag_filter_group = []) {
-			const rowid = this.tag_filter_counter++;
-			const data = {
-				'rowid': rowid
-			};
-
-			const new_row = this.tag_filter_template.evaluate(data);
-
-			const placeholder_row = document.querySelector('.js-tag-filter-row-placeholder');
-			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
-
-			const ms = document.getElementById('ms_tag_filter_groupids_'+rowid+'_');
-			$(ms).multiSelect();
-
-			for (const id in tag_filter_group) {
-				if (tag_filter_group.hasOwnProperty(id)) {
-					const groups = {
-						'id': tag_filter_group[id]['groupid'],
-						'name': tag_filter_group[id]['name']
-					};
-					$(ms).multiSelect('addData', [groups]);
-				}
-			}
-
-			if (tag_filter_group.length > 0) {
-				const tag_id = 'tag_filter_tag_'+rowid;
-				document.getElementById(tag_id).value = tag_filter_group[0]['tag'];
-
-				const value_id = 'tag_filter_value_'+rowid;
-				document.getElementById(value_id).value = tag_filter_group[0]['value'];
-			}
-
-			document.dispatchEvent(new Event('tab-indicator-update'));
-
-			document.getElementById('user-group-form').addEventListener('click', event => {
-				if (event.target.classList.contains('js-remove-table-row')) {
-					this.#removeRow(event.target);
-				}
-			});
-		}
-
 		#removeRow(button) {
 			button
 				.closest('tr')
@@ -184,7 +118,6 @@
 
 		$form.submit(function() {
 			$form.trimValues(['#name']);
-			trimTagFilters();
 		});
 
 		/**
@@ -199,17 +132,6 @@
 			else {
 				$userdirectory.removeAttr('disabled');
 			}
-		}
-
-		function trimTagFilters() {
-			let tag_filter_tags = document.querySelectorAll('[id^="tag_filter_tag_"]');
-			let tag_filter_values = document.querySelectorAll('[id^="tag_filter_value_"]');
-			let tag_filter_fields = [...tag_filter_tags, ...tag_filter_values];
-
-			tag_filter_fields.forEach(function(input) {
-				let inputId = '#' + input.id;
-				$form.trimValues([inputId]);
-			});
 		}
 	});
 </script>

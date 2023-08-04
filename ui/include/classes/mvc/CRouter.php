@@ -234,6 +234,8 @@ class CRouter {
 		'popup.tabfilter.delete'					=> ['CControllerPopupTabFilterDelete',					'layout.json',			null],
 		'popup.tabfilter.edit'						=> ['CControllerPopupTabFilterEdit',					'layout.json',			'popup.tabfilter.edit'],
 		'popup.tabfilter.update'					=> ['CControllerPopupTabFilterUpdate',					'layout.json',			null],
+		'popup.tagfilter.edit'						=> ['CControllerPopupTagFilterEdit',					'layout.json',			'popup.tagfilter.edit'],
+		'popup.tagfilter.update'					=> ['CControllerPopupTagFilterUpdate',					'layout.json',			null],
 		'popup.templategroup.edit'					=> ['CControllerTemplateGroupEdit',						'layout.json',			'popup.templategroup.edit'],
 		'popup.testtriggerexpr'						=> ['CControllerPopupTestTriggerExpr',					'layout.json',			'popup.testtriggerexpr'],
 		'popup.token.edit'							=> ['CControllerPopupTokenEdit',						'layout.json',			'popup.token.edit'],

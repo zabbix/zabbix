@@ -145,7 +145,7 @@ $template_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Perm
 $templategroup_right_table = (new CTable())
 	->setId('templategroup-right-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Template groups'), _('Permissions')])
+	->setHeader([_('Template groups'), _('Permissions'), _('Action')])
 	->addRow((new CRow())->addClass('js-templategroup-right-row-placeholder'))
 	->addRow([
 		(new CSimpleButton(_('Add')))
@@ -201,7 +201,7 @@ $host_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissi
 $hostgroup_right_table = (new CTable())
 	->setId('hostgroup-right-table')
 	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host groups'), _('Permissions')])
+	->setHeader([_('Host groups'), _('Permissions'), _('Action')])
 	->addRow((new CRow())->addClass('js-hostgroup-right-row-placeholder'))
 	->addRow([
 		(new CSimpleButton(_('Add')))
@@ -252,64 +252,17 @@ $host_permissions_row_template = (new CTemplateTag('hostgroup-right-row-template
 
 $host_permissions_form_grid->addItem($host_permissions_row_template);
 
-$tag_filter_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
-
-$tag_filter_table = (new CTable())
-	->setId('tag-filter-table')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host groups'), _('Tags')])
-	->addRow((new CRow())->addClass('js-tag-filter-row-placeholder'))
-	->addRow([
-		(new CSimpleButton(_('Add')))
-			->addClass('js-add-tag-filter-row')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-$tag_filter_form_grid
-	->addItem(
+$tag_filter_form_grid = (new CFormGrid())
+	->addItem([
+		new CLabel(_('Permissions')),
 		new CFormField(
-			(new CDiv($tag_filter_table))
+			(new CDiv(
+				new CPartial('administration.usergroup.tagfilters', ['tag_filters' => $data['tag_filters']])
+			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
-	);
-
-$tag_filter_multiselect = (new CMultiSelect([
-			'name' => 'ms_tag_filter[groupids][#{rowid}][]',
-			'object_name' => 'hostGroup',
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'ms_tag_filter_groupids_#{rowid}_'
-				]
-			],
-			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
-$tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
-	(new CRow([
-		$tag_filter_multiselect,
-		(new CCol(
-			(new CTextBox('tag_filter[tag][#{rowid}]'))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('placeholder', _('tag'))
-		))->setAttribute('style', 'vertical-align: top'),
-		(new CCol(
-			(new CTextBox('tag_filter[value][#{rowid}]'))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('placeholder', _('value'))
-		))->setAttribute('style', 'vertical-align: top'),
-		(new CCol(
-			(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
-		))->setAttribute('style', 'vertical-align: top')
-	]))
-		->addClass('form_row')
-);
-
-$tag_filter_form_grid->addItem($tag_filter_row_template);
+	]);
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_grid)
