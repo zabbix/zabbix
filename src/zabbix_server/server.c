@@ -1165,9 +1165,7 @@ int	main(int argc, char **argv)
 	static zbx_config_icmpping_t	config_icmpping = {
 		get_zbx_config_source_ip,
 		get_zbx_config_fping_location,
-#ifdef HAVE_IPV6
 		get_zbx_config_fping6_location,
-#endif
 		get_zbx_config_tmpdir};
 
 	ZBX_TASK_EX			t = {ZBX_TASK_START};

@@ -2179,7 +2179,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 	bulkwalk_context = (zbx_bulkwalk_context_t *)magic;
 	snmp_context = (zbx_snmp_context_t *)bulkwalk_context->arg;
 
-	if (reqid != bulkwalk_context->reqid && NULL != pdu && pdu->command != SNMP_MSG_REPORT)
+	if (reqid != bulkwalk_context->reqid && NULL != pdu && SNMP_MSG_REPORT != pdu->command)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "unexpected response request id:%d expected request id:%d command:%d"
 				" operation:%d", reqid, bulkwalk_context->reqid, pdu->command, operation);
@@ -2450,7 +2450,7 @@ static int	snmp_task_process(short event, void *data, int *fd)
 
 			if (0 != session->engineBoots || 0 != session->engineTime)
 			{
-				set_enginetime(session->securityEngineID, session->securityEngineIDLen,
+				set_enginetime(session->securityEngineID, (u_int)session->securityEngineIDLen,
 						session->engineBoots, session->engineTime, TRUE);
 			}
 
