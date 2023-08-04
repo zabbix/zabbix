@@ -120,7 +120,7 @@
 					this.#delete(target, itemids);
 				}
 			});
-			document.querySelector('.js-create-item').addEventListener('click', (e) => this.#edit(e.target));
+			document.querySelector('.js-create-item')?.addEventListener('click', (e) => this.#edit(e.target));
 		}
 
 		#edit(target, parameters = {}) {
