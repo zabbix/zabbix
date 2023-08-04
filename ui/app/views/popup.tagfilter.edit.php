@@ -49,7 +49,7 @@ $new_tag_filter_table = (new CTable())
 
 $form_grid
 	->addItem([
-		(new CLabel(_('Host groups'), 'host_groups'))->setAsteriskMark(),
+		(new CLabel(_('Host groups'), 'tag_filter__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'ms_new_tag_filter[groupids][]',

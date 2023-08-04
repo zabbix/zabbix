@@ -33,6 +33,16 @@ window.tag_filter_popup = new class {
 		this.#addTagFilterRow();
 
 		document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
+
+		document.getElementById('tag-filter-add-form').addEventListener('click', event => {
+			if (event.target.classList.contains('js-remove-table-row')) {
+				event.target.closest('tr').remove();
+			}
+		});
+
+		const multiselect = document.getElementById('ms_new_tag_filter_groupids_');
+
+		jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
 	}
 
 	#addTagFilterRow(tag_filter_group = []) {
@@ -53,17 +63,5 @@ window.tag_filter_popup = new class {
 			const value_id = 'tag_filter_value_'+rowid;
 			document.getElementById(value_id).value = tag_filter_group[0]['value'];
 		}
-
-		document.getElementById('tag-filter-add-form').addEventListener('click', event => {
-			if (event.target.classList.contains('js-remove-table-row')) {
-				this.#removeRow(event.target);
-			}
-		});
-	}
-
-	#removeRow(button) {
-		button
-			.closest('tr')
-			.remove();
 	}
 }
