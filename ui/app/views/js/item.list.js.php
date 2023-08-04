@@ -277,6 +277,10 @@
 			return overlay;
 		}
 
+		openItemForm(target, data) {
+			this.#edit(target, data);
+		}
+
 		executeNow(target, data) {
 			const curl = new Curl('zabbix.php');
 
