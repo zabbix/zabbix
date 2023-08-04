@@ -335,23 +335,24 @@
 	 * @param {Overlay} overlay
 	 */
 	function submitDCheck(overlay) {
-		var $form = overlay.$dialogue.find('form');
+		const $form = overlay.$dialogue.find('form');
 
 		$form.trimValues([
 			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
 			'#snmpv3_authpassphrase', '#snmpv3_privpassphrase'
 		]);
 
-		var data = $form
+		const data = $form
 				.find('#ports, >input[type=hidden], input:visible')
-				.serializeJSON(),
-			dialogueid = $form
+				.serializeJSON();
+
+		const dialogueid = $form
 				.closest("[data-dialogueid]")
 				.data('dialogueid');
 
-		$form.find('z-select:visible').each((index, element) => {
-			data[element.name] = element.value;
-		});
+		[...$form[0].querySelectorAll('z-select')]
+				?.filter((element) => isVisible(element))
+				?.forEach((element) => data[element.name] = element.value);
 
 		if (!dialogueid) {
 			return false;
