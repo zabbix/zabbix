@@ -267,11 +267,11 @@ if (!$data['readonly']) {
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
 			]))->addClass('form_row')
 		);
-}
 
-$macros_tab
-	->addItem($macro_row_tmpl)
-	->addItem($macro_row_inherited_tmpl);
+	$macros_tab
+		->addItem($macro_row_tmpl)
+		->addItem($macro_row_inherited_tmpl);
+}
 
 // Value mapping tab.
 $valuemap_tab = (new CFormList('valuemap-formlist'))->addRow(

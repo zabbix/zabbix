@@ -31,10 +31,10 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({readonly, parent_hostid, container = null}) {
+	constructor({container, readonly, parent_hostid}) {
+		this.$container = container;
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
-		this.$container = container ?? $('#macros_container .table-forms-td-right')
 	}
 
 	load(show_inherited_macros, templateids) {

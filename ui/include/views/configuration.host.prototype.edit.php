@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -217,6 +217,30 @@ $host_tab->addRow(
 	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
+$group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
+	(new CRow([
+		new CCol(
+			(new CTextBox('group_prototypes[#{i}][name]', '#{name}'))
+				->addClass('macro')
+				->addStyle('width: 448px')
+				->setAttribute('placeholder', '{$MACRO}')
+		),
+		(new CButtonLink(_('Remove')))
+			->setAttribute('name', 'remove')
+			->addClass('group-prototype-remove')
+	]))
+		->addClass(ZBX_STYLE_NOWRAP)
+		->addClass('form_row')
+);
+
+$host_interface_template = (new CTemplateTag('host-interface-row-tmpl'))->addItem(
+	new CPartial('configuration.host.interface.row')
+);
+
+$host_tab
+	->addItem($group_prototype_template)
+	->addItem($host_interface_template);
+
 $interface_header = renderInterfaceHeaders();
 
 $agent_interfaces = (new CDiv())
@@ -341,29 +365,106 @@ $tabs->addTab('tags-tab', _('Tags'),
 	TAB_INDICATOR_TAGS
 );
 
-$tabs->addTab('macroTab', _('Macros'),
-	(new CFormList('macrosFormList'))
-		->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
-			->addValue(_('Host prototype macros'), 0)
-			->addValue(_('Inherited and host prototype macros'), 1)
-			->setModern(true)
-		)
-		->addRow(
-			null,
-			new CPartial(
-				$data['show_inherited_macros']
-					? 'hostmacros.inherited.list.html'
-					: 'hostmacros.list.html',
-				[
-					'macros' => $data['macros'],
-					'parent_hostid' => $data['parent_host']['hostid'],
-					'readonly' => $data['templates']
-				]
-			),
-			'macros_container'
+$macro_tab = (new CFormList('macrosFormList'))
+	->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+		->addValue(_('Host prototype macros'), 0)
+		->addValue(_('Inherited and host prototype macros'), 1)
+		->setModern(true)
+	)
+	->addRow(
+		null,
+		new CPartial(
+			$data['show_inherited_macros']
+				? 'hostmacros.inherited.list.html'
+				: 'hostmacros.list.html',
+			[
+				'macros' => $data['macros'],
+				'parent_hostid' => $data['parent_host']['hostid'],
+				'readonly' => $data['templates']
+			]
 		),
-	TAB_INDICATOR_MACROS
-);
+		'macros_container'
+	);
+
+if (!$data['readonly']) {
+	$macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
+		->addItem(
+			(new CRow([
+				(new CCol([
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->addClass('macro')
+						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+						->setAttribute('placeholder', '{$MACRO}')
+						->disableSpellcheck()
+				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+						->setAttribute('placeholder', _('description'))
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP)
+			]))->addClass('form_row')
+		);
+
+	$macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
+		->addItem(
+			(new CRow([
+				(new CCol([
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+						->addClass('macro')
+						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+						->setAttribute('placeholder', '{$MACRO}')
+						->disableSpellcheck(),
+					new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN)
+				]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+				(new CCol(
+					(new CButton('macros[#{rowNum}][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP),
+				[
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					),
+					new CCol(),
+					new CCol(
+						(new CDiv())
+							->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+					)
+				]
+			]))->addClass('form_row')
+		)
+		->addItem(
+			(new CRow([
+				(new CCol(
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAttribute('placeholder', _('description'))
+				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
+			]))->addClass('form_row')
+		);
+
+	$macro_tab
+		->addItem($macro_row_tmpl)
+		->addItem($macro_row_inherited_tmpl);
+}
+
+$tabs->addTab('macro-tab', _('Macros'), $macro_tab, TAB_INDICATOR_MACROS);
 
 $tabs->addTab('inventoryTab', _('Inventory'),
 	(new CFormList('inventorylist'))
@@ -454,7 +555,15 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'form_name' => $form->getName()
+		'form_name' => $form->getName(),
+		'readonly' => $data['readonly'],
+		'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
+		'linked_templates' => $data['macros_tab']['linked_templates'],
+		'group_prototypes' => $data['host_prototype']['groupPrototypes'],
+		'prototype_templateid' => $data['host_prototype']['templateid'],
+		'prototype_interfaces' => $data['host_prototype']['interfaces'],
+		'parent_host_interfaces' => $data['parent_host']['interfaces'],
+		'parent_host_status' => $data['parent_host']['status']
 	]).');
 '))
 	->setOnDocumentReady()
