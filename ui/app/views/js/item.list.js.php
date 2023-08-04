@@ -206,7 +206,7 @@
 
 		#confirmAction(curl, data, target) {
 			const confirm = this.confirm_messages[curl.getArgument('action')];
-			const message = confirm[data.itemids.length > 1 ? 1 : 0];
+			const message = confirm ? confirm[data.itemids.length > 1 ? 1 : 0] : '';
 
 			if (message != '' && !window.confirm(message)) {
 				return;
@@ -275,6 +275,13 @@
 			});
 
 			return overlay;
+		}
+
+		executeNow(target, data) {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'item.execute');
+			this.#post(curl, data);
 		}
 
 		editHost(e, hostid) {

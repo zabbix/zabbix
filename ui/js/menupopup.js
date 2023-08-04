@@ -1136,20 +1136,22 @@ function getMenuPopupItem(options) {
 	}
 
 	if (options.context !== 'template') {
-		const execute = {
-			label: t('Execute now'),
-			disabled: !options.isExecutable
-		};
-
 		if (options.isExecutable) {
-			execute.clickCallback = function() {
-				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+			actions.push({
+				label: t('Execute now'),
+				clickCallback: function() {
+					jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				view.executeNow(null, {itemids: [options.itemid]});
-			};
+					view.executeNow(null, {itemids: [options.itemid]});
+				}
+			})
 		}
-
-		actions.push(execute);
+		else {
+			actions.push({
+				label: t('Execute now'),
+				disabled: true
+			});
+		}
 
 		sections.push({
 			label: t('Actions'),
