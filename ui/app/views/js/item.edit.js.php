@@ -253,7 +253,7 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.clear');
-		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]});
+		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]}, true);
 	}
 
 	execute() {
@@ -261,7 +261,7 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.execute');
-		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]});
+		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]}, true);
 	}
 
 	updateFieldsVisibility() {
@@ -317,7 +317,7 @@ window.item_edit_form = new class {
 		return fields;
 	}
 
-	#post(url, data) {
+	#post(url, data, keep_open = false) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -328,9 +328,19 @@ window.item_edit_form = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
-				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				if (keep_open) {
+					const message_box = makeMessageBox('good', response.success.messages, response.success.title)[0];
+
+					this.form.parentNode.querySelectorAll('.msg-good,.msg-bad,.msg-warning')
+						.forEach(node => node.remove());
+					this.form.parentNode.insertBefore(message_box, this.form);
+				}
+				else {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				}
 			})
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
