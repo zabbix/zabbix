@@ -337,9 +337,11 @@ window.item_edit_form = new class {
 					this.form.parentNode.insertBefore(message_box, this.form);
 				}
 				else {
+					const action = (new Curl(url)).getArgument('action');
+
 					overlayDialogueDestroy(this.overlay.dialogueid);
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {action, ...response}}));
 				}
 			})
 			.catch((exception) => {

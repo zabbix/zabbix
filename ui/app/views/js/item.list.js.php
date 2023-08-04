@@ -271,6 +271,7 @@
 					}
 				}
 
+				uncheckTableRows('item');
 				location.href = location.href;
 			});
 
@@ -316,7 +317,13 @@
 				location.href = original_url;
 			}
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', reloadPage);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (['item.update', 'item.create', 'item.delete'].indexOf(e.detail.action) != -1) {
+					uncheckTableRows('item');
+				}
+
+				reloadPage(e);
+			});
 			overlay.$dialogue[0].addEventListener('dialogue.create', reloadPage);
 			overlay.$dialogue[0].addEventListener('dialogue.update', reloadPage);
 			overlay.$dialogue[0].addEventListener('dialogue.delete', e => {
