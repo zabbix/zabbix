@@ -144,6 +144,8 @@ $table->setFooter(new CCol(
 		->setEnabled(!$data['readonly'])
 ));
 
+$form_grid->addItem(new CLabel(_('Tags')));
+
 if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
 	switch ($data['source']) {
 		case 'trigger':
@@ -173,8 +175,6 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 	);
 }
 
-$form_grid->addItem(
-	new CFormField($table)
-);
+$form_grid->addItem(new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)));
 
 $form_grid->show();
