@@ -495,8 +495,8 @@ window.item_edit_form = new class {
 		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
 			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
 
-			this.field.value.value = value;
 			this.field.value_type.value = value;
+			this.field.value_type_steps.value = value;
 		}
 
 		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
