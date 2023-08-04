@@ -202,7 +202,7 @@ include __DIR__.'/itemtest.js.php';
 			overlay.$dialogue[0].addEventListener('dialogue.submit',
 				this.events.elementSuccess.bind(this, this.context), {once: true}
 			);
-			},
+		},
 
 		refresh() {
 			const url = new Curl('');

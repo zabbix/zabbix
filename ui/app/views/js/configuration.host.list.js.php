@@ -109,14 +109,14 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-			this.overlay = PopUp('popup.host.edit', host_data, {
+			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			this.overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			this.overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},

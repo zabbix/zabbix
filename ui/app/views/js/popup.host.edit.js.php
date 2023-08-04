@@ -59,9 +59,8 @@ window.host_edit_popup = {
 
 	editTemplate(parameters) {
 		const form_fields = getFormFields(this.form);
-		const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
 
-		if (!diff) {
+		if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
 			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
 				return;
 			}

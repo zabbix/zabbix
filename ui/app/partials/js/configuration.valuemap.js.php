@@ -27,9 +27,7 @@
 
 <script type="text/javascript">
 (() => {
-	this.table = <?= json_encode($data['table_id']) ?>;
-
-	document.querySelectorAll(`#${this.table} .element-table-add`).forEach((element) =>
+	document.querySelectorAll(`#${'<?= $data['table_id'] ?>'} .element-table-add`).forEach((element) =>
 		element.addEventListener('click', (event) => openAddPopup(event))
 	);
 
@@ -71,10 +69,9 @@ var AddValueMap = class {
 		if (edit instanceof Element) {
 			return edit.replaceWith(this.row);
 		}
-		const table_id = <?= json_encode($data['table_id']) ?>
 
 		return document
-			.querySelector(`#${table_id} tbody`)
+			.querySelector(`#${'<?= $data['table_id'] ?>'} tbody`)
 			.append(this.row);
 	}
 

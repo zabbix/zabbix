@@ -127,12 +127,10 @@
 		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form_name = form_name;
 			this.form = document.getElementById(form_name);
-			this.overlay = overlays_stack.getById('host_edit');
 			this.initHostTab(host_interfaces, host_is_discovered);
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
-			this.initial_form_fields = getFormFields(this.form);
 		},
 
 		/**

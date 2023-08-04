@@ -57,24 +57,11 @@ window.template_edit_popup = new class {
 				this.#editLinkedTemplate(e.target.dataset.templateid);
 			}
 			else if (e.target.classList.contains('js-unlink')) {
-				e.target.closest('tr').remove();
-
-				this.linked_templateids = this.linked_templateids.filter(value =>
-					value != e.target.dataset.templateid
-				);
-
-				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
-				$('#template_add_templates_ , form[name="templates-form"]').trigger('change');
+				this.#unlink(e);
 			}
 			else if (e.target.classList.contains('js-unlink-and-clear')) {
-				e.target.closest('tr').remove();
-
-				this.linked_templateids = this.linked_templateids.filter(value =>
-					value != e.target.dataset.templateid
-				);
-
-				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
-				this.#unlinkAndClearTemplate(e.target.dataset.templateid);
+				this.#unlink(e);
+				this.#clear(e.target.dataset.templateid);
 			}
 		});
 
@@ -87,8 +74,8 @@ window.template_edit_popup = new class {
 	}
 
 	#initTemplateTab() {
-		const $groups_ms = $('#template_groups_, form[name="templates-form"]');
-		const $template_ms = $('#template_add_templates_, form[name="templates-form"]');
+		const $groups_ms = $('#template_groups_, this.form');
+		const $template_ms = $('#template_add_templates_, this.form');
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries', this.#getLinkedTemplates().concat(this.#getNewTemplates()));
@@ -109,7 +96,7 @@ window.template_edit_popup = new class {
 			parent_hostid: null
 		});
 
-		$('#template-tabs, form[name="templates-form"]').on('tabscreate tabsactivate', (event, ui) => {
+		$('#template-tabs, this.form').on('tabscreate tabsactivate', (event, ui) => {
 			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'template-macro-tab') {
@@ -163,9 +150,8 @@ window.template_edit_popup = new class {
 
 	#editLinkedTemplate(templateid) {
 		const form_fields = getFormFields(this.form);
-		const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
 
-		if (!diff) {
+		if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
 			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
 				return;
 			}
@@ -188,15 +174,35 @@ window.template_edit_popup = new class {
 		});
 	}
 
-	#unlinkAndClearTemplate(templateid) {
+	/**
+	 * Removes the linked template row and the template ID from linked templates object, triggers multiselect change
+	 * event.
+	 *
+	 * @param {object} e  Event object.
+	 */
+	#unlink(e) {
+		e.target.closest('tr').remove();
+
+		this.linked_templateids = this.linked_templateids.filter(value =>
+			value != e.target.dataset.templateid
+		);
+
+		this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
+		$('#template_add_templates_, this.form').trigger('change');
+	}
+
+	/**
+	 * Adds template ID s a hidden input to form within the clear_templates array.
+	 *
+	 * @param {string} templateid
+	 */
+	#clear(templateid) {
 		const clear_template = document.createElement('input');
 
 		clear_template.type = 'hidden';
 		clear_template.name = 'clear_templates[]';
 		clear_template.value = templateid;
 		this.form.appendChild(clear_template);
-
-		$('#template_add_templates_, form[name="templates-form"]').trigger('change');
 	}
 
 	/**
@@ -220,7 +226,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getNewTemplates() {
-		const $template_multiselect = $('#template_add_templates_, form[name="templates-form"]');
+		const $template_multiselect = $('#template_add_templates_, this.form');
 		const templateids = [];
 
 		// Readonly forms don't have multiselect.
@@ -239,7 +245,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getAddTemplates() {
-		const $ms = $('#template_add_templates_, form[name="templates-form"]');
+		const $ms = $('#template_add_templates_, this.form');
 		let templateids = [];
 
 		// Readonly forms don't have multiselect.
@@ -261,10 +267,8 @@ window.template_edit_popup = new class {
 		parameters.templateid = this.templateid;
 		this.#prepareFields(parameters);
 
-		this.overlay = PopUp('template.edit', parameters, {
-			dialogueid: 'templates-form',
-			dialogue_class: 'modal-popup-large',
-			prevent_navigation: true
+		PopUp('template.edit', parameters, {
+			dialogueid: 'templates-form'
 		});
 	}
 

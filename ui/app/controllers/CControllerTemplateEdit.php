@@ -93,7 +93,7 @@ class CControllerTemplateEdit extends CController {
 				'clone_templateid' => $templateid,
 				'template_name' =>$this->getInput('template_name', ''),
 				'visible_name' => $this->getInput('visiblename', ''),
-				'linked_templates' => $this->getInput('linked_templates', []),
+				'linked_templates' => [],
 				'templates' => $this->getInput('templates', []),
 				'add_templates' => [],
 				'original_templates' => [],
@@ -108,17 +108,16 @@ class CControllerTemplateEdit extends CController {
 			];
 
 			// Add already linked and new templates when cloning element.
-			$request_linked_templates = $this->getInput('templates', []);
 			$request_add_templates = $this->getInput('add_templates', []);
 
-			if ($request_linked_templates || $request_add_templates) {
+			if ($data['templates'] || $request_add_templates) {
 				$templates = API::Template()->get([
 					'output' => ['templateid', 'name'],
-					'templateids' => array_merge($request_linked_templates, $request_add_templates),
+					'templateids' => array_merge($data['templates'], $request_add_templates),
 					'preservekeys' => true
 				]);
 
-				$data['linked_templates'] = array_intersect_key($templates, array_flip($request_linked_templates));
+				$data['linked_templates'] = array_intersect_key($templates, array_flip($data['templates']));
 				CArrayHelper::sort($data['linked_templates'], ['name']);
 
 				$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
@@ -206,6 +205,7 @@ class CControllerTemplateEdit extends CController {
 		}
 		else {
 			$data = $this->getDefaultTemplateData();
+			$data['templateid'] = $templateid;
 
 			if ($templateid !== null) {
 				$dbTemplates = API::Template()->get([
@@ -367,11 +367,6 @@ class CControllerTemplateEdit extends CController {
 		}
 		unset($macro);
 
-		$data['macros_tab'] = [
-			'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
-			'add_templates' => array_map('strval', array_keys($data['add_templates']))
-		];
-
 		$data['warnings'] = $warnings;
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
@@ -380,7 +375,6 @@ class CControllerTemplateEdit extends CController {
 
 	private function getDefaultTemplateData(): array {
 		return [
-			'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
 			'template_name' => '',
 			'visible_name' => '',
 			'linked_templates' => [],
