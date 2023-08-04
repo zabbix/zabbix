@@ -176,7 +176,7 @@ class CControllerItemList extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Items'));
+		$response->setTitle(_('Configuration of items'));
 		$this->setResponse($response);
 	}
 
