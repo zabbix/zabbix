@@ -771,11 +771,15 @@ class testDashboardGaugeWidget extends CWebTest {
 				$data['fields']['Item'] = self::HOST.': '.$data['fields']['Item'];
 			}
 
-			// Check widget form fields and values in frontend.
+			// Check that Advanced configuration is false by default.
+			$saved_form->checkValue(['Advanced configuration' => false]);
+
+			// Open Advanced configuration if it is not defined as false in data provider.
 			if (CTestArrayHelper::get($data['fields'], 'Advanced configuration', true)) {
 				$saved_form->fill(['Advanced configuration' => true]);
 			}
 
+			// Check saved fields in form.
 			$saved_form->checkValue($data['fields']);
 
 			// Check that widget is saved in DB.
