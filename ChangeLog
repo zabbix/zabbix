@@ -168,8 +168,22 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.6rc1
 
 New features:
+.........T [ZBXNEXT-8581] added support HTTP proxy in Azure templates (egordymov)
+.........T [ZBXNEXT-8558] added MantisBT webhook (abiba)
+.........T [ZBXNEXT-8589] updated documentation, unified metrics names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
+.........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
+..F....PS. [ZBXNEXT-8190] increased MariaDB maximum supported version to 11.0 (mprihodko)
+..F....PS. [ZBXNEXT-8582] increased MySQL maximum supported version to 8.1 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-22027] fixed "Update problem" position in trigger context menu (agriscenko)
+..F....... [ZBX-22757] fixed action condition labels when custom expression is set (esekace)
+A......... [ZBX-22613] fixed script execution with API token as authentication (epulke)
+..F....... [ZBX-22881] fixed link to filtered users belonging to the specific user group (epulke)
+.........T [ZBX-23060] removed unused endpoints in JavaScript for Veeam Backup and Replication template (egordymov)
+........S. [ZBX-22772] added trends cleanup for non-numeric value types (wiper)
+A......... [ZBX-22787] fixed mediatypes incorrectly saving parameters when switching type from Webhook to Script and vice versa (Ivo)
+..F....... [ZBX-22788] fixed inability to close pop-up confirmation message on the first attempt after opening multiple popups (averza, kkuzmina)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.5
