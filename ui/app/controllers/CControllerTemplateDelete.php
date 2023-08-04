@@ -60,7 +60,7 @@ class CControllerTemplateDelete extends CController {
 		if ($this->getInput('templateids')) {
 			$templates = API::Template()->get([
 				'output' => [],
-				'templateids' => $this->getInput('templateids'),
+				'templateids' =>$templateids,
 				'editable' => true
 			]);
 
