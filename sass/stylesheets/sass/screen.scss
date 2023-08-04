@@ -1847,7 +1847,7 @@ select {
 		}
 
 		.overlay-dialogue-body {
-			overflow: auto;
+			overflow-y: auto;
 			overflow-x: hidden;
 			width: 100%;
 			max-height: calc(100vh - 220px);
@@ -1857,7 +1857,7 @@ select {
 			position: relative;
 			@extend %webkit-scrollbar;
 
-			> form {
+			form {
 				padding: 2px 0;
 			}
 

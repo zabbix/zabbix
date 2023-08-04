@@ -5393,7 +5393,7 @@ z-select button.focusable,
     .overlay-dialogue.modal .dashboard-widget-head {
       margin-bottom: 12px; }
     .overlay-dialogue.modal .overlay-dialogue-body {
-      overflow: auto;
+      overflow-y: auto;
       overflow-x: hidden;
       width: 100%;
       max-height: calc(100vh - 220px);
@@ -5401,7 +5401,7 @@ z-select button.focusable,
       margin: 0 -10px 8px;
       padding: 0 10px;
       position: relative; }
-      .overlay-dialogue.modal .overlay-dialogue-body > form {
+      .overlay-dialogue.modal .overlay-dialogue-body form {
         padding: 2px 0; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
