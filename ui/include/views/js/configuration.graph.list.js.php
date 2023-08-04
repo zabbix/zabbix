@@ -118,7 +118,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context), {once: true}
+				this.events.elementSuccess.bind(this, this.context, this.is_discovery), {once: true}
 			);
 		},
 
