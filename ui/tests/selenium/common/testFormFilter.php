@@ -190,7 +190,7 @@ class testFormFilter extends CWebTest {
 		$this->page->open($this->url)->waitUntilReady();
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
-		$tabs = $filter->getTabTitles();
+		$tabs = $filter->getTabsText();
 		foreach ($tabs as $tab) {
 			$filter->editProperties($tab);
 			$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
@@ -201,10 +201,10 @@ class testFormFilter extends CWebTest {
 
 			// Checking that deleted filter doesn't exist in filters tab list.
 			if ($tabs !== []) {
-				$this->assertEquals($tabs, $filter->getTabTitles());
+				$this->assertEquals($tabs, $filter->getTabsText());
 			}
 			else {
-				$this->assertEquals(null, $filter->getTabTitles());
+				$this->assertEquals(null, $filter->getTabsText());
 			}
 
 			// Checking that deleted filter doesn't exist in filters dropdown list.
@@ -287,7 +287,7 @@ class testFormFilter extends CWebTest {
 		$this->assertEquals($filter_name, $filter->getSelectedTabName());
 
 		// Checking that names displayed on the filter tabs same as in drop down list.
-		$this->assertEquals($filter->getTabTitles(), $this->getDropdownFilterNames());
+		$this->assertEquals($filter->getTabsText(), $this->getDropdownFilterNames());
 
 		// Checking that name displayed in filter properties.
 		$filter->editProperties();
