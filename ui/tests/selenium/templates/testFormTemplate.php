@@ -154,8 +154,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$this->zbxTestMultiselectRemove('template_groups_', $data['remove_group']);
 		}
 
-		$modal = COverlayDialogElement::find()->one();
-		$modal->query('xpath:./div[@class="overlay-dialogue-footer"]/button[text()="Add"]')->WaitUntilClickable()->one()->click();
+		$this->clickModalFooterButton('Add');
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -216,16 +215,16 @@ class testFormTemplate extends CLegacyWebTest {
 			}
 		}
 
-		$modal->close();
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function testFormTemplate_UpdateTemplateName() {
 		$new_template_name = 'Changed template name';
 
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template_edit_name);
 		$this->zbxTestInputTypeOverwrite('template_name', $new_template_name);
-		$this->zbxTestClickWait('update');
+		$this->clickModalFooterButton('Update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template updated');
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$new_template_name."'"));
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_edit_name'"));
@@ -234,11 +233,12 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_CloneTemplate() {
 		$cloned_template_name = 'Cloned template';
 
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template_clone);
-		$this->zbxTestClickWait('clone');
+
+		$this->clickModalFooterButton('Clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$this->clickModalFooterButton('Add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='$this->template_clone'"));
@@ -251,9 +251,9 @@ class testFormTemplate extends CLegacyWebTest {
 	public function testFormTemplate_Delete() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template."'");
 
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template);
-		$this->zbxTestClickWait('delete');
+		$this->clickModalFooterButton('Delete');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
 
@@ -263,9 +263,9 @@ class testFormTemplate extends CLegacyWebTest {
 
 	public function testFormTemplate_DeleteAndClearTemplate() {
 		$template = CDBHelper::getRow("select hostid from hosts where host like '".$this->template_full_delete."'");
-		$this->zbxTestLogin('templates.php');
+		$this->zbxTestLogin('zabbix.php?action=template.list');
 		$this->filterAndOpenTemplate($this->template_full_delete);
-		$this->zbxTestClickWait('delete_and_clear');
+		$this->clickModalFooterButton('Delete and clear');
 		$this->zbxTestAcceptAlert();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template deleted');
 		$this->assertEquals(0, CDBHelper::getCount("SELECT hostid FROM hosts WHERE hostid='".$template['hostid']."'"));
@@ -289,5 +289,16 @@ class testFormTemplate extends CLegacyWebTest {
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
 				->getColumn('Name')->query('link', $name)->one()->click();
 		$this->page->waitUntilReady();
+	}
+
+	/**
+	 * Clicks a button on the footer of the modal.
+	 *
+	 * @param string text    text of the button to be clicked
+	 */
+	protected function clickModalFooterButton($text) {
+		COverlayDialogElement::find()->one()
+			->query('xpath:./div[@class="overlay-dialogue-footer"]/button[text()="'.$text.'"]')
+			->WaitUntilClickable()->one()->click();
 	}
 }
