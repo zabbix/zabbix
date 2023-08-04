@@ -723,7 +723,7 @@ static int	DBpatch_6050063(void)
 				" from task_data td"
 				" where td.taskid=t.taskid and td.type in (%i,%i)"
 			")",
-			 TM_DATA_TYPE_TEST_ITEM, TM_DATA_TYPE_PROXYIDS))
+			TM_DATA_TYPE_TEST_ITEM, TM_DATA_TYPE_PROXYIDS))
 	{
 		return FAIL;
 	}
