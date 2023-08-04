@@ -342,11 +342,11 @@ int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj)
 	switch (*data)
 	{
 		case '{':
-			if (0 == json_parse_object(data, obj, &error))
+			if (0 == json_parse_object(data, obj, 0, &error))
 				goto out;
 			break;
 		case '[':
-			if (0 == json_parse_array(data, obj, &error))
+			if (0 == json_parse_array(data, obj, 0, &error))
 				goto out;
 			break;
 		default:
