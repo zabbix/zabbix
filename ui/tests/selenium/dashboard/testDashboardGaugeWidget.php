@@ -648,7 +648,8 @@ class testDashboardGaugeWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Item' => self::GAUGE_ITEM
+						'Item' => self::GAUGE_ITEM,
+						'Advanced configuration' => false
 					]
 				]
 			]
@@ -766,11 +767,13 @@ class testDashboardGaugeWidget extends CWebTest {
 			$this->assertEquals($old_widget_count + ($update ? 0 : 1), $dashboard->getWidgets()->count());
 			$saved_form = $dashboard->getWidget($header)->edit();
 
-			// Check widget form fields and values in frontend.
-			$saved_form->fill(['Advanced configuration' => true]);
-
 			if (array_key_exists('Item', $data['fields'])) {
 				$data['fields']['Item'] = self::HOST.': '.$data['fields']['Item'];
+			}
+
+			// Check widget form fields and values in frontend.
+			if (CTestArrayHelper::get($data['fields'], 'Advanced configuration', true)) {
+				$saved_form->fill(['Advanced configuration' => true]);
 			}
 
 			$saved_form->checkValue($data['fields']);
