@@ -108,8 +108,8 @@ class testPageTriggerUrl extends CWebTest {
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
 		// Add 'Update problem' menu link to data provider.
-		$data['links'] = ['Problems' => $data['links']['Problems'], 'History' => $data['links']['History'],
-				'Update problem' => ''] + $data['links'];
+		$data['links'] = array_slice($data['links'], 0, 2, true) + ['Update problem' => ''] +
+				array_slice($data['links'], 2, count($data['links']) - 2, true);
 
 		// Remove 'cause and symptoms' from data provider.
 		unset($data['links']['Mark as cause']);
