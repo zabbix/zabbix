@@ -36,7 +36,7 @@ require_once dirname(__FILE__).'/testPageApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/testPageApiTokensUserSettings.php';
 require_once dirname(__FILE__).'/testPageAvailabilityReport.php';
 require_once dirname(__FILE__).'/testPageDashboardList.php';
-require_once dirname(__FILE__).'/testPageEventCorrelation.php';
+require_once dirname(__FILE__).'/eventCorrelation/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/graphs/testFormGraph.php';
 require_once dirname(__FILE__).'/graphs/testFormGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
@@ -95,7 +95,7 @@ require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebho
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/testFormApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/testFormApiTokensUserSettings.php';
-require_once dirname(__FILE__).'/testFormEventCorrelation.php';
+require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
