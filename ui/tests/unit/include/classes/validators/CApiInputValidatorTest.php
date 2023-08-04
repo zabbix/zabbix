@@ -305,7 +305,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_COND_FORMULA],
 				'A and',
 				'/1/formula',
-				'Invalid parameter "/1/formula": check expression starting from "d".'
+				'Invalid parameter "/1/formula": incorrect syntax near "d".'
 			],
 			[
 				['type' => API_COND_FORMULA],
@@ -7586,7 +7586,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
 				"\n\n",
 				'/1/params',
-				'Invalid parameter "/1/params/3": value must be one of "0", "1".'
+				'Invalid parameter "/1/params/3": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				"\n\nS",
+				'/1/params',
+				'Invalid parameter "/1/params/3": an integer is expected.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
@@ -7598,7 +7604,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
 				",\n\"\n2",
 				'/1/params',
-				'Invalid parameter "/1/params/3": value must be one of "0", "1".'
+				'Invalid parameter "/1/params/3": value must be one of 0, 1.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
@@ -7635,6 +7641,204 @@ class CApiInputValidatorTest extends TestCase {
 				"\n\n",
 				'/1/params',
 				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"1.3.1.6.2.1\n0",
+				'/1/params',
+				"1.3.1.6.2.1\n0"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"1.3.1.6.2.1\n1",
+				'/1/params',
+				"1.3.1.6.2.1\n1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"1.3.1.6.2.1\n2",
+				'/1/params',
+				"1.3.1.6.2.1\n2"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"1.3.1.6.2.1\n3",
+				'/1/params',
+				"1.3.1.6.2.1\n3"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"",
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"1.3.1.6.2.1\n",
+				'/1/params',
+				'Invalid parameter "/1/params/2": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"\n\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"1.3.1.6.2.1\n4",
+				'/1/params',
+				'Invalid parameter "/1/params/2": value must be one of 0, 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
+				"1.3.1.6.2.1\na",
+				'/1/params',
+				'Invalid parameter "/1/params/2": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n0"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n1",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n2",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n2"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n3",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n3"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n0",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n0"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n1",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n2",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n2"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n3",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n3"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n1\n{#FIELD3}\n1.2.3.4.5.2\n2\n{#FIELD4}\n1.2.3.4.5.3\n3",
+				'/1/params',
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n1\n{#FIELD3}\n1.2.3.4.5.2\n2\n{#FIELD4}\n1.2.3.4.5.3\n3"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"",
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params/1": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n",
+				'/1/params',
+				'Invalid parameter "/1/params/2": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "3" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n",
+				'/1/params',
+				'Invalid parameter "/1/params/3": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\na",
+				'/1/params',
+				'Invalid parameter "/1/params/3": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n4",
+				'/1/params',
+				'Invalid parameter "/1/params/3": value must be one of 0, 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n",
+				'/1/params',
+				'Invalid parameter "/1/params/4": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "5" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n",
+				'/1/params',
+				'Invalid parameter "/1/params/5": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1",
+				'/1/params',
+				'Invalid parameter "/1/params": the parameter "6" is missing.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n",
+				'/1/params',
+				'Invalid parameter "/1/params/6": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n4",
+				'/1/params',
+				'Invalid parameter "/1/params/6": value must be one of 0, 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_TO_JSON]],
+				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n1\n",
+				'/1/params',
+				'Invalid parameter "/1/params/7": cannot be empty.'
 			],
 			[
 				['type' => API_PROMETHEUS_PATTERN],

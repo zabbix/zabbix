@@ -141,7 +141,7 @@ class CMenuHelper {
 					->setAliases(['chart4.php'])
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_TOP_TRIGGERS)
-				? (new CMenuItem(_('Triggers top 100')))->setUrl(new CUrl('toptriggers.php'), 'toptriggers.php')
+				? (new CMenuItem(_('Top 100 triggers')))->setAction('toptriggers.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_REPORTS_AUDIT)
 				? (new CMenuItem(_('Audit log')))->setAction('auditlog.list')

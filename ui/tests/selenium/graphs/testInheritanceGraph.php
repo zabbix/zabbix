@@ -89,7 +89,7 @@ class testInheritanceGraph extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add graph',
 					'errors'=> [
-						'Graph with name "testInheritanceGraph4" already exists in graphs or graph prototypes.'
+						'Graph "testInheritanceGraph4" already exists on the template "Inheritance test template".'
 					]
 				]
 			]

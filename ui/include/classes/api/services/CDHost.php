@@ -32,6 +32,8 @@ class CDHost extends CApiService {
 	protected $tableAlias = 'dh';
 	protected $sortColumns = ['dhostid', 'druleid'];
 
+	public const OUTPUT_FIELDS = ['dhostid', 'druleid', 'status', 'lastup', 'lastdown'];
+
 	/**
 	 * Get host data.
 	 *

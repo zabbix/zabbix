@@ -1,1 +1,0 @@
-A......... [ZBX-22814] fixed PHP runtime errors in API trigger.get method when using "expandComment" option (Ivo)

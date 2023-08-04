@@ -289,6 +289,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public static function getFilterData() {
 		return [
+			// #0
 			[
 				[
 					'filter' => [
@@ -298,6 +299,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'rows' => 86
 				]
 			],
+			// #1
 			[
 				[
 					'filter' => [
@@ -310,6 +312,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #2
 			[
 				[
 					'filter' => [
@@ -326,6 +329,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #3
 			[
 				[
 					'filter' => [
@@ -336,6 +340,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #4
 			[
 				[
 					'filter' => [
@@ -346,6 +351,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #5
 			[
 				[
 					'filter' => [
@@ -360,6 +366,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #6
 			[
 				[
 					'filter' => [
@@ -374,6 +381,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #7
 			[
 				[
 					'filter' => [
@@ -390,6 +398,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #8
 			[
 				[
 					'filter' => [
@@ -404,6 +413,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #9
 			[
 				[
 					'filter' => [
@@ -419,6 +429,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #10
 			[
 				[
 					'filter' => [
@@ -443,6 +454,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #11
 			[
 				[
 					'filter' => [
@@ -454,6 +466,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #12
 			[
 				[
 					'filter' => [
@@ -464,6 +477,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'rows' => 23
 				]
 			],
+			// #13
 			[
 				[
 					'filter' => [
@@ -477,6 +491,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #14
 			[
 				[
 					'filter' => [
@@ -488,6 +503,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #15
 			[
 				[
 					'filter' => [
@@ -499,6 +515,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #16
 			[
 				[
 					'filter' => [
@@ -510,6 +527,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #17
 			[
 				[
 					'filter' => [
@@ -518,6 +536,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => []
 				]
 			],
+			// #18
 			[
 				[
 					'filter' => [
@@ -603,7 +622,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'drule-ZBX6663-second'
 					],
 					'message' => 'Cannot delete discovery rule',
-					'details' => 'Cannot delete templated items.',
+					'details' => 'Invalid parameter "/1": cannot delete inherited LLD rule.',
 					'db_count' => 1
 				]
 			]

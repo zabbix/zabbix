@@ -1360,7 +1360,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_config_source_ip};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
-								config_startup_time, config_unavailable_delay, 0, 0,
+								config_startup_time, config_unavailable_delay,
+								config_unreachable_period, config_unreachable_delay,
 								config_max_concurrent_checks_per_poller};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, zbx_config_timeout,
@@ -1481,6 +1482,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
+
+#ifdef HAVE_ORACLE
+	zabbix_log(LOG_LEVEL_INFORMATION, "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in "
+			"future versions");
+#endif
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())

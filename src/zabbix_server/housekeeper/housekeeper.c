@@ -22,7 +22,7 @@
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxrtc.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -324,14 +324,16 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
  * Purpose: updates history housekeeping rule with item history setting and   *
  *          adds item to the delete queue if necessary                        *
  *                                                                            *
- * Parameters: rule    - [IN/OUT] the history housekeeping rule               *
- *             now     - [IN] the current timestamp                           *
- *             itemid  - [IN] the item to update                              *
- *             history - [IN] the number of seconds the item data             *
- *                       should be kept in history                            *
+ * Parameters: rules    - [IN] housekeeping rules to check                    *
+ *             count    - [IN] number of housekeeping rules to check          *
+ *             rule_add - [IN] active housekeeping rule for this item         *
+ *             now      - [IN] the current timestamp                          *
+ *             itemid   - [IN] the item to update                             *
+ *             history  - [IN] the number of seconds the item data            *
+ *                             should be kept in history/trends               *
  *                                                                            *
  ******************************************************************************/
-static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_rule_t *rule_add, int count,
+static void	hk_history_item_update(zbx_hk_history_rule_t *rules, int count, const zbx_hk_history_rule_t *rule_add,
 		int now, zbx_uint64_t itemid, int history)
 {
 	zbx_hk_history_rule_t	*rule;
@@ -393,7 +395,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 	{
 		zbx_uint64_t		itemid, hostid;
 		int			history, trends, value_type;
-		zbx_hk_history_rule_t	*rule;
+		zbx_hk_history_rule_t	*rule, *rule_add;
 
 		ZBX_STR2UINT64(itemid, row[0]);
 		value_type = atoi(row[1]);
@@ -403,8 +405,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
 			tmp = zbx_strdup(tmp, row[2]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &history, ZBX_LENGTH_UNLIMITED))
 			{
@@ -422,20 +424,25 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (0 != history && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
 				history = *rule->poption;
 
-			hk_history_item_update(rules, rule, ITEM_VALUE_TYPE_BIN + 1, now, itemid, history);
+			hk_history_item_update(rules, ITEM_VALUE_TYPE_BIN + 1, rule, now, itemid, history);
 		}
+
+		/* trend rules are shared between all trend types, so we can default to floating type */
+		rule = &rules[HK_UPDATE_CACHE_OFFSET_TREND_FLOAT];
+
+		if (ZBX_HK_MODE_REGULAR != *rule->poption_mode)
+			continue;
 
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
 		{
-			rule = rules + (value_type == ITEM_VALUE_TYPE_FLOAT ?
-					HK_UPDATE_CACHE_OFFSET_TREND_FLOAT : HK_UPDATE_CACHE_OFFSET_TREND_UINT);
-
-			if (ZBX_HK_MODE_REGULAR != *rule->poption_mode)
-				continue;
+			if (value_type == ITEM_VALUE_TYPE_UINT64)
+				rule_add = &rules[HK_UPDATE_CACHE_OFFSET_TREND_UINT];
+			else
+				rule_add = rule;
 
 			tmp = zbx_strdup(tmp, row[3]);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_is_time_suffix(tmp, &trends, ZBX_LENGTH_UNLIMITED))
 			{
@@ -448,13 +455,21 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'", row[0]);
 				continue;
 			}
-
-			if (0 != trends && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
-				trends = *rule->poption;
-
-			hk_history_item_update(rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT, rule,
-					HK_UPDATE_CACHE_TREND_COUNT, now, itemid, trends);
 		}
+		else
+		{
+			/* if item type was changed from numeric to non-numeric use default trends */
+			/* storage period for old trends data removal                              */
+			trends = SEC_PER_DAY * 365;
+
+			rule_add = NULL;
+		}
+
+		if (0 != trends && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
+			trends = *rule->poption;
+
+		hk_history_item_update(rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT, HK_UPDATE_CACHE_TREND_COUNT,
+				rule_add, now, itemid, trends);
 	}
 	zbx_db_free_result(result);
 

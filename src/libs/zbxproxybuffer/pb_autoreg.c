@@ -118,8 +118,8 @@ size_t	pb_autoreg_estimate_row_size(const char *host, const char *host_metadata,
 	size += zbx_shmem_required_chunk_size(sizeof(zbx_list_item_t));
 	size += zbx_shmem_required_chunk_size(strlen(host) + 1);
 	size += zbx_shmem_required_chunk_size(strlen(host_metadata) + 1);
-	size += zbx_shmem_required_chunk_size(strlen(dns) + 1);
 	size += zbx_shmem_required_chunk_size(strlen(ip) + 1);
+	size += zbx_shmem_required_chunk_size(strlen(dns) + 1);
 
 	return size;
 }
@@ -456,7 +456,7 @@ int	zbx_pb_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 
 	pb_unlock();
 
-	if (PB_DATABASE == state)
+	if (PB_MEMORY != state)
 		ret = pb_autoreg_get_db(j, lastid, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);

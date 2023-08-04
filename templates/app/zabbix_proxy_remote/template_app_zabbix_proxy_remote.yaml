@@ -48,6 +48,37 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 55b74e2521be4ec4bd74f28fafa1fc89
+          name: 'Remote Zabbix proxy: Utilization of agent poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.agent_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time agent poller processes have been busy in the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''agent poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes agent poller not started'
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: data-collector
+          triggers:
+            - uuid: c35b8290fb2840e9bb403f54ad0e7b97
+              expression: 'avg(/Remote Zabbix proxy health/process.agent_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"agent poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.agent_poller.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"agent poller"}'
+              name: 'Remote Zabbix proxy: Utilization of agent poller processes is high'
+              event_name: 'Remote Zabbix proxy: Utilization of agent poller processes over {$ZABBIX.PROXY.UTIL.MAX:"agent poller"}%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
         - uuid: 189d41565cdf4f459468c43d1b1d0961
           name: 'Remote Zabbix proxy: Utilization of availability manager internal processes, in %'
           type: DEPENDENT
@@ -292,6 +323,37 @@ zabbix_export:
               recovery_expression: 'avg(/Remote Zabbix proxy health/process.housekeeper.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"housekeeper"}'
               name: 'Remote Zabbix proxy: Utilization of housekeeper processes is high'
               event_name: 'Remote Zabbix proxy: Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX:"housekeeper"}%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: b93aad197c1d411f8845ae7c591d1759
+          name: 'Remote Zabbix proxy: Utilization of http agent poller data collector processes, in %'
+          type: DEPENDENT
+          key: process.http_agent_poller.avg.busy
+          delay: '0'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time http agent poller processes have been busy in the last minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.data.process[''http agent poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes http agent poller not started'
+          master_item:
+            key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
+          tags:
+            - tag: component
+              value: data-collector
+          triggers:
+            - uuid: 460ddec16c564c6dbc706b21747aa622
+              expression: 'avg(/Remote Zabbix proxy health/process.http_agent_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Remote Zabbix proxy health/process.http_agent_poller.avg.busy,10m)<{$ZABBIX.PROXY.UTIL.MIN:"http agent poller"}'
+              name: 'Remote Zabbix proxy: Utilization of http agent poller processes is high'
+              event_name: 'Remote Zabbix proxy: Utilization of http agent poller processes over {$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -778,6 +840,15 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
+            - uuid: 2f314a33e06444d88fd99b5442b10a9e
+              expression: 'nodata(/Remote Zabbix proxy health/rcache.buffer.pused,{$ZABBIX.PROXY.NODATA_TIMEOUT})=1'
+              name: 'Remote Zabbix proxy: Failed to fetch stats data'
+              event_name: 'Remote Zabbix proxy: Failed to fetch stats data (or no data for {$ZABBIX.PROXY.NODATA_TIMEOUT})'
+              priority: WARNING
+              description: 'Zabbix has not received statistics data for {$ZABBIX.PROXY.NODATA_TIMEOUT}.'
+              tags:
+                - tag: scope
+                  value: availability
             - uuid: 6aaad09f92f3419c9aa7164f2191a45a
               expression: 'max(/Remote Zabbix proxy health/rcache.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}'
               name: 'Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache'
@@ -1167,10 +1238,11 @@ zabbix_export:
           value: zabbix
       macros:
         - macro: '{$ZABBIX.PROXY.ADDRESS}'
-          value: 127.0.0.1
           description: 'IP/DNS/network mask list of proxies to be remotely queried (default is 127.0.0.1).'
+        - macro: '{$ZABBIX.PROXY.NODATA_TIMEOUT}'
+          value: 5m
+          description: 'The time threshold after which statistics are considered unavailable. Used in trigger expression.'
         - macro: '{$ZABBIX.PROXY.PORT}'
-          value: '10051'
           description: 'Port of proxy to be remotely queried (default is 10051).'
         - macro: '{$ZABBIX.PROXY.UTIL.MAX}'
           value: '75'
@@ -1263,46 +1335,56 @@ zabbix_export:
             host: 'Remote Zabbix proxy health'
             key: process.poller.avg.busy
         - sortorder: '2'
+          color: 1A7C11
+          item:
+            host: 'Remote Zabbix proxy health'
+            key: process.agent_poller.avg.busy
+        - sortorder: '3'
           color: 0000EE
           item:
             host: 'Remote Zabbix proxy health'
             key: process.ipmi_poller.avg.busy
-        - sortorder: '3'
+        - sortorder: '4'
           color: '007700'
           item:
             host: 'Remote Zabbix proxy health'
             key: process.icmp_pinger.avg.busy
-        - sortorder: '4'
+        - sortorder: '5'
           color: '003300'
           item:
             host: 'Remote Zabbix proxy health'
             key: process.http_poller.avg.busy
-        - sortorder: '5'
+        - sortorder: '6'
+          color: '274482'
+          item:
+            host: 'Remote Zabbix proxy health'
+            key: process.http_agent_poller.avg.busy
+        - sortorder: '7'
           color: 33FFFF
           item:
             host: 'Remote Zabbix proxy health'
             key: process.unreachable_poller.avg.busy
-        - sortorder: '6'
+        - sortorder: '8'
           color: DD0000
           item:
             host: 'Remote Zabbix proxy health'
             key: process.java_poller.avg.busy
-        - sortorder: '7'
+        - sortorder: '9'
           color: '000099'
           item:
             host: 'Remote Zabbix proxy health'
             key: process.snmp_trapper.avg.busy
-        - sortorder: '8'
+        - sortorder: '10'
           color: 00FF00
           item:
             host: 'Remote Zabbix proxy health'
             key: process.vmware_collector.avg.busy
-        - sortorder: '9'
+        - sortorder: '11'
           color: 5A2B57
           item:
             host: 'Remote Zabbix proxy health'
             key: process.history_poller.avg.busy
-        - sortorder: '10'
+        - sortorder: '12'
           color: 9FA8DA
           item:
             host: 'Remote Zabbix proxy health'
