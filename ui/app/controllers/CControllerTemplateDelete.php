@@ -55,44 +55,66 @@ class CControllerTemplateDelete extends CController {
 	 */
 	protected function doAction(): void {
 		$templateids = $this->getInput('templateids');
+		$writable = true;
 
-		if (!$this->hasInput('clear')) {
-			$hosts = API::Host()->get([
-				'output' => [],
-				'templateids' => $templateids,
-				'editable' => true,
-				'preservekeys' => true
-			]);
-
+		if ($this->getInput('templateids')) {
 			$templates = API::Template()->get([
 				'output' => [],
-				'parentTemplateids' => $templateids,
-				'editable' => true,
-				'preservekeys' => true
+				'templateids' => $this->getInput('templateids'),
+				'editable' => true
 			]);
 
-			if (count($templates) === $templateids) {
-				$result = API::Host()->massRemove([
-					'hostids' => array_keys($hosts),
-					'templateids' => $templateids
-				]);
-
-				if (!$result) {
-					throw new Exception();
-				}
-
-				$result = API::Template()->massRemove([
-					'templateids' => array_keys($templates),
-					'templateids_link' => $templateids
-				]);
-
-				if (!$result) {
-					throw new Exception();
-				}
+			if (!$templates) {
+				$writable = false;
 			}
 		}
 
-		$result = API::Template()->delete($templateids);
+		try {
+			DBstart();
+
+			if (!$this->hasInput('clear') && $writable) {
+				$hosts = API::Host()->get([
+					'output' => [],
+					'templateids' => $templateids,
+					'preservekeys' => true
+				]);
+
+				if ($hosts) {
+					$result = API::Host()->massRemove([
+						'hostids' => array_keys($hosts),
+						'templateids' => $templateids
+					]);
+
+					if (!$result) {
+						throw new Exception();
+					}
+				}
+
+				$templates = API::Template()->get([
+					'output' => [],
+					'parentTemplateids' => $templateids,
+					'preservekeys' => true
+				]);
+
+				if ($templates) {
+					$result = API::Template()->massRemove([
+						'templateids' => array_keys($templates),
+						'templateids_link' => $templateids
+					]);
+
+					if (!$result) {
+						throw new Exception();
+					}
+				}
+			}
+
+			$result = API::Template()->delete($templateids);
+
+			$result = DBend($result);
+		}
+		catch (Exception $e) {
+			DBend(false);
+		}
 
 		if (!$result) {
 			$templates = API::Template()->get([
