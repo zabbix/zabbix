@@ -407,19 +407,19 @@
 	 * @return {boolean}
 	 */
 	function hasDCheckDuplicates() {
-		var $form = jQuery(document.forms['dcheck_form']),
-			dcheckid = jQuery('#dcheckid').val(),
-			dcheck = $form
-				.find('#ports, input:visible')
-				.serializeJSON(),
-			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
-				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase'
-			];
+		const form = document.forms['dcheck_form'];
+		const dcheckid = document.getElementById('dcheckid')?.value;
+		const dcheck = $([...form.querySelectorAll('#ports, input')]
+				?.filter((element) => isVisible(element)))
+				?.serializeJSON();
+		const fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
+			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+			'snmpv3_privpassphrase'
+		];
 
-		$form.find('z-select:visible').each((index, element) => {
-			dcheck[element.name] = element.value;
-		});
+		[...form.querySelectorAll('z-select')]
+				?.filter((element) => isVisible(element))
+				?.forEach((element) => dcheck[element.name] = element.value);
 
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
@@ -428,17 +428,15 @@
 			dcheck['key_'] = dcheck['snmp_oid'];
 		}
 
-		for (var zbx_dcheckid in ZBX_CHECKLIST) {
+		for (const zbx_dcheckid in ZBX_CHECKLIST) {
 			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] !== dcheck['type']) {
 				continue;
 			}
 
 			if (typeof dcheckid === 'undefined' || dcheckid != zbx_dcheckid) {
-				var duplicate_fields = fields
+				const duplicate_fields = fields
 					.map(function(value) {
-						return typeof dcheck[value] === 'undefined'
-							|| dcheck[value] === ''
-							|| ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
+						return ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
 					})
 					.filter(function(value) {
 						return !!value;
