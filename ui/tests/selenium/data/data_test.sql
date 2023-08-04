@@ -1,7 +1,7 @@
 -- Activate Zabbix Server, set visible name and make it a more unique name
 UPDATE hosts SET status=0,name='ЗАББИКС Сервер',host='Test host' WHERE host='Zabbix server';
 
--- More medias for user 'Admin'
+-- More media for user 'Admin'
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (1,1,1,'test@zabbix.com',0,63,'1-7,00:00-24:00');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (2,1,1,'test2@zabbix.com',1,60,'1-7,00:00-24:00');
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (3,1,3,'123456789',0,32,'1-7,00:00-24:00');
@@ -219,10 +219,10 @@ INSERT INTO opgroup (opgroupid, operationid, groupid) VALUES (3, 26, 5);
 INSERT INTO optemplate (optemplateid, operationid, templateid) VALUES (3, 27, 10001);
 
 -- Add test graph
-INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (200000,'Test graph 1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,0);
+INSERT INTO graphs (graphid, name, width, height, yaxismin, yaxismax, templateid, show_work_period, show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right, ymin_type, ymax_type, ymin_itemid, ymax_itemid, flags) VALUES (2000000,'Test graph 1',900,200,0.0,100.0,NULL,1,0,1,1,0,0.0,0.0,1,1,NULL,NULL,0);
 
 -- Add graph items
-INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (200000, 200000, 42213, 1, 1, 'FF5555', 0, 2, 0);
+INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (2000000, 2000000, 42213, 1, 1, 'FF5555', 0, 2, 0);
 
 -- Add maintenance periods
 INSERT INTO maintenances (maintenanceid, name, maintenance_type, description, active_since, active_till,tags_evaltype) VALUES (1,'Maintenance period 1 (data collection)',0,'Test description 1',1294760280,1294846680,0);
@@ -1228,27 +1228,6 @@ INSERT INTO problem_tag (problemtagid,eventid,tag,value) VALUES (95,95,'Service'
 INSERT INTO rights (rightid,groupid,permission,id) VALUES (1,90,3,50004);
 INSERT INTO rights (rightid,groupid,permission,id) VALUES (2,91,3,50004);
 
--- event correlation
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99000, 'delete tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99000, 99000, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99001, 'Event correlation for update', 'Test description update', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99001, 99001, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99001, 'update tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99001, 99001, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99002, 'Event correlation for cancel', 'Test description cancel', 1, 1, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99002, 99002, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99002, 'cancel tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99002, 99002, 0);
-
-INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99003, 'Event correlation for clone', 'Test description clone', 0, 0, '');
-INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99003, 99003, 0);
-INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag');
-INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
-
 -- host prototypes
 INSERT INTO hosts (hostid, host, name, status, description, flags) VALUES (90001, 'Host for host prototype tests', 'Host for host prototype tests', 0, '', 0);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (99000, 90001, 4);
@@ -2071,18 +2050,18 @@ INSERT INTO dashboard (dashboardid, name, userid, private) VALUES (1410, 'Dashbo
 INSERT INTO dashboard_page (dashboard_pageid, dashboardid) VALUES (14100, 1410);
 
 -- Overrides for LLD Overrides test
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5000, 133800, 'Override for update 1', 1, 1, 0);
-INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (5001, 133800, 'Override for update 2', 2, 0, 0);
+INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (50000, 133800, 'Override for update 1', 1, 1, 0);
+INSERT INTO lld_override (lld_overrideid, itemid, name, step, evaltype, stop) values (50001, 133800, 'Override for update 2', 2, 0, 0);
 
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30000, 5000, 8, '{#MACRO1}', 'test expression_1');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30001, 5000, 9, '{#MACRO2}', 'test expression_2');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30002, 5000, 12, '{#MACRO3}', '');
-INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30003, 5000, 13, '{#MACRO4}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30000, 50000, 8, '{#MACRO1}', 'test expression_1');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30001, 50000, 9, '{#MACRO2}', 'test expression_2');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30002, 50000, 12, '{#MACRO3}', '');
+INSERT INTO lld_override_condition (lld_override_conditionid, lld_overrideid, operator, macro, value) values (30003, 50000, 13, '{#MACRO4}', '');
 
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4000, 5000, 0, 0, 'test item pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4001, 5000, 1, 1, 'test trigger pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4002, 5001, 2, 8, 'test graph pattern');
-INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4003, 5001, 3, 9, 'test host pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4000, 50000, 0, 0, 'test item pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4001, 50000, 1, 1, 'test trigger pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4002, 50001, 2, 8, 'test graph pattern');
+INSERT INTO lld_override_operation (lld_override_operationid, lld_overrideid, operationobject, operator, value) values (4003, 50001, 3, 9, 'test host pattern');
 
 INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (4000, 0);
 INSERT INTO lld_override_opdiscover (lld_override_operationid, discover) values (4002, 0);

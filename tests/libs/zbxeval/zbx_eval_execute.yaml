@@ -2230,4 +2230,12 @@ in:
   expression: 'histogram_quantile(1.1, 0.2, 10, 0.4, 20, 1.0, 60, 1.2, 70, "+Inf", 80)'
 out:
   result: FAIL
+---
+test case: Expression 'replace(0, 0, 0)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'replace(0, 0, 0)'
+out:
+  result: SUCCEED
+  value: '0'
 ...

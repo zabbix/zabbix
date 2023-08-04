@@ -149,8 +149,6 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'http_proxy' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -1271,9 +1269,10 @@ abstract class CControllerPopupItemTest extends CController {
 					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($field, ['usermacros' => true]);
 
 					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						// If matching macro is not found, return unresolved macro string.
 						$macro_value = array_key_exists($macro, $macros_posted)
 							? $macros_posted[$macro]
-							: '';
+							: $macro;
 
 						$field = substr_replace($field, $macro_value, $pos, strlen($macro));
 					}

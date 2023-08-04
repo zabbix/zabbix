@@ -985,6 +985,7 @@ static int	dbsync_compare_global_macro(const ZBX_DC_GMACRO *gmacro, const DB_ROW
 {
 	char	*macro = NULL, *context = NULL;
 	int	ret = FAIL;
+	unsigned char	context_op;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[3], gmacro->type))
 		return FAIL;
@@ -992,7 +993,7 @@ static int	dbsync_compare_global_macro(const ZBX_DC_GMACRO *gmacro, const DB_ROW
 	if (FAIL == dbsync_compare_str(dbrow[2], gmacro->value))
 		return FAIL;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[1], &macro, &context, NULL, &context_op))
 		return FAIL;
 
 	if (0 != strcmp(gmacro->macro, macro))
@@ -1008,6 +1009,9 @@ static int	dbsync_compare_global_macro(const ZBX_DC_GMACRO *gmacro, const DB_ROW
 	}
 
 	if (NULL == gmacro->context)
+		goto out;
+
+	if (gmacro->context_op != context_op)
 		goto out;
 
 	if (0 == strcmp(gmacro->context, context))
@@ -1098,8 +1102,9 @@ int	zbx_dbsync_compare_global_macros(zbx_dbsync_t *sync)
  ******************************************************************************/
 static int	dbsync_compare_host_macro(const ZBX_DC_HMACRO *hmacro, const DB_ROW dbrow)
 {
-	char	*macro = NULL, *context = NULL;
-	int	ret = FAIL;
+	char		*macro = NULL, *context = NULL;
+	int		ret = FAIL;
+	unsigned char	context_op;
 
 	if (FAIL == dbsync_compare_uchar(dbrow[4], hmacro->type))
 		return FAIL;
@@ -1110,7 +1115,7 @@ static int	dbsync_compare_host_macro(const ZBX_DC_HMACRO *hmacro, const DB_ROW d
 	if (FAIL == dbsync_compare_uint64(dbrow[1], hmacro->hostid))
 		return FAIL;
 
-	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[2], &macro, &context, NULL, NULL))
+	if (SUCCEED != zbx_user_macro_parse_dyn(dbrow[2], &macro, &context, NULL, &context_op))
 		return FAIL;
 
 	if (0 != strcmp(hmacro->macro, macro))
@@ -1127,6 +1132,9 @@ static int	dbsync_compare_host_macro(const ZBX_DC_HMACRO *hmacro, const DB_ROW d
 
 	if (NULL == hmacro->context)
 		goto out;
+
+	if (context_op != hmacro->context_op)
+		goto  out;
 
 	if (0 == strcmp(hmacro->context, context))
 		ret = SUCCEED;

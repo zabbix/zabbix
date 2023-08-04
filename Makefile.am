@@ -151,6 +151,7 @@ WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=fgets \
+	-Wl,--wrap=fstat \
 	-Wl,--wrap=open
 
 WRAP_FS_FUNCS = \
@@ -190,4 +191,20 @@ clean: clean-recursive
 	cd tests && $(MAKE) clean
 endif
 
-.PHONY: test tests clean
+sbom: sbom-ui
+
+sbom-ui: ui/sbom.json
+
+ui/sbom.json:
+	(cd ${@D} && \
+		composer CycloneDX:make-sbom --omit=dev --no-interaction \
+		--spec-version=1.4 \
+		--output-reproducible --output-format=JSON --output-file="${@F}")
+
+ui/sbom.xml:
+	(cd ${@D} && \
+		composer CycloneDX:make-sbom --omit=dev --no-interaction \
+		--spec-version=1.4 \
+		--output-reproducible --output-format=XML --output-file="${@F}")
+
+.PHONY: test tests clean sbom sbom-ui

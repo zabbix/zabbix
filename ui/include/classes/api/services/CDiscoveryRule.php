@@ -32,6 +32,8 @@ class CDiscoveryRule extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_RULE;
+
 	/**
 	 * Define a set of supported pre-processing rules.
 	 *
@@ -1532,7 +1534,6 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function checkInput(array &$items, $update = false, array $dbItems = []) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
 			$item['value_type'] = ITEM_VALUE_TYPE_TEXT;
 
 			// unset fields that are updated using the 'filter' parameter

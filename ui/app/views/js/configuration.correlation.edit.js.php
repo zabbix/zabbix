@@ -65,6 +65,9 @@
 
 			jQuery('#condition_label').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 		}
+		else {
+			jQuery('#evaltype').val(<?= CONDITION_EVAL_TYPE_AND_OR ?>);
+		}
 	}
 
 	jQuery(document).ready(function() {
