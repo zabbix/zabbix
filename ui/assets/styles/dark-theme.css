@@ -2863,13 +2863,13 @@ output {
       opacity: 0;
       transform: scaleY(0) translateY(50%); }
   output.msg-bad {
-    border-color: #dc3545; }
+    border-color: #dc3838; }
     output.msg-bad::before {
       content: ""; }
     output.msg-bad .msg-buttons button {
       color: #f2f2f2;
       background-color: transparent;
-      border-color: #dc3545; }
+      border-color: #dc3838; }
       output.msg-bad .msg-buttons button:hover {
         color: #f2f2f2;
         background-color: #5e737e;
@@ -2879,11 +2879,11 @@ output {
         background-color: #5e737e;
         border-color: #5e737e; }
   output.msg-good {
-    border-color: #28a745; }
+    border-color: #29a847; }
     output.msg-good::before {
       content: ""; }
   output.msg-warning {
-    border-color: #ffc107; }
+    border-color: #f4af25; }
     output.msg-warning::before {
       content: ""; }
   output.msg-global {
