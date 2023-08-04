@@ -67,6 +67,28 @@ class testDashboardGaugeWidget extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
+	/**
+	 * Get Thresholds table element with mapping set.
+	 *
+	 * @return CMultifieldTable
+	 */
+	protected function getThresholdsTable() {
+		return $this->query('id:thresholds-table')->asMultifieldTable([
+			'mapping' => [
+				'' => [
+					'name' => 'color',
+					'selector' => 'class:color-picker',
+					'class' => 'CColorPickerElement'
+				],
+				'Threshold' => [
+					'name' => 'threshold',
+					'selector' => 'xpath:./input',
+					'class' => 'CElement'
+				]
+			]
+		])->waitUntilVisible()->one();
+	}
+
 	public function prepareDashboardData() {
 		// Add item data to move needle on Gauge.
 		CDataHelper::addItemData(CDataHelper::get('AllItemValueTypes.0 Float item'), 50);
@@ -272,7 +294,7 @@ class testDashboardGaugeWidget extends CWebTest {
 			}
 		}
 
-		// Check Treshold parameters.
+		// Check Threshold parameters.
 		$threshold_field = $form->getField('Thresholds');
 		$threshold_field->query('button:Add')->one()->waitUntilClickable()->click();
 		$threshold_input ='id:thresholds_0_threshold';
@@ -354,7 +376,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => 0
 					],
 					'Thresholds' => [
-						['value' => '10']
+						['threshold' => '10']
 					],
 					'error' => [
 						'Invalid parameter "Description size": value must be one of 1-100.',
@@ -409,7 +431,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => ''
 					],
 					'Thresholds' => [
-						['value' => '10']
+						['threshold' => '10']
 					],
 					'error' => [
 						'Invalid parameter "Min": cannot be empty.',
@@ -442,7 +464,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => 'abc'
 					],
 					'Thresholds' => [
-						['value' => 'test']
+						['threshold' => 'test']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -475,7 +497,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => '1a'
 					],
 					'Thresholds' => [
-						['value' => '1', 'color' => 'ERERER']
+						[ 'threshold' => '1', 'color' => 'ERERER']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -502,7 +524,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => 'Ä'
 					],
 					'Thresholds' => [
-						['value' => 'ß']
+						['threshold' => 'ß']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -536,9 +558,10 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_show_arc' => true,
 						'id:th_arc_size' => '😽'
 					],
-					'Thresholds' => [
-						['value' => '𒉹']
-					],
+					// TODO: uncomment when fill issue is resolved.
+//					'Thresholds' => [
+////						['threshold' => '𒀐']
+//					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
@@ -547,7 +570,8 @@ class testDashboardGaugeWidget extends CWebTest {
 						'Invalid parameter "Arc size": value must be one of 1-100.',
 						'Invalid parameter "Units size": value must be one of 1-100.',
 						'Invalid parameter "Scale size": value must be one of 1-100.',
-						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
+						// TODO: uncomment when fill issue is resolved.
+//						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -605,7 +629,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'Enable host selection' => true
 					],
 					'Thresholds' => [
-						['value' => '555', 'color' => '1976D2']
+						['threshold' => '555', 'color' => '1976D2']
 					]
 				]
 			],
@@ -621,8 +645,8 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:units_pos' => 'Before value'
 					],
 					'Thresholds' => [
-						['value' => '30', 'color' => '03A9F4'],
-						['value' => '50', 'color' => '283593']
+						['threshold' => '30', 'color' => '03A9F4'],
+						['threshold' => '50', 'color' => '283593']
 					]
 				]
 			],
@@ -703,36 +727,12 @@ class testDashboardGaugeWidget extends CWebTest {
 		$form->fill(['Advanced configuration' => true]);
 
 		if (array_key_exists('Thresholds', $data)) {
-			$thresholds_field = $form->getField('Thresholds');
-
 			// To update Thresholds previously saved values should be removed.
-			$removed = false;
 			if ($update) {
-				$remove_buttons = $thresholds_field->query('button:Remove');
-
-				for ($j = 0; $j < $remove_buttons->count(); $j++) {
-					$thresholds_field->query('id:thresholds_'.$j.'_remove')->one()->click();
-					$removed = true;
-				}
+				$this->getThresholdsTable()->clear();
 			}
 
-			foreach ($data['Thresholds'] as $i => $threshold) {
-				// If Thresholds were previously removed, indexes' counts continue from the last removed number.
-				if ($removed) {
-					$i = $i + $j;
-				}
-
-				$thresholds_field->query('button:Add')->one()->waitUntilClickable()->click();
-
-				if (array_key_exists('value', $threshold)) {
-					$form->fill(['id:thresholds_'.$i.'_threshold' => $threshold['value']]);
-				}
-
-				if (array_key_exists('color', $threshold)) {
-					$form->query('xpath:.//input[@id="thresholds_'.$i.'_color"]/..')->asColorPicker()->one()
-							->fill($threshold['color']);
-				}
-			}
+			$this->getThresholdsTable()->fill($data['Thresholds']);
 		}
 
 		$form->fill($data['fields']);
@@ -781,6 +781,10 @@ class testDashboardGaugeWidget extends CWebTest {
 
 			// Check saved fields in form.
 			$saved_form->checkValue($data['fields']);
+
+			if (array_key_exists('Thresholds', $data)) {
+				$this->getThresholdsTable()->checkValue($data['Thresholds']);
+			}
 
 			// Check that widget is saved in DB.
 			$this->assertEquals(1,
