@@ -2,10 +2,8 @@ output {
 	position: relative;
 	box-sizing: border-box;
 	display: grid;
-	grid-template-columns: max-content 1fr;
-	grid-template-rows: 16px 1fr;
-	grid-column-gap: 10px;
-	grid-row-gap: 6px;
+	grid-template: 16.8px 1fr / max-content 1fr;
+	grid-gap: 6px 10px;
 	align-items: center;
 	flex-shrink: 0;
 	min-height: 48px;
@@ -45,6 +43,20 @@ output {
 		}
 	}
 
+	.msg-buttons {
+		width: 100%;
+		margin-top: 10px;
+		text-align: right;
+
+		button {
+			font-size: $font-h4-size;
+
+			&:not(:first-child) {
+				margin-left: 10px;
+			}
+		}
+	}
+
 	.msg-details {
 		grid-column: 1 / -1;
 		overflow: hidden;
@@ -56,6 +68,10 @@ output {
 			transition: padding-top $ui-transition-duration,
 						opacity $ui-transition-duration,
 						transform $ui-transition-duration;
+		}
+
+		&:first-child {
+			grid-row: 1 / -1;
 		}
 
 		&:not(:first-child) {
@@ -93,20 +109,6 @@ output {
 			border-top: none;
 			opacity: 0;
 			transform: scaleY(0) translateY(50%);
-		}
-	}
-
-	.msg-buttons {
-		width: 100%;
-		margin-top: 10px;
-		text-align: right;
-
-		button {
-			font-size: $font-h4-size;
-
-			&:not(:first-child) {
-				margin-left: 10px;
-			}
 		}
 	}
 
