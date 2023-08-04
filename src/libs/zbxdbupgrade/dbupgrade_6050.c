@@ -468,21 +468,29 @@ static int	DBpatch_6050039(void)
 		{
 			status = PROXY_MODE_ACTIVE;
 
-			zbx_db_insert_add_values(&db_insert_proxies,
-				proxyid, row[1], status, row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9],
-				row[10], "127.0.0.1", "10051");
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_ACTIVE, row[3],
+					tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
+					"127.0.0.1", "10051");
 		}
 		else if (DEPRECATED_STATUS_PROXY_PASSIVE == status)
 		{
-			int	useip;
+			char	*address;
+			char	*port;
 
-			status = PROXY_MODE_PASSIVE;
-			useip = atoi(row[11]);
+			if (SUCCEED != zbx_db_is_null(row[11]))
+			{
+				address = (1 == atoi(row[11]) ? row[12] : row[13]);
+				port = row[14];
+			}
+			else
+			{
+				address = "127.0.0.1";
+				port = "10051";
+				zabbix_log(LOG_LEVEL_WARNING, "cannot select interface for proxy '%s'",  row[1]);
+			}
 
-			zbx_db_insert_add_values(&db_insert_proxies,
-				proxyid, row[1], status, row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9],
-				NULL, (1 == useip ? row[12] : row[13]), row[14]
-			);
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_PASSIVE, row[3],
+					tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address, port);
 		}
 
 	}
