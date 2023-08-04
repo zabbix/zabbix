@@ -1,1 +1,1 @@
-..F....... [ZBX-22640] fixed an error in discovery rule check duplicate check (apoga)
+..F....... [ZBX-22640] fixed inability to add unique SNMPv3 checks in discovery rules (apoga)
