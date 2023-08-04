@@ -1137,6 +1137,37 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Calculates regular expression substitution. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
+	 * parameters or regular expression.
+	 *
+	 * @param string $value        [IN] The input value.
+	 * @param array  $parameters   [IN] The function parameters.
+	 * @param bool   $insensitive  [IN] Case insensitive match.
+	 *
+	 * @return string
+	 */
+	private function macrofuncRegsub(string $value, array $parameters, bool $insensitive): string {
+		if (count($parameters) != 2) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		set_error_handler(function ($errno, $errstr) {});
+		$rc = preg_match('/'.$parameters[0].'/'.($insensitive ? 'i' : ''), $value, $matches);
+		restore_error_handler();
+
+		if ($rc === false) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		$macro_values = [];
+		foreach ($this->getMacroPositions($parameters[1], ['replacements' => true]) as $macro) {
+			$macro_values[$macro] = array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '';
+		}
+
+		return strtr($parameters[1], $macro_values);
+	}
+
+	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -1145,8 +1176,8 @@ class CMacrosResolverGeneral {
 	 * @param array $macro_values
 	 * @param array $triggers
 	 * @param array $options
-	 * @param bool  $options['events]               Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
-	 * @param bool  $options['html]
+	 * @param bool  $options['events']              Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param bool  $options['html']
 	 *
 	 * @return array
 	 */
@@ -1207,41 +1238,26 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_value = UNRESOLVED_MACRO_STRING;
-
 					if ($value !== null) {
 						if (array_key_exists('function', $token)) {
-							if ($token['function'] !== 'regsub' && $token['function'] !== 'iregsub') {
-								continue;
-							}
+							switch ($token['function']) {
+								case 'regsub':
+								case 'iregsub':
+									$macro_value = $this->macrofuncRegsub($value, $token['parameters'],
+										$token['function'] === 'iregsub'
+									);
+									break;
 
-							if (count($token['parameters']) != 2) {
-								continue;
-							}
-
-							$ci = ($token['function'] === 'iregsub') ? 'i' : '';
-
-							set_error_handler(function ($errno, $errstr) {});
-							$rc = preg_match('/'.$token['parameters'][0].'/'.$ci, $value, $matches);
-							restore_error_handler();
-
-							if ($rc === false) {
-								continue;
-							}
-
-							$macro_value = $token['parameters'][1];
-							$matched_macros = $this->getMacroPositions($macro_value, ['replacements' => true]);
-
-							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-								$macro_value = substr_replace($macro_value,
-									array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '',
-									$pos, strlen($macro)
-								);
+								default:
+									$macro_value = UNRESOLVED_MACRO_STRING;
 							}
 						}
 						else {
 							$macro_value = formatHistoryValue($value, $function);
 						}
+					}
+					else {
+						$macro_value = UNRESOLVED_MACRO_STRING;
 					}
 
 					if ($options['html']) {
