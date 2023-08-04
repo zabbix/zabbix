@@ -2339,8 +2339,17 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				$quarters = ['01 – 03', '04 – 06', '07 – 09', '10 – 12'];
 				$to_year = date('Y', strtotime($to_date));
 				$to_month = date('m', strtotime($to_date));
-				$from_year = date('Y', strtotime($to_date.' - '.(3 * ($show_periods - 1)).' months'));
-				$from_month = date('m', strtotime($to_date.' - '.(3 * ($show_periods - 1)).' months'));
+
+				// Calculate the year and the month from which the SLA should be displayed via month number in AD.
+				$months_total = 12 * $to_year + $to_month - 3 * ($show_periods - 1);
+				$from_year = floor($months_total/12);
+				$from_month = $months_total - $from_year * 12;
+
+				// In case there is no remaining months after division, then month is december and year should be reduced.
+				if ($from_month == 0) {
+					$from_month = 12;
+					$from_year--;
+				}
 
 				$i = 0;
 				for ($year = $to_year; $year >= $from_year; $year--) {
