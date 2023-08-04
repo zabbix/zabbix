@@ -1505,8 +1505,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.21rc1
 
 New features:
+.........T [ZBXNEXT-8581] added support HTTP proxy in Azure templates (egordymov)
+.........T [ZBXNEXT-8558] added MantisBT webhook (abiba)
+.........T [ZBXNEXT-8589] updated documentation, unified metrics names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
+.........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
+..F....PS. [ZBXNEXT-8190] increased MariaDB maximum supported version to 11.0 (mprihodko)
+..F....PS. [ZBXNEXT-8582] increased MySQL maximum supported version to 8.1 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-22613] fixed script execution with API token as authentication (epulke)
+.........T [ZBX-23060] removed unused endpoints in JavaScript for Veeam Backup and Replication template (egordymov)
+........S. [ZBX-22772] added trends cleanup for non-numeric value types (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.20
