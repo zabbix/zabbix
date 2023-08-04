@@ -492,7 +492,6 @@ static int	DBpatch_6050039(void)
 			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_PASSIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address, port);
 		}
-
 	}
 	zbx_db_free_result(result);
 
@@ -711,61 +710,27 @@ static int	DBpatch_6050062(void)
 
 static int	DBpatch_6050063(void)
 {
-#define TM_STATUS_DONE		3
-#define TM_STATUS_EXPIRED	4
 #define TM_DATA_TYPE_TEST_ITEM	0
 #define TM_DATA_TYPE_PROXYIDS	2
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		rc = ZBX_DB_OK, ret = SUCCEED;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (NULL == (result = zbx_db_select("select td.taskid,td.type,td.data"
-			" from task_data td"
-			" join task t on td.taskid=t.taskid"
-			" where t.status not in (%i,%i) and"
-			" td.type in (%i,%i)",
-			TM_STATUS_DONE, TM_STATUS_EXPIRED, TM_DATA_TYPE_TEST_ITEM, TM_DATA_TYPE_PROXYIDS)))
+	if (ZBX_DB_OK > zbx_db_execute("delete"
+			" from task t"
+			" where exists ("
+				"select null"
+				" from task_data td"
+				" where td.taskid=t.taskid and td.type in (%i,%i)"
+			")",
+			 TM_DATA_TYPE_TEST_ITEM, TM_DATA_TYPE_PROXYIDS))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot select from tables 'task_data', 'task'", __func__);
 		return FAIL;
 	}
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		zbx_uint64_t	taskid;
-		int		type;
-		char		*data;
-
-		ZBX_STR2UINT64(taskid, row[0]);
-		type = atoi(row[1]);
-
-		if (TM_DATA_TYPE_TEST_ITEM == type)
-			data = zbx_string_replace(row[2], "\"proxy_hostid\"", "\"proxyid\"");
-		else
-			data = zbx_string_replace(row[2], "\"proxy_hostids\"", "\"proxyids\"");
-
-		if (0 != strcmp(row[2], data))
-			rc = zbx_db_execute("update task_data set data='%s' where taskid=" ZBX_FS_UI64, data, taskid);
-
-		zbx_free(data);
-
-		if (ZBX_DB_OK > rc)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "%s(): cannot update table 'task_data'", __func__);
-			ret = FAIL;
-			break;
-		}
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-#undef TM_STATUS_DONE
-#undef TM_STATUS_EXPIRED
 #undef TM_DATA_TYPE_TEST_ITEM
 #undef TM_DATA_TYPE_PROXYIDS
+
+	return SUCCEED;
 }
 
 #endif
