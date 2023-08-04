@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-07-24 06:57+0000\n"
+"PO-Revision-Date: 2023-07-26 13:49+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -951,7 +951,7 @@ msgstr "Afegir equip"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Afegeix etiquetes d'equip"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -17321,7 +17321,7 @@ msgstr "Esborra l'equip"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
-msgstr ""
+msgstr "Esborra etiquetes d'equip"
 
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
@@ -19575,6 +19575,10 @@ msgstr "Super administrador"
 msgid "Support"
 msgstr "Suport"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr "El suport per al tipus numèric antic és obsolet. Si et plau, actualitza a valors numèrics per a un rang estès."
@@ -20539,7 +20543,7 @@ msgstr "Top"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr ""
+msgstr "Els 100 triggers principals"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
@@ -20551,7 +20555,7 @@ msgstr "Els equips top"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
-msgstr ""
+msgstr "Triggers principals"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20764,7 +20768,7 @@ msgstr[1] "Triggers copiats"
 
 #: widgets/toptriggers/includes/WidgetForm.php:72
 msgid "Trigger count"
-msgstr ""
+msgstr "Recompte de triggers"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23147,6 +23151,10 @@ msgstr "Avís"
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
 msgstr "Missatge d'avís"
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
