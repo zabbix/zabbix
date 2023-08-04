@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once 'vendor/autoload.php';
 
+require_once 'vendor/autoload.php';
 require_once dirname(__FILE__).'/../CElement.php';
 
 /**
@@ -85,12 +85,19 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		// Edit can sometimes fail so we have to retry this operation.
+		$button = $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one();
+
+		if ($button->isVisible(false)) {
+			$button->hoverMouse();
+		}
+
+		// Edit can sometimes fail, so we have to retry this operation.
 		for ($i = 0; $i < 4; $i++) {
-			$this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one()->click(true);
+			$button->click();
 
 			try {
-				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()->asForm()->one();
+				return $this->query("xpath://div[@data-dialogueid=\"widget_properties\"]//form")->waitUntilVisible()
+						->asForm()->one();
 			}
 			catch (\Exception $e) {
 				if ($i === 1) {
