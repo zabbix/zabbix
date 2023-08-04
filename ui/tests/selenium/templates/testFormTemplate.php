@@ -82,9 +82,9 @@ class testFormTemplate extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'name' => '',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add template',
 					'errors' => [
-						'Incorrect value for field "Template name": cannot be empty.'
+						'Incorrect value for field "template_name": cannot be empty.'
 					]
 
 				]
@@ -94,7 +94,7 @@ class testFormTemplate extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'name' => 'Without groups',
 					'remove_group' => 'Templates',
-					'error_msg' => 'Page received incorrect data',
+					'error_msg' => 'Cannot add template',
 					'errors' => [
 						'Field "groups" is mandatory.'
 					]
@@ -108,8 +108,9 @@ class testFormTemplate extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTemplate_Create($data) {
-		$this->zbxTestLogin('templates.php?page=1');
+		$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Template groups')->select('Templates');
 		$filter->submit();
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
@@ -122,7 +123,7 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('group', $data)) {
-			$this->zbxTestClickButtonMultiselect('groups_');
+			$this->zbxTestClickButtonMultiselect('template_groups_');
 			$this->zbxTestLaunchOverlayDialog('Template groups');
 			$this->zbxTestClickLinkTextWait($data['group']);
 		}
@@ -132,7 +133,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 			for ($i = 0; $i < 3; $i++) {
 				try {
-					$this->zbxTestMultiselectNew('groups_', $data['new_group']);
+					$this->zbxTestMultiselectNew('template_groups_', $data['new_group']);
 					$selected = true;
 					break;
 				} catch (NoSuchElementException $ex) {
@@ -150,10 +151,11 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('remove_group', $data)) {
-			$this->zbxTestMultiselectRemove('groups_', $data['remove_group']);
+			$this->zbxTestMultiselectRemove('template_groups_', $data['remove_group']);
 		}
 
-		$this->zbxTestClickXpathWait("//button[@id='add' and @type='submit']");
+		$modal = COverlayDialogElement::find()->one();
+		$modal->query('xpath:./div[@class="overlay-dialogue-footer"]/button[text()="Add"]')->WaitUntilClickable()->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -187,10 +189,7 @@ class testFormTemplate extends CLegacyWebTest {
 		}
 
 		if (isset($data['formCheck'])) {
-			$this->zbxTestLogin('templates.php?page=1');
-			$filter->invalidate();
-			$filter->getField('Template groups')->select('Templates');
-			$filter->submit();
+			$this->zbxTestLogin('zabbix.php?action=template.list');
 
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 			$this->filterAndOpenTemplate($name);
@@ -198,14 +197,14 @@ class testFormTemplate extends CLegacyWebTest {
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
 
-			$this->zbxTestMultiselectAssertSelected('groups_', 'Templates');
+			$this->zbxTestMultiselectAssertSelected('template_groups_', 'Templates');
 
 			if (array_key_exists('new_group', $data)) {
-				$this->zbxTestMultiselectAssertSelected('groups_', $data['new_group']);
+				$this->zbxTestMultiselectAssertSelected('template_groups_', $data['new_group']);
 			}
 
 			if (array_key_exists('group', $data)) {
-				$this->zbxTestMultiselectAssertSelected('groups_', $data['group']);
+				$this->zbxTestMultiselectAssertSelected('template_groups_', $data['group']);
 			}
 
 			if (isset ($data['visible_name'])) {
@@ -216,6 +215,8 @@ class testFormTemplate extends CLegacyWebTest {
 				$this->zbxTestAssertElementValue('description', $data['description']);
 			}
 		}
+
+		$modal->close();
 	}
 
 	public function testFormTemplate_UpdateTemplateName() {
