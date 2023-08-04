@@ -408,7 +408,7 @@ class CFormElement extends CElement {
 
 				foreach ($values as $name => $value) {
 					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
-					$element->fill($value);
+					$container->query('xpath', $xpath)->one()->detect()->fill($value);
 				}
 			}
 
