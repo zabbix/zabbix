@@ -884,6 +884,12 @@ form {
 				margin-top: 5px;
 			}
 		}
+
+		.btn-icon {
+			&.btn-small {
+				top: 4px;
+			}
+		}
 	}
 
 	h4 {
