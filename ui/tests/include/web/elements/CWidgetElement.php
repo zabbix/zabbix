@@ -93,7 +93,7 @@ class CWidgetElement extends CElement {
 
 		// Edit can sometimes fail, so we have to retry this operation.
 		for ($i = 0; $i < 4; $i++) {
-			$button->click();
+			$button->click(true);
 
 			try {
 				return $this->query("xpath://div[@data-dialogueid=\"widget_properties\"]//form")->waitUntilVisible()
