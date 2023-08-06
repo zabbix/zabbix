@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
@@ -246,7 +247,7 @@ class CFilterElement extends CElement {
 		}
 
 		$tab = $this->getTab($name);
-		$tab->click(true);
+		$tab->click();
 		$container = $tab->parents('tag:li')->one();
 		$container->waitUntilClassesPresent(['selected']);
 
@@ -271,7 +272,7 @@ class CFilterElement extends CElement {
 		}
 
 		// TODO: fix after git-hook improvements DEV-2396
-		$this->getSelectedTab()->query('xpath:.//a['.CXPathHelper::fromClass('tabfilter-edit').']')->one()->waitUntilClickable()->click(true);
+		$this->getSelectedTab()->query('xpath:.//a['.CXPathHelper::fromClass('tabfilter-edit').']')->one()->waitUntilClickable()->click();
 
 		return COverlayDialogElement::find()->one()->waitUntilReady();
 	}
