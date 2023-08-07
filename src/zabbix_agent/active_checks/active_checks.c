@@ -150,12 +150,10 @@ static void	init_active_metrics(int config_buffer_size)
 
 static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
 {
-	int	i;
-
 	zbx_free(metric->key);
 	zbx_free(metric->key_orig);
 
-	for (i = 0; i < metric->logfiles_num; i++)
+	for (int i = 0; i < metric->logfiles_num; i++)
 		zbx_free(metric->logfiles[i].filename);
 
 	zbx_free(metric->logfiles);
@@ -230,11 +228,11 @@ static void	free_active_metrics(void)
 
 static int	get_min_nextcheck(void)
 {
-	int	i, min = -1;
+	int	min = -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < active_metrics.values_num; i++)
+	for (int i = 0; i < active_metrics.values_num; i++)
 	{
 		const ZBX_ACTIVE_METRIC	*metric = (const ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
@@ -253,12 +251,11 @@ static int	get_min_nextcheck(void)
 static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
 {
 	ZBX_ACTIVE_METRIC	*metric;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d",
 			__func__, key, refresh, lastlogsize, mtime);
 
-	for (i = 0; i < active_metrics.values_num; i++)
+	for (int i = 0; i < active_metrics.values_num; i++)
 	{
 		metric = active_metrics.values[i];
 
@@ -267,8 +264,6 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 		if (0 != strcmp(metric->key, key))
 		{
-			int	j;
-
 			zbx_free(metric->key);
 			metric->key = zbx_strdup(NULL, key);
 			metric->lastlogsize = lastlogsize;
@@ -277,7 +272,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->use_ino = 0;
 			metric->error_count = 0;
 
-			for (j = 0; j < metric->logfiles_num; j++)
+			for (int j = 0; j < metric->logfiles_num; j++)
 				zbx_free(metric->logfiles[j].filename);
 
 			zbx_free(metric->logfiles);

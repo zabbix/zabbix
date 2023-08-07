@@ -35,12 +35,9 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata_item, NULL)
-
-char	*zbx_config_host_interface = NULL;
-char	*zbx_config_host_interface_item	= NULL;
-
+ZBX_GET_CONFIG_VAR(char *, zbx_config_host_interface, NULL)
+ZBX_GET_CONFIG_VAR(char *, zbx_config_host_interface_item, NULL)
 ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
-
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 1)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
@@ -57,7 +54,7 @@ int	zbx_config_buffer_size		= 100;
 int	zbx_config_buffer_send		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND		= 20;
-int	zbx_config_eventlog_max_lines_per_second = 20;
+ZBX_GET_CONFIG_VAR(int, zbx_config_eventlog_max_lines_per_second, 20)
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 
