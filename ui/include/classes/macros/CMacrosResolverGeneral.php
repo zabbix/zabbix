@@ -1168,6 +1168,39 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Calculates number formatiing macro function. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
+	 * parameters or value.
+	 *
+	 * @param string $value        [IN] The input value.
+	 * @param array  $parameters   [IN] The function parameters.
+	 *
+	 * @return string
+	 */
+	private function macrofuncFmtnum(string $value, array $parameters): string {
+		if (count($parameters) != 1 || $parameters[0] == '') {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		$parser = new CNumberParser(['with_float' => false]);
+
+		if ($parser->parse($value) == CParser::PARSE_SUCCESS) {
+			return $value;
+		}
+
+		$parser = new CNumberParser();
+
+		if ($parser->parse($value) != CParser::PARSE_SUCCESS) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		if (!ctype_digit($parameters[0]) || (int) $parameters[0] > 20) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		return sprintf("%.*f", (int) $parameters[0], (float) $value);
+	}
+
+	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -1246,6 +1279,10 @@ class CMacrosResolverGeneral {
 									$macro_value = $this->macrofuncRegsub($value, $token['parameters'],
 										$token['function'] === 'iregsub'
 									);
+									break;
+
+								case 'fmtnum':
+									$macro_value = $this->macrofuncFmtnum($value, $token['parameters']);
 									break;
 
 								default:
