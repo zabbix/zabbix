@@ -52,7 +52,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	private static $icon_host = 'Host for triggers filtering';
 
 	private static $background_classes = [
-		'1_trigger_Average' => 'normal-bg cursor-pointer js-blink',
+		'1_trigger_Average' => 'normal-bg cursor-pointer blink',
 		'1_trigger_Disaster' => 'disaster-bg',
 		'1_trigger_High' => 'high-bg',
 		'1_trigger_Not_classified' => 'na-bg',
