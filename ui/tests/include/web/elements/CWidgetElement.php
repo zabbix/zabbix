@@ -96,6 +96,7 @@ class CWidgetElement extends CElement {
 			$button->click(true);
 
 			try {
+				// TODO: fix formatting after git-hook improvements DEV-2396.
 				return $this->query("xpath://div[@data-dialogueid=\"widget_properties\"]//form")->waitUntilVisible()
 						->asForm()->one();
 			}

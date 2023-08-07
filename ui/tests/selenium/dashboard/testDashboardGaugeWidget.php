@@ -558,9 +558,9 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_show_arc' => true,
 						'id:th_arc_size' => '😽'
 					],
-					// TODO: uncomment when fill issue is resolved.
+					// TODO: uncomment when fill issue is resolved in DEV-2608.
 //					'Thresholds' => [
-////						['threshold' => '𒀐']
+// 						['threshold' => '𒀐']
 //					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -570,7 +570,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'Invalid parameter "Arc size": value must be one of 1-100.',
 						'Invalid parameter "Units size": value must be one of 1-100.',
 						'Invalid parameter "Scale size": value must be one of 1-100.',
-						// TODO: uncomment when fill issue is resolved.
+						// TODO: uncomment when fill issue is resolved in DEV-2608.
 //						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
