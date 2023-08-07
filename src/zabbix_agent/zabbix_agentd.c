@@ -35,8 +35,8 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata_item, NULL)
-ZBX_GET_CONFIG_VAR(char *, zbx_config_host_interface, NULL)
-ZBX_GET_CONFIG_VAR(char *, zbx_config_host_interface_item, NULL)
+static char	*zbx_config_host_interface = NULL;
+static char	*zbx_config_host_interface_item = NULL;
 ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 1)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
