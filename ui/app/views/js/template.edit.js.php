@@ -75,7 +75,7 @@ window.template_edit_popup = new class {
 
 	#initTemplateTab() {
 		const $groups_ms = $(this.form).find('#template_groups_');
-		const $template_ms =  $(this.form).find('#template_add_templates_');
+		const $template_ms = $(this.form).find('#template_add_templates_');
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries', this.#getLinkedTemplates().concat(this.#getNewTemplates()));
