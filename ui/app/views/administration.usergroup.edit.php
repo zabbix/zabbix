@@ -257,7 +257,10 @@ $tag_filter_form_grid = (new CFormGrid())
 		new CLabel(_('Permissions')),
 		new CFormField(
 			(new CDiv(
-				new CPartial('administration.usergroup.tagfilters', ['tag_filters' => $data['tag_filters']])
+				new CPartial('administration.usergroup.tagfilters', [
+					'tag_filters' => $data['tag_filters'],
+					'html_tag_filters' => $data['html_tag_filters']
+				])
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

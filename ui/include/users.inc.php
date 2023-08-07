@@ -327,8 +327,8 @@ function uniqTagFilters(array $tag_filters) {
 }
 
 /**
- * Returns the sorted list of the unique tag filters and group names.
- * The list will be enriched by group names. Tag filters with filled tags or values will be overwritten empty.
+ * Returns the sorted list of the unique tag filters and group names. Combines the tags belonging to the same group.
+ * The list will be enriched by group names. Empty tag filters are labeled "All tags".
  *
  * @param array  $tag_filters
  * @param string $tag_filters[]['groupid']
@@ -346,27 +346,35 @@ function collapseTagFilters(array $tag_filters) {
 		$groupids[$tag_filter['groupid']] = true;
 	}
 
-	if ($groupids) {
-		$groups = API::HostGroup()->get([
-			'output' => ['name'],
-			'groupids' => array_keys($groupids),
-			'preservekeys' => true
-		]);
+	$groups = API::HostGroup()->get([
+		'output' => ['name'],
+		'groupids' => array_keys($groupids),
+		'preservekeys' => true
+	]);
 
-		$sorted_tag_filters = [];
-		foreach ($tag_filters as $tag_filter) {
-			if (array_key_exists($tag_filter['groupid'], $groups)) {
-				$tag_filter['name'] = $groups[$tag_filter['groupid']]['name'];
-				$sorted_tag_filters[] = $tag_filter;
-			}
+	$combined_tag_filters = [];
+
+	foreach ($tag_filters as $tag_filter) {
+		$groupid = $tag_filter['groupid'];
+		$name = array_key_exists($tag_filter['groupid'], $groups) ? $groups[$tag_filter['groupid']]['name'] : '';
+		$tag = ['tag' => $tag_filter['tag'], 'value' => $tag_filter['value']];
+
+		if (!isset($combined_tag_filters[$groupid])) {
+			$combined_tag_filters[$groupid] = [
+				'groupid' => $groupid,
+				'name' => $name,
+				'tags' => []
+			];
 		}
 
-		CArrayHelper::sort($sorted_tag_filters, ['name', 'tag', 'value']);
+		$combined_tag_filters[$groupid]['tags'][] = $tag;
 
-		return array_values($sorted_tag_filters);
+		CArrayHelper::sort($combined_tag_filters[$groupid]['tags'], ['tag', 'value']);
 	}
 
-	return $tag_filters;
+	CArrayHelper::sort($combined_tag_filters, ['name']);
+
+	return $combined_tag_filters;
 }
 
 /**

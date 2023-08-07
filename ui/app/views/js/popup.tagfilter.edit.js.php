@@ -26,11 +26,21 @@
 
 window.tag_filter_popup = new class {
 
-	init({}) {
+	init({tag_filters}) {
 		this.tag_filter_template = new Template(document.getElementById('tag-filter-row-template').innerHTML);
 		this.tag_filter_counter = 0;
 
-		this.#addTagFilterRow();
+		if (tag_filters.length !== 0 && tag_filters[0]['tag'] !== '') {
+			const tags_list_radio = document.querySelector(`input[name="filter_type"][value="1"]`);
+			tags_list_radio.checked = true;
+		}
+		else {
+			this.#addTagFilterRow();
+		}
+
+		for (let tag of tag_filters) {
+			this.#addTagFilterRow(tag);
+		}
 
 		document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 
@@ -45,7 +55,7 @@ window.tag_filter_popup = new class {
 		jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
 	}
 
-	#addTagFilterRow(tag_filter_group = []) {
+	#addTagFilterRow(tag = []) {
 		const rowid = this.tag_filter_counter++;
 		const data = {
 			'rowid': rowid
@@ -56,12 +66,12 @@ window.tag_filter_popup = new class {
 		const placeholder_row = document.querySelector('.js-tag-filter-row-placeholder');
 		placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
-		if (tag_filter_group.length > 0) {
+		if (tag.length !== 0) {
 			const tag_id = 'tag_filter_tag_'+rowid;
-			document.getElementById(tag_id).value = tag_filter_group[0]['tag'];
+			document.getElementById(tag_id).value = tag.tag;
 
 			const value_id = 'tag_filter_value_'+rowid;
-			document.getElementById(value_id).value = tag_filter_group[0]['value'];
+			document.getElementById(value_id).value = tag.value;
 		}
 	}
 }

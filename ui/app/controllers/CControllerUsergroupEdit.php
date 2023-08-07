@@ -38,8 +38,6 @@ class CControllerUsergroupEdit extends CController {
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
-			'ms_tag_filter' =>			'array',
-			'tag_filter' =>			    'array',
 
 			'form_refresh' =>			'int32'
 		];
@@ -97,14 +95,30 @@ class CControllerUsergroupEdit extends CController {
 			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
 		}
 
+		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
+		$template_groups = API::TemplateGroup()->get(['output' => ['groupid', 'name']]);
+
 		$data['hostgroup_rights'] = $this->getGroupRights();
 		$data['templategroup_rights'] = $this->getTemplategroupRights();
 
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 
-		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
-		$template_groups = API::TemplateGroup()->get(['output' => ['groupid', 'name']]);
+		$html_tag_filters = $data['tag_filters'];
+
+		foreach ($html_tag_filters as &$group) {
+			foreach ($group['tags'] as &$tag) {
+				if ($tag['tag'] === '') {
+					$tag = [
+						'tag' => 'All tags',
+						'value' => ''
+					];
+				}
+			}
+		}
+		unset($group, $tag);
+
+		$data['html_tag_filters'] = makeTags($html_tag_filters, true, 'groupid');
 
 		$new_hostgroup_rights = $this->processNewGroupRights($host_groups, 'ms_hostgroup_right', 'hostgroup_right');
 		$new_templategroup_rights = $this->processNewGroupRights(
@@ -117,38 +131,6 @@ class CControllerUsergroupEdit extends CController {
 
 		if (count($new_templategroup_rights) > 0) {
 			$data['templategroup_rights'] = $this->sortGroupRights($new_templategroup_rights);
-		}
-
-		$new_tag_filters = [];
-		$this->getInputs($new_tag_filters, ['ms_tag_filter', 'tag_filter']);
-
-		$tag_filters_groupIds = $new_tag_filters['ms_tag_filter']['groupids'] ?? [];
-		$tags = $new_tag_filters['tag_filter']['tag'] ?? [];
-		$values = $new_tag_filters['tag_filter']['value'] ?? [];
-
-		$formatted_new_tag_filters = [];
-
-		foreach ($tag_filters_groupIds as $index => $group) {
-			foreach ($group as $groupId) {
-				$tag = $tags[$index] ?? null;
-				$value = $values[$index] ?? null;
-
-				if ($groupId !== '0'&& $tag !== null && $value !== null) {
-					$key = array_search($groupId, array_column($host_groups, 'groupid'));
-					$name = $key !== false ? $host_groups[$key]['name'] : '';
-
-					$formatted_new_tag_filters[] = [
-						'groupid' => $groupId,
-						'tag' => $tag,
-						'value' => $value,
-						'name' => $name
-					];
-				}
-			}
-		}
-
-		if (count($formatted_new_tag_filters) > 0) {
-			$data['tag_filters'] = $formatted_new_tag_filters;
 		}
 
 		$data['users_ms'] = $this->getUsersMs();

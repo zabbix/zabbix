@@ -28,6 +28,7 @@
 	const view = new class {
 
 		init({templategroup_rights, hostgroup_rights, tag_filters}) {
+			this.tag_filters = tag_filters;
 			this.templategroup_rights = templategroup_rights;
 			this.template_permission_template = new Template(
 				document.getElementById('templategroup-right-row-template').innerHTML
@@ -60,6 +61,15 @@
 			document.getElementById('user-group-form').addEventListener('click', event => {
 				if (event.target.classList.contains('js-remove-table-row')) {
 					this.#removeRow(event.target);
+				}
+			});
+
+			document.getElementById('tag-filter-table').addEventListener('click', event => {
+				if (event.target.classList.contains('js-add-tag-filter')) {
+					this.#openAddPopup();
+				}
+				else if (event.target.classList.contains('js-edit-table-row')) {
+					this.#openAddPopup(event.target.closest('tr'));
 				}
 			});
 		}
@@ -104,6 +114,24 @@
 				.remove();
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
+		}
+
+		#openAddPopup(row = null) {
+			let popup_params = {};
+
+			if (row !== null) {
+				const groupid = row.querySelector('input[name*="[groupid]"]').value;
+				const tags = this.tag_filters[groupid];
+
+				popup_params = {
+					edit: '1',
+					groupid: groupid,
+					name: tags['name'],
+					tags: tags['tags']
+				};
+			}
+
+			PopUp('popup.tagfilter.edit', popup_params);
 		}
 	};
 

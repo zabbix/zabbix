@@ -28,7 +28,10 @@ class CControllerPopupTagFilterEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'edit' => 'in 1,0',
-			'update' => 'in 1'
+			'update' => 'in 1',
+			'groupid' => 'db hosts_groups.groupid',
+			'name' => 'string',
+			'tags' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -54,7 +57,9 @@ class CControllerPopupTagFilterEdit extends CController {
 		$data = [
 			'action' => 'popup.tagfilter.update',
 			'edit' => 0,
+			'groupid' => null,
 			'name' => '',
+			'tags' => []
 		];
 		$this->getInputs($data, array_keys($data));
 
@@ -64,8 +69,11 @@ class CControllerPopupTagFilterEdit extends CController {
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
-		$data['new_tag_filter']['groupids'] = [];
-		$data['host_groups_ms'] = self::getHostGroupsMs($data['new_tag_filter']['groupids']);
+
+		$data['host_groups_ms'] = [];
+		if ($data['groupid'] !== null) {
+			$data['host_groups_ms'] = self::getHostGroupsMs([$data['groupid']]);
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

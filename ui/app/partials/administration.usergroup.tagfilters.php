@@ -29,39 +29,15 @@ $tag_filter_table = (new CTable())
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Host groups'), _('Tags'), _('Action')]);
 
-$previous_name = '';
 foreach ($data['tag_filters'] as $key => $tag_filter) {
-	if ($previous_name === $tag_filter['name']) {
-		$tag_filter['name'] = '';
-	}
-	else {
-		$previous_name = $tag_filter['name'];
-	}
-
-	if ($tag_filter['tag'] !== '' && $tag_filter['value'] !== '') {
-		$tag_value = $tag_filter['tag'].NAME_DELIMITER.$tag_filter['value'];
-	}
-	elseif ($tag_filter['tag'] !== '') {
-		$tag_value = $tag_filter['tag'];
-	}
-	else {
-		$tag_value = italic(_('All tags'));
-	}
-
 	$action = [
 		(new CButtonLink(_('Edit')))->addClass('js-edit-table-row'),
 		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row'),
 		(new CVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']))->removeId(),
-		(new CVar('tag_filters['.$key.'][tag]', $tag_filter['tag']))->removeId(),
-		(new CVar('tag_filters['.$key.'][value]', $tag_filter['value']))->removeId(),
-		(new CVar('tag_filter', json_encode([
-			'groupid' => $tag_filter['groupid'],
-			'tag' => $tag_filter['tag'],
-			'value' => $tag_filter['value']
-		])))->removeId()->setEnabled(false)
+		(new CVar('tag_filters['.$key.'][tags]', $tag_filter['tags']))->removeId()
 	];
 
-	$tag_filter_table->addRow([$tag_filter['name'], $tag_value, $action]);
+	$tag_filter_table->addRow([$tag_filter['name'], $data['html_tag_filters'][$tag_filter['groupid']], $action]);
 }
 
 $tag_filter_table->addRow([
@@ -71,5 +47,3 @@ $tag_filter_table->addRow([
 ]);
 
 $tag_filter_table->show();
-
-$this->includeJsFile('administration.usergroup.tagfilters.js.php', ['tag_filters' => $data['tag_filters']]);

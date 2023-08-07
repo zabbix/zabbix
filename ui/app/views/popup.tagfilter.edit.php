@@ -113,9 +113,11 @@ $form
 	->addItem(
 		(new CScriptTag('
 			tag_filter_popup.init('.json_encode([
+				'tag_filters' => $data['tags']
 			]).');
 		'))->setOnDocumentReady()
-	);
+	)
+	->setAttribute('autofocus', 'autofocus');
 
 $output = [
 	'header' => $data['title'],
