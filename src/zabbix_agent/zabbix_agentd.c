@@ -54,7 +54,7 @@ int	zbx_config_buffer_size		= 100;
 int	zbx_config_buffer_send		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND		= 20;
-ZBX_GET_CONFIG_VAR(int, zbx_config_eventlog_max_lines_per_second, 20)
+static int	zbx_config_eventlog_max_lines_per_second = 20;
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 
