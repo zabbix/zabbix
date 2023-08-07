@@ -187,7 +187,6 @@ window.template_edit_popup = new class {
 			value != e.target.dataset.templateid
 		);
 
-		this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
 		$(this.form).find('#template_add_templates_').trigger('change');
 	}
 
