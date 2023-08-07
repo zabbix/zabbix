@@ -21,7 +21,7 @@
 
 class AllItemValueTypes {
 
-	const HOST = 'Host for all item types';
+	const HOST = 'Host for all item value types';
 
 	public static function load() {
 		CDataHelper::call('host.create', [
@@ -43,8 +43,8 @@ class AllItemValueTypes {
 		foreach ($value_types as $name => $type) {
 			$items_data[] = [
 				'hostid' => $hostids[self::HOST],
-				'name' => $type.' '.$name.' item',
-				'key_' => $type.$name,
+				'name' => $name.' item',
+				'key_' => $name,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => $type
 			];
@@ -53,20 +53,27 @@ class AllItemValueTypes {
 		CDataHelper::call('item.create', $items_data	);
 		$simple_itemids = CDataHelper::getIds('name');
 
-		// Add dependent binary item.
-		CDataHelper::call('item.create',
-			[
-				'hostid' => $hostids[self::HOST],
-				'name' => '5 Binary item',
-				'key_' => $type.'Binary',
-				'type' => ITEM_TYPE_DEPENDENT,
-				'value_type' => ITEM_VALUE_TYPE_BINARY,
-				'master_itemid' => $simple_itemids['0 Float item']
-			]
-		);
-		$binary_itemids = CDataHelper::getIds('name');
+		// Add dependent item.
+		$dependent_items_data = [];
+		$dependent_items = [
+			'Binary' => ITEM_VALUE_TYPE_BINARY,
+			'Unsigned_dependent' => ITEM_VALUE_TYPE_UINT64
+		];
 
-		$itemids = array_merge_recursive($simple_itemids, $binary_itemids);
+		foreach ($dependent_items as $name => $type) {
+			$dependent_items_data[] = [
+				'hostid' => $hostids[self::HOST],
+				'name' => $name.' item',
+				'key_' => $name,
+				'type' => ITEM_TYPE_DEPENDENT,
+				'value_type' => $type,
+				'master_itemid' => $simple_itemids['Float item']
+			];
+		}
+		CDataHelper::call('item.create', $dependent_items_data);
+		$dependent_itemids = CDataHelper::getIds('name');
+
+		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids);
 
 		return $itemids;
 	}

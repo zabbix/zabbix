@@ -33,9 +33,9 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	use TableTrait;
 
-	const HOST = 'Host for all item types';
+	const HOST = 'Host for all item value types';
 	const DELETE_GAUGE = 'Gauge for deleting';
-	const GAUGE_ITEM = '0 Float item';
+	const GAUGE_ITEM = 'Float item';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -91,7 +91,7 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	public function prepareDashboardData() {
 		// Add item data to move needle on Gauge.
-		CDataHelper::addItemData(CDataHelper::get('AllItemValueTypes.0 Float item'), 50);
+		CDataHelper::addItemData(CDataHelper::get('AllItemValueTypes.Float item'), 50);
 
 		$dashboards = CDataHelper::call('dashboard.create', [
 			'name' => 'Gauge widget dashboard',
@@ -111,7 +111,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => CDataHelper::get('AllItemValueTypes.0 Float item')
+									'value' => CDataHelper::get('AllItemValueTypes.Float item')
 								]
 							]
 						],
@@ -127,7 +127,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => CDataHelper::get('AllItemValueTypes.0 Float item')
+									'value' => CDataHelper::get('AllItemValueTypes.Float item')
 								]
 							]
 						]
@@ -929,7 +929,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady()->edit();
 		$widget = $dashboard->getWidget(self::DELETE_GAUGE);
 		$this->assertTrue($widget->isEditable());
-		// TODO: should be investigated and removed after DEV-2566, currently failing on Jenkins without sleep
+		// TODO: should be investigated and removed after DEV-2621, currently failing on Jenkins without sleep.
 		sleep(2);
 		$dashboard->deleteWidget(self::DELETE_GAUGE);
 		$widget->waitUntilNotPresent();
@@ -962,8 +962,9 @@ class testDashboardGaugeWidget extends CWebTest {
 		$table->waitUntilReloaded();
 
 		$visible_items = [
-			'0 Float item',
-			'3 Unsigned item'
+			'Float item',
+			'Unsigned item',
+			'Unsigned_dependent item'
 		];
 
 		$this->assertTableDataColumn($visible_items);
@@ -985,7 +986,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'screenshot_id' => 'Empty gauge with no data',
 					'fields' => [
-						'Item' => '3 Unsigned item'
+						'Item' => 'Unsigned item'
 					]
 				]
 			],
