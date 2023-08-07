@@ -1226,7 +1226,7 @@ static ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char
 	/*                             non-empty               empty                 */
 	/*                             /      \                /    \                */
 	/*                            /        \              /      \               */
-	/*                       'host'        'host'      'host'    'host'          */
+	/*                    'host/proxy' 'host/proxy' 'host/proxy' 'host/proxy'    */
 	/*                       record        record      record    record          */
 	/*                        has           has         has       has            */
 	/*                     non-empty       empty     non-empty  empty PSK        */
@@ -1250,7 +1250,7 @@ static ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char
 	/*             /              /--------- |            \              /       */
 	/*            /              /         \ |             \            /        */
 	/*       delete          new PSKid   new PSKid         set pointer in        */
-	/*       old PSK          already     not in           'hosts' record        */
+	/*       old PSK          already     not in           'hosts/proxy' record  */
 	/*        value           in psks      psks             to NULL PSK          */
 	/*        from            hashset     hashset                |               */
 	/*       string            /   \          \                 done             */
@@ -1270,7 +1270,7 @@ static ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char
 	/*                          \     |      /                                   */
 	/*                           \    |     /                                    */
 	/*                            set pointer                                    */
-	/*                            in 'host'                                      */
+	/*                            in 'host/proxy'                                */
 	/*                            record to                                      */
 	/*                            new PSKid                                      */
 	/*                                |                                          */
@@ -1287,10 +1287,10 @@ static ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char
 
 		if (1 == found)
 		{
-			if (NULL == tls_dc_psk)	/* 'host' record has empty PSK */
+			if (NULL == tls_dc_psk)	/* 'host/proxy' record has empty PSK */
 				goto done;
 
-			/* 'host' record has non-empty PSK. Unlink and delete PSK. */
+			/* 'host/proxy' record has non-empty PSK. Unlink and delete PSK. */
 			dc_psk_unlink(tls_dc_psk);
 		}
 
@@ -1302,7 +1302,7 @@ static ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char
 
 	zbx_strlower(tls_psk);
 
-	if (1 == found && NULL != tls_dc_psk)	/* 'host' record has non-empty PSK */
+	if (1 == found && NULL != tls_dc_psk)	/* 'host/proxy' record has non-empty PSK */
 	{
 		if (0 == strcmp(tls_dc_psk->tls_psk_identity, tls_psk_identity))	/* new PSKid same as */
 										/* old PSKid */
@@ -1374,7 +1374,7 @@ done:
 	{
 		if (NULL == zbx_hashset_search(psk_owners, &tls_dc_psk->tls_psk_identity))
 		{
-			/* register this host as the PSK identity owner, against which to report conflicts */
+			/* register this host/proxy as the PSK identity owner, against which to report conflicts */
 
 			psk_owner_local.first = (char *)tls_dc_psk->tls_psk_identity;
 			psk_owner_local.second = (char *)name;
