@@ -305,6 +305,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		}
 		else
 		{
+			zbx_unset_snmp_bulkwalk_options();
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
 			zbx_set_snmp_bulkwalk_options();
 			poller_config->clear_cache = 0;
@@ -348,6 +349,8 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		else
 		{
 #ifdef HAVE_NETSNMP
+			zbx_set_snmp_bulkwalk_options();
+
 			errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 					poller_config, poller_config, poller_config->base,
 					poller_config->config_timeout, poller_config->config_source_ip);
@@ -565,10 +568,6 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	}
-#ifdef HAVE_NETSNMP
-	else
-		zbx_set_snmp_bulkwalk_options();
-#endif
 
 	while (ZBX_IS_RUNNING())
 	{

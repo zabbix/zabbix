@@ -168,6 +168,7 @@ zbx_snmp_result_t;
 
 static ZBX_THREAD_LOCAL zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 static char				zbx_snmp_init_done;
+static char				zbx_snmp_init_bulkwalk_done;
 static pthread_rwlock_t			snmp_exec_rwlock;
 static char				snmp_rwlock_init_done;
 
@@ -2392,6 +2393,11 @@ void	zbx_set_snmp_bulkwalk_options(void)
 
 	zbx_init_snmp();
 
+	if (1 == zbx_snmp_init_bulkwalk_done)
+		return;
+
+	zbx_snmp_init_bulkwalk_done = 1;
+
 	snmp_bulkwalk_get_options(&default_opts);
 
 	bulk_opts.numeric_oids = 1;
@@ -2405,6 +2411,10 @@ void	zbx_set_snmp_bulkwalk_options(void)
 
 void	zbx_unset_snmp_bulkwalk_options(void)
 {
+	if (0 == zbx_snmp_init_bulkwalk_done)
+		return;
+
+	zbx_snmp_init_bulkwalk_done = 0;
 	snmp_bulkwalk_set_options(&default_opts);
 }
 
