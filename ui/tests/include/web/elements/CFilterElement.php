@@ -247,7 +247,7 @@ class CFilterElement extends CElement {
 		}
 
 		$tab = $this->getTab($name);
-		$tab->click(true);
+		$tab->click();
 		$container = $tab->parents('tag:li')->one();
 		$container->waitUntilClassesPresent(['selected']);
 
@@ -271,7 +271,7 @@ class CFilterElement extends CElement {
 			$this->selectTab($name);
 		}
 
-		$this->getSelectedTab()->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilClickable()->click(true);
+		$this->getSelectedTab()->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilClickable()->click();
 
 		return COverlayDialogElement::find()->one()->waitUntilReady();
 	}

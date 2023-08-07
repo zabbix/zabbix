@@ -208,7 +208,9 @@ class testFormFilter extends CWebTest {
 			}
 
 			// Checking that deleted filter doesn't exist in filters dropdown list.
-			$this->assertEquals($tabs, $this->getDropdownFilterNames());
+			$dropdown_filter = $this->getDropdownFilter();
+			$this->assertEquals($tabs, $dropdown_filter['items']);
+			$dropdown_filter['element']->close();
 		}
 	}
 
@@ -263,16 +265,17 @@ class testFormFilter extends CWebTest {
 	}
 
 	/**
-	 * Return filter names from droplist.
+	 * Return filter element and names from droplist.
 	 *
 	 * @return array
 	 */
-	public function getDropdownFilterNames() {
+	public function getDropdownFilter() {
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
-		$dropdown_filters = CPopupMenuElement::find()->waitUntilVisible()->one()->getItems()->asText();
-		array_shift($dropdown_filters);
+		$dropdown_filter = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$dropdown_items = $dropdown_filter->getItems()->asText();
+		array_shift($dropdown_items);
 
-		return $dropdown_filters;
+		return ['element' => $dropdown_filter, 'items' => $dropdown_items];
 	}
 
 	/**
@@ -287,7 +290,9 @@ class testFormFilter extends CWebTest {
 		$this->assertEquals($filter_name, $filter->getSelectedTabName());
 
 		// Checking that names displayed on the filter tabs same as in drop down list.
-		$this->assertEquals($filter->getTabsText(), $this->getDropdownFilterNames());
+		$dropdown_filter = $this->getDropdownFilter();
+		$this->assertEquals($filter->getTabsText(), $dropdown_filter['items']);
+		$dropdown_filter['element']->close();
 
 		// Checking that name displayed in filter properties.
 		$filter->editProperties();
