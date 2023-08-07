@@ -930,7 +930,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		$widget = $dashboard->getWidget(self::DELETE_GAUGE);
 		$this->assertTrue($widget->isEditable());
 		// TODO: should be investigated and removed after DEV-2621, currently failing on Jenkins without sleep.
-		sleep(2);
+//		sleep(2);
 		$dashboard->deleteWidget(self::DELETE_GAUGE);
 		$widget->waitUntilNotPresent();
 		$dashboard->save();
