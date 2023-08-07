@@ -463,24 +463,11 @@ class CMacrosResolverGeneral {
 						if ($macro_func_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 							$macro_parser = $macro_func_parser->getMacroParser();
 							$function_parser = $macro_func_parser->getFunctionParser();
-							$function_parameters = [];
-
-							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw['type']) {
-									case C10FunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw['raw'];
-										break;
-
-									case C10FunctionParser::PARAM_QUOTED:
-										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw['raw']);
-										break;
-								}
-							}
 
 							$macros['macro_funcs'][$key][$macro_func_parser->getMatch()] = [
 								'macro' => $macro_parser->getMacro(),
 								'function' => $function_parser->getFunction(),
-								'parameters' => $function_parameters
+								'parameters' => $function_parser->getParams()
 							];
 							$pos += $macro_func_parser->getLength() - 1;
 							continue 2;
@@ -519,25 +506,12 @@ class CMacrosResolverGeneral {
 						if ($macro_func_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 							$macro_n_parser = $macro_func_n_parser->getMacroParser();
 							$function_parser = $macro_func_n_parser->getFunctionParser();
-							$function_parameters = [];
-
-							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw['type']) {
-									case C10FunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw['raw'];
-										break;
-
-									case C10FunctionParser::PARAM_QUOTED:
-										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw['raw']);
-										break;
-								}
-							}
 
 							$macros['macro_funcs_n'][$key][$macro_func_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
 								'f_num' => $macro_n_parser->getReference(),
 								'function' => $function_parser->getFunction(),
-								'parameters' => $function_parameters
+								'parameters' => $function_parser->getParams()
 							];
 							$pos += $macro_func_n_parser->getLength() - 1;
 							continue 2;
