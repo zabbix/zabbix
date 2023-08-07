@@ -41,7 +41,6 @@ class testFormWebScenarioStep extends CWebTest {
 	const CREATE_SCENARIO = 'Scenario for Update';
 	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid';
 
-
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -1097,7 +1096,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'error' => "Cannot convert POST data:\n\nData is not properly encoded."
 				]
 			],
-			// #9 Non-existing character when converting from rwa data to post data.
+			// #9 Non-existing character when converting from raw data to post data.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1178,7 +1177,7 @@ class testFormWebScenarioStep extends CWebTest {
 	/**
 	 * Return web scenario step configuration form for the specified web scenario.
 	 *
-	 * @param	string			$scenario	name of web scenario for which to open step configuration form
+	 * @param	string	$scenario	name of web scenario for which to open step configuration form
 	 *
 	 * @return	CFormElement
 	 */

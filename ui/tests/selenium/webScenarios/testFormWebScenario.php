@@ -274,7 +274,7 @@ class testFormWebScenario extends CWebTest {
 
 		$tags_table = $form->query('class:tags-table')->one()->asTable();
 
-		// Check tags table headers when viewing scenario tags
+		// Check tags table headers when viewing scenario tags.
 		$this->assertEquals(['Name', 'Value', 'Action'], $tags_table->getHeaders()->asText());
 
 		// Check table tags placeholders and length.
