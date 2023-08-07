@@ -478,9 +478,11 @@ typedef struct
 	zbx_vector_host_rev_t		removed_hosts;
 	unsigned char			tls_connect;
 	unsigned char			tls_accept;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char			*tls_issuer;
 	const char			*tls_subject;
 	ZBX_DC_PSK			*tls_dc_psk;
+#endif
 	const char			*address;
 	const char			*port;
 }
