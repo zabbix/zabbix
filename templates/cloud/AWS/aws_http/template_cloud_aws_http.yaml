@@ -458,12 +458,12 @@ zabbix_export:
             - name: proxy
               value: '{$AWS.PROXY}'
           lld_macro_paths:
-            - lld_macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
-              path: $.infrastructure
             - lld_macro: '{#AWS.ECS.CLUSTER.NAME}'
               path: $.clusterName
             - lld_macro: '{#AWS.ECS.CLUSTER.STATUS}'
               path: $.status
+            - lld_macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
+              path: $.infrastructure
           overrides:
             - name: Serverless
               step: '1'

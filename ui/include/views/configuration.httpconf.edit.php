@@ -143,13 +143,15 @@ $scenario_tab
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(2000)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
@@ -180,13 +182,15 @@ $scenario_tab
 						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(2000)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)

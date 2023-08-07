@@ -53,15 +53,8 @@ int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t 
 
 int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts);
 
-int	zbx_proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-int	zbx_proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-int	zbx_proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-void	zbx_proxy_set_hist_lastid(const zbx_uint64_t lastid);
-void	zbx_proxy_set_dhis_lastid(const zbx_uint64_t lastid);
-void	zbx_proxy_set_areg_lastid(const zbx_uint64_t lastid);
 int	zbx_proxy_get_host_active_availability(struct zbx_json *j);
 
-int	zbx_proxy_get_history_count(void);
 int	zbx_proxy_get_delay(zbx_uint64_t lastid);
 
 int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
@@ -72,7 +65,7 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
 		char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
@@ -103,7 +96,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		const zbx_uint64_t hostid);
 
 /* event support */
-void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
+void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_event_t *events);
 void		zbx_db_free_event(zbx_db_event *event);
 void		zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);
@@ -130,6 +123,9 @@ void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **exp
 		zbx_trigger_func_t eval_func_cb, int recovery);
 void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
 		zbx_trigger_func_t eval_func_cb, int recovery);
+
+int	zbx_db_check_user_perm2system(zbx_uint64_t userid);
+char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
 
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1

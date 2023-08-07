@@ -57,7 +57,7 @@ int	zbx_compare_tags(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: comparison function to sort tags by tag/value                     *
+ * Purpose: comparison function to sort tags by tag/value.                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_compare_tags_natural(const void *d1, const void *d2)

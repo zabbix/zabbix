@@ -27,7 +27,7 @@
 #include "zbxwin32.h"
 
 #include <tlhelp32.h>
-#include "sddl.h"
+#include <sddl.h> /* ConvertSidToStringSid */
 
 #define MAX_NAME	256
 

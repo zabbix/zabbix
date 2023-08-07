@@ -474,7 +474,7 @@ function getMenuPopupMapElementTrigger(options) {
 
 		items.push({
 			label: t('Problems'),
-			disabled: !options.showEvents,
+			disabled: !options.show_events,
 			url: url.getUrl()
 		});
 	}
@@ -492,7 +492,7 @@ function getMenuPopupMapElementTrigger(options) {
 				label: item.name,
 				url: url.getUrl()
 			});
-		};
+		}
 
 		items.push({
 			label: t('History'),
@@ -542,7 +542,7 @@ function getMenuPopupMapElementTrigger(options) {
 					disabled: item.params.is_webitem,
 					url: url.getUrl()
 				});
-			};
+			}
 
 			config_urls.push({
 				label: t('Items'),
@@ -700,20 +700,31 @@ function getMenuPopupDashboard(options, trigger_element) {
 /**
  * Get menu popup trigger section data.
  *
- * @param {string} options['triggerid']                   Trigger ID.
- * @param {string} options['eventid']                     (optional) Required for "Update problem" section and event
+ * @param {object} options
+ *        {string} options['triggerid']                   Trigger ID.
+ *        {bool}   options['allowed_actions_change_problem_ranking']
+ *                                                        Whether user is allowed to change event rank.
+ *        {bool}   options['allowed_ui_conf_hosts']       Whether user has access to Configuration > Hosts.
+ *        {bool}   options['allowed_ui_latest_data']      Whether user has access to Monitoring > Latest data.
+ *        {bool}   options['allowed_ui_problems']         Whether user has access to Monitoring > Problems.
+ *        {bool}   options['backurl']                     URL from where the menu popup was called.
+ *        {bool}   options['show_events']                 Show Problems item enabled. Default: false.
+ *        {string} options['eventid']                     (optional) Required for "Update problem" section and event
  *                                                        rank change.
- * @param {object} options['items']                       Link to trigger item history page (optional).
- * @param {string} options['items'][]['name']             Item name.
- * @param {object} options['items'][]['params']           Item URL parameters ("name" => "value").
- * @param {bool}   options['update_problem']              (optional) Whether to show "Update problem" section.
- * @param {object} options['configuration']               Link to trigger configuration page (optional).
- * @param {bool}   options['showEvents']                  Show Problems item enabled. Default: false.
- * @param {string} options['url']                         Trigger URL link (optional).
+ *        {array}  options['eventids']                    (optional)
+ *        {array}  options['csrf_tokens']                 (optional) CSRF tokens.
+ *        {string} options['csrf_tokens']['acknowledge']  (optional) CSRF token for acknowledge action.
+ *        {string} options['csrf_tokens']['scriptexec']   (optional) CSRF token for script execution.
+ *        {array}  options['items']                       (optional) Link to trigger item history page.
+ *        {string} options['items'][]['name']             Item name.
+ *        {object} options['items'][]['params']           Item URL parameters ("name" => "value").
+ *        {bool}   options['mark_as_cause']               (optional) Whether to enable "Mark as cause".
+ *        {bool}   options['mark_selected_as_symptoms']   (optional) Whether to enable "Mark selected as symptoms".
+ *        {bool}   options['show_update_problem']         (optional) Whether to show "Update problem".
+ *        {bool}   options['show_rank_change_cause']      (optional) Whether to show "Mark as cause".
+ *        {bool}   options['show_rank_change_symptom']    (optional) Whether to show "Mark selected as symptoms".
+ *        {array}  options['urls']                        (optional) Links.
  * @param {object} trigger_element                        UI element which triggered opening of overlay dialogue.
- * @param {array} options[csrf_tokens][]
- * @param {string} options[csrf_tokens][]['scriptexec']   CSRF token for script execution.
- * @param {string} options[csrf_tokens][]['acknowledge']  CSRF token for acknowledge action.
  *
  * @return array
  */
@@ -731,19 +742,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 
 		items.push({
 			label: t('Problems'),
-			disabled: !options.showEvents,
+			disabled: !options.show_events,
 			url: url.getUrl()
-		});
-	}
-
-	if ('update_problem' in options) {
-		items.push({
-			label: t('Update problem'),
-			clickCallback: function() {
-				jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
-
-				acknowledgePopUp({eventids: [options.eventid]}, trigger_element);
-			}
 		});
 	}
 
@@ -760,7 +760,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 				label: item.name,
 				url: url.getUrl()
 			});
-		};
+		}
 
 		items.push({
 			label: t('History'),
@@ -775,6 +775,20 @@ function getMenuPopupTrigger(options, trigger_element) {
 		});
 	}
 
+	if ('show_update_problem' in options && options.show_update_problem) {
+		sections.push({
+			label: t('Actions'),
+			items: [{
+				label: t('Update problem'),
+				clickCallback: function() {
+					jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
+
+					acknowledgePopUp({eventids: [options.eventid]}, trigger_element);
+				}
+			}]
+		});
+	}
+
 	// configuration
 	if (options.allowed_ui_conf_hosts) {
 		const config_urls = [];
@@ -784,6 +798,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		url.setArgument('form', 'update');
 		url.setArgument('triggerid', options.triggerid);
 		url.setArgument('context', 'host');
+		url.setArgument('backurl', options.backurl);
 
 		config_urls.push({
 			label: t('Trigger'),
@@ -796,6 +811,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 				url.setArgument('form', 'update');
 				url.setArgument('itemid', item.params.itemid);
 				url.setArgument('context', 'host');
+				url.setArgument('backurl', options.backurl);
 
 				item_urls.push({
 					label: item.name,
@@ -826,8 +842,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 		curl.setArgument('action', 'popup.acknowledge.create');
 
 		/*
-		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause evets are
-		 * displayed.
+		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause events
+		 * are displayed.
 		 */
 		if (typeof options.show_rank_change_cause !== 'undefined' && options.show_rank_change_cause) {
 			// Must be synced with PHP ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE.
