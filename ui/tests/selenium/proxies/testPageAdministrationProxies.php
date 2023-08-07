@@ -563,14 +563,15 @@ class testPageAdministrationProxies extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $data['title'], CTestArrayHelper::get($data, 'message', null));
 
 			// Check DB. Status 5 stands for Active proxy and status 6 - for Passive proxy.
-			$db_proxies = CDBHelper::getColumn('SELECT * FROM hosts WHERE status IN (5,6)', 'host');
+			$db_proxies = CDBHelper::getColumn('SELECT * FROM proxy', 'name');
 
 			foreach ($data['proxies'] as $proxy) {
 				$this->assertEquals(($data['action'] !== 'Delete'), in_array($proxy, array_values($db_proxies)));
 
 				$exists = ($data['action'] === 'Delete')
 					? array_key_exists('expected', $data)
-					: true;
+					: true
+				;
 
 				$this->assertEquals($exists, $this->query('link', $proxy)->exists());
 			}

@@ -58,6 +58,7 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				'name' => self::$update_proxy,
 				'mode' => PROXY_MODE_ACTIVE,
+				'address' => "127.0.0.1",
 				'description' => 'Description for update',
 				'tls_connect' => 1,
 				'tls_accept'=> 1
@@ -65,6 +66,7 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				'name' => self::$change_active_proxy,
 				'mode' => PROXY_MODE_ACTIVE,
+				'address' => "127.0.0.1",
 				'description' => 'Active description for refresh',
 				'tls_connect' => 1,
 				'tls_accept'=> 7,
@@ -77,17 +79,13 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				'name' => self::$change_passive_proxy,
 				'mode' => PROXY_MODE_PASSIVE,
+				'address' => "127.0.0.1",
+				'port' => 10051,
 				'description' => '_Passive description for refresh',
 				'tls_connect' => 4,
 				'tls_accept'=> 1,
 				'tls_issuer' => 'passiverefreshpsk',
-				'tls_subject' => 'passiverefreshpsk',
-				'interface' => [
-					'ip' => '127.9.9.9',
-					'dns' => 'refreshdns',
-					'useip' => '0',
-					'port' => '220'
-				]
+				'tls_subject' => 'passiverefreshpsk'
 			]
 		]);
 	}
@@ -520,18 +518,18 @@ class testFormAdministrationProxies extends CWebTest {
 				// Check Interface field for passive scenario.
 				$selector = 'xpath:.//div[@class="table-forms-separator"]/table';
 				$this->assertTrue($dialog->query($selector)->one()->isEnabled());
-				$this->assertEquals(['IP address', 'DNS name', 'Connect to', 'Port'],
+				$this->assertEquals(['Address', 'Port'],
 						$dialog->query($selector)->one()->asTable()->getHeadersText()
 				);
 
 				// Check interface fields values.
-				foreach (['ip' => '127.0.0.1', 'dns' => 'localhost', 'port' => '10051'] as $id => $value) {
+				foreach (['address' => '127.0.0.1', 'port' => '10051'] as $id => $value) {
 					$this->assertEquals($value, $dialog->query('id', $id)->one()->getValue());
 				}
-				$this->assertEquals('IP', $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue());
+				//$this->assertEquals('IP', $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue());
 
 				// Check interface fields lengths.
-				foreach (['ip' => 64, 'dns' => 255, 'port' => 64] as $id => $length) {
+				foreach (['address' => 255, 'port' => 64] as $id => $length) {
 					$this->assertEquals($length, $dialog->query('id', $id)->one()->getAttribute('maxlength'));
 				}
 			}

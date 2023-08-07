@@ -66,10 +66,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
-					'SELECT hostid'.
-					' FROM items'.
-					' WHERE templateid IS NOT NULL'.
-					' AND name='.zbx_dbstr($data['discovery']).
+						'SELECT hostid'.
+						' FROM items'.
+						' WHERE templateid IS NOT NULL'.
+						' AND name='.zbx_dbstr($data['discovery']).
 				')'
 		);
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
@@ -187,17 +187,17 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// DB check.
 		$hosts_templates = 'SELECT NULL'.
-				' FROM hosts_templates'.
-				' WHERE hostid IN ('.
-					'SELECT hostid'.
-					' FROM hosts'.
-					' WHERE host='.zbx_dbstr($data['fields']['Host name']).
-				')'.
-				' AND templateid IN ('.
-					'SELECT hostid'.
-					' FROM hosts'.
-					' WHERE host='.zbx_dbstr($data['template']).
-				')';
+						' FROM hosts_templates'.
+						' WHERE hostid IN ('.
+								'SELECT hostid'.
+								' FROM hosts'.
+								' WHERE host='.zbx_dbstr($data['fields']['Host name']).
+						')'.
+						' AND templateid IN ('.
+								'SELECT hostid'.
+								' FROM hosts'.
+								' WHERE host='.zbx_dbstr($data['template']).
+						')';
 
 		$this->assertEquals(1, CDBHelper::getCount($hosts_templates));
 
@@ -216,18 +216,18 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$sql = 'SELECT host, status, name, ipmi_authtype,'.
 				' ipmi_privilege, ipmi_username, ipmi_password,'.
 				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
-				' tls_psk_identity, tls_psk, auto_compress, flags'.
+				' tls_psk_identity, tls_psk, flags'.
 				' FROM hosts'.
 				' WHERE flags=2 AND hostid IN ('.
-					'SELECT hostid'.
-					' FROM host_discovery'.
-					' WHERE parent_itemid IN ('.
-						'SELECT itemid'.
-						' FROM items'.
-						' WHERE hostid in ('.
-							'SELECT hostid'.
-							' FROM hosts'.
-							' WHERE host='.zbx_dbstr($data).
+						'SELECT hostid'.
+						' FROM host_discovery'.
+						' WHERE parent_itemid IN ('.
+								'SELECT itemid'.
+								' FROM items'.
+								' WHERE hostid in ('.
+										'SELECT hostid'.
+										' FROM hosts'.
+										' WHERE host='.zbx_dbstr($data).
 						')'.
 					')'.
 				')'.
@@ -362,7 +362,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->assertEquals($prototype_on_template, $prototype_on_host);
 	}
 
-		public static function getCloneData() {
+	public static function getCloneData() {
 		return [
 			[
 				[
@@ -524,7 +524,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$this->zbxTestLogin('host_prototypes.php?form=update&context=host&parent_discoveryid='.$discovery_id.'&hostid='.
-				$host_prototype
+			$host_prototype
 		);
 	}
 
@@ -580,7 +580,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		);
 	}
 
-		public static function getDeleteData() {
+	public static function getDeleteData() {
 		return [
 			[
 				[

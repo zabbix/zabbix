@@ -546,7 +546,6 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'old_name' => 'Discovery rule for update',
 					'name' => 'Update name',
-					'proxy' => 'Active proxy 3',
 					'iprange' => '1.1.0.1-25',
 					'delay' => '30s',
 					'checks' => [
@@ -582,17 +581,16 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		// Check the results in DB after update.
 		$proxy = DBfetch(DBselect('SELECT proxyid FROM drules WHERE name='.zbx_dbstr($data['name'])));
 		if ($proxy['proxyid']) {
-			$discovery_db_data = CDBHelper::getRow('SELECT hosts.host AS proxy, drules.name, iprange, delay'.
-					' FROM drules'.
-					' JOIN hosts ON drules.proxyid=hostid'.
-					' WHERE drules.name='.zbx_dbstr($data['name']));
+			$discovery_db_data = CDBHelper::getRow('SELECT drules.name, iprange, delay'.
+							' FROM drules'.
+							' WHERE drules.name='.zbx_dbstr($data['name']));
 		}
 		else {
 			$discovery_db_data = CDBHelper::getRow('SELECT name, iprange, delay FROM drules WHERE name='
 				.zbx_dbstr($data['name']));
 		}
 
-		$fields = ['name', 'proxy', 'iprange', 'delay'];
+		$fields = ['name', 'iprange', 'delay'];
 		foreach ($fields as $field) {
 			if (array_key_exists($field, $data)) {
 				$this->assertEquals($data[$field], $discovery_db_data[$field]);
