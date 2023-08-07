@@ -16,7 +16,7 @@ zabbix_export:
         CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
         GRANT pg_monitor TO zbx_monitor;
         
-        2. Edit `pg_hba.conf` to allow TCP connections for user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
+        2. Edit the `pg_hba.conf` configuration file to allow TCP connections for the user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
         
         3. Install the PostgreSQL ODBC driver.
         
@@ -24,7 +24,7 @@ zabbix_export:
         
         5. Specify the host name or IP address in the `{$PG.HOST}` macro.
         
-        6. Set the password that you have specified in step 1 in the macro `{$PG.PASSWORD}`.
+        6. Set the password that you specified in step 1 in the macro `{$PG.PASSWORD}`.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/384190-%C2%A0discussion-thread-for-official-zabbix-template-db-postgresql
         
@@ -114,9 +114,9 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 1d267b6aed064d03b4f464b27c1e897e
-          name: 'PostgreSQL: Get connections'
+          name: 'PostgreSQL: Get connections sum'
           type: ODBC
-          key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+          key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -478,7 +478,7 @@ zabbix_export:
               END AS repl_status
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode'
+          description: 'Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.'
           valuemap:
             name: 'PostgreSQL replication status'
           tags:
@@ -500,10 +500,11 @@ zabbix_export:
               value: application
           triggers:
             - uuid: 22077f0b0ee54becb43ef9ab808c3e43
-              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]) < 600'
+              expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]) < 10m'
               name: 'PostgreSQL: Service has been restarted'
-              event_name: 'PostgreSQL: Service has been restarted (uptime={ITEM.LASTVALUE})'
+              event_name: 'PostgreSQL: Service has been restarted (uptime < 10m)'
               priority: AVERAGE
+              description: 'PostgreSQL uptime is less than 10 minutes.'
               tags:
                 - tag: scope
                   value: notice
@@ -605,13 +606,13 @@ zabbix_export:
             - tag: component
               value: archive
         - uuid: 01b14665e1154c748324612d1e1ac8e3
-          name: 'Bgwriter: Buffers allocated'
+          name: 'Bgwriter: Buffers allocated per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_alloc.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of buffers allocated.'
+          description: 'Number of buffers allocated per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -625,13 +626,13 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: bea9f6c0525c4a03a8ded982da45635d
-          name: 'Bgwriter: Buffers written directly by a backend'
+          name: 'Bgwriter: Buffers written directly by a backend per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_backend.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of buffers written directly by a backend.'
+          description: 'Number of buffers written directly by a backend per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -645,13 +646,13 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: c6c5e980ffde4e62a7194602eaaa4c93
-          name: 'Bgwriter: Times a backend execute its own fsync'
+          name: 'Bgwriter: Times a backend executed its own fsync per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_backend_fsync.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times a backend had to execute its own fsync call (normally the background writer handles those even when the backend does its own write).'
+          description: 'Number of times a backend had to execute its own fsync call per second (normally the background writer handles those even when the backend does its own write).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -665,13 +666,13 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: c8cbd79cf23f4ef0a374d2afabe1d204
-          name: 'Checkpoint: Buffers checkpoints written'
+          name: 'Checkpoint: Buffers written during checkpoints per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_checkpoint.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of buffers written during checkpoints.'
+          description: 'Number of buffers written during checkpoints per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -685,13 +686,13 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 79563e8b9f054ce7afc93e50c0156f6f
-          name: 'Checkpoint: Buffers background written'
+          name: 'Checkpoint: Buffers written by the background writer per second'
           type: DEPENDENT
           key: pgsql.bgwriter.buffers_clean.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of buffers written by the background writer.'
+          description: 'Number of buffers written by the background writer per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -705,13 +706,13 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 9664a657f80246a687e4f60194abd608
-          name: 'Checkpoint: Requested'
+          name: 'Checkpoint: Requested per second'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoints_req.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of requested checkpoints that have been performed.'
+          description: 'Number of requested checkpoints that have been performed per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -725,13 +726,13 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 1956bd5ce6d1456298efb28b0d41f061
-          name: 'Checkpoint: By timeout'
+          name: 'Checkpoint: Scheduled per second'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoints_timed.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of scheduled checkpoints that have been performed.'
+          description: 'Number of scheduled checkpoints that have been performed per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -745,14 +746,14 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: acdc021b00144e70a8326bd1cc1f2b28
-          name: 'Checkpoint: Checkpoint sync time'
+          name: 'Checkpoint: Checkpoint sync time per second'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoint_sync_time.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Total amount of time that has been spent in the portion of checkpoint processing where files are synchronized to disk.'
+          description: 'Total amount of time per second that has been spent in the portion of checkpoint processing where files are synchronized to disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -769,14 +770,14 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 6db37bd846e8406a965c0638bb55b230
-          name: 'Checkpoint: Checkpoint write time'
+          name: 'Checkpoint: Checkpoint write time per second'
           type: DEPENDENT
           key: pgsql.bgwriter.checkpoint_write_time.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Total amount of time that has been spent in the portion of checkpoint processing where files are written to disk.'
+          description: 'Total amount of time per second that has been spent in the portion of checkpoint processing where files are written to disk.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -793,13 +794,13 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 073572decc084ff39d5a58cabb4860a5
-          name: 'Bgwriter: Number of bgwriter stopped'
+          name: 'Bgwriter: Number of bgwriter cleaning scan stopped per second'
           type: DEPENDENT
           key: pgsql.bgwriter.maxwritten_clean.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times the background writer stopped a cleaning scan because it had written too many buffers.'
+          description: 'Number of times the background writer stopped a cleaning scan because it had written too many buffers per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -813,9 +814,9 @@ zabbix_export:
             - tag: component
               value: bgwriter
         - uuid: 6444043a810b4b2f89740c1c794a47c0
-          name: 'PostgreSQL: Cache hit'
+          name: 'PostgreSQL: Cache hit ratio, %'
           type: CALCULATED
-          key: 'pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]'
+          key: pgsql.cache.hit
           history: 7d
           value_type: FLOAT
           units: '%'
@@ -827,7 +828,7 @@ zabbix_export:
         - uuid: 5e3e5b6a244c4dfdacc7167196e28d7d
           name: 'Connections sum: Active'
           type: DEPENDENT
-          key: pgsql.connections.active
+          key: pgsql.connections.sum.active
           delay: '0'
           history: 7d
           description: 'Total number of connections executing a query.'
@@ -836,14 +837,14 @@ zabbix_export:
               parameters:
                 - $.active
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 2dd753d41b5e4c4098fef4fe5ac51060
           name: 'Connections sum: Disabled'
           type: DEPENDENT
-          key: pgsql.connections.disabled
+          key: pgsql.connections.sum.disabled
           delay: '0'
           history: 7d
           description: 'Total number of disabled connections.'
@@ -852,14 +853,14 @@ zabbix_export:
               parameters:
                 - $.disabled
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 6d379fe1fe424ed68dea03a90da81da0
           name: 'Connections sum: Fastpath function call'
           type: DEPENDENT
-          key: pgsql.connections.fastpath_function_call
+          key: pgsql.connections.sum.fastpath_function_call
           delay: '0'
           history: 7d
           description: 'Total number of connections executing a fast-path function.'
@@ -868,14 +869,14 @@ zabbix_export:
               parameters:
                 - $.fastpath_function_call
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 8b777c5628c4462580f1ae70790fb584
           name: 'Connections sum: Idle'
           type: DEPENDENT
-          key: pgsql.connections.idle
+          key: pgsql.connections.sum.idle
           delay: '0'
           history: 7d
           description: 'Total number of connections waiting for a new client command.'
@@ -884,14 +885,14 @@ zabbix_export:
               parameters:
                 - $.idle
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 7851bc86735e46a48fd5c82d83ef066a
           name: 'Connections sum: Idle in transaction'
           type: DEPENDENT
-          key: pgsql.connections.idle_in_transaction
+          key: pgsql.connections.sum.idle_in_transaction
           delay: '0'
           history: 7d
           description: 'Total number of connections in a transaction state but not executing a query.'
@@ -900,14 +901,14 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 9267653f21b445beaacd3de3e55ad4ae
           name: 'Connections sum: Idle in transaction (aborted)'
           type: DEPENDENT
-          key: pgsql.connections.idle_in_transaction_aborted
+          key: pgsql.connections.sum.idle_in_transaction_aborted
           delay: '0'
           history: 7d
           description: 'Total number of connections in a transaction state but not executing a query, and where one of the statements in the transaction caused an error.'
@@ -916,14 +917,14 @@ zabbix_export:
               parameters:
                 - $.idle_in_transaction_aborted
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 512e90360d4d4b95aa23014181697afe
           name: 'Connections sum: Prepared'
           type: DEPENDENT
-          key: pgsql.connections.prepared
+          key: pgsql.connections.sum.prepared
           delay: '0'
           history: 7d
           description: |
@@ -934,14 +935,14 @@ zabbix_export:
               parameters:
                 - $.prepared
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 4d092ed405e2410f9e1a4cdb31249fe0
           name: 'Connections sum: Total'
           type: DEPENDENT
-          key: pgsql.connections.total
+          key: pgsql.connections.sum.total
           delay: '0'
           history: 7d
           description: 'Total number of connections.'
@@ -950,14 +951,14 @@ zabbix_export:
               parameters:
                 - $.total
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 2b2ca7abb85b4ae1992cbfc6902206a1
-          name: 'Connections sum: Total %'
+          name: 'Connections sum: Total, %'
           type: DEPENDENT
-          key: pgsql.connections.total_pct
+          key: pgsql.connections.sum.total_pct
           delay: '0'
           history: 7d
           units: '%'
@@ -967,13 +968,13 @@ zabbix_export:
               parameters:
                 - $.total_pct
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
           triggers:
             - uuid: 3b6662191c3b46ac930af02797a7162b
-              expression: 'min(/PostgreSQL by ODBC/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
+              expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'PostgreSQL: Total number of connections is too high'
               event_name: 'PostgreSQL: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN}% in 5m)'
               priority: AVERAGE
@@ -984,7 +985,7 @@ zabbix_export:
         - uuid: 7f525a9b9b6a494db660649388b8cb21
           name: 'Connections sum: Waiting'
           type: DEPENDENT
-          key: pgsql.connections.waiting
+          key: pgsql.connections.sum.waiting
           delay: '0'
           history: 7d
           description: |
@@ -995,18 +996,18 @@ zabbix_export:
               parameters:
                 - $.waiting
           master_item:
-            key: 'db.odbc.select[pgsql.connections,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
+            key: 'db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]'
           tags:
             - tag: component
               value: connections
         - uuid: 6cb6aaa39f494f13b792ea0d1570f0af
-          name: 'Dbstat: Hit blocks read'
+          name: 'Dbstat: Hit blocks read per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.blks_hit.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of times disk blocks were found already in the buffer cache.'
+          description: 'Number of times per second disk blocks were found already in the buffer cache.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1020,13 +1021,13 @@ zabbix_export:
             - tag: component
               value: cache
         - uuid: 8861dbcc607b481e9f7ca6b3081530a8
-          name: 'Dbstat: Disk blocks read'
+          name: 'Dbstat: Disk blocks read per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.blks_read.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of disk blocks read.'
+          description: 'Number of disk blocks read per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1082,13 +1083,13 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: ef6c8945243f41e88a08d93e66eec666
-          name: 'Dbstat: Conflicts'
+          name: 'Dbstat: Conflicts per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.conflicts.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of queries canceled due to conflicts with recovery (conflicts occur only on standby servers; see pg_stat_database_conflicts for details).'
+          description: 'Number of queries canceled per second due to conflicts with recovery (conflicts occur only on standby servers; see pg_stat_database_conflicts for details).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1102,13 +1103,13 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 5adcf2ce06984da2b0b0600d88e88451
-          name: 'Dbstat: Deadlocks'
+          name: 'Dbstat: Deadlocks per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.deadlocks.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of deadlocks detected.'
+          description: 'Number of deadlocks detected per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1138,14 +1139,14 @@ zabbix_export:
             - tag: component
               value: backends
         - uuid: 4c18ecf383154136ad68d5d938fc83d7
-          name: 'Dbstat: Number temp bytes'
+          name: 'Dbstat: Number temp bytes per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.temp_bytes.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: b
-          description: 'Total amount of data written to temporary files by queries.'
+          description: 'Total amount of data written per second to temporary files by queries.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1159,13 +1160,13 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: 0c7ad16e40e3454aaad27a6fe4b5e62d
-          name: 'Dbstat: Number temp files'
+          name: 'Dbstat: Number temp files per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.temp_files.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of temporary files created by queries.'
+          description: 'Number of temporary files created by queries per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1179,13 +1180,13 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: e3cd2d8ec2b8454f949c69bb00e0db57
-          name: 'Dbstat: Rows deleted'
+          name: 'Dbstat: Rows deleted per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_deleted.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of rows deleted by queries.'
+          description: 'Number of rows deleted by queries per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1199,13 +1200,13 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 9f09f94dcd6744e8b6a53167b1835a16
-          name: 'Dbstat: Rows fetched'
+          name: 'Dbstat: Rows fetched per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_fetched.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of rows fetched by queries.'
+          description: 'Number of rows fetched by queries per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1219,13 +1220,13 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 916291299e624959993f8a585da6c9c0
-          name: 'Dbstat: Rows inserted'
+          name: 'Dbstat: Rows inserted per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_inserted.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of rows inserted by queries.'
+          description: 'Number of rows inserted by queries per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1239,13 +1240,13 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: fc8f68f5068240f3acd2d18443efc624
-          name: 'Dbstat: Rows returned'
+          name: 'Dbstat: Rows returned per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_returned.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of rows returned by queries.'
+          description: 'Number of rows returned by queries per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1259,13 +1260,13 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: 802d541dd0314f8fba827e6d28013b5c
-          name: 'Dbstat: Rows updated'
+          name: 'Dbstat: Rows updated per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.tup_updated.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of rows updated by queries.'
+          description: 'Number of rows updated by queries per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1279,13 +1280,13 @@ zabbix_export:
             - tag: component
               value: queries
         - uuid: c00a09d04d4443d885006b29c5c14546
-          name: 'Dbstat: Committed transactions'
+          name: 'Dbstat: Committed transactions per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.xact_commit.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of transactions that have been committed.'
+          description: 'Number of transactions that have been committed per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1299,13 +1300,13 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 8f2259521add4cc0bd5e274604172d04
-          name: 'Dbstat: Roll backed transactions'
+          name: 'Dbstat: Roll backed transactions per second'
           type: DEPENDENT
           key: pgsql.dbstat.sum.xact_rollback.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Number of transactions that have been rolled back.'
+          description: 'Number of transactions that have been rolled back per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1465,7 +1466,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of times disk blocks were found already in the buffer cache, so that a read was not necessary.'
+              description: 'Total number of times per second disk blocks were found already in the buffer cache, so that a read was not necessary.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1487,7 +1488,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of disk blocks read in this database.'
+              description: 'Total number of disk blocks read per second in this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1503,14 +1504,14 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 3ce43b1b7b874278abef353c6c791c95
-              name: 'DB [{#DBNAME}]: Disk blocks read time'
+              name: 'DB [{#DBNAME}]: Disk blocks read time per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.blk_read_time.rate["{#DBNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: s
-              description: 'Time spent reading data file blocks by backends.'
+              description: 'Time spent reading data file blocks by backends per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1529,14 +1530,14 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 9c443a5bae6b4b4c84e6272cb254a38e
-              name: 'DB [{#DBNAME}]: Disk blocks write time'
+              name: 'DB [{#DBNAME}]: Disk blocks write time per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.blk_write_time.rate["{#DBNAME}"]'
               delay: '0'
               history: 7d
               value_type: FLOAT
               units: s
-              description: 'Time spent writing data file blocks by backends.'
+              description: 'Time spent writing data file blocks by backends per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1561,7 +1562,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of queries canceled due to conflicts with recovery in this database.'
+              description: 'Total number of queries canceled due to conflicts with recovery in this database per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1595,7 +1596,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of detected deadlocks in this database.'
+              description: 'Total number of detected deadlocks in this database per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1616,7 +1617,7 @@ zabbix_export:
                   name: 'DB [{#DBNAME}]: Deadlock occurred'
                   event_name: 'DB [{#DBNAME}]: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
-                  description: 'The number of detected deadlocks in this database exceeds the limit of {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}.'
+                  description: 'Number of deadlocks detected per second exceeds {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} for 5m.'
                   tags:
                     - tag: scope
                       value: availability
@@ -1709,7 +1710,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of rows deleted by queries in this database.'
+              description: 'Total number of rows deleted by queries in this database per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1731,7 +1732,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of rows fetched by queries in this database.'
+              description: 'Total number of rows fetched by queries in this database per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1753,7 +1754,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of rows inserted by queries in this database.'
+              description: 'Total number of rows inserted by queries in this database per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1775,7 +1776,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of rows returned by queries in this database.'
+              description: 'Number of rows returned by queries in this database per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1797,7 +1798,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Total number of rows updated by queries in this database.'
+              description: 'Total number of rows updated by queries in this database per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1819,7 +1820,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Number of transactions in this database that have been committed.'
+              description: 'Number of transactions in this database that have been committed per second.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1862,7 +1863,7 @@ zabbix_export:
               key: 'pgsql.locks.accessexclusive["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of accessexclusive locks for each database.'
+              description: 'Number of accessexclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1880,7 +1881,7 @@ zabbix_export:
               key: 'pgsql.locks.accessshare["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of accessshare locks for each database.'
+              description: 'Number of accessshare locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1898,7 +1899,7 @@ zabbix_export:
               key: 'pgsql.locks.exclusive["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of exclusive locks for each database.'
+              description: 'Number of exclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1937,7 +1938,7 @@ zabbix_export:
               key: 'pgsql.locks.rowexclusive["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of rowexclusive locks for each database.'
+              description: 'Number of rowexclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1955,7 +1956,7 @@ zabbix_export:
               key: 'pgsql.locks.rowshare["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of rowshare locks for each database.'
+              description: 'Number of rowshare locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1974,7 +1975,7 @@ zabbix_export:
               key: 'pgsql.locks.sharerowexclusive["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of total sharerowexclusive for each database.'
+              description: 'Number of total sharerowexclusive for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1992,7 +1993,7 @@ zabbix_export:
               key: 'pgsql.locks.shareupdateexclusive["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of shareupdateexclusive locks for each database.'
+              description: 'Number of shareupdateexclusive locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2010,7 +2011,7 @@ zabbix_export:
               key: 'pgsql.locks.share["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of share locks for each database.'
+              description: 'Number of share locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2023,12 +2024,12 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 02f319126deb4de19d95443304d97c0d
-              name: 'DB [{#DBNAME}]: Num of total locks'
+              name: 'DB [{#DBNAME}]: Num of locks total'
               type: DEPENDENT
               key: 'pgsql.locks.total["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Number of total locks for each database.'
+              description: 'Total number of locks in this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2067,7 +2068,7 @@ zabbix_export:
               key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Slow maintenance query count.'
+              description: 'Slow maintenance query count for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2086,7 +2087,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: s
-              description: 'Max maintenance query time.'
+              description: 'Max maintenance query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2105,7 +2106,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: s
-              description: 'Sum maintenance query time.'
+              description: 'Sum maintenance query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2123,7 +2124,7 @@ zabbix_export:
               key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Slow query count.'
+              description: 'Slow query count for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2152,7 +2153,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: s
-              description: 'Max query time.'
+              description: 'Max query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2171,7 +2172,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: s
-              description: 'Sum query time.'
+              description: 'Sum query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2189,7 +2190,7 @@ zabbix_export:
               key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
               delay: '0'
               history: 7d
-              description: 'Slow transaction query count.'
+              description: 'Slow transaction query count for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2208,7 +2209,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: s
-              description: 'Max transaction query time.'
+              description: 'Max transaction query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2227,7 +2228,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               units: s
-              description: 'Sum transaction query time.'
+              description: 'Sum transaction query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:

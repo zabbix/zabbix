@@ -49,7 +49,14 @@ else {
 
 		$table->addRow([
 			$hosts,
-			(new CLinkAction($trigger['description']))->setMenuPopup(CMenuPopupHelper::getTrigger($triggerid)),
+			(new CLinkAction($trigger['description']))->setMenuPopup(
+				CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'dashboard.view')
+						->getUrl()
+				])
+			),
 			CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 			$trigger['problem_count']
 		]);

@@ -336,9 +336,14 @@ class WidgetProblems extends CTableInfo {
 
 			$problem_link = [
 				(new CLinkAction($problem['name']))
-					->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid'],
-						['show_rank_change_cause' => true]
-					))
+					->setMenuPopup(CMenuPopupHelper::getTrigger([
+						'triggerid' => $trigger['triggerid'],
+						'backurl' => (new CUrl('zabbix.php'))
+							->setArgument('action', 'dashboard.view')
+							->getUrl(),
+						'eventid' => $problem['eventid'],
+						'show_rank_change_cause' => true
+					]))
 					->setAttribute('aria-label', _xs('%1$s, Severity, %2$s', 'screen reader',
 						$problem['name'], CSeverityHelper::getName((int) $problem['severity'])
 					))
