@@ -382,6 +382,97 @@ static int	DBpatch_6050033(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050034(void)
+{
+	return DBrename_table("group_discovery", "group_discovery_tmp");
+}
+
+static int	DBpatch_6050035(void)
+{
+	const zbx_db_table_t	table =
+			{"group_discovery", "groupdiscoveryid", 0,
+				{
+					{"groupdiscoveryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050036(void)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_db_insert_t		db_insert;
+	int			ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select groupid,parent_group_prototypeid,name,lastcheck,ts_delete"
+					" from group_discovery_tmp");
+
+	zbx_db_insert_prepare(&db_insert, "group_discovery", "groupdiscoveryid", "groupid", "parent_group_prototypeid",
+			"name", "lastcheck", "ts_delete", NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	groupid, parent_group_prototypeid;
+
+		ZBX_DBROW2UINT64(groupid, row[0]);
+		ZBX_DBROW2UINT64(parent_group_prototypeid, row[1]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, parent_group_prototypeid, row[2],
+				atoi(row[3]), atoi(row[4]));
+	}
+
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "groupdiscoveryid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050037(void)
+{
+	return DBdrop_table("group_discovery_tmp");
+}
+
+static int	DBpatch_6050038(void)
+{
+	return DBcreate_index("group_discovery", "group_discovery_1", "groupid,parent_group_prototypeid", 1);
+}
+
+static int	DBpatch_6050039(void)
+{
+	return DBcreate_index("group_discovery", "group_discovery_2", "parent_group_prototypeid", 0);
+}
+
+static int	DBpatch_6050040(void)
+{
+	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_discovery", 1, &field);
+}
+
+static int	DBpatch_6050041(void)
+{
+	const zbx_db_field_t	field = {"parent_group_prototypeid", NULL, "group_prototype", "group_prototypeid", 0, 0,
+			0, 0};
+
+	return DBadd_foreign_key("group_discovery", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -422,5 +513,13 @@ DBPATCH_ADD(6050030, 0, 1)
 DBPATCH_ADD(6050031, 0, 1)
 DBPATCH_ADD(6050032, 0, 1)
 DBPATCH_ADD(6050033, 0, 1)
+DBPATCH_ADD(6050034, 0, 1)
+DBPATCH_ADD(6050035, 0, 1)
+DBPATCH_ADD(6050036, 0, 1)
+DBPATCH_ADD(6050037, 0, 1)
+DBPATCH_ADD(6050038, 0, 1)
+DBPATCH_ADD(6050039, 0, 1)
+DBPATCH_ADD(6050040, 0, 1)
+DBPATCH_ADD(6050041, 0, 1)
 
 DBPATCH_END()
