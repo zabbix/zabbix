@@ -168,7 +168,7 @@ class testFormWebScenario extends CWebTest {
 			'Enabled' => ['value' => true]
 		];
 
-		// Substitute inherited web scenario speciffic fields and check Parent web scenario field.
+		// Substitute inherited web scenario specific fields and check Parent web scenario field.
 		if (array_key_exists('scenario_name', $data)) {
 			$scenario_fields['Name'] = ['value' => $data['scenario_name'], 'enabled' => false, 'maxlength' => 64];
 			$scenario_fields['Agent']['value'] = 'Internet Explorer 10';

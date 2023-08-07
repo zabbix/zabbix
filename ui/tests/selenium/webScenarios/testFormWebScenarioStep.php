@@ -225,7 +225,7 @@ class testFormWebScenarioStep extends CWebTest {
 			$row = $table->getRow(0);
 			$this->assertSame($table_layout['headers'], $table->getHeadersText());
 
-			// Check that Add button is clickable and tha Remove button is not.
+			// Check that Add button is clickable and the Remove button is not.
 			$add_button = $table->query('button:Add')->one();
 			$this->assertTrue($add_button->isClickable());
 			$remove_button = $row->query('button:Remove')->one();
@@ -994,7 +994,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$url_field->fill($data['url']);
 		$query_table = $step_form->getField('Query fields');
 
-		// Fill in exising query fields if such are present in the data provider.
+		// Fill in existing query fields if such are present in the data provider.
 		if (array_key_exists('existing_query', $data)) {
 			$this->fillTableField($data['existing_query'], $query_table);
 		}
