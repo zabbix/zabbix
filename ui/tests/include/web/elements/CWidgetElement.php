@@ -93,6 +93,7 @@ class CWidgetElement extends CElement {
 
 		// Edit can sometimes fail, so we have to retry this operation.
 		for ($i = 0; $i < 4; $i++) {
+			// TODO: remove force: true parameter after DEV-2621 is fixed.
 			$button->click(true);
 
 			try {
