@@ -32,7 +32,7 @@ void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *config_tls, unsigned int a
 		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
 		char *ServerCertIssuer, char *ServerCertSubject);
 
-static int	zbx_config_eventlog_max_lines_per_second;
+int	zbx_config_eventlog_max_lines_per_second = 20;
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
