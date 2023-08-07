@@ -1351,7 +1351,7 @@ class CItem extends CItemGeneral {
 				}
 			}
 
-			if ($row['host_status'] != HOST_STATUS_TEMPLATE) {
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE || $row['valuemapid'] == 0) {
 				unset($row['type']);
 			}
 
