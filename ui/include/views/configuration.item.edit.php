@@ -46,7 +46,8 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('backurl', $data['backurl']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);

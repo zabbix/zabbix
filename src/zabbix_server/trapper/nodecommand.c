@@ -19,7 +19,7 @@
 
 #include "nodecommand.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "trapper_auth.h"
 
 #include "../scripts/scripts.h"
@@ -244,7 +244,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
 	zbx_vector_uint64_t	eventids;
-	zbx_vector_ptr_t	events;
+	zbx_vector_db_event_t	events;
 	zbx_vector_ptr_pair_t	webhook_params;
 	char			*user_timezone = NULL, *webhook_params_json = NULL, error[MAX_STRING_LEN];
 	zbx_db_event		*problem_event = NULL, *recovery_event = NULL;
@@ -257,7 +257,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	*error = '\0';
 	memset(&host, 0, sizeof(host));
 	zbx_vector_uint64_create(&eventids);
-	zbx_vector_ptr_create(&events);
+	zbx_vector_db_event_create(&events);
 	zbx_vector_ptr_pair_create(&webhook_params);
 
 	zbx_script_init(&script);
@@ -307,7 +307,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 
 		zbx_vector_uint64_reserve(&eventids, 2);
-		zbx_vector_ptr_reserve(&events, 2);
+		zbx_vector_db_event_reserve(&events, 2);
 
 		zbx_vector_uint64_append(&eventids, eventid);	/* problem event in element [0]*/
 
@@ -325,7 +325,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		switch (events.values_num)
 		{
 			case 1:
-				if (eventid == ((zbx_db_event *)(events.values[0]))->eventid)
+				if (eventid == (events.values[0])->eventid)
 				{
 					problem_event = events.values[0];
 				}
@@ -336,7 +336,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				}
 				break;
 			case 2:
-				if (r_eventid == ((zbx_db_event *)(events.values[0]))->eventid)
+				if (r_eventid == ((events.values[0]))->eventid)
 				{
 					problem_event = events.values[1];
 					recovery_event = events.values[0];
@@ -391,9 +391,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	/* substitute macros in script body and webhook parameters */
 
 	if (0 != hostid)	/* script on host */
-		macro_type = MACRO_TYPE_SCRIPT;
+		macro_type = ZBX_MACRO_TYPE_SCRIPT;
 	else
-		macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
+		macro_type = (NULL != recovery_event) ? ZBX_MACRO_TYPE_SCRIPT_RECOVERY : ZBX_MACRO_TYPE_SCRIPT_NORMAL;
 
 	um_handle = zbx_dc_open_user_macros();
 
@@ -479,8 +479,8 @@ fail:
 	}
 
 	zbx_vector_ptr_pair_destroy(&webhook_params);
-	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_db_free_event);
-	zbx_vector_ptr_destroy(&events);
+	zbx_vector_db_event_clear_ext(&events, zbx_db_free_event);
+	zbx_vector_db_event_destroy(&events);
 	zbx_vector_uint64_destroy(&eventids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));

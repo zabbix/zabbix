@@ -60,6 +60,8 @@
 #	define ZBX_ROW_DL	";\n"
 #endif
 
+ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
+
 static int	connection_failure;
 
 static const zbx_config_dbhigh_t	*zbx_cfg_dbhigh = NULL;
