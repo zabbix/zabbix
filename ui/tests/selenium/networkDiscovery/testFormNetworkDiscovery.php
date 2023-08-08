@@ -53,7 +53,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Get discovery rules and checks tables hash values.
 	 */
-	private static function getHash() {
+	protected static function getHash() {
 		return CDBHelper::getHash( 'SELECT * FROM drules').
 				CDBHelper::getHash('SELECT * FROM dchecks');
 	}
@@ -90,18 +90,27 @@ class testFormNetworkDiscovery extends CWebTest {
 		$max_concurrent_field = $form->getField('id:concurrency_max_type')->asSegmentedRadio();
 		$this->assertEquals($labels, $max_concurrent_field->getLabels()->asText());
 
+		$custom_checks_field = $form->query('id:concurrency_max');
 		foreach ($labels as $label) {
 			$max_concurrent_field->select($label);
-			$custom_checks_field = $form->query('id:concurrency_max');
 			$status = ($label === 'Custom') ? true : false;
 			$this->assertTrue($custom_checks_field->one()->isVisible($status));
 			$this->assertTrue($custom_checks_field->one()->isEnabled());
 		}
 
 		// Radio fields are checked separately, because they are unique elements and don't match with any Framework element.
-		foreach (['IP address', 'DNS name', 'Host name'] as $label) {
-			$this->assertTrue($form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($label).
-					"]/../input[@checked]")->exists()
+		$fields = [
+			'Device uniqueness criteria' => ['IP address' => true],
+			'Host name' => ['DNS name' => true, 'IP address' => false],
+			'Visible name' => ['Host name' => true, 'DNS name' => false, 'IP address' => false]
+		];
+		foreach ($fields as $field => $radio_list) {
+			$get_field = $form->getField($field);
+			$this->assertEquals(array_keys($radio_list),
+					$get_field->query('xpath:.//input[@type="radio"]/../label')->all()->asText()
+			);
+			$this->assertEquals(array_search(true, $radio_list),
+					$get_field->query("xpath:.//input[@checked]/../label")->one()->getText()
 			);
 		}
 
@@ -111,12 +120,12 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		// New check adding dialog.
 		$form->getField('Checks')->query('button:Add')->waitUntilClickable()->one()->click();
-		$checks_dialog = COverlayDialogElement::find()->all()->last();
+		$checks_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals('Discovery check', $checks_dialog->getTitle());
 		$checks_form = $checks_dialog->asForm();
 		$this->assertEquals(['Check type', 'Port range'], $checks_form->getLabels(CElementFilter::VISIBLE)->asText());
-		$this->assertEquals(2, $checks_dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		$this->assertEquals(['Add', 'Cancel'],
+				$checks_dialog->getFooter()->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
 
 		$check_types = [
@@ -660,13 +669,30 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					]
 				]
+			],
+			// #23.
+			[
+				[
+					'fields' => [
+						'Name' => 'Checks for device uniqueness'
+					],
+					'Checks' => [
+						['Check type' => 'LDAP'],
+						['Check type' => 'NNTP'],
+						['Check type' => 'POP'],
+						['Check type' => 'SMTP'],
+						['Check type' => 'SSH'],
+						['Check type' => 'TCP'],
+						['Check type' => 'Telnet']
+					]
+				]
 			]
 		];
 	}
 
 	public function getCreateData() {
 		return [
-			// #23.
+			// #24.
 			[
 				[
 					'fields' => [
@@ -699,11 +725,12 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function getUpdateData() {
 		return [
-			// #23.
+			// #24.
 			[
 				[
 					'fields' => [
-						'Name' => 'long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_stri'
+						// Minus 6 symbols for "update" suffix.
+						'Name' => substr(STRING_255, 0, 249)
 					],
 					'Checks' => [
 						[
@@ -746,28 +773,28 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->checkDiscoveryRuleForm($data, true);
 	}
 
-	private function checkDiscoveryRuleForm($data, $update = false) {
+	protected function checkDiscoveryRuleForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
 
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+
 		if ($update) {
-			$this->page->login()->open('zabbix.php?action=discovery.list');
 			$this->query('link', self::$update_rule)->waitUntilClickable()->one()->click();
 			$old_name = self::$update_rule;
 		}
 		else {
-			$this->page->login()->open('zabbix.php?action=discovery.list');
 			$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
 		}
 
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
 
-		if ($update && !CTestArrayHelper::get($data, 'expected')) {
-			$data['fields']['Name'] = !CTestArrayHelper::get($data, 'trim')
-				? $data['fields']['Name'].'update'
-				: $data['fields']['Name'].'update       ';
+		if ($update && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			$data['fields']['Name'] = CTestArrayHelper::get($data, 'trim', false)
+				? $data['fields']['Name'].'update       '
+				: $data['fields']['Name'].'update';
 		}
 
 		// Clear all checks from discovery rule to change them to new ones from data provider.
@@ -776,23 +803,22 @@ class testFormNetworkDiscovery extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'Checks')) {
+			$additional_labels = ['Device uniqueness criteria', 'Host name','Visible name'];
 			$add_button = $form->getField('Checks')->query('button:Add')->waitUntilClickable()->one();
+			$expected_checks = [];
 
-			if (CTestArrayHelper::get($data, 'trim', false)) {
-				foreach ($data['Checks'] as $check) {
-					$check = array_map('trim', $check);
-					$new_checks[] = $check;
-				}
-				$data['Checks'] = $new_checks;
-			}
-
-			foreach ($data['Checks'] as $i => $check) {
+			foreach ($data['Checks'] as $check) {
 				$add_button->click();
 				$check_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$checks_form = $check_dialog->asForm();
 
 				if (!CTestArrayHelper::get($check, 'default')) {
 					$checks_form->fill($check);
+				}
+
+				// Trim Check fields for expected comparison.
+				if (CTestArrayHelper::get($data, 'trim', false)) {
+					$check = array_map('trim', $check);
 				}
 
 				if (array_key_exists('Port range', $check)) {
@@ -812,7 +838,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 				$check_dialog->waitUntilNotVisible();
 
-				// Ensure that Discovery check is added to table.
+				// Ensure that Discovery check is added to the table.
 				if (CTestArrayHelper::get($check, 'default')) {
 					$type_text = 'FTP';
 				}
@@ -857,10 +883,24 @@ class testFormNetworkDiscovery extends CWebTest {
 					}
 				}
 
-				$this->assertEquals($type_text,
-						$form->getFieldContainer('Checks')->asTable()->getRow($i)->getColumn('Type')->getText()
-				);
+				if (CTestArrayHelper::get($check, 'default')) {
+					$check['Check type'] = 'FTP';
+				}
+
+				// Ensure that corresponding checks and their parameters appear or don't appear in the "radio" fields.
+				foreach ($additional_labels as $label) {
+					$field = $form->getField($label);
+					$this->assertEquals(in_array($check['Check type'],
+							['Zabbix agent', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent']),
+							$field->query('xpath:.//input[@type="radio"]/../label[text()='.CXPathHelper::escapeQuotes($type_text).
+									']')->exists()
+					);
+				}
+
+				$expected_checks[] = $type_text;
 			}
+
+			$this->assertEquals($expected_checks, $this->getTableColumnData('Type', 'id:dcheckList'));
 		}
 
 		$form->fill($data['fields']);
@@ -878,7 +918,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot'.($update ? ' update': ' create').' discovery rule',
-				$data['error_details']
+					$data['error_details']
 			);
 			$this->assertEquals($old_hash, $this->getHash());
 		}
@@ -908,6 +948,11 @@ class testFormNetworkDiscovery extends CWebTest {
 							CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists()
 					);
 				}
+			}
+
+			// Compare checks table to ensure that Discovery checks are saved correctly.
+			if (CTestArrayHelper::get($data, 'Checks')) {
+				$this->assertEquals($expected_checks, $this->getTableColumnData('Type', 'id:dcheckList'));
 			}
 
 			// Check that Discovery rule saved in  DB.
@@ -1029,7 +1074,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->query('link', self::CHECKS_RULE)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$table = $form->query('id:dcheckList')->asTable()->one();
+		$table = $form->getField('Checks')->asTable();
 
 		if ($data['Checks'] === 'remove all') {
 			$this->removeAllChecks($form);
@@ -1040,7 +1085,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					$form->getField('Checks')->query('button:Add')->waitUntilClickable()->one()->click();
 					$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$checks_form = $checks_dialog->asForm();
-					unset ($check['add']);
+					unset($check['add']);
 					$checks_form->fill($check);
 					$checks_form->submit();
 					$checks_dialog->waitUntilNotVisible();
@@ -1052,8 +1097,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					$this->assertFalse($table->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($type_text).']')->exists());
 				}
 				else {
-					$this->query('id:dcheckList')->asTable()->one()->getRow($i)
-							->query('button:Edit')->one()->waitUntilClickable()->click();
+					$table->getRow($i)->query('button:Edit')->one()->waitUntilClickable()->click();
 					$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$checks_form = $checks_dialog->asForm();
 					$checks_form->fill($check);
@@ -1072,8 +1116,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 
 				// Compare Checks table with the expected result.
-				$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
-						'Discovery rule for changing checks')->query('tag:a')->waitUntilClickable()->one()->click();
+				$this->query('link', self::CHECKS_RULE)->waitUntilClickable()->one()->click();
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->assertTableDataColumn($data['expected_checks'], 'Type', 'id:dcheckList');
 			}
@@ -1089,7 +1132,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form = $dialog->asForm();
 
 		$original_field_values = $form->getFields()->asValues();
-		$original_checks = $this->getTableResult('Type', 'id:dcheckList');
+		$original_checks = $this->getTableColumnData('Type', 'id:dcheckList');
 
 		foreach ($form->query('xpath:.//input[@checked]/../label')->all() as $checked_radio) {
 			$original_radios[] = $checked_radio->getText();
@@ -1112,7 +1155,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->assertEquals($original_field_values, $form->getFields()->asValues());
 
 		// Compare Discovery rule's Checks.
-		$this->assertEquals($original_checks, $this->getTableResult('Type', 'id:dcheckList'));
+		$this->assertEquals($original_checks, $this->getTableColumnData('Type', 'id:dcheckList'));
 
 		// Compare form's radios.
 		foreach ($form->query('xpath:.//input[@checked]/../label')->all() as $checked_radio) {
@@ -1166,7 +1209,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	}
 
 	/**
-	 * Test for checking Dicrovery rule form's actions cancelling.
+	 * Test for checking Discovery rule form's actions cancelling.
 	 *
 	 * @dataProvider getCancelData
 	 */
@@ -1230,7 +1273,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * @param CFormElement $form    discovery rule's edit form
 	 */
-	private function removeAllChecks($form) {
+	protected function removeAllChecks($form) {
 		$checks_container = $form->getFieldContainer('Checks');
 		$checks_count = $checks_container->query('xpath:.//td[contains(@id, "dcheckCell_")]')->count();
 

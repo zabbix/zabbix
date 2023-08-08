@@ -33,18 +33,15 @@ class NetworkDiscovery {
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-						// IMAP.
-						'type' => 7,
+						'type' => SVC_IMAP,
 						'ports' => 10050
 					],
 					[
-						// POP.
-						'type' => 5,
+						'type' => SVC_POP,
 						'ports' => 99
 					],
 					[
-						// Zabbix agent.
-						'type' => 9,
+						'type' => SVC_AGENT,
 						'key_' => 'system.uname',
 						'ports' => 10050,
 						'uniq' => 1
@@ -57,8 +54,7 @@ class NetworkDiscovery {
 				'status' => 1,
 				'dchecks' => [
 					[
-						// IMAP.
-						'type' => 7,
+						'type' => SVC_IMAP,
 						'ports' => 10050
 					]
 				]
@@ -70,14 +66,13 @@ class NetworkDiscovery {
 				'dchecks' => [
 					[
 						// SNMPv1 agent.
-						'type' => 10,
+						'type' => SVC_SNMPv1,
 						'ports' => 161,
 						'key_' => '.1.3.6.1.2.1.9.9.9',
 						'snmp_community'=> 'test SNMP community'
 					],
 					[
-						// SNMPv3 agent.
-						'type' => 13,
+						'type' => SVC_SNMPv3,
 						'ports' => 162,
 						'key_' => '.1.3.6.1.2.1.1.1.0',
 						'snmpv3_contextname name' => 'test_context_name',
@@ -85,8 +80,7 @@ class NetworkDiscovery {
 						'snmpv3_securitylevel' => 0
 					],
 					[
-						// HTTPS.
-						'type' => 15,
+						'type' => SVC_TELNET,
 						'ports' => 23
 					]
 				]
@@ -96,26 +90,22 @@ class NetworkDiscovery {
 				'iprange' => '192.168.2.3-255',
 				'dchecks' => [
 					[
-						// LDAP.
-						'type' => 1,
+						'type' => SVC_LDAP,
 						'ports' => 555
 					],
 					[
-						// TCP.
-						'type' => 8,
+						'type' => SVC_TCP,
 						'ports' => 9988
 					],
 					[
-						// SNMPv1 agent.
-						'type' => 10,
+						'type' => SVC_SNMPv1,
 						'ports' => 165,
 						'key_' => '.1.9.6.1.10.1.9.9.9',
 						'snmp_community'=> 'original SNMP community',
 						'uniq' => 1
 					],
 					[
-						// SNMPv3 agent.
-						'type' => 13,
+						'type' => SVC_SNMPv3,
 						'ports' => 130,
 						'key_' => '.1.3.6.1.2.1.1.1.999',
 						'snmpv3_contextname name' => 'original_context_name',
@@ -134,7 +124,7 @@ class NetworkDiscovery {
 				'status' => 1,
 				'dchecks' => [
 					[
-						'type' => 12
+						'type' => SVC_ICMPPING
 					]
 				]
 			],
@@ -143,8 +133,7 @@ class NetworkDiscovery {
 				'iprange' => '192.168.15.20-255',
 				'dchecks' => [
 					[
-						// SNMPv3 agent.
-						'type' => 13,
+						'type' => SVC_SNMPv3,
 						'ports' => 130,
 						'key_' => '.1.3.6.1.2.1.1.1.999',
 						'snmpv3_contextname name' => 'cancel_context_name',
