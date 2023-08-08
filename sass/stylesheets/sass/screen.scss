@@ -1396,6 +1396,7 @@ form {
 	}
 
 	.httpconf-steps-dynamic-row,
+	.list-accordion-item-head,
 	.overrides-list-item {
 		.drag-icon {
 			top: 0;
@@ -4804,8 +4805,11 @@ svg {
 	padding-left: 15px;
 
 	.overrides-list-item {
-		position: relative;
 		display: table-row;
+
+		.columns-wrapper {
+			position: relative;
+		}
 
 		.btn-remove {
 			position: relative;
@@ -4888,18 +4892,17 @@ svg {
 	width: calc(100% - 15px);
 
 	.list-accordion-item {
-		position: relative;
 		display: table-row;
-
-		.drag-icon {
-			top: 0;
-		}
 
 		.btn-remove {
 			position: relative;
 			right: -10px;
 			top: 3px;
 		}
+	}
+
+	.list-accordion-item-head {
+		position: relative;
 	}
 
 	.list-accordion-item-head,
