@@ -522,7 +522,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->page->login()->open(
 					$is_prototype
 						? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-						: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+						: 'host_prototypes.php?form=update&host_prototypeid='.$id.'&groupid=0'
 				);
 				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			}
@@ -542,7 +542,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->page->login()->open(
 					$is_prototype
 						? 'host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id
-						: $host_type.'s.php?form=create'
+						: 'host_prototypes.php?form=create'
 				);
 				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			}
@@ -635,7 +635,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->login()->open(
 				$is_prototype
 					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+					: 'host_prototypes.php?form=update&host_prototypeid='.$id.'&groupid=0'
 			);
 
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
@@ -746,7 +746,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 			else {
-				$this->page->login()->open($host_type.'s.php?form=create');
+				$this->page->login()->open('host_prototypes.php?form=create');
 				$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 			}
 
@@ -920,7 +920,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->open(
 				$is_prototype
 					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+					: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 			);
 			$form->invalidate();
 		}
@@ -1060,7 +1060,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		else {
 			$link = $is_prototype
 				? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-				: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
+				: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0';
 
 			$this->page->login()->open($link);
 
@@ -1288,7 +1288,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$this->page->open(
 				$is_prototype
 					? 'host_prototypes.php?form=update&context=host&parent_discoveryid='.$lld_id.'&hostid='.$id
-					: $host_type.'s.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
+					: 'host_prototypes.php?form=update&'.$host_type.'id='.$id.'&groupid=0'
 			);
 			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
 		}
@@ -1312,12 +1312,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 
 		$this->assertMacros(($data !== null) ? $data['macros'] : []);
-		if ($host_type === 'template') {
-			$this->query('xpath://label[@for="show_inherited_template_macros_1"]')->waitUntilPresent()->one()->click();
-		}
-		else {
-			$this->query('xpath://label[@for="show_inherited_macros_1"]')->waitUntilPresent()->one()->click();
-		}
+		$this->query('xpath://label[@for="show_inherited'.($host_type === 'template' ? '_template' : '').'_macros_1"]')
+				->waitUntilPresent()->one()->click();
 
 		// Get all macros defined for this host.
 		$hostmacros = CDBHelper::getAll('SELECT macro, value, description, type FROM hostmacro where hostid ='.$id);
