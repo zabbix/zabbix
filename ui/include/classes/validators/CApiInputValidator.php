@@ -266,6 +266,9 @@ class CApiInputValidator {
 
 			case API_PROMETHEUS_LABEL:
 				return self::validatePrometheusLabel($rule, $data, $path, $error);
+
+			case API_HISTORY_VALUE:
+				return self::validateHistoryValue($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -346,6 +349,7 @@ class CApiInputValidator {
 			case API_PREPROC_PARAMS:
 			case API_PROMETHEUS_PATTERN:
 			case API_PROMETHEUS_LABEL:
+			case API_HISTORY_VALUE:
 				return true;
 
 			case API_OBJECT:
@@ -4171,5 +4175,25 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param array  $rule
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateHistoryValue(array $rule, &$data, string $path, string &$error): bool {
+		if (is_float($data) || is_int($data) || is_string($data)) {
+			$data = (string) $data;
+
+			return self::checkStringUtf8(0x00, $data, $path, $error) !== false;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('a history value is expected'));
+
+		return false;
 	}
 }

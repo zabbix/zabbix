@@ -195,7 +195,8 @@ class CControllerAuditLogList extends CController {
 			CAudit::ACTION_DELETE => _('Delete'),
 			CAudit::ACTION_EXECUTE => _('Execute'),
 			CAudit::ACTION_HISTORY_CLEAR => _('History clear'),
-			CAudit::ACTION_CONFIG_REFRESH => _('Configuration refresh')
+			CAudit::ACTION_CONFIG_REFRESH => _('Configuration refresh'),
+			CAudit::ACTION_PUSH => _('Push')
 		];
 	}
 
@@ -217,6 +218,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_GRAPH => _('Graph'),
 			CAudit::RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
 			CAudit::RESOURCE_HA_NODE => _('High availability node'),
+			CAudit::RESOURCE_HISTORY => _('History'),
 			CAudit::RESOURCE_HOST => _('Host'),
 			CAudit::RESOURCE_HOST_GROUP => _('Host group'),
 			CAudit::RESOURCE_HOST_PROTOTYPE => _('Host prototype'),

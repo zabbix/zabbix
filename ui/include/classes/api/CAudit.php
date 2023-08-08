@@ -38,6 +38,7 @@ class CAudit {
 	public const ACTION_LOGIN_FAILED = 9;
 	public const ACTION_HISTORY_CLEAR = 10;
 	public const ACTION_CONFIG_REFRESH = 11;
+	public const ACTION_PUSH = 12;
 
 	/**
 	 * Audit resources.
@@ -87,6 +88,7 @@ class CAudit {
 	public const RESOURCE_TEMPLATE_GROUP = 50;
 	public const RESOURCE_CONNECTOR = 51;
 	public const RESOURCE_LLD_RULE = 52;
+	public const RESOURCE_HISTORY = 53;
 
 	/**
 	 * Audit details actions.

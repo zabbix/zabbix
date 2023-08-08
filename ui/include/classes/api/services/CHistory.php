@@ -26,7 +26,8 @@ class CHistory extends CApiService {
 
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
+		'clear' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
+		'push' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName;
@@ -350,5 +351,51 @@ class CHistory extends CApiService {
 		if (count($db_items) != count($itemids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
+	}
+
+	/**
+	 * @param array $history
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	public function push(array $history): array {
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
+			'itemid' =>	['type' => API_ID],
+			'host' =>	['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
+			'key_' =>	['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
+			'value' =>	['type' => API_HISTORY_VALUE, 'flags' => API_REQUIRED],
+			'clock' =>	['type' => API_TIMESTAMP],
+			'ns' =>		['type' => API_INT32, 'in' => '0:999999999']
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $history, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$history = array_map(static function(array $item): array {
+			return CArrayHelper::renameKeys($item, ['key_' => 'key']);
+		}, $history);
+
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		$result = $zabbix_server->pushHistory($history,
+			array_key_exists('sessionid', self::$userData) ? self::$userData['sessionid'] : self::$userData['token']
+		);
+
+		if ($result === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $zabbix_server->getError());
+		}
+
+		return [
+			'response' => 'success',
+			'data' => $result
+		];
 	}
 }
