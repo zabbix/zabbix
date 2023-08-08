@@ -63,4 +63,22 @@ class CControllerItemCreate extends CControllerItem {
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
+
+	protected function getInputForApi(): array {
+		$input = parent::getInputForApi();
+
+		$item = [
+			'templateid' => '0',
+			'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
+			'hosts' => API::Host()->get([
+				'output' => ['hostid', 'status'],
+				'hostids' => [$this->getInput('hostid')],
+				'templated_hosts' => true,
+				'editable' => true
+			])
+		];
+		$item = ['hostid' => $this->getInput('hostid')] + getSanitizedItemFields($input + $item);
+
+		return $item;
+	}
 }

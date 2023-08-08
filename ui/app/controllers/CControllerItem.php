@@ -22,29 +22,9 @@
 abstract class CControllerItem extends CController {
 
 	protected function checkPermissions(): bool {
-		if (!CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
-			return false;
-		}
-
-		if ($this->hasInput('itemids')) {
-			$itemids = $this->getInput('itemids', []);
-
-			return count($itemids) == API::Item()->get(['countOutput' => true, 'itemids' => $itemids,
-				'editable' => true
-			]);
-		}
-
-		if ($this->hasInput('itemid')) {
-			return (bool) API::Item()->get(['itemids' => [$this->getInput('itemid')], 'editable' => true]);
-		}
-
-		if ($this->hasInput('hostid')) {
-			return $this->getInput('context') === 'host'
-				? (bool) API::Host()->get(['hostids' => [$this->getInput('hostid')], 'editable' => true])
-				: (bool) API::Template()->get(['templateids' => [$this->getInput('hostid')], 'editable' => true]);
-		}
-
-		return false;
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	/**
@@ -96,7 +76,6 @@ abstract class CControllerItem extends CController {
 			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'script'				=> 'db items.params',
-			'show_inherited_tags'	=> 'in 0,1',
 			'show_inherited_tags'	=> 'in 0,1',
 			'snmp_oid'				=> 'db items.snmp_oid',
 			'ssl_cert_file'			=> 'db items.ssl_cert_file',
@@ -421,31 +400,6 @@ abstract class CControllerItem extends CController {
 
 		$input['parameters'] = $parameters;
 
-		$input = CArrayHelper::renameKeys($input, $field_map);
-
-		if ($this->getInput('itemid', 0)) {
-			// Update operation, set non editable fields from database.
-			[$item] = API::Item()->get([
-				'output' => ['templateid', 'flags', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
-				'selectHosts' => ['status'],
-				'itemids' => [$this->getInput('itemid')]
-			]);
-			$item = ['itemid' => $this->getInput('itemid')] + getSanitizedItemFields($input + $item);
-		}
-		else if ($this->getInput('hostid', 0)) {
-			$item = [
-				'templateid' => '0',
-				'flags' => ZBX_FLAG_DISCOVERY_NORMAL,
-				'hosts' => API::Host()->get([
-					'output' => ['hostid', 'status'],
-					'hostids' => [$this->getInput('hostid')],
-					'templated_hosts' => true,
-					'editable' => true
-				])
-			];
-			$item = ['hostid' => $this->getInput('hostid')] + getSanitizedItemFields($input + $item);
-		}
-
-		return $item;
+		return CArrayHelper::renameKeys($input, $field_map);
 	}
 }

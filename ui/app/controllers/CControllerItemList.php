@@ -26,17 +26,6 @@ class CControllerItemList extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$types = [
-			-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP,
-			ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT,
-			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-			ITEM_TYPE_SCRIPT
-		];
-		$value_types = [
-			-1, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
-			ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
-		];
-		$sortfields = ['name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
 		$fields = [
 			'filter_set'			=> 'in 1',
 			'filter_rst'			=> 'in 1',
@@ -46,8 +35,16 @@ class CControllerItemList extends CController {
 			'filter_name'			=> 'string',
 			'filter_key'			=> 'string',
 			'filter_valuemapids'	=> 'array_db valuemap.valuemapid',
-			'filter_type'			=> 'in '.implode(',', $types),
-			'filter_value_type'		=> 'in '.implode(',', $value_types),
+			'filter_type'			=> 'in '.implode(',', [
+				-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP,
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT,
+				ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED,
+				ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
+			]),
+			'filter_value_type'		=> 'in '.implode(',', [
+				-1, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+			]),
 			'filter_snmp_oid'		=> 'string',
 			'filter_history'		=> 'string',
 			'filter_trends'			=> 'string',
@@ -71,8 +68,10 @@ class CControllerItemList extends CController {
 			'subfilter_history'		=> 'array',
 			'subfilter_trends'		=> 'array',
 			'subfilter_tags'		=> 'array',
-			'sort'					=> 'in '.implode(',', $sortfields),
-			'sortorder'				=> 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'sort'					=> 'in '.implode(',', [
+				'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'
+			]),
+			'sortorder'				=> 'in '.implode(',', [ZBX_SORT_DOWN.','.ZBX_SORT_UP]),
 			'page'					=> 'ge 1'
 		];
 
@@ -100,7 +99,7 @@ class CControllerItemList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
 			return false;
 		}
 
