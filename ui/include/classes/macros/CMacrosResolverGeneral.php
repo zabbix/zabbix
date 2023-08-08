@@ -1142,7 +1142,7 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Calculates number formatiing macro function. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
+	 * Calculates number formatting macro function. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
 	 * parameters or value.
 	 *
 	 * @param string $value        [IN] The input value.
@@ -1172,6 +1172,28 @@ class CMacrosResolverGeneral {
 		}
 
 		return sprintf("%.*f", (int) $parameters[0], (float) $value);
+	}
+
+	/**
+	 * Calculates macro function. Returns UNRESOLVED_MACRO_STRING in case of unsupported function.
+	 *
+	 * @param string $value        [IN] The input value.
+	 * @param string $function     [IN] The function name.
+	 * @param array  $parameters   [IN] The function parameters.
+	 *
+	 * @return string
+	 */
+	private function calcMacrofunc(string $value, string $function, array $parameters) {
+		switch ($function) {
+			case 'regsub':
+			case 'iregsub':
+				return $this->macrofuncRegsub($value, $parameters, $token['function'] === 'iregsub');
+
+			case 'fmtnum':
+				return $this->macrofuncFmtnum($value, $parameters);
+		}
+
+		return UNRESOLVED_MACRO_STRING;
 	}
 
 	/**
@@ -1246,26 +1268,9 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					if ($value !== null) {
-						if (array_key_exists('function', $token)) {
-							switch ($token['function']) {
-								case 'regsub':
-								case 'iregsub':
-									$macro_value = $this->macrofuncRegsub($value, $token['parameters'],
-										$token['function'] === 'iregsub'
-									);
-									break;
-
-								case 'fmtnum':
-									$macro_value = $this->macrofuncFmtnum($value, $token['parameters']);
-									break;
-
-								default:
-									$macro_value = UNRESOLVED_MACRO_STRING;
-							}
-						}
-						else {
-							$macro_value = formatHistoryValue($value, $function);
-						}
+						$macro_value = array_key_exists('function', $token)
+							? $this->calcMacrofunc($value, $token['function'], $token['parameters'])
+							: formatHistoryValue($value, $function);
 					}
 					else {
 						$macro_value = UNRESOLVED_MACRO_STRING;
