@@ -24,7 +24,7 @@
  * @var array    $data
  */
 $table = (new CTable())
-	->setId('valuemap-table')
+	->setId($data['table_id'])
 	->setColumns([
 		(new CTableColumn(_('Name')))
 			->addStyle('width: '.ZBX_TEXTAREA_MAPPING_VALUE_WIDTH.'px;')
@@ -41,10 +41,6 @@ if (array_key_exists('with_label', $data) && $data['with_label'] === true) {
 }
 else {
 	$table->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE);
-}
-
-if (array_key_exists('source', $data) && $data['source'] === 'template') {
-	$table->setId('template-valuemap-table');
 }
 
 $buttons = [
