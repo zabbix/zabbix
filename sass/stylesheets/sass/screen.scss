@@ -1380,11 +1380,31 @@ form {
 			padding: 0 11px 0 0;
 			vertical-align: middle;
 		}
+	}
 
+	.drag-icon {
+		position: absolute;
+		top: 1px;
+		margin-right: 5px;
+	}
+
+	.list-vertical-accordion,
+	.table-forms-separator {
 		.drag-icon {
-			position: absolute;
 			top: 5px;
-			margin-right: 5px;
+		}
+	}
+
+	.httpconf-steps-dynamic-row,
+	.overrides-list-item {
+		.drag-icon {
+			top: 0;
+		}
+	}
+
+	.trigger-list {
+		.drag-icon {
+			top: 1px;
 		}
 	}
 
@@ -4784,6 +4804,7 @@ svg {
 	padding-left: 15px;
 
 	.overrides-list-item {
+		position: relative;
 		display: table-row;
 
 		.btn-remove {
@@ -4867,7 +4888,12 @@ svg {
 	width: calc(100% - 15px);
 
 	.list-accordion-item {
+		position: relative;
 		display: table-row;
+
+		.drag-icon {
+			top: 0;
+		}
 
 		.btn-remove {
 			position: relative;
