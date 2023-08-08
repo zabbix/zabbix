@@ -363,8 +363,8 @@ class CHistory extends CApiService {
 	public function push(array $history): array {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'fields' => [
 			'itemid' =>	['type' => API_ID],
-			'host' =>	['type' => API_H_NAME, 'length' => DB::getFieldLength('hosts', 'host')],
-			'key_' =>	['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
+			'host' =>	['type' => API_STRING_UTF8],
+			'key' =>	['type' => API_STRING_UTF8],
 			'value' =>	['type' => API_HISTORY_VALUE, 'flags' => API_REQUIRED],
 			'clock' =>	['type' => API_TIMESTAMP],
 			'ns' =>		['type' => API_INT32, 'in' => '0:999999999']
@@ -374,10 +374,6 @@ class CHistory extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$history = array_map(static function(array $item): array {
-			return CArrayHelper::renameKeys($item, ['key_' => 'key']);
-		}, $history);
-
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$zabbix_server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
@@ -385,9 +381,7 @@ class CHistory extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::SCRIPT_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$result = $zabbix_server->pushHistory($history,
-			array_key_exists('sessionid', self::$userData) ? self::$userData['sessionid'] : self::$userData['token']
-		);
+		$result = $zabbix_server->pushHistory($history, self::getAuthIdentifier());
 
 		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $zabbix_server->getError());

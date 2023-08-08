@@ -364,13 +364,13 @@ class testHistory extends CAPITest {
 				'expected_error' => 'Invalid parameter "/1/host": a character string is expected.'
 			],
 
-			// Check "key_" field.
-			'Test history.push: invalid "key_" (boolean)' => [
+			// Check "key" field.
+			'Test history.push: invalid "key" (boolean)' => [
 				'request' => [
-					'key_' => true
+					'key' => true
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/1/key_": a character string is expected.'
+				'expected_error' => 'Invalid parameter "/1/key": a character string is expected.'
 			],
 
 			// Check "value" field.
