@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  *
  * @onBefore prepareGroupData
  *
- * @dataSource DiscoveredHosts
+ * @dataSource DiscoveredHosts, HostGroups
  */
 class testFormHostGroup extends testFormGroups {
 
