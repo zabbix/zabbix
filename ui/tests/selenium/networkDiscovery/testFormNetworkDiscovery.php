@@ -31,10 +31,10 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	use TableTrait;
 
-	CONST DELETE_RULE = 'Discovery rule to check delete';
-	CONST CANCEL_RULE = 'Discovery rule for cancelling scenario';
-	CONST CLONE_RULE = 'Discovery rule for clone';
-	CONST CHECKS_RULE = 'Discovery rule for changing checks';
+	const DELETE_RULE = 'Discovery rule to check delete';
+	const CANCEL_RULE = 'Discovery rule for cancelling scenario';
+	const CLONE_RULE = 'Discovery rule for clone';
+	const CHECKS_RULE = 'Discovery rule for changing checks';
 
 	/**
 	 * Name of discovery rule for update scenario.
