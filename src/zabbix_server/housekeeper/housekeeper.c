@@ -197,6 +197,23 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{NULL}
 };
 
+static int	hk_history_rules_partition_is_table_name_excluded(const char *table_name)
+{
+	static const char	*hk_history_rules_partition_exclude_list_table_names[] = {
+		"history_bin", /* not hypertable yet*/
+		{NULL}
+	};
+
+	for (const char **table_name_ptr = hk_history_rules_partition_exclude_list_table_names; NULL != *table_name_ptr;
+			*table_name_ptr++)
+	{
+		if (0 == strcmp(*table_name_ptr, table_name))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: compare two delete queue items by their itemid                    *
@@ -667,7 +684,8 @@ static int	housekeeping_history_and_trends(int now)
 		/* ZBX_HK_MODE_PARTITION is set during configuration sync based on the following: */
 		/* 1. "Override item history (or trend) period" must be on 2. DB must be PostgreSQL */
 		/* 3. config.db.extension must be set to "timescaledb" */
-		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
+		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode &&
+				FAIL == hk_history_rules_partition_is_table_name_excluded(rule->table))
 		{
 			hk_drop_partition(rule->table, *rule->poption, now);
 			goto skip;
@@ -735,11 +753,11 @@ skip:
  *                                                                            *
  * Purpose: removes old records from a table according to the specified rule  *
  *                                                                            *
- * Parameters: now  - [IN] the current time in seconds                        *
- *             rule - [IN/OUT] the housekeeping rule specifying table to      *
+ * Parameters: now  - [IN] current time in seconds                            *
+ *             rule - [IN/OUT] housekeeping rule specifying table to          *
  *                    clean and the required data (fields, filters, time)     *
  *                                                                            *
- * Return value: the number of deleted records                                *
+ * Return value: number of deleted records                                    *
  *                                                                            *
  ******************************************************************************/
 static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
@@ -751,7 +769,8 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
 			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
 
-	if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
+	if (ZBX_HK_MODE_PARTITION == *rule->poption_mode &&
+			FAIL == hk_history_rules_partition_is_table_name_excluded(rule->table))
 	{
 		hk_drop_partition(rule->table, *rule->phistory, now);
 		goto ret;
