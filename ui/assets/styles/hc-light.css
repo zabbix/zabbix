@@ -2754,8 +2754,6 @@ output {
   position: relative;
   box-sizing: border-box;
   display: grid;
-  grid-template: 16.8px 1fr / max-content 1fr;
-  grid-gap: 6px 10px;
   align-items: center;
   flex-shrink: 0;
   min-height: 48px;
@@ -2774,14 +2772,6 @@ output {
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); }
   output > span {
     font-size: 1.167em; }
-  output .link-action {
-    line-height: 14px; }
-    output .link-action .arrow-down,
-    output .link-action .arrow-up {
-      margin-left: 3px; }
-  output .msg-buttons,
-  output .msg-details {
-    grid-column: 1 / -1; }
   output .msg-buttons {
     margin-top: 4px;
     text-align: right; }
@@ -2790,15 +2780,7 @@ output {
       output .msg-buttons button:not(:first-child) {
         margin-left: 10px; }
   output .msg-details {
-    overflow: hidden;
-    opacity: 1;
-    transform: scaleY(1) translateY(0); }
-    output .msg-details:first-child {
-      grid-row: 1 / -1; }
-    output .msg-details:not(:first-child) {
-      padding-top: 6px;
-      border-top: 1px dashed;
-      border-color: inherit; }
+    overflow: hidden; }
     output .msg-details ul {
       max-height: 300px;
       overflow-y: auto; }
@@ -2808,14 +2790,29 @@ output {
         margin-left: 0; }
         output .msg-details li:only-child::before {
           display: none; }
-  output.collapsed {
-    grid-template-rows: 32px 0fr;
-    grid-row-gap: 0; }
-    output.collapsed .msg-details {
-      padding-top: 0;
-      border-top: none;
-      opacity: 0;
-      transform: scaleY(0) translateY(50%); }
+  output.collapsible {
+    grid-template: 16.8px 1fr / max-content 1fr;
+    grid-gap: 6px 10px; }
+    output.collapsible .link-action {
+      line-height: 14px; }
+      output.collapsible .link-action .arrow-down,
+      output.collapsible .link-action .arrow-up {
+        margin-left: 3px; }
+    output.collapsible .msg-details {
+      grid-column: 1 / -1;
+      padding-top: 6px;
+      border-top: 1px dashed;
+      border-color: inherit;
+      opacity: 1;
+      transform: scaleY(1) translateY(0); }
+    output.collapsible.collapsed {
+      grid-template-rows: 32px 0fr;
+      grid-row-gap: 0; }
+      output.collapsible.collapsed .msg-details {
+        padding-top: 0;
+        border-top: none;
+        opacity: 0;
+        transform: scaleY(0) translateY(50%); }
   output.msg-bad {
     border-color: #dc3838; }
     output.msg-bad::before {

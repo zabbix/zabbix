@@ -745,6 +745,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 	if (title !== null) {
 		if (Array.isArray(messages) && messages.length > 0) {
 			$msg_box.prepend($link_details);
+			$msg_box.addClass(ZBX_STYLE_COLLAPSIBLE);
 		}
 		jQuery('<span>')
 			.text(title)

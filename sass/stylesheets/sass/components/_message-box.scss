@@ -2,8 +2,6 @@ output {
 	position: relative;
 	box-sizing: border-box;
 	display: grid;
-	grid-template: 16.8px 1fr / max-content 1fr;
-	grid-gap: 6px 10px;
 	align-items: center;
 	flex-shrink: 0;
 	min-height: 48px;
@@ -13,11 +11,6 @@ output {
 	border-style: solid;
 	border-width: 2px 2px 2px 60px;
 	border-radius: 4px;
-
-	@if $ui-transitions {
-		transition: grid-template-rows $ui-transition-duration,
-					grid-row-gap $ui-transition-duration;
-	}
 
 	&::before {
 		@extend %icons-font;
@@ -32,20 +25,6 @@ output {
 
 	> span {
 		font-size: $font-h4-size;
-	}
-
-	.link-action {
-		line-height: 14px;
-
-		.arrow-down,
-		.arrow-up {
-			margin-left: 3px;
-		}
-	}
-
-	.msg-buttons,
-	.msg-details {
-		grid-column: 1 / -1;
 	}
 
 	.msg-buttons {
@@ -63,24 +42,6 @@ output {
 
 	.msg-details {
 		overflow: hidden;
-		opacity: 1;
-		transform: scaleY(1) translateY(0);
-
-		@if $ui-transitions {
-			transition: padding-top $ui-transition-duration,
-						opacity $ui-transition-duration,
-						transform $ui-transition-duration;
-		}
-
-		&:first-child {
-			grid-row: 1 / -1;
-		}
-
-		&:not(:first-child) {
-			padding-top: 6px;
-			border-top: 1px dashed;
-			border-color: inherit;
-		}
 
 		ul {
 			@extend %webkit-scrollbar;
@@ -102,15 +63,49 @@ output {
 		}
 	}
 
-	&.collapsed {
-		grid-template-rows: 32px 0fr;
-		grid-row-gap: 0;
+	&.collapsible {
+		grid-template: 16.8px 1fr / max-content 1fr;
+		grid-gap: 6px 10px;
+
+		@if $ui-transitions {
+			transition: grid-template-rows $ui-transition-duration,
+						grid-row-gap $ui-transition-duration;
+		}
+
+		.link-action {
+			line-height: 14px;
+
+			.arrow-down,
+			.arrow-up {
+				margin-left: 3px;
+			}
+		}
 
 		.msg-details {
-			padding-top: 0;
-			border-top: none;
-			opacity: 0;
-			transform: scaleY(0) translateY(50%);
+			grid-column: 1 / -1;
+			padding-top: 6px;
+			border-top: 1px dashed;
+			border-color: inherit;
+			opacity: 1;
+			transform: scaleY(1) translateY(0);
+
+			@if $ui-transitions {
+				transition: padding-top $ui-transition-duration,
+							opacity $ui-transition-duration,
+							transform $ui-transition-duration;
+			}
+		}
+
+		&.collapsed {
+			grid-template-rows: 32px 0fr;
+			grid-row-gap: 0;
+
+			.msg-details {
+				padding-top: 0;
+				border-top: none;
+				opacity: 0;
+				transform: scaleY(0) translateY(50%);
+			}
 		}
 	}
 
