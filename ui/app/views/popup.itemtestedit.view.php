@@ -430,7 +430,7 @@ $output = [
 	'header' => $data['title'],
 	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TEST_EDIT),
 	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
-	'body' => $warning_box->toString().$form->toString(),
+	'body' => (new CDiv([$warning_box, $form]))->toString(),
 	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[
