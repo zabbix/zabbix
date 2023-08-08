@@ -99,10 +99,53 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$time_now = time();
 
 		$master_column = $configuration[$this->fields_values['column']];
-		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
 
-		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
-		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
+		$master_items_only_numeric_allowed = false;
+
+		switch ($master_column['data']){
+			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+				$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
+				$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed,
+					$groupids, $hostids);
+				$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
+				break;
+
+			case CWidgetFieldColumnsList::DATA_HOST_NAME:
+				$master_items = $hosts != null ? $hosts : API::Host()->get([
+						'output' => ['name'],
+						'groupids' => $groupids,
+						'hostids' => $hostids,
+						'monitored_hosts' => true,
+						'preservekeys' => true
+					]);
+
+				$master_item_values = array_column($master_items, 'name', 'hostid');
+				break;
+
+			case CWidgetFieldColumnsList::DATA_TEXT:
+				$master_items = $hosts != null ? $hosts : API::Host()->get([
+					'output' => ['name'],
+					'groupids' => $groupids,
+					'hostids' => $hostids,
+					'monitored_hosts' => true,
+					'preservekeys' => true
+				]);
+
+				$master_item_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
+					[
+						$this->fields_values['column'] =>
+							$this->fields_values['columns'][$this->fields_values['column']]['text']
+					],
+					$master_items
+				)[$this->fields_values['column']];
+				break;
+
+			default:
+				return [
+					'configuration' => $configuration,
+					'rows' => []
+				];
+		}
 
 		if (!$master_item_values) {
 			return [
@@ -265,7 +308,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_items);
 
-		$hostid_to_itemid = array_column($master_items, 'itemid', 'hostid');
+		$hostid_to_itemid = $master_column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+			? array_column($master_items, 'itemid', 'hostid')
+			: array_column($master_items, 'hostid', 'hostid');
 
 		$rows = [];
 

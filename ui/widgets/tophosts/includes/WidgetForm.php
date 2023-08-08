@@ -87,9 +87,7 @@ class WidgetForm extends CWidgetForm {
 
 		if (array_key_exists('columns', $values)) {
 			foreach ($values['columns'] as $key => $value) {
-				if ($value['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
-					$this->field_column_values[$key] = ($value['name'] === '') ? $value['item'] : $value['name'];
-				}
+				$this->field_column_values[$key] = ($value['name'] === '') ? $value['item'] : $value['name'];
 			}
 		}
 
