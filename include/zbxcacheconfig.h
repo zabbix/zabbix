@@ -791,7 +791,7 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
-/* options for hk.history_mode, trends_mode */
+/* options for hk.history_mode, trends_mode, audit_mode */
 #define ZBX_HK_MODE_DISABLED		ZBX_HK_OPTION_DISABLED
 #define ZBX_HK_MODE_REGULAR		ZBX_HK_OPTION_ENABLED
 #define ZBX_HK_MODE_PARTITION		2
