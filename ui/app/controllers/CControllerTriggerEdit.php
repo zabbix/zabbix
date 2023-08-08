@@ -40,15 +40,13 @@ class CControllerTriggerEdit extends CController {
 			'dependencies' =>						'array',
 			'description' =>						'db triggers.comments',
 			'event_name' =>							'db triggers.event_name',
-			'expression' =>							'string',
-			'expression_full' =>					'string',
+			'expression' =>							'db triggers.expression',
 			'hostid' =>								'db hosts.hostid',
 			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
 			'name' =>								'string',
 			'opdata' =>								'db triggers.opdata',
 			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>				'string',
-			'recovery_expression_full' =>			'string',
+			'recovery_expression' =>				'db triggers.recovery_expression',
 			'recovery_mode' =>						'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
 			'status' =>								'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
 			'show_inherited_tags' =>				'in 0,1',
@@ -107,7 +105,6 @@ class CControllerTriggerEdit extends CController {
 	protected function doAction() {
 		$form_fields = [
 			'hostid' => 0,
-			'dependencies' => [],
 			'context' => '',
 			'expression' => '',
 			'recovery_expression' => '',
@@ -121,7 +118,6 @@ class CControllerTriggerEdit extends CController {
 			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
 			'type' => '0',
 			'event_name' => '',
-			'db_dependencies' => [],
 			'limited' => false,
 			'tags' =>[],
 			'recovery_expression_field_readonly' => false,
@@ -136,7 +132,6 @@ class CControllerTriggerEdit extends CController {
 		$data = [];
 		$this->getInputs($data, array_keys($form_fields));
 
-
 		if ($data['form_refresh']) {
 			$data['manual_close'] = !array_key_exists('manual_close', $data)
 				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
@@ -149,6 +144,7 @@ class CControllerTriggerEdit extends CController {
 
 		$data['description'] = $this->getInput('name', '');
 		$data['comments'] = $this->getInput('description', '');
+		$data['dependencies'] =  zbx_toObject($this->getInput('dependencies', []), 'triggerid');
 
 		if ($this->trigger && $data['form_refresh'] == 0) {
 			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->trigger,
@@ -244,6 +240,14 @@ class CControllerTriggerEdit extends CController {
 				}
 			}
 
+			$data['limited'] = ($data['templateid'] != 0);
+
+			if ($data['hostid'] == 0) {
+				$data['hostid'] = $data['hosts'][0]['hostid'];
+			}
+		}
+
+		if ($data['dependencies']) {
 			$data['db_dependencies'] = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'flags'],
 				'selectHosts' => ['hostid', 'name'],
@@ -257,12 +261,6 @@ class CControllerTriggerEdit extends CController {
 			unset($dependency);
 
 			order_result($data['db_dependencies'], 'description');
-
-			$data['limited'] = ($data['templateid'] != 0);
-
-			if ($data['hostid'] == 0) {
-				$data['hostid'] = $data['hosts'][0]['hostid'];
-			}
 		}
 
 		$data['expression_full'] = $data['expression'];
