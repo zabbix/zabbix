@@ -54,7 +54,6 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
-static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size, short *events);
@@ -452,7 +451,7 @@ int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const c
 		flags = 0;
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
-	tcp_init_hints(&hints, type, flags);
+	zbx_tcp_init_hints(&hints, type, flags);
 
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
@@ -478,7 +477,7 @@ int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const c
 
 	if (NULL != source_ip)
 	{
-		tcp_init_hints(&hints, type, AI_NUMERICHOST);
+		zbx_tcp_init_hints(&hints, type, AI_NUMERICHOST);
 
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
@@ -995,7 +994,7 @@ static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip)
  * Purpose: initialize hints for getaddrinfo() call                           *
  *                                                                            *
  ******************************************************************************/
-static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags)
+void	zbx_tcp_init_hints(struct addrinfo *hints, int socktype, int flags)
 {
 	memset(hints, 0, sizeof(struct addrinfo));
 
@@ -1289,7 +1288,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	zbx_socket_clean(s);
 	s->timeout = timeout;
 
-	tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST | AI_PASSIVE);
+	zbx_tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST | AI_PASSIVE);
 	zbx_snprintf(port, sizeof(port), "%hu", listen_port);
 
 	ip = ips = (NULL == listen_ip ? NULL : strdup(listen_ip));
@@ -2447,7 +2446,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
+int	zbx_tcp_check_allowed_peers_info(ZBX_SOCKADDR *peer_info, const char *peer_list)
 {
 	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
 	int	prefix_size;
@@ -2491,8 +2490,7 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 							ZBX_IPV4_MAX_CIDR_PREFIX : ZBX_IPV6_MAX_CIDR_PREFIX);
 				}
 
-				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, s->peer_info,
-						0))
+				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, *peer_info, 0))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
@@ -2506,6 +2504,33 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 		else
 			break;
 	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if connection initiator is in list of peers                 *
+ *                                                                            *
+ * Parameters: s         - [IN] socket descriptor                             *
+ *             peer_list - [IN] comma-delimited list of allowed peers.        *
+ *                              NULL not allowed. Empty string results in     *
+ *                              return value FAIL.                            *
+ *                                                                            *
+ * Return value: SUCCEED - connection allowed                                 *
+ *               FAIL - connection is not allowed                             *
+ *                                                                            *
+ * Comments: standard, compatible and IPv4-mapped addresses are treated       *
+ *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
+{
+	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
+	int	prefix_size;
+
+	if (SUCCEED == zbx_tcp_check_allowed_peers_info(&s->peer_info, peer_list))
+		return SUCCEED;
 
 	zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", s->peer, peer_list);
 

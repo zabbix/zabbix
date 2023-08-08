@@ -244,6 +244,11 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 		recv_proxy_data(sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
 		return SUCCEED;
 	}
+	else if (0 == strcmp(request, ZBX_PROTO_VALUE_HISTORY_PUSH))
+	{
+		trapper_process_history_push(sock, jp, config_comms->config_timeout);
+		return SUCCEED;
+	}
 
 	return FAIL;
 }

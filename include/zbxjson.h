@@ -245,6 +245,8 @@
 
 #define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
 
+#define ZBX_PROTO_VALUE_HISTORY_PUSH		"history.push"
+
 #define ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS	"suppress"
 #define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"
 

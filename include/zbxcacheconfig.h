@@ -394,6 +394,8 @@ typedef struct
 }
 zbx_host_key_t;
 
+ZBX_VECTOR_DECL(host_key, zbx_host_key_t)
+
 /* housekeeping related configuration data */
 typedef struct
 {
@@ -973,6 +975,8 @@ typedef struct
 	unsigned char	meta;	/* non-zero if contains meta information (lastlogsize and mtime) */
 }
 zbx_agent_value_t;
+
+ZBX_VECTOR_DECL(agent_value, zbx_agent_value_t)
 
 void	zbx_dc_items_update_nextcheck(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
 		size_t values_num);

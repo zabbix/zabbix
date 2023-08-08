@@ -130,4 +130,9 @@ char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
+const char	*zbx_permission_string(int perm);
+int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
+int	zbx_get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids);
+int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
+
 #endif /* ZABBIX_DBWRAP_H */
