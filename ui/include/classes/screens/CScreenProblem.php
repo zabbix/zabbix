@@ -1455,10 +1455,16 @@ class CScreenProblem extends CScreenBase {
 				? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
 				: [];
 			$description[] = (new CLinkAction($problem['name']))
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid'],
-					['show_rank_change_cause' => true, 'show_rank_change_symptom' => true]
-				))
-				->addClass(ZBX_STYLE_WORDBREAK);
+				->addClass(ZBX_STYLE_WORDBREAK)
+				->setMenuPopup(CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->getUrl(),
+					'eventid' => $problem['eventid'],
+					'show_rank_change_cause' => true,
+					'show_rank_change_symptom' => true
+				]));
 
 			$opdata = null;
 
