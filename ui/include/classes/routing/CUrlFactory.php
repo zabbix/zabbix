@@ -32,10 +32,6 @@ class CUrlFactory {
 		'actionconf.php' => [
 			'remove' => ['actionid']
 		],
-		'disc_prototypes.php' => [
-			'remove' => ['itemid'],
-			'add' => ['hostid', 'parent_discoveryid']
-		],
 		'graphs.php' => [
 			'remove' => ['graphid'],
 			'add' => ['hostid', 'parent_discoveryid']

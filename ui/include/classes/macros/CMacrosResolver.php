@@ -1194,26 +1194,24 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								}
 								elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
-										? (new CLink('/'.$function['host'].'/'.$function['key_'],
-											(new CUrl('disc_prototypes.php'))
-												->setArgument('form', 'update')
-												->setArgument('itemid', $function['itemid'])
-												->setArgument('parent_discoveryid', $function['parent_itemid'])
-												->setArgument('context', $options['context'])
-										))
-											->addClass(ZBX_STYLE_LINK_ALT)
+										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
+											->addClass(ZBX_STYLE_LINK_ALT)
+											->addClass('js-update-item')
+											->setAttribute('data-itemid', $function['itemid'])
+											->setAttribute('data-parent_discoveryid', $function['parent_itemid'])
+											->setAttribute('context', $options['context'])
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
 								else {
 									$link = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 										? (new CLink('/'.$function['host'].'/'.$function['key_']))
+											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
 											->addClass('js-update-item')
 											->setAttribute('data-itemid', $function['itemid'])
 											->setAttribute('data-context', $options['context'])
-											->addClass($style)
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}

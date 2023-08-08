@@ -179,7 +179,7 @@ class CMenuHelper {
 					->setAliases([
 						'template.dashboard.list', 'template.dashboard.edit', 'item.list?context=template',
 						'triggers.php?context=template', 'graphs.php?context=template',
-						'host_discovery.php?context=template', 'disc_prototypes.php?context=template',
+						'host_discovery.php?context=template', 'item.prototype.list?context=template',
 						'trigger_prototypes.php?context=template', 'host_prototypes.php?context=template',
 						'httpconf.php?context=template'
 					])
@@ -189,7 +189,7 @@ class CMenuHelper {
 					->setAction('host.list')
 					->setAliases([
 						'item.list?context=host', 'triggers.php?context=host', 'graphs.php?context=host',
-						'host_discovery.php?context=host', 'disc_prototypes.php?context=host',
+						'host_discovery.php?context=host', 'item.prototype.list?context=host',
 						'trigger_prototypes.php?context=host', 'host_prototypes.php?context=host',
 						'httpconf.php?context=host', 'host.edit'
 					])

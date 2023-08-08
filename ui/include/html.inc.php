@@ -489,7 +489,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// item prototypes
 		$item_prototypes = new CSpan([
 			new CLink(_('Item prototypes'),
-				(new CUrl('disc_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
 					->setArgument('parent_discoveryid', $db_discovery_rule['itemid'])
 					->setArgument('context', $context)
 			),
