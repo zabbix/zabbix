@@ -3542,7 +3542,8 @@ z-bar-gauge {
 
 z-select,
 .z-select {
-  display: inline-grid; }
+  display: inline-grid;
+  vertical-align: top; }
   z-select:focus,
   .z-select:focus {
     outline: none; }

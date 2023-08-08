@@ -1,6 +1,7 @@
 z-select,
 .z-select {
 	display: inline-grid;
+	vertical-align: top;
 
 	&:focus {
 		outline: none;
