@@ -669,7 +669,6 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '@#$%^&*()_+'
 					],
-					// TODO: Update error message accordingly. host name > proxy name.
 					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
@@ -679,7 +678,6 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '😀'
 					],
-					// TODO: Update error message accordingly. host name > proxy name.
 					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
@@ -689,7 +687,6 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{$USERMACRO}'
 					],
-					// TODO: Update error message accordingly. host name > proxy name.
 					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
@@ -699,7 +696,6 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{#LLDMACRO}'
 					],
-					// TODO: Update error message accordingly. host name > proxy name.
 					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
@@ -709,7 +705,6 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'кириллица'
 					],
-					// TODO: Update error message accordingly. host name > proxy name.
 					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
