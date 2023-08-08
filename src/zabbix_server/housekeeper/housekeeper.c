@@ -201,11 +201,11 @@ static int	hk_history_rules_partition_is_table_name_excluded(const char *table_n
 {
 	static const char	*hk_history_rules_partition_exclude_list_table_names[] = {
 		"history_bin", /* not hypertable yet*/
-		{NULL}
+		NULL
 	};
 
 	for (const char **table_name_ptr = hk_history_rules_partition_exclude_list_table_names; NULL != *table_name_ptr;
-			*table_name_ptr++)
+			table_name_ptr++)
 	{
 		if (0 == strcmp(*table_name_ptr, table_name))
 			return SUCCEED;
