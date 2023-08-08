@@ -1531,7 +1531,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 }
 
 /**
- * Converts seconds to the biggest part with decimals.
+ * Converts seconds to the biggest unit of measure with decimals.
  *
  * @param int|float|string  $value            Time period in seconds
  * @param bool              $ignore_millisec  Ignores milliseconds
