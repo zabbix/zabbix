@@ -2767,7 +2767,7 @@ output {
   border-radius: 4px; }
   output::before {
     position: absolute;
-    top: 7px;
+    top: 6px;
     left: -45px;
     font-size: 32px;
     color: rgba(255, 255, 255, 0.9);

@@ -2814,7 +2814,7 @@ output {
   transition: grid-template-rows 0.3s, grid-row-gap 0.3s; }
   output::before {
     position: absolute;
-    top: 7px;
+    top: 6px;
     left: -45px;
     font-size: 32px;
     color: rgba(255, 255, 255, 0.9);
