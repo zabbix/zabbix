@@ -598,7 +598,7 @@ class testPageAdministrationProxies extends CWebTest {
 	 */
 	public function testPageAdministrationProxies_SortColumns() {
 		// Open Proxies page with proxies sorted descendingly by name.
-		$this->page->login()->open('zabbix.php?action=proxy.list&sort=host&sortorder=DESC')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=proxy.list&sort=name&sortorder=DESC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 
 		foreach (['Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)'] as $column) {

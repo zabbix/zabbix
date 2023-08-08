@@ -144,7 +144,7 @@ class Proxies {
 			$active_proxy_data[] = [
 				'name' => $proxy,
 				'mode' => PROXY_MODE_ACTIVE,
-				'address' => "127.0.0.1",
+				'address' => "127.0.0.1"
 			];
 		}
 

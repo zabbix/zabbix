@@ -630,7 +630,7 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [],
-					'error' => 'Incorrect value for field "host": cannot be empty.'
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
@@ -660,7 +660,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => ''
 					],
-					'error' => 'Incorrect value for field "host": cannot be empty.'
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			[
@@ -669,7 +669,8 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '@#$%^&*()_+'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					// TODO: Update error message accordingly. host name > proxy name.
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -678,7 +679,8 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '😀'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					// TODO: Update error message accordingly. host name > proxy name.
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -687,7 +689,8 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{$USERMACRO}'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					// TODO: Update error message accordingly. host name > proxy name.
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -696,7 +699,8 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => '{#LLDMACRO}'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					// TODO: Update error message accordingly. host name > proxy name.
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -705,7 +709,8 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'кириллица'
 					],
-					'error' => 'Invalid parameter "/1/host": invalid host name.'
+					// TODO: Update error message accordingly. host name > proxy name.
+					'error' => 'Invalid parameter "/1/name": invalid host name.'
 				]
 			],
 			[
@@ -714,9 +719,9 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'Empty IP address',
 						'Proxy mode' => 'Passive',
-						'id:ip' => ''
+						'id:address' => ''
 					],
-					'error' => 'Incorrect value for field "IP address": cannot be empty.'
+					'error' => 'Incorrect value for field "Address": cannot be empty.'
 				]
 			],
 			[
@@ -734,34 +739,11 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
-						'Proxy name' => 'Empty DNS',
-						'Proxy mode' => 'Passive',
-						'id:dns' => '',
-						'id:useip' => 'DNS'
-					],
-					'error' => 'Incorrect value for field "DNS name": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
-						'Proxy name' => 'Wrong IP',
-						'Proxy mode' => 'Passive',
-						'id:ip' => '127.0.0.999'
-					],
-					'error' => 'Invalid parameter "/1/interface/ip": an IP address is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'proxy_fields' => [
 						'Proxy name' => 'Wrong Port',
 						'Proxy mode' => 'Passive',
 						'id:port' => 65536
 					],
-					'error' => 'Invalid parameter "/1/interface/port": value must be one of 0-65535.'
+					'error' => 'Invalid parameter "/1/port": value must be one of 0-65535.'
 				]
 			],
 			[
@@ -872,8 +854,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'IPv6',
 						'Proxy mode' => 'Passive',
-						'id:ip' => '::1',
-						'id:useip' => 'IP',
+						'id:address' => '::1',
 						'id:port' => 999
 					]
 				]
@@ -901,9 +882,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy PSK',
 						'Proxy mode' => 'Passive',
-						'id:ip' => '192.168.2.3',
-						'id:dns' => 'mytesthost',
-						'id:useip' => 'DNS',
+						'id:address' => '192.168.2.3',
 						'id:port' => 65535
 					],
 					'encryption_fields' => [
@@ -933,8 +912,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'IPv6 _2',
 						'Proxy mode' => 'Passive',
-						'id:ip' => 'fe80::1ff:fe23:4567:890a',
-						'id:useip' => 'IP',
+						'id:address' => 'fe80::1ff:fe23:4567:890a',
 						'id:port' => 0
 					]
 				]
@@ -989,9 +967,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy Certificate',
 						'Proxy mode' => 'Passive',
-						'id:ip' => '192.168.3.99',
-						'id:dns' => 'mytesthost',
-						'id:useip' => 'IP'
+						'id:address' => '192.168.3.99',
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'Certificate',
@@ -1136,7 +1112,7 @@ class testFormAdministrationProxies extends CWebTest {
 			$dialog->close();
 
 			// Check DB.
-			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM hosts WHERE host='.zbx_dbstr($data['proxy_fields']['Proxy name'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM proxy WHERE name ='.zbx_dbstr($data['proxy_fields']['Proxy name'])));
 
 			if ($update) {
 				self::$update_proxy = $data['proxy_fields']['Proxy name'];
@@ -1311,9 +1287,7 @@ class testFormAdministrationProxies extends CWebTest {
 			'proxy_fields' => [
 				'Proxy name' => 'Proxy for cancel',
 				'Proxy mode' => 'Passive',
-				'id:ip' => '192.8.8.8',
-				'id:dns' => 'canceldns',
-				'id:useip' => 'DNS',
+				'id:address' => '192.8.8.8',
 				'id:port' => 222,
 				'Description' => 'Description for cancel'
 			],
