@@ -3525,6 +3525,7 @@ form.is-loading {
   .table-forms .table-forms-separator .drag-icon {
     top: 5px; }
   .table-forms .httpconf-steps-dynamic-row .drag-icon,
+  .table-forms .list-accordion-item-head .drag-icon,
   .table-forms .overrides-list-item .drag-icon {
     top: 0; }
   .table-forms .trigger-list .drag-icon {
@@ -5838,8 +5839,9 @@ svg {
   max-width: 738px;
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
-    position: relative;
     display: table-row; }
+    .overrides-list .overrides-list-item .columns-wrapper {
+      position: relative; }
     .overrides-list .overrides-list-item .btn-remove {
       position: relative;
       right: -73px;
@@ -5898,14 +5900,13 @@ svg {
   padding-left: 15px;
   width: calc(100% - 15px); }
   .list-vertical-accordion .list-accordion-item {
-    position: relative;
     display: table-row; }
-    .list-vertical-accordion .list-accordion-item .drag-icon {
-      top: 0; }
     .list-vertical-accordion .list-accordion-item .btn-remove {
       position: relative;
       right: -10px;
       top: 3px; }
+  .list-vertical-accordion .list-accordion-item-head {
+    position: relative; }
   .list-vertical-accordion .list-accordion-item-head,
   .list-vertical-accordion .list-accordion-item-body {
     padding-bottom: 2px; }
