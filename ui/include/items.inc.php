@@ -1530,8 +1530,18 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 	}
 }
 
-function convertUnitSWithDecimals($value, $ignore_millisec = false, $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
-		$decimals_exact = false) {
+/**
+ * Converts seconds to the biggest part with decimals.
+ *
+ * @param int|float|string  $value            Time period in seconds
+ * @param bool              $ignore_millisec  Ignores milliseconds
+ * @param int               $decimals         Max number of first non-zero decimals to display
+ * @param bool              $decimals_exact   Display exactly this number of decimals instead of first non-zeros
+ *
+ * @return string
+ */
+function convertUnitSWithDecimals($value, bool $ignore_millisec = false, int $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		bool $decimals_exact = false): string {
 	$value = (float)$value;
 	$part = '';
 	$result = 0;
