@@ -637,7 +637,9 @@
 				? <?= json_encode(_('New trigger')) ?>
 				: <?= json_encode(_('New trigger prototype')) ?>;
 
-			const fields = this.form.querySelectorAll("input[readonly], input[disabled], textarea[readonly]");
+			const fields = this.form.querySelectorAll(
+				"input[readonly], input[disabled], textarea[readonly], button[disabled]"
+			);
 
 			fields.forEach((field) => {
 				field.removeAttribute("readonly");

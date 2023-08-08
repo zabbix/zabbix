@@ -312,14 +312,6 @@ $trigger_form_grid
 		)
 	]);
 
-// Append status to form list.
-if (!$data['triggerid']) {
-	$status = true;
-}
-else {
-	$status = ($data['status'] == TRIGGER_STATUS_ENABLED);
-}
-
 $trigger_form_grid
 	->addItem([
 		new CLabel([
@@ -344,7 +336,9 @@ $trigger_form_grid
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 			->setReadonly($discovered_trigger)
 	])
-	->addItem([new CLabel(_('Enabled')), new CFormField((new CCheckBox('status'))->setChecked($status))]);
+	->addItem([new CLabel(_('Enabled')), new CFormField((new CCheckBox('status'))->setChecked(
+		$data['status'] == TRIGGER_STATUS_ENABLED
+	))]);
 
 // Append tabs to form.
 $triggers_tab = new CTabView();

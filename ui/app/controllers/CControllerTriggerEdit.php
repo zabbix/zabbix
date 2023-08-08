@@ -35,13 +35,29 @@ class CControllerTriggerEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'context' =>							'in '.implode(',', ['host', 'template']),
-			'hostid' =>								'db hosts.hostid',
-			'triggerid' =>							'db triggers.triggerid',
-			'name' =>								'string',
+			'correlation_mode' =>					'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
+			'correlation_tag' =>					'db triggers.correlation_tag',
+			'dependencies' =>						'array',
+			'description' =>						'db triggers.comments',
+			'event_name' =>							'db triggers.event_name',
 			'expression' =>							'string',
+			'expression_full' =>					'string',
+			'hostid' =>								'db hosts.hostid',
+			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
+			'name' =>								'string',
+			'opdata' =>								'db triggers.opdata',
+			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
+			'recovery_expression' =>				'string',
+			'recovery_expression_full' =>			'string',
+			'recovery_mode' =>						'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
+			'status' =>								'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
 			'show_inherited_tags' =>				'in 0,1',
 			'form_refresh' =>						'in 0,1',
-			'tags' =>								'array'
+			'tags' =>								'array',
+			'triggerid' =>							'db triggers.triggerid',
+			'type' =>								'db triggers.type|in 0,1',
+			'url' =>								'db triggers.url',
+			'url_name' =>							'db triggers.url_name'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -89,34 +105,52 @@ class CControllerTriggerEdit extends CController {
 	}
 
 	protected function doAction() {
-		$data = [
-			'hostid' => $this->getInput('hostid', 0),
+		$form_fields = [
+			'hostid' => 0,
 			'dependencies' => [],
-			'context' => $this->getInput('context', ''),
-			'expression' => $this->getInput('expression', ''),
+			'context' => '',
+			'expression' => '',
 			'recovery_expression' => '',
 			'expression_full' => '',
 			'recovery_expression_full' => '',
-			'manual_close' => 1,
-			'correlation_mode' => 0,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED,
+			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
 			'correlation_tag' => '',
-			'description' => $this->getInput('name', ''),
 			'opdata' => '',
 			'priority' => '0',
-			'recovery_mode' => 0,
+			'recovery_mode' => ZBX_RECOVERY_MODE_EXPRESSION,
 			'type' => '0',
 			'event_name' => '',
 			'db_dependencies' => [],
 			'limited' => false,
-			'tags' => $this->getInput('tags', []),
+			'tags' =>[],
 			'recovery_expression_field_readonly' => false,
 			'triggerid' => null,
-			'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
-			'form_refresh' => $this->getInput('form_refresh', 0),
-			'templates' => []
+			'show_inherited_tags' => 0,
+			'form_refresh' => 0,
+			'templates' => [],
+			'url' => '',
+			'url_name' => ''
 		];
 
-		if ($this->trigger) {
+		$data = [];
+		$this->getInputs($data, array_keys($form_fields));
+
+
+		if ($data['form_refresh']) {
+			$data['manual_close'] = !array_key_exists('manual_close', $data)
+				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
+				: ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
+
+			$data['status'] = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+		}
+
+		$data += $form_fields;
+
+		$data['description'] = $this->getInput('name', '');
+		$data['comments'] = $this->getInput('description', '');
+
+		if ($this->trigger && $data['form_refresh'] == 0) {
 			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->trigger,
 				['sources' => ['expression', 'recovery_expression']]
 			);
@@ -225,13 +259,14 @@ class CControllerTriggerEdit extends CController {
 			order_result($data['db_dependencies'], 'description');
 
 			$data['limited'] = ($data['templateid'] != 0);
-			$data['expression_full'] = $data['expression'];
-			$data['recovery_expression_full'] = $data['recovery_expression'];
 
 			if ($data['hostid'] == 0) {
 				$data['hostid'] = $data['hosts'][0]['hostid'];
 			}
 		}
+
+		$data['expression_full'] = $data['expression'];
+		$data['recovery_expression_full'] = $data['recovery_expression'];
 
 		if (!$data['tags']) {
 			$data['tags'][] = ['tag' => '', 'value' => ''];
