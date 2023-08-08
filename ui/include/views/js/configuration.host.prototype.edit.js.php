@@ -78,10 +78,10 @@
 				document.getElementById('custom_interfaces'),
 				document.getElementById('interface-add'),
 				{
-					parent_is_template: this.parent_host_status,
+					parent_is_template: this.parent_host_status == <?= HOST_STATUS_TEMPLATE ?>,
 					is_templated: this.prototype_templateid != 0,
-					inherited_interfaces: Object.values(this.parent_host_interfaces),
-					custom_interfaces: Object.values(this.prototype_interfaces)
+					inherited_interfaces: this.parent_host_interfaces,
+					custom_interfaces: this.prototype_interfaces
 				}
 			);
 
@@ -103,7 +103,7 @@
 				this.addGroupPrototypeRow({name: group_prototype.name});
 			});
 
-			if (this.prototype_templateid) {
+			if (this.prototype_templateid != 0) {
 				jQuery('#tbl_group_prototypes').find('input').prop('readonly', true);
 				jQuery('#tbl_group_prototypes').find('button').prop('disabled', true);
 			}

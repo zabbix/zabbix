@@ -221,16 +221,15 @@ $group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
 	(new CRow([
 		new CCol(
 			(new CTextBox('group_prototypes[#{i}][name]', '#{name}'))
-				->addClass('macro')
 				->addStyle('width: 448px')
 				->setAttribute('placeholder', '{$MACRO}')
 		),
-		(new CButtonLink(_('Remove')))
-			->setAttribute('name', 'remove')
-			->addClass('group-prototype-remove')
-	]))
-		->addClass(ZBX_STYLE_NOWRAP)
-		->addClass('form_row')
+		(new CCol(
+			(new CButtonLink(_('Remove')))
+				->setAttribute('name', 'remove')
+				->addClass('group-prototype-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))->addClass('form_row')
 );
 
 $host_interface_template = (new CTemplateTag('host-interface-row-tmpl'))->addItem(
@@ -559,11 +558,11 @@ $html_page
 		'readonly' => $data['readonly'],
 		'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
 		'linked_templates' => $data['macros_tab']['linked_templates'],
-		'group_prototypes' => $data['host_prototype']['groupPrototypes'],
-		'prototype_templateid' => $data['host_prototype']['templateid'],
-		'prototype_interfaces' => $data['host_prototype']['interfaces'],
-		'parent_host_interfaces' => $data['parent_host']['interfaces'],
-		'parent_host_status' => $data['parent_host']['status']
+		'group_prototypes' => $host_prototype['groupPrototypes'],
+		'prototype_templateid' => $host_prototype['templateid'],
+		'prototype_interfaces' => array_values($host_prototype['interfaces']),
+		'parent_host_interfaces' => array_values($parent_host['interfaces']),
+		'parent_host_status' => $parent_host['status']
 	]).');
 '))
 	->setOnDocumentReady()
