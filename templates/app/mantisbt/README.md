@@ -31,6 +31,7 @@ This template has been tested on:
 |{$MANTIS.TOKEN}|<p>MantisBT Token.</p>||
 |{$MANTIS.LLD.FILTER.PROJECTS.MATCHES}|<p>Filter of discoverable projects.</p>|`.*`|
 |{$MANTIS.LLD.FILTER.PROJECTS.NOT_MATCHES}|<p>Filter to exclude discovered projects.</p>|`CHANGE_IF_NEEDED`|
+|{$MANTIS.HTTP.PROXY}|<p>Proxy for http requests.</p>||
 
 ### Items
 

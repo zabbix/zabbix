@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-02T17:29:05Z'
+  date: '2023-08-08T18:34:03Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -30,6 +30,7 @@ zabbix_export:
           description: 'Get projects from Mantis BT.'
           timeout: 30s
           url: '{$MANTIS.URL}/api/rest/projects/'
+          http_proxy: '{$MANTIS.HTTP.PROXY}'
           headers:
             - name: Authorization
               value: '{$MANTIS.TOKEN}'
@@ -626,6 +627,7 @@ zabbix_export:
               description: 'Getting project issues.'
               timeout: 30s
               url: '{$MANTIS.URL}/api/rest/issues?project_id={#ID}&page_size=0'
+              http_proxy: '{$MANTIS.HTTP.PROXY}'
               headers:
                 - name: Authorization
                   value: '{$MANTIS.TOKEN}'
@@ -864,6 +866,8 @@ zabbix_export:
         - tag: target
           value: mantis-bt
       macros:
+        - macro: '{$MANTIS.HTTP.PROXY}'
+          description: 'Proxy for http requests.'
         - macro: '{$MANTIS.LLD.FILTER.PROJECTS.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable projects.'
