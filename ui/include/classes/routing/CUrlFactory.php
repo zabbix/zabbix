@@ -29,6 +29,9 @@ class CUrlFactory {
 	 * @var array
 	 */
 	protected static $contextConfigs = [
+		'actionconf.php' => [
+			'remove' => ['actionid']
+		],
 		'disc_prototypes.php' => [
 			'remove' => ['itemid'],
 			'add' => ['hostid', 'parent_discoveryid']
