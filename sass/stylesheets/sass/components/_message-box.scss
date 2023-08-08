@@ -43,9 +43,13 @@ output {
 		}
 	}
 
+	.msg-buttons,
+	.msg-details {
+		grid-column: 1 / -1;
+	}
+
 	.msg-buttons {
-		width: 100%;
-		margin-top: 10px;
+		margin-top: 4px;
 		text-align: right;
 
 		button {
@@ -58,9 +62,7 @@ output {
 	}
 
 	.msg-details {
-		grid-column: 1 / -1;
 		overflow: hidden;
-		width: 100%;
 		opacity: 1;
 		transform: scaleY(1) translateY(0);
 

@@ -2821,18 +2821,18 @@ output {
     output .link-action .arrow-down,
     output .link-action .arrow-up {
       margin-left: 3px; }
+  output .msg-buttons,
+  output .msg-details {
+    grid-column: 1 / -1; }
   output .msg-buttons {
-    width: 100%;
-    margin-top: 10px;
+    margin-top: 4px;
     text-align: right; }
     output .msg-buttons button {
       font-size: 1.167em; }
       output .msg-buttons button:not(:first-child) {
         margin-left: 10px; }
   output .msg-details {
-    grid-column: 1 / -1;
     overflow: hidden;
-    width: 100%;
     opacity: 1;
     transform: scaleY(1) translateY(0);
     transition: padding-top 0.3s, opacity 0.3s, transform 0.3s; }
