@@ -27,7 +27,7 @@ class CControllerTemplateDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'templateids' =>	'not_empty|array_db hosts.hostid',
+			'templateids' =>	'required|array_db hosts.hostid',
 			'clear' =>			'in 1'
 		];
 
@@ -55,24 +55,24 @@ class CControllerTemplateDelete extends CController {
 	 */
 	protected function doAction(): void {
 		$templateids = $this->getInput('templateids');
-		$writable = true;
+		$result = false;
 
-		if ($this->getInput('templateids')) {
-			$templates = API::Template()->get([
-				'output' => [],
-				'templateids' =>$templateids,
-				'editable' => true
-			]);
-
-			if (!$templates) {
-				$writable = false;
-			}
-		}
+		$writeble_templates = API::Template()->get([
+			'output' => [],
+			'templateids' => $templateids,
+			'editable' => true,
+			'countOutput' => true
+		]);
 
 		try {
 			DBstart();
 
-			if (!$this->hasInput('clear') && $writable) {
+			if ($writeble_templates != count($templateids)) {
+				error(_('No permissions to referred object or it does not exist!'));
+				throw new Exception();
+			}
+
+			if (!$this->hasInput('clear')) {
 				$hosts = API::Host()->get([
 					'output' => [],
 					'templateids' => $templateids,
