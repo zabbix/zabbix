@@ -1475,6 +1475,14 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 				];
 			}
 
+			if ($item['units'] === 's' && $decimals !== 0) {
+				return [
+					'value' => convertUnitSWithDecimals($value, false, $decimals, true),
+					'units' => '',
+					'is_mapped' => false
+				];
+			}
+
 			$convert_options = [
 				'value' => $value,
 				'units' => $item['units']
@@ -1520,6 +1528,39 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 				'is_mapped' => false
 			];
 	}
+}
+
+function convertUnitSWithDecimals($value, $ignore_millisec = false, $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		$decimals_exact = false) {
+	$value = (float)$value;
+	$part = '';
+	$result = 0;
+
+	foreach ([
+		'y' => SEC_PER_YEAR,
+		'M' => SEC_PER_MONTH,
+		'd' => SEC_PER_DAY,
+		'h' => SEC_PER_HOUR,
+		'm' => SEC_PER_MIN,
+		's' => 1
+	] as $key => $sec_per_part) {
+		if (floor($value / $sec_per_part) > 0) {
+			$part = $key;
+			$result = $value / $sec_per_part;
+			break;
+		}
+	}
+
+	if ($part === '' && $ignore_millisec) {
+		$part = 's';
+		$result = $value;
+	}
+	elseif ($part === '') {
+		$part = 'ms';
+		$result = $value * 1000;
+	}
+
+	return formatFloat($result, ['decimals' => $decimals, 'decimals_exact' => $decimals_exact]).$part;
 }
 
 /**
