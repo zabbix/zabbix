@@ -2768,8 +2768,8 @@ output {
   output::before {
     position: absolute;
     top: 7px;
-    left: -43px;
-    font-size: 28px;
+    left: -45px;
+    font-size: 32px;
     color: rgba(255, 255, 255, 0.9);
     text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); }
   output > span {
@@ -2851,7 +2851,7 @@ output {
     padding-top: 4px;
     padding-bottom: 4px;
     margin: 0;
-    min-height: 33px; }
+    min-height: 37px; }
     output.msg-global-footer::before {
       top: 1px; }
 
