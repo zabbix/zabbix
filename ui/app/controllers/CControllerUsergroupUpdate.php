@@ -22,7 +22,6 @@
 class CControllerUsergroupUpdate extends CController {
 
 	protected function checkInput() {
-		sdff($this->getInputAll());
 		$fields = [
 			'usrgrpid' =>				'required|db usrgrp.usrgrpid',
 			'name' =>					'not_empty|db usrgrp.name',

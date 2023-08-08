@@ -31,16 +31,21 @@ window.tag_filter_popup = new class {
 		this.tag_filter_counter = 0;
 
 		if (tag_filters.length !== 0 && tag_filters[0]['tag'] !== '') {
-			const tags_list_radio = document.querySelector(`input[name="filter_type"][value="1"]`);
-			tags_list_radio.checked = true;
-		}
-		else {
-			this.#addTagFilterRow();
+			const tag_list_option = document.querySelector(`input[name="filter_type"][value='<?= TAG_FILTER_LIST ?>']`);
+			tag_list_option.checked = true;
+
+			for (const tag of tag_filters) {
+				this.#addTagFilterRow(tag);
+			}
 		}
 
-		for (let tag of tag_filters) {
-			this.#addTagFilterRow(tag);
-		}
+		this.#toggleTagList();
+
+		document.querySelectorAll('[name=filter_type]').forEach((type) => {
+			type.addEventListener('change', () =>
+				this.#toggleTagList()
+			);
+		});
 
 		document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 
@@ -51,27 +56,30 @@ window.tag_filter_popup = new class {
 		});
 
 		const multiselect = document.getElementById('ms_new_tag_filter_groupids_');
-
 		jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
 	}
 
 	#addTagFilterRow(tag = []) {
 		const rowid = this.tag_filter_counter++;
 		const data = {
-			'rowid': rowid
+			'rowid': rowid,
+			'tag': tag.length !== 0 ? tag.tag : '',
+			'value': tag.length !== 0 ? tag.value : ''
 		};
 
 		const new_row = this.tag_filter_template.evaluate(data);
 
 		const placeholder_row = document.querySelector('.js-tag-filter-row-placeholder');
 		placeholder_row.insertAdjacentHTML('beforebegin', new_row);
+	}
 
-		if (tag.length !== 0) {
-			const tag_id = 'tag_filter_tag_'+rowid;
-			document.getElementById(tag_id).value = tag.tag;
+	#toggleTagList() {
+		const tag_list_radio = document.querySelector('[name="filter_type"]:checked').value;
+		const tags = document.getElementById('tag-list-form-field');
+		const tags_label = document.querySelector("label[for='tag_filters']");
+		const show_tags = tag_list_radio == '<?= TAG_FILTER_LIST?>';
 
-			const value_id = 'tag_filter_value_'+rowid;
-			document.getElementById(value_id).value = tag.value;
-		}
+		tags.style.display = show_tags ? '' : 'none';
+		tags_label.style.display = show_tags ? '' : 'none';
 	}
 }

@@ -64,7 +64,7 @@ class CControllerPopupTagFilterEdit extends CController {
 		$this->getInputs($data, array_keys($data));
 
 		$data += [
-			'title' => _('Tag filter'),
+			'title' => $data['edit'] == 0 ? _('New tag filter') : _('Tag filter'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

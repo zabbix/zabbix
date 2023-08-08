@@ -38,7 +38,7 @@ $form_grid = new CFormGrid();
 
 $new_tag_filter_table = (new CTable())
 	->setId('new-tag-filter-table')
-	->setAttribute('style', 'width: 100%;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_FILTER_STANDARD_WIDTH.'px;')
 	->setHeader([_('Name'), _('Value'), _('Action')])
 	->addRow((new CRow())->addClass('js-tag-filter-row-placeholder'))
 	->addRow([
@@ -46,6 +46,8 @@ $new_tag_filter_table = (new CTable())
 			->addClass('js-add-tag-filter-row')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
+
+$show_tags_list = count($data['tags']) == 0 || (count($data['tags']) == 1 && $data['tags'][0]['tag'] == '') ? 0 : 1;
 
 $form_grid
 	->addItem([
@@ -60,7 +62,8 @@ $form_grid
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'ms_new_tag_filter_groupids_'
+						'dstfld1' => 'ms_new_tag_filter_groupids_',
+						'disableids' => array_column($data['host_groups_ms'], 'id')
 					]
 				],
 				'add_post_js' => false
@@ -72,38 +75,34 @@ $form_grid
 	->addItem([
 		new CLabel(_('Filter'), 'filter_type'),
 		new CFormField(
-			(new CRadioButtonList('filter_type', 0))
-				->addValue(_('All tags'), 0)
-				->addValue(_('Tag list'), 1)
+			(new CRadioButtonList('filter_type', $show_tags_list))
+				->addValue(_('All tags'), TAG_FILTER_ALL)
+				->addValue(_('Tag list'), TAG_FILTER_LIST)
 				->setModern(true)
 		)
 	])
 	->addItem([
 		(new CLabel(_('Tags'), 'tag_filters')),
-		new CFormField(
-			(new CDiv(
-				$new_tag_filter_table
-			))->addClass('table-forms-separator')
-		)
+		(new CFormField(
+			(new CDiv($new_tag_filter_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		))
+		->setId('tag-list-form-field')
 	]);
 
 $tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
 	(new CRow([
-		(new CCol(
-			(new CTextBox('tag_filter[tag][#{rowid}]'))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('placeholder', _('tag'))
-		))->setAttribute('style', 'vertical-align: top'),
-		(new CCol(
-			(new CTextBox('tag_filter[value][#{rowid}]'))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('placeholder', _('value'))
-		))->setAttribute('style', 'vertical-align: top'),
-		(new CCol(
-			(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
-		))->setAttribute('style', 'vertical-align: top')
-	]))
-		->addClass('form_row')
+		(new CTextBox('tag_filter[tag][#{rowid}]', '#{tag}', false,
+			DB::getFieldLength('tag_filter', 'tag')
+		))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setAttribute('placeholder', _('tag')),
+		(new CTextBox('tag_filter[value][#{rowid}]', '#{value}', false,
+			DB::getFieldLength('tag_filter', 'value')
+		))
+			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setAttribute('placeholder', _('value')),
+		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
+	]))->addClass('form_row')
 );
 
 $form_grid->addItem($tag_filter_row_template);
