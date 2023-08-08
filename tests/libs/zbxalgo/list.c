@@ -59,7 +59,7 @@ static void	test_list_range_values(int iterations, zbx_vector_ptr_t *values)
 	{
 		for (i = 0; i < values->values_num; i++)
 		{
-			zbx_list_append(&list, values->values[i], NULL);
+			(void)zbx_list_append(&list, values->values[i], NULL);
 		}
 
 		for (i = 0; i < values->values_num; i++)

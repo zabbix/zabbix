@@ -215,7 +215,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 			switch ($selector) {
 				case 'id:dashboard-config':
-					$controls->query($selector)->one()->click();
+					$controls->query($selector)->waitUntilClickable()->one()->click();
 					$this->checkDialogue('Dashboard properties');
 					break;
 
@@ -1108,10 +1108,10 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
 		}
 		else {
-			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Geomap', 'Graph',
-					'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
-					'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-					'Top hosts', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
+					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
+					'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+					'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

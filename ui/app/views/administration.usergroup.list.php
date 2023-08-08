@@ -197,7 +197,8 @@ foreach ($this->data['usergroups'] as $usergroup) {
 			$data['allowed_ui_users']
 				? new CLink(_('Users'), (new CUrl('zabbix.php'))
 					->setArgument('action', 'user.list')
-					->setArgument('filter_usrgrpid', $usergroup['usrgrpid'])
+					->setArgument('filter_usrgrpids', [$usergroup['usrgrpid']])
+					->setArgument('filter_set', '1')
 					->getUrl()
 				)
 				: _('Users'),

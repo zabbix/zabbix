@@ -2494,12 +2494,12 @@ zabbix_export:
           master_item:
             key: 'web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/queues"]'
           lld_macro_paths:
-            - lld_macro: '{#NODE}'
-              path: $.node
             - lld_macro: '{#QUEUE}'
               path: $.name
             - lld_macro: '{#VHOST}'
               path: $.vhost
+            - lld_macro: '{#NODE}'
+              path: $.node
       tags:
         - tag: class
           value: software

@@ -405,4 +405,76 @@ class CGraphPrototype extends CGraphGeneral {
 
 		return $result;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected static function checkDuplicates(array $graphs): void {
+		$_graph_indexes = [];
+
+		foreach ($graphs as $i => $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				$_graph_indexes[$gitem['itemid']][] = $i;
+			}
+		}
+
+		$result = DBselect(
+			'SELECT i.itemid,id.parent_itemid'.
+			' FROM items i,item_discovery id'.
+			' WHERE i.itemid=id.itemid'.
+				' AND '.dbConditionId('i.itemid', array_keys($_graph_indexes)).
+				' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE])
+		);
+
+		$graph_indexes = [];
+
+		while ($row = DBfetch($result)) {
+			foreach ($_graph_indexes[$row['itemid']] as $i) {
+				if (array_key_exists($row['parent_itemid'], $graph_indexes)
+						&& array_key_exists($graphs[$i]['name'], $graph_indexes[$row['parent_itemid']])
+						&& $graph_indexes[$row['parent_itemid']][$graphs[$i]['name']] != $i) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+						_s('value %1$s already exists', '(name)=('.$graphs[$i]['name'].')')
+					));
+				}
+
+				$graph_indexes[$row['parent_itemid']][$graphs[$i]['name']] = $i;
+			}
+		}
+
+		$result = DBselect(
+			'SELECT DISTINCT g.graphid,g.name,id.parent_itemid'.
+			' FROM graphs g,graphs_items gi,items i,item_discovery id'.
+			' WHERE g.graphid=gi.graphid'.
+				' AND gi.itemid=i.itemid'.
+				' AND i.itemid=id.itemid'.
+				' AND '.dbConditionString('g.name', array_unique(array_column($graphs, 'name'))).
+				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_PROTOTYPE]).
+				' AND '.dbConditionId('id.parent_itemid', array_keys($graph_indexes))
+		);
+
+		while ($row = DBfetch($result)) {
+			if (array_key_exists($row['parent_itemid'], $graph_indexes)
+					&& array_key_exists($row['name'], $graph_indexes[$row['parent_itemid']])) {
+				$graph = $graphs[$graph_indexes[$row['parent_itemid']][$row['name']]];
+
+				if (!array_key_exists('graphid', $graph) || bccomp($row['graphid'], $graph['graphid']) != 0) {
+					$data = DBfetch(DBselect(
+						'SELECT i.key_,h.host,h.status'.
+						' FROM items i,hosts h'.
+						' WHERE i.hostid=h.hostid'.
+							' AND '.dbConditionId('i.itemid', [$row['parent_itemid']])
+					));
+
+					$error = in_array($data['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+						? _('Graph prototype "%1$s" already exists on the LLD rule with key "%2$s" of the host "%3$s".')
+						: _('Graph prototype "%1$s" already exists on the LLD rule with key "%2$s" of the template "%3$s".');
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						sprintf($error, $graph['name'], $data['key_'], $data['host'])
+					);
+				}
+			}
+		}
+	}
 }

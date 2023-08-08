@@ -55,6 +55,7 @@ typedef enum
 	ZBX_MUTEX_MODBUS,
 	ZBX_MUTEX_TREND_FUNC,
 	ZBX_MUTEX_REMOTE_COMMANDS,
+	ZBX_MUTEX_PROXY_BUFFER,
 	/* NOTE: Do not forget to sync changes here with mutex names in diag_add_locks_info()! */
 	ZBX_MUTEX_COUNT
 }

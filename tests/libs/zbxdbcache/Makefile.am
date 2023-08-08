@@ -57,7 +57,8 @@ CACHE_LIBS = \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
-	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
+	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice.a \
 	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \

@@ -14,7 +14,7 @@ SUBDIRS = \
 	zbxprometheus \
 	zbxcomms \
 	zbxregexp \
-	zbxserver \
+	zbxexpression \
 	zbxtagfilter \
 	zbxtrends \
 	zbxtime \

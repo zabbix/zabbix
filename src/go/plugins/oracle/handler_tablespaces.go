@@ -178,9 +178,9 @@ FROM (SELECT df.CON_NAME,
              NVL(SUM(Y.BYTES), 0)                                                                                  AS FILE_BYTES,
              NVL(SUM(Y.MAX_BYTES), 0)                                                                              AS MAX_BYTES,
              NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0)                                                                     AS FREE_BYTES,
-             NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)                                                              AS USED_BYTES,
+             NVL(SUM(Y.BYTES) - MAX(Y.FREE_BYTES), 0)                                                              AS USED_BYTES,
              ROUND(DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2)                     AS USED_PCT_MAX,
-             ROUND(DECODE(SUM(Y.BYTES), 0, 0, (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100), 2) AS USED_FILE_PCT,
+             ROUND(DECODE(SUM(Y.BYTES), 0, 0, (NVL(SUM(Y.BYTES) - MAX(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100), 2) AS USED_FILE_PCT,
              DECODE(Y.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0)                                        AS STATUS
       FROM (SELECT ct.CON$NAME                  AS CON_NAME,
                    ctf.TABLESPACE_NAME          AS NAME,
@@ -644,13 +644,13 @@ FROM
             NVL(SUM(Y.BYTES), 0) AS FILE_BYTES,
             NVL(SUM(Y.MAX_BYTES), 0) AS MAX_BYTES,
             NVL(MAX(NVL(Y.FREE_BYTES, 0)), 0) AS FREE_BYTES,
-            NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0) AS USED_BYTES,
+            NVL(SUM(Y.BYTES) - MAX(Y.FREE_BYTES), 0) AS USED_BYTES,
             ROUND(
                 DECODE(SUM(Y.MAX_BYTES), 0, 0, (SUM(Y.BYTES) / SUM(Y.MAX_BYTES) * 100)), 2
             ) AS USED_PCT_MAX,
             ROUND(
                 DECODE(
-                    SUM(Y.BYTES), 0, 0, (NVL(SUM(Y.BYTES) - SUM(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100
+                    SUM(Y.BYTES), 0, 0, (NVL(SUM(Y.BYTES) - MAX(Y.FREE_BYTES), 0)) / SUM(Y.BYTES) * 100
                 ),2
             ) AS USED_FILE_PCT,
             DECODE(Y.STATUS, 'ONLINE', 1, 'OFFLINE', 2, 'READ ONLY', 3, 0) AS STATUS
