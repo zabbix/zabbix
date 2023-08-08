@@ -378,7 +378,9 @@ class CMultiselectElement extends CElement {
 	 *
 	 * @return array
 	 */
-	public function getSuggestions() {
-		return $this->query('xpath://ul[@class="multiselect-suggest"]/li[not(@class="suggest-hover")]')->all()->asText();
+	public function getSuggestionsText() {
+		$id = CXPathHelper::escapeQuotes($this->query('class:multiselect')->one()->getAttribute('id'));
+		return $this->query('xpath://div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]')->waitUntilVisible()
+				->query('xpath:./li[not(@class="suggest-hover")]')->all()->asText();
 	}
 }

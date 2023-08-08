@@ -28,7 +28,6 @@ use Facebook\WebDriver\WebDriverKeys;
  *
  * @onBefore prepareSelectedHostdata
  */
-
 class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 
 	/**
@@ -259,7 +258,11 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'host' => 'Host for widget'
+						'host' => 'Host for widget 3'
+					],
+					'type' => [
+						'field' => 'host',
+						'value' => 'Host for widget'
 					],
 					'expected' => [
 						'Host for widget 1',
@@ -267,7 +270,6 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Host for widget 4',
 						'Host for widget 5'
 					],
-					'select' => 'Host for widget 3',
 					'keyboard_navigation' => true
 				]
 			],
@@ -275,22 +277,28 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 				[
 					'Data set' => [
 						'host' => 'Host for widget 1',
-						'item' => 'Item for'
+						'item' => 'Item for Graph 1_3'
+					],
+					'type' => [
+						'field' => 'item',
+						'value' => 'Item for'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
 						'Item for Graph 1_2',
 						'Item for Graph 1_4',
 						'Item for Graph 1_5'
-					],
-					'select' => 'Item for Graph 1_3'
+					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'host' => 'Host for widget*',
-						'item' => 'Item'
+						'host' => 'Host for widget*'
+					],
+					'type' => [
+						'field' => 'item',
+						'value' => 'Item'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
@@ -318,11 +326,11 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 2'
-						],
-						'item' => 'Item'
+						'host' => ['Host for widget 1', 'Host for widget 2']
+					],
+					'type' => [
+						'field' => 'item',
+						'value' => 'Item'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
@@ -342,11 +350,11 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 4'
-						],
-						'item' => 'Item'
+						'host' => ['Host for widget 1', 'Host for widget 4']
+					],
+					'type' => [
+						'field' => 'item',
+						'value' => 'Item'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
@@ -361,6 +369,18 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 4_5'
 					]
 				]
+			],
+			[
+				[
+					'Data set' => [
+						'host' => ['Host for widget 1', 'Host for widget 4']
+					],
+					'type' => [
+						'field' => 'item',
+						'value' => 'Item for Graph 2'
+					],
+					'expected' => []
+				]
 			]
 		];
 	}
@@ -373,59 +393,48 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	public function testDashboardGraphWidgetSelectedHosts_CheckSuggestionList($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
-		$form->fill(['Type' => 'Graph']);
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph')]);
 
-		// Change mapping of associative arrays from data set.
-		if (array_key_exists('item', $data['Data set'])) {
-			$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => $data['Data set']['host']]);
+		$mapping = [
+			'host' => 'xpath:.//div[@id="ds_0_hosts_"]/..',
+			'item' => 'xpath:.//div[@id="ds_0_items_"]/..'
+		];
 
-			if (CTestArrayHelper::get($data, 'select')) {
-				$form->fill(['xpath:.//div[@id="ds_0_items_"]/..' => $data['select']]);
+		// If the host or item of data set exists in data provider, add xpath selector to it.
+		foreach ($mapping as $field => $selector) {
+			if (array_key_exists($field, $data['Data set'])) {
+				$data['Data set'][$selector] = $data['Data set'][$field];
+				unset($data['Data set'][$field]);
 			}
-
-			$field_data = ['xpath:.//input[@placeholder="item pattern"]' => $data['Data set']['item']];
 		}
-		else {
-			if (CTestArrayHelper::get($data, 'select')) {
-				$form->fill(['xpath:.//div[@id="ds_0_hosts_"]/..' => $data['select']]);
-			}
+		$form->fill($data['Data set']);
 
-			$field_data = ['xpath:.//input[@placeholder="host pattern"]' => $data['Data set']['host']];
-		}
+		// Enter a value in the host or item field to get list of suggestions.
+		$field = $form->getField($mapping[$data['type']['field']]);
+		$field->query('tag:input')->one()->type($data['type']['value']);
 
-		$form->fill($field_data);
-		$this->checkSuggestionListCommon($data['expected'], $form);
+		$this->assertEquals($data['expected'], $field->getSuggestionsText());
 
 		if (CTestArrayHelper::get($data, 'keyboard_navigation')) {
-			$this->checkSuggestionListWithKeyboardNavigation($data, $form);
+			$this->checkSuggestionListWithKeyboardNavigation($data, $form, $field);
 		}
-	}
-
-	/**
-	 * Check contents of the suggestions list.
-	 *
-	 * @param array			$data		data provider
-	 * @param CFormElement 	$form		form element of dashboard share
-	 */
-	protected function checkSuggestionListCommon ($data, $form) {
-		$this->query('class', 'multiselect-suggest')->waitUntilVisible();
-		$this->assertEquals($data, $form->getField('xpath:.//div[@id="ds_0_hosts_"]/..')->getSuggestions());
 	}
 
 	/**
 	 * Suggestion list check using keyboard navigation.
 	 *
-	 * @param array			$data		data provider
-	 * @param CFormElement 	$form		form element of dashboard share
+	 * @param array			        $data		data provider
+	 * @param CFormElement       	$form		form element of dashboard share
+	 * @param CMultiselectElement 	$field		field for suggestion list
 	 */
-	protected function checkSuggestionListWithKeyboardNavigation($data, $form) {
+	protected function checkSuggestionListWithKeyboardNavigation($data, $form, $field) {
 		$actual_suggestions = [];
-		$id = (CTestArrayHelper::get($data['Data set'], 'item')) ? 'items' : 'hosts';
+		$id = CTestArrayHelper::get($data['type'], 'field').'s';
 
 		// Go through the whole suggestion list using keyboard navigation and collect values that were in focus.
+		$option = ($id === 'items') ? 'Graph' : 'widget';
 		for ($x = 0; $x < (count($data['expected'])); $x++) {
 			$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
-			$option = ($id === 'items') ? 'Graph' : 'widget';
 			$suggestion_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
 					->one()->waitUntilTextPresent($option)->getText();
 			array_push($actual_suggestions, $suggestion_text);
@@ -442,12 +451,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$this->assertTrue($this->query('xpath://li[@data-id='.CXPathHelper::escapeQuotes($selected).']')->one()->isValid());
 
 		// Check that selected value is not in the list of suggestions.
-		if ($id === 'items') {
-			$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'Graph']);
-		}
-		else {
-			$form->fill(['xpath:.//input[@placeholder="host pattern"]' => 'Host for widget']);
-		}
-		$this->checkSuggestionListCommon(array_diff($data['expected'], [$selected]), $form);
+		$field->query('tag:input')->one()->type(($id === 'items') ? 'Graph' : 'Host for widget');
+		$this->assertEquals(array_diff($data['expected'], [$selected]), $field->getSuggestionsText());
 	}
 }
