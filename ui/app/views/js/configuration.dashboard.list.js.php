@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -25,13 +25,13 @@
 ?>
 
 <script>
-	const view = {
+	const view = new class {
 		editTemplate(e, templateid) {
 			e.preventDefault();
 			const template_data = {templateid};
 
 			this.openTemplatePopup(template_data);
-		},
+		}
 
 		openTemplatePopup(template_data) {
 			const overlay =  PopUp('template.edit', template_data, {
@@ -40,33 +40,30 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
-		},
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.submitTemplate(e.detail));
+		}
 
-		events: {
-			templateSuccess(e) {
-				const data = e.detail;
-				let curl = null;
+		submitTemplate(data) {
+			let curl = null;
 
-				if ('success' in data) {
-					postMessageOk(data.success.title);
+			if ('success' in data) {
+				postMessageOk(data.success.title);
 
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-
-					if ('action' in data.success && data.success.action === 'delete') {
-						curl = new Curl('zabbix.php');
-						curl.setArgument('action', 'template.list');
-					}
+				if ('messages' in data.success) {
+					postMessageDetails('success', data.success.messages);
 				}
 
-				if (curl == null) {
-					location.href = location.href;
+				if ('action' in data.success && data.success.action === 'delete') {
+					curl = new Curl('zabbix.php');
+					curl.setArgument('action', 'template.list');
 				}
-				else {
-					location.href = curl.getUrl();
-				}
+			}
+
+			if (curl == null) {
+				location.href = location.href;
+			}
+			else {
+				location.href = curl.getUrl();
 			}
 		}
 	}
