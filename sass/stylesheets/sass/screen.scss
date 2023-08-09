@@ -215,7 +215,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 	& > ul {
 		display: flex;
-		align-items: baseline;
 
 		& > li {
 			margin-right: 5px;
@@ -223,8 +222,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 			> ul {
 				display: flex;
-				align-items: baseline;
-				flex-wrap: wrap;
 
 				li {
 					margin-right: 5px;
@@ -242,8 +239,9 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 		li > span {
 			display: inline-block;
-			padding: 0px 7px;
-			line-height: 24px;
+			padding: 2px 7px;
+			margin: 1px 0;
+			line-height: 18px;
 			white-space: nowrap;
 			vertical-align: top;
 			text-overflow: ellipsis;
@@ -251,12 +249,13 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			max-width: 250px;
 
 			a {
+				margin-top: 2px;
 				vertical-align: top;
 				text-overflow: ellipsis;
 				overflow: hidden;
 				max-width: 200px;
 				display: inline-block;
-				line-height: 24px;
+				line-height: 14px;
 			}
 		}
 	}
@@ -270,91 +269,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	.host-dashboard-navigation {
 		display: grid;
 		grid-template-columns: max-content 1fr max-content;
-		column-gap: 10px;
+		column-gap: 5px;
 
 		.host-dashboard-navigation-tabs {
+			@extend .dashboard-navigation-tabs;
+
 			margin: -2px 0;
-			overflow: hidden;
-
-			.sortable {
-				padding: 2px 0;
-				margin: 0 -1.5px;
-			}
-
-			.sortable-list {
-				display: flex;
-				padding: 0;
-				margin: 0;
-				align-items: center;
-
-				& > .sortable-item:focus:not(:active) {
-					// Increase padding to accommodate the focused div's shadow.
-					padding: 0 3.5px 0 3.5px;
-
-					& > div {
-						padding: 0 8px;
-						border: 1px solid transparent;
-						box-shadow: 0 0 0 2px $btn-focus-outline-color;
-					}
-				}
-			}
-
-			.sortable-item {
-				// This container should not be visually styled at this level.
-				box-sizing: border-box;
-				display: block;
-				// Invisible padding for tab separation.
-				padding: 0 1.5px 0 1.5px;
-				margin: 0;
-				list-style-type: none;
-				outline: none;
-
-				& > div {
-					display: flex;
-					align-items: center;
-
-					min-height: 22px;
-					line-height: 22px;
-					padding: 0 10px;
-					flex-shrink: 0;
-
-					font-size: 12px;
-					white-space: nowrap;
-
-					cursor: pointer;
-					user-select: none;
-
-					background-color: $ui-bg-color;
-					border: 1px solid $ui-border-color;
-					border-radius: 2px;
-
-					@if $ui-transitions {
-						transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
-					}
-
-					span {
-						@extend %overflow-ellipsis;
-						max-width: 300px;
-						color: $font-color;
-					}
-				}
-			}
-
-			.sortable > .sortable-item > div,
-			.sortable-list > .sortable-item > div:hover {
-				background: $action-hover-color;
-				border: 1px solid darken($action-hover-color, 20%);
-			}
-
-			.sortable > .sortable-item > div.selected-tab,
-			.sortable-list > .sortable-item > div.selected-tab {
-				background-color: $ui-bg-selected-color;
-				border: 1px solid transparent;
-
-				span {
-					color: $font-selected-color;
-				}
-			}
 		}
 
 		.host-dashboard-navigation-controls {
@@ -417,14 +337,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 		}
 
 		li > span {
-			padding: 2px 7px;
-			line-height: 18px;
-
-			a {
-				margin-top: 2px;
-				line-height: 14px;
-			}
-
 			&.selected {
 				background-color: $ui-bg-color;
 				border-radius: 2px;

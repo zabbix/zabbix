@@ -109,10 +109,16 @@ $html_page = (new CHtmlPage())
 
 $navigation = (new CDiv())
 	->addClass(ZBX_STYLE_HOST_DASHBOARD_HEADER_NAVIGATION)
-	->addItem((new CList())->addItem(new CBreadcrumbs([
-		(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
-		(new CSpan())->addItem($data['host']['name'])
-	])));
+	->addItem(
+		(new CList())->addItem(
+			new CBreadcrumbs([
+				(new CSpan())->addItem(
+					new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))
+				),
+				(new CSpan())->addItem($data['host']['name'])
+			])
+		)
+	);
 
 if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 	$dashboard_tabs = (new CDiv())
