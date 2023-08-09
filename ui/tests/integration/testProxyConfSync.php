@@ -1076,6 +1076,7 @@ class testProxyConfSync extends CIntegrationTest
 	private static $regexpid;
 	private static $vaultmacroid;
 	private static $secretmacroid;
+	private static $tlshostid;
 
 	/**
 	 * @inheritdoc
@@ -1504,6 +1505,32 @@ class testProxyConfSync extends CIntegrationTest
 		$this->assertArrayHasKey("regexpids", $response['result']);
 	}
 
+	private function setupTlsForHost()
+	{
+		$response = $this->call('host.get', [
+			'output' => 'hostids',
+			'filter' => [
+				'host' => ['Host1']
+			],
+			'preservekeys' => true
+		]);
+		$this->assertArrayHasKey('result', $response);
+		self::$tlshostid = array_key_first($response['result']);
+
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
+
 	public function loadInitialConfiguration()
 	{
 		$this->createRegexp();
@@ -1570,6 +1597,8 @@ class testProxyConfSync extends CIntegrationTest
 
 			]
 		]);
+
+		$this->setupTlsForHost();
 	}
 
 	private function disableAllHosts()
@@ -1592,6 +1621,19 @@ class testProxyConfSync extends CIntegrationTest
 				'status' => 1
 			]);
 		}
+	}
+
+	private function updateTlsForHost()
+	{
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
 	}
 
 	/**
@@ -1696,6 +1738,7 @@ class testProxyConfSync extends CIntegrationTest
 		]);
 
 		$this->updateGlobalMacro();
+		$this->updateTlsForHost();
 		$this->disableAllHosts();
 
 		self::startComponent(self::COMPONENT_SERVER);

@@ -1108,6 +1108,7 @@ class testInitialConfSync extends CIntegrationTest
 	private static $regexpid;
 	private static $vaultmacroid;
 	private static $secretmacroid;
+	private static $tlshostid;
 
 	/**
 	 * @inheritdoc
@@ -1397,6 +1398,44 @@ class testInitialConfSync extends CIntegrationTest
 		self::$maintenanceid = $response['result']['maintenanceids'][0];
 	}
 
+	private function setupTlsForHost()
+	{
+		$response = $this->call('host.get', [
+			'output' => 'hostids',
+			'filter' => [
+				'host' => ['Host1']
+			],
+			'preservekeys' => true
+		]);
+		$this->assertArrayHasKey('result', $response);
+		self::$tlshostid = array_key_first($response['result']);
+
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
+	private function updateTlsForHost()
+	{
+		$response = $this->call('host.update', [
+			'hostid' => self::$tlshostid,
+			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertEquals(1, count($response['result']['hostids']));
+	}
+
 	private function updateMaintenance()
 	{
 		$response = $this->call('maintenance.update', [
@@ -1486,6 +1525,12 @@ class testInitialConfSync extends CIntegrationTest
 			'name' => 'ProxyA',
 			'mode' => PROXY_MODE_ACTIVE,
 			'allowed_addresses' => '10.0.2.15,zabbix.test',
+			'tls_connect' => HOST_ENCRYPTION_NONE,
+			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
+			'tls_issuer' => 'iss',
+			'tls_subject' => 'sub',
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8',
 			'hosts' => []
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
@@ -1496,7 +1541,11 @@ class testInitialConfSync extends CIntegrationTest
 			'mode' => PROXY_MODE_PASSIVE,
 			'hosts' => [],
 			'address' => '127.0.0.1',
-			'port' => '10099'
+			'port' => '10099',
+			'tls_connect' => HOST_ENCRYPTION_PSK,
+			'tls_accept' => HOST_ENCRYPTION_NONE,
+			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8',
 		]);
 		$this->assertArrayHasKey('proxyids', $response['result']);
 		self::$proxyid_passive = $response['result']['proxyids'][0];
@@ -1808,6 +1857,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->createActions();
 		$this->createMaintenance();
+		$this->setupTlsForHost();
 	}
 
 	/**
@@ -1922,6 +1972,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->updateGlobalMacro();
 		$this->updateAction();
+		$this->updateTlsForHost();
 
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
