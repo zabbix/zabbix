@@ -98,20 +98,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$time_now = time();
 
-		$master_column = $configuration[$this->fields_values['column']];
-
+		$master_column_index = $this->fields_values['column'];
+		$master_column = $configuration[$master_column_index];
+		$master_entities = [];
+		$master_entity_values = [];
 		$master_items_only_numeric_allowed = false;
 
-		switch ($master_column['data']){
+		switch ($master_column['data']) {
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 				$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
 				$master_entities = self::getItems($master_column['item'], $master_items_only_numeric_allowed,
-					$groupids, $hostids);
+					$groupids, $hostids
+				);
 				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
 				break;
 
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
-				$master_entities = $hosts != null ? $hosts : API::Host()->get([
+				$master_entities = $hosts !== null ? $hosts : API::Host()->get([
 						'output' => ['name'],
 						'groupids' => $groupids,
 						'hostids' => $hostids,
@@ -123,7 +126,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				break;
 
 			case CWidgetFieldColumnsList::DATA_TEXT:
-				$master_entities = $hosts != null ? $hosts : API::Host()->get([
+				$master_entities = $hosts !== null ? $hosts : API::Host()->get([
 					'output' => ['name'],
 					'groupids' => $groupids,
 					'hostids' => $hostids,
@@ -132,19 +135,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 
 				$master_entity_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
-					[
-						$this->fields_values['column'] =>
-							$this->fields_values['columns'][$this->fields_values['column']]['text']
-					],
+					[$master_column_index => $this->fields_values['columns'][$master_column_index]['text']],
 					$master_entities
-				)[$this->fields_values['column']];
+				)[$master_column_index];
 				break;
-
-			default:
-				return [
-					'configuration' => $configuration,
-					'rows' => []
-				];
 		}
 
 		if (!$master_entity_values) {
@@ -164,8 +158,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($master_items_only_numeric_present) {
 				arsort($master_entity_values, SORT_NUMERIC);
 
-				$master_items_min = end($master_entity_values);
-				$master_items_max = reset($master_entity_values);
+				$master_entities_min = end($master_entity_values);
+				$master_entities_max = reset($master_entity_values);
 			}
 			else {
 				asort($master_entity_values, SORT_NATURAL);
@@ -175,8 +169,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($master_items_only_numeric_present) {
 				asort($master_entity_values, SORT_NUMERIC);
 
-				$master_items_min = reset($master_entity_values);
-				$master_items_max = end($master_entity_values);
+				$master_entities_min = reset($master_entity_values);
+				$master_entities_max = end($master_entity_values);
 			}
 			else {
 				arsort($master_entity_values, SORT_NATURAL);
@@ -215,7 +209,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
-			if ($column_index == $this->fields_values['column']) {
+			if ($column_index == $master_column_index) {
 				$column_items = $master_entities;
 				$column_item_values = $master_entity_values;
 			}
@@ -257,15 +251,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				unset($threshold);
 			}
 
-			if ($column_index == $this->fields_values['column']) {
+			if ($column_index == $master_column_index) {
 				if ($calc_extremes) {
 					if ($column['min'] === '') {
-						$column['min'] = $master_items_min;
+						$column['min'] = $master_entities_min;
 						$column['min_binary'] = $column['min'];
 					}
 
 					if ($column['max'] === '') {
-						$column['max'] = $master_items_max;
+						$column['max'] = $master_entities_max;
 						$column['max_binary'] = $column['max'];
 					}
 				}
