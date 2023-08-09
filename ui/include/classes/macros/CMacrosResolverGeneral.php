@@ -1593,6 +1593,13 @@ class CMacrosResolverGeneral {
 							foreach ($sec_nums as $sec_num => $_macros) {
 								$value = getItemFunctionalValue($db_item, $function, $sec_num);
 
+								if ($value !== null) {
+									$value = convertUnits(['value' => $value, 'units' => $db_item['units']]);
+								}
+								else {
+									$value = UNRESOLVED_MACRO_STRING;
+								}
+
 								foreach ($_macros as $_macro) {
 									$macro_values[$_macro] = $value;
 								}
