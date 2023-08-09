@@ -382,6 +382,34 @@ static int	DBpatch_6050033(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050034(void)
+{
+	int ret;
+
+	const zbx_db_field_t	takes_userinput = {"takes_userinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	userinput_prompt = {"userinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	userinput_validator = {"userinput_validator", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	/*
+	 * The below default value is an invalid one.
+	 * This should never happen in practice when describing new scripts.
+	 */
+	const zbx_db_field_t	userinput_validator_type = {"userinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	userinput_default_value = {"userinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	if (SUCCEED != (ret = DBadd_field("scripts", &takes_userinput)))
+		return ret;
+	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_prompt)))
+		return ret;
+	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_validator)))
+		return ret;
+	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_validator_type)))
+		return ret;
+	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_default_value)))
+		return ret;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -422,5 +450,6 @@ DBPATCH_ADD(6050030, 0, 1)
 DBPATCH_ADD(6050031, 0, 1)
 DBPATCH_ADD(6050032, 0, 1)
 DBPATCH_ADD(6050033, 0, 1)
+DBPATCH_ADD(6050034, 0, 1)
 
 DBPATCH_END()
