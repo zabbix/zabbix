@@ -165,13 +165,12 @@ class CControllerItemEdit extends CControllerItem {
 	 * Get host data.
 	 */
 	protected function getHost(): array {
-		$conditions = $this->hasInput('hostid')
-			? ['hostids' => [$this->getInput('hostid')]]
-			: ['itemids' => [$this->getInput('itemid')]];
 		[$host] = API::Host()->get([
 			'output' => ['name', 'flags', 'status'],
-			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main']
-		] + $conditions);
+			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
+			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+		]);
 
 		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		// Sort interfaces to be listed starting with one selected as 'main'.
@@ -189,12 +188,11 @@ class CControllerItemEdit extends CControllerItem {
 	 * @param string $templateid
 	 */
 	protected function getTemplate(): array {
-		$conditions = $this->hasInput('hostid')
-			? ['templateids' => [$this->getInput('hostid')]]
-			: ['itemids' => [$this->getInput('itemid')]];
 		[$template] = API::Template()->get([
-			'output' => ['name', 'flags']
-		] + $conditions);
+			'output' => ['templateid', 'name', 'flags'],
+			'templateids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
+			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
+		]);
 		$template += [
 			'hostid' => $template['templateid'],
 			'status' => HOST_STATUS_TEMPLATE,

@@ -78,7 +78,8 @@ foreach ($data['items'] as $item) {
 
 	if ($item['discoveryRule']) {
 		$description[] = (new CLink($item['discoveryRule']['name'],
-			(new CUrl('disc_prototypes.php'))
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'item.prototype.list')
 				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
 				->setArgument('context', $data['context'])
 		))

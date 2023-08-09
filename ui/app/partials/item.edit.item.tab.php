@@ -34,11 +34,11 @@ $formgrid = (new CFormGrid())
 	->addItem($data['discovered'] ? [
 		new CLabel(_('Discovered by')),
 		new CFormField(
-			new CLink($data['discovery_rule']['name'], (new CUrl('disc_prototypes.php'))
-				->setArgument('form', 'update')
+			new CLink($data['discovery_rule']['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.prototype.edit')
 				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 				->setArgument('itemid', $data['discovery_itemid'])
-				->setArgument('context', 'host')
+				->setArgument('context', $data['form']['context'])
 		))
 	] : null)
 	->addItem([
@@ -643,8 +643,8 @@ $formgrid
 	]);
 
 $hint = null;
-if ($data['config']['hk_history_global']  && ($data['host']['status'] == HOST_STATUS_MONITORED
-			|| $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {
+if ($data['source'] === 'item' && $data['config']['hk_history_global']
+		&& ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = _x('global housekeeping settings', 'item_form');
 
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
@@ -675,8 +675,8 @@ $formgrid->addItem([
 ]);
 
 $hint = null;
-if ($data['config']['hk_trends_global'] && ($data['host']['status'] == HOST_STATUS_MONITORED
-			|| $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {
+if ($data['source'] === 'item' && $data['config']['hk_trends_global']
+		&& ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED)) {
 	$link = _x('global housekeeping settings', 'item_form');
 
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
@@ -716,7 +716,7 @@ $formgrid
 			)->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-log-time-format-field')
 	])
-	->addItem($data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED ? [
+	->addItem($data['source'] === 'itemprototype' || $data['host']['flags'] != ZBX_FLAG_DISCOVERY_CREATED ? [
 		(new CLabel(_('Value mapping'), 'valuemapid_ms'))->setId('js-item-value-map-label'),
 		(new CFormField(
 			(new CMultiSelect([
@@ -756,7 +756,7 @@ $formgrid
 		))->setId('js-item-trapper-hosts-field')
 	]);
 
-if (!$data['discovered']) {
+if ($data['source'] === 'item' && !$data['discovered']) {
 	$select = (new CSelect('inventory_link'))
 		->setFocusableElementId('label-host-inventory')
 		->setValue($data['form']['inventory_link'])
@@ -778,24 +778,42 @@ $formgrid
 			->setMaxlength(DB::getFieldLength('items', 'description'))
 			->setReadonly($data['discovered'])
 		)
-	])
-	->addItem([
+	]);
+
+if ($data['source'] === 'item') {
+	$formgrid->addItem([
 		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
 			(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['form']['status'] == ITEM_STATUS_ACTIVE))
 	]);
 
-if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['form']['itemid'] != 0
-		&& $data['form']['context'] === 'host') {
-	$formgrid->addItem(
-		(new CFormField((new CLink(_('Latest data'),
-			(new CUrl())
-				->setArgument('action', 'latest.view')
-				->setArgument('hostids[]', $data['form']['hostid'])
-				->setArgument('name', $data['form']['name'])
-				->setArgument('filter_set', '1')
-		))->setTarget('_blank')))
-	);
+	if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['form']['itemid'] != 0
+			&& $data['form']['context'] === 'host') {
+		$formgrid->addItem(
+			(new CFormField((new CLink(_('Latest data'),
+				(new CUrl())
+					->setArgument('action', 'latest.view')
+					->setArgument('hostids[]', $data['form']['hostid'])
+					->setArgument('name', $data['form']['name'])
+					->setArgument('filter_set', '1')
+			))->setTarget('_blank')))
+		);
+	}
+}
+else {
+	$formgrid
+		->addItem([
+			new CLabel(_('Create enabled'), 'status'),
+			new CFormField(
+				(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['form']['status'] == ITEM_STATUS_ACTIVE))
+		])
+		->addItem([
+			new CLabel(_('Discover'), 'discover'),
+			new CFormField((new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+				->setChecked($data['form']['discover'] == ZBX_PROTOTYPE_DISCOVER)
+				->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
+			)
+		]);
 }
 
 $formgrid->show();

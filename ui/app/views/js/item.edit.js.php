@@ -43,7 +43,7 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 window.item_edit_form = new class {
 
 	init({
-		field_switches, form_data, host, interface_types, testable_item_types, type_with_key_select,
+		actions, field_switches, form_data, host, interface_types, testable_item_types, type_with_key_select,
 		value_type_keys
 	}) {
 		this.form_data = form_data;
@@ -54,6 +54,7 @@ window.item_edit_form = new class {
 		this.type_interfaceids = {};
 		this.value_type_keys = value_type_keys;
 		this.type_with_key_select = type_with_key_select;
+		this.actions = actions;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -209,14 +210,14 @@ window.item_edit_form = new class {
 	clone() {
 		this.form.querySelector('[name="itemid"]').remove();
 		this.form.querySelector('[name="templateid"]').remove();
-		reloadPopup(this.form, 'item.edit');
+		reloadPopup(this.form, this.actions.form);
 	}
 
 	create() {
 		const fields = this.#getFormFields();
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'item.create');
+		curl.setArgument('action', this.actions.create);
 		this.#post(curl.getUrl(), fields);
 	}
 
@@ -224,7 +225,7 @@ window.item_edit_form = new class {
 		const fields = this.#getFormFields();
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'item.update');
+		curl.setArgument('action', this.actions.update);
 		this.#post(curl.getUrl(), fields);
 	}
 
@@ -244,7 +245,7 @@ window.item_edit_form = new class {
 		const fields = this.#getFormFields();
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'item.delete');
+		curl.setArgument('action', this.actions.delete);
 		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]});
 	}
 
@@ -480,7 +481,7 @@ window.item_edit_form = new class {
 	}
 
 	#inheritedTagsChangeHandler(e) {
-		reloadPopup(this.form, 'item.edit');
+		reloadPopup(this.form, this.actions.edit);
 	}
 
 	#updateHistoryModeVisibility() {

@@ -29,20 +29,6 @@ $scripts = [
 	$this->readJsFile('item.preprocessing.js.php', $data, $dir),
 	$this->readJsFile('itemtest.js.php', $data + ['hostid' => $data['form']['hostid']], $dir)
 ];
-$form = (new CForm('post'))
-	->setName('itemForm')
-	->setId('item-form')
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
-	->addItem(getMessages())
-	->addVar('context', $data['form']['context'])
-	->addVar('hostid', $data['form']['hostid'])
-	->addVar('itemid', $data['form']['itemid'] ? $data['form']['itemid'] : null)
-	->addVar('discovered', $data['form']['discovered'])
-	->addVar('templateid', $data['form']['itemid'] ? $data['form']['templateid'] : null)
-	->addVar('form_refresh', 1);
-
-// Enable form submitting on Enter.
-$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 $item = $data['form'];
 $value_types = [
 	ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
@@ -56,6 +42,20 @@ $type_with_key_select = [
 	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
 	ITEM_TYPE_SNMPTRAP, ITEM_TYPE_JMX, ITEM_TYPE_IPMI
 ];
+$form = (new CForm('post'))
+	->setName('itemForm')
+	->setId('item-form')
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')))->removeId())
+	->addItem(getMessages())
+	->addVar('context', $item['context'])
+	->addVar('hostid', $data['host']['hostid'])
+	->addVar('itemid', $item['itemid'] ? $item['itemid'] : null)
+	->addVar('discovered', $item['discovered'])
+	->addVar('templateid', $item['itemid'] ? $item['templateid'] : null)
+	->addVar('form_refresh', 1);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if (!$item['delay_flex']) {
 	$item['delay_flex'] = [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]];
@@ -167,6 +167,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'master_item' => $data['master_item'],
 			'parent_items' => $data['parent_items'],
 			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
+			'source' => 'item',
 			'types' => $data['types'],
 			'valuemap' => $data['valuemap'],
 			'value_types' => $value_types,
@@ -202,6 +203,12 @@ if (!$data['form_refresh']) {
 $form
 	->addItem($tabs)
 	->addItem((new CScriptTag('item_edit_form.init('.json_encode([
+			'actions' => [
+				'form' => 'item.edit',
+				'update' => 'item.update',
+				'create' => 'item.create',
+				'delete' => 'item.delete'
+			],
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
 			'form_data' => $item,
 			'host' => $data['host'],

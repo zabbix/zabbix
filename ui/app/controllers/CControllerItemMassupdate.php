@@ -373,7 +373,8 @@ class CControllerItemMassupdate extends CController {
 		if ($data['prototype']) {
 			$data['parent_discoveryid'] = $this->getInput('parent_discoveryid', 0);
 			$data += [
-				'location_url' => (new CUrl('disc_prototypes.php'))
+				'location_url' => (new CUrl('zabbix.php'))
+					->setArgument('action', 'item.prototype.list')
 					->setArgument('context', $this->getInput('context'))
 					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 					->getUrl(),
