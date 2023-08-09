@@ -89,7 +89,6 @@ ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
-ZBX_VECTOR_IMPL(agent_value, zbx_agent_value_t)
 ZBX_VECTOR_IMPL(host_key, zbx_host_key_t)
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;

@@ -30,13 +30,33 @@
 #include "zbxdbwrap.h"
 #include "zbxpreproc.h"
 
-static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_t *itemid,
-		char **host, char **key, char **value, zbx_timespec_t *ts, char **error)
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_host_key_t 	hk;
+	char		*value;
+	zbx_timespec_t	ts;
+}
+zbx_hp_item_value_t;
+
+ZBX_PTR_VECTOR_DECL(hp_item_value_ptr, zbx_hp_item_value_t *)
+ZBX_PTR_VECTOR_IMPL(hp_item_value_ptr, zbx_hp_item_value_t *)
+
+static void	hp_item_value_free(zbx_hp_item_value_t *hp)
+{
+	zbx_free(hp->hk.host);
+	zbx_free(hp->hk.key);
+	zbx_free(hp->value);
+	zbx_free(hp);
+}
+
+static zbx_hp_item_value_t	*create_item_value(const char *pnext, time_t now, int *ns_offset, char **error)
 {
 	char			*str = NULL;
 	size_t			str_alloc = 0;
 	int			ret = FAIL;
 	struct zbx_json_parse	jp;
+	zbx_hp_item_value_t	*hp = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -46,9 +66,12 @@ static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_
 		goto out;
 	}
 
+	hp = (zbx_hp_item_value_t *)zbx_malloc(NULL, sizeof(zbx_hp_item_value_t));
+	memset(hp, 0, sizeof(zbx_hp_item_value_t));
+
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_ITEMID, &str, &str_alloc, NULL))
 	{
-		if (SUCCEED != zbx_is_uint64(str, itemid) || 0 == itemid)
+		if (SUCCEED != zbx_is_uint64(str, &hp->itemid) || 0 == hp->itemid)
 		{
 			*error = zbx_dsprintf(NULL, "invalid \"%s\" tag value: \"%s\"", ZBX_PROTO_TAG_ITEMID, str);
 			goto out;
@@ -56,14 +79,14 @@ static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_
 	}
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_HOST, &str, &str_alloc, NULL))
-		*host = zbx_strdup(NULL, str);
+		hp->hk.host = zbx_strdup(NULL, str);
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_KEY, &str, &str_alloc, NULL))
-		*key = zbx_strdup(NULL, str);
+		hp->hk.key = zbx_strdup(NULL, str);
 
-	if (0 != *itemid)
+	if (0 != hp->itemid)
 	{
-		if (NULL != *host || NULL != *key)
+		if (NULL != hp->hk.host || NULL != hp->hk.key)
 		{
 			*error = zbx_dsprintf(NULL, "\"%s\" tag conflicts with \"%s\" and \"%s\" tags",
 					ZBX_PROTO_TAG_ITEMID, ZBX_PROTO_TAG_HOST, ZBX_PROTO_TAG_ITEMID);
@@ -72,7 +95,7 @@ static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_
 	}
 	else
 	{
-		if (NULL == *host || NULL == *key)
+		if (NULL == hp->hk.host || NULL == hp->hk.key)
 		{
 			*error = zbx_dsprintf(NULL, "missing \"%s\" or \"%s\" tag",
 					ZBX_PROTO_TAG_HOST, ZBX_PROTO_TAG_ITEMID);
@@ -82,7 +105,7 @@ static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_CLOCK, &str, &str_alloc, NULL))
 	{
-		if (SUCCEED != zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, &ts->sec, 4, 1, INT32_MAX))
+		if (SUCCEED != zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, &hp->ts.sec, 4, 1, INT32_MAX))
 		{
 			*error = zbx_dsprintf(NULL, "invalid \"%s\" tag value: \"%s\"", ZBX_PROTO_TAG_CLOCK, str);
 			goto out;
@@ -91,13 +114,13 @@ static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_NS, &str, &str_alloc, NULL))
 	{
-		if (SUCCEED != zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, &ts->ns, 4, 0, 999999999))
+		if (SUCCEED != zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, &hp->ts.ns, 4, 0, 999999999))
 		{
 			*error = zbx_dsprintf(NULL, "invalid \"%s\" tag value: \"%s\"", ZBX_PROTO_TAG_NS, str);
 			goto out;
 		}
 
-		if (0 == ts->sec)
+		if (0 == hp->ts.sec)
 		{
 			*error = zbx_dsprintf(NULL, "cannot use \"%s\" tag without \"%s\" tag",
 					ZBX_PROTO_TAG_NS, ZBX_PROTO_TAG_CLOCK);
@@ -106,11 +129,11 @@ static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_
 	}
 	else
 	{
-		ts->ns = (*ns_offset)++;
+		hp->ts.ns = (*ns_offset)++;
 	}
 
-	if (0 == ts->sec)
-		ts->sec = (int)now;
+	if (0 == hp->ts.sec)
+		hp->ts.sec = (int)now;
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp, ZBX_PROTO_TAG_VALUE, &str, &str_alloc, NULL))
 	{
@@ -118,24 +141,22 @@ static int	parse_item(const char *pnext, time_t now, int *ns_offset, zbx_uint64_
 		goto out;
 	}
 
-	*value = str;
+	hp->value = str;
 	str = NULL;
+
 	ret = SUCCEED;
 out:
 	zbx_free(str);
 
-	if (SUCCEED != ret)
-	{
-		zbx_free(*host);
-		zbx_free(*key);
-		zbx_free(*value);
-	}
+	if (SUCCEED != ret && NULL != hp)
+		hp_item_value_free(hp);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " host:%s key:%s ts:%d.%09d value:%s error:%s",
-			__func__, zbx_result_string(ret), *itemid, ZBX_NULL2EMPTY_STR(*host), ZBX_NULL2EMPTY_STR(*key),
-			ts->sec, ts->ns, ZBX_NULL2EMPTY_STR(*value), ZBX_NULL2EMPTY_STR(*error));
+			__func__, zbx_result_string(ret), hp->itemid, ZBX_NULL2EMPTY_STR(hp->hk.host),
+			ZBX_NULL2EMPTY_STR(hp->hk.key), hp->ts.sec, hp->ts.ns, ZBX_NULL2EMPTY_STR(hp->value),
+			ZBX_NULL2EMPTY_STR(*error));
 
-	return ret;
+	return hp;
 }
 
 ZBX_VECTOR_DECL(ts, zbx_timespec_t)
@@ -148,8 +169,8 @@ typedef struct
 }
 zbx_item_timestamps_t;
 
-static int	push_item_value(struct addrinfo *ai, zbx_uint64_t userid, zbx_hashset_t *timestamps,
-		zbx_history_recv_item_t *item, int errcode, zbx_agent_value_t *value, char **error)
+static int	validate_item_config(struct addrinfo *ai, zbx_uint64_t userid, zbx_history_recv_item_t *item,
+		int errcode, zbx_hp_item_value_t *value, char **error)
 {
 	if (SUCCEED != errcode)
 	{
@@ -211,13 +232,20 @@ static int	push_item_value(struct addrinfo *ai, zbx_uint64_t userid, zbx_hashset
 		return FAIL;
 	}
 
+	return SUCCEED;
+}
+
+static int	validate_item_value(zbx_hashset_t *item_timestamps, zbx_history_recv_item_t *item,
+		zbx_hp_item_value_t *value, char **error)
+{
 	zbx_item_timestamps_t	*item_ts;
 
-	if (NULL == (item_ts = (zbx_item_timestamps_t *)zbx_hashset_search(timestamps, &item->itemid)))
+	if (NULL == (item_ts = (zbx_item_timestamps_t *)zbx_hashset_search(item_timestamps, &item->itemid)))
 	{
 		zbx_item_timestamps_t	item_ts_local = {.itemid =  item->itemid};
 
-		item_ts = (zbx_item_timestamps_t *)zbx_hashset_insert(timestamps, &item_ts_local, sizeof(item_ts_local));
+		item_ts = (zbx_item_timestamps_t *)zbx_hashset_insert(item_timestamps, &item_ts_local,
+				sizeof(item_ts_local));
 		zbx_vector_ts_create(&item_ts->timestamps);
 	}
 
@@ -233,6 +261,11 @@ static int	push_item_value(struct addrinfo *ai, zbx_uint64_t userid, zbx_hashset
 
 	zbx_vector_ts_append(&item_ts->timestamps, value->ts);
 
+	return SUCCEED;
+}
+
+static void	push_item_value(zbx_history_recv_item_t *item, zbx_hp_item_value_t *value)
+{
 	AGENT_RESULT	result;
 
 	zbx_init_agent_result(&result);
@@ -244,8 +277,6 @@ static int	push_item_value(struct addrinfo *ai, zbx_uint64_t userid, zbx_hashset
 			ITEM_STATE_NORMAL, NULL);
 
 	zbx_free_agent_result(&result);
-
-	return SUCCEED;
 }
 
 typedef struct
@@ -255,162 +286,159 @@ typedef struct
 }
 zbx_item_error_t;
 
-static int	process_history_push(const struct zbx_json_parse *jp, char **data)
+static int	hk_compare(const void *d1, const void *d2)
 {
-	zbx_user_t			user;
-	struct zbx_json_parse		jp_data;
-	int				ret = FAIL;
-	char				clientip[MAX_STRING_LEN];
-	struct addrinfo			hints, *ai = NULL;
-	zbx_vector_uint64_t		itemids, id_index, hk_index;
-	zbx_vector_host_key_t		hostkeys;
-	zbx_vector_agent_value_t	values;
-	int				ns_offset = 0, items_num = 0;
-	const char			*pnext = NULL;
-	time_t				now;
+	const zbx_host_key_t	*hk1 = (const zbx_host_key_t *)d1;
+	const zbx_host_key_t	*hk2 = (const zbx_host_key_t *)d2;
+	int			ret;
+
+	if (0 != (ret = strcmp(hk1->host, hk2->host)))
+		return ret;
+
+	return strcmp(hk1->key, hk2->key);
+}
+
+static void	push_item_values(zbx_uint64_t userid, struct addrinfo *ai, zbx_vector_hp_item_value_ptr_t *values,
+		int itemids_num, int hostkeys_num, struct zbx_json *j)
+{
+	/* extract unique itemids/hostkeys */
+
+	zbx_vector_uint64_t	itemids;
+	zbx_vector_host_key_t	hostkeys;
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_vector_uint64_create(&id_index);
-	zbx_vector_uint64_create(&hk_index);
+	zbx_vector_uint64_reserve(&itemids, itemids_num);
+
 	zbx_vector_host_key_create(&hostkeys);
-	zbx_vector_agent_value_create(&values);
+	zbx_vector_host_key_reserve(&hostkeys, hostkeys_num);
 
-	zbx_user_init(&user);
-
-	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
+	for (int i = 0; i < values->values_num; i++)
 	{
-		*data = zbx_strdup(NULL, "Permission denied.");
-		goto out;
-	}
-
-	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
-	{
-		*data = zbx_strdup(NULL, "Cannot find tag: \"" ZBX_PROTO_TAG_CLIENTIP "\".");
-		goto out;
-	}
-
-	zbx_tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST);
-	if (0 != getaddrinfo(clientip, NULL, &hints, &ai))
-	{
-		*data = zbx_dsprintf(NULL, "Invalid tag \"" ZBX_PROTO_TAG_CLIENTIP "\" value: %s.", clientip);
-		goto out;
-	}
-
-	if (FAIL == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
-	{
-		*data = zbx_strdup(NULL, "Cannot find tag: \"" ZBX_PROTO_TAG_DATA "\".");
-		goto out;
-	}
-
-	now = time(NULL);
-
-	while (NULL != (pnext = zbx_json_next(&jp_data, pnext)))
-	{
-		char			*host = NULL, *key = NULL, *value = NULL, *error = NULL;
-		zbx_uint64_t		itemid = 0;
-		zbx_timespec_t		ts = {0, 0};
-		zbx_agent_value_t	agent_value = {0};
-
-		if (SUCCEED != parse_item(pnext, now, &ns_offset, &itemid, &host, &key, &value, &ts, &error))
-		{
-			*data = zbx_dsprintf(NULL, "Cannot parse item #%d data: %s.", items_num + 1, error);
-			zbx_free(error);
-			goto out;
-		}
-
-		if (0 == itemid)
-		{
-			zbx_host_key_t	hostkey = {.host = host, .key = key};
-
-			zbx_vector_host_key_append_ptr(&hostkeys, &hostkey);
-			zbx_vector_uint64_append(&hk_index, items_num);
-		}
+		if (0 == values->values[i]->itemid)
+			zbx_vector_host_key_append(&hostkeys, values->values[i]->hk);
 		else
-		{
-			zbx_vector_uint64_append(&itemids, itemid);
-			zbx_vector_uint64_append(&id_index, items_num);
-		}
-
-		agent_value.value = value;
-		agent_value.ts = ts;
-		zbx_vector_agent_value_append_ptr(&values, &agent_value);
-
-		items_num++;
+			zbx_vector_uint64_append(&itemids, values->values[i]->itemid);
 	}
 
-	zbx_history_recv_item_t	*id_items, *hk_items;
-	int			*id_errcodes, *hk_errcodes;
+	zbx_vector_uint64_sort(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	id_items = (zbx_history_recv_item_t *)zbx_malloc(NULL, sizeof(zbx_history_recv_item_t) *
-			(size_t)itemids.values_num);
-	id_errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
-	zbx_dc_config_history_recv_get_items_by_itemids(id_items, itemids.values, id_errcodes, itemids.values_num,
-			ZBX_ITEM_GET_DEFAULT);
+	zbx_vector_host_key_sort(&hostkeys, hk_compare);
+	zbx_vector_host_key_uniq(&hostkeys, hk_compare);
 
-	hk_items = (zbx_history_recv_item_t *)zbx_malloc(NULL, sizeof(zbx_history_recv_item_t) *
-			(size_t)hostkeys.values_num);
-	hk_errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)hostkeys.values_num);
-	zbx_dc_config_history_recv_get_items_by_keys(hk_items, hostkeys.values, hk_errcodes,
-			(size_t)hostkeys.values_num);
+	/* obtain item configuration */
 
-	int			hk_i = 0, id_i = 0;
-	struct zbx_json		j;
+	zbx_history_recv_item_t	*id_items = NULL, *hk_items = NULL;
+	int			*id_errcodes = NULL, *hk_errcodes = NULL;
+
+	if (0 != itemids.values_num)
+	{
+		id_items = (zbx_history_recv_item_t *)zbx_malloc(NULL, sizeof(zbx_history_recv_item_t) *
+				(size_t)itemids.values_num);
+		id_errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)itemids.values_num);
+		zbx_dc_config_history_recv_get_items_by_itemids(id_items, itemids.values, id_errcodes,
+				itemids.values_num, ZBX_ITEM_GET_DEFAULT);
+	}
+
+	if (0 != hostkeys.values_num)
+	{
+		hk_items = (zbx_history_recv_item_t *)zbx_malloc(NULL, sizeof(zbx_history_recv_item_t) *
+				(size_t)hostkeys.values_num);
+		hk_errcodes = (int *)zbx_malloc(NULL, sizeof(int) * (size_t)hostkeys.values_num);
+		zbx_dc_config_history_recv_get_items_by_keys(hk_items, hostkeys.values, hk_errcodes,
+				(size_t)hostkeys.values_num);
+	}
+
+	/* push values */
+
 	zbx_hashset_t		item_timestamps, item_errors;
 
 	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-	zbx_hashset_create(&item_timestamps, items_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&item_timestamps, values->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&item_errors, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_json_init(&j, 1024);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+	zbx_json_addstring(j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
 
-	for (int i = 0; i < items_num; i++)
+	for (int i = 0; i < values->values_num; i++)
 	{
 		zbx_history_recv_item_t	*item;
 		int			errcode;
 		char			*error = NULL;
 		zbx_item_error_t	*item_err;
 
-		if ((int)id_index.values[id_i] == i)
+		if (0 == values->values[i]->itemid)
 		{
-			item = &id_items[id_i];
-			errcode = id_errcodes[id_i++];
+			int	index;
+
+			if (FAIL == (index = zbx_vector_host_key_bsearch(&hostkeys, values->values[i]->hk, hk_compare)))
+			{
+				zbx_json_addobject(j, NULL);
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, 0);
+				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, "internal host/key indexing error",
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_close(j);
+
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item = &hk_items[index];
+			errcode = hk_errcodes[index];
 		}
 		else
 		{
-			item = &hk_items[hk_i];
-			errcode = hk_errcodes[hk_i++];
+			int	index;
+
+			if (FAIL == (index = zbx_vector_uint64_bsearch(&itemids, values->values[i]->itemid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			{
+				zbx_json_addobject(j, NULL);
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, 0);
+				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, "internal itemid indexing error",
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_close(j);
+
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			item = &id_items[index];
+			errcode = id_errcodes[index];
 		}
 
-		zbx_json_addobject(&j, NULL);
-
-		zbx_json_adduint64(&j, ZBX_PROTO_TAG_ITEMID, item->itemid);
+		zbx_json_addobject(j, NULL);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, item->itemid);
 
 		if (NULL != (item_err = (zbx_item_error_t *)zbx_hashset_search(&item_errors, &item->itemid)))
 		{
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
 		}
-		else if (SUCCEED != push_item_value(ai, user.userid, &item_timestamps, item, errcode, &values.values[i],
-				&error))
+		else if (SUCCEED != validate_item_config(ai, userid, item, errcode, values->values[i], &error))
 		{
 			zbx_item_error_t	item_err_local = {.itemid = item->itemid, .error = error};
 
 			zbx_hashset_insert(&item_errors, &item_err_local, sizeof(item_err_local));
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 		}
+		else if (SUCCEED != validate_item_value(&item_timestamps, item, values->values[i], &error))
+		{
+			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+			zbx_free(error);
+		}
+		else
+			push_item_value(item, values->values[i]);
 
-		zbx_json_close(&j);
+		zbx_json_close(j);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
 
 	zbx_preprocessor_flush();
 
-	*data = zbx_strdup(NULL, j.buffer);
-
-	zbx_json_clean(&j);
+	/* cleanup */
 
 	zbx_hashset_iter_t	iter;
 	zbx_item_timestamps_t	*item_ts;
@@ -434,6 +462,76 @@ static int	process_history_push(const struct zbx_json_parse *jp, char **data)
 	zbx_free(hk_items);
 	zbx_free(hk_errcodes);
 
+	zbx_vector_uint64_destroy(&itemids);
+	zbx_vector_host_key_destroy(&hostkeys);
+}
+
+static int	process_history_push(const struct zbx_json_parse *jp, struct zbx_json *j, char **error)
+{
+	zbx_user_t			user;
+	struct zbx_json_parse		jp_data;
+	int				ret = FAIL;
+	char				clientip[MAX_STRING_LEN];
+	struct addrinfo			hints, *ai = NULL;
+	int				ns_offset = 0, hostkeys_num = 0, itemids_num = 0;
+	const char			*pnext = NULL;
+	time_t				now;
+	zbx_vector_hp_item_value_ptr_t	values;
+
+	zbx_vector_hp_item_value_ptr_create(&values);
+
+	zbx_user_init(&user);
+
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
+	{
+		*error = zbx_strdup(NULL, "Permission denied.");
+		goto out;
+	}
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
+	{
+		*error = zbx_strdup(NULL, "Cannot find tag: \"" ZBX_PROTO_TAG_CLIENTIP "\".");
+		goto out;
+	}
+
+	zbx_tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST);
+	if (0 != getaddrinfo(clientip, NULL, &hints, &ai))
+	{
+		*error = zbx_dsprintf(NULL, "Invalid tag \"" ZBX_PROTO_TAG_CLIENTIP "\" value: %s.", clientip);
+		goto out;
+	}
+
+	if (FAIL == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		*error = zbx_strdup(NULL, "Cannot find tag: \"" ZBX_PROTO_TAG_DATA "\".");
+		goto out;
+	}
+
+	now = time(NULL);
+
+	while (NULL != (pnext = zbx_json_next(&jp_data, pnext)))
+	{
+		char			*errmsg = NULL;
+		zbx_hp_item_value_t	*hp;
+
+		if (NULL == (hp = create_item_value(pnext, now, &ns_offset, &errmsg)))
+		{
+			*error = zbx_dsprintf(NULL, "Cannot parse item #%d data: %s.", hostkeys_num + itemids_num + 1,
+					errmsg);
+			zbx_free(errmsg);
+			goto out;
+		}
+
+		zbx_vector_hp_item_value_ptr_append(&values, hp);
+
+		if (0 == hp->itemid)
+			hostkeys_num++;
+		else
+			itemids_num++;
+	}
+
+	push_item_values(user.userid, ai, &values, itemids_num, hostkeys_num, j);
+
 	ret = SUCCEED;
 
 out:
@@ -442,44 +540,32 @@ out:
 
 	zbx_user_free(&user);
 
-	for (int i = 0; i < values.values_num; i++)
-	{
-		zbx_free(values.values[i].value);
-		zbx_free(values.values[i].source);
-	}
-	zbx_vector_agent_value_destroy(&values);
-
-	for (int i = 0; i < hostkeys.values_num; i++)
-	{
-		zbx_free(hostkeys.values[i].host);
-		zbx_free(hostkeys.values[i].key);
-	}
-	zbx_vector_host_key_destroy(&hostkeys);
-
-	zbx_vector_uint64_destroy(&hk_index);
-	zbx_vector_uint64_destroy(&id_index);
-	zbx_vector_uint64_destroy(&itemids);
+	zbx_vector_hp_item_value_ptr_clear_ext(&values, hp_item_value_free);
+	zbx_vector_hp_item_value_ptr_destroy(&values);
 
 	return ret;
 }
 
 int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout)
 {
-	char		*data = NULL;
+	char		*error = NULL;
 	int		ret;
+	struct zbx_json	j;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = process_history_push(jp, &data)))
-	{
-		zbx_send_response(sock, ret, data, timeout);
-		zbx_free(data);
-		goto out;
-	}
+	zbx_json_init(&j, 1024);
 
-	zbx_tcp_send(sock, data);
-	zbx_free(data);
-out:
+	if (SUCCEED != (ret = process_history_push(jp, &j, &error)))
+	{
+		zbx_send_response(sock, ret, error, timeout);
+		zbx_free(error);
+	}
+	else
+		zbx_tcp_send(sock, j.buffer);
+
+	zbx_json_clean(&j);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
