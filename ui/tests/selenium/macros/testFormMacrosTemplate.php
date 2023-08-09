@@ -151,7 +151,7 @@ class testFormMacrosTemplate extends testFormMacros {
 	 */
 	public function testFormMacrosTemplate_RemoveInheritedMacro($data) {
 		$this->checkRemoveInheritedMacros($data, 'template', self::$templateid_remove_inherited,
-				name: 'Template for Inherited macros removing');
+				false, null, 'Template for Inherited macros removing');
 	}
 
 	public function getCreateSecretMacrosData() {
