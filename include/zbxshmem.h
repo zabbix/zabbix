@@ -132,4 +132,46 @@ ZBX_SHMEM_FUNC1_IMPL_MALLOC(__prefix, __info)				\
 ZBX_SHMEM_FUNC1_IMPL_REALLOC(__prefix, __info)				\
 ZBX_SHMEM_FUNC1_IMPL_FREE(__prefix, __info)
 
+
+/**/
+#define ZBX_SHMEM_FUNC1_DECL_MALLOC_N(__prefix)				\
+void	*__prefix ## _shmem_malloc_func(void *old, size_t size)
+#define ZBX_SHMEM_FUNC1_DECL_REALLOC_N(__prefix)				\
+void	*__prefix ## _shmem_realloc_func(void *old, size_t size)
+#define ZBX_SHMEM_FUNC1_DECL_FREE_N(__prefix)				\
+void	__prefix ## _shmem_free_func(void *ptr)
+
+#define ZBX_SHMEM_FUNC1_IMPL_MALLOC_N(__prefix, __info)			\
+									\
+void	*__prefix ## _shmem_malloc_func(void *old, size_t size)	\
+{									\
+	return zbx_shmem_malloc(__info, old, size);			\
+}
+
+#define ZBX_SHMEM_FUNC1_IMPL_REALLOC_N(__prefix, __info)			\
+									\
+void	*__prefix ## _shmem_realloc_func(void *old, size_t size) \
+{									\
+	return zbx_shmem_realloc(__info, old, size);			\
+}
+
+#define ZBX_SHMEM_FUNC1_IMPL_FREE_N(__prefix, __info)			\
+									\
+void	__prefix ## _shmem_free_func(void *ptr)			\
+{									\
+	zbx_shmem_free(__info, ptr);					\
+}
+
+#define ZBX_SHMEM_FUNC_DECL_N(__prefix)					\
+									\
+ZBX_SHMEM_FUNC1_DECL_MALLOC_N(__prefix);					\
+ZBX_SHMEM_FUNC1_DECL_REALLOC_N(__prefix);					\
+ZBX_SHMEM_FUNC1_DECL_FREE_N(__prefix);
+
+#define ZBX_SHMEM_FUNC_IMPL_N(__prefix, __info)				\
+									\
+ZBX_SHMEM_FUNC1_IMPL_MALLOC_N(__prefix, __info)				\
+ZBX_SHMEM_FUNC1_IMPL_REALLOC_N(__prefix, __info)				\
+ZBX_SHMEM_FUNC1_IMPL_FREE_N(__prefix, __info)
+
 #endif /* ZABBIX_SHMEM_H */

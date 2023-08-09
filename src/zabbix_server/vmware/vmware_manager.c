@@ -18,6 +18,9 @@
 **/
 
 #include "vmware.h"
+#include "vmware_internal.h"
+#include "vmware_perfcntr.h"
+
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtime.h"
