@@ -31,7 +31,7 @@ $tag_filter_table = (new CTable())
 
 foreach ($data['tag_filters'] as $key => $tag_filter) {
 	$action = [
-		(new CButtonLink(_('Edit')))->addClass('js-edit-table-row'),
+		(new CButtonLink(_('Edit')))->addClass('js-edit-tag-filter'),
 		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row'),
 		(new CVar('tag_filters['.$key.'][groupid]', $tag_filter['groupid']))->removeId(),
 		(new CVar('tag_filters['.$key.'][tags]', $tag_filter['tags']))->removeId()

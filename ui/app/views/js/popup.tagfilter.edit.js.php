@@ -26,15 +26,21 @@
 
 window.tag_filter_popup = new class {
 
-	init({tag_filters}) {
+	init({tag_filters, groupid}) {
+		this.overlay = overlays_stack.getById('tag-filter-edit');
+		this.dialogue = this.overlay.$dialogue[0];
+		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.tag_filters = tag_filters;
+		this.group_tag_filters = groupid !== 0 ? tag_filters[groupid]['tags'] : [];
+		this.groupid = groupid;
 		this.tag_filter_template = new Template(document.getElementById('tag-filter-row-template').innerHTML);
 		this.tag_filter_counter = 0;
 
-		if (tag_filters.length !== 0 && tag_filters[0]['tag'] !== '') {
+		if (this.group_tag_filters.length !== 0 && this.group_tag_filters[0]['tag'] !== '') {
 			const tag_list_option = document.querySelector(`input[name="filter_type"][value='<?= TAG_FILTER_LIST ?>']`);
 			tag_list_option.checked = true;
 
-			for (const tag of tag_filters) {
+			for (const tag of this.group_tag_filters) {
 				this.#addTagFilterRow(tag);
 			}
 		}
@@ -81,5 +87,63 @@ window.tag_filter_popup = new class {
 
 		tags.style.display = show_tags ? '' : 'none';
 		tags_label.style.display = show_tags ? '' : 'none';
+	}
+
+	submit() {
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'popup.tagfilter.check');
+
+		const fields = getFormFields(this.form);
+		fields.tag_filters = this.tag_filters;
+		fields.groupid = this.groupid;
+
+		if (fields.esc_period != null ) {
+			fields.esc_period = fields.esc_period.trim();
+		}
+
+		this.#post(curl.getUrl(), fields);
+	}
+
+	#post(url, data, success_callback) {
+		this.overlay.setLoading();
+
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			})
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
 }

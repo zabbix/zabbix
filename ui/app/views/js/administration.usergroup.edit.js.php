@@ -62,13 +62,10 @@
 				if (event.target.classList.contains('js-remove-table-row')) {
 					this.#removeRow(event.target);
 				}
-			});
-
-			document.getElementById('tag-filter-table').addEventListener('click', event => {
 				if (event.target.classList.contains('js-add-tag-filter')) {
 					this.#openAddPopup();
 				}
-				else if (event.target.classList.contains('js-edit-table-row')) {
+				if (event.target.classList.contains('js-edit-tag-filter')) {
 					this.#openAddPopup(event.target.closest('tr'));
 				}
 			});
@@ -117,21 +114,66 @@
 		}
 
 		#openAddPopup(row = null) {
-			let popup_params = {};
+			let popup_params = {
+				tag_filters: this.tag_filters
+			};
 
 			if (row !== null) {
 				const groupid = row.querySelector('input[name*="[groupid]"]').value;
-				const tags = this.tag_filters[groupid];
 
 				popup_params = {
 					edit: '1',
 					groupid: groupid,
-					name: tags['name'],
-					tags: tags['tags']
+					name: this.tag_filters[groupid]['name'],
+					tag_filters: this.tag_filters
 				};
 			}
 
-			PopUp('popup.tagfilter.edit', popup_params);
+			const overlay = PopUp('popup.tagfilter.edit', popup_params, {
+				dialogueid: 'tag-filter-edit',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail));
+		}
+
+		#reload(response) {
+			this.tag_filters = response.tag_filters;
+			const tag_filter_form_field = document.getElementById('js-tag-filter-form-field');
+			tag_filter_form_field.classList.add('is-loading');
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'usergroup.tagfilter.list');
+			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(response)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+					}
+
+					tag_filter_form_field.innerHTML = response.body;
+				})
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				})
+				.finally(() => {
+					tag_filter_form_field.classList.remove('is-loading');
+			});
 		}
 	};
 

@@ -28,10 +28,9 @@ class CControllerPopupTagFilterEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'edit' => 'in 1,0',
-			'update' => 'in 1',
 			'groupid' => 'db hosts_groups.groupid',
 			'name' => 'string',
-			'tags' => 'array'
+			'tag_filters' => 'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,11 +54,10 @@ class CControllerPopupTagFilterEdit extends CController {
 
 	protected function doAction() {
 		$data = [
-			'action' => 'popup.tagfilter.update',
 			'edit' => 0,
 			'groupid' => null,
 			'name' => '',
-			'tags' => []
+			'tag_filters' => []
 		];
 		$this->getInputs($data, array_keys($data));
 

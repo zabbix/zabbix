@@ -264,6 +264,7 @@ $tag_filter_form_grid = (new CFormGrid())
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->setId('js-tag-filter-form-field')
 		)
 	]);
 

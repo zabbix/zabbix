@@ -21,15 +21,13 @@
 
 /**
  * @var CView $this
- * @var array	 $data
+ * @var array $data
  */
 
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tagfilter')))->removeId())
 	->setId('tag-filter-add-form')
-	->setName('tag-filter-add-form')
-	->addVar('action', $data['action'])
-	->addVar('update', 1);
+	->setName('tag-filter-add-form');
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -39,15 +37,13 @@ $form_grid = new CFormGrid();
 $new_tag_filter_table = (new CTable())
 	->setId('new-tag-filter-table')
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_FILTER_STANDARD_WIDTH.'px;')
-	->setHeader([_('Name'), _('Value'), _('Action')])
+	->setHeader([_('Tag'), _('Value'), _('Action')])
 	->addRow((new CRow())->addClass('js-tag-filter-row-placeholder'))
 	->addRow([
 		(new CSimpleButton(_('Add')))
 			->addClass('js-add-tag-filter-row')
 			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
-
-$show_tags_list = count($data['tags']) == 0 || (count($data['tags']) == 1 && $data['tags'][0]['tag'] == '') ? 0 : 1;
 
 $form_grid
 	->addItem([
@@ -62,8 +58,7 @@ $form_grid
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'ms_new_tag_filter_groupids_',
-						'disableids' => array_column($data['host_groups_ms'], 'id')
+						'dstfld1' => 'ms_new_tag_filter_groupids_'
 					]
 				],
 				'add_post_js' => false
@@ -75,7 +70,7 @@ $form_grid
 	->addItem([
 		new CLabel(_('Filter'), 'filter_type'),
 		new CFormField(
-			(new CRadioButtonList('filter_type', $show_tags_list))
+			(new CRadioButtonList('filter_type', TAG_FILTER_ALL))
 				->addValue(_('All tags'), TAG_FILTER_ALL)
 				->addValue(_('Tag list'), TAG_FILTER_LIST)
 				->setModern(true)
@@ -91,12 +86,12 @@ $form_grid
 
 $tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
 	(new CRow([
-		(new CTextBox('tag_filter[tag][#{rowid}]', '#{tag}', false,
+		(new CTextBox('new_tag_filter[#{rowid}][tag]', '#{tag}', false,
 			DB::getFieldLength('tag_filter', 'tag')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('tag_filter[value][#{rowid}]', '#{value}', false,
+		(new CTextBox('new_tag_filter[#{rowid}][value]', '#{value}', false,
 			DB::getFieldLength('tag_filter', 'value')
 		))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
@@ -112,7 +107,8 @@ $form
 	->addItem(
 		(new CScriptTag('
 			tag_filter_popup.init('.json_encode([
-				'tag_filters' => $data['tags']
+				'tag_filters' => $data['tag_filters'],
+				'groupid' => $data['groupid'] ?: 0
 			]).');
 		'))->setOnDocumentReady()
 	)
@@ -120,12 +116,12 @@ $form
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.tagfilter.edit.js.php', []),
+	'script_inline' =>  getPagePostJs().
+		$this->readJsFile('popup.tagfilter.edit.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => $data['edit'] ? _('Update') : _('Add'),
-			'class' => '',
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'tag_filter_popup.submit();'
