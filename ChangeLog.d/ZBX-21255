@@ -1,0 +1,1 @@
+..F....... [ZBX-21255] added support of ithe fmtnum() function for {ITEM.VALUE}, {ITEM.LASTVALUE} and expression macros (Sasha)
