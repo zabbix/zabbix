@@ -1749,7 +1749,7 @@ clean:
  ******************************************************************************/
 static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **re, char **err_msg)
 {
-	char	*regexp_err;
+	char	*regexp_err = NULL;
 
 	if (SUCCEED != zbx_regexp_compile(filename_regexp, re, &regexp_err))
 	{
