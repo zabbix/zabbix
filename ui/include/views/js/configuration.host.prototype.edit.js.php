@@ -160,7 +160,7 @@
 						);
 					}
 
-					panel.data('macros_initialized', true);
+					this.macros_initialized = true;
 				}
 			});
 
