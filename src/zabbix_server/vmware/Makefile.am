@@ -5,10 +5,13 @@ noinst_LIBRARIES = libzbxvmware.a
 libzbxvmware_a_SOURCES = \
 	vmware_stats.c \
 	vmware_perfcntr.c \
-	vmware.c \
+	vmware_perfcntr.h \
 	vmware_rest.c \
 	vmware_manager.c \
-	vmware.h
+	vmware_constants.h \
+	vmware_internal.h \
+	vmware.c \
+	vmware.h \
 
 libzbxvmware_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \
