@@ -2293,9 +2293,9 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
  *                                                                            *
  ******************************************************************************/
 #ifndef HAVE_IPV6
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR *name, int ipv6v4_mode)
 {
-	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
+	struct sockaddr_in	*name4 = (struct sockaddr_in *)name,
 				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
 
 	ZBX_UNUSED(ipv6v4_mode);
@@ -2303,7 +2303,7 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_
 	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
 }
 #else
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR *name, int ipv6v4_mode)
 {
 	/* Network Byte Order is ensured */
 	/* IPv4-compatible, the first 96 bits are zeros */
@@ -2311,15 +2311,15 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_
 	/* IPv4-mapped, the first 80 bits are zeros, 16 next - ones */
 	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
 
-	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
+	struct sockaddr_in	*name4 = (struct sockaddr_in *)name,
 				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
-	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
+	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)name,
 				*ai_addr6 = (struct sockaddr_in6 *)current_ai->ai_addr;
 
 #ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
-	if (current_ai->ai_family == name.ss_family)
+	if (current_ai->ai_family == name->ss_family)
 #else
-	if (current_ai->ai_family == name.__ss_family)
+	if (current_ai->ai_family == name->__ss_family)
 #endif
 	{
 		switch (current_ai->ai_family)
@@ -2490,7 +2490,7 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 							ZBX_IPV4_MAX_CIDR_PREFIX : ZBX_IPV6_MAX_CIDR_PREFIX);
 				}
 
-				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, *peer_info, 0))
+				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, peer_info, 0))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;

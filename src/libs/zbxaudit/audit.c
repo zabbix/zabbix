@@ -729,7 +729,7 @@ int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const c
 
 	zbx_db_begin();
 
-	zbx_db_insert_add_values(&db_insert,  auditid_cuid, userid, username, (int)time(NULL), ZBX_AUDIT_ACTION_EXECUTE,
+	zbx_db_insert_add_values(&db_insert,  auditid_cuid, userid, username, (int)time(NULL), ZBX_AUDIT_ACTION_PUSH,
 			clientip, AUDIT_RESOURCE_HISTORY, auditid_cuid,
 			details_json.buffer);
 
