@@ -74,8 +74,8 @@ window.template_edit_popup = new class {
 	}
 
 	#initTemplateTab() {
-		const $groups_ms = $(this.form).find('#template_groups_');
-		const $template_ms = $(this.form).find('#template_add_templates_');
+		const $groups_ms = $('#template_groups_', this.form);
+		const $template_ms = $('#template_add_templates_', this.form);
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries', this.#getLinkedTemplates().concat(this.#getNewTemplates()));
@@ -96,7 +96,7 @@ window.template_edit_popup = new class {
 			parent_hostid: null
 		});
 
-		$(this.form).find('#template-tabs').on('tabscreate tabsactivate', (event, ui) => {
+		$('#template-tabs', this.form).on('tabscreate tabsactivate', (event, ui) => {
 			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'template-macro-tab') {
@@ -193,7 +193,7 @@ window.template_edit_popup = new class {
 			value != e.target.dataset.templateid
 		);
 
-		$(this.form).find('#template_add_templates_').trigger('change');
+		$('#template_add_templates_', this.form).trigger('change');
 	}
 
 	/**
@@ -231,7 +231,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getNewTemplates() {
-		const $template_multiselect = $(this.form).find('#template_add_templates_');
+		const $template_multiselect = $('#template_add_templates_', this.form);
 		const templateids = [];
 
 		// Readonly forms don't have multiselect.
@@ -250,7 +250,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getAddTemplates() {
-		const $ms = $(this.form).find('#template_add_templates_');
+		const $ms = $('#template_add_templates_', this.form);
 		let templateids = [];
 
 		// Readonly forms don't have multiselect.
