@@ -994,6 +994,8 @@ class testFormAction extends CLegacyWebTest {
 							'Remove from host group',
 							'Link template',
 							'Unlink template',
+							'Add host tags',
+							'Remove host tags',
 							'Enable host',
 							'Disable host',
 							'Set host inventory mode',

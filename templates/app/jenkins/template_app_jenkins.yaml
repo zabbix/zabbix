@@ -2268,10 +2268,10 @@ zabbix_export:
             - name: tree
               value: 'jobs[name,description,url]'
           lld_macro_paths:
-            - lld_macro: '{#DESCRIPTION}'
-              path: $.description
             - lld_macro: '{#NAME}'
               path: $.name
+            - lld_macro: '{#DESCRIPTION}'
+              path: $.description
             - lld_macro: '{#URL}'
               path: $.url
           preprocessing:

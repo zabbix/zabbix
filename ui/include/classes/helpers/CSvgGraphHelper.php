@@ -838,8 +838,8 @@ class CSvgGraphHelper {
 		}
 
 		$options = [
-			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
-			'select_acknowledges' => ['action'],
+			'output' => ['eventid', 'objectid', 'name', 'severity', 'clock', 'r_eventid'],
+			'selectAcknowledges' => ['action'],
 			'problem_time_from' => $time_period['time_from'],
 			'problem_time_till' => $time_period['time_to'],
 			'symptom' => false,
@@ -894,10 +894,7 @@ class CSvgGraphHelper {
 		}
 
 		// Add severity filter.
-		$filter_severities = implode(',', $problem_options['severities']);
-		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
+		if ($problem_options['severities']) {
 			$options['severities'] = $problem_options['severities'];
 		}
 

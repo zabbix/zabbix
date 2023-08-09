@@ -2157,7 +2157,6 @@ select {
 }
 
 .textarea-flexible {
-	display: block;
 	min-height: 24px;
 	overflow: hidden;
 	resize: none;
@@ -3336,6 +3335,10 @@ svg {
 .problem-icon-link {
 	overflow: hidden;
 	border-radius: 2px;
+
+	.problem-icon-list-item {
+		border-radius: 0;
+	}
 
 	&:link,
 	&:hover,

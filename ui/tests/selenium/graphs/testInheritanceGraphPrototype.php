@@ -93,7 +93,8 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 						['itemName' => 'testInheritanceItemPrototype1']
 					],
 					'errors'=> [
-						'Graph with name "testInheritanceGraphPrototype4" already exists in graphs or graph prototypes.'
+						'Graph prototype "testInheritanceGraphPrototype4" already exists on the LLD rule with '.
+								'key "inheritance-discovery-rule" of the template "Inheritance test template".'
 					]
 				]
 			]

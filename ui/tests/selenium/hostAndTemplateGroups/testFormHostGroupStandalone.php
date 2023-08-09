@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  *
  * @onBefore prepareGroupData
  *
- * @dataSource DiscoveredHosts
+ * @dataSource DiscoveredHosts, HostTemplateGroups
  */
 class testFormHostGroupStandalone extends testFormGroups {
 
@@ -178,7 +178,7 @@ class testFormHostGroupStandalone extends testFormGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'One group for Delete',
+					'name' => self::DELETE_ONE_GROUP,
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
 				]
 			],

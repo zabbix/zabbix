@@ -569,7 +569,7 @@ int	DBcreate_serial_sequence(const char *table_name)
 	return SUCCEED;
 }
 
-int	DBdrop_serial_sequence(const char *table_name)
+static int	DBdrop_serial_sequence(const char *table_name)
 {
 	if (ZBX_DB_OK > zbx_db_execute("drop sequence " ZBX_FS_DB_SEQUENCE, table_name))
 	{
@@ -593,7 +593,7 @@ int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
 	return SUCCEED;
 }
 
-int	DBdrop_serial_trigger(const char *table_name)
+static int	DBdrop_serial_trigger(const char *table_name)
 {
 	if (ZBX_DB_OK > zbx_db_execute("drop trigger " ZBX_FS_DB_TRIGGER, table_name))
 	{
@@ -656,6 +656,7 @@ int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *fie
 	return SUCCEED;
 
 #else /* ORACLE */
+	ZBX_UNUSED(field);
 
 	if (SUCCEED != DBdrop_serial_sequence(table_name))
 		return FAIL;
@@ -664,7 +665,6 @@ int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *fie
 		return FAIL;
 
 	return SUCCEED;
-
 #endif
 }
 
