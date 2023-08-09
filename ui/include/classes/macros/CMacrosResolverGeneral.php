@@ -1270,20 +1270,21 @@ class CMacrosResolverGeneral {
 	/**
 	 * Calculates macro function. Returns UNRESOLVED_MACRO_STRING in case of unsupported function.
 	 *
-	 * @param string $value        [IN] The input value.
-	 * @param string $function     [IN] The function name.
-	 * @param array  $parameters   [IN] The function parameters.
+	 * @param string $value                    [IN] The input value.
+	 * @param array  $macrofunc                [IN]
+	 * @param string $macrofunc['function']    [IN] The function name.
+	 * @param array  $macrofunc['parameters']  [IN] The function parameters.
 	 *
 	 * @return string
 	 */
-	private static function calcMacrofunc(string $value, string $function, array $parameters) {
-		switch ($function) {
+	private static function calcMacrofunc(string $value, array $macrofunc) {
+		switch ($macrofunc['function']) {
 			case 'regsub':
 			case 'iregsub':
-				return self::macrofuncRegsub($value, $parameters, $function === 'iregsub');
+				return self::macrofuncRegsub($value, $macrofunc['parameters'], $macrofunc['function'] === 'iregsub');
 
 			case 'fmtnum':
-				return self::macrofuncFmtnum($value, $parameters);
+				return self::macrofuncFmtnum($value, $macrofunc['parameters']);
 		}
 
 		return UNRESOLVED_MACRO_STRING;
@@ -1362,9 +1363,7 @@ class CMacrosResolverGeneral {
 				foreach ($tokens as $token) {
 					if ($value !== null) {
 						$macro_value = array_key_exists('macrofunc', $token)
-							? self::calcMacrofunc($value, $token['macrofunc']['function'],
-								$token['macrofunc']['parameters']
-							)
+							? self::calcMacrofunc($value, $token['macrofunc'])
 							: formatHistoryValue($value, $function);
 					}
 					else {
