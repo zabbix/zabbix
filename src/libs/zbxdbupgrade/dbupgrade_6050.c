@@ -717,11 +717,11 @@ static int	DBpatch_6050063(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > zbx_db_execute("delete"
-			" from task t"
+			" from task"
 			" where exists ("
 				"select null"
 				" from task_data td"
-				" where td.taskid=t.taskid and td.type in (%i,%i)"
+				" where td.taskid=task.taskid and td.type in (%i,%i)"
 			")",
 			TM_DATA_TYPE_TEST_ITEM, TM_DATA_TYPE_PROXYIDS))
 	{
