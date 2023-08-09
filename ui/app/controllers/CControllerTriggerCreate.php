@@ -27,26 +27,26 @@ class CControllerTriggerCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>							'in '.implode(',', ['host', 'template']),
-			'correlation_mode' =>					'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
-			'correlation_tag' =>					'db triggers.correlation_tag',
-			'dependencies' =>						'array',
-			'description' =>						'db triggers.comments',
-			'event_name' =>							'db triggers.event_name',
-			'expression' =>							'required|db triggers.expression|not_empty',
-			'hostid' =>								'db hosts.hostid',
-			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
 			'name' =>								'required|db triggers.description|not_empty',
+			'event_name' =>							'db triggers.event_name',
 			'opdata' =>								'db triggers.opdata',
 			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>				'db triggers.recovery_expression',
+			'expression' =>							'required|db triggers.expression|not_empty',
 			'recovery_mode' =>						'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
+			'recovery_expression' =>				'db triggers.recovery_expression',
+			'type' =>								'db triggers.type|in 0,1',
+			'correlation_mode' =>					'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
+			'correlation_tag' =>					'db triggers.correlation_tag',
+			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
+			'url_name' =>							'db triggers.url_name',
+			'url' =>								'db triggers.url',
+			'description' =>						'db triggers.comments',
 			'status' =>								'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
 			'tags' =>								'array',
+			'dependencies' =>						'array',
+			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid',
-			'type' =>								'db triggers.type|in 0,1',
-			'url' =>								'db triggers.url',
-			'url_name' =>							'db triggers.url_name'
+			'context' =>							'in '.implode(',', ['host', 'template'])
 		];
 
 		$ret = $this->validateInput($fields);

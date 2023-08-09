@@ -27,26 +27,28 @@ class CControllerTriggerPrototypeCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'name' =>								'required|db triggers.description|not_empty',
+			'event_name' =>							'db triggers.event_name',
+			'opdata' =>								'db triggers.opdata',
+			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
+			'expression' =>							'required|db triggers.expression|not_empty',
+			'recovery_mode' =>						'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
+			'recovery_expression' =>				'db triggers.recovery_expression',
+			'type' =>								'db triggers.type|in 0,1',
 			'correlation_mode' =>					'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
 			'correlation_tag' =>					'db triggers.correlation_tag',
-			'dependencies' =>						'array',
-			'description' =>						'db triggers.comments',
-			'discover' =>							'db triggers.discover',
-			'event_name' =>							'db triggers.event_name',
-			'expression' =>							'required|db triggers.expression|not_empty',
 			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
-			'name' =>								'required|db triggers.description|not_empty',
-			'opdata' =>								'db triggers.opdata',
-			'parent_discoveryid'=>					'required|db triggers.triggerid',
-			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>				'db triggers.recovery_expression',
-			'recovery_mode' =>						'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
+			'url_name' =>							'db triggers.url_name',
+			'url' =>								'db triggers.url',
+			'description' =>						'db triggers.comments',
 			'status' =>								'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
 			'tags' =>								'array',
+			'dependencies' =>						'array',
+			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid',
-			'type' =>								'db triggers.type|in 0,1',
-			'url' =>								'db triggers.url',
-			'url_name' =>							'db triggers.url_name'
+			'discover' =>							'db triggers.discover',
+			'parent_discoveryid'=>					'required|db triggers.triggerid',
+			'context' =>							'in '.implode(',', ['host', 'template'])
 		];
 
 		$ret = $this->validateInput($fields);
