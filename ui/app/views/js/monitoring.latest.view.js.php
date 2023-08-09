@@ -434,7 +434,7 @@
 		},
 
 		editTrigger(trigger_data) {
-			clearMessages();
+			this._removePopupMessage();
 
 			const overlay = PopUp('trigger.edit', trigger_data, {
 				dialogueid: 'trigger-edit',
