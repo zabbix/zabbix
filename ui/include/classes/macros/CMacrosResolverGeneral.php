@@ -426,18 +426,23 @@ class CMacrosResolverGeneral {
 			$macros['expr_macros'] = [];
 
 			$expr_macro_parser = new CExpressionMacroParser();
+			$expr_macro_function_parser = new CExpressionMacroFunctionParser();
 		}
 
 		if ($extract_expr_macros_host) {
 			$macros['expr_macros_host'] = [];
+			$options = ['host_macro' => true, 'empty_host' => true];
 
-			$expr_macro_parser_host = new CExpressionMacroParser(['host_macro' => true, 'empty_host' => true]);
+			$expr_macro_parser_host = new CExpressionMacroParser($options);
+			$expr_macro_function_parser_host = new CExpressionMacroFunctionParser($options);
 		}
 
 		if ($extract_expr_macros_host_n) {
 			$macros['expr_macros_host_n'] = [];
+			$options = ['host_macro_n' => true, 'empty_host' => true];
 
-			$expr_macro_parser_host_n = new CExpressionMacroParser(['host_macro_n' => true, 'empty_host' => true]);
+			$expr_macro_parser_host_n = new CExpressionMacroParser($options);
+			$expr_macro_function_parser_host_n = new CExpressionMacroFunctionParser($options);
 		}
 
 		foreach ($texts as $text) {
@@ -564,6 +569,33 @@ class CMacrosResolverGeneral {
 					}
 				}
 
+				if ($extract_expr_macros && $expr_macro_function_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_function_parser
+						->getExpressionMacroParser()
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$function_parser = $expr_macro_function_parser->getFunctionParser();
+
+						$macros['expr_macros'][$expr_macro_function_parser->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: '',
+							'macrofunc' => [
+								'function' => $function_parser->getFunction(),
+								'parameters' => $function_parser->getParams()
+							]
+						];
+						$pos += $expr_macro_function_parser->getLength() - 1;
+						continue;
+					}
+				}
+
 				if ($extract_expr_macros_host && $expr_macro_parser_host->parse($text, $pos) != CParser::PARSE_FAIL) {
 					$tokens = $expr_macro_parser_host
 						->getExpressionParser()
@@ -580,6 +612,35 @@ class CMacrosResolverGeneral {
 								: ''
 						];
 						$pos += $expr_macro_parser_host->getLength() - 1;
+						continue;
+					}
+				}
+
+				if ($extract_expr_macros_host
+						&& $expr_macro_function_parser_host->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_function_parser_host
+						->getExpressionMacroParser()
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$function_parser = $expr_macro_function_parser_host->getFunctionParser();
+
+						$macros['expr_macros_host'][$expr_macro_function_parser_host->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: '',
+							'macrofunc' => [
+								'function' => $function_parser->getFunction(),
+								'parameters' => $function_parser->getParams()
+							]
+
+						];
+						$pos += $expr_macro_function_parser_host->getLength() - 1;
 						continue;
 					}
 				}
@@ -601,6 +662,34 @@ class CMacrosResolverGeneral {
 								: ''
 						];
 						$pos += $expr_macro_parser_host_n->getLength() - 1;
+						continue;
+					}
+				}
+
+				if ($extract_expr_macros_host_n
+						&& $expr_macro_function_parser_host_n->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_function_parser_host_n
+						->getExpressionMacroParser()
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$function_parser = $expr_macro_function_parser_host_n->getFunctionParser();
+
+						$macros['expr_macros_host_n'][$expr_macro_function_parser_host_n->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: '',
+							'macrofunc' => [
+								'function' => $function_parser->getFunction(),
+								'parameters' => $function_parser->getParams()
+							]
+						];
+						$pos += $expr_macro_function_parser_host_n->getLength() - 1;
 						continue;
 					}
 				}

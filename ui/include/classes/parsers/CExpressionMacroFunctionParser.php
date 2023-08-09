@@ -114,4 +114,22 @@ class CExpressionMacroFunctionParser extends CParser {
 
 		return (isset($source[$p]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
 	}
+
+	/**
+	 * Returns the expression parser.
+	 *
+	 * @return CExpressionMacroParser
+	 */
+	public function getExpressionMacroParser(): CExpressionMacroParser {
+		return $this->expression_macro_parser;
+	}
+
+	/**
+	 * Returns function parser.
+	 *
+	 * @return string
+	 */
+	public function getFunctionParser() {
+		return $this->function_parser;
+	}
 }
