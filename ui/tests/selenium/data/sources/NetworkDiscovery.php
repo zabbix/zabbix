@@ -119,12 +119,34 @@ class NetworkDiscovery {
 				]
 			],
 			[
-				'name' => 'Discovery rule to check delete',
+				'name' => 'Discovery rule for successful deleting',
 				'iprange' => '192.168.1.1-255',
 				'status' => 1,
 				'dchecks' => [
 					[
 						'type' => SVC_ICMPPING
+					]
+				]
+			],
+			[
+				'name' => 'Discovery rule for deleting, used in Action',
+				'iprange' => '192.168.2.2-255',
+				'status' => 1,
+				'dchecks' => [
+					[
+						'type' => SVC_IMAP,
+						'ports' => 2050
+					],
+				]
+			],
+			[
+				'name' => 'Discovery rule for deleting, check used in Action',
+				'iprange' => '192.168.2.2-255',
+				'status' => 1,
+				'dchecks' => [
+					[
+						'type' => SVC_TELNET,
+						'ports' => 15
 					]
 				]
 			],
@@ -143,6 +165,61 @@ class NetworkDiscovery {
 						'snmpv3_authpassphrase' => 'cancel_authpassphrase',
 						'snmpv3_privprotocol' => 5,
 						'snmpv3_privpassphrase' => 'cancel_privpassphrase'
+					]
+				]
+			]
+		]);
+		$discovery_ruleids = CDataHelper::getIds('name');
+		$check_id = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
+				.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
+		);
+
+		CDataHelper::call('action.create', [
+			[
+				'name' => 'Action with discovery rule',
+				'eventsource' => 1,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'conditiontype' => 18,
+							'operator' => 0,
+							'value' => $discovery_ruleids['Discovery rule for deleting, used in Action']
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => 0,
+						'opmessage' => [
+							'default_msg' => 1,
+							'mediatypeid' => 0
+						],
+						'opmessage_usr' => [['userid' => 1]]
+					]
+				]
+			],
+			[
+				'name' => 'Action with discovery check',
+				'eventsource' => 1,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'conditiontype' => 19,
+							'operator' => 0,
+							'value' => $check_id
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => 0,
+						'opmessage' => [
+							'default_msg' => 1,
+							'mediatypeid' => 0
+						],
+						'opmessage_usr' => [['userid' => 1]]
 					]
 				]
 			]

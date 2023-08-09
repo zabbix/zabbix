@@ -31,10 +31,15 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	use TableTrait;
 
-	const DELETE_RULE = 'Discovery rule to check delete';
 	const CANCEL_RULE = 'Discovery rule for cancelling scenario';
 	const CLONE_RULE = 'Discovery rule for clone';
 	const CHECKS_RULE = 'Discovery rule for changing checks';
+	const DELETE_RULES = [
+		'success' => 'Discovery rule for successful deleting',
+		'action_used' => 'Discovery rule for deleting, used in Action',
+		'action_check_used' =>  'Discovery rule for deleting, check used in Action'
+	];
+
 
 	/**
 	 * Name of discovery rule for update scenario.
@@ -674,7 +679,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Checks for device uniqueness'
+						'Name' => 'Checks for radio fields'
 					],
 					'Checks' => [
 						['Check type' => 'LDAP'],
@@ -980,12 +985,16 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						[
 							// SNMPv1 agent.
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Port range' => 200,
 							'SNMP community' => 'new_test_community',
 							'SNMP OID' => 'new test SNMP OID'
 						],
 						[
 							// SNMPv3 agent.
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'Port range' => 9999,
 							'SNMP OID' => 'new test SNMP OID _2',
 							'Context name' => 'new test context name',
@@ -998,6 +1007,8 @@ class testFormNetworkDiscovery extends CWebTest {
 						],
 						[
 							// Telnet.
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
 							'Port range' => 205
 						]
 					],
@@ -1013,15 +1024,20 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'Checks' => [
 						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
 							'Check type' => 'ICMP ping',
 							'Allow redirect' => true
 						],
 						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'Check type' => 'POP',
 							'Port range' => 2020
 						],
 						[
-							'remove' => true
+							'action' => USER_ACTION_REMOVE,
+							'index' => 2
 						]
 					],
 					'expected_checks' => [
@@ -1035,7 +1051,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'Checks' => [
 						[
-							'add' => true,
+							'action' =>  USER_ACTION_ADD,
 							'Check type' => 'SNMPv2 agent',
 							'Port range' => 903,
 							'SNMP community' => 'v2_test_community',
@@ -1052,8 +1068,8 @@ class testFormNetworkDiscovery extends CWebTest {
 			// #3 Delete all checks.
 			[
 				[
-					'expected' => TEST_BAD,
 					'Checks' => 'remove all',
+					'expected' => TEST_BAD,
 					'error_details' => 'Field "dchecks" is mandatory.'
 				]
 			]
@@ -1080,46 +1096,48 @@ class testFormNetworkDiscovery extends CWebTest {
 			$this->removeAllChecks($form);
 		}
 		else {
-			foreach ($data['Checks'] as $i => $check) {
-				if (CTestArrayHelper::get($check, 'add')) {
-					$form->getField('Checks')->query('button:Add')->waitUntilClickable()->one()->click();
-					$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-					$checks_form = $checks_dialog->asForm();
-					unset($check['add']);
-					$checks_form->fill($check);
-					$checks_form->submit();
-					$checks_dialog->waitUntilNotVisible();
-				}
-				elseif (CTestArrayHelper::get($check, 'remove')) {
-					$row = $table->getRow($i);
-					$type_text = $row->getColumn('Type')->getText();
-					$row->query('button:Remove')->one()->waitUntilClickable()->click();
-					$this->assertFalse($table->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($type_text).']')->exists());
-				}
-				else {
-					$table->getRow($i)->query('button:Edit')->one()->waitUntilClickable()->click();
-					$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-					$checks_form = $checks_dialog->asForm();
-					$checks_form->fill($check);
-					$checks_form->submit();
-					$checks_dialog->waitUntilNotVisible();
+			foreach ($data['Checks'] as $check) {
+				switch ($check['action']) {
+					case USER_ACTION_ADD:
+					case USER_ACTION_UPDATE:
+						if ($check['action'] === USER_ACTION_UPDATE) {
+							$table->getRow($check['index'])->query('button:Edit')->one()->waitUntilClickable()->click();
+							unset($check['index'], $check['action']);
+						}
+						else {
+							$table->query('button:Add')->waitUntilClickable()->one()->click();
+							unset($check['action']);
+						}
+
+						$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+						$checks_form = $checks_dialog->asForm();
+						$checks_form->fill($check);
+						$checks_form->submit();
+						$checks_dialog->waitUntilNotVisible();
+						break;
+
+					case USER_ACTION_REMOVE:
+						$row = $table->getRow($check['index']);
+						$row->query('button:Remove')->one()->waitUntilClickable()->click();
+						$row->waitUntilNotPresent();
+						break;
 				}
 			}
+		}
 
-			$form->submit();
+		$form->submit();
 
-			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-				$this->assertMessage(TEST_BAD, 'Cannot update discovery rule', $data['error_details']);
-				$this->assertEquals($old_hash, $this->getHash());
-			}
-			else {
-				$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot update discovery rule', $data['error_details']);
+			$this->assertEquals($old_hash, $this->getHash());
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 
-				// Compare Checks table with the expected result.
-				$this->query('link', self::CHECKS_RULE)->waitUntilClickable()->one()->click();
-				COverlayDialogElement::find()->one()->waitUntilReady();
-				$this->assertTableDataColumn($data['expected_checks'], 'Type', 'id:dcheckList');
-			}
+			// Compare Checks table with the expected result.
+			$this->query('link', self::CHECKS_RULE)->waitUntilClickable()->one()->click();
+			COverlayDialogElement::find()->one()->waitUntilReady();
+			$this->assertTableDataColumn($data['expected_checks'], 'Type', 'id:dcheckList');
 		}
 
 		$dialog->close();
@@ -1166,21 +1184,58 @@ class testFormNetworkDiscovery extends CWebTest {
 		$dialog->close();
 
 		// Check Discovery rules in DB.
-		foreach(['Discovery rule for clone', $new_name] as $name) {
+		foreach([self::CLONE_RULE, $new_name] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr($name)));
 		}
 	}
 
-	public function testFormNetworkDiscovery_Delete() {
+	public static function getDeleteData() {
+		return [
+			[
+				[
+					'discovery' => self::DELETE_RULES['success']
+				]
+			],
+			[
+				[
+					'discovery' => self::DELETE_RULES['action_used'],
+					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_used']).
+							' is used in "Action with discovery rule" action.'
+				]
+			],
+			[
+				[
+					'discovery' => self::DELETE_RULES['action_check_used'],
+					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_check_used']).
+							' is used in "Action with discovery check" action.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getDeleteData
+	 */
+	public function testFormNetworkDiscovery_Delete($data) {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
-		$this->query('link', self::DELETE_RULE)->waitUntilClickable()->one()->click();
+		$this->query('link', $data['discovery'])->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->assertEquals('Delete discovery rule?', $this->page->getAlertText());
 		$this->page->acceptAlert();
-		$dialog->ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr(self::DELETE_RULE)));
+
+		if (CTestArrayHelper::get($data, 'error')) {
+			$this->assertMessage(TEST_BAD, 'Cannot delete discovery rule', $data['error']);
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.
+					zbx_dbstr($data['discovery'])));
+			$dialog->close();
+		}
+		else {
+			$dialog->ensureNotPresent();
+			$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
+			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name='.
+					zbx_dbstr($data['discovery'])));
+		}
 	}
 
 	public static function getCancelData() {
@@ -1274,14 +1329,9 @@ class testFormNetworkDiscovery extends CWebTest {
 	 * @param CFormElement $form    discovery rule's edit form
 	 */
 	protected function removeAllChecks($form) {
-		$checks_container = $form->getFieldContainer('Checks');
-		$checks_count = $checks_container->query('xpath:.//td[contains(@id, "dcheckCell_")]')->count();
-
-		for ($i = 0; $i < $checks_count; $i++) {
-			// After each deletion checks buttons reset their position, so upper items locator is always [1].
-			$remove_button = $checks_container->query('xpath:(.//button[text()="Remove"])[1]')->one();
-			$remove_button->waitUntilClickable()->click();
-			$remove_button->waitUntilNotPresent();
+		foreach ($form->getFieldContainer('Checks')->asTable()->getRows() as $row) {
+			$row->query('button:Remove')->one()->waitUntilClickable()->click();
+			$row->waitUntilNotPresent();
 		}
 	}
 }
