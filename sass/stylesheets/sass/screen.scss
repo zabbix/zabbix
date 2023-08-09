@@ -317,6 +317,10 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			}
 		}
 	}
+
+	& + .list-table {
+		margin-top: 4px;
+	}
 }
 
 .header-navigation {

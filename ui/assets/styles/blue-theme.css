@@ -4480,6 +4480,8 @@ pre, pre a, pre td, pre span {
         line-height: 22px;
         margin-bottom: 5px;
         text-align: center; }
+  .host-dashboard-header-navigation + .list-table {
+    margin-top: 4px; }
 
 .header-navigation {
   display: inline-block;

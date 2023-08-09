@@ -197,7 +197,9 @@ if (count($data['dashboard']['pages']) > 1
 		);
 	}
 
-	$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
+	$dashboard->addItem(
+		(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+	);
 
 	$html_page
 		->addItem($dashboard)
@@ -205,10 +207,7 @@ if (count($data['dashboard']['pages']) > 1
 }
 else {
 	$html_page
-		->addItem((new CDiv())
-			->addStyle('margin-top: 10px;')
-			->addItem(new CTableInfo())
-		)
+		->addItem(new CTableInfo())
 		->show();
 }
 
