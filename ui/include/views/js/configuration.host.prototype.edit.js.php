@@ -39,6 +39,7 @@
 			this.prototype_interfaces = prototype_interfaces;
 			this.parent_host_interfaces = parent_host_interfaces;
 			this.parent_host_status = parent_host_status;
+			this.macros_templateids = null;
 
 			this.initHostTab();
 			this.initMacrosTab();
@@ -115,38 +116,36 @@
 				'readonly': this.readonly,
 				'parent_hostid': this.parent_hostid
 			});
-			this.show_inherited_macros = this.form
-				.querySelector('input[name=show_inherited_macros]:checked').value == 1;
+			let macros_initialized = false;
 
 			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
 				let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+				const show_inherited_macros = this.form
+					.querySelector('input[name=show_inherited_macros]:checked').value == 1;
 
 				if (panel.attr('id') === 'macro-tab') {
-					if (!this.macros_initialized) {
-						this.macros_initialized = false;
-					}
 
 					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (event.type === 'tabsactivate') {
 						const templateids = this.getAllTemplates();
 
 						// First time always load inherited macros.
-						if (!this.macros_templateids) {
+						if (this.macros_templateids === null) {
 							this.macros_templateids = templateids;
 
-							if (this.show_inherited_macros) {
-								this.macros_manager.load(this.show_inherited_macros, templateids);
-								this.macros_initialized = true;
+							if (show_inherited_macros) {
+								this.macros_manager.load(show_inherited_macros, templateids);
+								macros_initialized = true;
 							}
 						}
 						// Other times load inherited macros only if templates changed.
-						else if (this.show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
+						else if (show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
 							this.macros_templateids = templateids;
-							this.macros_manager.load(this.show_inherited_macros, templateids);
+							this.macros_manager.load(show_inherited_macros, templateids);
 						}
 					}
 
-					if (this.macros_initialized) {
+					if (macros_initialized) {
 						return;
 					}
 
@@ -155,22 +154,15 @@
 						$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
 					}
 					else {
-						this.macros_manager.initMacroTable(
-							this.show_inherited_macros
-						);
+						this.macros_manager.initMacroTable(show_inherited_macros);
 					}
 
-					this.macros_initialized = true;
+					macros_initialized = true;
 				}
 			});
 
 			this.form.querySelector('#show_inherited_macros').onchange = (e) => {
-				this.show_inherited_macros = e.target.value == 1;
-
-				this.macros_manager.load(
-					this.show_inherited_macros,
-					this.linked_templates.concat(this.getAddTemplates())
-				);
+				this.macros_manager.load(e.target.value == 1, this.getAllTemplates());
 			}
 		}
 
@@ -233,26 +225,6 @@
 		}
 
 		/**
-		 * Collects IDs selected in "Add templates" multiselect.
-		 *
-		 * @return {array}  Templateids.
-		 */
-		getAddTemplates() {
-			const $ms = $('#add_templates_');
-			let templateids = [];
-
-			// Readonly forms don't have multiselect.
-			if ($ms.length) {
-				// Collect IDs from Multiselect.
-				$ms.multiSelect('getData').forEach(function (template) {
-					templateids.push(template.id);
-				});
-			}
-
-			return templateids;
-		}
-
-		/**
 		 * Collects ids of currently active (linked + new) templates.
 		 *
 		 * @return {array}  Templateids.
@@ -266,6 +238,7 @@
 		 *
 		 * @return {array}  Templateids.
 		 */
+
 		getLinkedTemplates() {
 			const linked_templateids = [];
 
