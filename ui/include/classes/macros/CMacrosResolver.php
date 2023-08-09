@@ -1863,7 +1863,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($columns as $column => $value) {
 			$data[$column] = [];
 
-			foreach ($entities as $key => $item) {
+			foreach ($entities as $key => $entity) {
 				$data[$column][$key] = strtr($value, $macro_values[$key]);
 			}
 		}
