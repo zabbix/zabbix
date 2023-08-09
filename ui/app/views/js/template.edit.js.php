@@ -120,6 +120,12 @@ window.template_edit_popup = new class {
 
 						panel.data('macros_initialized', true);
 					}
+					else {
+						this.macros_manager.load(
+							this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
+							this.linked_templateids.concat(templateids)
+						);
+					}
 				}
 
 				if (macros_initialized) {
