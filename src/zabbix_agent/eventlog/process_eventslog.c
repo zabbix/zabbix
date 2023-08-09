@@ -567,7 +567,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 	if (1 == metric->skip_old_data)
 	{
-		metric->lastlogsize = LastID;
+		metric->lastlogsize = lastlogsize = LastID;
 		metric->skip_old_data = 0;
 		zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data: lastlogsize:" ZBX_FS_UI64, metric->lastlogsize);
 		goto finish;

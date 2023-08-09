@@ -877,7 +877,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 	/* update counters */
 	if (1 == metric->skip_old_data)
 	{
-		metric->lastlogsize = LastID - 1;
+		metric->lastlogsize = lastlogsize = LastID - 1;
 		metric->skip_old_data = 0;
 		zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data: lastlogsize:" ZBX_FS_UI64, lastlogsize);
 		goto finish;
