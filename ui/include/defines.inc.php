@@ -1474,7 +1474,7 @@ define('API_BOOLEAN',				4);
 define('API_FLAG',					5);
 define('API_FLOAT',					6);
 define('API_UINT64',				7);
-define('API_FILTER_VALUE',			60);
+define('API_VALUE',					60);
 // arrays
 define('API_OBJECT',				8);
 define('API_IDS',					9);
@@ -1539,7 +1539,6 @@ define('API_XML',					65);
 define('API_PREPROC_PARAMS',		66);
 define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
-define('API_HISTORY_VALUE',			69);
 
 // flags
 define('API_REQUIRED',					0x00001);

@@ -6235,6 +6235,55 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
 			],
 			[
+				['type' => API_VALUE],
+				null,
+				'/1/value',
+				'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_VALUE],
+				true,
+				'/1/value',
+				'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_VALUE],
+				[],
+				'/1/value',
+				'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_VALUE],
+				'',
+				'/1/value',
+				''
+			],
+			[
+				['type' => API_VALUE],
+				'abc',
+				'/1/value',
+				'abc'
+			],
+			[
+				['type' => API_VALUE],
+				1,
+				'/1/value',
+				1
+			],
+			[
+				['type' => API_VALUE],
+				0.5,
+				'/1/value',
+				0.5
+			],
+			[
+				['type' => API_VALUE],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/value',
+				'Invalid parameter "/1/value": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_ITEM_KEY],
 				'key',
 				'/1/item_key',
@@ -8256,55 +8305,6 @@ class CApiInputValidatorTest extends TestCase {
 				'{$MACRO: '."\xd1".'ontext}',
 				'/1/secret',
 				'Invalid parameter "/1/secret": invalid byte sequence in UTF-8.'
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				null,
-				'/1/history_value',
-				'Invalid parameter "/1/history_value": a history value is expected.'
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				true,
-				'/1/history_value',
-				'Invalid parameter "/1/history_value": a history value is expected.'
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				[],
-				'/1/history_value',
-				'Invalid parameter "/1/history_value": a history value is expected.'
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				'',
-				'/1/history_value',
-				''
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				'abc',
-				'/1/history_value',
-				'abc'
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				1,
-				'/1/history_value',
-				'1'
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				0.5,
-				'/1/history_value',
-				'0.5'
-			],
-			[
-				['type' => API_HISTORY_VALUE],
-				// broken UTF-8 byte sequence
-				"\xd1".'12345',
-				'/1/history_value',
-				'Invalid parameter "/1/history_value": invalid byte sequence in UTF-8.'
 			]
 		];
 	}

@@ -386,14 +386,14 @@ class testHistory extends CAPITest {
 					'value' => true
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/1/value": a history value is expected.'
+				'expected_error' => 'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
 			],
 			'Test history.push: invalid "value" (array)' => [
 				'request' => [
 					'value' => []
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/1/value": a history value is expected.'
+				'expected_error' => 'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
 			],
 
 			// Check "clock" field.

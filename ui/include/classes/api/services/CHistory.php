@@ -365,7 +365,7 @@ class CHistory extends CApiService {
 			'itemid' =>	['type' => API_ID],
 			'host' =>	['type' => API_STRING_UTF8],
 			'key' =>	['type' => API_STRING_UTF8],
-			'value' =>	['type' => API_HISTORY_VALUE, 'flags' => API_REQUIRED],
+			'value' =>	['type' => API_VALUE, 'flags' => API_REQUIRED],
 			'clock' =>	['type' => API_TIMESTAMP],
 			'ns' =>		['type' => API_INT32, 'in' => '0:999999999']
 		]];
