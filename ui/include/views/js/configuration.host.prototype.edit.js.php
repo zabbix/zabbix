@@ -115,35 +115,38 @@
 				'readonly': this.readonly,
 				'parent_hostid': this.parent_hostid
 			});
+			this.show_inherited_macros = this.form
+				.querySelector('input[name=show_inherited_macros]:checked').value == 1;
 
 			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
 				let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 				if (panel.attr('id') === 'macro-tab') {
-					const macros_initialized = panel.data('macros_initialized') || false;
+					if (!this.macros_initialized) {
+						this.macros_initialized = false;
+					}
 
 					// Please note that macro initialization must take place once and only when the tab is visible.
 					if (event.type === 'tabsactivate') {
-						let panel_templateids = panel.data('templateids') || [];
-						let templateids = this.getAddTemplates();
+						const templateids = this.getAllTemplates();
 
-						const merged_templateids = panel_templateids.concat(templateids).filter(function (e) {
-							return !(panel_templateids.includes(e) && templateids.includes(e));
-						});
+						// First time always load inherited macros.
+						if (!this.macros_templateids) {
+							this.macros_templateids = templateids;
 
-						if (merged_templateids.length > 0) {
-							panel.data('templateids', templateids);
-
-							this.macros_manager.load(
-								this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
-								this.linked_templates.concat(templateids)
-							);
-
-							panel.data('macros_initialized', true);
+							if (this.show_inherited_macros) {
+								this.macros_manager.load(this.show_inherited_macros, templateids);
+								this.macros_initialized = true;
+							}
+						}
+						// Other times load inherited macros only if templates changed.
+						else if (this.show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
+							this.macros_templateids = templateids;
+							this.macros_manager.load(this.show_inherited_macros, templateids);
 						}
 					}
 
-					if (macros_initialized) {
+					if (this.macros_initialized) {
 						return;
 					}
 
@@ -153,7 +156,7 @@
 					}
 					else {
 						this.macros_manager.initMacroTable(
-							this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1
+							this.show_inherited_macros
 						);
 					}
 
@@ -161,10 +164,12 @@
 				}
 			});
 
-			this.form.querySelector('#show_inherited_macros').onchange = () => {
+			this.form.querySelector('#show_inherited_macros').onchange = (e) => {
+				this.show_inherited_macros = e.target.value == 1;
+
 				this.macros_manager.load(
-					this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
-					this.getAllTemplates()
+					this.show_inherited_macros,
+					this.linked_templates.concat(this.getAddTemplates())
 				);
 			}
 		}

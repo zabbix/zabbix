@@ -26,13 +26,12 @@
 
 window.template_edit_popup = new class {
 
-	init({templateid, linked_templates, readonly, warnings}) {
+	init({templateid, linked_templates, warnings}) {
 		this.overlay = overlays_stack.getById('templates-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.templateid = templateid;
 		this.linked_templateids = linked_templates;
-		this.readonly = readonly;
 
 		if (warnings.length > 0) {
 			const message_box = warnings.length > 1
@@ -91,64 +90,37 @@ window.template_edit_popup = new class {
 
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
-			container: $('#template_macros_container .table-forms-td-right'),
-			readonly: this.readonly,
-			parent_hostid: null
+			container: $('#template_macros_container .table-forms-td-right')
 		});
+		this.show_inherited_macros = this.form
+			.querySelector('input[name=show_inherited_template_macros]:checked').value == 1;
 
 		$('#template-tabs', this.form).on('tabscreate tabsactivate', (event, ui) => {
 			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'template-macro-tab') {
-				const macros_initialized = panel.data('macros_initialized') || false;
-
 				// Please note that macro initialization must take place once and only when the tab is visible.
 				if (event.type === 'tabsactivate') {
-					let panel_templateids = panel.data('templateids') || [];
-					const templateids = this.#getAddTemplates();
+					const templateids = this.#getLinkedTemplates().concat(this.#getNewTemplates());
 
-					const merged_templateids = panel_templateids.concat(templateids).filter(function(e) {
-						return !(panel_templateids.includes(e) && templateids.includes(e));
-					});
-
-					if (merged_templateids.length > 0) {
-						panel.data('templateids', templateids);
-						this.macros_manager.load(
-							this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
-							this.linked_templateids.concat(templateids)
-						);
-
-						panel.data('macros_initialized', true);
+					if (!this.macros_templateids) {
+						this.macros_templateids = templateids;
 					}
-					else {
-						this.macros_manager.load(
-							this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
-							this.linked_templateids.concat(templateids)
-						);
+
+					// After initialization load inherited macros only if templates changed.
+					if (this.show_inherited_macros && this.macros_templateids.xor(templateids).length > 0) {
+						this.macros_templateids = templateids;
+						this.macros_manager.load(this.show_inherited_macros, templateids);
 					}
 				}
-
-				if (macros_initialized) {
-					return;
-				}
-
-				// Initialize macros.
-				if (this.readonly) {
-					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#template_tbl_macros').textareaFlexible();
-				}
-				else {
-					this.macros_manager.initMacroTable(
-						this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1
-					);
-				}
-
-				panel.data('macros_initialized', true);
 			}
 		});
 
-		this.form.querySelector('#show_inherited_template_macros').onchange = () => {
+		this.form.querySelector('#show_inherited_template_macros').onchange = (e) => {
+			this.show_inherited_macros = e.target.value == 1;
+
 			this.macros_manager.load(
-				this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
+				this.show_inherited_macros,
 				this.linked_templateids.concat(this.#getAddTemplates())
 			);
 		}
@@ -234,7 +206,6 @@ window.template_edit_popup = new class {
 		const $template_multiselect = $('#template_add_templates_', this.form);
 		const templateids = [];
 
-		// Readonly forms don't have multiselect.
 		if ($template_multiselect.length) {
 			$template_multiselect.multiSelect('getData').forEach(template => {
 				templateids.push(template.id);
@@ -253,7 +224,6 @@ window.template_edit_popup = new class {
 		const $ms = $('#template_add_templates_', this.form);
 		let templateids = [];
 
-		// Readonly forms don't have multiselect.
 		if ($ms.length) {
 			// Collect IDs from Multiselect.
 			$ms.multiSelect('getData').forEach(function (template) {

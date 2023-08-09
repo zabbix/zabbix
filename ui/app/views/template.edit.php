@@ -344,7 +344,6 @@ $form
 			template_edit_popup.init('.json_encode([
 				'templateid' => $data['templateid'],
 				'linked_templates' => array_keys($data['linked_templates']),
-				'readonly' => $data['readonly'],
 				'warnings' => $data['warnings']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
