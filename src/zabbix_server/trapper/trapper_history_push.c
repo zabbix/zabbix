@@ -195,14 +195,8 @@ zbx_item_timestamps_t;
  *                                                                            *
  ******************************************************************************/
 static int	validate_item_config(const struct addrinfo *ai, zbx_uint64_t userid, zbx_history_recv_item_t *item,
-		int errcode, const zbx_hp_item_value_t *value, char **error)
+		const zbx_hp_item_value_t *value, char **error)
 {
-	if (SUCCEED != errcode)
-	{
-		*error = zbx_strdup(NULL, "Invalid item.");
-		return FAIL;
-	}
-
 	if (ITEM_STATUS_ACTIVE != item->status)
 	{
 		*error = zbx_strdup(NULL, "Item is disabled.");
@@ -468,31 +462,39 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 		}
 
 		zbx_json_addobject(j, NULL);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, item->itemid);
 
-		if (NULL != (item_err = (zbx_item_error_t *)zbx_hashset_search(&item_errors, &item->itemid)))
+		if (SUCCEED != errcode)
 		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
-			(*failed_num)++;
-		}
-		else if (SUCCEED != validate_item_config(ai, userid, item, errcode, values->values[i], &error))
-		{
-			zbx_item_error_t	item_err_local = {.itemid = item->itemid, .error = error};
-
-			zbx_hashset_insert(&item_errors, &item_err_local, sizeof(item_err_local));
-			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
-			(*failed_num)++;
-		}
-		else if (SUCCEED != validate_item_value(&item_timestamps, item, values->values[i], &error))
-		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
-			zbx_free(error);
-			(*failed_num)++;
+			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, "Invalid item.", ZBX_JSON_TYPE_STRING);
 		}
 		else
 		{
-			push_item_value_to_history(item, values->values[i]);
-			(*processed_num)++;
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, item->itemid);
+
+			if (NULL != (item_err = (zbx_item_error_t *)zbx_hashset_search(&item_errors, &item->itemid)))
+			{
+				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
+				(*failed_num)++;
+			}
+			else if (SUCCEED != validate_item_config(ai, userid, item, values->values[i], &error))
+			{
+				zbx_item_error_t	item_err_local = {.itemid = item->itemid, .error = error};
+
+				zbx_hashset_insert(&item_errors, &item_err_local, sizeof(item_err_local));
+				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+				(*failed_num)++;
+			}
+			else if (SUCCEED != validate_item_value(&item_timestamps, item, values->values[i], &error))
+			{
+				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+				zbx_free(error);
+				(*failed_num)++;
+			}
+			else
+			{
+				push_item_value_to_history(item, values->values[i]);
+				(*processed_num)++;
+			}
 		}
 
 		zbx_json_close(j);
