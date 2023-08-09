@@ -363,6 +363,9 @@ typedef struct
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
 	int		timeout;
+	unsigned char	takes_userinput;
+	char		*userinput_validator;
+	unsigned char	userinput_validator_type;
 }
 zbx_script_t;
 

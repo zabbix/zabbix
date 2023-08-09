@@ -91,6 +91,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	db_result = zbx_db_select("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
 			",username,password,publickey,privatekey"
+			",takes_userinput,userinput_validator,userinput_validator_type"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
 
@@ -129,6 +130,14 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		script->port = zbx_strdup(script->port, row[8]);
 		script->username = zbx_strdup(script->username, row[10]);
 		script->password = zbx_strdup(script->password, row[11]);
+	}
+
+	ZBX_STR2UCHAR(script->takes_userinput, row[14]);
+
+	if (ZBX_SCRIPT_TAKES_USERINPUT_YES == script->takes_userinput)
+	{
+		script->userinput_validator = zbx_strdup(script->userinput_validator, row[15]);
+		ZBX_STR2UCHAR(script->userinput_validator_type, row[16]);
 	}
 
 	script->command = zbx_strdup(script->command, row[0]);

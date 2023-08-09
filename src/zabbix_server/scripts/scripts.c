@@ -680,6 +680,7 @@ void	zbx_script_clean(zbx_script_t *script)
 	zbx_free(script->password);
 	zbx_free(script->command);
 	zbx_free(script->command_orig);
+	zbx_free(script->userinput_validator);
 }
 
 /******************************************************************************
