@@ -694,3 +694,53 @@ void	zbx_audit_entry_append_string(zbx_audit_entry_t *entry, int audit_op, const
 
 	va_end(args);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: record history push request results into audit log                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const char *clientip, int processed_num,
+		int failed_num, double time_spent)
+{
+	int		ret = SUCCEED;
+	char		auditid_cuid[CUID_LEN];
+	struct zbx_json	details_json;
+	zbx_config_t	cfg;
+	zbx_db_insert_t	db_insert;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
+
+	if (ZBX_AUDITLOG_ENABLED != cfg.auditlog_enabled)
+		goto out;
+
+	zbx_new_cuid(auditid_cuid);
+
+	zbx_json_init(&details_json, ZBX_JSON_STAT_BUF_LEN);
+
+	append_int_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "history.processed", processed_num);
+	append_int_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "history.failed", failed_num);
+	append_double_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "history.time", time_spent);
+
+	zbx_db_insert_prepare(&db_insert, "auditlog", "auditid", "userid", "username", "clock", "action", "ip",
+			"resourcetype", "recordsetid", "details", NULL);
+
+	zbx_db_begin();
+
+	zbx_db_insert_add_values(&db_insert,  auditid_cuid, userid, username, (int)time(NULL), ZBX_AUDIT_ACTION_EXECUTE,
+			clientip, AUDIT_RESOURCE_HISTORY, auditid_cuid,
+			details_json.buffer);
+
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_commit();
+
+	zbx_db_insert_clean(&db_insert);
+	zbx_json_free(&details_json);
+out:
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}

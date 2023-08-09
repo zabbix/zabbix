@@ -39,6 +39,7 @@
 #define ZBX_AUDIT_ACTION_UPDATE		1
 #define ZBX_AUDIT_ACTION_DELETE		2
 #define ZBX_AUDIT_ACTION_EXECUTE	7
+#define ZBX_AUDIT_ACTION_PUSH		12
 
 #define AUDIT_DETAILS_ACTION_ADD	"add"
 #define AUDIT_DETAILS_ACTION_UPDATE	"update"
@@ -67,5 +68,8 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_tab
 		const char *key, const char *value, const char *table, const char *field);
 void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key, const char *value, const char *table, const char *field);
+
+int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const char *clientip, int processed_num,
+		int failed_num, double time_spent);
 
 #endif	/* ZABBIX_ZBXAUDIT_H */

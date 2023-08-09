@@ -29,6 +29,7 @@
 #include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxpreproc.h"
+#include "audit/zbxaudit.h"
 
 typedef struct
 {
@@ -299,7 +300,7 @@ static int	hk_compare(const void *d1, const void *d2)
 }
 
 static void	push_item_values(zbx_uint64_t userid, struct addrinfo *ai, zbx_vector_hp_item_value_ptr_t *values,
-		int itemids_num, int hostkeys_num, struct zbx_json *j)
+		int itemids_num, int hostkeys_num, int *processed_num, int *failed_num, struct zbx_json *j)
 {
 	/* extract unique itemids/hostkeys */
 
@@ -415,6 +416,7 @@ static void	push_item_values(zbx_uint64_t userid, struct addrinfo *ai, zbx_vecto
 		if (NULL != (item_err = (zbx_item_error_t *)zbx_hashset_search(&item_errors, &item->itemid)))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
+			(*failed_num)++;
 		}
 		else if (SUCCEED != validate_item_config(ai, userid, item, errcode, values->values[i], &error))
 		{
@@ -422,14 +424,19 @@ static void	push_item_values(zbx_uint64_t userid, struct addrinfo *ai, zbx_vecto
 
 			zbx_hashset_insert(&item_errors, &item_err_local, sizeof(item_err_local));
 			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+			(*failed_num)++;
 		}
 		else if (SUCCEED != validate_item_value(&item_timestamps, item, values->values[i], &error))
 		{
 			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
 			zbx_free(error);
+			(*failed_num)++;
 		}
 		else
+		{
 			push_item_value(item, values->values[i]);
+			(*processed_num)++;
+		}
 
 		zbx_json_close(j);
 	}
@@ -473,10 +480,14 @@ static int	process_history_push(const struct zbx_json_parse *jp, struct zbx_json
 	int				ret = FAIL;
 	char				clientip[MAX_STRING_LEN];
 	struct addrinfo			hints, *ai = NULL;
-	int				ns_offset = 0, hostkeys_num = 0, itemids_num = 0;
+	int				ns_offset = 0, hostkeys_num = 0, itemids_num = 0, processed_num = 0,
+					failed_num = 0;
 	const char			*pnext = NULL;
 	time_t				now;
 	zbx_vector_hp_item_value_ptr_t	values;
+	double				time_start;
+
+	time_start = zbx_time();
 
 	zbx_vector_hp_item_value_ptr_create(&values);
 
@@ -530,10 +541,12 @@ static int	process_history_push(const struct zbx_json_parse *jp, struct zbx_json
 			itemids_num++;
 	}
 
-	push_item_values(user.userid, ai, &values, itemids_num, hostkeys_num, j);
+	push_item_values(user.userid, ai, &values, itemids_num, hostkeys_num, &processed_num, &failed_num, j);
+
+	zbx_auditlog_history_push(user.userid, user.username, clientip, processed_num, failed_num,
+			zbx_time() - time_start);
 
 	ret = SUCCEED;
-
 out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
