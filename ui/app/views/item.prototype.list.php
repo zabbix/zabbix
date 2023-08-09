@@ -23,6 +23,8 @@
  * @var CView $this
  */
 
+$this->addJsFile('multilineinput.js');
+$this->addJsFile('items.js');
 $this->includeJsFile('item.prototype.list.js.php');
 
 $form = (new CForm())
@@ -77,6 +79,7 @@ foreach ($data['items'] as $item) {
 
 	$description[] = (new CLink($item['name']))
 		->addClass('js-update-item')
+		->setAttribute('data-context', $data['context'])
 		->setAttribute('data-itemid', $item['itemid']);
 
 	$table->addRow([
@@ -155,7 +158,7 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'itemprototy
 			(new CList())
 				->addItem(
 					(new CSimpleButton(_('Create item prototype')))
-						->setAttribute('data-discoveryid', $data['parent_discoveryid'])
+						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 						->setAttribute('data-context', $data['context'])
 						->addClass('js-create-item-prototype')
 				)

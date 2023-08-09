@@ -34,19 +34,14 @@
 		}
 
 		initEvents() {
-			document.querySelector('.js-create-item-prototype')?.addEventListener('click', (e) => this.#edit(e.target, {
-				context: e.target.dataset.context,
-				parent_discoveryid: e.target.dataset.parent_discoveryid
-			}));
+			document.querySelector('.js-create-item-prototype')
+				?.addEventListener('click', (e) => this.#edit(e.target, e.target.dataset));
 			this.form.addEventListener('click', e => {
 				const target = e.target;
 				const selectedids = Object.keys(chkbxRange.getSelectedIds());
 
-				if (target.classList.contains('js-update-item')) {
-					this.#edit(target, {
-						itemid: target.dataset.itemid,
-						parent_discoveryid: target.dataset.parent_discoveryid
-					});
+				if (target.matches('.js-update-item')) {
+					this.#edit(target, target.dataset);
 				}
 				else if (target.matches('.js-enable-item')) {
 					this.#enable(null, {itemids: [target.dataset.itemid], field: target.dataset.field});

@@ -19,10 +19,12 @@
 **/
 
 
-abstract class CControllerItemPrototype extends CControllerItem {
+abstract class CControllerItemPrototype extends CController {
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	protected function validateFormInput(array $required_fields): bool {
@@ -69,7 +71,6 @@ abstract class CControllerItemPrototype extends CControllerItem {
 			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
 			'script'				=> 'db items.params',
 			'show_inherited_tags'	=> 'in 0,1',
-			'show_inherited_tags'	=> 'in 0,1',
 			'snmp_oid'				=> 'db items.snmp_oid',
 			'ssl_cert_file'			=> 'db items.ssl_cert_file',
 			'ssl_key_file'			=> 'db items.ssl_key_file',
@@ -99,6 +100,259 @@ abstract class CControllerItemPrototype extends CControllerItem {
 		$field = '';
 		$ret = $this->validateInput($fields);
 
+		if ($ret) {
+			$ret = $this->hasInput('parent_discoveryid') || $this->hasInput('itemid');
+			$field = $this->hasInput('parent_discoveryid') ? 'itemid' : 'parent_discoveryid';
+		}
+
+		if (!$ret && $field !== '') {
+			error(_s('Incorrect value for "%1$s" field.', $field));
+		}
+
 		return $ret;
+	}
+
+	/**
+	 * Get form data for item from input.
+	 *
+	 * @return array
+	 */
+	protected function getInputForForm(): array {
+		$input = [
+			'allow_traps' => DB::getDefault('items', 'allow_traps'),
+			'authtype' => DB::getDefault('items', 'authtype'),
+			'context' => '',
+			'delay' => ZBX_ITEM_DELAY_DEFAULT,
+			'delay_flex' => [],
+			'description' => DB::getDefault('items', 'description'),
+			'discover' => DB::getDefault('items', 'discover'),
+			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+			'headers' => [],
+			'history' => DB::getDefault('items', 'history'),
+			'history_mode' => ITEM_STORAGE_CUSTOM,
+			'hostid' => 0,
+			'http_authtype' => ZBX_HTTP_AUTH_NONE,
+			'http_password' => '',
+			'http_proxy' => DB::getDefault('items', 'http_proxy'),
+			'http_username' => '',
+			'interfaceid' => 0,
+			'inventory_link' => 0,
+			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
+			'itemid' => 0,
+			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
+			'key' => '',
+			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
+			'master_itemid' => 0,
+			'name' => '',
+			'output_format' => DB::getDefault('items', 'output_format'),
+			'parameters' => [],
+			'params_ap' => DB::getDefault('items', 'params'),
+			'params_es' => DB::getDefault('items', 'params'),
+			'params_f' => DB::getDefault('items', 'params'),
+			'parent_discoveryid' => 0,
+			'password' => DB::getDefault('items', 'password'),
+			'post_type' => DB::getDefault('items', 'post_type'),
+			'posts' => DB::getDefault('items', 'posts'),
+			'preprocessing' => [],
+			'privatekey' => DB::getDefault('items', 'privatekey'),
+			'publickey' => DB::getDefault('items', 'publickey'),
+			'query_fields' => [],
+			'request_method' => DB::getDefault('items', 'request_method'),
+			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
+			'script' => DB::getDefault('items', 'params'),
+			'show_inherited_tags' => 0,
+			'snmp_oid' => DB::getDefault('items', 'snmp_oid'),
+			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
+			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
+			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
+			'status' => DB::getDefault('items', 'status'),
+			'status_codes' => DB::getDefault('items', 'status_codes'),
+			'status' => DB::getDefault('items', 'status'),
+			'tags' => [],
+			'templateid' => 0,
+			'timeout' => DB::getDefault('items', 'timeout'),
+			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
+			'trends' => DB::getDefault('items', 'trends'),
+			'trends_mode' => ITEM_STORAGE_CUSTOM,
+			'type' => DB::getDefault('items', 'type'),
+			'units' => DB::getDefault('items', 'units'),
+			'url' => '',
+			'username' => DB::getDefault('items', 'username'),
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'valuemapid' => 0,
+			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'verify_peer' => DB::getDefault('items', 'verify_peer')
+		];
+		$this->getInputs($input, array_keys($input));
+
+		if ($input['query_fields']) {
+			$query_fields = [];
+
+			foreach ($input['query_fields']['sortorder'] as $index) {
+				$query_fields[] = [
+					'name' => $input['query_fields']['name'][$index],
+					'value' => $input['query_fields']['value'][$index]
+				];
+			}
+
+			$input['query_fields'] = $query_fields;
+		}
+
+		if ($input['headers']) {
+			$headers = [];
+
+			foreach ($input['headers']['sortorder'] as $index) {
+				$headers[] = [
+					'name' => $input['headers']['name'][$index],
+					'value' => $input['headers']['value'][$index]
+				];
+			}
+
+			$input['headers'] = $headers;
+		}
+
+		if ($input['preprocessing']) {
+			$preprocessings = [];
+
+			foreach ($input['preprocessing'] as $preprocessing) {
+				$preprocessings[] = $preprocessing + [
+					'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+					'error_handler_params' => ''
+				];
+			}
+
+			$input['preprocessing'] = $preprocessings;
+		}
+
+		if ($input['tags'] && $input['show_inherited_tags'] == 0) {
+			// Unset inherited tags.
+			$tags = [];
+
+			foreach ($input['tags'] as $tag) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+					continue;
+				}
+
+				$tags[] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+
+			$input['tags'] = $tags;
+		}
+
+		$params_field = [
+			ITEM_TYPE_SCRIPT => 'script',
+			ITEM_TYPE_SSH => 'params_es',
+			ITEM_TYPE_TELNET => 'params_es',
+			ITEM_TYPE_DB_MONITOR => 'params_ap',
+			ITEM_TYPE_CALCULATED => 'params_f'
+		];
+		$input['params'] = '';
+
+		if (array_key_exists($input['type'], $params_field)) {
+			$field = $params_field[$input['type']];
+			$input['params'] = $input[$field];
+		}
+
+		return $input;
+	}
+
+	/**
+	 * Get data to send to API from input.
+	 *
+	 * @return array
+	 */
+	protected function getInputForApi(): array {
+		$input = $this->getInputForForm();
+		$field_map = [];
+
+		if ($this->hasInput('key')) {
+			$field_map['key'] = 'key_';
+		}
+
+		if ($this->getInput('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
+			$input['history'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($this->getInput('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
+			$input['trends'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($this->getInput('type') == ITEM_TYPE_HTTPAGENT) {
+			$field_map['http_authtype'] = 'authtype';
+			$field_map['http_username'] = 'username';
+			$field_map['http_password'] = 'password';
+		}
+
+		if ($input['delay_flex']) {
+			$custom_intervals = $this->getInput('delay_flex', []);
+			isValidCustomIntervals($custom_intervals, true);
+			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
+		}
+
+		if ($input['query_fields']) {
+			$query_fields = [];
+
+			foreach ($input['query_fields'] as $query_field) {
+				if ($query_field['name'] === '' && $query_field['value'] === '') {
+					continue;
+				}
+
+				$query_fields[] = [$query_field['name'] => $query_field['value']];
+			}
+
+			$input['query_fields'] = $query_fields;
+		}
+
+		if ($input['headers']) {
+			$headers = [];
+
+			foreach ($input['headers'] as $header) {
+				if ($header['name'] === '' && $header['value'] === '') {
+					continue;
+				}
+
+				$headers[$header['name']] = $header['value'];
+			}
+
+			$input['headers'] = $headers;
+		}
+
+		if ($input['preprocessing']) {
+			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
+		}
+
+		if ($input['tags']) {
+			$tags = [];
+
+			foreach ($input['tags'] as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$tags[] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+
+			$input['tags'] = $tags;
+		}
+
+		$parameters = [];
+
+		foreach ($input['parameters'] as $parameter) {
+			if ($parameter['name'] === '' || $parameter['value'] === '') {
+				continue;
+			}
+
+			$parameters[] = $parameter;
+		}
+
+		$input['parameters'] = $parameters;
+
+		return CArrayHelper::renameKeys($input, $field_map);
 	}
 }
