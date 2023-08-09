@@ -71,8 +71,12 @@ $html_page = (new CHtmlPage())
 	->setTitle(_('Host dashboards'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
-	->setControls((new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
-		->setAttribute('aria-label', _('Content controls'))
+	->setControls(
+		(new CTag('nav', true))
+			->addItem(
+				(new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
+			)
+			->setAttribute('aria-label', _('Content controls'))
 	)
 	->setKioskModeControls(
 		(count($data['dashboard']['pages']) > 1)
