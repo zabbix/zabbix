@@ -1985,7 +1985,7 @@ class CDashboard {
 			dashboardPageWidgetDelete: (e) => {
 				this._clearWarnings();
 
-				this.#validateFieldsReferences({dashboard_page: e.target});
+				this.#validateFieldsReferences({dashboard_page: this._selected_dashboard_page});
 			},
 
 			dashboardPageWidgetPosition: () => {
