@@ -105,13 +105,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		switch ($master_column['data']){
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 				$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
-				$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed,
+				$master_entities = self::getItems($master_column['item'], $master_items_only_numeric_allowed,
 					$groupids, $hostids);
-				$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
+				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
 				break;
 
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
-				$master_items = $hosts != null ? $hosts : API::Host()->get([
+				$master_entities = $hosts != null ? $hosts : API::Host()->get([
 						'output' => ['name'],
 						'groupids' => $groupids,
 						'hostids' => $hostids,
@@ -119,11 +119,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 						'preservekeys' => true
 					]);
 
-				$master_item_values = array_column($master_items, 'name', 'hostid');
+				$master_entity_values = array_column($master_entities, 'name', 'hostid');
 				break;
 
 			case CWidgetFieldColumnsList::DATA_TEXT:
-				$master_items = $hosts != null ? $hosts : API::Host()->get([
+				$master_entities = $hosts != null ? $hosts : API::Host()->get([
 					'output' => ['name'],
 					'groupids' => $groupids,
 					'hostids' => $hostids,
@@ -131,12 +131,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'preservekeys' => true
 				]);
 
-				$master_item_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
+				$master_entity_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
 					[
 						$this->fields_values['column'] =>
 							$this->fields_values['columns'][$this->fields_values['column']]['text']
 					],
-					$master_items
+					$master_entities
 				)[$this->fields_values['column']];
 				break;
 
@@ -147,14 +147,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				];
 		}
 
-		if (!$master_item_values) {
+		if (!$master_entity_values) {
 			return [
 				'configuration' => $configuration,
 				'rows' => []
 			];
 		}
 
-		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_items,
+		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_entities,
 			static function(array $item): bool {
 				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
@@ -162,35 +162,35 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($this->fields_values['order'] == Widget::ORDER_TOP_N) {
 			if ($master_items_only_numeric_present) {
-				arsort($master_item_values, SORT_NUMERIC);
+				arsort($master_entity_values, SORT_NUMERIC);
 
-				$master_items_min = end($master_item_values);
-				$master_items_max = reset($master_item_values);
+				$master_items_min = end($master_entity_values);
+				$master_items_max = reset($master_entity_values);
 			}
 			else {
-				asort($master_item_values, SORT_NATURAL);
+				asort($master_entity_values, SORT_NATURAL);
 			}
 		}
 		else {
 			if ($master_items_only_numeric_present) {
-				asort($master_item_values, SORT_NUMERIC);
+				asort($master_entity_values, SORT_NUMERIC);
 
-				$master_items_min = reset($master_item_values);
-				$master_items_max = end($master_item_values);
+				$master_items_min = reset($master_entity_values);
+				$master_items_max = end($master_entity_values);
 			}
 			else {
-				arsort($master_item_values, SORT_NATURAL);
+				arsort($master_entity_values, SORT_NATURAL);
 			}
 		}
 
 		$show_lines = $this->isTemplateDashboard() ? 1 : $this->fields_values['show_lines'];
-		$master_item_values = array_slice($master_item_values, 0, $show_lines, true);
-		$master_items = array_intersect_key($master_items, $master_item_values);
+		$master_entity_values = array_slice($master_entity_values, 0, $show_lines, true);
+		$master_entities = array_intersect_key($master_entities, $master_entity_values);
 
 		$master_hostids = [];
 
-		foreach (array_keys($master_item_values) as $itemid) {
-			$master_hostids[$master_items[$itemid]['hostid']] = true;
+		foreach (array_keys($master_entity_values) as $entity) {
+			$master_hostids[$master_entities[$entity]['hostid']] = true;
 		}
 
 		$number_parser = new CNumberParser([
@@ -216,8 +216,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
 			if ($column_index == $this->fields_values['column']) {
-				$column_items = $master_items;
-				$column_item_values = $master_item_values;
+				$column_items = $master_entities;
+				$column_item_values = $master_entity_values;
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
@@ -306,11 +306,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_items);
+		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_entities);
 
 		$hostid_to_itemid = $master_column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-			? array_column($master_items, 'itemid', 'hostid')
-			: array_column($master_items, 'hostid', 'hostid');
+			? array_column($master_entities, 'itemid', 'hostid')
+			: array_column($master_entities, 'hostid', 'hostid');
 
 		$rows = [];
 
