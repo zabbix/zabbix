@@ -307,7 +307,7 @@
 		}
 
 		openTemplatePopup(template_data) {
-			const overlay =  PopUp('template.edit', template_data, {
+			const overlay = PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true

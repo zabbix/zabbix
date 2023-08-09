@@ -38,9 +38,9 @@ $template_tab = (new CFormGrid())
 		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('template_name', $data['template_name'], false, DB::getFieldLength('hosts', 'host')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+				->setAttribute('autofocus', 'autofocus')
 		)
 	])
 	->addItem([
@@ -122,23 +122,23 @@ $template_tab
 		(new CLabel(_('Template groups'), 'template_groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
-			'name' => 'template_groups[]',
-			'object_name' => 'templateGroup',
-			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
-			'data' => $data['groups_ms'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'template_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'template_groups_',
-					'editable' => true,
-					'disableids' => array_column($data['groups_ms'], 'id')
+				'name' => 'template_groups[]',
+				'object_name' => 'templateGroup',
+				'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
+				'data' => $data['groups_ms'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'template_groups',
+						'srcfld1' => 'groupid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'template_groups_',
+						'editable' => true,
+						'disableids' => array_column($data['groups_ms'], 'id')
+					]
 				]
-			]
-		]))
-			->setAriaRequired()
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	])
 	->addItem([
@@ -166,13 +166,13 @@ $tags_tab = (new CFormGrid)
 		new CLabel(_('Tags')),
 		new CFormField(
 			new CPartial('configuration.tags.tab', [
-			'source' => 'template',
-			'tags' => $data['tags'],
-			'readonly' => $data['readonly'],
-			'tabs_id' => 'template-tabs',
-			'tags_tab_id' => 'template-tags-tab',
-			'with_label' => true
-		]))
+				'source' => 'template',
+				'tags' => $data['tags'],
+				'readonly' => $data['readonly'],
+				'tabs_id' => 'template-tabs',
+				'tags_tab_id' => 'template-tags-tab',
+				'with_label' => true
+			]))
 	]);
 
 $form->addItem(
