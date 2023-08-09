@@ -18,7 +18,7 @@
 **/
 
 #include "trapper_request.h"
-
+#include "trapper_history_push.h"
 #include "cfg.h"
 #include "trapper_auth.h"
 #include "zbxdbhigh.h"

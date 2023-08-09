@@ -2446,7 +2446,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_allowed_peers_info(ZBX_SOCKADDR *peer_info, const char *peer_list)
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list)
 {
 	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
 	int	prefix_size;
@@ -2526,9 +2526,6 @@ int	zbx_tcp_check_allowed_peers_info(ZBX_SOCKADDR *peer_info, const char *peer_l
  ******************************************************************************/
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 {
-	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
-	int	prefix_size;
-
 	if (SUCCEED == zbx_tcp_check_allowed_peers_info(&s->peer_info, peer_list))
 		return SUCCEED;
 
