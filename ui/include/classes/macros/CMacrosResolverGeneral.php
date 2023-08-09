@@ -1291,6 +1291,25 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Calculates macro function for expression macros. Returns UNRESOLVED_MACRO_STRING in case of unsupported function.
+	 *
+	 * @param string $value                    [IN] The input value.
+	 * @param array  $macrofunc                [IN]
+	 * @param string $macrofunc['function']    [IN] The function name.
+	 * @param array  $macrofunc['parameters']  [IN] The function parameters.
+	 *
+	 * @return string
+	 */
+	private static function calcExpressionMacrofunc(string $value, array $macrofunc) {
+		switch ($macrofunc['function']) {
+			case 'fmtnum':
+				return self::macrofuncFmtnum($value, $macrofunc['parameters']);
+		}
+
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -1528,14 +1547,18 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Get expression macros like "{?avg(/host/key, 1d)}".
+	 * Get expression macros like "{?avg(/host/key, 1d)}" or {{?min(/host/key, 1h)}.fmtnum(2)}.
 	 *
-	 * @param array $macros
-	 * @param array $macros[<macro>]['function']
-	 * @param array $macros[<macro>]['host']
-	 * @param array $macros[<macro>]['key']
-	 * @param array $macros[<macro>]['sec_num']
-	 * @param array $macro_values
+	 * @param array  $macros
+	 * @param array  $macros[<macro>]
+	 * @param string $macros[<macro>]['function']
+	 * @param string $macros[<macro>]['host']
+	 * @param string $macros[<macro>]['key']
+	 * @param string $macros[<macro>]['sec_num']
+	 * @param array  $macros[<macro>]['macrofunc']                (optional)
+	 * @param string $macros[<macro>]['macrofunc']['function']
+	 * @param array  $macros[<macro>]['macrofunc']['parameters']
+	 * @param array  $macro_values
 	 *
 	 * @return array
 	 */
@@ -1547,11 +1570,17 @@ class CMacrosResolverGeneral {
 		$function_data = [];
 
 		foreach ($macros as $macro => $data) {
+			$macro_data = ['macro' => $macro];
+			if (array_key_exists('macrofunc', $data)) {
+				$macro_data['macrofunc'] = $data['macrofunc'];
+			}
+
 			if ($data['function'] === 'last') {
-				$function_data['last'][$data['host']][$data['key']][] = $macro;
+				$function_data['last'][$data['host']][$data['key']][] = $macro_data;
 			}
 			else {
-				$function_data['other'][$data['host']][$data['key']][$data['function']][$data['sec_num']][] = $macro;
+				$function_data['other'][$data['host']][$data['key']][$data['function']][$data['sec_num']][] =
+					$macro_data;
 			}
 		}
 
@@ -1569,12 +1598,15 @@ class CMacrosResolverGeneral {
 					]);
 
 					foreach ($db_items as $db_item) {
-						$value = $db_item['lastclock']
-							? formatHistoryValue($db_item['lastvalue'], $db_item)
-							: UNRESOLVED_MACRO_STRING;
-
-						foreach ($keys[$db_item['key_']] as $_macro) {
-							$macro_values[$_macro] = $value;
+						foreach ($keys[$db_item['key_']] as $macro_data) {
+							if ($db_item['lastclock']) {
+								$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+									? self::calcExpressionMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
+									: formatHistoryValue($db_item['lastvalue'], $db_item);
+							}
+							else {
+								$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
+							}
 						}
 					}
 				}
@@ -1593,15 +1625,15 @@ class CMacrosResolverGeneral {
 							foreach ($sec_nums as $sec_num => $_macros) {
 								$value = getItemFunctionalValue($db_item, $function, $sec_num);
 
-								if ($value !== null) {
-									$value = convertUnits(['value' => $value, 'units' => $db_item['units']]);
-								}
-								else {
-									$value = UNRESOLVED_MACRO_STRING;
-								}
-
-								foreach ($_macros as $_macro) {
-									$macro_values[$_macro] = $value;
+								foreach ($_macros as $macro_data) {
+									if ($value !== null) {
+										$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+											? self::calcExpressionMacrofunc($value, $macro_data['macrofunc'])
+											: convertUnits(['value' => $value, 'units' => $db_item['units']]);
+									}
+									else {
+										$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
+									}
 								}
 							}
 						}
