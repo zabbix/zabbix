@@ -28,6 +28,7 @@
 
 #	define ZBX_MUTEX_LOG		zbx_mutex_create_per_process_name(L"ZBX_MUTEX_LOG")
 #	define ZBX_MUTEX_PERFSTAT	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT")
+#	define ZBX_MUTEX_PERFSTAT_RO	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT_RO")
 
 typedef wchar_t * zbx_mutex_name_t;
 typedef HANDLE zbx_mutex_t;
