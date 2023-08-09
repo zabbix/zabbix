@@ -1485,6 +1485,7 @@ class testInitialConfSync extends CIntegrationTest
 		$response = $this->call('proxy.create', [
 			'name' => 'ProxyA',
 			'mode' => PROXY_MODE_ACTIVE,
+			'allowed_addresses' => '10.0.2.15,zabbix.test',
 			'hosts' => []
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
