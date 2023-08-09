@@ -27,13 +27,12 @@
 <script>
 	const view = new class {
 
-		init({form_name, readonly, parent_hostid, linked_templates, group_prototypes, prototype_templateid,
-				prototype_interfaces, parent_host_interfaces, parent_host_status}) {
+		init({form_name, readonly, parent_hostid, group_prototypes, prototype_templateid, prototype_interfaces,
+				parent_host_interfaces, parent_host_status}) {
 			this.form = document.getElementById('host-prototype-form');
 			this.form_name = form_name;
 			this.readonly = readonly;
 			this.parent_hostid = parent_hostid;
-			this.linked_templates = linked_templates;
 			this.group_prototypes = group_prototypes;
 			this.prototype_templateid = prototype_templateid;
 			this.prototype_interfaces = prototype_interfaces;

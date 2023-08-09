@@ -557,7 +557,6 @@ $html_page
 		'form_name' => $form->getName(),
 		'readonly' => $data['readonly'],
 		'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
-		'linked_templates' => $data['macros_tab']['linked_templates'],
 		'group_prototypes' => $host_prototype['groupPrototypes'],
 		'prototype_templateid' => $host_prototype['templateid'],
 		'prototype_interfaces' => array_values($host_prototype['interfaces']),

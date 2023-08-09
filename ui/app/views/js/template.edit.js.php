@@ -107,8 +107,6 @@ window.template_edit_popup = new class {
 
 					if (this.macros_templateids === null) {
 						this.macros_templateids = templateids;
-						this.macros_manager.load(show_inherited_macros, templateids);
-						macros_initialized = true;
 					}
 
 					// After initialization load inherited macros only if templates changed.
