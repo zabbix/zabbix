@@ -546,6 +546,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 				[
 					'old_name' => 'Discovery rule for update',
 					'name' => 'Update name',
+					'proxy' => 'Active proxy 3',
 					'iprange' => '1.1.0.1-25',
 					'delay' => '30s',
 					'checks' => [

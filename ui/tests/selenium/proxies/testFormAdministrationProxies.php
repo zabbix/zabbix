@@ -731,6 +731,17 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy_fields' => [
+						'Proxy name' => 'Wrong Address',
+						'Proxy mode' => 'Passive',
+						'id:address' => '🙂🙂🙂😀😀😀'
+					],
+					'error' => 'Invalid parameter "/1/address": an IP or DNS is expected.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'proxy_fields' => [
 						'Proxy name' => 'Wrong Port',
 						'Proxy mode' => 'Passive',
 						'id:port' => 65536
