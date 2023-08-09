@@ -884,12 +884,6 @@ form {
 				margin-top: 5px;
 			}
 		}
-
-		.btn-icon {
-			&.btn-small {
-				top: 4px;
-			}
-		}
 	}
 
 	h4 {
@@ -3783,8 +3777,7 @@ svg {
 	.table-col-action { width: 55px; }
 }
 
-z-select,
-.z-select {
+z-select {
 	&.z-select-host-interface {
 		.description:not(:empty) {
 			display: block;
