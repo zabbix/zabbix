@@ -16,6 +16,11 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+#include "config.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
 #include "vmware_perfcntr.h"
 #include "vmware.h"
 #include "vmware_internal.h"
@@ -1646,5 +1651,4 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 	return pentity;
 }
 
-
-
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

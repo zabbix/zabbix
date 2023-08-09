@@ -722,9 +722,8 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 #define ZBX_VCENTER_LESS_THAN_6_5_0_STATS_MAXQUERYMETRICS	64
 #define ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS	256
 
-#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
-		__vm_shmem_realloc_func, __vm_shmem_free_func)
-
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
+#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
+		__vm_shmem_realloc_func, __vm_shmem_free_func)
 #endif	/* ZABBIX_VMWARE_H */
