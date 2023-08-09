@@ -471,8 +471,10 @@ class CMacrosResolverGeneral {
 
 							$macros['macro_funcs'][$key][$macro_func_parser->getMatch()] = [
 								'macro' => $macro_parser->getMacro(),
-								'function' => $function_parser->getFunction(),
-								'parameters' => $function_parser->getParams()
+								'macrofunc' => [
+									'function' => $function_parser->getFunction(),
+									'parameters' => $function_parser->getParams()
+								]
 							];
 							$pos += $macro_func_parser->getLength() - 1;
 							continue 2;
@@ -515,8 +517,10 @@ class CMacrosResolverGeneral {
 							$macros['macro_funcs_n'][$key][$macro_func_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
 								'f_num' => $macro_n_parser->getReference(),
-								'function' => $function_parser->getFunction(),
-								'parameters' => $function_parser->getParams()
+								'macrofunc' => [
+									'function' => $function_parser->getFunction(),
+									'parameters' => $function_parser->getParams()
+								]
 							];
 							$pos += $macro_func_n_parser->getLength() - 1;
 							continue 2;
@@ -1357,8 +1361,10 @@ class CMacrosResolverGeneral {
 
 				foreach ($tokens as $token) {
 					if ($value !== null) {
-						$macro_value = array_key_exists('function', $token)
-							? self::calcMacrofunc($value, $token['function'], $token['parameters'])
+						$macro_value = array_key_exists('macrofunc', $token)
+							? self::calcMacrofunc($value, $token['macrofunc']['function'],
+								$token['macrofunc']['parameters']
+							)
 							: formatHistoryValue($value, $function);
 					}
 					else {
