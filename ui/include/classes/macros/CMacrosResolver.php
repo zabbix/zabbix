@@ -351,7 +351,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach (array_keys($macros) as $hostid) {
 			foreach ($data[$hostid] as &$text) {
-				$matched_macros = $this->getMacroPositions($text, $types);
+				$matched_macros = self::getMacroPositions($text, $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$text = substr_replace($text, $macros[$hostid][$macro], $pos, strlen($macro));
@@ -511,7 +511,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($macro_values as $triggerid => $foo) {
 			$trigger = &$triggers[$triggerid];
 
-			$matched_macros = $this->getMacroPositions($trigger['description'], $types);
+			$matched_macros = self::getMacroPositions($trigger['description'], $types);
 
 			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 				if (array_key_exists($macro, $macro_values[$triggerid])) {
@@ -663,7 +663,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$trigger = &$triggers[$triggerid];
 
 			foreach ($options['sources'] as $source) {
-				$matched_macros = $this->getMacroPositions($trigger[$source], $types);
+				$matched_macros = self::getMacroPositions($trigger[$source], $types);
 
 				if ($options['html']) {
 					$macro_string = [];
@@ -836,7 +836,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$types = $this->transformToPositionTypes($types);
 
-		$matched_macros = $this->getMacroPositions($trigger['url'], $types);
+		$matched_macros = self::getMacroPositions($trigger['url'], $types);
 
 		$url = $trigger['url'];
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
@@ -1773,7 +1773,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach (array_keys($macro_values) as $key) {
 			foreach ($options['sources'] as $source) {
-				$matched_macros = $this->getMacroPositions($data[$key][$source], $types);
+				$matched_macros = self::getMacroPositions($data[$key][$source], $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$data[$key][$source] =

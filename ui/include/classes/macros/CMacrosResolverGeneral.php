@@ -95,7 +95,7 @@ class CMacrosResolverGeneral {
 	 */
 	protected function hasMacros(array $texts, array $types) {
 		foreach ($texts as $text) {
-			if ($this->getMacroPositions($text, $types)) {
+			if (self::getMacroPositions($text, $types)) {
 				return true;
 			}
 		}
@@ -142,7 +142,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	public function getMacroPositions($text, array $types) {
+	public static function getMacroPositions($text, array $types) {
 		$macros = [];
 		$extract_usermacros = array_key_exists('usermacros', $types);
 		$extract_macros = array_key_exists('macros', $types);
@@ -773,7 +773,7 @@ class CMacrosResolverGeneral {
 					$forced = true;
 				}
 
-				$matched_macros = $this->getMacroPositions($param, $types);
+				$matched_macros = self::getMacroPositions($param, $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
@@ -1052,7 +1052,7 @@ class CMacrosResolverGeneral {
 								}
 
 								$macro_value = $data['parameters'][1];
-								$matched_macros = $this->getMacroPositions($macro_value, ['replacements' => true]);
+								$matched_macros = self::getMacroPositions($macro_value, ['replacements' => true]);
 
 								foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 									$macro_value = substr_replace($macro_value,
@@ -1120,7 +1120,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return string
 	 */
-	private function macrofuncRegsub(string $value, array $parameters, bool $insensitive): string {
+	private static function macrofuncRegsub(string $value, array $parameters, bool $insensitive): string {
 		if (count($parameters) != 2) {
 			return UNRESOLVED_MACRO_STRING;
 		}
@@ -1134,7 +1134,7 @@ class CMacrosResolverGeneral {
 		}
 
 		$macro_values = [];
-		foreach ($this->getMacroPositions($parameters[1], ['replacements' => true]) as $macro) {
+		foreach (self::getMacroPositions($parameters[1], ['replacements' => true]) as $macro) {
 			$macro_values[$macro] = array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '';
 		}
 
@@ -1150,7 +1150,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return string
 	 */
-	private function macrofuncFmtnum(string $value, array $parameters): string {
+	private static function macrofuncFmtnum(string $value, array $parameters): string {
 		if (count($parameters) != 1 || $parameters[0] == '') {
 			return UNRESOLVED_MACRO_STRING;
 		}
@@ -1183,14 +1183,14 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return string
 	 */
-	private function calcMacrofunc(string $value, string $function, array $parameters) {
+	private static function calcMacrofunc(string $value, string $function, array $parameters) {
 		switch ($function) {
 			case 'regsub':
 			case 'iregsub':
-				return $this->macrofuncRegsub($value, $parameters, $token['function'] === 'iregsub');
+				return self::macrofuncRegsub($value, $parameters, $function === 'iregsub');
 
 			case 'fmtnum':
-				return $this->macrofuncFmtnum($value, $parameters);
+				return self::macrofuncFmtnum($value, $parameters);
 		}
 
 		return UNRESOLVED_MACRO_STRING;
@@ -1269,7 +1269,7 @@ class CMacrosResolverGeneral {
 				foreach ($tokens as $token) {
 					if ($value !== null) {
 						$macro_value = array_key_exists('function', $token)
-							? $this->calcMacrofunc($value, $token['function'], $token['parameters'])
+							? self::calcMacrofunc($value, $token['function'], $token['parameters'])
 							: formatHistoryValue($value, $function);
 					}
 					else {
