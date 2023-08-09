@@ -104,7 +104,7 @@ class CDashboard {
 		this._csrf_token = csrf_token;
 
 		this.#initialize();
-		this._registerEvents();
+		this.#registerEvents();
 	}
 
 	#initialize() {
@@ -165,7 +165,7 @@ class CDashboard {
 
 		this._state = DASHBOARD_STATE_ACTIVE;
 
-		this._activateEvents();
+		this.#activateEvents();
 
 		const dashboard_page = this._getInitialDashboardPage();
 
@@ -506,15 +506,11 @@ class CDashboard {
 		this._dashboard_pages.set(dashboard_page, {});
 
 		for (const widget_data of widgets) {
-			dashboard_page.addWidget({
+			dashboard_page.addWidgetFromData({
 				...widget_data,
 				is_new: false,
 				unique_id: this._createUniqueId()
 			});
-		}
-
-		if (this._state === DASHBOARD_STATE_ACTIVE) {
-			this.#validateFieldsReferences();
 		}
 
 		if (!this._is_kiosk_mode) {
@@ -563,8 +559,6 @@ class CDashboard {
 		}
 
 		this._dashboard_pages.delete(dashboard_page);
-
-		this.#validateFieldsReferences();
 
 		this._target.classList.toggle(ZBX_STYLE_DASHBOARD_IS_MULTIPAGE, this._dashboard_pages.size > 1);
 
@@ -624,7 +618,7 @@ class CDashboard {
 				if (references_substitution.has(reference)) {
 					accessor.setReference(references_substitution.get(reference));
 				}
-				else if (!references.has(reference)) {
+				else {
 					accessor.setReference('');
 				}
 			}
@@ -721,19 +715,15 @@ class CDashboard {
 			return;
 		}
 
-		let old_widget_data = null;
-
 		if (widget !== null) {
-			old_widget_data = widget.getDataCopy({is_single_copy: false});
-
-			dashboard_page.deleteWidget(widget, {is_batch_mode: true});
+			dashboard_page.deleteWidget(widget, {do_destroy: false, is_batch_mode: true});
 		}
 
 		if ('reference' in new_widget_data.fields) {
 			new_widget_data.fields.reference = this._createReference();
 		}
 
-		const references = this._getReferences();
+		const references = this._getReferences({dashboard_page});
 
 		for (const accessor of CWidgetBase.getFieldsReferencesAccessors(new_widget_data.fields,
 				new_widget_data.fields_references)) {
@@ -763,12 +753,7 @@ class CDashboard {
 
 				if (response.widgets[0] === null) {
 					if (widget !== null) {
-						dashboard_page.replaceWidget(paste_placeholder_widget, {
-							...old_widget_data,
-							widgetid: widget.getWidgetId(),
-							is_new: false,
-							unique_id: widget.getUniqueId()
-						});
+						dashboard_page.replaceWidget(paste_placeholder_widget, widget);
 					}
 					else {
 						dashboard_page.deleteWidget(paste_placeholder_widget);
@@ -779,7 +764,7 @@ class CDashboard {
 					return;
 				}
 
-				dashboard_page.replaceWidget(paste_placeholder_widget, {
+				dashboard_page.replaceWidgetFromData(paste_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
 					fields_references: response.widgets[0].fields_references,
@@ -789,7 +774,7 @@ class CDashboard {
 					unique_id: this._createUniqueId()
 				});
 
-				this.#validateFieldsReferences();
+				this.#validateFieldsReferences({dashboard_page});
 			})
 			.catch((exception) => {
 				dashboard_page.deleteWidget(paste_placeholder_widget);
@@ -982,9 +967,7 @@ class CDashboard {
 	}
 
 	#startDashboardPage(dashboard_page) {
-		dashboard_page.on(CDashboardPage.EVENT_PRELOAD_OUTER_DATA_SOURCE,
-			this._events.dashboardPagePreloadOuterDataSource
-		);
+		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.start();
 	}
@@ -1026,9 +1009,7 @@ class CDashboard {
 	}
 
 	#destroyDashboardPage(dashboard_page) {
-		dashboard_page.off(CDashboardPage.EVENT_PRELOAD_OUTER_DATA_SOURCE,
-			this._events.dashboardPagePreloadOuterDataSource
-		);
+		dashboard_page.off(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.destroy();
 	}
@@ -1494,7 +1475,7 @@ class CDashboard {
 				if (widget === null) {
 					this._new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
-							this._new_widget_dashboard_page.addWidget(widget_data);
+							this._new_widget_dashboard_page.addWidgetFromData(widget_data);
 							this._new_widget_dashboard_page.resetWidgetPlaceholder();
 							this._new_widget_dashboard_page = null;
 							this._new_widget_pos = null;
@@ -1508,10 +1489,10 @@ class CDashboard {
 
 					dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
-							dashboard_page.replaceWidget(widget, widget_data);
+							dashboard_page.replaceWidgetFromData(widget, widget_data);
 							dashboard_page.resetWidgetPlaceholder();
 
-							this.#validateFieldsReferences();
+							this.#validateFieldsReferences({dashboard_page});
 						});
 				}
 			})
@@ -1892,10 +1873,12 @@ class CDashboard {
 		return reference;
 	}
 
-	_getReferences() {
+	_getReferences({dashboard_page = null} = {}) {
 		const references = new Set();
 
-		for (const dashboard_page of this._dashboard_pages.keys()) {
+		const dashboard_pages = dashboard_page !== null ? [dashboard_page] : this._dashboard_pages.keys();
+
+		for (const dashboard_page of dashboard_pages) {
 			for (const widget of dashboard_page.getWidgets()) {
 				const fields = widget.getFields();
 
@@ -1908,62 +1891,42 @@ class CDashboard {
 		return references;
 	}
 
-	#validateFieldsReferences() {
-		const references = this._getReferences();
+	#validateFieldsReferences({dashboard_page}) {
+		const references = this._getReferences({dashboard_page});
 
-		for (const dashboard_page of this._dashboard_pages.keys()) {
-			for (const widget of dashboard_page.getWidgets()) {
-				const fields = widget.getFields();
-				const fields_references = widget.getFieldsReferences();
+		for (const widget of dashboard_page.getWidgets()) {
+			const fields = widget.getFields();
+			const fields_references = widget.getFieldsReferences();
 
-				let has_updates = false;
+			let has_updates = false;
 
-				for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields, fields_references)) {
-					if (!references.has(accessor.getReference())) {
-						accessor.setReference('');
+			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields, fields_references)) {
+				if (!references.has(accessor.getReference())) {
+					accessor.setReference('');
 
-						has_updates = true;
-					}
+					has_updates = true;
 				}
+			}
 
-				if (has_updates) {
-					widget.updateProperties({fields});
-				}
+			if (has_updates) {
+				widget.updateProperties({fields});
 			}
 		}
 	}
 
 	// Internal events management methods.
 
-	_registerEvents() {
+	#registerEvents() {
 		let wrapper_scrollbar_width = 0;
 		let user_interaction_animation_frame = null;
 
 		this._events = {
-			dashboardPagePreloadOuterDataSource: (e) => {
+			dashboardPageRequireDataSource: (e) => {
 				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
 					return;
 				}
 
-				for (const dashboard_page of this._dashboard_pages.keys()) {
-					if (dashboard_page === e.target) {
-						continue;
-					}
-
-					for (const widget of dashboard_page.getWidgets()) {
-						if (widget.getFields().reference === e.detail.reference) {
-							if (dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
-								this.#startDashboardPage(dashboard_page);
-							}
-
-							dashboard_page.preloadWidget(widget);
-
-							return;
-						}
-					}
-				}
-
-				console.log('Could not preload outer data source', e.detail.reference);
+				console.log('Could not find required data source', e.detail.reference);
 			},
 
 			dashboardPageEdit: () => {
@@ -2019,10 +1982,10 @@ class CDashboard {
 				this.editWidgetProperties();
 			},
 
-			dashboardPageWidgetDelete: () => {
+			dashboardPageWidgetDelete: (e) => {
 				this._clearWarnings();
 
-				this.#validateFieldsReferences();
+				this.#validateFieldsReferences({dashboard_page: e.target});
 			},
 
 			dashboardPageWidgetPosition: () => {
@@ -2222,7 +2185,7 @@ class CDashboard {
 		};
 	}
 
-	_activateEvents() {
+	#activateEvents() {
 		if (!this._is_kiosk_mode) {
 			new ResizeObserver(this._events.gridResize).observe(this._containers.grid);
 			new ResizeObserver(this._events.tabsResize).observe(this._containers.navigation_tabs);

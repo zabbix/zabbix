@@ -89,6 +89,25 @@ class CWidgetForm {
 		return $fields_references;
 	}
 
+	/**
+	 * Use actual referred data instead of references. Used for widget presentation.
+	 *
+	 * @param array $fields_referred_data
+	 *
+	 * @return $this
+	 */
+	public function useFieldsReferredData(array $fields_referred_data): self {
+		foreach ($this->fields as $field) {
+			$field_referred_data = array_key_exists($field->getName(), $fields_referred_data)
+				? $fields_referred_data[$field->getName()]
+				: [];
+
+			$field->useReferredData($field_referred_data);
+		}
+
+		return $this;
+	}
+
 	public function isTemplateDashboard(): bool {
 		return $this->templateid !== null;
 	}

@@ -91,7 +91,9 @@ abstract class CWidgetField {
 	}
 
 	/**
-	 * Get field value. If no value is set, will return default value.
+	 * Get field value. If no value is set, return the default value.
+	 *
+	 * @return mixed
 	 */
 	public function getValue() {
 		return $this->value ?? $this->default;
@@ -101,6 +103,88 @@ abstract class CWidgetField {
 		$this->value = $value;
 
 		return $this;
+	}
+
+	/**
+	 * Use actual referred data instead of references. Used for widget presentation.
+	 *
+	 * Override to customize value structure and/or validation rules.
+	 *
+	 * @param array $referred_data            Array of substitutions.
+	 *        array $foreign_data[]['path']   Path to the reference in the value.
+	 *        mixed $foreign_data[]['value']  Value for the reference substitution.
+	 *
+	 * @return $this
+	 */
+	public function useReferredData(array $referred_data): self {
+		$value = $this->getValue();
+
+		$references = $this->getReferences();
+		$resolved_referred_data =  self::resolveReferredData($references, $referred_data);
+
+		foreach ($references as $reference) {
+			$source_value = $resolved_referred_data;
+			$target_value = &$value;
+
+			foreach ($reference['path'] as $step) {
+				if (!is_array($target_value) || !array_key_exists($step, $target_value)) {
+					continue 2;
+				}
+
+				$source_value = $resolved_referred_data[$step];
+				$target_value = &$target_value[$step];
+			}
+
+			$target_value = $source_value;
+		}
+
+		$this->setValue($value);
+
+		return $this;
+	}
+
+	/**
+	 * Normalize received referred data according to the declared references.
+	 *
+	 * Only declared references will be resolved. Missing referred data will resolve as nulls.
+	 *
+	 * @param array $references
+	 * @param array $referred_data
+	 *
+	 * @return mixed|null
+	 */
+	protected static function resolveReferredData(array $references, array $referred_data) {
+		$resolved_referred_data = null;
+
+		foreach ($references as $reference) {
+			$target_value = &$resolved_referred_data;
+
+			foreach ($reference['path'] as $step) {
+				if (!is_array($target_value)) {
+					$target_value = [];
+				}
+
+				$target_value = &$target_value[$step];
+			}
+
+			$target_value = null;
+		}
+
+		foreach ($referred_data as $entry) {
+			$target_value = &$resolved_referred_data;
+
+			foreach ($entry['path'] as $step) {
+				if (!is_array($target_value) || !array_key_exists($step, $target_value)) {
+					break;
+				}
+
+				$target_value = &$target_value[$step];
+			}
+
+			$target_value = $entry['value'];
+		}
+
+		return $resolved_referred_data;
 	}
 
 	public function getValuesCaptions(): array {

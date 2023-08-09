@@ -72,16 +72,14 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
  */
 class CWidgetBase {
 
-	// Preload outer data source event: informs the dashboard page to preload the referred outer data source.
-	static EVENT_PRELOAD_OUTER_DATA_SOURCE = 'widget-preload-outer-data-source';
+	// Require data source event: informs the dashboard page to load the referred data source.
+	static EVENT_REQUIRE_DATA_SOURCE = 'widget-require-data-source';
 
 	#fields_references_accessors = null;
 
-	#outer_data = new Map();
+	#fields_referred_data = new Map();
 
-	#outer_data_subscriptions = [];
-
-	#is_data_exchange_active = false;
+	#fields_referred_data_subscriptions = [];
 
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
@@ -276,7 +274,9 @@ class CWidgetBase {
 			this.setPos(this._pos);
 		}
 
-		this._registerEvents();
+		this.#registerEvents();
+
+		this.#startDataExchange();
 
 		this.onStart();
 	}
@@ -297,11 +297,10 @@ class CWidgetBase {
 
 		this._state = WIDGET_STATE_ACTIVE;
 
-		this.#startDataExchange();
+		this.#activateEvents();
 
 		this.onActivate();
 
-		this._activateEvents();
 		this._startUpdating();
 	}
 
@@ -321,15 +320,16 @@ class CWidgetBase {
 
 		this._state = WIDGET_STATE_INACTIVE;
 
-		this.onDeactivate();
-
 		if (this._is_new) {
 			this._is_new = false;
 			this._target.classList.remove('new-widget');
 		}
 
-		this._deactivateEvents();
 		this._stopUpdating();
+
+		this.onDeactivate();
+
+		this.#deactivateEvents();
 	}
 
 	/**
@@ -381,7 +381,7 @@ class CWidgetBase {
 
 		for (const type of Object.keys(data)) {
 			if (!declared_types.has(type)) {
-				throw new Error('Cannot broadcast token of undeclared type.');
+				throw new Error('Cannot broadcast data of undeclared type.');
 			}
 		}
 
@@ -419,28 +419,22 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Check if the data exchange is active.
+	 * Require loading the specified data source.
 	 *
-	 * @returns {boolean}
+	 * @param {string} reference
 	 */
-	#isDataExchangeActive() {
-		return this.#is_data_exchange_active;
+	requireDataSource(reference) {
+		this.fire(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, {reference});
 	}
 
 	/**
-	 * Start data exchange by preloading all dependent data sources and subscribing to their data events.
+	 * Load and connect to the referred data sources.
 	 *
-	 * Invoked once, either on activation or preload request.
+	 * Invoked before the first activation of the dashboard page, as well as on fields/fields_references updates.
 	 */
 	#startDataExchange() {
-		if (this.#is_data_exchange_active) {
-			return;
-		}
-
-		this.#is_data_exchange_active = true;
-
 		for (const accessor of this.#getFieldsReferencesAccessors()) {
-			this.preloadOuterDataSource(accessor.getReference());
+			this.requireDataSource(accessor.getReference());
 
 			const subscription = ZABBIX.EventHub.subscribe({
 				require: {
@@ -449,26 +443,24 @@ class CWidgetBase {
 					type: accessor.type
 				},
 				callback: ({data}) => {
-					this.#outer_data.set(accessor, data);
+					this.#fields_referred_data.set(accessor, data);
 
-					this._startUpdating();
+					if (this._state === WIDGET_STATE_ACTIVE) {
+						this._startUpdating();
+					}
 				}
 			});
 
-			this.#outer_data_subscriptions.push(subscription);
+			this.#fields_referred_data_subscriptions.push(subscription);
 		}
 	}
 
 	/**
-	 * Stop data exchange. Invoked when the widget gets deleted.
+	 * Disconnect from the referred data sources, invalidate broadcast data.
+	 *
+	 * Invoked when the widget or the dashboard page gets deleted, as well as on fields/fields_references updates.
 	 */
 	#stopDataExchange() {
-		if (!this.#is_data_exchange_active) {
-			return;
-		}
-
-		this.#is_data_exchange_active = false;
-
 		ZABBIX.EventHub.invalidateData({
 			context: 'dashboard',
 			sender_type: 'widget',
@@ -476,68 +468,45 @@ class CWidgetBase {
 			reference: this._fields.reference
 		});
 
-		for (const subscription of this.#outer_data_subscriptions) {
+		for (const subscription of this.#fields_referred_data_subscriptions) {
 			ZABBIX.EventHub.unsubscribe(subscription);
 		}
 
-		this.#outer_data.clear();
-		this.#outer_data_subscriptions = [];
+		this.#fields_referred_data.clear();
+		this.#fields_referred_data_subscriptions = [];
 
 		this.#resetFieldsReferencesAccessors();
 	}
 
 	/**
-	 * Preload outer data source.
-	 *
-	 * @param {string} reference
-	 */
-	preloadOuterDataSource(reference) {
-		this.fire(CWidgetBase.EVENT_PRELOAD_OUTER_DATA_SOURCE, {reference});
-	}
-
-	/**
-	 * Check if the outer data has been fully received from all data sources.
+	 * Check if the referred data has been fully received from all data sources.
 	 *
 	 * @returns {boolean}
 	 */
-	isOuterDataReady() {
-		return this.#outer_data.size === this.#getFieldsReferencesAccessors().length;
+	isFieldsReferredDataReady() {
+		return this.#fields_referred_data.size === this.#getFieldsReferencesAccessors().length;
 	}
 
 	/**
-	 * Get outer data received from data sources, as specified by fields and field references of the widget.
+	 * Get referred data received from data sources, as specified by fields/fields_references of the widget.
 	 *
 	 * @returns {Object}
 	 */
-	getOuterData() {
-		const outer_data = {};
+	getFieldsReferredData() {
+		const referred_data = {};
 
-		for (const [accessor, value] of this.#outer_data.entries()) {
-			if (!(accessor.field in outer_data)) {
-				outer_data[accessor.field] = [];
+		for (const [accessor, value] of this.#fields_referred_data.entries()) {
+			if (!(accessor.field in referred_data)) {
+				referred_data[accessor.field] = [];
 			}
 
-			outer_data[accessor.field].push({
+			referred_data[accessor.field].push({
 				path: accessor.path,
 				value
 			});
 		}
 
-		return outer_data;
-	}
-
-	/**
-	 * Preload widget which hasn't yet been activated.
-	 *
-	 * Invoked to allow the widget to broadcast the data to the dependent widgets which are currently being activated.
-	 */
-	preload() {
-		if (this.#isDataExchangeActive()) {
-			return;
-		}
-
-		this.#startDataExchange();
-		this._startUpdating();
+		return referred_data;
 	}
 
 	// External events management methods.
@@ -847,7 +816,7 @@ class CWidgetBase {
 	/**
 	 * Get accessors to the fields referenced by the field reference descriptor.
 	 *
-	 * @returns {{Object}[]}
+	 * @returns {Object[]}
 	 */
 	#getFieldsReferencesAccessors() {
 		if (this.#fields_references_accessors === null) {
@@ -873,7 +842,7 @@ class CWidgetBase {
 	 * @param {Object} fields              Widget field values (widget configuration data).
 	 * @param {Object} fields_references   Widget field reference descriptor.
 	 *
-	 * @returns {{Object}[]}
+	 * @returns {Object[]}
 	 */
 	static getFieldsReferencesAccessors(fields, fields_references) {
 		const accessors = [];
@@ -1005,7 +974,7 @@ class CWidgetBase {
 					}
 				})
 				.catch((exception) => {
-					console.log('Could not update widget refresh rate:', exception);
+					console.log('Could not update widget refresh rate', exception);
 				});
 		}
 	}
@@ -1124,7 +1093,7 @@ class CWidgetBase {
 								this._startUpdating();
 							}
 							else {
-								this._stopUpdating();
+								this._stopUpdating({do_abort: false});
 							}
 						}
 					}
@@ -1164,26 +1133,24 @@ class CWidgetBase {
 			return;
 		}
 
-		if (!this.isOuterDataReady()) {
-			if (this._state === WIDGET_STATE_ACTIVE) {
-				if (this._show_preloader_asap) {
-					this._showPreloader();
-				}
-				else {
-					this._schedulePreloader();
-				}
+		if (!this.isFieldsReferredDataReady()) {
+			if (this._show_preloader_asap) {
+				this._showPreloader();
+			}
+			else {
+				this._schedulePreloader();
 			}
 
 			return;
 		}
 
-		this._update();
-
-		if (this._state === WIDGET_STATE_ACTIVE && !this._is_edit_mode && this._rf_rate > 0) {
+		if (!this._is_edit_mode && this._rf_rate > 0) {
 			this._update_interval_id = setInterval(() => {
 				this._update();
 			}, this._rf_rate * 1000);
 		}
+
+		this._update();
 	}
 
 	/**
@@ -1235,19 +1202,15 @@ class CWidgetBase {
 			return;
 		}
 
-		this._contents_size = this._state === WIDGET_STATE_ACTIVE
-			? this._getContentsSize()
-			: {contents_width: 0, contents_height: 0};
+		this._contents_size = this._getContentsSize();
 
 		this._update_abort_controller = new AbortController();
 
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			if (this._show_preloader_asap) {
-				this._showPreloader();
-			}
-			else {
-				this._schedulePreloader();
-			}
+		if (this._show_preloader_asap) {
+			this._showPreloader();
+		}
+		else {
+			this._schedulePreloader();
 		}
 
 		Promise.resolve()
@@ -1263,7 +1226,7 @@ class CWidgetBase {
 					this._hidePreloader();
 				}
 				else {
-					console.log('Could not update widget:', exception);
+					console.log('Could not update widget', exception);
 
 					this._startUpdating({delay_sec: this._update_retry_sec});
 				}
@@ -1609,7 +1572,7 @@ class CWidgetBase {
 	/**
 	 * Create event listeners. Invoked once, upon widget initialization.
 	 */
-	_registerEvents() {
+	#registerEvents() {
 		this._events = {
 			actions: (e) => {
 				this.fire(WIDGET_EVENT_ACTIONS, {mouse_event: e});
@@ -1642,7 +1605,7 @@ class CWidgetBase {
 	/**
 	 * Activate event listeners. Invoked on each activation of the dashboard page.
 	 */
-	_activateEvents() {
+	#activateEvents() {
 		this._button_actions.addEventListener('click', this._events.actions);
 
 		if (this._is_editable) {
@@ -1658,7 +1621,7 @@ class CWidgetBase {
 	/**
 	 * Deactivate event listeners. Invoked on each deactivation of the dashboard page.
 	 */
-	_deactivateEvents() {
+	#deactivateEvents() {
 		this._button_actions.removeEventListener('click', this._events.actions);
 
 		if (this._is_editable) {
