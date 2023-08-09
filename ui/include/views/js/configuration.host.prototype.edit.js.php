@@ -238,7 +238,6 @@
 		 *
 		 * @return {array}  Templateids.
 		 */
-
 		getLinkedTemplates() {
 			const linked_templateids = [];
 
