@@ -305,17 +305,6 @@ class CControllerAuditLogList extends CController {
 				continue;
 			}
 
-			if ($auditlog['action'] == CAudit::ACTION_PUSH) {
-				$auditlog['short_details'] = implode("\n", [
-					_s('Processed: %1$s', $details['processed']),
-					_s('Failed: %1$s', $details['failed']),
-					_s('Total: %1$s', $details['total']),
-					_s('Seconds spent: %1$s', $details['seconds spent'])
-				]);
-
-				continue;
-			}
-
 			// Add space after description string.
 			if ($auditlog['short_details'] != '') {
 				$auditlog['short_details'] .= "\n\n";
