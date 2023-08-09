@@ -187,17 +187,17 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 
 		// DB check.
 		$hosts_templates = 'SELECT NULL'.
-						' FROM hosts_templates'.
-						' WHERE hostid IN ('.
-								'SELECT hostid'.
-								' FROM hosts'.
-								' WHERE host='.zbx_dbstr($data['fields']['Host name']).
-						')'.
-						' AND templateid IN ('.
-								'SELECT hostid'.
-								' FROM hosts'.
-								' WHERE host='.zbx_dbstr($data['template']).
-						')';
+				' FROM hosts_templates'.
+				' WHERE hostid IN ('.
+					'SELECT hostid'.
+					' FROM hosts'.
+					' WHERE host='.zbx_dbstr($data['fields']['Host name']).
+				')'.
+				' AND templateid IN ('.
+					'SELECT hostid'.
+					' FROM hosts'.
+					' WHERE host='.zbx_dbstr($data['template']).
+				')';
 
 		$this->assertEquals(1, CDBHelper::getCount($hosts_templates));
 
@@ -214,24 +214,24 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	private function sqlForHostPrototypeCompare($data) {
 		$sql = 'SELECT host, status, name, ipmi_authtype,'.
-				' ipmi_privilege, ipmi_username, ipmi_password,'.
-				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
-				' tls_psk_identity, tls_psk, flags'.
-				' FROM hosts'.
-				' WHERE flags=2 AND hostid IN ('.
-						'SELECT hostid'.
-						' FROM host_discovery'.
-						' WHERE parent_itemid IN ('.
+						' ipmi_privilege, ipmi_username, ipmi_password,'.
+						' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
+						' tls_psk_identity, tls_psk, flags'.
+						' FROM hosts'.
+						' WHERE flags=2 AND hostid IN ('.
+							'SELECT hostid'.
+							' FROM host_discovery'.
+							' WHERE parent_itemid IN ('.
 								'SELECT itemid'.
 								' FROM items'.
 								' WHERE hostid in ('.
-										'SELECT hostid'.
-										' FROM hosts'.
-										' WHERE host='.zbx_dbstr($data).
+									'SELECT hostid'.
+									' FROM hosts'.
+									' WHERE host='.zbx_dbstr($data).
+								')'.
+							')'.
 						')'.
-					')'.
-				')'.
-				' ORDER BY host, name';
+						' ORDER BY host, name';
 
 		return CDBHelper::getHash($sql);
 	}
@@ -524,7 +524,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		}
 
 		$this->zbxTestLogin('host_prototypes.php?form=update&context=host&parent_discoveryid='.$discovery_id.'&hostid='.
-			$host_prototype
+				$host_prototype
 		);
 	}
 

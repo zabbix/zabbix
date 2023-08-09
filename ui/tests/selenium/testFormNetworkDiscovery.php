@@ -581,9 +581,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		// Check the results in DB after update.
 		$proxy = DBfetch(DBselect('SELECT proxyid FROM drules WHERE name='.zbx_dbstr($data['name'])));
 		if ($proxy['proxyid']) {
-			$discovery_db_data = CDBHelper::getRow('SELECT drules.name, iprange, delay'.
-							' FROM drules'.
-							' WHERE drules.name='.zbx_dbstr($data['name']));
+			$discovery_db_data = CDBHelper::getRow(
+				'SELECT drules.name, iprange, delay'.
+				' FROM drules'.
+				' WHERE drules.name='.zbx_dbstr($data['name'])
+			);
 		}
 		else {
 			$discovery_db_data = CDBHelper::getRow('SELECT name, iprange, delay FROM drules WHERE name='

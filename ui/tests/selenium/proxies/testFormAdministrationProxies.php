@@ -58,7 +58,6 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				'name' => self::$update_proxy,
 				'mode' => PROXY_MODE_ACTIVE,
-				'address' => "127.0.0.1",
 				'description' => 'Description for update',
 				'tls_connect' => 1,
 				'tls_accept'=> 1
@@ -66,7 +65,6 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				'name' => self::$change_active_proxy,
 				'mode' => PROXY_MODE_ACTIVE,
-				'address' => "127.0.0.1",
 				'description' => 'Active description for refresh',
 				'tls_connect' => 1,
 				'tls_accept'=> 7,
@@ -79,7 +77,7 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				'name' => self::$change_passive_proxy,
 				'mode' => PROXY_MODE_PASSIVE,
-				'address' => "127.0.0.1",
+				'address' => '127.9.9.9',
 				'port' => 10051,
 				'description' => '_Passive description for refresh',
 				'tls_connect' => 4,
@@ -526,7 +524,6 @@ class testFormAdministrationProxies extends CWebTest {
 				foreach (['address' => '127.0.0.1', 'port' => '10051'] as $id => $value) {
 					$this->assertEquals($value, $dialog->query('id', $id)->one()->getValue());
 				}
-				//$this->assertEquals('IP', $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue());
 
 				// Check interface fields lengths.
 				foreach (['address' => 255, 'port' => 64] as $id => $length) {

@@ -570,8 +570,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 				$exists = ($data['action'] === 'Delete')
 					? array_key_exists('expected', $data)
-					: true
-				;
+					: true;
 
 				$this->assertEquals($exists, $this->query('link', $proxy)->exists());
 			}
