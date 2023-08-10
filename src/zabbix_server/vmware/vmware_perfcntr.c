@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#define ZBX_XML_DATETIME		26
+
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "vmware_perfcntr.h"
@@ -33,8 +35,6 @@
 
 ZBX_VECTOR_IMPL(uint16, uint16_t)
 ZBX_PTR_VECTOR_IMPL(perf_available, zbx_vmware_perf_available_t *)
-
-#define ZBX_XML_DATETIME		26
 
 #define ZBX_XPATH_REFRESHRATE()						\
 	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
