@@ -1264,7 +1264,7 @@ class CMacrosResolverGeneral {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		return sprintf("%.${parameters[0]}f", (float) $value);
+		return sprintf('%.'.$parameters[0].'f', (float) $value);
 	}
 
 	/**
