@@ -3990,7 +3990,7 @@ div.dashboard-widget-map .btn-back-map-container {
   to {
     opacity: 1; } }
 div.dashboard-widget-navtree .navtree .tree .tree-list .margin-lvl {
-  flex-shrink: 0; }
+  display: inline-block; }
 div.dashboard-widget-navtree .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
   width: 15px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list > .tree-item.ui-sortable-helper .content {
@@ -4083,18 +4083,16 @@ div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-
   width: 150px; }
 div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   display: flex;
-  align-items: center;
+  align-items: end;
   justify-content: space-between;
-  min-width: 320px;
-  height: 20px;
-  padding: 8px 0;
+  min-width: 288px;
+  height: 18px;
+  padding: 9px 0;
   border-bottom: 1px solid #383838; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row:hover {
     background-color: #383838; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content {
     position: relative;
-    display: flex;
-    align-items: center;
     min-width: 0; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content .arrow {
       display: inline-block;
@@ -4105,11 +4103,10 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content > .item-name {
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.5; }
+      text-overflow: ellipsis; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .problem-icon-list {
     padding-left: 10px;
-    margin-right: 5px; }
+    margin-right: 10px; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .problem-icon-list .problem-icon-list-item {
       border-radius: 2px; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools {

@@ -16,7 +16,7 @@ div.dashboard-widget-navtree {
 		.tree {
 			.tree-list {
 				.margin-lvl {
-					flex-shrink: 0;
+					display: inline-block;
 				}
 
 				&.root > .tree-item > .tree-row > .content > .margin-lvl {
@@ -64,11 +64,11 @@ div.dashboard-widget-navtree {
 			.tree-item {
 				.tree-row {
 					display: flex;
-					align-items: center;
+					align-items: end;
 					justify-content: space-between;
-					min-width: 320px;
-					height: 20px;
-					padding: 8px 0;
+					min-width: 288px;
+					height: 18px;
+					padding: 9px 0;
 					border-bottom: 1px solid $table-border-color;
 
 					&:hover {
@@ -77,8 +77,6 @@ div.dashboard-widget-navtree {
 
 					.content {
 						position: relative;
-						display: flex;
-						align-items: center;
 						min-width: 0;
 
 						.arrow {
@@ -95,13 +93,12 @@ div.dashboard-widget-navtree {
 							white-space: nowrap;
 							overflow: hidden;
 							text-overflow: ellipsis;
-							line-height: 1.5;
 						}
 					}
 
 					.problem-icon-list {
 						padding-left: 10px;
-						margin-right: 5px;
+						margin-right: 10px;
 
 						.problem-icon-list-item {
 							border-radius: 2px;
@@ -236,7 +233,7 @@ div.dashboard-widget-navtree {
 			.tree {
 				.tree-item {
 					.tree-row {
-						min-width: 410px;
+						min-width: 378px;
 					}
 				}
 			}
