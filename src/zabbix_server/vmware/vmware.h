@@ -578,9 +578,6 @@ ZBX_SHMEM_FUNC_DECL(, __vm)
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-//void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
-//void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
-
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
 zbx_vmware_cust_query_t *zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *soap_type,
