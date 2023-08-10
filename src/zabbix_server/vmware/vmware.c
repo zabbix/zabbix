@@ -2477,8 +2477,8 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_free(*error);
 	}
 
-	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH, get_vmware_service_objects()[service->type].session_manager,
-			username_esc, password_esc);
+	zbx_snprintf(xml, sizeof(xml), ZBX_POST_VMWARE_AUTH,
+			get_vmware_service_objects()[service->type].session_manager, username_esc, password_esc);
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, xml, NULL, NULL, error))
 		goto out;
@@ -2515,7 +2515,9 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 
 	char	tmp[MAX_STRING_LEN];
 
-	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT, get_vmware_service_objects()[service->type].session_manager);
+	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_LOGOUT,
+			get_vmware_service_objects()[service->type].session_manager);
+
 	return zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error);
 }
 

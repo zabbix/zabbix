@@ -46,7 +46,6 @@ ZBX_PTR_VECTOR_IMPL(perf_available, zbx_vmware_perf_available_t *)
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
 
-
 /******************************************************************************
  *                                                                            *
  * performance counter hashset support functions                              *
