@@ -434,7 +434,7 @@ static void	DBpatch_6050034_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 		{
 			zbx_vector_uint64_append(nofunc_ids, interval->values[n]->wfid);
 			zbx_wiget_field_free(interval->values[n]);
-			zbx_vector_wiget_field_remove(interval, n);
+			zbx_vector_wiget_field_remove_noorder(interval, n);
 		}
 
 		if (FAIL != (n = zbx_vector_wiget_field_bsearch(timeshift, val, zbx_wiget_field_compare)))
@@ -452,10 +452,7 @@ static void	DBpatch_6050034_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 		zbx_wiget_field_t	*val = interval->values[interval->values_num - 1];
 
 		if (FAIL == (n = zbx_vector_wiget_field_bsearch(timeshift, val, zbx_wiget_field_compare)))
-		{
 			shift = "";
-			sign_shift = "";
-		}
 		else
 			shift = timeshift->values[n]->value_str;
 
@@ -576,6 +573,7 @@ static int	DBpatch_6050034_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 				" set value_str='%s',name='%s'"
 				" where widget_fieldid=" ZBX_FS_UI64 ";\n",
 				val->value_str, name, val->wfid);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	for (i = 0; i < time_to->values_num; i++)
@@ -589,6 +587,7 @@ static int	DBpatch_6050034_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 				" set value_str='%s',name='%s'"
 				" where widget_fieldid=" ZBX_FS_UI64 ";\n",
 				val->value_str, name, val->wfid);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
