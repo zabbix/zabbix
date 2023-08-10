@@ -18,6 +18,9 @@
 **/
 
 #include "zbxasyncpoller.h"
+#include "zbxcommon.h"
+#include <event2/util.h>
+#include <event2/dns.h>
 
 #ifdef HAVE_LIBEVENT
 
@@ -29,6 +32,9 @@ typedef struct
 	struct event			*tx_event;
 	struct event			*rx_event;
 	struct event			*timeout_event;
+	char				ip[65];
+	int				timeout;
+	char				*error;
 }
 zbx_async_task_t;
 
@@ -44,6 +50,7 @@ static void	async_task_remove(zbx_async_task_t *task)
 
 	event_free(task->timeout_event);
 
+	zbx_free(task->error);
 	zbx_free(task);
 }
 
@@ -70,7 +77,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data, &fd);
+	ret = task->process_cb(what, task->data, &fd, task->ip, task->error);
 
 	switch (ret)
 	{
@@ -78,7 +85,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			async_task_remove(task);
 			break;
 		case ZBX_ASYNC_TASK_READ:
-			if (fd_in != fd)
+			if (fd_in != fd || NULL == task->rx_event)
 			{
 				ev = event_get_base(task->timeout_event);
 
@@ -90,7 +97,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			event_add(task->rx_event, NULL);
 			break;
 		case ZBX_ASYNC_TASK_WRITE:
-			if (fd_in != fd)
+			if (fd_in != fd || NULL == task->tx_event)
 			{
 				ev = event_get_base(task->timeout_event);
 
@@ -107,32 +114,69 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, task_state_to_str(ret));
 }
 
-void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
-		zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb)
+static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
+{
+	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() result:%d", __func__, err);
+
+	if (0 != err)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve DNS name: %s", evutil_gai_strerror(err));
+		task->ip[0] = '\0';
+		task->error = zbx_strdup(task->error, evutil_gai_strerror(err));
+		async_event(-1, EV_TIMEOUT, task);
+	}
+	else
+	{
+		struct timeval	tv = {task->timeout, 0};
+
+		switch (ai->ai_addr->sa_family)
+		{
+			case AF_INET:
+				inet_ntop(AF_INET, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), task->ip,
+						(socklen_t)sizeof(task->ip));
+				break;
+			case AF_INET6:
+				inet_ntop(AF_INET6, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), task->ip,
+						(socklen_t)sizeof(task->ip));
+				break;
+			default:
+				task->ip[0] = '\0';
+				break;
+		}
+
+		evutil_freeaddrinfo(ai);
+
+		evtimer_add(task->timeout_event, &tv);
+		async_event(-1, 0, task);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr, 
+		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb)
 {
 	zbx_async_task_t	*task;
-	struct timeval		tv = {timeout, 0};
+	struct evutil_addrinfo	hints;
 
 	task = (zbx_async_task_t *)zbx_malloc(NULL, sizeof(zbx_async_task_t));
 	task->data = data;
 	task->process_cb = process_cb;
 	task->free_cb = clear_cb;
 	task->timeout_event = evtimer_new(ev, async_event, (void *)task);
+	task->timeout = timeout;
 
-	evtimer_add(task->timeout_event, &tv);
+	task->rx_event = NULL;
+	task->tx_event = NULL;
+	task->error = NULL;
 
-	if (-1 != fd)
-	{
-		task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
-		task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
-	}
-	else
-	{
-		task->rx_event = NULL;
-		task->tx_event = NULL;
-	}
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	hints.ai_flags = 0;
+	hints.ai_socktype = SOCK_STREAM;
 
-	/* call initialization event */
-	async_event(fd, 0, task);
+	evdns_getaddrinfo(dnsbase, addr, NULL, &hints, async_dns_event, task);
 }
 #endif

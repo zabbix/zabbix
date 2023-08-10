@@ -41,6 +41,8 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 
+#include <event2/dns.h>
+
 ZBX_VECTOR_IMPL(int32, int)
 
 typedef struct
@@ -343,7 +345,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		else if (ITEM_TYPE_ZABBIX == items[i].type)
 		{
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
-					poller_config, poller_config, poller_config->base,
+					poller_config, poller_config, poller_config->base, poller_config->dnsbase,
 					poller_config->config_timeout, poller_config->config_source_ip);
 		}
 		else
@@ -352,7 +354,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 			zbx_set_snmp_bulkwalk_options();
 
 			errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
-					poller_config, poller_config, poller_config->base,
+					poller_config, poller_config, poller_config->base, poller_config->dnsbase,
 					poller_config->config_timeout, poller_config->config_source_ip);
 #else
 			errcodes[i] = NOTSUPPORTED;
@@ -432,6 +434,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 		int process_num, event_callback_fn async_check_items_callback)
 {
 	struct timeval	tv = {1, 0};
+	char		*timeout;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -447,6 +450,21 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize event base");
 		exit(EXIT_FAILURE);
 	}
+
+	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
+		exit(EXIT_FAILURE);
+	}
+
+	timeout = zbx_dsprintf(NULL, "%d", poller_args_in->config_comms->config_timeout);
+	if (0 != evdns_base_set_option(poller_config->dnsbase, "timeout:", timeout))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set timeout to asynchronous DNS library");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free(timeout);
 
 	poller_config->config_source_ip = poller_args_in->config_comms->config_source_ip;
 	poller_config->config_timeout = poller_args_in->config_comms->config_timeout;
@@ -482,6 +500,7 @@ static void	async_poller_stop(zbx_poller_config_t *poller_config)
 
 static void	async_poller_destroy(zbx_poller_config_t *poller_config)
 {
+	evdns_base_free(poller_config->dnsbase, 1);
 	event_base_free(poller_config->base);
 	zbx_vector_uint64_clear(&poller_config->itemids);
 	zbx_vector_int32_clear(&poller_config->lastclocks);
