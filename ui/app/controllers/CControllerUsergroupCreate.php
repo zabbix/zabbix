@@ -34,8 +34,7 @@ class CControllerUsergroupCreate extends CController {
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
-			'ms_tag_filter' =>			'array',
-			'tag_filter' =>				'array',
+			'tag_filters' =>			'array',
 
 			'form_refresh' =>			'int32'
 		];
@@ -83,23 +82,15 @@ class CControllerUsergroupCreate extends CController {
 		$user_group['hostgroup_rights'] = $hostgroup_rights;
 		$user_group['templategroup_rights'] = $templategroup_rights;
 
-		$tag_filters = [];
-		$this->getInputs($tag_filters, ['ms_tag_filter', 'tag_filter']);
+		$tag_filters = $this->getInput('tag_filters', []);
 
-		$tag_filters_groupIds = $tag_filters['ms_tag_filter']['groupids'] ?? [];
-		$tags = $tag_filters['tag_filter']['tag'] ?? [];
-		$values = $tag_filters['tag_filter']['value'] ?? [];
-
-		foreach ($tag_filters_groupIds as $index => $group) {
-			foreach ($group as $groupId) {
-				$tag = $tags[$index] ?? null;
-				$value = $values[$index] ?? null;
-
-				if ($groupId !== '0'&& $tag !== null && $value !== null) {
+		foreach ($tag_filters as $hostgroup) {
+			foreach ($hostgroup['tags'] as $tag_filter) {
+				if($hostgroup['groupid'] !== '0') {
 					$user_group['tag_filters'][] = [
-						'groupid' => $groupId,
-						'tag' => $tag,
-						'value' => $value
+						'groupid' => $hostgroup['groupid'],
+						'tag' => $tag_filter['tag'],
+						'value' => $tag_filter['value']
 					];
 				}
 			}

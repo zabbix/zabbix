@@ -89,7 +89,7 @@ class CControllerPopupTagFilterCheck extends CController {
 		$filter_type = $this->getInput('filter_type', TAG_FILTER_ALL);
 		$ms_groups = $this->getInput('ms_new_tag_filter', []);
 		$groupids = $ms_groups['groupids'];
-		$new_tag_filters = $this->getInput('new_tag_filter', []);
+		$new_tag_filters = $this->filterDuplicates($this->getInput('new_tag_filter', []));
 		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
 
 		foreach ($groupids as $groupid) {
@@ -97,44 +97,41 @@ class CControllerPopupTagFilterCheck extends CController {
 			if (isset($data['tag_filters'][$groupid])) {
 				$existing_tag_filters = &$data['tag_filters'][$groupid]['tags'];
 
-				// If the existing tag is not found in the new tags, remove it.
-				foreach ($existing_tag_filters as $key => $existing_tag_filter) {
-					$is_still_present = false;
-
-					foreach ($new_tag_filters as $new_tag_filter) {
-						if ($existing_tag_filter['tag'] == $new_tag_filter['tag']
-								&& $existing_tag_filter['value'] == $new_tag_filter['value'])
-						{
-							$is_still_present = true;
-							break;
-						}
-					}
-
-					if (!$is_still_present) {
-						unset($existing_tag_filters[$key]);
-					}
+				if ($filter_type == TAG_FILTER_ALL) {
+					$existing_tag_filters = [['tag' => '', 'value' => '']];
 				}
 
+				// If the existing tag is not found in the new tags list, remove it.
+				if ($filter_type == TAG_FILTER_LIST) {
+					foreach ($existing_tag_filters as $key => $existing_tag_filter) {
+						if ($existing_tag_filter['tag'] === '') {
+							unset($existing_tag_filters[$key]);
+							break;
+						}
+						else {
+							$is_still_present = false;
+
+							foreach ($new_tag_filters as $new_tag_filter) {
+								if ($existing_tag_filter['tag'] == $new_tag_filter['tag']
+									&& $existing_tag_filter['value'] == $new_tag_filter['value'])
+								{
+									$is_still_present = true;
+									break;
+								}
+							}
+
+							if (!$is_still_present) {
+								unset($existing_tag_filters[$key]);
+							}
+						}
+					}
+				}
 
 				foreach ($new_tag_filters as $new_tag_filter) {
 					$is_duplicate = false;
 
-					foreach ($existing_tag_filters as $key => $existing_tag_filter) {
-						// Discard all old tags if now 'All tags' are set for the host group.
-						if ($filter_type == TAG_FILTER_ALL) {
-							$data['tag_filters'][$groupid]['tags'] = [
-								[
-									'tag' => '',
-									'value' => ''
-								]
-							];
-							break 2;
-						}
-						if ($filter_type == TAG_FILTER_LIST && $existing_tag_filter['tag'] === '') {
-							unset($existing_tag_filters[$key]);
-							break;
-						}
-
+					foreach ($existing_tag_filters as &$existing_tag_filter) {
+						// Skip duplicate tags.
 						if ($new_tag_filter['tag'] == $existing_tag_filter['tag'] &&
 							$new_tag_filter['value'] == $existing_tag_filter['value']) {
 							$is_duplicate = true;
@@ -151,6 +148,7 @@ class CControllerPopupTagFilterCheck extends CController {
 			else {
 				$key = array_search($groupid, array_column($host_groups, 'groupid'));
 				$name = $key !== false ? $host_groups[$key]['name'] : '';
+
 				$data['tag_filters'][$groupid] = [
 					'groupid' => $groupid,
 					'name' => $name,
@@ -159,8 +157,21 @@ class CControllerPopupTagFilterCheck extends CController {
 			}
 		}
 
-		CArrayHelper::sort($data['tag_filters'], ['name']);
-
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+	}
+
+	private function filterDuplicates($tag_filters): array {
+		$unique_tag_filters = [];
+		$used = [];
+
+		foreach ($tag_filters as $tag_filter) {
+			$unique_pair = $tag_filter['tag'].NAME_DELIMITER.$tag_filter['value'];
+			if (!isset($used[$unique_pair])) {
+				$used[$unique_pair] = true;
+				$unique_tag_filters[] = $tag_filter;
+			}
+		}
+
+		return $unique_tag_filters;
 	}
 }

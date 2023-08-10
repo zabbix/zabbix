@@ -31,12 +31,24 @@ window.tag_filter_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.tag_filters = tag_filters;
-		this.group_tag_filters = groupid !== 0 ? tag_filters[groupid]['tags'] : [];
+		this.group_tag_filters = groupid !== 0 ? this.tag_filters[groupid]['tags'] : [];
 		this.groupid = groupid;
 		this.tag_filter_template = new Template(document.getElementById('tag-filter-row-template').innerHTML);
 		this.tag_filter_counter = 0;
 
-		if (this.group_tag_filters.length !== 0 && this.group_tag_filters[0]['tag'] !== '') {
+		if (typeof this.group_tag_filters === 'object' && !Array.isArray(this.group_tag_filters)) {
+			let result = [];
+
+			for (let key in this.group_tag_filters) {
+				result.push(this.group_tag_filters[key]);
+			}
+
+			this.group_tag_filters = result;
+		}
+
+		const indices = Object.keys(this.group_tag_filters);
+		const first_index = indices[0];
+		if (this.group_tag_filters.length !== 0 && this.group_tag_filters[first_index]['tag'] !== '') {
 			const tag_list_option = document.querySelector(`input[name="filter_type"][value='<?= TAG_FILTER_LIST ?>']`);
 			tag_list_option.checked = true;
 
@@ -96,6 +108,17 @@ window.tag_filter_popup = new class {
 		const fields = getFormFields(this.form);
 		fields.tag_filters = this.tag_filters;
 		fields.groupid = this.groupid;
+
+		if (fields.filter_type == <?= TAG_FILTER_ALL?>) {
+			delete fields.new_tag_filter;
+		}
+
+		if ('new_tag_filter' in fields) {
+			for (const tag_filter of Object.values(fields.new_tag_filter)) {
+				tag_filter.tag = tag_filter.tag.trim();
+				tag_filter.value = tag_filter.value.trim();
+			}
+		}
 
 		if (fields.esc_period != null ) {
 			fields.esc_period = fields.esc_period.trim();

@@ -86,8 +86,7 @@ class CControllerUsergroupUpdate extends CController {
 		$user_group['hostgroup_rights'] = $hostgroup_rights;
 		$user_group['templategroup_rights'] = $templategroup_rights;
 
-		$tag_filters = [];
-		$tag_filters = array_merge($tag_filters, $this->getInput('tag_filters'));
+		$tag_filters = $this->getInput('tag_filters', []);
 
 		foreach ($tag_filters as $hostgroup) {
 			foreach ($hostgroup['tags'] as $tag_filter) {

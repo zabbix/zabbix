@@ -38,6 +38,7 @@ class CControllerUsergroupEdit extends CController {
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
+			'tag_filters' =>			'array',
 
 			'form_refresh' =>			'int32'
 		];
@@ -104,6 +105,21 @@ class CControllerUsergroupEdit extends CController {
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 
+		if ($this->hasInput('tag_filters')) {
+			$new_tag_filters = $this->getInput('tag_filters', []);
+
+			foreach ($new_tag_filters as $tag_filter) {
+				$groupid = $tag_filter['groupid'];
+				$key = array_search($groupid, array_column($host_groups, 'groupid'));
+				$name = $key !== false ? $host_groups[$key]['name'] : '';
+
+				$data['tag_filters'][$groupid] = [
+					'groupid' => $groupid,
+					'name' => $name,
+					'tags' => $tag_filter['tags']
+				];
+			}
+		}
 		$html_tag_filters = $data['tag_filters'];
 
 		foreach ($html_tag_filters as &$group) {
