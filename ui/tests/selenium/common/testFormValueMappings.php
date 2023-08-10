@@ -78,13 +78,14 @@ class testFormValueMappings extends CWebTest {
 		$this->openValueMappingTab($source);
 
 		// Check value mapping table headers and content.
-		$table = $this->query('id:valuemap-table')->asTable()->one();
+		$table = $this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->asTable()->one();
 		$this->assertEquals(['Name', 'Value', 'Action'], $table->getHeadersText());
 		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
 
 		// Check value mapping configuration form layout.
 		$this->query('name:valuemap_add')->one()->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		//$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals('Value mapping', $dialog->getTitle());
 		$mapping_form = $dialog->getContent()->asForm();
 
@@ -132,8 +133,9 @@ class testFormValueMappings extends CWebTest {
 	 */
 	public function checkClone($source) {
 		// Create a clone of an existing host/template with value mappings.
-		$form = $this->openValueMappingTab($source, true, false);
+		$this->openValueMappingTab($source, true, false);
 		$this->query('button', 'Clone')->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$form->getField(ucfirst($source).' name')->fill('Clone Valuemap Test');
 		$form->submit();
 		$this->page->waitUntilReady();
@@ -142,18 +144,20 @@ class testFormValueMappings extends CWebTest {
 		// Get the id of the created host/template clone.
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Clone Valuemap Test'));
 
-		// Check value mappings were copied correctly.
+		// Get name of host or template for the filter and link.
+		$name = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid='.zbx_dbstr($hostid));
+
 		if ($source === 'host') {
-			$this->page->login()->open('zabbix.php?action=host.edit&hostid='.$hostid);
-			$cloned_form = $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
+			$this->page->open('zabbix.php?action=host.list&filter_name='.$name.'&filter_set=1');
 		}
 		else {
-			$this->page->open($source.'s.php?form=update&'.$source.'id='.$hostid);
-			$cloned_form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+			$this->page->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 		}
 
-		$cloned_form->selectTab('Value mapping');
+		$this->query('link', $name)->one()->click();
+		COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Value mapping');
 		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
+		COverlayDialogElement::find()->one()->close();
 	}
 
 	public function getValuemapData() {
@@ -843,7 +847,7 @@ class testFormValueMappings extends CWebTest {
 		))->one()->click();
 
 		// Fill in the name of the valuemap and the parameters of its mappings.
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($data['name']);
 
 		$mapping_table = $dialog->query('id:mappings_table')->asMultifieldTable()->one();
@@ -865,7 +869,6 @@ class testFormValueMappings extends CWebTest {
 		}
 		else {
 			// Save the configuration of the host with created/updated value mappings.
-			COverlayDialogElement::ensureNotPresent();
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
@@ -889,7 +892,8 @@ class testFormValueMappings extends CWebTest {
 
 				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
-				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot_id']);
+				$this->assertScreenshot($this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->one(),
+						$action.$data['screenshot_id']);
 			}
 		}
 	}
@@ -900,7 +904,7 @@ class testFormValueMappings extends CWebTest {
 	 * @param array $data	Data provider
 	 */
 	private function checkMappings($data) {
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$mappings_table = $this->query('id:mappings_table')->asMultifieldTable()->one();
 
 		// Check value mapping name.
@@ -935,14 +939,18 @@ class testFormValueMappings extends CWebTest {
 			$this->page->login();
 		}
 
+		// Get name of host or template for the filter and link.
+		$name = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid='.zbx_dbstr($sourceid));
+
 		if ($source === 'host') {
-			$this->page->open('zabbix.php?action=host.edit&hostid='.$sourceid);
-			$form = $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
+			$this->page->open('zabbix.php?action=host.list&filter_name='.$name.'&filter_set=1');
 		}
 		else {
-			$this->page->open($source.'s.php?form=update&'.$source.'id='.$sourceid);
-			$form = $this->query('name:'.$source.'sForm')->asForm(['normalized' => true])->waitUntilVisible()->one();
+			$this->page->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 		}
+
+		$this->query('link', $name)->one()->click();
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		if ($open_tab) {
 			$form->selectTab('Value mapping');
@@ -964,7 +972,7 @@ class testFormValueMappings extends CWebTest {
 		// Open configuration of a value mapping and save it without making any changes.
 		$this->openValueMappingTab($source);
 		$this->query('link', self::UPDATE_VALUEMAP1)->one()->click();
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->submit()->waitUntilNotVisible();
 		$this->query('button:Update')->one()->click();
 
@@ -1006,7 +1014,7 @@ class testFormValueMappings extends CWebTest {
 		// Open value mapping configuration and update its fields.
 		$this->openValueMappingTab($source);
 		$this->query('link', self::UPDATE_VALUEMAP2)->one()->click();
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($fields['name']);
 		$dialog->query('id:mappings_table')->asMultifieldTable()->one()->fill($fields['mappings']);
 
@@ -1031,7 +1039,7 @@ class testFormValueMappings extends CWebTest {
 
 		// Delete the value mapping.
 		$form = $this->openValueMappingTab($source);
-		$table = $this->query('id:valuemap-table')->asTable()->one();
+		$table = $this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->asTable()->one();
 		$table->findRow('Name', self::DELETE_VALUEMAP)->query('button:Remove')->one()->click();
 		$form->submit();
 
@@ -1071,20 +1079,21 @@ class testFormValueMappings extends CWebTest {
 
 		// Create a new host/template, populate the hosthroup but leave the name empty.
 		if ($source === 'host') {
-			$this->page->login()->open('zabbix.php?action=host.edit');
-			$form = $this->query('id:host-form')->asForm()->waitUntilVisible()->one();
+			$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+			$this->query('button:Create host')->one()->click();
 		}
 		else {
-			$this->page->login()->open($source.'s.php?form=create');
-			$form = $this->query('name:'.$source.'sForm')->asForm(['normalized' => true])->waitUntilVisible()->one();
+			$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
+			$this->query('button:Create template')->one()->click();
 		}
 
+		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->getField(ucfirst($source).' groups')->fill(($source === 'host') ? 'Discovered hosts' : 'Templates');
 
 		// Open value mappings tab and add a value mapping.
 		$form->selectTab('Value mapping');
 		$this->query('name:valuemap_add')->one()->click();
-		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->one();
+		$dialog = COverlayDialogElement::find()->asForm()->waitUntilVisible()->all()->last();
 		$dialog->query('xpath:.//input[@id="name"]')->one()->fill($valuemap['name']);
 		$dialog->query('id:mappings_table')->asMultifieldTable()->one()->fill($valuemap['mappings']);
 		$dialog->submit()->waitUntilNotVisible();
@@ -1104,7 +1113,7 @@ class testFormValueMappings extends CWebTest {
 	 * @param string $source		Entity (hosts or templates) for which the scenario is executed.
 	 */
 	public function checkMassValuemappingScreenshot($source) {
-		$this->page->login()->open(($source === 'hosts') ? 'zabbix.php?action=host.list' : 'templates.php')->waitUntilReady();
+		$this->page->login()->open(($source === 'hosts') ? 'zabbix.php?action=host.list' : 'zabbix.php?action=template.list')->waitUntilReady();
 		$this->selectTableRows();
 		$this->query('button:Mass update')->one()->click();
 		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
