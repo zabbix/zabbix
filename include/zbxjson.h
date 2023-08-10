@@ -61,6 +61,7 @@
 #define ZBX_PROTO_TAG_HOSTID			"hostid"
 #define ZBX_PROTO_TAG_AVAILABLE			"available"
 #define ZBX_PROTO_TAG_ERROR			"error"
+#define ZBX_PROTO_TAG_USERINPUT			"userinput"
 #define ZBX_PROTO_TAG_USERNAME			"username"
 #define ZBX_PROTO_TAG_PASSWORD			"password"
 #define ZBX_PROTO_TAG_SID			"sid"

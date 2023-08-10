@@ -337,7 +337,7 @@ static int validate_userinput(const char *userinput, const char *validator, cons
  *                                                                              *
  ********************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
-		const char *clientip, int config_timeout, const char *config_source_ip, char **result, char **debug)
+		const char *clientip, const char *userinput, int config_timeout, const char *config_source_ip, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
 	zbx_dc_host_t		host;
@@ -654,8 +654,8 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout,
 		const char *config_source_ip)
 {
-	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
-				clientip[MAX_STRING_LEN];
+	char			*result = NULL, *send = NULL, *debug = NULL, *userinput = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
+				clientip[MAX_STRING_LEN], tmp_userinput[MAX_STRING_LEN];
 	int			ret = FAIL, got_hostid = 0, got_eventid = 0;
 	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	struct zbx_json		j;
@@ -750,7 +750,10 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout,
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_USERINPUT, tmp_userinput, sizeof(tmp_userinput), NULL))
+		userinput = tmp_userinput;
+
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, userinput, config_timeout,
 			config_source_ip, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
