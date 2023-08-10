@@ -20,7 +20,7 @@
 #include "dbconfig.h"
 
 #include "zbxtasks.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
@@ -45,6 +45,7 @@
 #include "zbxpreprocbase.h"
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
+#include "zbx_discoverer_constants.h"
 
 int	sync_in_progress = 0;
 
@@ -85,6 +86,9 @@ ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
+ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
+ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
+ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
@@ -974,6 +978,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->config->hk.audit_mode = value_int;
 		config->revision.config_table = revision;
 	}
+
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != config->config->hk.audit_mode &&
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+	{
+		if (ZBX_HK_MODE_PARTITION != config->config->hk.audit_mode)
+		{
+			config->config->hk.audit_mode = ZBX_HK_MODE_PARTITION;
+			config->revision.config_table = revision;
+		}
+	}
+#endif
 
 	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[17])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[18], revision))
@@ -2034,7 +2050,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		{
 			addr = zbx_strdup(NULL, interface->ip);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				dc_strpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
@@ -2044,7 +2060,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		{
 			addr = zbx_strdup(NULL, interface->dns);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				dc_strpool_replace(1, &interface->dns, addr);
 			zbx_free(addr);
@@ -10039,7 +10055,7 @@ out:
  *             timers        - [IN] timers of triggers to retrieve            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order,
+void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order,
 		const zbx_vector_ptr_t *timers)
 {
 	int		i;
@@ -10090,7 +10106,7 @@ void	zbx_dc_get_triggers_by_timers(zbx_hashset_t *trigger_info, zbx_vector_ptr_t
 			trigger->timespec = timer->eval_ts;
 			trigger->flags = flags;
 
-			zbx_vector_ptr_append(trigger_order, trigger);
+			zbx_vector_dc_trigger_append(trigger_order, trigger);
 		}
 	}
 
@@ -10395,14 +10411,14 @@ void	zbx_dc_free_timers(zbx_vector_ptr_t *timers)
 	UNLOCK_CACHE;
 }
 
-void	zbx_dc_free_triggers(zbx_vector_ptr_t *triggers)
+void	zbx_dc_free_triggers(zbx_vector_dc_trigger_t *triggers)
 {
 	int	i;
 
 	for (i = 0; i < triggers->values_num; i++)
-		DCclean_trigger((zbx_dc_trigger_t *)triggers->values[i]);
+		DCclean_trigger(triggers->values[i]);
 
-	zbx_vector_ptr_clear(triggers);
+	zbx_vector_dc_trigger_clear(triggers);
 }
 
 void	zbx_dc_config_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail)
@@ -14492,43 +14508,40 @@ void	zbx_dc_cleanup_autoreg_host(void)
 	UNLOCK_CACHE;
 }
 
-static void	zbx_gather_item_tags(ZBX_DC_ITEM *item, zbx_vector_ptr_t *item_tags)
+static void	zbx_gather_item_tags(ZBX_DC_ITEM *item, zbx_vector_item_tag_t *item_tags)
 {
-	zbx_dc_item_tag_t	*dc_tag;
-	zbx_item_tag_t		*tag;
-	int			i;
-
-	for (i = 0; i < item->tags.values_num; i++)
+	for (int i = 0; i < item->tags.values_num; i++)
 	{
-		dc_tag = (zbx_dc_item_tag_t *)item->tags.values[i];
-		tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
+		zbx_dc_item_tag_t	*dc_tag = item->tags.values[i];
+		zbx_item_tag_t		*tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
+
 		tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);
 		tag->tag.value = zbx_strdup(NULL, dc_tag->value);
-		zbx_vector_ptr_append(item_tags, tag);
+
+		zbx_vector_item_tag_append(item_tags, tag);
 	}
 }
 
-static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_ptr_t *item_tags)
+static void	zbx_gather_tags_from_host(zbx_uint64_t hostid, zbx_vector_item_tag_t *item_tags)
 {
 	zbx_dc_host_tag_index_t 	*dc_tag_index;
-	zbx_dc_host_tag_t		*dc_tag;
-	zbx_item_tag_t			*tag;
-	int				i;
 
 	if (NULL != (dc_tag_index = zbx_hashset_search(&config->host_tags_index, &hostid)))
 	{
-		for (i = 0; i < dc_tag_index->tags.values_num; i++)
+		for (int i = 0; i < dc_tag_index->tags.values_num; i++)
 		{
-			dc_tag = (zbx_dc_host_tag_t *)dc_tag_index->tags.values[i];
-			tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
+			zbx_dc_host_tag_t	*dc_tag = (zbx_dc_host_tag_t *)dc_tag_index->tags.values[i];
+			zbx_item_tag_t		*tag = (zbx_item_tag_t *) zbx_malloc(NULL, sizeof(zbx_item_tag_t));
+
 			tag->tag.tag = zbx_strdup(NULL, dc_tag->tag);
 			tag->tag.value = zbx_strdup(NULL, dc_tag->value);
-			zbx_vector_ptr_append(item_tags, tag);
+
+			zbx_vector_item_tag_append(item_tags, tag);
 		}
 	}
 }
 
-static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
+static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 {
 	ZBX_DC_TEMPLATE_ITEM	*item;
 
@@ -14541,11 +14554,11 @@ static void	zbx_gather_tags_from_template_chain(zbx_uint64_t itemid, zbx_vector_
 	}
 }
 
-void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
+void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 {
 	ZBX_DC_ITEM		*item;
 	zbx_item_tag_t		*tag;
-	int			n, i;
+	int			n;
 
 	if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)))
 		return;
@@ -14579,7 +14592,7 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 	}
 
 	/* assign hostid and itemid values to newly gathered tags */
-	for (i = n; i < item_tags->values_num; i++)
+	for (int i = n; i < item_tags->values_num; i++)
 	{
 		tag = (zbx_item_tag_t *)item_tags->values[i];
 		tag->hostid = item->hostid;
@@ -14587,7 +14600,7 @@ void	zbx_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
 	}
 }
 
-void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_ptr_t *item_tags)
+void	zbx_dc_get_item_tags(zbx_uint64_t itemid, zbx_vector_item_tag_t *item_tags)
 {
 	RDLOCK_CACHE;
 

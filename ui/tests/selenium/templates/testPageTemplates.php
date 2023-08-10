@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, EntitiesTags
+ * @dataSource TagFilter, EntitiesTags, WebScenarios
  */
 class testPageTemplates extends CLegacyWebTest {
 
@@ -427,12 +427,11 @@ class testPageTemplates extends CLegacyWebTest {
 	 * Test opening Hosts filtered by corresponding Template.
 	 */
 	public function testPageTemplates_CheckHostsColumn() {
-		$template = 'Form test template';
+		$template = 'Template for web scenario testing';
 		$hosts = ['Simple form test host'];
 
-		$this->page->login()->open('templates.php?groupid=0');
-		// Reset Templates filter from possible previous scenario.
-		$this->resetFilter();
+		$this->page->login()->open('templates.php?page=3');
+
 		// Click on Hosts link in Template row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();

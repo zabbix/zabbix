@@ -18,7 +18,7 @@
 **/
 
 #include "snmptrapper.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 
 #include "zbxself.h"
@@ -106,7 +106,7 @@ static int	process_trap_for_interface(zbx_uint64_t interfaceid, char *trap, zbx_
 
 		items[i].key = zbx_strdup(items[i].key, items[i].key_orig);
 		if (SUCCEED != zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL,
-				MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
+				ZBX_MACRO_TYPE_ITEM_KEY, error, sizeof(error)))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 			errcodes[i] = NOTSUPPORTED;

@@ -23,7 +23,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -38,6 +38,7 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 #include "zbxproxybuffer.h"
+#include "zbx_discoverer_constants.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
@@ -468,26 +469,29 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 					SVC_SNMPv3 == dcheck_ptr->type)
 			{
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community, MACRO_TYPE_COMMON,
-						NULL, 0);
+						NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community,
+						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				zbx_substitute_key_macros(&dcheck_ptr->key_, NULL, NULL, NULL, NULL,
-						MACRO_TYPE_SNMP_OID, NULL, 0);
+						ZBX_MACRO_TYPE_SNMP_OID, NULL, 0);
 
 				if (SVC_SNMPv3 == dcheck_ptr->type)
 				{
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL,
+							&dcheck_ptr->snmpv3_securityname, ZBX_MACRO_TYPE_COMMON, NULL,
 							0);
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+							&dcheck_ptr->snmpv3_authpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
+							0);
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
 							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
+							&dcheck_ptr->snmpv3_privpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
+							0);
+					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+							NULL, NULL, NULL, NULL, NULL, NULL,
+							&dcheck_ptr->snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL,
+							0);
 				}
 			}
 
@@ -983,7 +987,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 
 		delay_str = zbx_strdup(delay_str, drule->delay_str);
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&delay_str, MACRO_TYPE_COMMON, NULL, 0);
+				&delay_str, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 		{
