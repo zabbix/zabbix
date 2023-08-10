@@ -466,16 +466,14 @@ static int	DBpatch_6050039(void)
 
 		if (DEPRECATED_STATUS_PROXY_ACTIVE == status)
 		{
-			status = PROXY_MODE_ACTIVE;
-
 			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_ACTIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
 					"127.0.0.1", "10051");
 		}
 		else if (DEPRECATED_STATUS_PROXY_PASSIVE == status)
 		{
-			char	*address;
-			char	*port;
+			const char	*address;
+			const char	*port;
 
 			if (SUCCEED != zbx_db_is_null(row[11]))
 			{

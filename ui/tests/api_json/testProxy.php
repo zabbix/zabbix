@@ -173,7 +173,7 @@ class testProxy extends CAPITest {
 				'mode' => PROXY_MODE_ACTIVE
 			],
 			'select_hosts_extend' => [
-				'name' => 'API test proxy - verify fields returned wth selectHosts extend',
+				'name' => 'API test proxy - verify fields returned with selectHosts extend',
 				'mode' => PROXY_MODE_ACTIVE
 			]
 		];
@@ -565,7 +565,7 @@ class testProxy extends CAPITest {
 			],
 
 			// Check "interface".
-			'Test proxy.create: invalid paramater "interface" 1' => [
+			'Test proxy.create: invalid parameter "interface" 1' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_ACTIVE,
@@ -573,7 +573,7 @@ class testProxy extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "interface".'
 			],
-			'Test proxy.create: invalid paramater "interface" 2' => [
+			'Test proxy.create: invalid parameter "interface" 2' => [
 				'proxy' => [
 					'name' => 'API create proxy',
 					'mode' => PROXY_MODE_PASSIVE,

@@ -38,7 +38,6 @@
 #include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
-#include "zbx_host_constants.h"
 #include "zbxdbwrap.h"
 #include "zbxevent.h"
 

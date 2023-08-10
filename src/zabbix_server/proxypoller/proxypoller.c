@@ -36,7 +36,6 @@
 #include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
-#include "zbx_host_constants.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 

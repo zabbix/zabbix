@@ -23,7 +23,6 @@
 #include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
-#include "zbx_host_constants.h"
 #include "../taskmanager/taskmanager.h"
 
 int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
