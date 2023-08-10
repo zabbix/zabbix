@@ -758,18 +758,18 @@ class CProxy extends CApiService {
 				if (($proxy['mode'] == PROXY_MODE_ACTIVE && ($proxy['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == 0)
 						|| ($proxy['mode'] == PROXY_MODE_PASSIVE
 							&& $proxy['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE)) {
-					$proxy += [
+					$proxy += DB::getUpdatedValues('proxy', [
 						'tls_issuer' => DB::getDefault('proxy', 'tls_issuer'),
 						'tls_subject' => DB::getDefault('proxy', 'tls_subject')
-					];
+					], $db_proxy);
 				}
 
 				if (($proxy['mode'] == PROXY_MODE_ACTIVE && ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == 0)
 						|| ($proxy['mode'] == PROXY_MODE_PASSIVE && $proxy['tls_connect'] != HOST_ENCRYPTION_PSK)) {
-					$proxy += [
+					$proxy += DB::getUpdatedValues('proxy', [
 						'tls_psk_identity' => DB::getDefault('proxy', 'tls_psk_identity'),
 						'tls_psk' => DB::getDefault('proxy', 'tls_psk')
-					];
+					], $db_proxy);
 				}
 			}
 		}
