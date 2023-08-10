@@ -5678,7 +5678,6 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 #	undef ZBX_SUFFIX
 }
 
-#include <log.h>
 /******************************************************************************
  *                                                                            *
  * Purpose: converts double value to string and truncates insignificant       *
@@ -5697,7 +5696,7 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
 
 	if (0.0 == modf(val, &ipart))
 	{
-		zbx_snprintf(buffer, size, ZBX_FS_UI64, (zbx_uint64_t)val);
+		zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
 	}
 	else
 	{
