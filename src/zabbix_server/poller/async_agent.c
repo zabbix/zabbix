@@ -284,7 +284,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	zbx_tcp_send_context_init(agent_context->item.key, strlen(agent_context->item.key), 0, ZBX_TCP_PROTOCOL,
 		&agent_context->tcp_send_context);
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
-	
+
 	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, config_timeout,
 			agent_task_process, clear_cb);
 

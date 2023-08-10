@@ -162,7 +162,7 @@ struct zbx_snmp_context
 	int				config_timeout;
 	int				probe;
 	unsigned char			snmp_version;
-	char				*snmp_community; 
+	char				*snmp_community;
 	char				*snmpv3_securityname;
 	char				*snmpv3_contextname;
 	unsigned char			snmpv3_securitylevel;
@@ -3133,7 +3133,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 			errcodes[j] = snmp_result.errcode;
 		}
-	
+
 		evdns_base_free(dnsbase, 0);
 		event_base_free(base);
 

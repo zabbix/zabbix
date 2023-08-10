@@ -155,7 +155,7 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr, 
+void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase, const char *addr,
 		void *data, int timeout, zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb)
 {
 	zbx_async_task_t	*task;
