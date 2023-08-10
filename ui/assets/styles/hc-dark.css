@@ -1049,6 +1049,7 @@ footer {
         .form-grid fieldset.collapsible legend .toggle:focus {
           box-shadow: none; }
           .form-grid fieldset.collapsible legend .toggle:focus span {
+            margin-bottom: -1px;
             border-bottom-width: 2px;
             border-bottom-style: solid; }
     .form-grid fieldset.collapsible.collapsed .toggle::after {
