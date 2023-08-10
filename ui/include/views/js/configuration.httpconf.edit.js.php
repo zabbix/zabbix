@@ -340,7 +340,7 @@
 						}
 
 						if ('action' in data.success && data.success.action === 'delete') {
-							curl = new Curl('host_discovery.php');
+							curl = new Curl('httpconf.php');
 							curl.setArgument('context', context);
 						}
 					}

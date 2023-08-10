@@ -30,7 +30,7 @@
 		context: null,
 		parent_discoveryid: null,
 
-		init({form_name, context, parent_discoveryid}) {
+		init({form_name, context, parent_discoveryid = null}) {
 			this.form_name = form_name;
 			this.context = context;
 			this.is_discovery = parent_discoveryid !== null;
