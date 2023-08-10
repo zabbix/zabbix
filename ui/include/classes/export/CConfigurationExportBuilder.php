@@ -863,7 +863,18 @@ class CConfigurationExportBuilder {
 	protected function formatGraphs(array $graphs) {
 		$result = [];
 
-		CArrayHelper::sort($graphs, ['name']);
+		usort($graphs, static function (array $graph_a, array $graph_b): int {
+			$comparison = strnatcasecmp($graph_a['name'], $graph_b['name']);
+
+			if ($comparison != 0) {
+				return $comparison;
+			}
+
+			CArrayHelper::sort($graph_a['gitems'], ['host']);
+			CArrayHelper::sort($graph_b['gitems'], ['host']);
+
+			return strnatcasecmp(reset($graph_a['gitems'])['host'], reset($graph_b['gitems'])['host']);
+		});
 
 		foreach ($graphs as $graph) {
 			$data = [
