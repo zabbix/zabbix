@@ -672,9 +672,21 @@
 		 * @see init.js add.popup event
 		 */
 		addPopupValues(data) {
+			const dependency_table = this.form.querySelector('#dependency-table tbody');
+			let existing_dependencies = [];
 			let template;
 
+			dependency_table
+				.querySelectorAll('.js-related-trigger-edit')
+				.forEach(row => {
+				existing_dependencies.push(row.dataset.triggerid);
+			})
+
 			Object.values(data).forEach((dependency) => {
+				if (existing_dependencies.includes(dependency.triggerid)) {
+					return;
+				}
+
 				const element = {
 					name: dependency.name,
 					triggerid: dependency.triggerid,
@@ -683,9 +695,7 @@
 
 				template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
 
-				document
-					.querySelector('#dependency-table tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(element));
+				dependency_table.insertAdjacentHTML('beforeend', template.evaluate(element));
 			})
 		}
 	}
