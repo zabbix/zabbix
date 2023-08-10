@@ -62,10 +62,6 @@
 
 				location.href = location.href;
 			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
-				new TabIndicators('host-tabs');
-			});
 		},
 
 		submit(button) {

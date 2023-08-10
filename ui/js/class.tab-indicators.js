@@ -199,6 +199,10 @@ class TabIndicatorFactory {
 				return new GraphProblemsTabIndicatorItem;
 			case 'GraphTime':
 				return new GraphTimeTabIndicatorItem;
+			case 'HostMacros':
+				return new HostMacrosTabIndicatorItem;
+			case 'HostPrototypeMacros':
+				return new HostPrototypeMacrosTabIndicatorItem;
 			case 'HttpAuth':
 				return new HttpAuthTabIndicatorItem;
 			case 'Media':
@@ -217,8 +221,6 @@ class TabIndicatorFactory {
 				return new LdapTabIndicatorItem;
 			case 'LldMacros':
 				return new LldMacrosTabIndicatorItem;
-			case 'Macros':
-				return new MacrosTabIndicatorItem;
 			case 'Overrides':
 				return new OverridesTabIndicatorItem;
 			case 'Operations':
@@ -243,6 +245,8 @@ class TabIndicatorFactory {
 				return new TagFilterTabIndicatorItem;
 			case 'Tags':
 				return new TagsTabIndicatorItem;
+			case 'TemplateMacros':
+				return new TemplateMacrosTabIndicatorItem;
 			case 'Time':
 				return new TimeTabIndicatorItem;
 			case 'Valuemaps':
@@ -333,7 +337,7 @@ class TabIndicatorItem {
 	}
 }
 
-class MacrosTabIndicatorItem extends TabIndicatorItem {
+class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 
 	static ZBX_PROPERTY_INHERITED = 1;
 
@@ -342,14 +346,7 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		let macros;
-
-		if (document.querySelector('#templates-form')) {
-			macros = [...document.forms['template-edit-form'].querySelectorAll('#tbl_macros .form_row')];
-		}
-		else {
-			macros = [...document.querySelectorAll('#tbl_macros .form_row')]
-		}
+		let macros = [...document.forms['host-form'].querySelectorAll('#tbl_macros .form_row')];
 
 		return macros
 			.filter((row) => {
@@ -357,7 +354,7 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
-					&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+						&& parseInt(inherited_type.value, 10) == HostMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
@@ -367,14 +364,95 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		let target_node;
+		let target_node = document.getElementById('macros_container');
 
-		if (document.querySelector('#templates-form')) {
-			target_node = document.getElementById('template_macros_container');
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			});
 		}
-		else {
-			target_node = document.getElementById('macros_container');
+	}
+}
+
+class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
+
+	static ZBX_PROPERTY_INHERITED = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		let macros = [...document.forms['hostPrototypeForm'].querySelectorAll('#tbl_macros .form_row')];
+
+		return macros
+			.filter((row) => {
+				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
+				const inherited = HostPrototypeMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
+
+				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+					return false;
+				}
+
+				return (macro !== null && macro.value !== '');
+			})
+			.length;
+	}
+
+	initObserver() {
+		let target_node = document.getElementById('macros_container');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				subtree: true
+			});
 		}
+	}
+}
+
+class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
+
+	static ZBX_PROPERTY_INHERITED = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		let macros = [...document.forms['templates-form'].querySelectorAll('#tbl_macros .form_row')];
+
+		return macros
+			.filter((row) => {
+				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
+				const inherited = TemplateMacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED;
+
+				if (inherited_type !== null && parseInt(inherited_type.value, 10) == inherited) {
+					return false;
+				}
+
+				return (macro !== null && macro.value !== '');
+			})
+			.length;
+	}
+
+	initObserver() {
+		let target_node = document.getElementById('template_macros_container');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {

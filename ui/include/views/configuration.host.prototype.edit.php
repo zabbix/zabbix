@@ -463,7 +463,7 @@ if (!$data['readonly']) {
 		->addItem($macro_row_inherited_tmpl);
 }
 
-$tabs->addTab('macro-tab', _('Macros'), $macro_tab, TAB_INDICATOR_MACROS);
+$tabs->addTab('macro-tab', _('Macros'), $macro_tab, TAB_INDICATOR_HOST_PROTOTYPE_MACROS);
 
 $tabs->addTab('inventoryTab', _('Inventory'),
 	(new CFormList('inventorylist'))

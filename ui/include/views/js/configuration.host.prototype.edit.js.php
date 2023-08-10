@@ -285,7 +285,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.templateSubmit(e));
-			overlay.$dialogue[0].addEventListener('dialogue.close', () => new TabIndicators());
 		}
 
 		refresh() {

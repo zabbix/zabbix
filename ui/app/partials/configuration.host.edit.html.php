@@ -509,7 +509,7 @@ $tabs = (new CTabView(['id' => 'host-tabs']))
 	->addTab('host-tab', _('Host'), $host_tab)
 	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI)
 	->addTab('host-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
-	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
+	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_HOST_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)
 	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
 
