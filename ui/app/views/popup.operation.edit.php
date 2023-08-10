@@ -364,7 +364,7 @@ $form_grid->addItem(
 						(new CSimpleButton(_('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->addClass('element-table-remove')
-					))->addClass(ZBX_STYLE_NOWRAP),
+					))->addClass(ZBX_STYLE_NOWRAP)
 				]))
 					->addClass('form_row')
 					->setAttribute('data-id','#{row_index}')

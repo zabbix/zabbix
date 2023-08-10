@@ -631,7 +631,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
 						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
 						'Angle' => '270°',
-						'Description' => '𒀐 New test Description 😁🙂😁🙂',
+						'id:description' => '𒀐 New test Description 😁🙂😁🙂',
 						'id:desc_size' => 30,
 						'id:desc_bold' => true,
 						'id:desc_v_pos' => 'Top',

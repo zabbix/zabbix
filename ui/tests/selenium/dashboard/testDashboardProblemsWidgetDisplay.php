@@ -244,7 +244,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		$event = CDataHelper::call('event.get', [
 			'eventids' => 1009953,
-			'select_acknowledges' => ['clock']
+			'selectAcknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}

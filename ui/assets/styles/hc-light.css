@@ -6435,6 +6435,8 @@ svg {
 .problem-icon-link {
   overflow: hidden;
   border-radius: 2px; }
+  .problem-icon-link .problem-icon-list-item {
+    border-radius: 0; }
   .problem-icon-link:link, .problem-icon-link:hover, .problem-icon-link:focus {
     border-bottom: none; }
   .problem-icon-link:focus {

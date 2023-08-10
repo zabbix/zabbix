@@ -338,7 +338,7 @@ static int	DBpatch_6050029(void)
 	return SUCCEED;
 }
 
-static int  DBpatch_6050030(void)
+static int	DBpatch_6050030(void)
 {
 	const zbx_db_table_t table =
 			{"optag", "optagid", 0,
@@ -366,6 +366,20 @@ static int	DBpatch_6050032(void)
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("optag", 1, &field);
+}
+
+static int	DBpatch_6050033(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'toptriggers','widgets/toptriggers',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 #endif
@@ -407,5 +421,6 @@ DBPATCH_ADD(6050029, 0, 1)
 DBPATCH_ADD(6050030, 0, 1)
 DBPATCH_ADD(6050031, 0, 1)
 DBPATCH_ADD(6050032, 0, 1)
+DBPATCH_ADD(6050033, 0, 1)
 
 DBPATCH_END()
