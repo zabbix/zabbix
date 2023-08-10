@@ -27,6 +27,21 @@ class NetworkDiscovery {
 	 * @return array
 	 */
 	public static function load() {
+		// Create proxies for Discovery rule with proxy.
+		$proxies = CDataHelper::call('proxy.create',
+			[
+				[
+					'host' => 'Proxy for Network discovery',
+					'status' => 5
+				],
+				[
+					'host' => 'Proxy for Network discovery cloning',
+					'status' => 5
+				]
+			]
+		);
+		$proxyid = $proxies['proxyids'][0];;
+
 		CDataHelper::call('drule.create', [
 			[
 				'name' => 'Discovery rule for update',
@@ -88,33 +103,45 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for clone',
 				'iprange' => '192.168.2.3-255',
+				'proxy_hostid' => $proxyid,
+				'delay' => '25h',
+				'status' =>  1,
+				'concurrency_max' => 0,
 				'dchecks' => [
 					[
 						'type' => SVC_LDAP,
-						'ports' => 555
+						'ports' => 555,
+						'host_source' => 1,
+						'name_source' => 2
 					],
 					[
 						'type' => SVC_TCP,
-						'ports' => 9988
+						'ports' => 9988,
+						'host_source' => 1,
+						'name_source' => 2
 					],
 					[
 						'type' => SVC_SNMPv1,
 						'ports' => 165,
 						'key_' => '.1.9.6.1.10.1.9.9.9',
 						'snmp_community'=> 'original SNMP community',
-						'uniq' => 1
+						'uniq' => 1,
+						'host_source' => 1,
+						'name_source' => 2
 					],
 					[
 						'type' => SVC_SNMPv3,
 						'ports' => 130,
 						'key_' => '.1.3.6.1.2.1.1.1.999',
-						'snmpv3_contextname name' => 'original_context_name',
+						'snmpv3_contextname' => 'original_context_name',
 						'snmpv3_securityname' => 'original_security_name',
 						'snmpv3_securitylevel' => 2,
 						'snmpv3_authprotocol' => 4,
 						'snmpv3_authpassphrase' => 'original_authpassphrase',
 						'snmpv3_privprotocol' => 5,
-						'snmpv3_privpassphrase' => 'original_privpassphrase'
+						'snmpv3_privpassphrase' => 'original_privpassphrase',
+						'host_source' => 3,
+						'name_source' => 2
 					]
 				]
 			],
