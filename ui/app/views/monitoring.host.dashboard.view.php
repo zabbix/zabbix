@@ -38,7 +38,7 @@ if (array_key_exists('no_data', $data)) {
 	return;
 }
 
-$this->addJsFile('d3.js');
+$this->addJsFile('d3.v7.min.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
