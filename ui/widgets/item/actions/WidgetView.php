@@ -171,15 +171,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($items) {
 			$item = $items[$itemid];
 
-			$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
-
-			$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
-
-			$value_type = $item['value_type'];
+			$history_period = $time_to - $time_from;
 
 			$items[$itemid] += [
 				'source' => ($this->fields_values['history'] != ITEM_VALUE_DATA_SOURCE_TRENDS) ? 'history' : 'trends'
 			];
+
+			$history = Manager::History()->getAggregationByInterval(
+				$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
+			);
+
+			$value_type = $item['value_type'];
 
 			$aggregate_function = $this->fields_values['aggregate_function'];
 
@@ -196,27 +198,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$range_time_parser->parse($to);
 					$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
+					$interval = $time_to;
 					$aggregate_interval = $time_to-$time_from;
 				}
 				else {
+					$interval = $history_period;
 					$aggregate_interval = $history_period;
 				}
 
 				$last_results = Manager::History()->getAggregationByInterval(
-					$items, $time_from, $time_to, $aggregate_function, $aggregate_interval
+					$items, $time_from, $time_to, $aggregate_function, $interval
 				);
 
 				if (!empty($last_results)) {
 					$agg_data = $last_results[$items[$itemid]['itemid']]['data'];
 
-					if (array_key_exists(1, $agg_data) && $agg_data[0]['clock'] < $agg_data[1]['clock']) {
-						$agg_data[0] = $agg_data[1];
-						unset($agg_data[1]);
-					}
-
 					$prev_results = Manager::History()->getAggregationByInterval(
 						$items, $time_from-$aggregate_interval, time()-$aggregate_interval,
-						$aggregate_function, $aggregate_interval
+						$aggregate_function, $interval
 					);
 
 					if (!empty($prev_results)) {
@@ -244,6 +243,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 					unset($datas);
 				}
+			}
+			else {
+				$aggregate_interval = $time_to-$time_from;
+
+				$prev_results = Manager::History()->getAggregationByInterval(
+					$items, $time_from-$aggregate_interval, $time_from, AGGREGATE_LAST, $time_from
+				);
+
+				if (!empty($prev_results)) {
+					$history[$items[$itemid]['itemid']]['data'] += [
+						'1' => $prev_results[$items[$itemid]['itemid']]['data'][0]
+					];
+				}
+
+				$history[$items[$itemid]['itemid']] = $history[$items[$itemid]['itemid']]['data'];
 			}
 
 			if ($history) {
