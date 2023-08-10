@@ -19,11 +19,9 @@
 #ifndef ZABBIX_VMWARE_H
 #define ZABBIX_VMWARE_H
 
-#include "config.h"
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxcomms.h"
 #include "zbxshmem.h"
 
 /* the vmware service state */

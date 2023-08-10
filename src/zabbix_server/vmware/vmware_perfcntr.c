@@ -25,6 +25,7 @@
 #include "vmware.h"
 #include "vmware_internal.h"
 
+#include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2

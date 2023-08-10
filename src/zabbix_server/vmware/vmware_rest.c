@@ -23,6 +23,8 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "zbxstr.h"
+#include "zbxjson.h"
+#include "zbxalgo.h"
 
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 

@@ -33,6 +33,8 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
+#include "zbxjson.h"
+#include "zbxsysinc.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.
