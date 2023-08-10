@@ -30,6 +30,29 @@
 
 #define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX	1
 #define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST	2
+
+static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
+{
+	zbx_token_t	token;
+	int		pos = 0;
+	size_t		out_offset = 0, macrovalue_len;
+
+	macrovalue_len = strlen(macrovalue);
+	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
+	out_offset++;
+
+	for (; SUCCEED == zbx_token_find(*out, pos, &token, ZBX_TOKEN_SIMPLE_MACRO); pos++)
+	{
+		pos = token.loc.r;
+
+		if (0 == strncmp(*out + token.loc.l, macro, token.loc.r - token.loc.l + 1))
+		{
+			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
+					token.loc.r - token.loc.l + 1, macrovalue, macrovalue_len);
+		}
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: finds whether a given value is in a given comma-separated value   *
