@@ -77,7 +77,7 @@ static zbx_shmem_info_t	*tfc_mem = NULL;
 
 static zbx_mutex_t	tfc_lock = ZBX_MUTEX_NULL;
 
-ZBX_SHMEM_FUNC_IMPL(__tfc, tfc_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __tfc, tfc_mem)
 
 #define LOCK_CACHE	zbx_mutex_lock(tfc_lock)
 #define UNLOCK_CACHE	zbx_mutex_unlock(tfc_lock)

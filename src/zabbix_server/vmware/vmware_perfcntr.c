@@ -19,8 +19,6 @@
 
 #include "config.h"
 
-#define ZBX_XML_DATETIME		26
-
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "vmware_perfcntr.h"
@@ -32,6 +30,8 @@
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
+
+#define ZBX_XML_DATETIME		26
 
 ZBX_VECTOR_IMPL(uint16, uint16_t)
 ZBX_PTR_VECTOR_IMPL(perf_available, zbx_vmware_perf_available_t *)

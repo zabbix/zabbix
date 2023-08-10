@@ -47,7 +47,7 @@ static zbx_get_config_forks_f	get_config_forks_cb = NULL;
 static zbx_mutex_t	sm_lock = ZBX_MUTEX_NULL;
 
 static zbx_shmem_info_t	*sm_mem = NULL;
-ZBX_SHMEM_FUNC_IMPL(__sm, sm_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __sm, sm_mem)
 
 #endif
 

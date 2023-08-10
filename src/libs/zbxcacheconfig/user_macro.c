@@ -26,7 +26,7 @@
 #include "zbxnum.h"
 
 extern zbx_shmem_info_t	*config_mem;
-ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __config, config_mem)
 
 ZBX_PTR_VECTOR_IMPL(um_macro, zbx_um_macro_t *)
 ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)

@@ -576,7 +576,7 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
 void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
-ZBX_SHMEM_FUNC_DECL_N(__vm)
+ZBX_SHMEM_FUNC_DECL(, __vm)
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

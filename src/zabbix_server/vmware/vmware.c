@@ -70,7 +70,7 @@ static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_shmem_info_t	*vmware_mem = NULL;
 
-ZBX_SHMEM_FUNC_IMPL_N(__vm, vmware_mem)
+ZBX_SHMEM_FUNC_IMPL(, __vm, vmware_mem)
 
 zbx_vmware_t	*vmware = NULL;
 

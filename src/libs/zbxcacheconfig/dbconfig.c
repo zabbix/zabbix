@@ -112,7 +112,7 @@ zbx_rwlock_t		config_lock = ZBX_RWLOCK_NULL;
 zbx_rwlock_t		config_history_lock = ZBX_RWLOCK_NULL;
 zbx_shmem_info_t	*config_mem;
 
-ZBX_SHMEM_FUNC_IMPL(__config, config_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __config, config_mem)
 
 static void	dc_maintenance_precache_nested_groups(void);
 static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);

@@ -38,7 +38,7 @@ ZBX_PTR_VECTOR_IMPL(pb_discovery_ptr, zbx_pb_discovery_t *)
 zbx_pb_t		*pb_data = NULL;
 static zbx_shmem_info_t	*pb_mem = NULL;
 
-ZBX_SHMEM_FUNC_IMPL(__pb, pb_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __pb, pb_mem)
 
 static void	pb_init_state(zbx_pb_t *pb);
 

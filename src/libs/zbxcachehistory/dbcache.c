@@ -3991,8 +3991,8 @@ void	zbx_dc_flush_history(void)
  * history cache storage                                                      *
  *                                                                            *
  ******************************************************************************/
-ZBX_SHMEM_FUNC_IMPL(__hc_index, hc_index_mem)
-ZBX_SHMEM_FUNC_IMPL(__hc, hc_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __hc_index, hc_index_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __hc, hc_mem)
 
 /******************************************************************************
  *                                                                            *
@@ -4585,7 +4585,7 @@ int	hc_get_history_compression_age(void)
  *                                                                            *
  ******************************************************************************/
 
-ZBX_SHMEM_FUNC_IMPL(__trend, trend_mem)
+ZBX_SHMEM_FUNC_IMPL(static, __trend, trend_mem)
 
 static int	init_trend_cache(zbx_uint64_t *trends_cache_size, char **error)
 {
