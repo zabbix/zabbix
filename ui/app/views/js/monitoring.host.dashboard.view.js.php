@@ -201,6 +201,16 @@
 				this.#selectHostDashboardTab(e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`));
 			});
 
+			this.#host_dashboard_navigation_tabs.addEventListener('keydown', (e) => {
+				if (e.key === 'Enter') {
+					const dashboard_tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+
+					if (dashboard_tab !== null && dashboard_tab !== this.#selected_dashboard_tab) {
+						this.#selectHostDashboardTab(dashboard_tab);
+					}
+				}
+			});
+
 			this.#previous_dashboard.addEventListener('click', () => {
 				const keys = [...this.#host_dashboard_tabs.keys()];
 				const previous_dashboardid = keys[keys.indexOf(this.#dashboardid) - 1];
