@@ -44,7 +44,6 @@ $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.csvggraph.js');
-$this->addJsFile('class.csvgpie.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.csvggauge.js');

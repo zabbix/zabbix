@@ -21,6 +21,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.widget.js"]
+		"js": ["class.svgpie.js", "class.widget.js"]
 	}
 }
