@@ -90,9 +90,11 @@
 					},
 					buttons: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>
 						? {
-							previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE?>'),
+							previous_page: document
+								.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE?>'),
 							next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE ?>'),
-							slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
+							slideshow: document
+								.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
 						}
 						: {
 							previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE ?>'),
@@ -144,8 +146,10 @@
 
 			if (web_layout_mode == <?= ZBX_LAYOUT_NORMAL ?>) {
 				this.#host_dashboards = host_dashboards;
-				this.#host_dashboard_navigation_tabs = document.querySelector('.<?= ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS ?>');
-				this.#previous_dashboard = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD ?>');
+				this.#host_dashboard_navigation_tabs = document
+					.querySelector('.<?= ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS ?>');
+				this.#previous_dashboard = document
+					.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD ?>');
 				this.#next_dashboard = document.querySelector('.<?= ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD ?>');
 
 				this.#activateHostDashboardNavigation();
