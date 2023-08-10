@@ -22,6 +22,7 @@
 namespace Widgets\Item;
 
 use Zabbix\Core\CWidget;
+use Widgets\Item\Includes\WidgetForm;
 
 class Widget extends CWidget {
 
@@ -51,5 +52,9 @@ class Widget extends CWidget {
 
 	public function getDefaultName(): string {
 		return _('Item value');
+	}
+
+	public function usesTimeSelector(array $fields_values): bool {
+		return !WidgetForm::hasOverrideTime($fields_values);
 	}
 }

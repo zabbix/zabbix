@@ -45,4 +45,20 @@ class CWidgetItem extends CWidget {
 	hasPadding() {
 		return false;
 	}
+
+	setTimePeriod(time_period) {
+		super.setTimePeriod(time_period);
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
+	}
+
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			from: this._time_period.from,
+			to: this._time_period.to
+		};
+	}
 }

@@ -110,8 +110,10 @@ else {
 	}
 }
 
+
 (new CWidgetView($data))
 	->addItem($body)
+	->setVar('info', $data['info'])
 	->show();
 
 /**

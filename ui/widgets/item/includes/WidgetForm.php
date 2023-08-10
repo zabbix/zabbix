@@ -308,6 +308,14 @@ class WidgetForm extends CWidgetForm {
 			);
 	}
 
+	/**
+	 * Check if widget configuration is set to use overridden time.
+	 */
+	public static function hasOverrideTime(array $fields_values): bool {
+		return array_key_exists('item_time', $fields_values)
+			&& $fields_values['item_time'] == ITEM_VALUE_CUSTOM_TIME_ON;
+	}
+
 	private static function validateTimeSelectorPeriod(string $from, string $to): array {
 		$errors = [];
 		$ts = [];

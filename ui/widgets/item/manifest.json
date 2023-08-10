@@ -13,8 +13,7 @@
 			"width": 4,
 			"height": 3
 		},
-		"js_class": "CWidgetItem",
-		"use_time_selector": true
+		"js_class": "CWidgetItem"
 	},
 	"actions": {
 		"widget.item.view": {

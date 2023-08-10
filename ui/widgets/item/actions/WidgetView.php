@@ -32,6 +32,7 @@ use API,
 	CRangeTimeParser;
 
 use Widgets\Item\Widget;
+use Widgets\Item\Includes\WidgetForm;
 
 use Zabbix\Core\CWidget;
 
@@ -41,7 +42,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
+			'from' => 'range_time',
+			'to' => 'range_time'
 		]);
 	}
 
@@ -67,6 +69,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true,
 			'preservekeys' => true
 		];
+
+		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
+
+		if ($dashboard_time) {
+			$from = $this->getInput('from');
+			$to = $this->getInput('to');
+		}
+		else {
+			$from = $this->fields_values['time_from'];
+			$to = $this->fields_values['time_to'];
+		}
+
+		$range_time_parser = new CRangeTimeParser();
+
+		$range_time_parser->parse($from);
+		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+		$range_time_parser->parse($to);
+		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
 			&& ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
@@ -94,6 +115,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				];
 			}
 		}
+
+		$options['dashboard_time'] = $dashboard_time;
+		$options['time_period'] = [
+			'time_from' => $time_from,
+			'time_to' => $time_to
+		];
 
 		$show = array_flip($this->fields_values['show']);
 
@@ -172,8 +199,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$aggregate_interval = $time_to-$time_from;
 				}
 				else {
-					$time_from = time()-$history_period;
-					$time_to = time();
 					$aggregate_interval = $history_period;
 				}
 
@@ -389,6 +414,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'url' => $url,
 			'bg_color' => $bg_color,
 			'error' => $error,
+			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -523,5 +549,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($row);
 
 		return $cells;
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if (WidgetForm::hasOverrideTime($this->fields_values)) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_from'], $this->fields_values['time_to'])
+			];
+		}
+
+		return $info;
 	}
 }
