@@ -130,10 +130,11 @@ class CControllerPopupTagFilterCheck extends CController {
 				foreach ($new_tag_filters as $new_tag_filter) {
 					$is_duplicate = false;
 
-					foreach ($existing_tag_filters as &$existing_tag_filter) {
+					foreach ($existing_tag_filters as $existing_tag_filter) {
 						// Skip duplicate tags.
 						if ($new_tag_filter['tag'] == $existing_tag_filter['tag'] &&
-							$new_tag_filter['value'] == $existing_tag_filter['value']) {
+								$new_tag_filter['value'] == $existing_tag_filter['value'])
+						{
 							$is_duplicate = true;
 							break;
 						}
