@@ -1165,7 +1165,7 @@ class testProxy extends CAPITest {
 					$this->assertSame($proxies[$num]['port'], $db_proxy['port'], 'port should match request');
 				}
 				else {
-					$this->assertSame($db_proxy['port'], DB::getDefault('proxy', 'port'), 'port shoud match db');
+					$this->assertSame($db_proxy['port'], DB::getDefault('proxy', 'port'), 'port should match db');
 				}
 
 				if (array_key_exists('tls_accept', $proxies[$num])) {
