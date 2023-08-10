@@ -127,7 +127,7 @@ class CExpressionMacroFunctionParser extends CParser {
 	/**
 	 * Returns function parser.
 	 *
-	 * @return string
+	 * @return C10FunctionParser
 	 */
 	public function getFunctionParser() {
 		return $this->function_parser;
