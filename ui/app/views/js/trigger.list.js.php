@@ -108,19 +108,12 @@
 				uncheckTableRows('trigger');
 				postMessageOk(e.detail.title);
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
 
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('trigger');
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
 				}
 
 				location.href = location.href;
