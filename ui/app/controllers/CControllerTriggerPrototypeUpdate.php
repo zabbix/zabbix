@@ -151,7 +151,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 
 		CArrayHelper::sort($tags, ['tag', 'value']);
 
-		$dependencies = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+		$dependencies = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
 		CArrayHelper::sort($dependencies, ['triggerid']);
 
 		$trigger_prototype += [
