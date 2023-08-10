@@ -30,6 +30,41 @@
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: finds whether a given value is in a given comma-separated value   *
+ *          list using case sensitive comparison.                             *
+ *                                                                            *
+ * Parameters:  value   - [IN] value to search for                            *
+ *              csv     - [IN] comma-separated list of values                 *
+ *                                                                            *
+ * Return value:  SUCCEED - the value appears in the list                     *
+ *                FAIL    - the value is not in the given list                *
+ *                                                                            *
+ * Assumptions: The list given in csv does not contain duplicates             *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_value_in_csv_list(const char *value, const char *csv)
+{
+	int ret = FAIL;
+	char *list, *l, *token, *saveptr;
+
+	list = zbx_strdup(list, csv);
+
+	for (l = list; NULL != (token = strtok_r(l, ",", &saveptr)); l = NULL)
+	{
+		if (0 == strcmp(value, token))
+		{
+			ret = SUCCEED;
+			break;
+		}
+	}
+
+	zbx_free(list);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
  *                                                                            *
  * Return value:  SUCCEED - the remote command was executed successfully      *
@@ -223,6 +258,37 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	zbx_db_free_result(db_result);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validates a given user input with a validator of a given type     *
+ *                                                                            *
+ * Parameters:  userinput       - [IN] the user provided input string         *
+ *              validator       - [IN] a string containing a validator        *
+ *              validator_type  - [IN] indicator for how to interpret the     *
+ *                                     validator string                       *
+ *                                                                            *
+ * Return value:  SUCCEED or FAIL                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int validate_userinput(const char *userinput, const char *validator, const unsigned char validator_type)
+{
+	int ret;
+
+	switch (validator_type)
+	{
+		case ZBX_USER_INPUT_VALIDATOR_TYPE_REGEX:
+			ret = (NULL != zbx_regexp_match(userinput, validator, NULL) ? SUCCEED : FAIL);
+			break;
+		case ZBX_USER_INPUT_VALIDATOR_TYPE_LIST:
+			ret = is_value_in_csv_list(userinput, validator);
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	return ret;
 }
 
 /********************************************************************************
