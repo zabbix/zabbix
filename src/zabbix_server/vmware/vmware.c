@@ -20,7 +20,6 @@
 #include "vmware.h"
 #include "vmware_internal.h"
 #include "vmware_perfcntr.h"
-#include "vmware_constants.h"
 
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2

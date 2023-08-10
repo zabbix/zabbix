@@ -25,6 +25,19 @@
 
 #include "zbxxml.h"
 
+#define ZBX_POST_VSPHERE_HEADER									\
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"					\
+		"<SOAP-ENV:Envelope"								\
+			" xmlns:ns0=\"urn:vim25\""						\
+			" xmlns:ns1=\"http://schemas.xmlsoap.org/soap/envelope/\""		\
+			" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""		\
+			" xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\">"	\
+			"<SOAP-ENV:Header/>"							\
+			"<ns1:Body>"
+#define ZBX_POST_VSPHERE_FOOTER									\
+			"</ns1:Body>"								\
+		"</SOAP-ENV:Envelope>"
+
 /* VMware service object name mapping for vcenter and vsphere installations */
 typedef struct
 {

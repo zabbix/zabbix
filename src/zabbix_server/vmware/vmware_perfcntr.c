@@ -24,7 +24,6 @@
 #include "vmware_perfcntr.h"
 #include "vmware.h"
 #include "vmware_internal.h"
-#include "vmware_constants.h"
 
 #include "zbxstr.h"
 #include "zbxxml.h"
@@ -37,12 +36,12 @@ ZBX_PTR_VECTOR_IMPL(perf_available, zbx_vmware_perf_available_t *)
 
 #define ZBX_XML_DATETIME		26
 
+#define ZBX_XPATH_REFRESHRATE()						\
+	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
+
 #define ZBX_XPATH_ISAGGREGATE()										\
 	"/*/*/*/*/*[local-name()='entity'][../*[local-name()='summarySupported']='true' and "		\
 	"../*[local-name()='currentSupported']='false']"
-
-#define ZBX_XPATH_REFRESHRATE()										\
-	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
 
 #define ZBX_XPATH_COUNTERINFO()										\
 	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
@@ -134,7 +133,6 @@ static int	vmware_uint16_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-/**/
 /******************************************************************************
  *                                                                            *
  * Purpose: frees perfvalue data structure                                    *
@@ -293,8 +291,6 @@ void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter)
 {
 	vmware_shared_strfree(counter->path);
 }
-
-/**/
 
 /******************************************************************************
  *                                                                            *
@@ -1296,8 +1292,6 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
-
 
 /******************************************************************************
  *                                                                            *

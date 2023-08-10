@@ -8,7 +8,6 @@ libzbxvmware_a_SOURCES = \
 	vmware_perfcntr.h \
 	vmware_rest.c \
 	vmware_manager.c \
-	vmware_constants.h \
 	vmware_internal.h \
 	vmware.c \
 	vmware.h
