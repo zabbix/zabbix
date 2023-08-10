@@ -81,8 +81,12 @@ output {
 			}
 		}
 
+		.msg-buttons,
 		.msg-details {
 			grid-column: 1 / -1;
+		}
+
+		.msg-details {
 			padding-top: 6px;
 			border-top: 1px dashed;
 			border-color: inherit;
