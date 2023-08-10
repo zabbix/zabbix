@@ -40,6 +40,9 @@ $trigger_form = (new CForm('post', $url))
 	->addVar('expression_full', $data['expression_full'], 'expression-full')
 	->addVar('recovery_expression_full', $data['recovery_expression_full'], 'recovery-expression-full');
 
+// Enable form submitting on Enter.
+$trigger_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
 if ($data['triggerid'] !== null) {
 	$trigger_form->addVar('triggerid', $data['triggerid']);
 }
