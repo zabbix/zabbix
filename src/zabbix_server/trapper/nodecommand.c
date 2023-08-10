@@ -28,6 +28,8 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 
+#define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX	1
+#define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST	2
 /******************************************************************************
  *                                                                            *
  * Purpose: finds whether a given value is in a given comma-separated value   *
@@ -278,10 +280,10 @@ static int validate_userinput(const char *userinput, const char *validator, cons
 
 	switch (validator_type)
 	{
-		case ZBX_USER_INPUT_VALIDATOR_TYPE_REGEX:
+		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX:
 			ret = (NULL != zbx_regexp_match(userinput, validator, NULL) ? SUCCEED : FAIL);
 			break;
-		case ZBX_USER_INPUT_VALIDATOR_TYPE_LIST:
+		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST:
 			ret = is_value_in_csv_list(userinput, validator);
 			break;
 		default:
