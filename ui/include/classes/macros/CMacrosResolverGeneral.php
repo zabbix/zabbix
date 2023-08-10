@@ -1236,7 +1236,7 @@ class CMacrosResolverGeneral {
 
 	/**
 	 * Calculates number formatting macro function. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
-	 * parameters or value.
+	 * parameters or value. Formatting is not applied to integer values.
 	 *
 	 * @param string $value        [IN] The input value.
 	 * @param array  $parameters   [IN] The function parameters.
@@ -1264,7 +1264,7 @@ class CMacrosResolverGeneral {
 			return UNRESOLVED_MACRO_STRING;
 		}
 
-		return sprintf("%.*f", (int) $parameters[0], (float) $value);
+		return sprintf("%.${parameters[0]}f", (float) $value);
 	}
 
 	/**
