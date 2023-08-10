@@ -22,7 +22,7 @@
 class CWidgetFormFieldsetCollapsibleView extends CFormFieldsetCollapsible {
 
 	protected array $fields = [];
-
+	protected ?CTag $field_hint = null;
 	public function __construct(string $caption, array $fields = []) {
 		parent::__construct($caption);
 
@@ -66,6 +66,12 @@ class CWidgetFormFieldsetCollapsibleView extends CFormFieldsetCollapsible {
 		}
 
 		$this->fields[] = $value;
+
+		return $this;
+	}
+
+	public function setFieldHint(CTag $hint): self {
+		$this->field_hint = $hint;
 
 		return $this;
 	}

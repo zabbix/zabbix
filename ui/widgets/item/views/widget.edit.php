@@ -27,6 +27,7 @@
  */
 
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+use Zabbix\Widgets\Fields\CWidgetFieldDatePicker;
 
 $form = new CWidgetFormView($data);
 
@@ -63,6 +64,29 @@ $form
 			)
 			->addFieldsGroup(
 				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
+			)
+			->addField(
+				(new CWidgetFieldSelectView($data['fields']['aggregate_function']))
+					->setFieldHint(
+				makeWarningIcon(_('With this setting only numeric items will be displayed.'))
+					->addStyle('display: none')
+					->setId('item_value_aggregate_warning'))
+			)
+			->addField(
+				(new CWidgetFieldCheckBoxView($data['fields']['item_time']))
+					->addRowClass('js-row-override-time')
+			)
+			->addField(
+				(new CWidgetFieldDatePickerView($data['fields']['time_from']))
+					->addRowClass('js-row-override-time')
+			)
+			->addField(
+				(new CWidgetFieldDatePickerView($data['fields']['time_to']))
+					->addRowClass('js-row-override-time')
+
+			)
+			->addField(
+				new CWidgetFieldRadioButtonListView($data['fields']['history'])
 			)
 	)
 	->addField(array_key_exists('dynamic', $data['fields'])

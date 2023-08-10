@@ -21,7 +21,9 @@
 
 namespace Widgets\Item\Includes;
 
-use API;
+use API,
+	CRangeTimeParser,
+	CSettingsHelper;
 
 use Zabbix\Widgets\{
 	CWidgetField,
@@ -32,6 +34,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldCheckBoxList,
 	CWidgetFieldColor,
+	CWidgetFieldDatePicker,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
 	CWidgetFieldRadioButtonList,
@@ -110,6 +113,13 @@ class WidgetForm extends CWidgetForm {
 					break 2;
 				}
 			}
+		}
+
+		// Test item custom time period.
+		if ($this->getFieldValue('item_time') == ITEM_VALUE_CUSTOM_TIME_ON) {
+			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
+				$this->getFieldValue('time_to')
+			));
 		}
 
 		return $errors;
@@ -257,11 +267,73 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
+				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [
+					AGGREGATE_NONE => _('not used'),
+					AGGREGATE_MIN => _('min'),
+					AGGREGATE_MAX => _('max'),
+					AGGREGATE_AVG => _('avg'),
+					AGGREGATE_COUNT => _('count'),
+					AGGREGATE_SUM => _('sum'),
+					AGGREGATE_FIRST => _('first'),
+					AGGREGATE_LAST => _('last')
+				]))->setDefault(AGGREGATE_NONE)
+			)
+			->addField(
+				new CWidgetFieldCheckBox('item_time', _('Override time period selector'))
+			)
+			->addField(
+				(new CWidgetFieldDatePicker('time_from', _('From')))
+					->setDefault('now-1h')
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK | CWidgetField::FLAG_NOT_EMPTY)
+			)
+			->addField(
+				(new CWidgetFieldDatePicker('time_to', _('To')))
+					->setDefault('now')
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK | CWidgetField::FLAG_NOT_EMPTY)
+
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('history', _('History data selection'), [
+					ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
+					ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
+					ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
+				]))->setDefault(ITEM_VALUE_DATA_SOURCE_AUTO)
+			)
+			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
 			)
 			->addField($this->isTemplateDashboard()
 				? null
 				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 			);
+	}
+
+	private static function validateTimeSelectorPeriod(string $from, string $to): array {
+		$errors = [];
+		$ts = [];
+		$ts['now'] = time();
+		$range_time_parser = new CRangeTimeParser();
+
+		foreach (['from' => $from, 'to' => $to] as $field => $value) {
+			$range_time_parser->parse($value);
+			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+		}
+
+		$period = $ts['to'] - $ts['from'] + 1;
+		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+		$max_period = 1 + $ts['now'] - $range_time_parser->getDateTime(true)->getTimestamp();
+
+		if ($period < ZBX_MIN_PERIOD) {
+			$errors[] = _n('Minimum time period to display is %1$s minute.',
+				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
+			);
+		}
+		elseif ($period > $max_period) {
+			$errors[] = _n('Maximum time period to display is %1$s day.',
+				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
+			);
+		}
+
+		return $errors;
 	}
 }

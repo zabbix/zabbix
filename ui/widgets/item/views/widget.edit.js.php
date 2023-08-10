@@ -34,6 +34,9 @@ window.widget_item_form = new class {
 		this._show_change_indicator = document.getElementById(`show_${<?= Widget::SHOW_CHANGE_INDICATOR ?>}`);
 
 		this._units_show = document.getElementById('units_show');
+		this._item_time = document.getElementById('item_time');
+		this._aggregate_function = document.getElementById('aggregate_function');
+		this._aggregate_warning = document.getElementById('item_value_aggregate_warning');
 
 		jQuery('#itemid').on('change', () => this.updateWarningIcon());
 
@@ -60,7 +63,17 @@ window.widget_item_form = new class {
 			});
 		}
 
+		this._aggregate_warning.style.display = Number(this._aggregate_function.value) === <?= AGGREGATE_AVG ?>
+		|| Number(this._aggregate_function.value) === <?= AGGREGATE_MIN ?>
+		|| Number(this._aggregate_function.value) === <?= AGGREGATE_MAX ?>
+		|| Number(this._aggregate_function.value) === <?= AGGREGATE_SUM ?> ? '' : 'none';
+
+		for (const element of this._form.querySelectorAll('.js-row-override-time')) {
+			element.style.display = Number(this._aggregate_function.value) === 0 ? 'none' : '';
+		}
+
 		this._units_show.addEventListener('change', () => this.updateForm());
+		this._item_time.addEventListener('change', () => this.updateForm());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -68,6 +81,10 @@ window.widget_item_form = new class {
 	}
 
 	updateForm() {
+		const override_fields = this._form.querySelectorAll('.js-row-override-time');
+		const aggregate_options = document.getElementById('aggregate_function');
+		const aggregate_warning = document.getElementById('item_value_aggregate_warning')
+
 		for (const element of this._form.querySelectorAll('.fields-group-description')) {
 			element.style.display = this._show_description.checked ? '' : 'none';
 
@@ -103,6 +120,22 @@ window.widget_item_form = new class {
 				input.disabled = !this._show_change_indicator.checked;
 			}
 		}
+
+		this._item_time.value = (this._item_time.checked) ? 1 : 0;
+
+		for (const element of document.querySelectorAll('#time_from, #time_from_calendar, #time_to, #time_to_calendar')) {
+			element.disabled = !this._item_time.checked;
+		}
+
+		aggregate_options.addEventListener('change', function() {
+			for (const element of override_fields) {
+				element.style.display = (Number(this.value) === <?= AGGREGATE_NONE ?>) ? 'none' : 'block';
+			}
+
+			aggregate_warning.style.display = Number(this.value) === <?= AGGREGATE_AVG ?>
+				|| Number(this.value) === <?= AGGREGATE_MIN ?> || Number(this.value) === <?= AGGREGATE_MAX ?>
+				|| Number(this.value) === <?= AGGREGATE_SUM ?> ? '' : 'none';
+		});
 	}
 
 	updateWarningIcon() {
