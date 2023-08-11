@@ -175,13 +175,12 @@ class testPageGroups extends CWebTest {
 			$dialog->close();
 		}
 		else {
-			$this->assertStringContainsString('templates.php?form=update&templateid='.$id, $this->page->getCurrentUrl());
-			$this->page->assertHeader('Templates');
-			$this->query('id:templates-form')->asForm(['normalized' => true])->waitUntilVisible()->one()
-					->checkValue(['Template name' => $links['host_template']]);
-			$this->query('button:Cancel')->one()->click();
-			$this->assertStringContainsString('templates.php', $this->page->getCurrentUrl());
-			$this->page->open($this->link)->waitUntilReady();
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$this->assertStringContainsString($this->link, $this->page->getCurrentUrl());
+			$this->assertEquals('Template', $dialog->getTitle());
+			COverlayDialogElement::find()->asForm()->waitUntilVisible()->one()->checkValue(['Template name' => $links['host_template']]);
+			$dialog->query('button:Cancel')->one()->click();
+			$dialog->ensureNotPresent();
 		}
 
 		// Check link to hosts or templates page with selected group in filer.
@@ -189,7 +188,7 @@ class testPageGroups extends CWebTest {
 		$row->getColumn('Count')->query('link', $links['count'])->one()->click();
 		$this->assertStringContainsString((($this->object === 'host')
 			? 'zabbix.php?action=host.list&'
-			: 'templates.php?').'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
+			: 'zabbix.php?action=template.list&').'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
 		);
 		$this->page->assertHeader(ucfirst($this->object).'s');
 		CFilterElement::find()->one()->getForm()->checkValue([ucfirst($this->object).' groups' => $links['name']]);
