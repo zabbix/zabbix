@@ -19,11 +19,10 @@
 
 #include "zbxasyncpoller.h"
 #include "zbxcommon.h"
-#include <event2/util.h>
-#include <event2/dns.h>
 
 #ifdef HAVE_LIBEVENT
-
+#include <event2/util.h>
+#include <event2/dns.h>
 typedef struct
 {
 	void				*data;
