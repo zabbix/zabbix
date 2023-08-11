@@ -1,1 +1,1 @@
-...G...... [ZBX-23221] fixed memory leak when using encryption by certificate in Zabbix Agent 2; thanks to Masato Hirahata for the patch (akozlovs)
+...G...PS. [ZBX-23221] fixed memory leaks when using certificate-based encryption in Zabbix Agent 1 and Agent 2; thanks to Masato Hirahata for the patch (akozlovs, Andris)
