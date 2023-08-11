@@ -307,7 +307,6 @@ class testFormTags extends CWebTest {
 				$form->fill(['Host groups' => 'Zabbix servers']);
 				break;
 
-			case 'template':
 			case 'trigger':
 			case 'trigger prototype':
 				$form = $this->query($locator)->waitUntilPresent()->asForm(['normalized' => true])->one();
@@ -327,6 +326,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'host':
+			case 'template':
 			case 'service':
 			case 'connector':
 				$form = COverlayDialogElement::find()->asGridForm(['normalized' => true])->one()->waitUntilVisible();
@@ -572,7 +572,7 @@ class testFormTags extends CWebTest {
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
-			if ($object === 'host' || $object === 'service' || $object === 'connector') {
+			if ($object === 'host' || $object === 'service' || $object === 'connector' || $object === 'template') {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -620,7 +620,7 @@ class testFormTags extends CWebTest {
 			// Check the results in form.
 			$this->checkTagFields($data, $object, $form);
 
-			if ($object === 'connector') {
+			if ($object === 'connector' || $object === 'template') {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -786,7 +786,7 @@ class testFormTags extends CWebTest {
 
 		$element->checkValue($tags);
 
-		if ($object === 'host' || $object === 'discovered host' || $object === 'connector') {
+		if ($object === 'host' || $object === 'discovered host' || $object === 'connector' || $object === 'template') {
 			COverlayDialogElement::find()->one()->close();
 		}
 	}
@@ -831,6 +831,11 @@ class testFormTags extends CWebTest {
 			$this->page->open($this->link);
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilReady();
 			$table->query('link', $data['name'])->waitUntilClickable()->one()->click();
+			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		}
+		elseif ($object === 'template') {
+			$this->page->open('zabbix.php?action=template.list&filter_name='.$data['name'].'&filter_set=1')->waitUntilReady();
+			$this->query('link', $data['name'])->one()->click();
 			$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		}
 		else {
