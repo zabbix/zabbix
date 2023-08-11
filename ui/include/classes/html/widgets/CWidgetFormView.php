@@ -85,10 +85,9 @@ class CWidgetFormView {
 
 		$this->registerField($field);
 
-		$this->form_grid->addItem([
-			$field->getLabel(),
-			(new CFormField($field->getView()))->addClass($field->getClass())
-		]);
+		foreach ($field->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+			$this->form_grid->addItem([$label, (new CFormField($view))->addClass($class)]);
+		}
 
 		return $this;
 	}

@@ -83,6 +83,14 @@ abstract class CWidgetFieldView {
 		return null;
 	}
 
+	public function getViewCollection(): array {
+		return [[
+			'label' => $this->getLabel(),
+			'view' => $this->getView(),
+			'class' => $this->getClass()
+		]];
+	}
+
 	public function getClass(): ?string {
 		return $this->class ? implode(' ', $this->class) : null;
 	}

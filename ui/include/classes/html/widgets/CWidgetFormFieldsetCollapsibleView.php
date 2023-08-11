@@ -71,16 +71,19 @@ class CWidgetFormFieldsetCollapsibleView extends CFormFieldsetCollapsible {
 	}
 
 	protected function bodyToString(): string {
-		foreach ($this->fields as &$field) {
+		$collection = [];
+
+		foreach ($this->fields as $field) {
 			if ($field instanceof CWidgetFieldsGroupView) {
-				$field = [$field->getLabel(), $field];
+				$collection[] = [$field->getLabel(), $field];
 			}
 			elseif ($field instanceof CWidgetFieldView) {
-				$field = [$field->getLabel(), (new CFormField($field->getView()))->addClass($field->getClass())];
+				foreach ($field->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+					$collection[] = [$label, (new CFormField($view))->addClass($class)];
+				}
 			}
 		}
-		unset($field);
 
-		return $this->makeLegend().unpack_object($this->fields);
+		return $this->makeLegend().unpack_object($collection);
 	}
 }
