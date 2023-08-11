@@ -870,10 +870,21 @@ class CConfigurationExportBuilder {
 				return $comparison;
 			}
 
-			CArrayHelper::sort($graph_a['gitems'], ['host']);
-			CArrayHelper::sort($graph_b['gitems'], ['host']);
+			$graph_a_items = [];
+			$graph_b_items = [];
 
-			return strnatcasecmp(reset($graph_a['gitems'])['host'], reset($graph_b['gitems'])['host']);
+			foreach ($graph_a['gitems'] as $gitem) {
+				$graph_a_items[] = $gitem['itemid'];
+			}
+
+			foreach ($graph_b['gitems'] as $gitem) {
+				$graph_b_items[] = $gitem['itemid'];
+			}
+
+			CArrayHelper::sort($graph_a_items, ['host']);
+			CArrayHelper::sort($graph_b_items, ['host']);
+
+			return strnatcasecmp(reset($graph_a_items)['host'], reset($graph_b_items)['host']);
 		});
 
 		foreach ($graphs as $graph) {
