@@ -20,7 +20,7 @@
 
 
 require_once __DIR__.'/../include/CAPITest.php';
-require_once __DIR__.'/../include/helpers/CMockDataHelper.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 
 class testDependentItems extends CAPITest {
@@ -31,143 +31,174 @@ class testDependentItems extends CAPITest {
 			return;
 		}
 
-		CMockDataHelper::createObjects([
-			[
-				'host_group' => [
-					['dependent.items.tests.host.group']
-				],
-				'template_group' => [
-					['dependent.items.tests.template.group']
+		DBconnect($error);
+
+		CTestDataHelper::createObjects([
+			'template_groups' => [
+				['name' => 'dependent.items.tests.template.group']
+			],
+			'host_groups' => [
+				['name' => 'dependent.items.tests.host.group']
+			],
+			'templates' => [
+				[
+					'host' => 'dependent.items.template',
+					'items' => [
+						['key_' => 'template.master.item'],
+						[
+							'key_' => 'template.dependent.item',
+							'master_itemid' => ':item:template.master.item'
+						],
+						[
+							'key_' => 'template.dependent.descendant',
+							'master_itemid' => ':item:template.dependent.item'
+						],
+						[
+							'key_' => 'template.dependent.level.last',
+							'master_itemid' => ':item:template.dependent.descendant'
+						],
+						['key_' => 'template.item.another'],
+						['key_' => 'mixed.dependency.master.item'],
+						[
+							'key_' => 'mixed.dependency.dependent.item',
+							'master_itemid' => ':item:mixed.dependency.master.item'
+						],
+						[
+							'key_' => 'mixed.dependency.dependent.descendant',
+							'master_itemid' => ':item:mixed.dependency.dependent.item'
+						]
+					],
+					'lld_rules' => [
+						['key_' => 'template.discovery.rule.update'],
+						[
+							'key_' => 'mixed.dependency.dependent.rule',
+							'master_itemid' => ':item:mixed.dependency.dependent.descendant'
+						],
+						[
+							'key_' => 'template.discovery.rule',
+							'item_prototypes' => [
+								['key_' => 'template.master.item.prototype[{#LLD}]'],
+								[
+									'key_' => 'template.dependent.item.prototype[{#LLD}]',
+									'master_itemid' => ':item_prototype:template.master.item.prototype[{#LLD}]'
+								],
+								[
+									'key_' => 'template.dependent.item.prototype.descendant[{#LLD}]',
+									'master_itemid' => ':item_prototype:template.dependent.item.prototype[{#LLD}]'
+								],
+								[
+									'key_' => 'template.dependent.item.prototype.level.last[{#LLD}]',
+									'master_itemid' => ':item_prototype:template.dependent.item.prototype.descendant[{#LLD}]'
+								],
+								['key_' => 'template.dependent.item.prototype.another[{#LLD}]'],
+								[
+									'key_' => 'mixed.dependency.item.prototype[{#LLD}]',
+									'master_itemid' => ':item:mixed.dependency.dependent.descendant'
+								]
+							]
+						]
+					],
 				]
 			],
-			[
-				'template' => [
-					['dependent.items.template']
+			'hosts' => [
+				[
+					'host' => 'dependent.items.host',
+					'items' => [
+						['key_' => 'independent.item'],
+						['key_' => 'master.item'],
+						[
+							'key_' => 'dependent.item',
+							'master_itemid' => ':item:master.item'
+						],
+						[
+							'key_' => 'dependent.item.descendant',
+							'master_itemid' => ':item:dependent.item'
+						],
+						['key_' => 'to.match.template.dependent.level.last'],
+						[
+							'key_' => 'dependent.item.for.inherit.test',
+							'master_itemid' => ':item:to.match.template.dependent.level.last'
+						],
+						['key_' => 'master.for.discovered.item'],
+					],
+					'lld_rules' => [
+						['key_' => 'independent.rule'],
+						[
+							'key_' => 'to.match.template.discovery.rule',
+							'item_prototypes' => [
+								['key_' => 'mixed.dependency.item.prototype[{#LLD}]'],
+								[
+									'key_' => 'mixed.dependency.item.prototype.descendant[{#LLD}]',
+									'master_itemid' => ':item_prototype:mixed.dependency.item.prototype[{#LLD}]'
+								]
+							]
+						],
+						[
+							'key_' => 'discovery.rule',
+							'item_prototypes' => [
+								[
+									'key_' => 'master.item.prototype[{#LLD}]',
+									'discovered_items' => [
+										['key_' => 'master.item.discovered']
+									]
+								],
+								[
+									'key_' => 'dependent.item.prototype[{#LLD}]',
+									'master_itemid' => ':item_prototype:master.item.prototype[{#LLD}]'
+								],
+								[
+									'key_' => 'dependent.item_prototype.descendant[{#LLD}]',
+									'master_itemid' => ':item_prototype:dependent.item.prototype[{#LLD}]'
+								],
+								[
+									'key_' => 'independent.item.prototype[{#LLD}]'
+								],
+								[
+									'key_' => 'item.prototype.for.discovered.item[{#LLD}]',
+									'master_itemid' => ':item:master.for.discovered.item',
+									'discovered_items' => [
+										[
+											'key_' => 'discovered.dependent.item',
+											'master_itemid' => ':item:master.for.discovered.item'
+										]
+									]
+								]
+							]
+						],
+						[
+							'key_' => 'dependent.discovery.rule',
+							'master_itemid' => ':item:master.item'
+						],
+					]
 				],
-				'item' => [
-					['template.master.item'],
-					['template.dependent.item', ['master_itemid' => ':item:template.master.item']],
-					['template.dependent.descendant', ['master_itemid' => ':item:template.dependent.item']],
-					['template.dependent.level.last', ['master_itemid' => ':item:template.dependent.descendant']],
-					['template.item.another'],
-
-					// Has items, lld_rule and prototype as dependents.
-					['mixed.dependency.master.item'],
-					['mixed.dependency.dependent.item', ['master_itemid' => ':item:mixed.dependency.master.item']],
-					['mixed.dependency.dependent.descendant', [
-						'master_itemid' => ':item:mixed.dependency.dependent.item'
-					]]
-				],
-				'lld_rule' => [
-					['template.discovery.rule.update'],
-					['mixed.dependency.dependent.rule', [
-						'master_itemid' => ':item:mixed.dependency.dependent.descendant'
-					]],
-
-					['template.discovery.rule']
-				],
-				'item_prototype' => [
-					['template.master.item.prototype'],
-					['template.dependent.item.prototype', [
-						'master_itemid' => ':item_prototype:template.master.item.prototype'
-					]],
-					['template.dependent.item.prototype.descendant', [
-						'master_itemid' => ':item_prototype:template.dependent.item.prototype'
-					]],
-					['template.dependent.item.prototype.level.last', [
-						'master_itemid' => ':item_prototype:template.dependent.item.prototype.descendant'
-					]],
-
-					['template.dependent.item.prototype.another'],
-					['mixed.dependency.item.prototype', [
-						'master_itemid' => ':item:mixed.dependency.dependent.descendant'
-					]]
-				]
-			],
-			[
-				'host' => [
-					['dependent.items.host']
-				],
-				'item' => [
-					['independent.item'],
-
-					['master.item'],
-					['dependent.item', ['master_itemid' => ':item:master.item']],
-					['dependent.item.descendant', ['master_itemid' => ':item:dependent.item']],
-
-					['to.match.template.dependent.level.last'],
-					['dependent.item.for.inherit.test', [
-						'master_itemid' => ':item:to.match.template.dependent.level.last'
-					]]
-				],
-				'lld_rule' => [
-					['independent.rule'],
-					['to.match.template.discovery.rule'],
-					['discovery.rule'],
-					['dependent.discovery.rule', ['master_itemid' => ':item:master.item']]
-				],
-				'item_prototype' => [
-					['master.item.prototype', ['ruleid' => ':lld_rule:discovery.rule']],
-					['dependent.item.prototype', [
-						'master_itemid' => ':item_prototype:master.item.prototype',
-						'ruleid' => ':lld_rule:discovery.rule'
-					]],
-					['dependent.item_prototype.descendant', [
-						'master_itemid' => ':item_prototype:dependent.item.prototype',
-						'ruleid' => ':lld_rule:discovery.rule'
-					]],
-					['independent.item.prototype', [
-						'ruleid' => ':lld_rule:discovery.rule'
-					]],
-
-					['mixed.dependency.item.prototype', ['ruleid' => ':lld_rule:to.match.template.discovery.rule']],
-					['mixed.dependency.item.prototype.descendant', [
-						'ruleid' => ':lld_rule:to.match.template.discovery.rule',
-						'master_itemid' => ':item_prototype:mixed.dependency.item.prototype'
-					]]
-				],
-				'host_prototype' => [
-					['host.prototype.discovery', ['ruleid' => ':lld_rule:discovery.rule']]
-				]
-			],
-			[
-				'discovered_host' => [
-					['dependent.items.host.discovered', ['parent_hostid' => ':host_prototype:host.prototype.discovery']]
-				],
-				'item' => [
-					['discovered.master']
-				],
-				'discovered_item' => [
-					['master.discovered', ['parent_itemid' => ':item_prototype:master.item.prototype']],
-					['dependent.discovered', [
-						'parent_itemid' => ':item_prototype:dependent.item.prototype',
-						'master_itemid' => ':item:discovered.master'
-					]]
-				]
-			],
-			[
-				'host' => [
-					['dependent.items.host.other']
-				],
-				'item' => [
-					['master.item.other'],
-					['dependent.item.other', ['master_itemid' => ':item:master.item.other']]
-				],
-				'lld_rule' => [
-					['discovery.rule.other']
-				],
-				'item_prototype' => [
-					['master.item.prototype.other'],
-					['dependent.item.prototype.other', [
-						'master_itemid' => ':item_prototype:master.item.prototype.other'
-					]]
+				[
+					'host' => 'dependent.items.host.other',
+					'items' => [
+						['key_' => 'master.item.other'],
+						[
+							'key_' => 'dependent.item.other',
+							'master_itemid' => ':item:master.item.other'
+						]
+					],
+					'lld_rules' => [
+						[
+							'key_' => 'discovery.rule.other',
+							'item_prototypes' => [
+								['key_' => 'master.item.prototype.other[{#LLD}]'],
+								[
+									'key_' => 'dependent.item.prototype.other[{#LLD}]',
+									'master_itemid' => ':item_prototype:master.item.prototype.other[{#LLD}]'
+								]
+							]
+						]
+					]
 				]
 			]
 		]);
 	}
 
 	public static function tearDownAfterClass(): void {
-		CMockDataHelper::cleanUp();
+		CTestDataHelper::cleanUp();
 	}
 
 	public static function getTestCases() {
@@ -197,14 +228,14 @@ class testDependentItems extends CAPITest {
 			'Simple update master item prototype.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:master.item.prototype'
+					'itemid' => ':item_prototype:master.item.prototype[{#LLD}]'
 				],
 				'error' => null
 			],
 			'Simple update discovered master item.' => [
 				'method' => 'item.update',
 				'params' => [
-					'itemid' => ':discovered_item:master.discovered'
+					'itemid' => ':discovered_item:master.item.discovered'
 				],
 				'error' => null
 			],
@@ -218,14 +249,14 @@ class testDependentItems extends CAPITest {
 			'Simple update dependent item prototype.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:dependent.item.prototype'
+					'itemid' => ':item_prototype:dependent.item.prototype[{#LLD}]'
 				],
 				'error' => null
 			],
 			'Simple update discovered dependent item.' => [
 				'method' => 'item.update',
 				'params' => [
-					'itemid' => ':discovered_item:dependent.discovered'
+					'itemid' => ':discovered_item:discovered.dependent.item'
 				],
 				'error' => null
 			],
@@ -239,9 +270,10 @@ class testDependentItems extends CAPITest {
 
 			'Set incorrect master_itemid for item (create).' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['dependent.error', [
+				'params' => CTestDataHelper::prepareItem([
+					'key_' => 'dependent.error',
 					'hostid' => $default_ids['hostid'],
-					'master_itemid' => $default_ids['nonexistent_itemid']]
+					'master_itemid' => $default_ids['nonexistent_itemid']
 				]),
 				'error' => 'Invalid parameter "/1/master_itemid": an item ID is expected.'
 			],
@@ -255,25 +287,27 @@ class testDependentItems extends CAPITest {
 			],
 			'Set incorrect master_itemid for item prototype (create).' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItemPrototype(['dependent.item.prototype.new', [
+				'params' => CTestDataHelper::prepareItemPrototype([
+					'key_' => 'dependent.item.prototype.new',
 					'hostid' => $default_ids['hostid'],
-					'master_itemid' => $default_ids['nonexistent_itemid']]
+					'master_itemid' => $default_ids['nonexistent_itemid']
 				]),
 				'error' => 'Invalid parameter "/1/master_itemid": an item ID is expected.'
 			],
 			'Set incorrect master_itemid for item prototype (update).' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:dependent.item.prototype',
+					'itemid' => ':item_prototype:dependent.item.prototype[{#LLD}]',
 					'master_itemid' => $default_ids['nonexistent_itemid']
 				],
 				'error' => 'Invalid parameter "/1/master_itemid": an item/item prototype ID is expected.'
 			],
 			'Set incorrect master_itemid for discovery rule (create).' => [
 				'method' => 'discoveryrule.create',
-				'params' => CMockDataHelper::mockLldRule(['discovery.rule.error', [
+				'params' => CTestDataHelper::prepareLldRule([
+					'key_' => 'discovery.rule.error',
 					'hostid' => $default_ids['hostid'],
-					'master_itemid' => $default_ids['nonexistent_itemid']]
+					'master_itemid' => $default_ids['nonexistent_itemid']
 				]),
 				'error' => 'Invalid parameter "/1/master_itemid": an item ID is expected.'
 			],
@@ -287,9 +321,10 @@ class testDependentItems extends CAPITest {
 			],
 			'Set master_itemid from other host for item (create).' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['dependent.item.new', [
+				'params' => CTestDataHelper::prepareItem([
+					'key_' => 'dependent.item.new',
 					'hostid' => $default_ids['hostid'],
-					'master_itemid' => ':item:master.item.other']
+					'master_itemid' => ':item:master.item.other'
 				]),
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item ID from another host or template.'
 			],
@@ -303,44 +338,47 @@ class testDependentItems extends CAPITest {
 			],
 			'Set master_itemid from other host for item prototype (create).' => [
 				'method' => 'itemprototype.create',
-				'params' => CMockDataHelper::mockItemPrototype(['dependent.item.prototype.other.new', [
+				'params' => CTestDataHelper::prepareItemPrototype([
+					'key_' => 'dependent.item.prototype.other.new[{#LLD}]',
 					'hostid' => ':host:dependent.items.host.other',
 					'ruleid' => ':lld_rule:discovery.rule.other',
-					'master_itemid' => ':item_prototype:master.item.prototype'
-				]]),
+					'master_itemid' => ':item_prototype:master.item.prototype[{#LLD}]'
+				]),
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item/item prototype ID from another host or template.'
 			],
 			'Set master_itemid from other host for item prototype (update).' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:dependent.item.prototype.other',
-					'master_itemid' => ':item_prototype:master.item.prototype'
+					'itemid' => ':item_prototype:dependent.item.prototype.other[{#LLD}]',
+					'master_itemid' => ':item_prototype:master.item.prototype[{#LLD}]'
 				],
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item/item prototype ID from another host or template.'
 			],
 			'Set master_itemid from other discovery rule for item prototype (create).' => [
 				'method' => 'itemprototype.create',
-				'params' => CMockDataHelper::mockItemPrototype(['dependent.item.prototype.new', [
+				'params' => CTestDataHelper::prepareItemPrototype([
+					'key_' => 'dependent.item.prototype.new[{#LLD}]',
 					'hostid' => $default_ids['hostid'],
 					'ruleid' => $default_ids['ruleid'],
-					'master_itemid' => ':item_prototype:master.item.prototype.other'
-				]]),
+					'master_itemid' => ':item_prototype:master.item.prototype.other[{#LLD}]'
+				]),
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item/item prototype ID from another host or template.'
 			],
 			'Set master_itemid from other discovery rule for item prototype (update).' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:dependent.item.prototype',
-					'master_itemid' => ':item_prototype:master.item.prototype.other'
+					'itemid' => ':item_prototype:dependent.item.prototype[{#LLD}]',
+					'master_itemid' => ':item_prototype:master.item.prototype.other[{#LLD}]'
 				],
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item/item prototype ID from another host or template.'
 			],
 			'Set master_itemid from other discovery rule for LLD rule (create).' => [
 				'method' => 'discoveryrule.create',
-				'params' => CMockDataHelper::mockLldRule(['discovery.rule.new', [
+				'params' => CTestDataHelper::prepareLldRule([
+					'key_' => 'discovery.rule.new',
 					'hostid' => $default_ids['hostid'],
 					'master_itemid' => ':item:master.item.other'
-				]]),
+				]),
 				'error' => 'Invalid parameter "/1/master_itemid": cannot be an item ID from another host or template.'
 			],
 			'Set master_itemid from other discovery rule for LLD rule (update).' => [
@@ -355,27 +393,30 @@ class testDependentItems extends CAPITest {
 			// Dependencies on discovered items not allowed.
 			'Create dependent item, which depends on discovered item.' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['dependent.on.master.discovered', [
+				'params' => CTestDataHelper::prepareItem([
+					'key_' => 'dependent.on.master.discovered',
 					'hostid' => $default_ids['hostid'],
-					'master_itemid' => ':discovered_item:master.discovered'
-				]]),
+					'master_itemid' => ':discovered_item:master.item.discovered'
+				]),
 				'error' => 'Invalid parameter "/1/master_itemid": an item ID is expected.'
 			],
 			'Create dependent item prototype, which depends on discovered item.' => [
 				'method' => 'itemprototype.create',
-				'params' => CMockDataHelper::mockItemPrototype(['item.prototype.dependent.on.master.discovered', [
+				'params' => CTestDataHelper::prepareItemPrototype([
+					'key_' => 'item.prototype.dependent.on.master.discovered[{#LLD}]',
 					'hostid' => $default_ids['hostid'],
 					'ruleid' => $default_ids['ruleid'],
-					'master_itemid' => ':discovered_item:master.discovered'
-				]]),
+					'master_itemid' => ':discovered_item:master.item.discovered'
+				]),
 				'error' => 'Invalid parameter "/1/master_itemid": an item/item prototype ID is expected.'
 			],
 			'Create dependent discovery rule, which depends on discovered item.' => [
 				'method' => 'discoveryrule.create',
-				'params' => CMockDataHelper::mockLldRule(['lld_rule.dependent.on.master.discovered', [
+				'params' => CTestDataHelper::prepareLldRule([
+					'key_' => 'lld_rule.dependent.on.master.discovered',
 					'hostid' => $default_ids['hostid'],
-					'master_itemid' => ':discovered_item:master.discovered'
-				]]),
+					'master_itemid' => ':discovered_item:master.item.discovered'
+				]),
 				'error' => 'Invalid parameter "/1/master_itemid": an item ID is expected.'
 			],
 
@@ -396,14 +437,14 @@ class testDependentItems extends CAPITest {
 			'Simple update templated master item prototype.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:template.master.item.prototype'
+					'itemid' => ':item_prototype:template.master.item.prototype[{#LLD}]'
 				],
 				'error' => null
 			],
 			'Simple update templated dependent item prototype.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:template.dependent.item.prototype'
+					'itemid' => ':item_prototype:template.dependent.item.prototype[{#LLD}]'
 				],
 				'error' => null
 			],
@@ -426,8 +467,8 @@ class testDependentItems extends CAPITest {
 			'Circular dependency to itself (itemprototype.update).' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:dependent.item.prototype',
-					'master_itemid' => ':item_prototype:dependent.item.prototype'
+					'itemid' => ':item_prototype:dependent.item.prototype[{#LLD}]',
+					'master_itemid' => ':item_prototype:dependent.item.prototype[{#LLD}]'
 				],
 				'error' => 'Invalid parameter "/1/master_itemid": circular item dependency is not allowed.'
 			],
@@ -451,9 +492,9 @@ class testDependentItems extends CAPITest {
 			'Circular dependency to descendant item prototypes (update).' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:master.item.prototype',
+					'itemid' => ':item_prototype:master.item.prototype[{#LLD}]',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => ':item_prototype:dependent.item_prototype.descendant'
+					'master_itemid' => ':item_prototype:dependent.item_prototype.descendant[{#LLD}]'
 				],
 				'error' => 'Invalid parameter "/1/master_itemid": circular item dependency is not allowed.'
 			],
@@ -506,7 +547,7 @@ class testDependentItems extends CAPITest {
 			'Set "master_itemid" for not-dependent item prototype (update).' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:independent.item.prototype',
+					'itemid' => ':item_prototype:independent.item.prototype[{#LLD}]',
 					'master_itemid' => $default_ids['masterid']
 				],
 				'error' => 'Invalid parameter "/1/master_itemid": value must be 0.'
@@ -541,7 +582,7 @@ class testDependentItems extends CAPITest {
 					'key_' => 'another.dependency.level[{#LLD}]',
 					'type' => ITEM_TYPE_DEPENDENT,
 					'value_type' => ITEM_VALUE_TYPE_STR,
-					'master_itemid' => ':item_prototype:template.dependent.item.prototype.level.last'
+					'master_itemid' => ':item_prototype:template.dependent.item.prototype.level.last[{#LLD}]'
 				],
 				'error' => 'Cannot set dependency for item prototype with key "another.dependency.level[{#LLD}]" on the master item prototype with key "template.dependent.item.prototype.level.last[{#LLD}]" on the template "dependent.items.template": allowed count of dependency levels would be exceeded.'
 			],
@@ -568,9 +609,9 @@ class testDependentItems extends CAPITest {
 			'Check for maximum depth of the item prototypes tree (update). Add 4th level.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:template.dependent.item.prototype.another',
+					'itemid' => ':item_prototype:template.dependent.item.prototype.another[{#LLD}]',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => ':item_prototype:template.dependent.item.prototype.level.last'
+					'master_itemid' => ':item_prototype:template.dependent.item.prototype.level.last[{#LLD}]'
 				],
 				'error' => 'Cannot set dependency for item prototype with key "template.dependent.item.prototype.another[{#LLD}]" on the master item prototype with key "template.dependent.item.prototype.level.last[{#LLD}]" on the template "dependent.items.template": allowed count of dependency levels would be exceeded.'
 			],
@@ -604,9 +645,9 @@ class testDependentItems extends CAPITest {
 			'Check for maximum depth of the item prototypes tree (update). Add 4th level at the top.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:template.master.item.prototype',
+					'itemid' => ':item_prototype:template.master.item.prototype[{#LLD}]',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => ':item_prototype:template.dependent.item.prototype.another'
+					'master_itemid' => ':item_prototype:template.dependent.item.prototype.another[{#LLD}]'
 				],
 				'error' => 'Cannot set dependency for item prototype with key "template.master.item.prototype[{#LLD}]" on the master item prototype with key "template.dependent.item.prototype.another[{#LLD}]" on the template "dependent.items.template": allowed count of dependency levels would be exceeded.'
 			],
@@ -658,78 +699,79 @@ class testDependentItems extends CAPITest {
 			// 3 dependents exist on template.
 			'Check for maximum count of items in the tree on the template level.' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['dependent.item', [
-						'hostid' => $default_ids['templateid'],
-						'master_itemid' => ':item:template.item.another'
-					], 1, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-				]),
+				'params' => CTestDataHelper::prepareItemSet([
+					'key_' => 'dependent.item',
+					'hostid' => $default_ids['templateid'],
+					'master_itemid' => ':item:template.item.another'
+				], 1, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1),
 				'error' => 'Cannot set dependency for item with key "dependent.item.1" on the master item with key "template.item.another" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the template level, no previous dependents.' => [
 				'method' => 'item.create',
 				'params' => array_merge(
-					CMockDataHelper::mockItem(['dependent.item.set.1', [
-							'hostid' => $default_ids['templateid'],
-							'master_itemid' => ':item:template.item.another'
-						], 1, 100
-					]),
-					CMockDataHelper::mockItem(['dependent.item.set.2', [
-							'hostid' => $default_ids['templateid'],
-							'master_itemid' => ':item:template.item.another'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-					])
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.1',
+						'hostid' => $default_ids['templateid'],
+						'master_itemid' => ':item:template.item.another'
+					], 1, 100),
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.2',
+						'hostid' => $default_ids['templateid'],
+						'master_itemid' => ':item:template.item.another'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1)
 				),
 				'error' => 'Cannot set dependency for item with key "dependent.item.set.1.1" on the master item with key "template.item.another" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the template level, add one set to existing tree.' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['dependent.item', [
+				'params' => CTestDataHelper::prepareItemSet([
+					'key_' => 'dependent.item',
 					'hostid' => $default_ids['templateid'],
 					'master_itemid' => ':item:template.dependent.descendant'
-				], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1]),
+				], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1),
 				'error' => 'Cannot set dependency for item with key "dependent.item.4" on the master item with key "template.dependent.descendant" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the template level, add sets to existing tree.' => [
 				'method' => 'item.create',
 				'params' => array_merge(
-					CMockDataHelper::mockItem(['dependent.item.set.1', [
-							'hostid' => $default_ids['templateid'],
-							'master_itemid' => ':item:template.dependent.descendant'
-						], 4, 100
-					]),
-					CMockDataHelper::mockItem(['dependent.item.set.2', [
-							'hostid' => $default_ids['templateid'],
-							'master_itemid' => ':item:template.dependent.descendant'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-					])
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.1',
+						'hostid' => $default_ids['templateid'],
+						'master_itemid' => ':item:template.dependent.descendant'
+					], 4, 100),
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.2',
+						'hostid' => $default_ids['templateid'],
+						'master_itemid' => ':item:template.dependent.descendant'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1)
 				),
 				'error' => 'Cannot set dependency for item with key "dependent.item.set.1.4" on the master item with key "template.dependent.descendant" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of item prototypes in the tree on the template level, add one item prototype set.' => [
 				'method' => 'itemprototype.create',
-				'params' => CMockDataHelper::mockItemPrototype(['dependent.item.prototype', [
-						'hostid' => $default_ids['templateid'],
-						'ruleid' => ':lld_rule:template.discovery.rule',
-						'master_itemid' => ':item:template.dependent.item'
-					], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-				]),
+				'params' => CTestDataHelper::prepareItemPrototypeSet([
+					'key_' => 'dependent.item.prototype[{#LLD}]',
+					'hostid' => $default_ids['templateid'],
+					'ruleid' => ':lld_rule:template.discovery.rule',
+					'master_itemid' => ':item:template.dependent.item'
+				], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1),
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.prototype.4[{#LLD}]" on the master item with key "template.dependent.item" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of item prototypes in the tree on the template level, add two item prototype sets.' => [
 				'method' => 'itemprototype.create',
 				'params' => array_merge(
-					CMockDataHelper::mockItemPrototype(['dependent.item.prototype.set.1', [
-							'hostid' => $default_ids['templateid'],
-							'ruleid' => ':lld_rule:template.discovery.rule',
-							'master_itemid' => ':item:template.dependent.item'
-						], 4, 100
-					]),
-					CMockDataHelper::mockItemPrototype(['dependent.item.prototype.set.2', [
-							'hostid' => $default_ids['templateid'],
-							'ruleid' => ':lld_rule:template.discovery.rule',
-							'master_itemid' => ':item:template.dependent.descendant'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-					])
+					CTestDataHelper::prepareItemPrototypeSet([
+						'key_' => 'dependent.item.prototype.set.1[{#LLD}]',
+						'hostid' => $default_ids['templateid'],
+						'ruleid' => ':lld_rule:template.discovery.rule',
+						'master_itemid' => ':item:template.dependent.item'
+					], 4, 100),
+					CTestDataHelper::prepareItemPrototypeSet([
+						'key_' => 'dependent.item.prototype.set.2[{#LLD}]',
+						'hostid' => $default_ids['templateid'],
+						'ruleid' => ':lld_rule:template.discovery.rule',
+						'master_itemid' => ':item:template.dependent.descendant'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1)
 				),
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.prototype.set.1.4[{#LLD}]" on the master item with key "template.dependent.item" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
@@ -737,121 +779,124 @@ class testDependentItems extends CAPITest {
 			'Check for maximum count of items in the tree on the template level, fill to max.' => [
 				'method' => 'item.create',
 				'params' => array_merge(
-					CMockDataHelper::mockItem(['dependent.item.set.1', [
-							'hostid' => $default_ids['templateid'],
-							'master_itemid' => ':item:template.dependent.descendant'
-						], 4, 100
-					]),
-					CMockDataHelper::mockItem(['dependent.item.set.2', [
-							'hostid' => $default_ids['templateid'],
-							'master_itemid' => ':item:template.dependent.descendant'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT
-					])
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.1',
+						'hostid' => $default_ids['templateid'],
+						'master_itemid' => ':item:template.dependent.descendant'
+					], 4, 100),
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.2',
+						'hostid' => $default_ids['templateid'],
+						'master_itemid' => ':item:template.dependent.descendant'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT)
 				),
 				'error' => null
 			],
 			'Check for maximum count of items in the tree on the template level, adding overflow item.' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['overflow.dependent.item', [
+				'params' => CTestDataHelper::prepareItem([
+					'key_' => 'overflow.dependent.item',
 					'hostid' => $default_ids['templateid'],
 					'master_itemid' => ':item:template.dependent.item'
-				]]),
+				]),
 				'error' => 'Cannot set dependency for item with key "overflow.dependent.item" on the master item with key "template.dependent.item" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of item prototypes in the tree on the template level, add overflow item prototype.' => [
 				'method' => 'itemprototype.create',
-				'params' => CMockDataHelper::mockItemPrototype(['overflow.dependent.item.prototype', [
+				'params' => CTestDataHelper::prepareItemPrototype([
+					'key_' => 'overflow.dependent.item.prototype[{#LLD}]',
 					'hostid' => $default_ids['templateid'],
 					'ruleid' => ':lld_rule:template.discovery.rule',
 					'master_itemid' => ':item:template.dependent.item'
-				]]),
+				]),
 				'error' => 'Cannot set dependency for item prototype with key "overflow.dependent.item.prototype[{#LLD}]" on the master item with key "template.dependent.item" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the template level, adding overflow LLD rule.' => [
 				'method' => 'discoveryrule.create',
-				'params' => CMockDataHelper::mockLldRule(['overflow.dependent.rule', [
+				'params' => CTestDataHelper::prepareLldRule([
+					'key_' => 'overflow.dependent.rule',
 					'hostid' => $default_ids['templateid'],
 					'master_itemid' => ':item:template.dependent.item'
-				]]),
+				]),
 				'error' => 'Cannot set dependency for LLD rule with key "overflow.dependent.rule" on the master item with key "template.dependent.item" on the template "dependent.items.template": allowed count of dependent items would be exceeded.'
 			],
 
 			// 3 dependents exist on host
 			'Check for maximum count of items in the tree on the host level.' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['dependent.item', [
-						'hostid' => $default_ids['hostid'],
-						'master_itemid' => ':item:master.item'
-					], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-				]),
+				'params' => CTestDataHelper::prepareItemSet([
+					'key_' => 'dependent.item',
+					'hostid' => $default_ids['hostid'],
+					'master_itemid' => ':item:master.item'
+				], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1),
 				'error' => 'Cannot set dependency for item with key "dependent.item.4" on the master item with key "master.item" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the host level, combination.' => [
 				'method' => 'item.create',
 				'params' => array_merge(
-					CMockDataHelper::mockItem(['dependent.item.set.1', [
-							'hostid' => $default_ids['hostid'],
-							'master_itemid' => ':item:dependent.item'
-						], 4, 100
-					]),
-					CMockDataHelper::mockItem(['dependent.item.set.2', [
-							'hostid' => $default_ids['hostid'],
-							'master_itemid' => ':item:dependent.item.descendant'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-					])
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.1',
+						'hostid' => $default_ids['hostid'],
+						'master_itemid' => ':item:dependent.item'
+					], 4, 100),
+					CTestDataHelper::prepareItemSet([
+						'key_' => 'dependent.item.set.2',
+						'hostid' => $default_ids['hostid'],
+						'master_itemid' => ':item:dependent.item.descendant'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1)
 				),
 				'error' => 'Cannot set dependency for item with key "dependent.item.set.1.4" on the master item with key "dependent.item" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of discovery rule in the tree on the host level.' => [
 				'method' => 'discoveryrule.create',
-				'params' => CMockDataHelper::mockLldRule(['dependent.lld.rule', [
-						'hostid' => $default_ids['hostid'],
-						'master_itemid' => ':item:master.item'
-					], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-				]),
+				'params' => CTestDataHelper::prepareLldRuleSet([
+					'key_' => 'dependent.lld.rule',
+					'hostid' => $default_ids['hostid'],
+					'master_itemid' => ':item:master.item'
+				], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1),
 				'error' => 'Cannot set dependency for LLD rule with key "dependent.lld.rule.4" on the master item with key "master.item" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of discovery rule in the tree on the host level, combination.' => [
 				'method' => 'discoveryrule.create',
 				'params' => array_merge(
-					CMockDataHelper::mockLldRule(['dependent.lld.rule.set.1', [
-							'hostid' => $default_ids['hostid'],
-							'master_itemid' => ':item:dependent.item'
-						], 4, 100
-					]),
-					CMockDataHelper::mockLldRule(['dependent.lld.rule.set.2', [
-							'hostid' => $default_ids['hostid'],
-							'master_itemid' => ':item:dependent.item.descendant'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-					])
+					CTestDataHelper::prepareLldRuleSet([
+						'key_' => 'dependent.lld.rule.set.1',
+						'hostid' => $default_ids['hostid'],
+						'master_itemid' => ':item:dependent.item'
+					], 4, 100),
+					CTestDataHelper::prepareLldRuleSet([
+						'key_' => 'dependent.lld.rule.set.2',
+						'hostid' => $default_ids['hostid'],
+						'master_itemid' => ':item:dependent.item.descendant'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1)
 				),
 				'error' => 'Cannot set dependency for LLD rule with key "dependent.lld.rule.set.1.4" on the master item with key "dependent.item" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of item prototypes in the tree on the host level.' => [
 				'method' => 'itemprototype.create',
-				'params' => CMockDataHelper::mockItemPrototype(['dependent.item.prototype', [
-						'hostid' => $default_ids['hostid'],
-						'ruleid' => $default_ids['ruleid'],
-						'master_itemid' => ':item:master.item'
-					], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-				]),
+				'params' => CTestDataHelper::prepareItemPrototypeSet([
+					'key_' => 'dependent.item.prototype[{#LLD}]',
+					'hostid' => $default_ids['hostid'],
+					'ruleid' => $default_ids['ruleid'],
+					'master_itemid' => ':item:master.item'
+				], 4, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1),
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.prototype.4[{#LLD}]" on the master item with key "master.item" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of item prototypes in the tree on the host level, combination.' => [
 				'method' => 'itemprototype.create',
 				'params' => array_merge(
-					CMockDataHelper::mockItemPrototype(['dependent.item.prototype.set.1', [
-							'hostid' => $default_ids['hostid'],
-							'ruleid' => $default_ids['ruleid'],
-							'master_itemid' => ':item:dependent.item'
-						], 4, 100
-					]),
-					CMockDataHelper::mockItemPrototype(['dependent.item.prototype.set.2', [
-							'hostid' => $default_ids['hostid'],
-							'ruleid' => $default_ids['ruleid'],
-							'master_itemid' => ':item:dependent.item.descendant'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1
-					])
+					CTestDataHelper::prepareItemPrototypeSet([
+						'key_' => 'dependent.item.prototype.set.1[{#LLD}]',
+						'hostid' => $default_ids['hostid'],
+						'ruleid' => $default_ids['ruleid'],
+						'master_itemid' => ':item:dependent.item'
+					], 4, 100),
+					CTestDataHelper::prepareItemPrototypeSet([
+						'key_' => 'dependent.item.prototype.set.2[{#LLD}]',
+						'hostid' => $default_ids['hostid'],
+						'ruleid' => $default_ids['ruleid'],
+						'master_itemid' => ':item:dependent.item.descendant'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1)
 				),
 				'error' => 'Cannot set dependency for item prototype with key "dependent.item.prototype.set.1.4[{#LLD}]" on the master item with key "dependent.item" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
@@ -859,44 +904,47 @@ class testDependentItems extends CAPITest {
 			'Check for maximum count of items in the tree on the host level, fill to max.' => [
 				'method' => 'itemprototype.create',
 				'params' => array_merge(
-					CMockDataHelper::mockItemPrototype(['dependent.item.prototype.set.1', [
-							'hostid' => $default_ids['hostid'],
-							'ruleid' => $default_ids['ruleid'],
-							'master_itemid' => ':item:dependent.item'
-						], 4, 100
-					]),
-					CMockDataHelper::mockItemPrototype(['dependent.item.prototype.set.2', [
-							'hostid' => $default_ids['hostid'],
-							'ruleid' => $default_ids['ruleid'],
-							'master_itemid' => ':item:dependent.item.descendant'
-						], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT
-					])
+					CTestDataHelper::prepareItemPrototypeSet([
+						'key_' => 'dependent.item.prototype.set.1[{#LLD}]',
+						'hostid' => $default_ids['hostid'],
+						'ruleid' => $default_ids['ruleid'],
+						'master_itemid' => ':item:dependent.item'
+					], 4, 100),
+					CTestDataHelper::prepareItemPrototypeSet([
+						'key_' => 'dependent.item.prototype.set.2[{#LLD}]',
+						'hostid' => $default_ids['hostid'],
+						'ruleid' => $default_ids['ruleid'],
+						'master_itemid' => ':item:dependent.item.descendant'
+					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT)
 				),
 				'error' => null
 			],
 			'Check for maximum count of items in the tree on the host level, adding overflow item.' => [
 				'method' => 'item.create',
-				'params' => CMockDataHelper::mockItem(['overflow.dependent.item', [
+				'params' => CTestDataHelper::prepareItem([
+					'key_' => 'overflow.dependent.item',
 					'hostid' => $default_ids['hostid'],
 					'master_itemid' => ':item:dependent.item.descendant'
-				]]),
+				]),
 				'error' => 'Cannot set dependency for item with key "overflow.dependent.item" on the master item with key "dependent.item.descendant" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of item prototypes in the tree on the host level, add overflow item prototype.' => [
 				'method' => 'itemprototype.create',
-				'params' => CMockDataHelper::mockItemPrototype(['overflow.dependent.item.prototype', [
+				'params' => CTestDataHelper::prepareItemPrototype([
+					'key_' => 'overflow.dependent.item.prototype[{#LLD}]',
 					'hostid' => $default_ids['hostid'],
 					'ruleid' => $default_ids['ruleid'],
 					'master_itemid' => ':item:dependent.item.descendant'
-				]]),
+				]),
 				'error' => 'Cannot set dependency for item prototype with key "overflow.dependent.item.prototype[{#LLD}]" on the master item with key "dependent.item.descendant" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the host level, adding overflow LLD rule.' => [
 				'method' => 'discoveryrule.create',
-				'params' => CMockDataHelper::mockLldRule(['overflow.dependent.rule', [
+				'params' => CTestDataHelper::prepareLldRule([
+					'key_' => 'overflow.dependent.rule',
 					'hostid' => $default_ids['hostid'],
 					'master_itemid' => ':item:dependent.item.descendant'
-				]]),
+				]),
 				'error' => 'Cannot set dependency for LLD rule with key "overflow.dependent.rule" on the master item with key "dependent.item.descendant" on the host "dependent.items.host": allowed count of dependent items would be exceeded.'
 			]
 		];
@@ -911,7 +959,7 @@ class testDependentItems extends CAPITest {
 			self::markTestSkipped('Lower the ZBX_DEPENDENT_ITEM_MAX_COUNT option to run this test.');
 		}
 
-		CMockDataHelper::processReferences($params);
+		CTestDataHelper::processReferences($method, $params);
 
 		return $this->call($method, $params, $error);
 	}
