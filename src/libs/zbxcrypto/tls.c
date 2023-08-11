@@ -1997,11 +1997,15 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 		{
 			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_issuer, sizeof(tls_issuer), error))
+		{
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
+		}
 	}
 
 	if (NULL != subject && '\0' != *subject)
@@ -2010,11 +2014,15 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 		{
 			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_subject() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_subject, sizeof(tls_subject), error))
+		{
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
+		}
 	}
 
 	gnutls_x509_crt_deinit(cert);
