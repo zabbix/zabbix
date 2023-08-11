@@ -5692,7 +5692,7 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
  ******************************************************************************/
 const char	*zbx_print_double(char *buffer, size_t size, double val)
 {
-	double ipart;
+	double	ipart;
 
 	if (0.0 == modf(val, &ipart))
 	{
