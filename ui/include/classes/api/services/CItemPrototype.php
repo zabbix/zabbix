@@ -880,8 +880,7 @@ class CItemPrototype extends CItemGeneral {
 			$item_indexes = array_flip(array_column($items, 'itemid'));
 
 			foreach ($items as $i => $item) {
-				if ($item['type'] == ITEM_TYPE_DEPENDENT
-						&& array_key_exists($item['master_itemid'], $item_indexes)) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists($item['master_itemid'], $item_indexes)) {
 					$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
 
 					unset($items[$i]);
@@ -1306,7 +1305,7 @@ class CItemPrototype extends CItemGeneral {
 				}
 			}
 
-			if ($row['host_status'] != HOST_STATUS_TEMPLATE) {
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE || $row['valuemapid'] == 0) {
 				unset($row['type']);
 			}
 
