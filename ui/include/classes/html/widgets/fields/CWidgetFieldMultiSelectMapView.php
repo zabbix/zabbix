@@ -31,6 +31,10 @@ class CWidgetFieldMultiSelectMapView extends CWidgetFieldMultiSelectView {
 		return 'sysmaps';
 	}
 
+	protected function getObjectLabels(): array {
+		return ['object' => _('Map'), 'objects' => _('Maps')];
+	}
+
 	protected function getPopupParameters(): array {
 		return [
 			'srctbl' => 'sysmaps',

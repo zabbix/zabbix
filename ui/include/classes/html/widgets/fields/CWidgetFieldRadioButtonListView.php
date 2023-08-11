@@ -30,12 +30,11 @@ class CWidgetFieldRadioButtonListView extends CWidgetFieldView {
 	public function getView(): CRadioButtonList {
 		$view = (new CRadioButtonList($this->field->getName(), $this->field->getValue()))
 			->setModern()
-			->setAriaRequired($this->isRequired());
+			->setAriaRequired($this->isRequired())
+			->setEnabled(!$this->isDisabled());
 
 		foreach ($this->field->getValues() as $key => $value) {
-			$view
-				->addValue($value, $key, null, $this->field->getAction())
-				->setEnabled(!$this->isDisabled());
+			$view->addValue($value, $key, null, $this->field->getAction());
 		}
 
 		return $view;
