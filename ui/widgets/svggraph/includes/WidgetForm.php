@@ -49,8 +49,6 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
-	private const LEGEND_AGGREGATION_OFF = 0;
-
 	private const PERCENTILE_MIN = 1;
 	private const PERCENTILE_MAX = 100;
 
@@ -378,7 +376,6 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('legend_aggregation', _('Show aggregation function')))
-					->setDefault(self::LEGEND_AGGREGATION_OFF)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
