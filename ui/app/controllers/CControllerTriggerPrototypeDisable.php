@@ -48,12 +48,8 @@ class CControllerTriggerPrototypeDisable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$triggerids = $this->getInput('triggerids');
-
-		return count($triggerids) == API::TriggerPrototype()->get([
-				'countOutput' => true,
-				'triggerids' => $triggerids
-			]);
+		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN
+			|| $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function doAction(): void {
