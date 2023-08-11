@@ -24,7 +24,7 @@
  */
 ?>
 
-window.tag_filter_popup = new class {
+window.tag_filter_edit = new class {
 
 	init({tag_filters, groupid}) {
 		this.overlay = overlays_stack.getById('tag-filter-edit');
@@ -103,7 +103,7 @@ window.tag_filter_popup = new class {
 
 	submit() {
 		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'popup.tagfilter.check');
+		curl.setArgument('action', 'usergroup.tagfilter.check');
 
 		const fields = getFormFields(this.form);
 		fields.tag_filters = this.tag_filters;

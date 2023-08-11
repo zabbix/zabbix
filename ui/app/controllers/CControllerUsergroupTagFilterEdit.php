@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupTagFilterEdit extends CController {
+class CControllerUsergroupTagFilterEdit extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();

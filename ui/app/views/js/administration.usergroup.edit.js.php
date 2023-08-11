@@ -129,7 +129,7 @@
 				};
 			}
 
-			const overlay = PopUp('popup.tagfilter.edit', popup_params, {
+			const overlay = PopUp('usergroup.tagfilter.edit', popup_params, {
 				dialogueid: 'tag-filter-edit',
 				dialogue_class: 'modal-popup-medium',
 				prevent_navigation: true

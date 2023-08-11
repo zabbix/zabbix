@@ -106,7 +106,7 @@ $form
 	->addItem($form_grid)
 	->addItem(
 		(new CScriptTag('
-			tag_filter_popup.init('.json_encode([
+			tag_filter_edit.init('.json_encode([
 				'tag_filters' => $data['tag_filters'],
 				'groupid' => $data['groupid'] ?: 0
 			]).');
@@ -117,14 +117,14 @@ $form
 $output = [
 	'header' => $data['title'],
 	'script_inline' =>  getPagePostJs().
-		$this->readJsFile('popup.tagfilter.edit.js.php'),
+		$this->readJsFile('usergroup.tagfilter.edit.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => $data['edit'] ? _('Update') : _('Add'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'tag_filter_popup.submit();'
+			'action' => 'tag_filter_edit.submit();'
 		]
 	]
 ];

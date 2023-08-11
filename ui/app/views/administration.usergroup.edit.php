@@ -257,7 +257,7 @@ $tag_filter_form_grid = (new CFormGrid())
 		new CLabel(_('Permissions')),
 		new CFormField(
 			(new CDiv(
-				new CPartial('administration.usergroup.tagfilters', [
+				new CPartial('usergroup.tagfilters', [
 					'tag_filters' => $data['tag_filters'],
 					'html_tag_filters' => $data['html_tag_filters']
 				])
