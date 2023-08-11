@@ -2179,8 +2179,6 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	report_deserialize_test_report(message->data, &name, &dashboardid, &userid, &access_userid, &report_time,
 			&period, &params);
 
-
-
 	rm_get_report_dimensions(dashboardid, &width, &height);
 
 	for (i = 0; i < params.values_num; i++)
