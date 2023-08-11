@@ -492,6 +492,7 @@ static void	async_poller_stop(zbx_poller_config_t *poller_config)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	evdns_base_free(poller_config->dnsbase, 1);
 	evtimer_del(poller_config->async_check_items_timer);
 	event_base_dispatch(poller_config->base);
 
@@ -500,7 +501,6 @@ static void	async_poller_stop(zbx_poller_config_t *poller_config)
 
 static void	async_poller_destroy(zbx_poller_config_t *poller_config)
 {
-	evdns_base_free(poller_config->dnsbase, 1);
 	event_base_free(poller_config->base);
 	zbx_vector_uint64_clear(&poller_config->itemids);
 	zbx_vector_int32_clear(&poller_config->lastclocks);
