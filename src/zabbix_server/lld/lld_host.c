@@ -1294,6 +1294,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 			group->name_orig = NULL;
 			group->flags = 0x00;
 			zbx_vector_ptr_create(&group->hosts);
+			zbx_vector_lld_group_discovery_ptr_create(&group->discovery);
 
 			zbx_vector_lld_group_ptr_append(groups, group);
 		}
@@ -1449,6 +1450,32 @@ static  void	lld_group_merge_group_discovery(zbx_vector_lld_group_discovery_ptr_
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: merge old group host links with discovered ones                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_group_merge_hosts(zbx_vector_ptr_t *dst, zbx_vector_ptr_t *src)
+{
+	/* first remove duplicate hosts from source vector */
+	for (int i = 0; i < dst->values_num; i++)
+	{
+		zbx_lld_host_t 	*host = dst->values[i];
+
+		for (int j = 0; j < src->values_num; j++)
+		{
+			if (host == src->values[j])
+			{
+				zbx_vector_ptr_remove_noorder(src, j);
+				break;
+			}
+		}
+	}
+
+	/* append source vector to the destination vector */
+	zbx_vector_ptr_append_array(dst, src->values, src->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: check if a group was possibly renamed by finding common prototype *
  *                                                                            *
  ******************************************************************************/
@@ -1517,7 +1544,7 @@ static void	lld_groups_validate(zbx_vector_lld_group_ptr_t *groups, zbx_vector_l
 
 				zbx_vector_lld_group_discovery_ptr_clear(&right->discovery);
 
-				zbx_vector_ptr_append(&left->hosts, right->hosts.values[0]);
+				lld_group_merge_hosts(&left->hosts, &right->hosts);
 
 				lld_group_free(right);
 				zbx_vector_lld_group_ptr_remove_noorder(groups_in, j);
@@ -1556,8 +1583,9 @@ static void	lld_groups_validate(zbx_vector_lld_group_ptr_t *groups, zbx_vector_l
 
 			if (0 == (strcmp(left->name, right->name)))
 			{
+				left->flags = ZBX_FLAG_LLD_GROUP_DISCOVERED;
 				lld_group_merge_group_discovery(&left->discovery, &right->discovery);
-				zbx_vector_ptr_append_array(&left->hosts, right->hosts.values, right->hosts.values_num);
+				lld_group_merge_hosts(&left->hosts, &right->hosts);
 				zbx_vector_lld_group_ptr_append(groups_out, left);
 				zbx_vector_lld_group_ptr_remove_noorder(groups, i);
 
@@ -2171,6 +2199,8 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 
 	zbx_free(sql);
 out:
+	zbx_vector_uint64_destroy(&groupids);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -4906,7 +4936,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 
 		lld_interfaces_validate(&hosts, error);
 
-		lld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
+		lld_hostgroups_make(&groupids, &hosts, &groups_out, &del_hostgroupids);
 		lld_templates_make(parent_hostid, &hosts);
 
 		lld_hostmacros_make(&hostmacros, &hosts, lld_macro_paths);
