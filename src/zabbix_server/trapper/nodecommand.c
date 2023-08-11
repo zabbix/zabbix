@@ -490,6 +490,31 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	/* substitute macros in script body and webhook parameters */
 
+	if (ZBX_SCRIPT_TAKES_USERINPUT_YES == script.takes_userinput)
+	{
+		char *expanded_cmd;
+		size_t expanded_cmd_size;
+
+		if (NULL == userinput)
+		{
+			zbx_strlcpy(error, "Script takes user input, but none was provided.", sizeof(error));
+			goto fail;
+		}
+
+		if (FAIL == validate_userinput(userinput, script.userinput_validator, script.userinput_validator_type))
+		{
+			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
+			goto fail;
+		}
+
+		substitute_macro(script.command, "{USERINPUT}", userinput, &expanded_cmd, &expanded_cmd_size);
+
+		if (NULL == (script.command = zbx_strdup(script.command, expanded_cmd)))
+			goto fail;
+
+		zbx_free(expanded_cmd);
+	}
+
 	if (0 != hostid)	/* script on host */
 		macro_type = ZBX_MACRO_TYPE_SCRIPT;
 	else
