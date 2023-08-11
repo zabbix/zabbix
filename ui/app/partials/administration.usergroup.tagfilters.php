@@ -37,7 +37,16 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 		(new CVar('tag_filters['.$key.'][tags]', $tag_filter['tags']))->removeId()
 	];
 
-	$tag_filter_table->addRow([$tag_filter['name'], $data['html_tag_filters'][$tag_filter['groupid']], $action]);
+	$first_index = key($tag_filter['tags']);
+
+	if ($tag_filter['tags'][$first_index]['tag'] == '' && $tag_filter['tags'][$first_index]['value'] == '') {
+		$badges = italic(_('All tags'));
+	}
+	else {
+		$badges = $data['html_tag_filters'][$tag_filter['groupid']];
+	}
+
+	$tag_filter_table->addRow([$tag_filter['name'], $badges, $action]);
 }
 
 $tag_filter_table->addRow([

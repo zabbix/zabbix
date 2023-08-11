@@ -120,19 +120,16 @@ class CControllerUsergroupEdit extends CController {
 				];
 			}
 		}
+
 		$html_tag_filters = $data['tag_filters'];
 
-		foreach ($html_tag_filters as &$group) {
-			foreach ($group['tags'] as &$tag) {
-				if ($tag['tag'] === '') {
-					$tag = [
-						'tag' => 'All tags',
-						'value' => ''
-					];
-				}
+		foreach ($html_tag_filters as $key => $group) {
+			$tags = $group['tags'];
+
+			if (empty($tags) || (count($tags) === 1 && $tags[key($tags)]['tag'] === '')) {
+				unset($html_tag_filters[$key]);
 			}
 		}
-		unset($group, $tag);
 
 		$data['html_tag_filters'] = makeTags($html_tag_filters, true, 'groupid');
 
