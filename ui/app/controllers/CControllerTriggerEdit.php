@@ -108,8 +108,6 @@ class CControllerTriggerEdit extends CController {
 			'context' => '',
 			'expression' => '',
 			'recovery_expression' => '',
-			'expression_full' => '',
-			'recovery_expression_full' => '',
 			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED,
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
 			'correlation_tag' => '',
@@ -120,11 +118,12 @@ class CControllerTriggerEdit extends CController {
 			'event_name' => '',
 			'limited' => false,
 			'tags' =>[],
-			'recovery_expression_field_readonly' => false,
 			'triggerid' => null,
 			'show_inherited_tags' => 0,
 			'form_refresh' => 0,
+			'status' => TRIGGER_STATUS_ENABLED,
 			'templates' => [],
+			'db_dependencies' => [],
 			'url' => '',
 			'url_name' => ''
 		];
@@ -132,7 +131,7 @@ class CControllerTriggerEdit extends CController {
 		$data = [];
 		$this->getInputs($data, array_keys($form_fields));
 
-		if ($data['form_refresh']) {
+		if ($this->hasInput('form_refresh') && $data['form_refresh']) {
 			$data['manual_close'] = !array_key_exists('manual_close', $data)
 				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 				: ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
@@ -146,104 +145,38 @@ class CControllerTriggerEdit extends CController {
 		$data['comments'] = $this->getInput('description', '');
 		$data['dependencies'] =  zbx_toObject($this->getInput('dependencies', []), 'triggerid');
 
-		if ($this->trigger && $data['form_refresh'] == 0) {
-			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->trigger,
-				['sources' => ['expression', 'recovery_expression']]
-			);
+		if ($data['tags'] && $data['show_inherited_tags'] == 0) {
+			// Unset inherited tags.
+			$tags = [];
 
-			$data = array_merge($data, reset($triggers));
-
-			// Get templates.
-			$data['templates'] = makeTriggerTemplatesHtml($data['triggerid'],
-				getTriggerParentTemplates([$data], ZBX_FLAG_DISCOVERY_NORMAL), ZBX_FLAG_DISCOVERY_NORMAL,
-				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-			);
-
-			if ($data['show_inherited_tags']) {
-				$items = [];
-				$item_prototypes = [];
-
-				foreach ($data['items'] as $item) {
-					if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-						$items[] = $item;
-					}
-					else {
-						$item_prototypes[] = $item;
-					}
+			foreach ($data['tags'] as $tag) {
+				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+					continue;
 				}
 
-				$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
-					+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
-
-				unset($item_parent_templates[0]);
-
-				$db_templates = $item_parent_templates
-					? API::Template()->get([
-						'output' => ['templateid'],
-						'selectTags' => ['tag', 'value'],
-						'templateids' => array_keys($item_parent_templates),
-						'preservekeys' => true
-					])
-					: [];
-
-				$inherited_tags = [];
-
-				foreach ($item_parent_templates as $templateid => $template) {
-					if (array_key_exists($templateid, $db_templates)) {
-						foreach ($db_templates[$templateid]['tags'] as $tag) {
-							if (array_key_exists($tag['tag'], $inherited_tags)
-								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-								$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
-									$templateid => $template
-								];
-							}
-							else {
-								$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-										'parent_templates' => [$templateid => $template],
-										'type' => ZBX_PROPERTY_INHERITED
-									];
-							}
-						}
-					}
-				}
-
-				$db_hosts = API::Host()->get([
-					'output' => [],
-					'selectTags' => ['tag', 'value'],
-					'hostids' => $data['hostid'],
-					'templated_hosts' => true
-				]);
-
-				if ($db_hosts) {
-					foreach ($db_hosts[0]['tags'] as $tag) {
-						$inherited_tags[$tag['tag']][$tag['value']] = $tag;
-						$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
-					}
-				}
-
-				foreach ($data['tags'] as $tag) {
-					if (array_key_exists($tag['tag'], $inherited_tags)
-						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-						$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-					}
-					else {
-						$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-					}
-				}
-
-				$data['tags'] = [];
-
-				foreach ($inherited_tags as $tag) {
-					foreach ($tag as $value) {
-						$data['tags'][] = $value;
-					}
-				}
+				$tags[] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
 			}
 
-			$data['limited'] = ($data['templateid'] != 0);
+			$data['tags'] = $tags;
+		}
 
-			if ($data['hostid'] == 0) {
-				$data['hostid'] = $data['hosts'][0]['hostid'];
+		if ($this->trigger) {
+			$trigger = $this->getAdditionalTriggerData($data, $data['tags']);
+
+			if ($data['form_refresh']) {
+				if ($data['show_inherited_tags']) {
+					$data['tags'] = $trigger['tags'];
+				}
+
+				$data['templateid'] = $trigger['templateid'];
+				$data['limited'] = $trigger['limited'];
+				$data['flags'] = $trigger['flags'];
+			}
+			else {
+				$data = $trigger;
 			}
 		}
 
@@ -277,5 +210,129 @@ class CControllerTriggerEdit extends CController {
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
+	}
+
+	/**
+	 * Collects information about the existing trigger.
+	 *
+	 * @param array $data
+	 * @return array
+	 */
+	private function getAdditionalTriggerData(array $data, array $input_tags): array {
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->trigger,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		$data = array_merge($data, reset($triggers));
+
+		// Get templates.
+		$data['templates'] = makeTriggerTemplatesHtml($data['triggerid'],
+			getTriggerParentTemplates([$data], ZBX_FLAG_DISCOVERY_NORMAL), ZBX_FLAG_DISCOVERY_NORMAL,
+			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
+		if ($data['show_inherited_tags']) {
+			$data['tags'] = $this->getInheritedTags($data, $input_tags);
+		}
+
+		$data['limited'] = ($data['templateid'] != 0);
+
+		if ($data['hostid'] == 0) {
+			$data['hostid'] = $data['hosts'][0]['hostid'];
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Add trigger inherited tags to $data['tags'] array of trigger tags.
+	 *
+	 * @param array $data
+	 * @param array $input_tags
+	 */
+	private function getInheritedTags(array $data, array $input_tags): array {
+		$items = [];
+		$item_prototypes = [];
+
+		foreach ($data['items'] as $item) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				$items[] = $item;
+			}
+			else {
+				$item_prototypes[] = $item;
+			}
+		}
+
+		$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
+			+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
+
+		unset($item_parent_templates[0]);
+
+		$db_templates = $item_parent_templates
+			? API::Template()->get([
+				'output' => ['templateid'],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => array_keys($item_parent_templates),
+				'preservekeys' => true
+			])
+			: [];
+
+		$inherited_tags = [];
+
+		// Make list of parent template tags.
+		foreach ($item_parent_templates as $templateid => $template) {
+			if (array_key_exists($templateid, $db_templates)) {
+				foreach ($db_templates[$templateid]['tags'] as $tag) {
+					if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+							$templateid => $template
+						];
+					}
+					else {
+						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+								'parent_templates' => [$templateid => $template],
+								'type' => ZBX_PROPERTY_INHERITED
+							];
+					}
+				}
+			}
+		}
+
+		$db_hosts = API::Host()->get([
+			'output' => [],
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $data['hostid'],
+			'templated_hosts' => true
+		]);
+
+		// Overwrite and attach host level tags.
+		if ($db_hosts) {
+			foreach ($db_hosts[0]['tags'] as $tag) {
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+			}
+		}
+
+		// Overwrite and attach trigger's own tags.
+		foreach ($input_tags as $tag) {
+			if (array_key_exists($tag['tag'], $inherited_tags)
+				&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+			else {
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+		}
+
+		$data['tags'] = [];
+
+		foreach ($inherited_tags as $tag) {
+			foreach ($tag as $value) {
+				$data['tags'][] = $value;
+			}
+		}
+
+		return $data['tags'];
 	}
 }

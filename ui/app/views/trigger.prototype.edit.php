@@ -288,14 +288,6 @@ $trigger_form_grid
 		)
 	]);
 
-// append status to form list
-if (!$data['triggerid']) {
-	$status = true;
-}
-else {
-	$status = ($data['status'] == TRIGGER_STATUS_ENABLED);
-}
-
 $trigger_form_grid
 	->addItem([
 		new CLabel([
@@ -321,7 +313,7 @@ $trigger_form_grid
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 	])
 	->addItem([new CLabel(_('Create enabled')),
-		new CFormField((new CCheckBox('status'))->setChecked($status))
+		new CFormField((new CCheckBox('status'))->setChecked($data['status'] == TRIGGER_STATUS_ENABLED))
 	])
 	->addItem([new CLabel(_('Discover')),
 		new CFormField(

@@ -46,7 +46,7 @@ class CControllerTriggerPrototypeCreate extends CController {
 			'dependencies' =>						'array',
 			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid',
-			'discover' =>							'db triggers.discover',
+			'discover' =>							'db triggers.discover|in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
 			'parent_discoveryid'=>					'required|db triggers.triggerid',
 			'context' =>							'in '.implode(',', ['host', 'template'])
 		];

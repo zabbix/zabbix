@@ -51,7 +51,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'tags' =>								'array',
 			'dependencies' =>						'array',
 			'hostid' =>								'db hosts.hostid',
-			'discover' =>							'db triggers.discover',
+			'discover' =>							'db triggers.discover|in '.implode(',', [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]),
 			'parent_discoveryid'=>					'required|db triggers.triggerid',
 			'context' =>							'in '.implode(',', ['host', 'template'])
 		];
