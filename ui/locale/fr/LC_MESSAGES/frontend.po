@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-07-25 08:40+0000\n"
+"PO-Revision-Date: 2023-07-31 07:53+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -952,7 +952,7 @@ msgstr "Ajouter hôte"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Ajouter des tags d'hôte"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -17322,7 +17322,7 @@ msgstr "Supprimer l'hôte"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
-msgstr ""
+msgstr "Supprimer les tags d'hôte"
 
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
@@ -19576,6 +19576,10 @@ msgstr "Super administrateur"
 msgid "Support"
 msgstr "Support"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr "La prise en charge d'Oracle DB est obsolète depuis Zabbix 7.0 et sera supprimée dans les futures versions."
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr "La prise en charge de l'ancien type numérique est obsolète. Veuillez passer aux valeurs numériques de la plage étendue."
@@ -20540,7 +20544,7 @@ msgstr "Haut"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr ""
+msgstr "Top 100 des déclencheurs"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
@@ -20552,7 +20556,7 @@ msgstr "Top des hôtes"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
-msgstr ""
+msgstr "Top des déclencheurs"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20765,7 +20769,7 @@ msgstr[1] "Déclencheurs copiés"
 
 #: widgets/toptriggers/includes/WidgetForm.php:72
 msgid "Trigger count"
-msgstr ""
+msgstr "Nombre de déclencheurs"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23148,6 +23152,10 @@ msgstr "Avertissement"
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
 msgstr "Message d'alerte"
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr "Attention ! La prise en charge d'Oracle DB est obsolète depuis Zabbix 7.0 et sera supprimée dans les futures versions."
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."

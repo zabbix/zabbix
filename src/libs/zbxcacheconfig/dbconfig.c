@@ -248,7 +248,7 @@ static int	cmp_key_id(const char *key_1, const char *key_2)
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
-static unsigned char	poller_by_item(unsigned char type, const char *key)
+static unsigned char	poller_by_item(unsigned char type, const char *key, const char *snmp_oid)
 {
 	switch (type)
 	{
@@ -263,7 +263,6 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				return ZBX_POLLER_TYPE_PINGER;
 			}
 			ZBX_FALLTHROUGH;
-		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
@@ -303,6 +302,22 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				break;
 
 			return ZBX_POLLER_TYPE_AGENT;
+		case ITEM_TYPE_SNMP:
+			if (NULL == snmp_oid)
+				break;
+
+			if (0 == strncmp(snmp_oid, "walk[", 5))
+			{
+				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
+					break;
+
+				return ZBX_POLLER_TYPE_SNMP;
+			}
+
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_NORMAL;
 	}
 
 	return ZBX_NO_POLLER;
@@ -517,6 +532,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
 	unsigned char	poller_type;
+	const char	*snmp_oid = NULL;
 
 	if (0 != dc_host->proxy_hostid && SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
 	{
@@ -524,7 +540,15 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 		return;
 	}
 
-	poller_type = poller_by_item(dc_item->type, dc_item->key);
+	if (ITEM_TYPE_SNMP == dc_item->type)
+	{
+		ZBX_DC_SNMPITEM	*snmpitem;
+
+		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid)))
+			snmp_oid = snmpitem->snmp_oid;
+	}
+
+	poller_type = poller_by_item(dc_item->type, dc_item->key, snmp_oid);
 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
@@ -978,6 +1002,18 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->config->hk.audit_mode = value_int;
 		config->revision.config_table = revision;
 	}
+
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != config->config->hk.audit_mode &&
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+	{
+		if (ZBX_HK_MODE_PARTITION != config->config->hk.audit_mode)
+		{
+			config->config->hk.audit_mode = ZBX_HK_MODE_PARTITION;
+			config->revision.config_table = revision;
+		}
+	}
+#endif
 
 	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[17])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[18], revision))
@@ -10718,6 +10754,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 		case ZBX_POLLER_TYPE_AGENT:
+		case ZBX_POLLER_TYPE_SNMP:
 			if (0 == (max_items = config_max_concurrent_checks - processing))
 				goto out;
 
@@ -10749,8 +10786,11 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 		{
 			if (ITEM_TYPE_SNMP == dc_item_prev->type)
 			{
-				if (0 != __config_snmp_item_compare(dc_item_prev, dc_item))
-					break;
+				if (ZBX_POLLER_TYPE_NORMAL == poller_type)
+				{
+					if (0 != __config_snmp_item_compare(dc_item_prev, dc_item))
+						break;
+				}
 			}
 			else if (ITEM_TYPE_JMX == dc_item_prev->type)
 			{
