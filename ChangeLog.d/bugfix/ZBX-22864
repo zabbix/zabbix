@@ -1,0 +1,1 @@
+.......PS. [ZBX-22864] fixed calculation of max_repetitions sent out to device in SNMP PDUs (mprihodko)
