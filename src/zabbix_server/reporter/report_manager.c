@@ -2208,7 +2208,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 				0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
 		{
 			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, (char **)&params.values[i].second, MACRO_TYPE_REPORT, NULL, 0);
+					NULL, (char **)&params.values[i].second, ZBX_MACRO_TYPE_REPORT, NULL, 0);
 		}
 	}
 
