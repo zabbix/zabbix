@@ -19,7 +19,10 @@
 **/
 
 
-use Widgets\PieChart\Includes\CWidgetFieldDataSet;
+use Widgets\PieChart\Includes\{
+	CWidgetFieldDataSet,
+	WidgetForm
+};
 
 ?>
 
@@ -214,7 +217,7 @@ window.widget_pie_chart_form = new class {
 	toggleDisplayingOptionsFields() {
 		const draw_type = this._form.querySelector('[name="draw_type"]:checked').value;
 		const doughnut_config_fields = this._form.querySelectorAll('#width_label, #width_range, #show_total_fields');
-		const is_doughnut = draw_type == <?= PIE_CHART_DRAW_DOUGHNUT ?>;
+		const is_doughnut = draw_type == <?= WidgetForm::DRAW_TYPE_DOUGHNUT ?>;
 		const merge = document.getElementById('merge');
 		const total_value_fields = this._form.querySelectorAll(
 			'#value_size, #decimal_places, #units_show, #units, #value_bold, #value_color'
@@ -647,7 +650,7 @@ window.widget_pie_chart_form = new class {
 		if (items_type !== null) {
 			for (let i = 0; i < datasets.length; i++) {
 				for (let j = 0; j < items_type[i].length; j++) {
-					if (items_type[i][j].value == <?= PIE_CHART_ITEM_TOTAL ?>) {
+					if (items_type[i][j].value == <?= CWidgetFieldDataSet::ITEM_TYPE_TOTAL ?>) {
 						is_total = true;
 					}
 				}

@@ -36,8 +36,13 @@ use Widgets\PieChart\Includes\{
 	WidgetForm
 };
 
-
 class WidgetView extends CControllerDashboardWidgetView {
+
+	private const LEGEND_AGGREGATION_ON = 1;
+	private const MERGE_SECTORS_ON = 1;
+	private const SHOW_TOTAL_ON = 1;
+	private const SHOW_UNITS_ON = 1;
+	private const VALUE_BOLD_ON = 1;
 
 	protected function init(): void {
 		parent::init();
@@ -80,26 +85,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'templateid' => $this->getInput('templateid', ''),
 			'merge_sectors' => [
 				'merge' => $this->fields_values['merge'],
-				'percent' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON
+				'percent' => $this->fields_values['merge'] == self::MERGE_SECTORS_ON
 					? $this->fields_values['merge_percent']
 					: null,
-				'color' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON
+				'color' => $this->fields_values['merge'] == self::MERGE_SECTORS_ON
 					? '#'.$this->fields_values['merge_color']
 					: null
 			],
 			'total_value' => [
 				'total_show' => $this->fields_values['total_show'],
-				'decimal_places' => $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
+				'decimal_places' => $this->fields_values['total_show'] == self::SHOW_TOTAL_ON
 					? $this->fields_values['decimal_places']
 					: null
 			],
 			'units' => [
 				'units_show' => $this->fields_values['units_show'],
-				'units_value' => $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
+				'units_value' => $this->fields_values['units_show'] == self::SHOW_UNITS_ON
 					? $this->fields_values['units']
 					: null
 			],
-			'legend_aggregation_show' => $this->fields_values['legend_aggregation'] == PIE_CHART_LEGEND_AGGREGATION_ON
+			'legend_aggregation_show' => $this->fields_values['legend_aggregation'] == self::LEGEND_AGGREGATION_ON
 		];
 
 		$data = [
@@ -324,7 +329,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
 		 * $metric.
 		 */
-		if ($data_source == PIE_CHART_DATA_SOURCE_AUTO) {
+		if ($data_source == WidgetForm::DATA_SOURCE_AUTO) {
 			/**
 			 * First, if global configuration setting "Override item history period" is enabled, override globally
 			 * specified "Data storage period" value to each metric custom history storage duration, converting it
@@ -403,8 +408,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$time_from = $metric['time_period']['time_from'];
 
 				$metric['source'] = ($trends == 0 || (time() - $history < $time_from))
-					? PIE_CHART_DATA_SOURCE_HISTORY
-					: PIE_CHART_DATA_SOURCE_TRENDS;
+					? WidgetForm::DATA_SOURCE_HISTORY
+					: WidgetForm::DATA_SOURCE_TRENDS;
 			}
 		}
 		else {
@@ -440,7 +445,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item = [
 				'itemid' => $metric['itemid'],
 				'value_type' => $metric['value_type'],
-				'source' => ($metric['source'] == PIE_CHART_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
+				'source' => ($metric['source'] == WidgetForm::DATA_SOURCE_HISTORY) ? 'history' : 'trends'
 			];
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
@@ -532,7 +537,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($metrics as &$metric) {
 			$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
-					&& $metric['options']['type'] == PIE_CHART_ITEM_TOTAL);
+					&& $metric['options']['type'] == CWidgetFieldDataSet::ITEM_TYPE_TOTAL);
 
 			if ($templateid !== '') {
 				$metric = [
@@ -558,7 +563,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			unset($metric['items']);
 
-			if ($units_config['units_show'] == PIE_CHART_SHOW_UNITS_ON && $units_config['units_value'] !== ''
+			if ($units_config['units_show'] == self::SHOW_UNITS_ON && $units_config['units_value'] !== ''
 					&& isset($metric['item'])) {
 				$metric['item']['units'] = $units_config['units_value'];
 			}
@@ -616,7 +621,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$percentage = ($metric['value'] / $raw_total_value) * 100;
 			}
 
-			if ($merge_sectors['merge'] == PIE_CHART_MERGE_ON) {
+			if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON) {
 				if ($percentage < $merge_sectors['percent']) {
 					$below_threshold_count++;
 
@@ -725,16 +730,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'space' => $this->fields_values['space']
 		];
 
-		if ($this->fields_values['draw_type'] == PIE_CHART_DRAW_DOUGHNUT) {
+		if ($this->fields_values['draw_type'] == WidgetForm::DRAW_TYPE_DOUGHNUT) {
 			$config['width'] = $this->fields_values['width'];
 
-			if ($this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON) {
+			if ($this->fields_values['total_show'] == self::SHOW_TOTAL_ON) {
 				$config['total_value'] = [
 					'show' => true,
 					'size' => $this->fields_values['value_size'],
-					'is_bold' =>  $this->fields_values['value_bold'] == PIE_CHART_VALUE_BOLD_ON,
+					'is_bold' =>  $this->fields_values['value_bold'] == self::VALUE_BOLD_ON,
 					'color' => '#'.$this->fields_values['value_color'],
-					'units_show' => $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
+					'units_show' => $this->fields_values['units_show'] == self::SHOW_UNITS_ON
 				];
 			}
 			else {
@@ -759,7 +764,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		if ($this->fields_values['legend'] == PIE_CHART_LEGEND_ON) {
+		if ($this->fields_values['legend'] == WidgetForm::LEGEND_ON) {
 			$legend['show'] = true;
 			$legend['lines'] = $this->fields_values['legend_lines'];
 			$legend['columns'] = $this->fields_values['legend_columns'];

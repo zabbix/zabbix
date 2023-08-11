@@ -44,13 +44,47 @@ use Zabbix\Widgets\Fields\{
  */
 class WidgetForm extends CWidgetForm {
 
+	public const DATA_SOURCE_AUTO = 0;
+	public const DATA_SOURCE_HISTORY = 1;
+	public const DATA_SOURCE_TRENDS = 2;
+
+	public const DRAW_TYPE_DOUGHNUT = 1;
+	private const DRAW_TYPE_PIE = 0;
+
+	private const CUSTOM_TIME_ON = 1;
+
+	public const LEGEND_ON = 1;
+	private const LEGEND_COLUMNS_MAX = 4;
+	private const LEGEND_COLUMNS_MIN = 1;
+	private const LEGEND_LINES_MAX = 10;
+	private const LEGEND_LINES_MIN = 1;
+
+	private const MERGE_PERCENT_MAX = 10;
+	private const MERGE_PERCENT_MIN = 1;
+
+	private const SPACE_DEFAULT = 1;
+	private const SPACE_MAX = 10;
+	private const SPACE_MIN = 0;
+
+	private const VALUE_DECIMALS_DEFAULT = 2;
+	private const VALUE_DECIMALS_MAX = 6;
+	private const VALUE_DECIMALS_MIN = 1;
+
+	private const VALUE_SIZE_DEFAULT = 10;
+	private const VALUE_SIZE_MAX = 100;
+	private const VALUE_SIZE_MIN = 1;
+
+	private const WIDTH_DEFAULT = 50;
+	private const WIDTH_MIN = 20;
+	private const WIDTH_STEP = 10;
+
 	private bool $graph_time_on = false;
 	private bool $legend_on = true;
 
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
-		if ($this->getFieldValue('graph_time') == PIE_CHART_CUSTOM_TIME_ON) {
+		if ($this->getFieldValue('graph_time') == self::CUSTOM_TIME_ON) {
 			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
 				$this->getFieldValue('time_to')
 			));
@@ -63,7 +97,7 @@ class WidgetForm extends CWidgetForm {
 		$values = parent::normalizeValues($values);
 
 		if (array_key_exists('graph_time', $values)) {
-			$this->graph_time_on = $values['graph_time'] == PIE_CHART_CUSTOM_TIME_ON;
+			$this->graph_time_on = $values['graph_time'] == self::CUSTOM_TIME_ON;
 		}
 
 		if (!$this->graph_time_on) {
@@ -71,7 +105,7 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		if (array_key_exists('legend', $values)) {
-			$this->legend_on = $values['legend'] == PIE_CHART_LEGEND_ON;
+			$this->legend_on = $values['legend'] == self::LEGEND_ON;
 		}
 
 		return $values;
@@ -95,37 +129,37 @@ class WidgetForm extends CWidgetForm {
 		return $this
 			->addField(
 				(new CWidgetFieldRadioButtonList('source', _('History data selection'), [
-					PIE_CHART_DATA_SOURCE_AUTO => _x('Auto', 'history source selection method'),
-					PIE_CHART_DATA_SOURCE_HISTORY => _('History'),
-					PIE_CHART_DATA_SOURCE_TRENDS => _('Trends')
-				]))->setDefault(PIE_CHART_DATA_SOURCE_AUTO)
+					self::DATA_SOURCE_AUTO => _x('Auto', 'history source selection method'),
+					self::DATA_SOURCE_HISTORY => _('History'),
+					self::DATA_SOURCE_TRENDS => _('Trends')
+				]))->setDefault(self::DATA_SOURCE_AUTO)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('draw_type', _('Draw'), [
-					PIE_CHART_DRAW_PIE => _('Pie'),
-					PIE_CHART_DRAW_DOUGHNUT => _('Doughnut')
-				]))->setDefault(PIE_CHART_DRAW_PIE)
+					self::DRAW_TYPE_PIE => _('Pie'),
+					self::DRAW_TYPE_DOUGHNUT => _('Doughnut')
+				]))->setDefault(self::DRAW_TYPE_PIE)
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('width', _('Width'),
-					PIE_CHART_WIDTH_MIN, PIE_CHART_WIDTH_DEFAULT, PIE_CHART_WIDTH_STEP
+					self::WIDTH_MIN, self::WIDTH_DEFAULT, self::WIDTH_STEP
 				))
-					->setDefault(PIE_CHART_WIDTH_DEFAULT)
+					->setDefault(self::WIDTH_DEFAULT)
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('space', _('Space between sectors'),
-					PIE_CHART_SPACE_MIN, PIE_CHART_SPACE_MAX
+					self::SPACE_MIN, self::SPACE_MAX
 				))
-					->setDefault(PIE_CHART_SPACE_DEFAULT)
+					->setDefault(self::SPACE_DEFAULT)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('merge', null, _('Merge sectors smaller than '))
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('merge_percent', null,
-					PIE_CHART_MERGE_PERCENT_MIN, PIE_CHART_MERGE_PERCENT_MAX
+					self::MERGE_PERCENT_MIN, self::MERGE_PERCENT_MAX
 				))
-					->setDefault(PIE_CHART_MERGE_PERCENT_DEFAULT)
+					->setDefault(self::MERGE_PERCENT_MIN)
 			)
 			->addField(
 				(new CWidgetFieldColor('merge_color'))
@@ -135,15 +169,15 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('value_size', _('Size'),
-					PIE_CHART_VALUE_SIZE_MIN, PIE_CHART_VALUE_SIZE_MAX
+					self::VALUE_SIZE_MIN, self::VALUE_SIZE_MAX
 				))
-					->setDefault(PIE_CHART_VALUE_SIZE_DEFAULT)
+					->setDefault(self::VALUE_SIZE_DEFAULT)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'),
-					PIE_CHART_VALUE_DECIMALS_MIN, PIE_CHART_VALUE_DECIMALS_MAX
+					self::VALUE_DECIMALS_MIN, self::VALUE_DECIMALS_MAX
 				))
-					->setDefault(PIE_CHART_VALUE_DECIMALS_DEFAULT)
+					->setDefault(self::VALUE_DECIMALS_DEFAULT)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
@@ -186,25 +220,24 @@ class WidgetForm extends CWidgetForm {
 	private function initLegendFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(PIE_CHART_LEGEND_ON)
+				(new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(self::LEGEND_ON)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('legend_aggregation', _('Show aggregation function')))
-					->setDefault(PIE_CHART_LEGEND_AGGREGATION_OFF)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('legend_lines', _('Number of rows'),
-					PIE_CHART_LEGEND_LINES_MIN, PIE_CHART_LEGEND_LINES_MAX
+					self::LEGEND_LINES_MIN, self::LEGEND_LINES_MAX
 				))
-					->setDefault(PIE_CHART_LEGEND_LINES_MIN)
+					->setDefault(self::LEGEND_LINES_MIN)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('legend_columns', _('Number of columns'),
-					PIE_CHART_LEGEND_COLUMNS_MIN, PIE_CHART_LEGEND_COLUMNS_MAX
+					self::LEGEND_COLUMNS_MIN, self::LEGEND_COLUMNS_MAX
 				))
-					->setDefault(PIE_CHART_LEGEND_COLUMNS_MAX)
+					->setDefault(self::LEGEND_COLUMNS_MAX)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			);
 	}
@@ -215,7 +248,7 @@ class WidgetForm extends CWidgetForm {
 	 */
 	public static function hasOverrideTime(array $fields_values): bool {
 		return array_key_exists('graph_time', $fields_values)
-			&& $fields_values['graph_time'] == PIE_CHART_CUSTOM_TIME_ON;
+			&& $fields_values['graph_time'] == self::CUSTOM_TIME_ON;
 	}
 
 	private static function validateTimeSelectorPeriod(string $from, string $to): array {

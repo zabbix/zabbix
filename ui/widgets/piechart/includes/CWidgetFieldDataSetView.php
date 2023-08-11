@@ -363,8 +363,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					->setId('items_'.$ds_num.'_'.$row_num.'_type')
 					->setValue($type)
 					->addOptions(CSelect::createOptionsFromArray([
-						PIE_CHART_ITEM_NORMAL => _('Normal'),
-						PIE_CHART_ITEM_TOTAL => _('Total')
+						CWidgetFieldDataSet::ITEM_TYPE_NORMAL => _('Normal'),
+						CWidgetFieldDataSet::ITEM_TYPE_TOTAL => _('Total')
 					]))
 			]))->addClass('table-col-type'),
 			(new CCol([

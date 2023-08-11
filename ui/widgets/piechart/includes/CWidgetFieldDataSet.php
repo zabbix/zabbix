@@ -36,6 +36,9 @@ class CWidgetFieldDataSet extends CWidgetField {
 	public const DATASET_TYPE_SINGLE_ITEM = 0;
 	public const DATASET_TYPE_PATTERN_ITEM = 1;
 
+	public const ITEM_TYPE_NORMAL = 0;
+	public const ITEM_TYPE_TOTAL = 1;
+
 	// Predefined colors for data-sets in JSON format. Each next data set takes next sequential value from palette.
 	public const DEFAULT_COLOR_PALETTE = [
 		'FF465C', 'B0AF07', '0EC9AC', '524BBC', 'ED1248', 'D1E754', '2AB5FF', '385CC7', 'EC1594', 'BAE37D',
@@ -59,7 +62,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 				'dataset_aggregation'   => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])],
-				'type'                  => ['type' => API_INTS32, 'flags' => null, 'in' => implode(',', [PIE_CHART_ITEM_NORMAL, PIE_CHART_ITEM_TOTAL])],
+				'type'                  => ['type' => API_INTS32, 'flags' => null, 'in' => implode(',', [self::ITEM_TYPE_NORMAL, self::ITEM_TYPE_TOTAL])],
 				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255]
 			]]);
 	}
@@ -171,7 +174,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				$validation_rules_by_type = $validation_rules;
 				if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 					foreach($data['type'] as $item_type) {
-						if ($item_type == PIE_CHART_ITEM_TOTAL) {
+						if ($item_type == self::ITEM_TYPE_TOTAL) {
 							$total_item_count++;
 						}
 					}

@@ -35,16 +35,16 @@ $form = (new CWidgetFormView($data));
 
 $form_tabs = (new CTabView())
 	->addTab('data_set', _('Data set'), getDatasetTab($form, $data['fields']),
-		TAB_INDICATOR_PIE_CHART_DATASET
+		'pie-dataset'
 	)
 	->addTab('displaying_options', _('Displaying options'), getDisplayOptionsTab($form, $data['fields']),
-		TAB_INDICATOR_PIE_CHART_DISPLAY_OPTIONS
+		'pie-display-options'
 	)
 	->addTab('time_period', _('Time period'), getTimePeriodTab($form, $data['fields']),
-		TAB_INDICATOR_PIE_CHART_TIME
+		'pie-time'
 	)
 	->addTab('legend_tab', _('Legend'), getLegendTab($form, $data['fields']),
-		TAB_INDICATOR_PIE_CHART_LEGEND
+		'pie-legend'
 	)
 	->setSelected(0)
 	->addClass('pie-chart-widget-config-tabs');
