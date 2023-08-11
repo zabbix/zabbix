@@ -356,8 +356,13 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 		else if (0 == strncmp(metric->key + 3, "rt.count[", 9))		/* logrt.count[ */
 			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_COUNT;
 	}
-	else if (0 == strncmp(metric->key, "eventlog[", 9))
-		metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
+	else if (0 == strncmp(metric->key, "eventlog", 8))
+	{
+		if ('[' == metric->key[8])
+			metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
+		else if (0 == strncmp(metric->key + 8, ".count[", 7))
+			metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG | ZBX_METRIC_FLAG_LOG_COUNT;
+	}
 
 	metric->start_time = 0.0;
 	metric->processed_bytes = 0;
