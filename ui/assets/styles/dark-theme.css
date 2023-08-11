@@ -4095,7 +4095,7 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
     display: flex;
     min-width: 0; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content .arrow {
-      display: inline-block;
+      flex-shrink: 0;
       width: 16px;
       margin-right: 2px; }
       div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content .arrow > .treeview {

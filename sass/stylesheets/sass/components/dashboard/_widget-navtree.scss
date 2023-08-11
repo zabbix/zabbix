@@ -81,7 +81,7 @@ div.dashboard-widget-navtree {
 						min-width: 0;
 
 						.arrow {
-							display: inline-block;
+							flex-shrink: 0;
 							width: 16px;
 							margin-right: 2px;
 
