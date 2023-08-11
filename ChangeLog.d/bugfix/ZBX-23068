@@ -1,0 +1,1 @@
+...G...... [ZBX-23068] fixed crash and memory leak when using system.sw.os.get key (vso)

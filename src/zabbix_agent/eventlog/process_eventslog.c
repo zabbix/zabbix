@@ -50,7 +50,7 @@ static void	zbx_get_message_files(const wchar_t *szLogName, const wchar_t *szSou
 {
 	wchar_t	buf[MAX_PATH];
 	HKEY	hKey = NULL;
-	DWORD	szData;
+	DWORD	szData = 0;
 
 	/* Get path to message dll */
 	StringCchPrintf(buf, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s\\%s"), szLogName, szSourceName);
