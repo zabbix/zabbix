@@ -84,7 +84,12 @@ class NetworkDiscovery {
 						'type' => SVC_SNMPv1,
 						'ports' => 161,
 						'key_' => '.1.3.6.1.2.1.9.9.9',
-						'snmp_community'=> 'test SNMP community'
+						'snmp_community'=> 'test SNMP community',
+						'host_source' => 1,
+						'name_source' => 0
+						// TODO: Change host_source and name_source to commented lines when ZBX-23252 is fixed.
+						//'host_source' => 3,
+						//'name_source' => 2
 					],
 					[
 						'type' => SVC_SNMPv3,
@@ -92,11 +97,20 @@ class NetworkDiscovery {
 						'key_' => '.1.3.6.1.2.1.1.1.0',
 						'snmpv3_contextname name' => 'test_context_name',
 						'snmpv3_securityname' => 'test_security_name',
-						'snmpv3_securitylevel' => 0
+						'snmpv3_securitylevel' => 0,
+						'host_source' => 1,
+						// TODO: Change  name_source to commented line when ZBX-23252 is fixed.
+						//'name_source' => 2
+						'name_source' => 0,
+						'uniq' => 1
 					],
 					[
 						'type' => SVC_TELNET,
-						'ports' => 23
+						'ports' => 23,
+						'host_source' => 1,
+						// TODO: Change  name_source to commented line when ZBX-23252 is fixed.
+						//'name_source' => 2
+						'name_source' => 0
 					]
 				]
 			],
