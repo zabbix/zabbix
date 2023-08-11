@@ -359,6 +359,50 @@ void	zbx_locks_enable(void)
 #endif
 #endif	/* _WINDOWS */
 
+#ifdef _WINDOWS
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Create the semaphore                                              *
+ *                                                                            *
+ * Parameters:  mutex - handle of semaphore                                   *
+ *              name - name of semaphore                                      *
+ *                                                                            *
+ * Return value: If the function succeeds, then return SUCCEED,               *
+ *               FAIL on an error                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_mutex_glob_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
+{
+	if (NULL == (*mutex = CreateSemaphore(NULL, 1, 1, name)))
+	{
+		*error = zbx_dsprintf(*error, "error on semaphore creating: %s", strerror_from_system(GetLastError()));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Release the semaphore                                             *
+ *                                                                            *
+ * Parameters: mutex - handle of semaphore                                    *
+ *                                                                            *
+ ******************************************************************************/
+void	__zbx_mutex_glob_unlock(const char *filename, int line, zbx_mutex_t mutex)
+{
+	if (ZBX_MUTEX_NULL == mutex)
+		return;
+
+	if (0 == ReleaseSemaphore(mutex, 1, NULL))
+	{
+		zbx_error("[file:'%s',line:%d] unlock failed: %s",
+				filename, line, strerror_from_system(GetLastError()));
+		exit(EXIT_FAILURE);
+	}
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Create the mutex                                                  *

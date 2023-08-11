@@ -28,13 +28,16 @@
 
 #	define ZBX_MUTEX_LOG		zbx_mutex_create_per_process_name(L"ZBX_MUTEX_LOG")
 #	define ZBX_MUTEX_PERFSTAT	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT")
-#	define ZBX_MUTEX_PERFSTAT_RO	zbx_mutex_create_per_process_name(L"ZBX_MUTEX_PERFSTAT_RO")
 
 typedef wchar_t * zbx_mutex_name_t;
 typedef HANDLE zbx_mutex_t;
 
 #	define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
 #	define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
+
+#	define zbx_mutex_glob_lock(mutex)	zbx_mutex_lock(mutex)
+#	define zbx_mutex_glob_unlock(mutex)	__zbx_mutex_glob_unlock(__FILE__, __LINE__, mutex)
+#	define zbx_mutex_glob_destroy(mutex)	zbx_mutex_destroy(mutex)
 #else	/* not _WINDOWS */
 typedef enum
 {
@@ -182,6 +185,8 @@ void	zbx_mutex_destroy(zbx_mutex_t *mutex);
 
 #ifdef _WINDOWS
 zbx_mutex_name_t	zbx_mutex_create_per_process_name(const zbx_mutex_name_t prefix);
+int			zbx_mutex_glob_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error);
+void			__zbx_mutex_glob_unlock(const char *filename, int line, zbx_mutex_t mutex);
 #endif
 
 #endif	/* ZABBIX_MUTEXS_H */
