@@ -1,0 +1,1 @@
+...G...PS. [ZBX-23221] fixed memory leaks when using certificate-based encryption in Zabbix Agent 1 and Agent 2; thanks to Masato Hirahata for the patch (akozlovs, Andris)
