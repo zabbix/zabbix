@@ -301,6 +301,9 @@ static int validate_userinput(const char *userinput, const char *validator, cons
 {
 	int ret;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userinput:%s, validator:%s, validator_type:" ZBX_FS_UI64,
+			__func__, userinput, validator, validator_type);
+
 	switch (validator_type)
 	{
 		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX:
@@ -312,6 +315,8 @@ static int validate_userinput(const char *userinput, const char *validator, cons
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -325,6 +330,7 @@ static int validate_userinput(const char *userinput, const char *validator, cons
  *              eventid          - [IN] the id of an event                      *
  *              user             - [IN] the user who executes the command       *
  *              clientip         - [IN] the IP of client                        *
+ *              userinput        - [IN] user provided value to the script       *
  *              config_timeout   - [IN]                                         *
  *              config_source_ip - [IN]                                         *
  *              result           - [OUT] the result of a script execution       *
@@ -351,8 +357,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
-			" userid:" ZBX_FS_UI64 " clientip:%s",
-			__func__, scriptid, hostid, eventid, user->userid, clientip);
+			" userid:" ZBX_FS_UI64 " clientip:%s, userinput:%s",
+			__func__, scriptid, hostid, eventid, user->userid, clientip, userinput);
 
 	*error = '\0';
 	memset(&host, 0, sizeof(host));
