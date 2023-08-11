@@ -16,7 +16,7 @@ div.dashboard-widget-navtree {
 		.tree {
 			.tree-list {
 				.margin-lvl {
-					display: inline-block;
+					flex-shrink: 0;
 				}
 
 				&.root > .tree-item > .tree-row > .content > .margin-lvl {
@@ -64,7 +64,7 @@ div.dashboard-widget-navtree {
 			.tree-item {
 				.tree-row {
 					display: flex;
-					align-items: end;
+					align-items: center;
 					justify-content: space-between;
 					min-width: 288px;
 					height: 18px;
@@ -77,6 +77,7 @@ div.dashboard-widget-navtree {
 
 					.content {
 						position: relative;
+						display: flex;
 						min-width: 0;
 
 						.arrow {
@@ -90,6 +91,7 @@ div.dashboard-widget-navtree {
 						}
 
 						> .item-name {
+							height: 14px;
 							white-space: nowrap;
 							overflow: hidden;
 							text-overflow: ellipsis;
