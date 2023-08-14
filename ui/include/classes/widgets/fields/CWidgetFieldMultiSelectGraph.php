@@ -32,8 +32,4 @@ class CWidgetFieldMultiSelectGraph extends CWidgetFieldMultiSelect {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH);
 	}
-
-	public function getInType(): string {
-		return $this->isMultiple() ? '_graphids' : '_graphid';
-	}
 }

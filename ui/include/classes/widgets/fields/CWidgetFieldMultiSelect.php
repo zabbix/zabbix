@@ -71,10 +71,6 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		return $this;
 	}
 
-	public function getInType(): string {
-		return '';
-	}
-
 	public function preventDefault($default_prevented = true): self {
 		if ($default_prevented) {
 			$this->setMultiple(false);

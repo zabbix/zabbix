@@ -32,8 +32,4 @@ class CWidgetFieldMultiSelectHost extends CWidgetFieldMultiSelect {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_HOST);
 	}
-
-	public function getInType(): string {
-		return $this->isMultiple() ? '_hostids' : '_hostid';
-	}
 }

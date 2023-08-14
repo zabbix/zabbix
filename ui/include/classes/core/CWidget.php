@@ -89,6 +89,8 @@ class CWidget extends CModule {
 		/** @var CWidgetField $field */
 		foreach ($form->getFields() as $field) {
 			if (array_key_exists($field->getName(), $in_params)) {
+				$field->setInType($in_params[$field->getName()]['type']);
+
 				if (in_array($in_params[$field->getName()]['type'], ['_host', '_hosts'])) {
 					$field->acceptDashboard();
 				}

@@ -68,7 +68,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 				'add_post_js' => false
 			];
 
-			if (!$this->field->idDefaultPrevented()) {
+			if (!$this->field->isDefaultPrevented()) {
 				if ($this->custom_select) {
 					$options['custom_select'] = true;
 				}
@@ -107,7 +107,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 					'field_value' => $this->field->getValue(),
 					'in_type' => $this->field->getInType(),
 					'object_labels' => $this->getObjectLabels(),
-					'default_prevented' => $this->field->idDefaultPrevented(),
+					'default_prevented' => $this->field->isDefaultPrevented(),
 					'widget_accepted' => $this->field->isWidgetAccepted(),
 					'dashboard_accepted' => $this->field->isDashboardAccepted()
 				]).'

@@ -61,6 +61,8 @@ abstract class CWidgetField {
 	private bool $widget_accepted = false;
 	private bool $dashboard_accepted = false;
 
+	private string $in_type = '';
+
 	/**
 	 * @param string      $name   Field name in form.
 	 * @param string|null $label  Label for the field in form.
@@ -217,7 +219,7 @@ abstract class CWidgetField {
 		return $this;
 	}
 
-	public function idDefaultPrevented(): bool {
+	public function isDefaultPrevented(): bool {
 		return $this->default_prevented;
 	}
 
@@ -260,6 +262,16 @@ abstract class CWidgetField {
 		$this->dashboard_accepted = $dashboard_accepted;
 
 		return $this;
+	}
+
+	public function setInType(string $in_type): self {
+		$this->in_type = $in_type;
+
+		return $this;
+	}
+
+	public function getInType(): string {
+		return $this->in_type;
 	}
 
 	public function getReferences(): array {
