@@ -701,10 +701,12 @@ class CTestDataHelper {
 				return;
 			}
 
-			$ref_start = array_shift($colon_positions) + 1;
-			$ref_end = array_shift($colon_positions) + 1;
+			$colon_start = array_shift($colon_positions);
+			array_shift($colon_positions);
 
-			$ref = substr($object[$property], $ref_start, $ref_end - $ref_start - 1);
+			$ref = $colon_positions
+				? substr($object[$property], $colon_start, reset($colon_positions) - $colon_start - 1)
+				: substr($object[$property], $colon_start);
 
 			if (!array_key_exists($ref, $value)) {
 				return;
@@ -747,6 +749,7 @@ class CTestDataHelper {
 
 		if (is_string(key($params))) {
 			foreach ($ref_fields as $ref_field) {
+				$abc = 1;
 				self::processReference($params, $ref_field);
 			}
 		}
