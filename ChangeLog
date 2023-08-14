@@ -1,9 +1,9 @@
 Changes for 6.0.21rc1
 
 New features:
-.........T [ZBXNEXT-8581] added support HTTP proxy in Azure templates (egordymov)
+.........T [ZBXNEXT-8581] added support for HTTP proxy in Azure templates (egordymov)
 .........T [ZBXNEXT-8558] added MantisBT webhook (abiba)
-.........T [ZBXNEXT-8589] updated documentation, unified metrics names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
+.........T [ZBXNEXT-8589] updated documentation, unified metric names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
 .........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
 ..F....PS. [ZBXNEXT-8190] increased MariaDB maximum supported version to 11.0 (mprihodko)
 ..F....PS. [ZBXNEXT-8582] increased MySQL maximum supported version to 8.1 (mprihodko)
