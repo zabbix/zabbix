@@ -86,6 +86,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'hostids' => $hostids,
 				'evaltype' => $this->fields_values['evaltype'],
 				'tags' => $this->fields_values['tags'],
+				'filter' => ['maintenance_status' => 0],
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -115,12 +116,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
 				$master_entities = $hosts !== null ? $hosts : API::Host()->get([
-						'output' => ['name'],
-						'groupids' => $groupids,
-						'hostids' => $hostids,
-						'monitored_hosts' => true,
-						'preservekeys' => true
-					]);
+					'output' => ['name'],
+					'groupids' => $groupids,
+					'hostids' => $hostids,
+					'filter' => ['maintenance_status' => 0],
+					'monitored_hosts' => true,
+					'preservekeys' => true
+				]);
 
 				$master_entity_values = array_column($master_entities, 'name', 'hostid');
 				break;
@@ -130,6 +132,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'output' => ['name'],
 					'groupids' => $groupids,
 					'hostids' => $hostids,
+					'filter' => ['maintenance_status' => 0],
 					'monitored_hosts' => true,
 					'preservekeys' => true
 				]);
@@ -138,6 +141,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 					[$master_column_index => $this->fields_values['columns'][$master_column_index]['text']],
 					$master_entities
 				)[$master_column_index];
+
+				foreach ($master_entity_values as $key => $value) {
+					if ($value === '') {
+						unset($master_entity_values[$key]);
+						unset($master_entities[$key]);
+					}
+				}
+
 				break;
 		}
 
@@ -162,7 +173,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_max = reset($master_entity_values);
 			}
 			else {
-				asort($master_entity_values, SORT_NATURAL);
+				natcasesort($master_entity_values);
 			}
 		}
 		else {
@@ -173,7 +184,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$master_entities_max = end($master_entity_values);
 			}
 			else {
-				arsort($master_entity_values, SORT_NATURAL);
+				natcasesort($master_entity_values);
+				$master_entity_values = array_reverse($master_entity_values, true);
 			}
 		}
 
