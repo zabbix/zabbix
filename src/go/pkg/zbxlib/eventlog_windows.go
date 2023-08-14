@@ -32,8 +32,7 @@ void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *config_tls, unsigned int a
 		char *PSKIdentity, char *PSKKey, char *CAFile, char *CRLFile, char *CertFile, char *KeyFile,
 		char *ServerCertIssuer, char *ServerCertSubject);
 
-extern int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
-
+int	zbx_config_eventlog_max_lines_per_second = 20;
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
@@ -48,7 +47,8 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, char **error);
+		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
+		int config_buffer_size, int config_eventlog_max_lines_per_second, char **error);
 
 typedef struct
 {
@@ -264,7 +264,9 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
 		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
 		C.zbx_process_value_func_t(procValueFunc), &clastLogsizeSent, ctlsConfig_p,
-		(C.int)(agent.Options.Timeout), nil, nil, &cerrmsg)
+		(C.int)(agent.Options.Timeout), (C.CString)(agent.Options.SourceIP),
+		(C.CString)(agent.Options.Hostname), (C.int)(agent.Options.BufferSend),
+		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_eventlog_max_lines_per_second), &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char
@@ -275,8 +277,8 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 		logTs = item.LastTs
 	}
 	log.Tracef("Calling C function \"get_eventlog_value()\"")
-	for i := 0; C.get_eventlog_value(result, C.int(i), &cvalue, &csource, &clogeventid, &cseverity, &ctimestamp, &cstate,
-		&clastlogsize) != C.FAIL; i++ {
+	for i := 0; C.get_eventlog_value(result, C.int(i), &cvalue, &csource, &clogeventid, &cseverity, &ctimestamp,
+		&cstate, &clastlogsize) != C.FAIL; i++ {
 
 		var value, source string
 		var logeventid, severity, timestamp int
@@ -363,5 +365,5 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 }
 
 func SetEventlogMaxLinesPerSecond(num int) {
-	C.CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = C.int(num)
+	C.zbx_config_eventlog_max_lines_per_second = C.int(num)
 }
