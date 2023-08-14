@@ -625,7 +625,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
-				->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 			$this->query('link', $name)->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -912,7 +912,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
-				->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 			$this->query('link', $name)->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -1053,7 +1053,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
-				->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 			$this->query('link', $name)->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -1070,7 +1070,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$form->selectTab('Macros');
 		$radio_switcher = $this->query('id:show_inherited'.($host_type === 'template' ? '_template' : '').'_macros')
-			->asSegmentedRadio()->waitUntilPresent()->one();
+				->asSegmentedRadio()->waitUntilPresent()->one();
 
 		switch ($data['case']) {
 			case 'Remove macro from Host':
@@ -1215,7 +1215,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
-				->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 			$this->query('link', $name)->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -1280,7 +1280,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else if ($host_type === 'template') {
 			$this->page->login()
-				->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 			$this->query('link', $name)->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -1825,7 +1825,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		}
 		else if ($source === 'templates') {
 			$this->page->login()
-				->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
+					->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 			$this->query('link', $name)->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
