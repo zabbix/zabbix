@@ -34,6 +34,8 @@
 
 /* winevt.h contents START */
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
+
+BOOL WINAPI	EvtClose(EVT_HANDLE Object);
 /* winevt.h contents END */
 
 LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
@@ -73,12 +75,15 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
 		int config_buffer_size, int config_eventlog_max_lines_per_second, char **error)
 {
-	int		rate, ret = FAIL;
-	AGENT_REQUEST	request;
-	const char	*filename, *pattern, *maxlines_persec, *key_severity, *key_source, *key_logeventid, *skip;
-	OSVERSIONINFO	versionInfo;
+	int 			ret = FAIL, rate, max_rate = MAX_VALUE_LINES;
+	AGENT_REQUEST		request;
+	const char		*filename, *pattern, *maxlines_persec, *skip,*key_severity, *key_source,
+				*key_logeventid;
+	OSVERSIONINFO		versionInfo;
+	zbx_vector_prov_meta_t	prov_meta;
 
 	zbx_init_agent_request(&request);
+	zbx_vector_prov_meta_create(&prov_meta);
 
 	if (SUCCEED != zbx_parse_item_key(metric->key, &request))
 	{
@@ -144,11 +149,16 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 		goto out;
 	}
 
+	max_rate *= 0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags) ? MAX_VALUE_LINES_MULTIPLIER : 1;
+
 	if (NULL == (maxlines_persec = get_rparam(&request, 5)) || '\0' == *maxlines_persec)
 	{
 		rate = config_eventlog_max_lines_per_second;
+
+		if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
+			rate *= MAX_VALUE_LINES_MULTIPLIER;
 	}
-	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
+	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || max_rate < rate)
 	{
 		*error = zbx_strdup(*error, "Invalid sixth parameter.");
 		goto out;
@@ -189,7 +199,16 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
 					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
 					config_tls, config_timeout, config_source_ip, config_hostname,
-					config_buffer_send, config_buffer_size, metric, lastlogsize_sent, error);
+					config_buffer_send, config_buffer_size, metric, lastlogsize_sent, &prov_meta,
+					error);
+
+			for (int i = 0; i < prov_meta.values_num; i++)
+			{
+				if (NULL != prov_meta.values[i].handle)
+					EvtClose(prov_meta.values[i].handle);
+
+				zbx_free(prov_meta.values[i].name);
+			}
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -206,6 +225,7 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 				error);
 	}
 out:
+	zbx_vector_prov_meta_destroy(&prov_meta);
 	zbx_free_agent_request(&request);
 
 	return ret;

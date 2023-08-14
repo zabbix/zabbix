@@ -313,6 +313,8 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 		flags |= MetricFlagLogCount | MetricFlagLogLogrt
 	case "eventlog":
 		flags |= MetricFlagLogEventlog
+	case "eventlog.count":
+		flags |= MetricFlagLogCount | MetricFlagLogEventlog
 	default:
 		return nil, errors.New("Unsupported item key.")
 	}

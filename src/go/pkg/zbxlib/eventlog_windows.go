@@ -86,7 +86,12 @@ static void add_eventlog_value(eventlog_result_t *result, const char *value, con
 	eventlog_value_t *log;
 	log = (eventlog_value_t *)zbx_malloc(NULL, sizeof(eventlog_value_t));
 	log->value = zbx_strdup(NULL, value);
-	log->source = zbx_strdup(NULL, source);
+
+	if (NULL != source)
+		log->source = zbx_strdup(NULL, source);
+	else
+		log->source = NULL;
+
 	log->logeventid = logeventid;
 	log->severity = severity;
 	log->timestamp = timestamp;
@@ -111,6 +116,7 @@ static int get_eventlog_value(eventlog_result_t *result, int index, char **value
 	*timestamp = log->timestamp;
 	*state = log->state;
 	*lastlogsize = log->lastlogsize;
+
 	return SUCCEED;
 }
 
@@ -128,18 +134,56 @@ static void free_eventlog_result(eventlog_result_t *result)
 	zbx_free(result);
 }
 
-int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
-		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
-		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
-		unsigned char flags)
+int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
+		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
+		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
+		int config_timeout, const char *config_source_ip)
 {
 	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(host);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(mtime);
+	ZBX_UNUSED(flags);
+	ZBX_UNUSED(config_tls);
+	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(config_source_ip);
 
 	eventlog_result_t *result = (eventlog_result_t *)agent2_result;
 	if (result->values.values_num == result->slots)
 		return FAIL;
 
 	add_eventlog_value(result, value, source, *logeventid, *severity, *timestamp, state, *lastlogsize);
+
+	return SUCCEED;
+}
+int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
+		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
+		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
+		int config_timeout, const char *config_source_ip)
+{
+	ZBX_UNUSED(addrs);
+	ZBX_UNUSED(host);
+	ZBX_UNUSED(key);
+	ZBX_UNUSED(mtime);
+	ZBX_UNUSED(flags);
+	ZBX_UNUSED(config_tls);
+	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(config_source_ip);
+
+	ZBX_UNUSED(source);
+	ZBX_UNUSED(logeventid);
+	ZBX_UNUSED(severity);
+	ZBX_UNUSED(timestamp);
+	ZBX_UNUSED(state);
+
+	eventlog_result_t *result = (eventlog_result_t *)agent2_result;
+	if (result->values.values_num == result->slots)
+		return FAIL;
+
+	add_eventlog_value(result, value, NULL, 0, 0, 0, 0, *lastlogsize);
+
 	return SUCCEED;
 }
 */
@@ -173,7 +217,7 @@ type EventLogResult struct {
 	Mtime          int
 }
 
-func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, cblob unsafe.Pointer) {
+func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, cblob unsafe.Pointer, isCountItem bool) {
 	log.Tracef("Calling C function \"metric_set_refresh()\"")
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
@@ -210,11 +254,16 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 		ctlsConfig_p = &ctlsConfig
 	}
 
+	procValueFunc := C.process_eventlog_value_cb
+	if isCountItem {
+		procValueFunc = C.process_eventlog_count_value_cb
+	}
+
 	var cerrmsg *C.char
 	log.Tracef("Calling C function \"process_eventlog_check()\"")
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
 		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
-		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, ctlsConfig_p,
+		C.zbx_process_value_func_t(procValueFunc), &clastLogsizeSent, ctlsConfig_p,
 		(C.int)(agent.Options.Timeout), (C.CString)(agent.Options.SourceIP),
 		(C.CString)(agent.Options.Hostname), (C.int)(agent.Options.BufferSend),
 		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_eventlog_max_lines_per_second), &cerrmsg)
@@ -235,20 +284,34 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 		var logeventid, severity, timestamp int
 		var r EventLogResult
 		if cstate == C.ITEM_STATE_NORMAL {
-			value = C.GoString(cvalue)
-			source = C.GoString(csource)
-			logeventid = int(clogeventid)
-			severity = int(cseverity)
-			timestamp = int(ctimestamp)
+			if !isCountItem {
+				value = C.GoString(cvalue)
+				source = C.GoString(csource)
+				logeventid = int(clogeventid)
+				severity = int(cseverity)
+				timestamp = int(ctimestamp)
 
-			r = EventLogResult{
-				Value:          &value,
-				EventSource:    &source,
-				EventID:        &logeventid,
-				EventSeverity:  &severity,
-				EventTimestamp: &timestamp,
-				Ts:             logTs,
-				LastLogsize:    uint64(clastlogsize),
+				r = EventLogResult{
+					Value:          &value,
+					EventSource:    &source,
+					EventID:        &logeventid,
+					EventSeverity:  &severity,
+					EventTimestamp: &timestamp,
+					Ts:             logTs,
+					LastLogsize:    uint64(clastlogsize),
+				}
+			} else {
+				value = C.GoString(cvalue)
+
+				r = EventLogResult{
+					Value:          &value,
+					EventSource:    nil,
+					EventID:        nil,
+					EventSeverity:  nil,
+					EventTimestamp: nil,
+					Ts:             logTs,
+					LastLogsize:    uint64(clastlogsize),
+				}
 			}
 
 		} else {

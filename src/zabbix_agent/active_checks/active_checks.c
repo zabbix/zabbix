@@ -212,7 +212,7 @@ static void	free_active_metrics(void)
 	zbx_regexp_clean_expressions(&regexps);
 	zbx_vector_expression_destroy(&regexps);
 
-	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
+	zbx_vector_active_metrics_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
 	zbx_vector_active_metrics_ptr_destroy(&active_metrics);
 
 	zbx_vector_command_result_ptr_clear_ext(&command_results, (zbx_clean_func_t)free_command_result);
@@ -348,8 +348,13 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 		else if (0 == strncmp(metric->key + 3, "rt.count[", 9))		/* logrt.count[ */
 			metric->flags |= ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_COUNT;
 	}
-	else if (0 == strncmp(metric->key, "eventlog[", 9))
-		metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
+	else if (0 == strncmp(metric->key, "eventlog", 8))
+	{
+		if ('[' == metric->key[8])
+			metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
+		else if (0 == strncmp(metric->key + 8, ".count[", 7))
+			metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG | ZBX_METRIC_FLAG_LOG_COUNT;
+	}
 
 	metric->start_time = 0.0;
 	metric->processed_bytes = 0;
