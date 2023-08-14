@@ -55,32 +55,35 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['items'] as $item) {
-	$description = [makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
+	$name = [makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_PROTOTYPE,
 		$data['allowed_ui_conf_templates']
 	)];
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = $item['master_item']['name'];
+			$name[] = $item['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink($item['master_item']['name']))
+			$name[] = (new CLink($item['master_item']['name']))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL)
 				->addClass($item['master_item']['source'] === 'itemprototypes'
 					? 'js-update-itemprototype' : 'js-update-item'
 				)
 				->setAttribute('data-itemid', $item['master_item']['itemid'])
+				->setAttribute('data-parent_discoveryid', $item['master_item']['source'] === 'itemprototypes'
+					? $data['parent_discoveryid']
+					: null)
 				->setAttribute('data-context', $data['context']);
 		}
 
-		$description[] = NAME_DELIMITER;
+		$name[] = NAME_DELIMITER;
 	}
 
-	$description[] = (new CLink($item['name']))
+	$name[] = (new CLink($item['name']))
 		->addClass('js-update-item')
-		->setAttribute('data-context', $data['context'])
-		->setAttribute('data-itemid', $item['itemid']);
+		->setAttribute('data-itemid', $item['itemid'])
+		->setAttribute('data-context', $data['context']);
 
 	$table->addRow([
 		new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']),
@@ -92,7 +95,7 @@ foreach ($data['items'] as $item) {
 					'backurl' => $list_url
 				])
 			),
-		$description,
+		$name,
 		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],

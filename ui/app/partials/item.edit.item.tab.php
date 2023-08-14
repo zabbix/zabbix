@@ -272,8 +272,9 @@ $formgrid = (new CFormGrid())
 						(new CTextBox('headers[value][#{rowNum}]', '#{value}', $data['readonly'], 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-
+						(new CButtonLink(_('Remove')))
+							->addClass('element-table-remove')
+							->setEnabled(!$data['readonly'])
 					]))->addClass('form_row')
 				),
 			]))

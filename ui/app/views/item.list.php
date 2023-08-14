@@ -71,13 +71,12 @@ $now_ts = time();
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
 foreach ($data['items'] as $item) {
-	// Description
-	$description = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
+	$name = makeItemTemplatePrefix($item['itemid'], $data['parent_templates'], ZBX_FLAG_DISCOVERY_NORMAL,
 		$data['allowed_ui_conf_templates']
 	);
 
 	if ($item['discoveryRule']) {
-		$description[] = (new CLink($item['discoveryRule']['name'],
+		$name[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('zabbix.php'))
 				->setArgument('action', 'item.prototype.list')
 				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
@@ -85,15 +84,15 @@ foreach ($data['items'] as $item) {
 		))
 			->addClass(ZBX_STYLE_LINK_ALT)
 			->addClass(ZBX_STYLE_ORANGE);
-		$description[] = NAME_DELIMITER;
+		$name[] = NAME_DELIMITER;
 	}
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = $item['master_item']['name'];
+			$name[] = $item['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink($item['master_item']['name']))
+			$name[] = (new CLink($item['master_item']['name']))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_TEAL)
 				->addClass('js-update-item')
@@ -101,10 +100,10 @@ foreach ($data['items'] as $item) {
 				->setAttribute('data-context', $data['context']);
 		}
 
-		$description[] = NAME_DELIMITER;
+		$name[] = NAME_DELIMITER;
 	}
 
-	$description[] = (new CLink($item['name']))
+	$name[] = (new CLink($item['name']))
 		->addClass('js-update-item')
 		->setAttribute('data-itemid', $item['itemid'])
 		->setAttribute('data-context', $data['context']);
@@ -189,7 +188,7 @@ foreach ($data['items'] as $item) {
 				])
 			),
 		$data['hostid'] != 0 ? null : $item['hosts'][0]['host'],
-		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol($name))->addClass(ZBX_STYLE_WORDBREAK),
 		$item['triggers']
 			? [
 				(new CLinkAction(_('Triggers')))->setHint($hint_table),
