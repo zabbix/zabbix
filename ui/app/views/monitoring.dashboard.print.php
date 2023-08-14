@@ -56,12 +56,37 @@ $this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 
+$dashboard_container = new CDiv();
+
+if (count($data['dashboard']['pages']) >= 2) {
+	foreach ($data['dashboard']['pages'] as $index => $dashboard_page) {
+		$page_number = $index + 1;
+
+		$page_title = (new CDiv())
+			->addItem(
+				new CTag(
+					'h1', true, $dashboard_page['name'] !== '' ? $dashboard_page['name'] : _('Page').' '.$page_number
+				)
+			);
+
+		$dashboard_container
+			->addItem(
+				$page_title
+			)
+			->addItem(
+				(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+			);
+	}
+}
+else {
+	$dashboard_container->addItem(
+		(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+	);
+}
+
 (new CHtmlPage())
-	->addItem(
-		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBOARD)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID))
-	)
+	->setTitle($data['dashboard']['name'])
+	->addItem($dashboard_container)
 	->show();
 
 (new CScriptTag('

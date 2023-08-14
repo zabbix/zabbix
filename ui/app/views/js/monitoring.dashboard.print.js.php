@@ -29,50 +29,48 @@
 		init({dashboard, widget_defaults, time_period}) {
 			timeControl.refreshPage = false;
 
-			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
-				containers: {
-					grid: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_GRID ?>'),
-					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
-					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
-				},
-				buttons: {
-					previous_page: null,
-					next_page: null,
-					slideshow: null
-				},
-				data: {
-					dashboardid: dashboard.dashboardid,
-					name: dashboard.name,
-					userid: null,
-					templateid: null,
-					display_period: dashboard.display_period,
-					auto_start: false
-				},
-				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
-				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-				cell_height: 70,
-				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
-				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
-				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
-				is_editable: false,
-				is_edit_mode: false,
-				can_edit_dashboards: false,
-				is_kiosk_mode: true,
-				time_period: time_period,
-				dynamic_hostid: null
-			});
+			const dashboard_page_containers = document.querySelectorAll('.<?= ZBX_STYLE_DASHBOARD_GRID ?>');
+			let page_number = 0;
 
 			for (const page of dashboard.pages) {
-				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+				const dashboard_page = new CDashboardPage(dashboard_page_containers[page_number], {
+					data: {
+						dashboard_pageid: page.dashboard_pageid,
+						name: page.name,
+						display_period: page.display_period
+					},
+					dashboard: {
+						templateid: null,
+						dashboardid: dashboard.dashboardid
+					},
+					cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
+					cell_height: 70,
+					max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
+					max_rows: <?= DASHBOARD_MAX_ROWS ?>,
+					widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+					widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+					widget_defaults: widget_defaults,
+					is_editable: false,
+					is_edit_mode: false,
+					can_edit_dashboards: false,
+					time_period: time_period,
+					dynamic_hostid: null,
+					unique_id: page.dashboard_pageid
+				});
+
+				for (const widget_data of page.widgets) {
+					dashboard_page.addWidget({
+						...widget_data,
+						is_new: false,
+						unique_id: widget_data.widgetid
+					});
 				}
 
-				ZABBIX.Dashboard.addDashboardPage(page);
-			}
+				dashboard_page.start();
+				dashboard_page.activate();
 
-			ZABBIX.Dashboard.activate();
+				page_number = page_number + 1;
+			}
 		}
 	}
 </script>
