@@ -68,10 +68,21 @@ class CControllerPopupLldOverride extends CController {
 			'stop' => $this->getInput('stop', 0),
 			'overrides_evaltype' => $this->getInput('overrides_evaltype', CONDITION_EVAL_TYPE_AND_OR),
 			'overrides_formula' => $this->getInput('overrides_formula', ''),
-			'overrides_filters' => $this->getInput('overrides_filters', []),
+			'overrides_filters' => $this->getInput('overrides_filters', [[
+				'macro' => '',
+				'operator' => CONDITION_OPERATOR_REGEXP,
+				'value' => '',
+				'formulaid' => num2letter(0)
+			]]),
 			'operations' => $this->getInput('operations', []),
 			'overrides_names' => $this->getInput('overrides_names', [])
 		];
+
+		if (!$this->hasInput('validate')) {
+			$page_options['overrides_filters'] = sortLldRuleFilterConditions($page_options['overrides_filters'],
+				$page_options['overrides_evaltype']
+			);
+		}
 
 		if ($this->hasInput('validate')) {
 			if ($page_options['name'] === '') {

@@ -2041,8 +2041,6 @@ function prepareLldMacroPaths(array $macro_paths): array {
  * @return array
  */
 function prepareLldFilter(array $filter): array {
-	ksort($filter['conditions']);
-
 	foreach ($filter['conditions'] as $i => &$condition) {
 		if ($condition['macro'] === '' && $condition['value'] === '') {
 			unset($filter['conditions'][$i]);
@@ -2057,7 +2055,7 @@ function prepareLldFilter(array $filter): array {
 	}
 	unset($condition);
 
-	$filter['conditions'] = array_values($filter['conditions']);
+	$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
 
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
 		$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
