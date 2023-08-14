@@ -173,6 +173,7 @@
 				})
 				.finally(() => {
 					tag_filter_form_field.classList.remove('is-loading');
+					document.dispatchEvent(new Event('tab-indicator-update'));
 			});
 		}
 	};
