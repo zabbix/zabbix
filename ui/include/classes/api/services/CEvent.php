@@ -436,9 +436,9 @@ class CEvent extends CApiService {
 		if (count($acknowledge_actions) > 1) {
 			$sql_parts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
-					' FROM acknowledges ack'.
-					' WHERE '.implode(' AND ', $acknowledge_actions).
-				')';
+				' FROM acknowledges ack'.
+				' WHERE '.implode(' AND ', $acknowledge_actions).
+			')';
 		}
 
 		// suppressed
