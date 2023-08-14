@@ -40,6 +40,8 @@ class CDashboard {
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
+	#edit_widget_cache = null;
+
 	constructor(target, {
 		containers,
 		buttons,
@@ -119,15 +121,10 @@ class CDashboard {
 
 		this._unique_id_index = 0;
 
-		this._new_widget_dashboard_page = null;
-		this._new_widget_pos = null;
-		this._new_widget_pos_reserved = null;
-
 		this._warning_message_box = null;
 
 		this._reserve_header_lines = 0;
 		this._reserve_header_lines_timeout_id = null;
-		this._is_edit_widget_properties_cancel_subscribed = false;
 
 		this._header_lines_steady_period = 2000;
 
@@ -1282,7 +1279,7 @@ class CDashboard {
 	editWidgetProperties(properties = {}, {new_widget_pos = null} = {}) {
 		this._clearWarnings();
 
-		if (properties.type === undefined) {
+		if (!('type' in properties)) {
 			properties.type = this._widget_last_type;
 
 			if (properties.type === null) {
@@ -1290,6 +1287,18 @@ class CDashboard {
 
 				return;
 			}
+		}
+
+		this.#edit_widget_cache = {
+			type: properties.type
+		};
+
+		if ('unique_id' in properties && 'dashboard_page_unique_id' in properties) {
+			this.#edit_widget_cache.unique_id = properties.unique_id;
+			this.#edit_widget_cache.dashboard_page_unique_id = properties.dashboard_page_unique_id;
+		}
+		else {
+			this.#edit_widget_cache.new_widget_dashboard_page = this._selected_dashboard_page;
 		}
 
 		const overlay = PopUp(`widget.${properties.type}.edit`, {
@@ -1302,37 +1311,39 @@ class CDashboard {
 
 		overlay.xhr.then(() => {
 			const form = overlay.$dialogue.$body[0].querySelector('form');
-			const original_properties = overlay.data.original_properties;
 
-			if (original_properties.unique_id === null) {
-				this._new_widget_dashboard_page = this._selected_dashboard_page;
-				this._new_widget_pos = new_widget_pos;
+			if (!('unique_id' in properties) || !('dashboard_page_unique_id' in properties)) {
+				this.#edit_widget_cache.new_widget_pos = new_widget_pos;
 
-				const default_widget_size = this._widget_defaults[original_properties.type].size;
+				const default_widget_size = this._widget_defaults[properties.type].size;
 
-				if (this._new_widget_pos === null) {
-					this._new_widget_pos_reserved = this._new_widget_dashboard_page.findFreePos(default_widget_size);
+				if (new_widget_pos === null) {
+					this.#edit_widget_cache.new_widget_pos_reserved =
+						this.#edit_widget_cache.new_widget_dashboard_page.findFreePos(default_widget_size);
 				}
 				else {
-					this._new_widget_pos_reserved = {
+					this.#edit_widget_cache.new_widget_pos_reserved = {
 						...default_widget_size,
-						...this._new_widget_pos
+						...new_widget_pos
 					};
 
-					this._new_widget_pos_reserved.width = Math.min(this._new_widget_pos_reserved.width,
-						this._max_columns - this._new_widget_pos_reserved.x
+					this.#edit_widget_cache.new_widget_pos_reserved.width = Math.min(
+						this.#edit_widget_cache.new_widget_pos_reserved.width,
+						this._max_columns - this.#edit_widget_cache.new_widget_pos_reserved.x
 					);
 
-					this._new_widget_pos_reserved.height = Math.min(this._new_widget_pos_reserved.height,
-						this._max_rows - this._new_widget_pos_reserved.y
+					this.#edit_widget_cache.new_widget_pos_reserved.height = Math.min(
+						this.#edit_widget_cache.new_widget_pos_reserved.height,
+						this._max_rows - this.#edit_widget_cache.new_widget_pos_reserved.y
 					);
 
-					this._new_widget_pos_reserved = this._new_widget_dashboard_page.accommodatePos(
-						this._new_widget_pos_reserved
-					);
+					this.#edit_widget_cache.new_widget_pos_reserved =
+						this.#edit_widget_cache.new_widget_dashboard_page.accommodatePos(
+							this.#edit_widget_cache.new_widget_pos_reserved
+						);
 				}
 
-				if (this._new_widget_pos_reserved === null) {
+				if (this.#edit_widget_cache.new_widget_pos_reserved === null) {
 					for (const el of form.parentNode.children) {
 						if (el.matches('.msg-warning')) {
 							el.parentNode.removeChild(el);
@@ -1373,13 +1384,8 @@ class CDashboard {
 			}
 		});
 
-		if (!this._is_edit_widget_properties_cancel_subscribed) {
-			this._is_edit_widget_properties_cancel_subscribed = true;
-
-			overlay.$dialogue[0].addEventListener('overlay.close', this._events.editWidgetPropertiesCancel,
-				{once: true}
-			);
-		}
+		overlay.$dialogue[0].removeEventListener('overlay.close', this._events.editWidgetPropertiesClose);
+		overlay.$dialogue[0].addEventListener('overlay.close', this._events.editWidgetPropertiesClose, {once: true});
 	}
 
 	reloadWidgetProperties() {
@@ -1388,12 +1394,10 @@ class CDashboard {
 		const fields = getFormFields(form);
 
 		const properties = {
-			type: fields.type,
-			unique_id: overlay.data.original_properties.unique_id ?? undefined,
-			dashboard_page_unique_id: overlay.data.original_properties.dashboard_page_unique_id ?? undefined
+			type: fields.type
 		};
 
-		if (properties.type === overlay.data.original_properties.type) {
+		if (properties.type === this.#edit_widget_cache.type) {
 			properties.name = fields.name;
 			properties.view_mode = fields.show_header === '1'
 				? ZBX_WIDGET_VIEW_MODE_NORMAL
@@ -1406,9 +1410,17 @@ class CDashboard {
 			properties.fields = fields;
 		}
 
-		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.reload'));
+		let new_widget_pos = null;
 
-		this.editWidgetProperties(properties, {new_widget_pos: this._new_widget_pos});
+		if ('unique_id' in this.#edit_widget_cache && 'dashboard_page_unique_id' in this.#edit_widget_cache) {
+			properties.unique_id = this.#edit_widget_cache.unique_id;
+			properties.dashboard_page_unique_id = this.#edit_widget_cache.dashboard_page_unique_id;
+		}
+		else {
+			new_widget_pos = this.#edit_widget_cache.new_widget_pos;
+		}
+
+		this.editWidgetProperties(properties, {new_widget_pos});
 	}
 
 	applyWidgetProperties() {
@@ -1427,13 +1439,13 @@ class CDashboard {
 		delete fields.name;
 		delete fields.show_header;
 
-		const dashboard_page = overlay.data.original_properties.dashboard_page_unique_id !== null
-			? this.getDashboardPage(overlay.data.original_properties.dashboard_page_unique_id)
-			: null;
+		let dashboard_page = null;
+		let widget = null;
 
-		const widget = dashboard_page !== null
-			? dashboard_page.getWidget(overlay.data.original_properties.unique_id)
-			: null;
+		if ('unique_id' in this.#edit_widget_cache && 'dashboard_page_unique_id' in this.#edit_widget_cache) {
+			dashboard_page = this.getDashboardPage(this.#edit_widget_cache.dashboard_page_unique_id);
+			widget = dashboard_page.getWidget(this.#edit_widget_cache.unique_id);
+		}
 
 		const busy_condition = this._createBusyCondition();
 
@@ -1466,20 +1478,22 @@ class CDashboard {
 					fields,
 					fields_references,
 					widgetid: null,
-					pos: widget === null ? this._new_widget_pos_reserved : widget.getPos(),
+					pos: widget === null ? this.#edit_widget_cache.new_widget_pos_reserved : widget.getPos(),
 					is_new: widget === null,
 					rf_rate: 0,
 					unique_id: this._createUniqueId()
 				};
 
 				if (widget === null) {
-					this._new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
+					if (this.#edit_widget_cache.new_widget_dashboard_page.getState()
+							=== DASHBOARD_PAGE_STATE_DESTROYED) {
+						return;
+					}
+
+					this.#edit_widget_cache.new_widget_dashboard_page.promiseScrollIntoView(widget_data.pos)
 						.then(() => {
-							this._new_widget_dashboard_page.addWidgetFromData(widget_data);
-							this._new_widget_dashboard_page.resetWidgetPlaceholder();
-							this._new_widget_dashboard_page = null;
-							this._new_widget_pos = null;
-							this._new_widget_pos_reserved = null;
+							this.#edit_widget_cache.new_widget_dashboard_page.addWidgetFromData(widget_data);
+							this.#edit_widget_cache.new_widget_dashboard_page.resetWidgetPlaceholder();
 						});
 				}
 				else {
@@ -1530,8 +1544,22 @@ class CDashboard {
 			});
 	}
 
+	getEditingWidgetContext() {
+		if ('unique_id' in this.#edit_widget_cache && 'dashboard_page_unique_id' in this.#edit_widget_cache) {
+			return {
+				unique_id: this.#edit_widget_cache.unique_id,
+				dashboard_page_unique_id: this.#edit_widget_cache.dashboard_page_unique_id
+			};
+		}
+
+		return {
+			unique_id: null,
+			dashboard_page_unique_id: this.#edit_widget_cache.new_widget_dashboard_page.getUniqueId()
+		};
+	}
+
 	_isEditingWidgetProperties() {
-		return this._is_edit_widget_properties_cancel_subscribed;
+		return overlays_stack.getById('widget_properties') !== undefined;
 	}
 
 	_promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}) {
@@ -1552,10 +1580,6 @@ class CDashboard {
 
 				return response;
 			});
-	}
-
-	_cancelEditingWidgetProperties() {
-		this._selected_dashboard_page.resetWidgetPlaceholder();
 	}
 
 	_getDashboardPageActionsContextMenu(dashboard_page) {
@@ -1914,6 +1938,59 @@ class CDashboard {
 		}
 	}
 
+	getReferableWidgets({type, widget_context: {dashboard_page_unique_id, unique_id = null}}) {
+		const dashboard_page = this.getDashboardPage(dashboard_page_unique_id);
+
+		const widgets_with_reference = new Map();
+
+		for (const widget of dashboard_page.getWidgets()) {
+			if ('reference' in widget.getFields()) {
+				widgets_with_reference.set(widget.getUniqueId(), widget);
+			}
+		}
+
+		const referable_widgets = new Set();
+
+		for (const widget of widgets_with_reference.values()) {
+			for (const out of this._widget_defaults[widget.getType()].out) {
+				if (out.type === type) {
+					referable_widgets.add(widget);
+
+					break;
+				}
+			}
+		}
+
+		if (unique_id !== null && widgets_with_reference.has(unique_id)) {
+			referable_widgets.delete(widgets_with_reference.get(unique_id));
+
+			let circular_references = new Set([widgets_with_reference.get(unique_id).getFields().reference]);
+
+			while (circular_references.size > 0) {
+				let circular_references_next = new Set();
+
+				for (const widget of widgets_with_reference.values()) {
+					const fields = widget.getFields();
+					const fields_references = widget.getFieldsReferences();
+
+					for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields, fields_references)) {
+						if (circular_references.has(accessor.getReference())) {
+							circular_references_next.add(fields.reference);
+
+							referable_widgets.delete(widget);
+
+							break;
+						}
+					}
+				}
+
+				circular_references = circular_references_next;
+			}
+		}
+
+		return [...referable_widgets];
+	}
+
 	// Internal events management methods.
 
 	#registerEvents() {
@@ -2177,10 +2254,8 @@ class CDashboard {
 				}
 			},
 
-			editWidgetPropertiesCancel: () => {
-				this._cancelEditingWidgetProperties();
-
-				this._is_edit_widget_properties_cancel_subscribed = false;
+			editWidgetPropertiesClose: () => {
+				this._selected_dashboard_page.resetWidgetPlaceholder();
 			}
 		};
 	}

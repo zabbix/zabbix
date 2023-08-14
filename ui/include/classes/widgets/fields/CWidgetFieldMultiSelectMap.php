@@ -32,4 +32,8 @@ class CWidgetFieldMultiSelectMap extends CWidgetFieldMultiSelect {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
 	}
+
+	public function getInType(): string {
+		return $this->isMultiple() ? '_mapids' : '_mapid';
+	}
 }

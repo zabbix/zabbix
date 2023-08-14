@@ -32,4 +32,8 @@ class CWidgetFieldMultiSelectItem extends CWidgetFieldMultiSelect {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_ITEM);
 	}
+
+	public function getInType(): string {
+		return $this->isMultiple() ? '_itemids' : '_itemid';
+	}
 }

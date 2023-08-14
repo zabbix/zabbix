@@ -182,14 +182,7 @@ class CWidgetFormView {
 			],
 			'doc_url' => $this->data['url'] === ''
 				? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
-				: $this->data['url'],
-			'data' => [
-				'original_properties' => [
-					'type' => $this->data['type'],
-					'unique_id' => $this->data['unique_id'],
-					'dashboard_page_unique_id' => $this->data['dashboard_page_unique_id']
-				]
-			]
+				: $this->data['url']
 		];
 
 		if ($error = get_and_clear_messages()) {

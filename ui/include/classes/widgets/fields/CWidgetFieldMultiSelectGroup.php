@@ -32,4 +32,8 @@ class CWidgetFieldMultiSelectGroup extends CWidgetFieldMultiSelect {
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GROUP);
 	}
+
+	public function getInType(): string {
+		return $this->isMultiple() ? '_groupids' : '_groupid';
+	}
 }

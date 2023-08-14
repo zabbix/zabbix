@@ -44,6 +44,13 @@ class CWidgetFieldMultiselect {
 	#labels;
 
 	/**
+	 * Data type accepted from referred data sources.
+	 *
+	 * @type {string}
+	 */
+	#in_type;
+
+	/**
 	 * @type {string|null}
 	 */
 	#selected_reference = null;
@@ -76,6 +83,7 @@ class CWidgetFieldMultiselect {
 	constructor(element, multiselect_params, {
 		field_name,
 		field_value,
+		in_type,
 		object_labels,
 		default_prevented,
 		widget_accepted,
@@ -83,6 +91,7 @@ class CWidgetFieldMultiselect {
 	}) {
 		this.#name = field_name;
 		this.#labels = object_labels;
+		this.#in_type = in_type;
 		this.#default_prevented = default_prevented;
 		this.#widget_accepted = widget_accepted;
 		this.#dashboard_accepted = dashboard_accepted;
@@ -155,7 +164,7 @@ class CWidgetFieldMultiselect {
 			document.getElementById(`${this.#name}-reference-table-tmpl`).innerHTML
 		).evaluateToElement();
 
-		const widgets = this.DASHBOARD_getWidgets();
+		const widgets = this.#getWidgets();
 
 		let rows_html = '';
 
@@ -201,7 +210,7 @@ class CWidgetFieldMultiselect {
 			caption = {id: 'DASHBOARD', name: t('Dashboard')}
 		}
 		else {
-			for (const widget of this.DASHBOARD_getWidgets()) {
+			for (const widget of this.#getWidgets()) {
 				if (widget.id === reference) {
 					caption = widget
 					break;
@@ -251,7 +260,7 @@ class CWidgetFieldMultiselect {
 
 		if (this.#widget_accepted) {
 			const widgets = [];
-			for (const widget of this.DASHBOARD_getWidgets()) {
+			for (const widget of this.#getWidgets()) {
 				if (widget.name.toLowerCase().includes(search)) {
 					widgets.push({...widget, source: 'widget'});
 				}
@@ -276,12 +285,21 @@ class CWidgetFieldMultiselect {
 		return result_entities;
 	}
 
+	#getWidgets() {
+		const widgets = ZABBIX.Dashboard.getReferableWidgets({
+			type: this.#in_type,
+			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+		});
 
-	DASHBOARD_getWidgets() {
-		return [
-			{id: 'DD56KD', prefix: 'Page1'+': ', name: 'URL'},
-			{id: 'AFG87E', prefix: 'Page1'+': ', name: 'Problems'},
-			{id: '67AFCB', prefix: 'Page2'+': ', name: 'Problems'}
-		];
+		const result = [];
+
+		for (const widget of widgets) {
+			result.push({
+				id: widget.getFields().reference,
+				name: widget.getHeaderName()
+			});
+		}
+
+		return result;
 	}
 }

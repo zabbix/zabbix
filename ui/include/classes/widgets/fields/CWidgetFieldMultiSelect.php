@@ -71,12 +71,29 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		return $this;
 	}
 
+	public function getInType(): string {
+		return '';
+	}
+
 	public function preventDefault($default_prevented = true): self {
 		if ($default_prevented) {
 			$this->setMultiple(false);
 		}
 
 		return parent::preventDefault($default_prevented);
+	}
+
+	public function getReferences(): array {
+		$value = $this->getValue();
+
+		if (is_array($value) && array_key_exists('reference', $value)) {
+			return [[
+				'path' => ['reference'],
+				'type' => $this->getInType()
+			]];
+		}
+
+		return [];
 	}
 
 	protected function getValidationRules(): array {
@@ -94,17 +111,15 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
-		if ($value !== $this->default) {
-			if (is_array($value) && array_key_exists('reference', $value)) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'[reference]',
-					'value' => $value['reference']
-				];
-			}
-			else {
-				parent::toApi($widget_fields);
-			}
+		if (is_array($value) && array_key_exists('reference', $value)) {
+			$widget_fields[] = [
+				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+				'name' => $this->name.'[reference]',
+				'value' => $value['reference']
+			];
+		}
+		else {
+			parent::toApi($widget_fields);
 		}
 	}
 }

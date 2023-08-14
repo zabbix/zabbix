@@ -34,6 +34,10 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		$this->field = $field;
 	}
 
+	abstract protected function getObjectName(): string;
+
+	abstract protected function getObjectLabels(): array;
+
 	public function getId(): string {
 		return $this->getMultiselect()->getId();
 	}
@@ -101,6 +105,7 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 				'.json_encode([
 					'field_name' => $this->field->getName(),
 					'field_value' => $this->field->getValue(),
+					'in_type' => $this->field->getInType(),
 					'object_labels' => $this->getObjectLabels(),
 					'default_prevented' => $this->field->idDefaultPrevented(),
 					'widget_accepted' => $this->field->isWidgetAccepted(),
