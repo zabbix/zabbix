@@ -124,26 +124,38 @@ class CControllerUsergroupUpdate extends CController {
 	 *
 	 * @return array
 	 */
-	private function processRights($groupId_key, $permission_key) {
+	private function processRights($groupid_key, $permission_key) {
 		$rights = [];
-		$processed_rights = [];
-		$this->getInputs($rights, [$groupId_key, $permission_key]);
+		$this->getInputs($rights, [$groupid_key, $permission_key]);
 
-		$groupIds = $rights[$groupId_key]['groupids'] ?? [];
+		$groupids = $rights[$groupid_key]['groupids'] ?? [];
 		$permissions = $rights[$permission_key]['permission'] ?? [];
 
-		foreach ($groupIds as $index => $group) {
-			foreach ($group as $groupId) {
+		$processed_rights = [];
+		$unique_rights = [];
+
+		foreach ($groupids as $index => $group) {
+			foreach ($group as $groupid) {
 				$permission = $permissions[$index] ?? PERM_DENY;
 
-				if ($groupId !== '0') {
-					$processed_rights[] = [
-						'id' => (string) $groupId,
-						'permission' => $permission
-					];
+				if ($groupid !== '0') {
+					// If duplicates submitted, saves the one with most strict permission type.
+					if (!isset($unique_rights[$groupid])) {
+						$unique_rights[$groupid] = $permission;
+					} else {
+						$unique_rights[$groupid] = min($unique_rights[$groupid], $permission);
+					}
 				}
 			}
 		}
+
+		foreach ($unique_rights as $groupid => $permission) {
+			$processed_rights[] = [
+				'id' => (string) $groupid,
+				'permission' => $permission
+			];
+		}
+
 		return $processed_rights;
 	}
 }
