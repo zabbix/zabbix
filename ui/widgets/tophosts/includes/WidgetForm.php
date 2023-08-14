@@ -85,9 +85,36 @@ class WidgetForm extends CWidgetForm {
 			}
 		}
 
+		$host_name_empty_count = 0;
+
 		if (array_key_exists('columns', $values)) {
 			foreach ($values['columns'] as $key => $value) {
-				$this->field_column_values[$key] = $value['name'] === '' ? $value['item'] : $value['name'];
+				sdff($value, '/home/test/work/logs/zabbix.log');
+				switch ($value['data']) {
+					case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+						$this->field_column_values[$key] = $value['name'] === '' ? $value['item'] : $value['name'];
+						break;
+
+					case CWidgetFieldColumnsList::DATA_HOST_NAME:
+						if ($value['name'] === '') {
+							if ($host_name_empty_count == 0) {
+								$this->field_column_values[$key] = 'Host name';
+							}
+							else {
+								$this->field_column_values[$key] = 'Host name '.$host_name_empty_count;
+							}
+
+							$host_name_empty_count++;
+						} else {
+							$this->field_column_values[$key] = $value['name'];
+						}
+
+						break;
+
+					case CWidgetFieldColumnsList::DATA_TEXT:
+						$this->field_column_values[$key] = $value['name'] === '' ? $value['name'] : $value['text'];
+						break;
+				}
 			}
 		}
 
