@@ -1300,7 +1300,7 @@ class testFormNetworkDiscovery extends CWebTest {
 							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
 						]
 					]
-					// TODO: Change expected_radios to commented lines when ZBX-23252 is fixed.
+					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed.
 //					'expected_radios' => [
 //						'Device uniqueness criteria' => [
 //							'IP address' => false,
@@ -1366,7 +1366,7 @@ class testFormNetworkDiscovery extends CWebTest {
 							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
 						]
 					],
-					// TODO: Change expected_radios to commented lines when ZBX-23252 is fixed.
+					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed.
 //					'expected_radios' => [
 //						'Device uniqueness criteria' => [
 //							'IP address' => false,
@@ -1422,7 +1422,7 @@ class testFormNetworkDiscovery extends CWebTest {
 							'SNMPv1 agent (200) "new test SNMP OID"' => false
 						]
 					]
-					// TODO: Change expected_radios to commented lines when ZBX-23252 is fixed.
+					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed.
 //					'expected_radios' => [
 //						'Device uniqueness criteria' => [
 //							'SNMPv1 agent (200) "new test SNMP OID"' => false

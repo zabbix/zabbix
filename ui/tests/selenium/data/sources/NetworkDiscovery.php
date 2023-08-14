@@ -87,7 +87,7 @@ class NetworkDiscovery {
 						'snmp_community'=> 'test SNMP community',
 						'host_source' => 1,
 						'name_source' => 0
-						// TODO: Change host_source and name_source to commented lines when ZBX-23252 is fixed.
+						// TODO: Change host_source and name_source to commented lines when ZBX-23088 is fixed.
 						//'host_source' => 3,
 						//'name_source' => 2
 					],
@@ -99,7 +99,7 @@ class NetworkDiscovery {
 						'snmpv3_securityname' => 'test_security_name',
 						'snmpv3_securitylevel' => 0,
 						'host_source' => 1,
-						// TODO: Change  name_source to commented line when ZBX-23252 is fixed.
+						// TODO: Change  name_source to commented line when ZBX-23088 is fixed.
 						//'name_source' => 2
 						'name_source' => 0,
 						'uniq' => 1
@@ -108,7 +108,7 @@ class NetworkDiscovery {
 						'type' => SVC_TELNET,
 						'ports' => 23,
 						'host_source' => 1,
-						// TODO: Change  name_source to commented line when ZBX-23252 is fixed.
+						// TODO: Change  name_source to commented line when ZBX-23088 is fixed.
 						//'name_source' => 2
 						'name_source' => 0
 					]
