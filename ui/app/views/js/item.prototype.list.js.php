@@ -25,8 +25,9 @@
 ?>
 <script>
 	const view = new class {
-		init({form_name, token, confirm_messages}) {
+		init({form_name, token, confirm_messages, context}) {
 			this.token = token;
+			this.context = context;
 			this.form = document.forms[form_name];
 			this.confirm_messages = confirm_messages;
 
@@ -44,19 +45,19 @@
 					this.#edit(target, target.dataset);
 				}
 				else if (target.matches('.js-enable-item')) {
-					this.#enable(null, {itemids: [target.dataset.itemid], field: target.dataset.field});
+					this.#enable(null, {...target.dataset, itemids: [target.dataset.itemid]});
 				}
 				else if (target.matches('.js-disable-item')) {
-					this.#disable(null, {itemids: [target.dataset.itemid], field: target.dataset.field});
+					this.#disable(null, {...target.dataset, itemids: [target.dataset.itemid]});
 				}
 				else if (target.matches('.js-massenable-item')) {
-					this.#enable(target, {itemids: selectedids, field: 'status'});
+					this.#enable(target, {itemids: selectedids, context: this.context, field: 'status'});
 				}
 				else if (target.matches('.js-massdisable-item')) {
-					this.#disable(target, {itemids: selectedids, field: 'status'});
+					this.#disable(target, {itemids: selectedids, context: this.context, field: 'status'});
 				}
 				else if (target.matches('.js-massdelete-item')) {
-					this.#delete(target, {itemids: selectedids});
+					this.#delete(target, {itemids: selectedids, context: this.context});
 				}
 			});
 		}

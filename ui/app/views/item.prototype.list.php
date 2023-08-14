@@ -107,14 +107,14 @@ foreach ($data['items'] as $item) {
 			->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
 			->setAttribute('data-itemid', $item['itemid'])
 			->setAttribute('data-field', 'status')
-			->setAttribute('context', $data['context']),
+			->setAttribute('data-context', $data['context']),
 		(new CLink(($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER) ? _('No') : _('Yes')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 			->addClass($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER ? 'js-enable-item' : 'js-disable-item')
 			->setAttribute('data-itemid', $item['itemid'])
 			->setAttribute('data-field', 'discover')
-			->setAttribute('context', $data['context']),
+			->setAttribute('data-context', $data['context']),
 		$data['tags'][$item['itemid']]
 	]);
 }
@@ -188,6 +188,7 @@ $confirm_messages = [
 				'value' => CCsrfTokenHelper::get('item')
 			],
 			'confirm_messages' => $confirm_messages,
+			'context' => $data['context'],
 			'form_name' => $form->getName()
 		]).');
 	'))

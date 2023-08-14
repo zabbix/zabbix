@@ -27,6 +27,7 @@ class CControllerItemPrototypeDelete extends CControllerItemPrototype {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'context'	=> 'required|in host,template',
 			'itemids'	=> 'required|array_id'
 		];
 

@@ -27,6 +27,7 @@ class CControllerItemPrototypeDisable extends CControllerItemPrototype {
 
 	protected function checkInput(): bool {
 		$fields = [
+			'context'	=> 'required|in host,template',
 			'field'		=> 'required|in status,discover',
 			'itemids'	=> 'required|array_id'
 		];

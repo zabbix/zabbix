@@ -27,7 +27,8 @@ class CControllerItemDelete extends CControllerItem {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemids' => 'required|array_id'
+			'context'	=> 'required|in host,template',
+			'itemids'	=> 'required|array_id'
 		];
 
 		$ret = $this->validateInput($fields);

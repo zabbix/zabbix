@@ -22,6 +22,10 @@
 abstract class CControllerItemPrototype extends CController {
 
 	protected function checkPermissions(): bool {
+		if (!$this->hasInput('context')) {
+			return false;
+		}
+
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
