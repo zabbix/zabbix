@@ -96,7 +96,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 					$existing_tag_filters = [['tag' => '', 'value' => '']];
 				}
 
-				// If the existing tag is not found in the new tags list, remove it.
 				if ($filter_type == TAG_FILTER_LIST) {
 					foreach ($existing_tag_filters as $key => $existing_tag_filter) {
 						if ($existing_tag_filter['tag'] === '') {
@@ -113,8 +112,8 @@ class CControllerUsergroupTagFilterCheck extends CController {
 									break;
 								}
 							}
-
-							if (!$is_still_present) {
+							// If the existing tag is not found in the new tags list, remove it (only from the host group which was open for editing).
+							if (!$is_still_present && $groupid == $this->getInput('groupid')) {
 								unset($existing_tag_filters[$key]);
 							}
 						}
