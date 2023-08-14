@@ -45,10 +45,11 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	public function doAction() {
 		$form_refresh = $this->hasInput('form_refresh');
-		$host = $this->getInput('context') === 'host' ? $this->getHost() : $this->getTemplate();
 		$form = $form_refresh || !$this->hasInput('itemid') ? $this->getInputForForm() : $this->getItem();
+		$itemid = $this->hasInput('itemid') ? $this->getInput('itemid') : $this->getInput('parent_discoveryid');
+		$host = $this->getInput('context') === 'host' ? $this->getHost($itemid) : $this->getTemplate($itemid);
+		$form['hostid'] = $host['hostid'];
 		$data = [
-			'action' => $this->getAction(),
 			'readonly' => false,
 			'host' => $host,
 			'valuemap' => [],
@@ -74,6 +75,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			],
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
+		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 
 		if ($data['form']['valuemapid']) {
 			$valuemaps = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
@@ -99,6 +101,38 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			$data['master_item'] = $master_items ? reset($master_items) : [];
 		}
 
+		if ($data['form']['itemid']) {
+			$item = [
+				'itemid' => $data['form']['itemid'],
+				'templateid' => $data['form']['templateid']
+			];
+			$data['parent_items'] = makeItemTemplatesHtml(
+				$item['itemid'],
+				getItemParentTemplates([$item], ZBX_FLAG_DISCOVERY_PROTOTYPE),
+				ZBX_FLAG_DISCOVERY_PROTOTYPE,
+				$this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
+			[$db_item] = API::ItemPrototype()->get([
+				'output' => ['flags'],
+				'selectDiscoveryRule' => ['name', 'templateid'],
+				'itemids' => [$data['form']['itemid']]
+			]);
+
+			if ($db_item) {
+				$data['flags'] = $db_item['flags'];
+				$data['discovery_rule'] = $db_item['discoveryRule'];
+			}
+		}
+
+		if ($this->getInput('show_inherited_tags', 0)) {
+			$data['form']['tags'] = CItemPrototypeHelper::getTagsWithInherited([
+				'item' => $data['form'] + ['discoveryRule' => $data['discovery_rule']],
+				'itemid' => $data['form']['itemid'],
+				'tags' => $data['form']['tags'],
+				'hostid' => [$host['hostid']]
+			]);
+		}
+
 		$data['value_type_keys'] = [];
 		$key_value_type = CItemData::getValueTypeByKey();
 		foreach (CItemData::getKeysByItemType() as $type => $keys) {
@@ -120,14 +154,14 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 
 	/**
 	 * Get host data.
+	 *
+	 * @param int $itemid  Item prototype or it discovery rule id.
 	 */
-	protected function getHost(): array {
+	protected function getHost($itemid): array {
 		[$host] = API::Host()->get([
 			'output' => ['hostid', 'name', 'flags', 'status'],
 			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
-			'itemids' => $this->hasInput('parent_discoveryid')
-				? $this->getInput('parent_discoveryid')
-				: $this->getInput('itemid')
+			'itemids' => [$itemid]
 		]);
 
 		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
@@ -143,14 +177,12 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 	/**
 	 * Get template data.
 	 *
-	 * @param string $templateid
+	 * @param int $itemid  Item prototype or it discovery rule id.
 	 */
-	protected function getTemplate(): array {
+	protected function getTemplate($itemid): array {
 		[$template] = API::Template()->get([
 			'output' => ['templateid', 'name', 'flags'],
-			'itemids' => $this->hasInput('parent_discoveryid')
-				? $this->getInput('parent_discoveryid')
-				: $this->getInput('itemid')
+			'itemids' => [$itemid]
 		]);
 		$template += [
 			'hostid' => $template['templateid'],

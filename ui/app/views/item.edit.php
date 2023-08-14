@@ -214,6 +214,7 @@ $form
 			'host' => $data['host'],
 			'interface_types' => $data['interface_types'],
 			'readonly' => $data['readonly'],
+			'source' => 'item',
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys']

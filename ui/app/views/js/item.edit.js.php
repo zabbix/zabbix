@@ -37,25 +37,28 @@ const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
+const ZBX_STYLE_BTN_GREY = <?= json_encode(ZBX_STYLE_BTN_GREY) ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
+const ZBX_STYLE_FORM_INPUT_MARGIN = <?= json_encode(ZBX_STYLE_FORM_INPUT_MARGIN) ?>;
 
 window.item_edit_form = new class {
 
 	init({
 		actions, field_switches, form_data, host, interface_types, readonly, testable_item_types, type_with_key_select,
-		value_type_keys
+		value_type_keys, source
 	}) {
-		this.form_readonly = readonly;
+		this.actions = actions;
 		this.form_data = form_data;
+		this.form_readonly = readonly;
 		this.host = host;
-		this.testable_item_types = testable_item_types;
 		this.interface_types = interface_types;
 		this.optional_interfaces = [];
+		this.source = source;
+		this.testable_item_types = testable_item_types;
 		this.type_interfaceids = {};
-		this.value_type_keys = value_type_keys;
 		this.type_with_key_select = type_with_key_select;
-		this.actions = actions;
+		this.value_type_keys = value_type_keys;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -79,6 +82,12 @@ window.item_edit_form = new class {
 
 		this.initForm(field_switches);
 		this.initEvents();
+
+		if (this.source === 'itemprototype') {
+			this.initItemPrototypeForm();
+			this.initItemPrototypeEvents();
+		}
+
 		this.updateFieldsVisibility();
 
 		this.initial_form_fields = getFormFields(this.form);
@@ -139,6 +148,21 @@ window.item_edit_form = new class {
 			row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
 			row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
 		});
+	}
+
+	initItemPrototypeForm() {
+		let node;
+		const master_item = this.form.querySelector('.multiselect-control:has(#master_itemid)');
+
+		node = document.createElement('div');
+		node.classList.add(ZBX_STYLE_FORM_INPUT_MARGIN);
+		master_item.append(node);
+
+		node = document.createElement('button');
+		node.classList.add(ZBX_STYLE_BTN_GREY);
+		node.setAttribute('name', 'master-item-prototype');
+		node.textContent = t('Select prototype');
+		master_item.append(node);
 	}
 
 	initEvents() {
@@ -206,6 +230,12 @@ window.item_edit_form = new class {
 				this.updateFieldsVisibility();
 			}
 		});
+	}
+
+	initItemPrototypeEvents() {
+		this.form.querySelector('[name="master-item-prototype"]').addEventListener('click',
+			e => this.#openMasterItemPrototypePopup(e)
+		);
 	}
 
 	clone() {
@@ -528,6 +558,23 @@ window.item_edit_form = new class {
 		overlay.$dialogue[0].addEventListener('dialogue.submit',
 			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
 		);
+	}
+
+	#openMasterItemPrototypePopup(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		PopUp('popup.generic', {
+			srctbl: 'item_prototypes',
+			srcfld1: 'itemid',
+			srcfld2: 'name',
+			dstfrm: this.form.getAttribute('name'),
+			dstfld1: 'master_itemid',
+			parent_discoveryid: this.form_data.discoveryid,
+			excludeids: [this.form_data.itemid]
+		}, {dialogue_class: 'modal-popup-generic'});
+
+		return false;
 	}
 }
 })();
