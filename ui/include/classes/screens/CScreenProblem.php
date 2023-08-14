@@ -277,9 +277,9 @@ class CScreenProblem extends CScreenBase {
 						$options['acknowledged'] = true;
 
 						if (array_key_exists('acknowledged_by_me', $filter) && $filter['acknowledged_by_me'] == 1) {
-							$filter_options += [
+							$options += [
 								'action' => ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-								'action_userid' => CUser::$userData['userid']
+								'action_userids' => CUser::$userData['userid']
 							];
 						}
 						break;
