@@ -21,6 +21,7 @@
 #include "zbxcommon.h"
 
 #ifdef HAVE_LIBEVENT
+#include "zbxip.h"
 #include <event2/util.h>
 #include <event2/dns.h>
 typedef struct
@@ -172,8 +173,17 @@ void	zbx_async_poller_add_task(struct event_base *ev, struct evdns_base *dnsbase
 	task->error = NULL;
 
 	memset(&hints, 0, sizeof(hints));
+
+	if (SUCCEED == zbx_is_ip4(addr))
+		hints.ai_flags = AI_NUMERICHOST;
+#ifdef HAVE_IPV6
+	else if (SUCCEED == zbx_is_ip6(addr))
+		hints.ai_flags = AI_NUMERICHOST;
+#endif
+	else
+		hints.ai_flags = 0;
+
 	hints.ai_family = PF_UNSPEC;
-	hints.ai_flags = 0;
 	hints.ai_socktype = SOCK_STREAM;
 
 	evdns_getaddrinfo(dnsbase, addr, NULL, &hints, async_dns_event, task);
