@@ -19430,6 +19430,10 @@ msgstr "超级管理员"
 msgid "Support"
 msgstr "支持"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr "将不支持使用对旧数值类型。 请升级到扩展范围的数值。"
@@ -22989,6 +22993,10 @@ msgstr "告警"
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
 msgstr "告警信息"
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
