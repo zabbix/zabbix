@@ -297,7 +297,9 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from'],
-			'tags' => array_key_exists('tags', $problem_options) ? $problem_options['tags'] : null,
+			'tags' => array_key_exists('tags', $problem_options) && $problem_options['tags']
+				? $problem_options['tags']
+				: null,
 			'evaltype' => array_key_exists('evaltype', $problem_options)
 				? $problem_options['evaltype']
 				: TAG_EVAL_TYPE_AND_OR
@@ -362,51 +364,6 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 	}
 
 	return $triggers;
-}
-
-/**
- * Creates and returns a trigger status cell for the trigger overview table.
- *
- * @param array  $trigger
- * @param array  $dependencies  The list of trigger dependencies, prepared by getTriggerDependencies() function.
- *
- * @return CCol
- */
-function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
-	$column = (new CCol([
-		array_key_exists($trigger['triggerid'], $dependencies)
-			? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
-			: [],
-		$trigger['problem']['acknowledged'] == 1
-			? (new CSpan())->addClass(ZBX_ICON_CHECK)
-			: null
-	]))
-		->addClass(CSeverityHelper::getStyle((int) $trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE))
-		->addClass(ZBX_STYLE_CURSOR_POINTER);
-
-	$eventid = 0;
-	$blink_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::BLINK_PERIOD));
-	$duration = time() - $trigger['lastchange'];
-
-	if ($blink_period > 0 && $duration < $blink_period) {
-		$column->addClass('js-blink');
-		$column->setAttribute('data-time-to-blink', $blink_period - $duration);
-		$column->setAttribute('data-toggle-class', ZBX_STYLE_BLINK_HIDDEN);
-	}
-
-	if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-		$eventid = $trigger['problem']['eventid'];
-		$update_problem = true;
-	}
-	else {
-		$update_problem = false;
-	}
-
-	$column->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
-		['update_problem' => $update_problem]
-	));
-
-	return $column;
 }
 
 /**
@@ -616,9 +573,15 @@ function make_trigger_details($trigger, $eventid) {
 			new CCol(_('Trigger')),
 			new CCol((new CLinkAction(CMacrosResolverHelper::resolveTriggerName($trigger)))
 				->addClass(ZBX_STYLE_WORDWRAP)
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $eventid,
-					['show_rank_change_cause' => true]
-				))
+				->setMenuPopup(CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('tr_events.php'))
+						->setArgument('triggerid', $trigger['triggerid'])
+						->setArgument('eventid', $eventid)
+						->getUrl(),
+					'eventid' => $eventid,
+					'show_rank_change_cause' => true
+				]))
 			)
 		])
 		->addRow([
@@ -2028,14 +1991,14 @@ function getTriggerDependencies(array $triggers) {
 /**
  * Returns icons with tooltips for triggers with dependencies.
  *
- * @param array  $dependencies
- * @param array  $dependencies['up']    (optional) The list of "Dependent" triggers.
- * @param array  $dependencies['down']  (optional) The list of "Depeneds on" triggers.
- * @param bool   $freeze_on_click
+ * @param array $dependencies
+ *        array $dependencies['up']    (optional) The list of "Dependent" triggers.
+ *        array $dependencies['down']  (optional) The list of "Depends on" triggers.
+ * @param bool  $freeze_on_click
  *
  * @return array
  */
-function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
+function makeTriggerDependencies(array $dependencies, bool $freeze_on_click = true): array {
 	$result = [];
 
 	foreach (['down', 'up'] as $type) {

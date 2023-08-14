@@ -309,6 +309,7 @@ class CRouter {
 		'token.enable'								=> ['CControllerTokenEnable',							null,					null],
 		'token.list'								=> ['CControllerTokenList',								'layout.htmlpage',		'administration.token.list'],
 		'token.update'								=> ['CControllerTokenUpdate',							'layout.json',			null],
+		'toptriggers.list'							=> ['CControllerTopTriggersList',						'layout.htmlpage',		'reports.toptriggers.list'],
 		'trigdisplay.edit'							=> ['CControllerTrigDisplayEdit',						'layout.htmlpage',		'administration.trigdisplay.edit'],
 		'trigdisplay.update'						=> ['CControllerTrigDisplayUpdate',						null,					null],
 		'user.create'								=> ['CControllerUserCreate',							null,					null],
@@ -370,7 +371,6 @@ class CRouter {
 		'sysmap.php'					=> ['CLegacyAction', null, null],
 		'sysmaps.php'					=> ['CLegacyAction', null, null],
 		'templates.php' 				=> ['CLegacyAction', null, null],
-		'toptriggers.php'				=> ['CLegacyAction', null, null],
 		'tr_events.php'					=> ['CLegacyAction', null, null],
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],
 		'triggers.php'					=> ['CLegacyAction', null, null]

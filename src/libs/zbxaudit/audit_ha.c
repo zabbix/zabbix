@@ -76,3 +76,13 @@ void	zbx_audit_ha_update_field_int(const char *nodeid, const char *key, int old_
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
 	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, key, old_value, new_value);
 }
+
+void	zbx_audit_ha_add_field_int(const char *nodeid, const char *key, int value)
+{
+	zbx_audit_entry_t	*entry;
+
+	RETURN_IF_AUDIT_OFF();
+
+	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
+	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_ADD, key, value);
+}
