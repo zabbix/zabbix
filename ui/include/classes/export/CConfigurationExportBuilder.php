@@ -636,7 +636,7 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'filter' => $discoveryRule['filter'],
+				'filter' => self::formatLldFilter($discoveryRule['filter']),
 				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes'], $simple_trigger_prototypes),
@@ -647,7 +647,7 @@ class CConfigurationExportBuilder {
 				'timeout' => $discoveryRule['timeout'],
 				'url' => $discoveryRule['url'],
 				'query_fields' => $discoveryRule['query_fields'],
-				'parameters' => $discoveryRule['parameters'],
+				'parameters' => self::formatItemParameters($discoveryRule['parameters']),
 				'posts' => $discoveryRule['posts'],
 				'status_codes' => $discoveryRule['status_codes'],
 				'follow_redirects' => $discoveryRule['follow_redirects'],
@@ -662,10 +662,14 @@ class CConfigurationExportBuilder {
 				'ssl_key_password' => $discoveryRule['ssl_key_password'],
 				'verify_peer' => $discoveryRule['verify_peer'],
 				'verify_host' => $discoveryRule['verify_host'],
-				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
+				'lld_macro_paths' => self::formatLldMacroPaths($discoveryRule['lld_macro_paths']),
 				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
-				'overrides' => $discoveryRule['overrides']
+				'overrides' => self::formatLldOverrides($discoveryRule['overrides'])
 			];
+
+			if (!$data['filter']['conditions']) {
+				unset($data['filter']);
+			}
 
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
@@ -705,6 +709,70 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format the LLD filter.
+	 *
+	 * @param array $filter
+	 *
+	 * @return array
+	 */
+	private static function formatLldFilter(array $filter): array {
+		$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
+
+		return $filter;
+	}
+
+	/**
+	 * Format the LLD macro paths.
+	 *
+	 * @param array $lld_macro_paths
+	 *
+	 * @return array
+	 */
+	private static function formatLldMacroPaths(array $lld_macro_paths): array {
+		CArrayHelper::sort($lld_macro_paths, ['lld_macro']);
+
+		return array_values($lld_macro_paths);
+	}
+
+
+	/**
+	 * Format the LLD overrides contained in a discovery rule.
+	 *
+	 * @param array $overrides
+	 *
+	 * @return array
+	 */
+	private static function formatLldOverrides(array $overrides): array {
+		CArrayHelper::sort($overrides, ['step']);
+
+		foreach ($overrides as &$override) {
+			$override['filter'] = self::formatLldFilter($override['filter']);
+
+			unset($override['filter']['eval_formula']);
+
+			if (!$override['filter']['conditions']) {
+				unset($override['filter']);
+			}
+
+			CArrayHelper::sort($override['operations'], ['operationobject', 'operator', 'value']);
+
+			foreach ($override['operations'] as &$operation) {
+				if (array_key_exists('tags', $operation)) {
+					CArrayHelper::sort($operation['tags'], ['tag', 'value']);
+				}
+
+				if (array_key_exists('templates', $operation)) {
+					CArrayHelper::sort($operation['templates'], ['name']);
+				}
+			}
+			unset($operation);
+		}
+		unset($override);
+
+		return array_values($overrides);
+	}
+
+	/**
 	 * Format preprocessing steps.
 	 *
 	 * @param array $preprocessing_steps
@@ -738,6 +806,8 @@ class CConfigurationExportBuilder {
 		order_result($httptests, 'name');
 
 		foreach ($httptests as $httptest) {
+			CArrayHelper::sort($httptest['variables'], ['name']);
+
 			$result[] = [
 				'uuid' => $httptest['uuid'],
 				'name' => $httptest['name'],
@@ -777,6 +847,8 @@ class CConfigurationExportBuilder {
 		order_result($httpsteps, 'no');
 
 		foreach ($httpsteps as $httpstep) {
+			CArrayHelper::sort($httpstep['variables'], ['name']);
+
 			$result[] = [
 				'name' => $httpstep['name'],
 				'url' => $httpstep['url'],
@@ -818,7 +890,29 @@ class CConfigurationExportBuilder {
 	protected function formatGraphs(array $graphs) {
 		$result = [];
 
-		CArrayHelper::sort($graphs, ['name']);
+		usort($graphs, static function (array $graph_a, array $graph_b): int {
+			$comparison = strnatcasecmp($graph_a['name'], $graph_b['name']);
+
+			if ($comparison != 0) {
+				return $comparison;
+			}
+
+			$graph_a_items = [];
+			$graph_b_items = [];
+
+			foreach ($graph_a['gitems'] as $gitem) {
+				$graph_a_items[] = $gitem['itemid'];
+			}
+
+			foreach ($graph_b['gitems'] as $gitem) {
+				$graph_b_items[] = $gitem['itemid'];
+			}
+
+			CArrayHelper::sort($graph_a_items, ['host']);
+			CArrayHelper::sort($graph_b_items, ['host']);
+
+			return strnatcasecmp(reset($graph_a_items)['host'], reset($graph_b_items)['host']);
+		});
 
 		foreach ($graphs as $graph) {
 			$data = [
@@ -1121,7 +1215,7 @@ class CConfigurationExportBuilder {
 				'timeout' => $item['timeout'],
 				'url' => $item['url'],
 				'query_fields' => $item['query_fields'],
-				'parameters' => $item['parameters'],
+				'parameters' => self::formatItemParameters($item['parameters']),
 				'posts' => $item['posts'],
 				'status_codes' => $item['status_codes'],
 				'follow_redirects' => $item['follow_redirects'],
@@ -1193,6 +1287,19 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Format item parameters.
+	 *
+	 * @param array $parameters
+	 *
+	 * @return array
+	 */
+	private static function formatItemParameters(array $parameters): array {
+		CArrayHelper::sort($parameters, ['name']);
+
+		return array_values($parameters);
 	}
 
 	/**
@@ -1322,7 +1429,7 @@ class CConfigurationExportBuilder {
 	protected function formatWidgets(array $widgets) {
 		$result = [];
 
-		CArrayHelper::sort($widgets, ['name']);
+		CArrayHelper::sort($widgets, ['x', 'y']);
 
 		foreach ($widgets as $widget) {
 			$result[] = [
@@ -1350,7 +1457,7 @@ class CConfigurationExportBuilder {
 	protected function formatWidgetFields(array $fields) {
 		$result = [];
 
-		CArrayHelper::sort($fields, ['type']);
+		self::sortWidgetFields($fields);
 
 		foreach ($fields as $field) {
 			$result[] = [
@@ -1361,6 +1468,58 @@ class CConfigurationExportBuilder {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Sorts widget fields taking into account expanded objects.
+	 *
+	 * @param array $fields
+	 */
+	private static function sortWidgetFields(array &$fields): void {
+		usort($fields, static function(array $widget_field_a, array $widget_field_b): int {
+			$comparison = strnatcasecmp($widget_field_a['name'], $widget_field_b['name']);
+
+			if ($comparison != 0) {
+				return $comparison;
+			}
+
+			$comparison = strnatcasecmp($widget_field_a['type'], $widget_field_b['type']);
+
+			if ($comparison != 0) {
+				return $comparison;
+			}
+
+			switch ($widget_field_a['type']) {
+				case ZBX_WIDGET_FIELD_TYPE_HOST:
+					$value_fields = ['host'];
+					break;
+
+				case ZBX_WIDGET_FIELD_TYPE_ITEM:
+				case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+					$value_fields = ['host', 'key'];
+					break;
+
+				case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+				case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+					$value_fields = ['host', 'name'];
+					break;
+
+				default:
+					return strnatcasecmp($widget_field_a['value'], $widget_field_b['value']);
+			}
+
+			foreach ($value_fields as $value_field) {
+				$comparison = strnatcasecmp($widget_field_a['value'][$value_field],
+					$widget_field_b['value'][$value_field]
+				);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+			}
+
+			return 0;
+		});
 	}
 
 	/**
