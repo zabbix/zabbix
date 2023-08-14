@@ -43,7 +43,7 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 		$badges = italic(_('All tags'));
 	}
 	else {
-		$badges = $data['html_tag_filters'][$tag_filter['groupid']];
+		$badges = $data['tag_filters_badges'][$tag_filter['groupid']];
 	}
 
 	$tag_filter_table->addRow([$tag_filter['name'], $badges, $action]);

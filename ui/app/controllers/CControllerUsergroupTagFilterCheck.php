@@ -62,14 +62,9 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 		if (count($new_tag_filters) !== 0) {
 			foreach ($new_tag_filters as $tag_filter) {
-				if ($tag_filter['tag'] === '' && $tag_filter['value'] !== '') {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
-
-					return false;
-				}
-				else if ($this->getInput('filter_type') == TAG_FILTER_LIST && $tag_filter['tag'] === ''
-						&& $tag_filter['value'] === '')
-				{
+				if (($tag_filter['tag'] === '' && $tag_filter['value'] !== '')
+						|| ($this->getInput('filter_type') == TAG_FILTER_LIST && $tag_filter['tag'] === ''
+							&& $tag_filter['value'] === '')) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 
 					return false;
@@ -113,8 +108,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 							foreach ($new_tag_filters as $new_tag_filter) {
 								if ($existing_tag_filter['tag'] == $new_tag_filter['tag']
-									&& $existing_tag_filter['value'] == $new_tag_filter['value'])
-								{
+										&& $existing_tag_filter['value'] == $new_tag_filter['value']) {
 									$is_still_present = true;
 									break;
 								}
@@ -133,8 +127,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 					foreach ($existing_tag_filters as $existing_tag_filter) {
 						// Skip duplicate tags.
 						if ($new_tag_filter['tag'] == $existing_tag_filter['tag'] &&
-								$new_tag_filter['value'] == $existing_tag_filter['value'])
-						{
+								$new_tag_filter['value'] == $existing_tag_filter['value']) {
 							$is_duplicate = true;
 							break;
 						}

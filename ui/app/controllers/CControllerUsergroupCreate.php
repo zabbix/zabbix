@@ -76,11 +76,8 @@ class CControllerUsergroupCreate extends CController {
 
 		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userdirectoryid']);
 
-		$hostgroup_rights = $this->processRights('ms_hostgroup_right', 'hostgroup_right');
-		$templategroup_rights = $this->processRights('ms_templategroup_right', 'templategroup_right');
-
-		$user_group['hostgroup_rights'] = $hostgroup_rights;
-		$user_group['templategroup_rights'] = $templategroup_rights;
+		$user_group['hostgroup_rights'] = $this->processRights('ms_hostgroup_right', 'hostgroup_right');
+		$user_group['templategroup_rights'] = $this->processRights('ms_templategroup_right', 'templategroup_right');
 
 		$tag_filters = $this->getInput('tag_filters', []);
 

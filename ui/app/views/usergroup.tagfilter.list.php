@@ -27,7 +27,7 @@
 $output = [
 	'body' => (new CPartial('usergroup.tagfilters', [
 		'tag_filters' => $data['tag_filters'],
-		'html_tag_filters' => $data['html_tag_filters']
+		'tag_filters_badges' => $data['tag_filters_badges']
 	]))->getOutput()
 ];
 

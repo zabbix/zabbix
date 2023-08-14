@@ -96,11 +96,13 @@ class CControllerUsergroupEdit extends CController {
 			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
 		}
 
+		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
+
 		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
 		$template_groups = API::TemplateGroup()->get(['output' => ['groupid', 'name']]);
 
-		$data['hostgroup_rights'] = $this->getGroupRights();
-		$data['templategroup_rights'] = $this->getTemplategroupRights();
+		$data['hostgroup_rights'] = $this->getGroupRights($host_groups);
+		$data['templategroup_rights'] = $this->getTemplategroupRights($template_groups);
 
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
@@ -121,30 +123,17 @@ class CControllerUsergroupEdit extends CController {
 			}
 		}
 
-		$html_tag_filters = $data['tag_filters'];
+		$tag_filters_badges = $data['tag_filters'];
 
-		foreach ($html_tag_filters as $key => $group) {
+		foreach ($tag_filters_badges as $key => $group) {
 			$tags = $group['tags'];
 
 			if (empty($tags) || (count($tags) === 1 && $tags[key($tags)]['tag'] === '')) {
-				unset($html_tag_filters[$key]);
+				unset($tag_filters_badges[$key]);
 			}
 		}
 
-		$data['html_tag_filters'] = makeTags($html_tag_filters, true, 'groupid');
-
-		$new_hostgroup_rights = $this->processNewGroupRights($host_groups, 'ms_hostgroup_right', 'hostgroup_right');
-		$new_templategroup_rights = $this->processNewGroupRights(
-			$template_groups, 'ms_templategroup_right', 'templategroup_right'
-		);
-
-		if (count($new_hostgroup_rights) > 0) {
-			$data['hostgroup_rights'] = $this->sortGroupRights($new_hostgroup_rights);
-		}
-
-		if (count($new_templategroup_rights) > 0) {
-			$data['templategroup_rights'] = $this->sortGroupRights($new_templategroup_rights);
-		}
+		$data['tag_filters_badges'] = makeTags($tag_filters_badges, true, 'groupid');
 
 		$data['users_ms'] = $this->getUsersMs();
 
@@ -172,7 +161,15 @@ class CControllerUsergroupEdit extends CController {
 	 *
 	 * @return array
 	 */
-	private function getGroupRights() {
+	private function getGroupRights($host_groups = []) {
+		if ($this->hasInput('ms_hostgroup_right') && $this->hasInput('hostgroup_right')) {
+			$new_hostgroup_rights = $this->processNewRights($host_groups, 'ms_hostgroup_right', 'hostgroup_right');
+
+			if (count($new_hostgroup_rights) > 0) {
+				return $this->sortGroupRights($new_hostgroup_rights);
+			}
+		}
+
 		$group_rights = getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : []);
 
 		return $this->sortGroupRights($group_rights);
@@ -183,7 +180,17 @@ class CControllerUsergroupEdit extends CController {
 	 *
 	 * @return array
 	 */
-	private function getTemplategroupRights() {
+	private function getTemplategroupRights($template_groups = []) {
+		if ($this->hasInput('ms_templategroup_right') && $this->hasInput('templategroup_right')) {
+			$new_templategroup_rights = $this->processNewRights(
+				$template_groups, 'ms_templategroup_right', 'templategroup_right'
+			);
+
+			if (count($new_templategroup_rights) > 0) {
+				return $this->sortGroupRights($new_templategroup_rights);
+			}
+		}
+
 		$group_rights = getTemplateGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : []);
 
 		return $this->sortGroupRights($group_rights);
@@ -194,24 +201,24 @@ class CControllerUsergroupEdit extends CController {
 	 *
 	 * @return array
 	 */
-	function processNewGroupRights($groups, $groupId_key, $permission_key) {
+	function processNewRights($groups, $groupid_key, $permission_key) {
 		$new_rights = [];
-		$this->getInputs($new_rights, [$groupId_key, $permission_key]);
+		$this->getInputs($new_rights, [$groupid_key, $permission_key]);
 
-		$groupIds = $new_rights[$groupId_key]['groupids'] ?? [];
+		$groupids = $new_rights[$groupid_key]['groupids'] ?? [];
 		$permissions = $new_rights[$permission_key]['permission'] ?? [];
 
 		$group_rights = [];
 
-		foreach ($groupIds as $index => $group) {
-			foreach ($group as $groupId) {
+		foreach ($groupids as $index => $group) {
+			foreach ($group as $groupid) {
 				$permission = $permissions[$index] ?? PERM_DENY;
 
-				if ($groupId !== '0') {
-					$key = array_search($groupId, array_column($groups, 'groupid'));
+				if ($groupid !== '0') {
+					$key = array_search($groupid, array_column($groups, 'groupid'));
 					$name = $key !== false ? $groups[$key]['name'] : '';
 
-					$group_rights[$groupId] = [
+					$group_rights[$groupid] = [
 						'permission' => $permission,
 						'name' => $name
 					];

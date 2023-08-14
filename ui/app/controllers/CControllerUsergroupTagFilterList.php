@@ -56,17 +56,17 @@ class CControllerUsergroupTagFilterList extends CController {
 
 		CArrayHelper::sort($data['tag_filters'], ['name']);
 
-		$html_tag_filters = $data['tag_filters'];
+		$tag_filters_badges = $data['tag_filters'];
 
-		foreach ($html_tag_filters as $key => $group) {
+		foreach ($tag_filters_badges as $key => $group) {
 			$tags = $group['tags'];
 
 			if (empty($tags) || (count($tags) === 1 && $tags[key($tags)]['tag'] === '')) {
-				unset($html_tag_filters[$key]);
+				unset($tag_filters_badges[$key]);
 			}
 		}
 
-		$data['html_tag_filters'] = makeTags($html_tag_filters, true, 'groupid');
+		$data['tag_filters_badges'] = makeTags($tag_filters_badges, true, 'groupid');
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
