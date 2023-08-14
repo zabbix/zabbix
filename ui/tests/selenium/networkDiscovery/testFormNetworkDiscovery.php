@@ -1745,6 +1745,10 @@ class testFormNetworkDiscovery extends CWebTest {
 	 * @dataProvider getDeleteData
 	 */
 	public function testFormNetworkDiscovery_Delete($data) {
+		if (CTestArrayHelper::get($data, 'error')) {
+			$old_hash = $this->getHash();
+		}
+
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('link', $data['discovery'])->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
@@ -1754,8 +1758,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'error')) {
 			$this->assertMessage(TEST_BAD, 'Cannot delete discovery rule', $data['error']);
-			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.
-					zbx_dbstr($data['discovery'])));
+			$this->assertEquals($old_hash, $this->getHash());
 			$dialog->close();
 		}
 		else {
@@ -1766,8 +1769,17 @@ class testFormNetworkDiscovery extends CWebTest {
 		}
 	}
 
+	public function testFormNetworkDiscovery_SimpleUpdate() {
+
+	}
+
 	public static function getCancelData() {
 		return [
+			[
+				[
+					'action' => 'Simple update'
+				]
+			],
 			[
 				[
 					'action' => 'Add'
@@ -1809,43 +1821,49 @@ class testFormNetworkDiscovery extends CWebTest {
 		if ($data['action'] === 'Delete') {
 			$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 			$this->page->dismissAlert();
+			$dialog->close();
 		}
 		else {
-			// Fill form's fields.
-			$form->fill([
-				'Name' => $new_name,
-				'Discovery by proxy' => 'Passive proxy 1',
-				'Update interval' => '15s',
-				'Enabled' => false
-			]);
+			if ($data['action'] !== 'Simple update') {
+				// Fill form's fields.
+				$form->fill([
+					'Name' => $new_name,
+					'Discovery by proxy' => 'Passive proxy 1',
+					'Update interval' => '15s',
+					'Enabled' => false
+				]);
 
-			$form->getFieldContainer('Checks')->query('button', $data['action'] === 'Add' ? 'Add' : 'Edit')
-					->waitUntilClickable()->one()->click();
-			$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-			$checks_form = $checks_dialog->asForm();
-			$checks_form->fill([
-				'Check type' => 'SNMPv2 agent',
-				'Port range' => 99,
-				'SNMP community' => 'new cancel community',
-				'SNMP OID' => 'new cancel OID'
-			]);
-			$checks_form->submit();
-			$checks_dialog->waitUntilNotVisible();
+				$form->getFieldContainer('Checks')->query('button', $data['action'] === 'Add' ? 'Add' : 'Edit')
+						->waitUntilClickable()->one()->click();
+				$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$checks_form = $checks_dialog->asForm();
+				$checks_form->fill([
+					'Check type' => 'SNMPv2 agent',
+					'Port range' => 99,
+					'SNMP community' => 'new cancel community',
+					'SNMP OID' => 'new cancel OID'
+				]);
+				$checks_form->submit();
+				$checks_dialog->waitUntilNotVisible();
 
-			$radios = [
-				'Device uniqueness criteria' => ['SNMPv2 agent (99) "new cancel OID"' => true],
-				'Host name' => ['IP address' => true],
-				'Visible name' => ['DNS name' => true]
-			];
+				$radios = [
+					'Device uniqueness criteria' => ['SNMPv2 agent (99) "new cancel OID"' => true],
+					'Host name' => ['IP address' => true],
+					'Visible name' => ['DNS name' => true]
+				];
 
-			$this->fillRadioFields($radios, $form);
+				$this->fillRadioFields($radios, $form);
 
-			if ($data['action'] === 'Clone') {
-				$dialog->query('button', $data['action'])->one()->click();
+				if ($data['action'] === 'Clone') {
+					$dialog->query('button', $data['action'])->one()->click();
+				}
 			}
+
+			$dialog->query('button', ($data['action'] === 'Simple update') ? 'Update' : 'Cancel')
+					->waitUntilClickable()->one()->click();
 		}
 
-		$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$dialog->waitUntilNotVisible();
 		$this->page->assertHeader('Discovery rules');
 		$this->assertEquals($old_hash, $this->getHash());
 	}
