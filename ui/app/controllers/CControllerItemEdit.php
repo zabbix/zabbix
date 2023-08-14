@@ -87,7 +87,8 @@ class CControllerItemEdit extends CControllerItem {
 		if ($data['form']['master_itemid']) {
 			$master_items = API::Item()->get([
 				'output' => ['itemid', 'name'],
-				'itemids' => $data['form']['master_itemid']
+				'itemids' => $data['form']['master_itemid'],
+				'webitems' => true
 			]);
 			$data['master_item'] = $master_items ? reset($master_items) : [];
 		}
@@ -121,7 +122,7 @@ class CControllerItemEdit extends CControllerItem {
 		}
 
 		if ($this->getInput('show_inherited_tags', 0)) {
-			$data['form']['tags'] = $this->getInheritedTags([
+			$data['form']['tags'] = CItemHelper::getTagsWithInherited([
 				'item' => $data['form'] + ['discoveryRule' => $data['discovery_rule']],
 				'itemid' => $data['form']['itemid'],
 				'tags' => $data['form']['tags'],
@@ -310,100 +311,5 @@ class CControllerItemEdit extends CControllerItem {
 		}
 
 		return $item;
-	}
-
-	/**
-	 * Add item inherited tags to $data['tags'] array of item tags.
-	 * Copy of function getItemFormData, file forms.inc.php, part to get inherited tags.
-	 *
-	 * @param array $data
-	 */
-	protected function getInheritedTags(array $data): array {
-		if ($data['item']['discoveryRule']) {
-			$items = [$data['item']['discoveryRule']];
-			$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_RULE)['templates'];
-		}
-		else {
-			$items = [[
-				'templateid' => $data['item']['templateid'],
-				'itemid' => $data['itemid']
-			]];
-			$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
-		}
-		unset($parent_templates[0]);
-
-		$db_templates = $parent_templates
-			? API::Template()->get([
-				'output' => ['templateid'],
-				'selectTags' => ['tag', 'value'],
-				'templateids' => array_keys($parent_templates),
-				'preservekeys' => true
-			])
-			: [];
-
-		$inherited_tags = [];
-
-		// Make list of template tags.
-		foreach ($parent_templates as $templateid => $template) {
-			if (array_key_exists($templateid, $db_templates)) {
-				foreach ($db_templates[$templateid]['tags'] as $tag) {
-					if (array_key_exists($tag['tag'], $inherited_tags)
-							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
-							$templateid => $template
-						];
-					}
-					else {
-						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-							'parent_templates' => [$templateid => $template],
-							'type' => ZBX_PROPERTY_INHERITED
-						];
-					}
-				}
-			}
-		}
-
-		$db_hosts = API::Host()->get([
-			'output' => ['hostid', 'name'],
-			'selectTags' => ['tag', 'value'],
-			'hostids' => $data['hostid'],
-			'templated_hosts' => true
-		]);
-
-		// Overwrite and attach host level tags.
-		if ($db_hosts) {
-			foreach ($db_hosts[0]['tags'] as $tag) {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag;
-				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
-			}
-		}
-
-		// Overwrite and attach item's own tags.
-		foreach ($data['tags'] as $tag) {
-			if (array_key_exists($tag['tag'], $inherited_tags)
-					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-			}
-			else {
-				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-			}
-		}
-
-		$data['tags'] = [];
-
-		foreach ($inherited_tags as $tag) {
-			foreach ($tag as $value) {
-				$data['tags'][] = $value;
-			}
-		}
-
-		if (!$data['tags']) {
-			$data['tags'] = [['tag' => '', 'value' => '']];
-		}
-		else {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
-		}
-
-		return $data['tags'];
 	}
 }

@@ -88,7 +88,8 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		if ($data['form']['master_itemid']) {
 			$master_items = API::Item()->get([
 				'output' => ['itemid', 'name'],
-				'itemids' => [$data['form']['master_itemid']]
+				'itemids' => [$data['form']['master_itemid']],
+				'webitems' => true
 			]);
 
 			if (!$master_items) {
@@ -226,6 +227,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'trends_mode' => $item['trends'] == ITEM_NO_STORAGE_VALUE ? ITEM_STORAGE_OFF : ITEM_STORAGE_CUSTOM,
 			'context' => $this->getInput('context'),
 			'show_inherited_tags' => 0,
+			'parent_discoveryid' => $item['discoveryRule']['itemid'],
 			'key' => $item['key_']
 		];
 		unset($item['key_']);

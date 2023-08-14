@@ -42,21 +42,24 @@
 				const selectedids = Object.keys(chkbxRange.getSelectedIds());
 
 				if (target.matches('.js-update-item')) {
-					this.#edit(target, target.dataset);
+					this.#edit(target, {...target.dataset, action: 'item.edit'});
 				}
-				else if (target.matches('.js-enable-item')) {
+				else if (target.matches('.js-update-itemprototype')) {
+					this.#edit(target, {...target.dataset, action: 'item.prototype.edit'});
+				}
+				else if (target.matches('.js-enable-itemprototype')) {
 					this.#enable(null, {...target.dataset, itemids: [target.dataset.itemid]});
 				}
-				else if (target.matches('.js-disable-item')) {
+				else if (target.matches('.js-disable-itemprototype')) {
 					this.#disable(null, {...target.dataset, itemids: [target.dataset.itemid]});
 				}
-				else if (target.matches('.js-massenable-item')) {
+				else if (target.matches('.js-massenable-itemprototype')) {
 					this.#enable(target, {itemids: selectedids, context: this.context, field: 'status'});
 				}
-				else if (target.matches('.js-massdisable-item')) {
+				else if (target.matches('.js-massdisable-itemprototype')) {
 					this.#disable(target, {itemids: selectedids, context: this.context, field: 'status'});
 				}
-				else if (target.matches('.js-massdelete-item')) {
+				else if (target.matches('.js-massdelete-itemprototype')) {
 					this.#delete(target, {itemids: selectedids, context: this.context});
 				}
 			});
@@ -137,7 +140,10 @@
 		}
 
 		#edit(target, parameters = {}) {
-			this.#popup('item.prototype.edit', parameters, {
+			const action = parameters.action;
+
+			delete parameters.action;
+			this.#popup(action, parameters, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
 				trigger_element: target

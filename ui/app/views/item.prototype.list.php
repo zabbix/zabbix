@@ -64,25 +64,32 @@ foreach ($data['items'] as $item) {
 			$name[] = $item['master_item']['name'];
 		}
 		else {
-			$name[] = (new CLink($item['master_item']['name']))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL)
-				->addClass($item['master_item']['source'] === 'itemprototypes'
-					? 'js-update-itemprototype' : 'js-update-item'
-				)
-				->setAttribute('data-itemid', $item['master_item']['itemid'])
-				->setAttribute('data-parent_discoveryid', $item['master_item']['source'] === 'itemprototypes'
-					? $data['parent_discoveryid']
-					: null)
-				->setAttribute('data-context', $data['context']);
+			if ($item['master_item']['source'] === 'itemprototypes') {
+				$name[] = (new CLink($item['master_item']['name']))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_TEAL)
+					->addClass('js-update-itemprototype')
+					->setAttribute('data-itemid', $item['master_item']['itemid'])
+					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+					->setAttribute('data-context', $data['context']);
+			}
+			else {
+				$name[] = (new CLink($item['master_item']['name']))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_TEAL)
+					->addClass('js-update-item')
+					->setAttribute('data-itemid', $item['master_item']['itemid'])
+					->setAttribute('data-context', $data['context']);
+			}
 		}
 
 		$name[] = NAME_DELIMITER;
 	}
 
 	$name[] = (new CLink($item['name']))
-		->addClass('js-update-item')
+		->addClass('js-update-itemprototype')
 		->setAttribute('data-itemid', $item['itemid'])
+		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 		->setAttribute('data-context', $data['context']);
 
 	$table->addRow([
