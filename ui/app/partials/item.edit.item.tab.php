@@ -137,6 +137,7 @@ $formgrid = (new CFormGrid())
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 						(new CButtonLink(_('Remove')))
 							->addClass('element-table-remove')
+							->setEnabled(!$data['readonly'])
 					]))->addClass('form_row')
 				)
 			]))

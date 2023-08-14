@@ -43,9 +43,10 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 window.item_edit_form = new class {
 
 	init({
-		actions, field_switches, form_data, host, interface_types, testable_item_types, type_with_key_select,
+		actions, field_switches, form_data, host, interface_types, readonly, testable_item_types, type_with_key_select,
 		value_type_keys
 	}) {
+		this.form_readonly = readonly;
 		this.form_data = form_data;
 		this.host = host;
 		this.testable_item_types = testable_item_types;
@@ -121,12 +122,12 @@ window.item_edit_form = new class {
 			sortable: true,
 			template: '#query-field-row-tmpl',
 			rows: this.form_data.query_fields
-		});
+		}).sortable({disabled: this.form_readonly});
 		jQuery('#headers-table').dynamicRows({
 			sortable: true,
 			template: '#item-header-row-tmpl',
 			rows: this.form_data.headers
-		});
+		}).sortable({disabled: this.form_readonly});
 		jQuery('#delay-flex-table').dynamicRows({
 			template: '#delay-flex-row-tmpl',
 			rows: this.form_data.delay_flex
@@ -481,7 +482,7 @@ window.item_edit_form = new class {
 	}
 
 	#inheritedTagsChangeHandler(e) {
-		reloadPopup(this.form, this.actions.edit);
+		reloadPopup(this.form, this.actions.form);
 	}
 
 	#updateHistoryModeVisibility() {
