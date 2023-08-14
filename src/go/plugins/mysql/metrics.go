@@ -36,6 +36,8 @@ const (
 	keyReplicationSlaveStatus = "mysql.replication.get_slave_status"
 	keyStatusVars             = "mysql.get_status_variables"
 	keyVersion                = "mysql.version"
+
+	masterHostParam = "Master"
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
@@ -94,8 +96,8 @@ var metrics = metric.MetricSet{
 
 	keyDatabaseSize: metric.New("Returns size of given database in bytes.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword,
-			metric.NewParam("Database", "Database name.").SetRequired(), paramTLSConnect, paramTLSCaFile,
-			paramTLSCertFile, paramTLSKeyFile}, false),
+			metric.NewParam("Database", "Database name.").SetRequired(),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyPing: metric.New("Tests if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
@@ -106,7 +108,7 @@ var metrics = metric.MetricSet{
 			paramTLSKeyFile}, false),
 
 	keyReplicationSlaveStatus: metric.New("Returns replication status.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam("Master", "Master host."),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam(masterHostParam, "Master host."),
 			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyStatusVars: metric.New("Returns values of global status variables.",
