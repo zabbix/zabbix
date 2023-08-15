@@ -342,13 +342,8 @@
 			'#snmpv3_authpassphrase', '#snmpv3_privpassphrase'
 		]);
 
-		const data = $form
-				.find('#ports, >input[type=hidden], input:visible')
-				.serializeJSON();
-
-		const dialogueid = $form
-				.closest("[data-dialogueid]")
-				.data('dialogueid');
+		const data = $form.find('#ports, >input[type=hidden], input:visible').serializeJSON();
+		const dialogueid = $form.closest("[data-dialogueid]").data('dialogueid');
 
 		[...$form[0].querySelectorAll('z-select')]
 				?.filter((element) => isVisible(element))
@@ -376,7 +371,7 @@
 				return jQuery(response.errors).insertBefore($form);
 			}
 			else {
-				var dcheck = response.params;
+				const dcheck = response.params;
 
 				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
 					dcheck.name += ' (' + dcheck.ports + ')';
@@ -436,12 +431,8 @@
 
 			if (typeof dcheckid === 'undefined' || dcheckid != zbx_dcheckid) {
 				const duplicate_fields = fields
-					.map(function(value) {
-						return ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
-					})
-					.filter(function(value) {
-						return !!value;
-					});
+					.map((value) => ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value])
+					.filter((value) => !!value);
 
 				if (duplicate_fields.length === fields.length) {
 					return true;
