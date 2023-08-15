@@ -47,9 +47,12 @@ class testFormGroups extends CWebTest {
 	const LLD = 'LLD for Discovered host tests';
 
 	/**
-	 * Host and template group name for cancel, clone and delete test scenario.
+	 * Objects created in dataSource HostGroups.
 	 */
-	const DELETE_GROUP = 'Group for Delete test';
+	const DELETE_GROUP = 'Group empty for Delete test';
+	const DELETE_ONE_HOST_GROUP = 'One group belongs to one host for Delete test';
+	const DELETE_ONE_TEMPLATE_GROUP = 'One group belongs to one template for Delete test';
+	const DELETE_GROUP2 = 'First group to one object for Delete test';
 
 	/**
 	 * Host and template subgroup name for clone test scenario.
@@ -94,121 +97,7 @@ class testFormGroups extends CWebTest {
 				'name' => 'Group for Update test'
 			],
 			[
-				'name' => 'Group for Delete test'
-			],
-			[
-				'name' => 'One group for Delete'
-			],
-			[
-				'name' => 'Group for Script'
-			],
-			[
-				'name' => 'Group for Action'
-			],
-			[
-				'name' => 'Group for Maintenance'
-			],
-			[
-				'name' => 'Group for Host prototype'
-			],
-			[
-				'name' => 'Group for Correlation'
-			],
-			[
 				'name' => 'Group1/Subgroup1/Subgroup2'
-			]
-		]);
-		$host_groupids = CDataHelper::getIds('name');
-
-		// Create elements with host groups.
-		$host = CDataHelper::createHosts([
-			[
-				'host' => 'Host for host group testing',
-				'interfaces' => [],
-				'groups' => [
-					'groupid' => $host_groupids['One group for Delete']
-				]
-			]
-		]);
-		$hostid = $host['hostids']['Host for host group testing'];
-
-		$lld = CDataHelper::call('discoveryrule.create', [
-			'name' => 'LLD for host group test',
-			'key_' => 'lld.hostgroup',
-			'hostid' => $hostid,
-			'type' => ITEM_TYPE_TRAPPER,
-			'delay' => 30
-		]);
-		$lldid = $lld['itemids'][0];
-		CDataHelper::call('hostprototype.create', [
-			'host' => 'Host prototype {#KEY} for host group testing',
-			'ruleid' => $lldid,
-			'groupLinks' => [
-				[
-					'groupid' => $host_groupids['Group for Host prototype']
-				]
-			]
-		]);
-
-		CDataHelper::call('script.create', [
-			[
-				'name' => 'Script for host group testing',
-				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
-				'type' => ZBX_SCRIPT_TYPE_WEBHOOK,
-				'command' => 'return 1',
-				'groupid' => $host_groupids['Group for Script']
-			]
-		]);
-
-		CDataHelper::call('action.create', [
-			[
-				'name' => 'Discovery action for host group testing',
-				'eventsource' => EVENT_SOURCE_DISCOVERY,
-				'status' => ACTION_STATUS_ENABLED,
-				'operations' => [
-					[
-						'operationtype' => OPERATION_TYPE_GROUP_ADD,
-						'opgroup' => [
-							[
-								'groupid' => $host_groupids['Group for Action']
-							]
-						]
-					]
-				]
-			]
-		]);
-
-		CDataHelper::call('maintenance.create', [
-			[
-				'name' => 'Maintenance for host group testing',
-				'active_since' => 1358844540,
-				'active_till' => 1390466940,
-				'groups' => [
-					[
-						'groupid' => $host_groupids['Group for Maintenance']
-					]
-				],
-				'timeperiods' => [[]]
-			]
-		]);
-
-		CDataHelper::call('correlation.create', [
-			[
-				'name' => 'Corellation for host group testing',
-				'filter' => [
-					'evaltype' => ZBX_CORR_OPERATION_CLOSE_OLD,
-					'conditions' => [
-						[
-							'type' => ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
-							'groupid' => $host_groupids['Group for Correlation']
-						]
-					]
-				],
-				'operations' => [
-					[
-						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
-					]
-				]
 			]
 		]);
 	}
@@ -621,8 +510,15 @@ class testFormGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'One group for Delete',
+					'name' => self::DELETE_ONE_HOST_GROUP,
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'name' => self::DELETE_ONE_TEMPLATE_GROUP,
+					'error' => 'Template "Template for host group testing" cannot be without host group.'
 				]
 			],
 			[
@@ -661,10 +557,24 @@ class testFormGroups extends CWebTest {
 					'error' => 'Host group "Discovered hosts" is internal and cannot be deleted.'
 				]
 			],
+			// Empty group without Host/Template.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'name' => self::DELETE_GROUP
+				]
+			],
+			// Host has two groups, one of them can be deleted.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => self::DELETE_GROUP2
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Group for Action'
 				]
 			]
 		];
