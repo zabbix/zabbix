@@ -125,6 +125,11 @@ class CControllerHousekeepingEdit extends CController {
 					$data['compression_availability'] = array_key_exists('compression_availability', $dbversion)
 						&& $dbversion['compression_availability'];
 
+					// Temporary state to show checkbox checked and disabled before the real state is detected.
+					if (!array_key_exists('compression_availability', $dbversion)) {
+						$data['compression_not_detected'] = true;
+					}
+
 					if ($data['compression_availability']) {
 						$data += CHousekeepingHelper::getWarnings($dbversion_status);
 					}
