@@ -121,52 +121,9 @@ $form_grid->addItem([
 	new CFormField($item_select)
 ]);
 
-// Time shift.
-$form_grid->addItem([
-	new CLabel(_('Time shift'), 'timeshift'),
-	new CFormField(
-		(new CTextBox('timeshift', $data['timeshift']))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-			->setAttribute('placeholder', _('none'))
-	)
-]);
-
 $numeric_only_warning = new CSpan(
 	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
 );
-
-// Aggregation function.
-$form_grid->addItem([
-	new CLabel(
-		[
-			_('Aggregation function'),
-			$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
-		],
-		'aggregate_function'
-	),
-	new CFormField(
-		(new CSelect('aggregate_function'))
-			->setValue($data['aggregate_function'])
-			->addOptions(CSelect::createOptionsFromArray([
-				AGGREGATE_NONE => _('none'),
-				AGGREGATE_MIN => _('min'),
-				AGGREGATE_MAX => _('max'),
-				AGGREGATE_AVG => _('avg'),
-				AGGREGATE_COUNT => _('count'),
-				AGGREGATE_SUM => _('sum'),
-				AGGREGATE_FIRST => _('first'),
-				AGGREGATE_LAST => _('last')
-			]))
-	)
-]);
-
-// Aggregation interval.
-$form_grid->addItem([
-	(new CLabel(_('Aggregation interval'), 'aggregate_interval'))->setAsteriskMark(),
-	new CFormField(
-		(new CTextBox('aggregate_interval', $data['aggregate_interval']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-	)
-]);
 
 // Display.
 $form_grid->addItem([
@@ -184,34 +141,6 @@ $form_grid->addItem([
 			->addValue(_('Indicators'), CWidgetFieldColumnsList::DISPLAY_INDICATORS)
 			->setModern()
 	)
-]);
-
-// History data.
-$form_grid->addItem([
-	new CLabel(
-		[
-			_('History data'),
-			(new CSpan(
-				makeWarningIcon(
-					_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
-				)
-			))->setId('tophosts-column-history-data-warning')
-		],
-		'history'
-	),
-	new CFormField(
-		(new CRadioButtonList('history', (int) $data['history']))
-			->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
-			->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
-			->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
-			->setModern()
-	)
-]);
-
-// Base color.
-$form_grid->addItem([
-	new CLabel(_('Base color'), 'base_color'),
-	new CFormField(new CColor('base_color', $data['base_color']))
 ]);
 
 // Min value.
@@ -234,12 +163,10 @@ $form_grid->addItem([
 	)
 ]);
 
-// Decimal places.
+// Base color.
 $form_grid->addItem([
-	new CLabel(_('Decimal places'), 'decimal_places'),
-	(new CFormField(
-		(new CNumericBox('decimal_places', $data['decimal_places'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-	))
+	new CLabel(_('Base color'), 'base_color'),
+	new CFormField(new CColor('base_color', $data['base_color']))
 ]);
 
 // Thresholds table.
@@ -282,6 +209,90 @@ $form_grid->addItem([
 		$numeric_only_warning->setId('tophosts-column-thresholds-warning')
 	], 'thresholds_table'),
 	new CFormField($thresholds)
+]);
+
+// Decimal places.
+$form_grid->addItem([
+	new CLabel(_('Decimal places'), 'decimal_places'),
+	(new CFormField(
+		(new CNumericBox('decimal_places', $data['decimal_places'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	))
+]);
+
+// Aggregation function.
+$form_grid->addItem([
+	new CLabel(
+		[
+			_('Aggregation function'),
+			$numeric_only_warning->setId('tophosts-column-aggregate-function-warning')
+		],
+		'aggregate_function'
+	),
+	new CFormField(
+		(new CSelect('aggregate_function'))->setId('aggregate_function')
+			->setValue($data['aggregate_function'])
+			->addOptions(CSelect::createOptionsFromArray([
+				AGGREGATE_NONE => _('not used'),
+				AGGREGATE_MIN => _('min'),
+				AGGREGATE_MAX => _('max'),
+				AGGREGATE_AVG => _('avg'),
+				AGGREGATE_COUNT => _('count'),
+				AGGREGATE_SUM => _('sum'),
+				AGGREGATE_FIRST => _('first'),
+				AGGREGATE_LAST => _('last')
+			]))
+	)
+]);
+
+$form_grid->addItem([
+	(new CLabel(_('Override time period selector'), 'item_time'))->addClass('override-time'),
+	(new CFormField(
+		new CCheckBox('item_time', $data['item_time'])
+	))->addClass('override-time')
+]);
+
+$form_grid->addItem([
+	(new CLabel(_('From'), 'time_from'))
+		->setAsteriskMark()
+		->addClass('override-time'),
+	(new CFormField(
+		(new CDateSelector('time_from', $data['time_from']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setAriaRequired()
+	))->addClass('override-time')
+]);
+
+$form_grid->addItem([
+	(new CLabel(_('To'), 'time_to'))
+		->setAsteriskMark()
+		->addClass('override-time'),
+	(new CFormField(
+		(new CDateSelector('time_to', $data['time_to']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setAriaRequired()
+	))->addClass('override-time')
+]);
+
+// History data.
+$form_grid->addItem([
+	new CLabel(
+		[
+			_('History data'),
+			(new CSpan(
+				makeWarningIcon(
+					_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+				)
+			))->setId('tophosts-column-history-data-warning')
+		],
+		'history'
+	),
+	new CFormField(
+		(new CRadioButtonList('history', (int) $data['history']))
+			->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
+			->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
+			->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
+			->setModern()
+	)
 ]);
 
 $form

@@ -62,14 +62,10 @@ class CWidgetFieldColumnsList extends CWidgetField {
 												['else' => true,
 													'type' => API_STRING_UTF8]
 				]],
-				'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
 				'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
-				'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
-													'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
-												['else' => true,
-													'type' => API_STRING_UTF8]
-				]],
+				'time_from'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'default' => 'now-1h'],
+				'time_to'				=> ['type' => API_STRING_UTF8, 'flags' => API_ALLOW_NULL | API_NOT_EMPTY, 'default' => 'now'],
+				'item_time'				=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'default' => 0],
 				'display'				=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
 													'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
@@ -110,9 +106,10 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'name' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'data' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'item' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'timeshift' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'item_time' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'time_from' => ZBX_WIDGET_FIELD_TYPE_STR,
+			'time_to' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'min' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,

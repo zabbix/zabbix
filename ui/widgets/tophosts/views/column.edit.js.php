@@ -28,8 +28,16 @@ window.tophosts_column_edit_form = new class {
 	init({form_name, thresholds, thresholds_colors}) {
 		this._$widget_form = $(`form[name="${form_name}"]`);
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
+		this._item_time = document.getElementById('item_time');
+		this._aggregate_function = document.getElementById('aggregate_function');
 
-		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]', this._$widget_form)
+		this._item_time.checked = Number(this._aggregate_function.value) !== 0;
+
+		for (const element of this._$widget_form[0].querySelectorAll('.override-time')) {
+			element.style.display = Number(this._aggregate_function.value) === 0 ? 'none' : '';
+		}
+
+		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"], [name="item_time"]', this._$widget_form)
 			.on('change', () => this._update());
 
 		colorPalette.setThemeColors(thresholds_colors);
@@ -86,10 +94,11 @@ window.tophosts_column_edit_form = new class {
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
 		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= AGGREGATE_NONE ?>;
+		const aggregate_options = document.getElementById('aggregate_function');
+		const override_fields = document.querySelectorAll('.override-time');
 
 		$('#item', this._$widget_form).multiSelect(data_item_value ? 'enable' : 'disable');
-		$('[name="aggregate_function"],[name="timeshift"]', this._$widget_form).attr('disabled', !data_item_value);
-		$('[name="aggregate_interval"]', this._$widget_form).attr('disabled', !data_item_value || no_aggregate_function);
+		$('[name="aggregate_function"]', this._$widget_form).attr('disabled', !data_item_value);
 		$('[name="display"],[name="history"]', this._$widget_form).attr('disabled', !data_item_value);
 		$('[name="text"]', this._$widget_form).attr('disabled', !data_text);
 		$('[name="min"],[name="max"]', this._$widget_form).attr('disabled', display_as_is || !data_item_value);
@@ -111,11 +120,27 @@ window.tophosts_column_edit_form = new class {
 
 		// Toggle visibility of disabled form elements.
 		$('.form-grid > label', this._$widget_form).each((i, elm) => {
+			const except_fields = 'override-time';
 			const form_field = $(elm).next();
-			const is_visible = (form_field.find(':disabled,.disabled').length == 0);
 
-			$(elm).toggle(is_visible);
-			form_field.toggle(is_visible);
+			if (!form_field.hasClass(except_fields)) {
+				const is_visible = (form_field.find(':disabled,.disabled').length == 0);
+
+				$(elm).toggle(is_visible);
+				form_field.toggle(is_visible);
+			}
+		});
+
+		this._item_time.value = (this._item_time.checked) ? 1 : 0;
+
+		for (const element of document.querySelectorAll('#time_from, #time_from_calendar, #time_to, #time_to_calendar')) {
+			element.disabled = !this._item_time.checked;
+		}
+
+		aggregate_options.addEventListener('change', function() {
+			for (const element of override_fields) {
+				element.style.display = (Number(this.value) === <?= AGGREGATE_NONE ?>) ? 'none' : 'block';
+			}
 		});
 	}
 

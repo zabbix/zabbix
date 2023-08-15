@@ -41,7 +41,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
+			'dynamic_hostid' => 'db hosts.hostid',
+			'from' => 'range_time',
+			'to' => 'range_time'
 		]);
 	}
 
@@ -364,57 +366,48 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		}
 
-		$timeshift = $column['timeshift'] !== '' ? timeUnitToSeconds($column['timeshift']) : 0;
+		foreach ($items as $itemid => $item) {
+			$column += ['itemid' => $itemid];
+		}
 
-		$time_to = $time_now + $timeshift;
-
-		$time_from = $column['aggregate_function'] != AGGREGATE_NONE
-			? $time_to - timeUnitToSeconds($column['aggregate_interval'])
-			: $time_to - $history_period;
-
-		$function = $column['aggregate_function'] != AGGREGATE_NONE
-			? $column['aggregate_function']
-			: AGGREGATE_LAST;
-
-		$interval = $time_to;
+		$aggregate_function = $column['aggregate_function'];
+		$time_from = time() - $history_period;
+		$time_to = time();
 
 		self::addDataSource($items, $time_from, $time_now, $column['history']);
 
-		$result = [];
-
-		if ($column['aggregate_function'] == AGGREGATE_NONE) {
-			$items_by_source = ['history' => [], 'trends' => []];
-
-			foreach ($items as $itemid => $item) {
-				$items_by_source[$item['source']][$itemid] = $item;
-			}
-
-			if ($timeshift != 0) {
-				$values = [];
-
-				foreach ($items_by_source['history'] as $itemid => $item) {
-					$history = Manager::History()->getValueAt($item, $time_to, 0);
-
-					if (is_array($history)) {
-						$values[$itemid] = $history['value'];
-					}
-				}
+		if ($aggregate_function === AGGREGATE_NONE) {
+			$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, AGGREGATE_LAST, $time_to);
+		}
+		else {
+			if ($column['item_time'] === 0) {
+				$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $aggregate_function, $time_to);
 			}
 			else {
-				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
-				$values = array_column(array_column($values, 0), 'value', 'itemid');
-			}
+				$from = $column['time_from'];
+				$to = $column['time_to'];
 
-			$result += $values;
-			$items = $items_by_source['trends'];
+				$range_time_parser = new CRangeTimeParser();
+
+				$range_time_parser->parse($from);
+				$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+				$range_time_parser->parse($to);
+				$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+
+				$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $aggregate_function, $time_to);
+			}
 		}
 
-		$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
-		$values = array_column(array_column(array_column($values, 'data'), 0),
-			$function == AGGREGATE_COUNT ? 'count' : 'value', 'itemid'
-		);
+		$result = [];
 
-		$result += $values;
+		if ($values) {
+			$values = $values[$column['itemid']]['data'][0];
+
+			$result += $aggregate_function != AGGREGATE_COUNT
+				? [$column['itemid'] => $values['value']]
+				: [$column['itemid'] => $values['count']];
+		}
 
 		return $result;
 	}

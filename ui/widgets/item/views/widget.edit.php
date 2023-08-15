@@ -83,7 +83,6 @@ $form
 			->addField(
 				(new CWidgetFieldDatePickerView($data['fields']['time_to']))
 					->addRowClass('js-row-override-time')
-
 			)
 			->addField(
 				new CWidgetFieldRadioButtonListView($data['fields']['history'])
