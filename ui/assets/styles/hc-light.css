@@ -2238,11 +2238,11 @@ button {
       background-color: #f4f4f4; }
 
 .inline-filter {
+  line-height: 24px;
   text-align: right; }
+  .inline-filter button,
+  .inline-filter input,
   .inline-filter label {
-    line-height: 24px; }
-  .inline-filter label,
-  .inline-filter input {
     vertical-align: top; }
   .inline-filter > li {
     display: inline-block; }
