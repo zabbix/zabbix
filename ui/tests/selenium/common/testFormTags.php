@@ -691,7 +691,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'template':
-				$form = $this->query('name:templatesForm')->asForm(['normalized' => true])->waitUntilPresent()->one();
+				$form = COverlayDialogElement::find()->asForm()->one();
 				$form->fill(['Template name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
@@ -761,6 +761,13 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name',  $new_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
+			if ($object === 'template') {
+				$this->query('button:Reset')->one()->click();
+				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+				$filter->fill(['Name' => $new_name]);
+				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			}
+
 			$this->query('link', $new_name)->one()->click();
 		}
 		$form->invalidate();
