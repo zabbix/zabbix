@@ -1463,6 +1463,14 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 				continue;
 			}
 
+			if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot process event for trigger prototype"
+						" (triggerid:" ZBX_FS_UI64 ")", trigger->triggerid);
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
 			zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin,
 					&query->functionids);
 

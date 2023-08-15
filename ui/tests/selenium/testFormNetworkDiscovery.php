@@ -620,6 +620,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($discovery['name']);
 			COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Update')->waitUntilClickable()
 					->one()->click();
+			COverlayDialogElement::ensureNotPresent();
 
 			// Check the results in frontend.
 			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');

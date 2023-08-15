@@ -3933,7 +3933,7 @@ class CApiInputValidator {
 		}
 
 		if ($types) {
-			$matches = (new CMacrosResolverGeneral())->getMacroPositions($json, $types);
+			$matches = CMacrosResolverGeneral::getMacroPositions($json, $types);
 			$shift = 0;
 
 			foreach ($matches as $pos => $substr) {
