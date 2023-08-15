@@ -31,6 +31,7 @@ use API,
 	CSettingsHelper,
 	Manager;
 
+use CRangeTimeParser;
 use Widgets\TopHosts\Widget;
 
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
