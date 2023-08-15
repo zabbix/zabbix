@@ -128,10 +128,15 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 	}
 
 	size = 0;
-	if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_VALUE, &values[*values_num], &size, NULL))
+	if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_RUNTIME_ERROR, &values[*values_num], &size,
+			NULL))
 	{
-		*error = zbx_strdup(NULL, "Missing value field.");
-		goto out;
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_data, ZBX_PROTO_TAG_VALUE, &values[*values_num], &size,
+				NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing value field.");
+			goto out;
+		}
 	}
 	ts[(*values_num)++] = ts_now;
 
@@ -337,7 +342,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value_raw.data.err,
 						ZBX_JSON_TYPE_STRING);
 
-				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
+				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action && NULL != preproc_error)
 				{
 					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, preproc_error,
 							ZBX_JSON_TYPE_STRING);

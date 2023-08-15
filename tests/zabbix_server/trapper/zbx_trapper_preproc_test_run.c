@@ -78,6 +78,13 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 
 	pp_execute(&ctx, preproc, NULL, NULL, &value_in, *ts, get_zbx_config_source_ip(), &value_out, &results_out,
 			&results_num);
+	for (i = 0; i < steps->values_num; i++)
+	{
+		zbx_pp_step_t *pstep = steps->values[i];
+
+		if (pstep->error_handler_params != preproc->steps[i].error_handler_params)
+			pstep->error_handler_params = preproc->steps[i].error_handler_params;
+	}
 
 	/* copy results */
 	for (i = 0; i < results_num; i++)

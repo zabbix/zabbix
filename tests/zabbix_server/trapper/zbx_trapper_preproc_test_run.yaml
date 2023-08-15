@@ -1247,4 +1247,125 @@ out:
         "result": "10"
       }
     }
+---
+test case: 'Check for not supported test'
+in:
+  request: |
+    {
+          "data": {
+                "runtime_error": "error 123",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "\\0",
+                    "params": "123"
+                  }
+                ],
+                "state": "1",
+                "value_type": "0"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "action": 3,
+             "error":"error 123",
+             "failed":"123"
+          }
+        ],
+        "error": "123"
+      }
+    }
+---
+test case: 'Check for not supported test'
+in:
+  request: |
+    {
+          "data": {
+                "runtime_error": "error 123",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "\\0",
+                    "params": "123"
+                  }
+                ],
+                "state": "1",
+                "value_type": "0"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "action": 3,
+             "error":"error 123",
+             "failed":"123"
+          }
+        ],
+        "error": "123"
+      }
+    }
+---
+test case: 'Check for not supported test'
+in:
+  request: |
+    {
+          "data": {
+                "runtime_error": "error 123",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "\\0",
+                    "params": "123"
+                  },
+                  {
+                    "type": "26",
+                    "error_handler_params": "333",
+                    "params": "123",
+                    "error_handler": "2"
+                  }
+                ],
+                "state": "1",
+                "value_type": "0"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "action": 3,
+             "error":"error 123"
+          },
+          {
+             "action": 2,
+             "error":"123",
+             "result": "333"
+          }
+        ],
+        "result": "333"
+      }
+    }
 ...

@@ -94,6 +94,8 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_SNMP_WALK_TO_VALUE;
 	if (0 == strcmp(str, "ZBX_PREPROC_SCRIPT"))
 		return ZBX_PREPROC_SCRIPT;
+	if (0 == strcmp(str, "ZBX_PREPROC_VALIDATE_NOT_SUPPORTED"))
+		return ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 
 	fail_msg("unknow preprocessing step type: %s", str);
 	return FAIL;
@@ -133,6 +135,15 @@ static void	read_history_value(const char *path, zbx_variant_t *value, zbx_times
 	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts);
 	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 	zbx_variant_convert(value, zbx_mock_str_to_variant(zbx_mock_get_object_member_string(handle, "variant")));
+}
+
+static void	read_error(const char *path, zbx_variant_t *value, zbx_timespec_t *ts)
+{
+	zbx_mock_handle_t	handle;
+
+	handle = zbx_mock_get_parameter_handle(path);
+	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts);
+	zbx_variant_set_error(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 }
 
 static void	read_step(const char *path, zbx_pp_step_t *step)
@@ -283,7 +294,13 @@ void	zbx_mock_test_entry(void **state)
 
 	pp_context_init(&ctx);
 
-	read_value("in.value", &value_type, &value_in, &ts);
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.error"))
+	{
+		read_error("in.error", &value_in, &ts);
+		value_type = value_in.type;
+	}
+	else
+		read_value("in.value", &value_type, &value_in, &ts);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.history"))
 	{

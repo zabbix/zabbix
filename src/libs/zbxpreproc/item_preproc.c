@@ -1039,6 +1039,103 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks error for pattern matching regular expression              *
+ *                                                                            *
+ * Parameters: value                - [IN] value to process                   *
+ *             params               - [IN] operation parameters               *
+ *             error                - [IN/OUT]                                *
+ *                                                                            *
+ * Return value: FAIL - preprocessing step error                              *
+ *               SUCCEED - preprocessing step succeeded, error may contain    *
+ *                         extracted error message                            *
+ *                                                                            *
+ * Return value: FAIL - preprocessing step error                              *
+ *               SUCCEED - preprocessing step succeeded, error may contain    *
+ *                         extracted error message                            *
+ *                                                                            *
+ ******************************************************************************/
+int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error)
+{
+#define ZBX_PP_MATCH_TYPE_MATCHES	0
+#define ZBX_PP_MATCH_TYPE_NOT_MATCH	1
+	zbx_variant_t	value_str;
+	int		ret = SUCCEED, match_type = 0;
+	char		*pattern = NULL, *newline, *out = NULL, *errptr = NULL;
+	zbx_regexp_t	*regex;
+
+	if (0 == strcmp("", params))
+		return ret;
+
+	zbx_variant_copy(&value_str, value);
+
+	pattern = zbx_strdup(NULL, params);
+
+	if (NULL != (newline = strchr(pattern, '\n')))
+	{
+		match_type = atoi(newline);
+
+		if (ZBX_PP_MATCH_TYPE_NOT_MATCH != match_type)
+			match_type = ZBX_PP_MATCH_TYPE_MATCHES;
+	}
+
+	if (ZBX_PP_MATCH_TYPE_MATCHES == match_type)
+	{
+		if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &errptr))
+		{
+			*error = zbx_dsprintf(*error, "regular expression compilation failed: %s", errptr);
+			zbx_free(errptr);
+			goto out;
+		}
+
+		if (SUCCEED == zbx_mregexp_sub_precompiled(value->data.str, regex, *error, ZBX_MAX_RECV_DATA_SIZE,
+				&out))
+		{
+			if (NULL != out)
+			{
+				zbx_free(*error);
+				*error = out;
+			}
+		}
+		else
+			ret = FAIL;
+	}
+	else
+	{
+		int	res;
+
+		if (FAIL == zbx_regexp_compile(pattern, &regex, &errptr))
+		{
+			*error = zbx_dsprintf(*error, "regular expression compilation failed: %s", errptr);
+			zbx_free(errptr);
+			ret = FAIL;
+			goto out;
+		}
+
+		if (FAIL != (res = zbx_regexp_match_precompiled2(value_str.data.str, regex, &errptr)))
+		{
+			if (ZBX_REGEXP_MATCH == res)
+				ret = FAIL;
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "regular expression execution failed: %s", errptr);
+			zbx_free(errptr);
+			ret = FAIL;
+		}
+	}
+
+	zbx_regexp_free(regex);
+out:
+	zbx_free(pattern);
+	zbx_variant_clear(&value_str);
+
+	return ret;
+#undef ZBX_PP_MATCH_TYPE_MATCHES
+#undef ZBX_PP_MATCH_TYPE_NOT_MATCH
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: throttles value by suppressing identical values                   *
  *                                                                            *
  * Parameters: value         - [IN/OUT] value to process                      *
