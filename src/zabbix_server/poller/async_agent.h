@@ -34,17 +34,9 @@ zbx_zabbix_agent_step_t;
 
 typedef struct
 {
+	zbx_dc_item_context_t	item;
 	void			*arg;
 	void			*arg_action;
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	unsigned char		value_type;
-	unsigned char		flags;
-	unsigned char		state;
-	char			*key;
-	char			*key_orig;
-	char			host[ZBX_HOSTNAME_BUF_LEN];
-	zbx_dc_interface_t	interface;
 	zbx_socket_t		s;
 	zbx_tcp_recv_context_t	tcp_recv_context;
 	zbx_tcp_send_context_t	tcp_send_context;
@@ -53,8 +45,6 @@ typedef struct
 	char			*tls_arg1;
 	char			*tls_arg2;
 	unsigned char		tls_connect;
-	int			ret;
-	AGENT_RESULT		result;
 }
 zbx_agent_context;
 

@@ -36,8 +36,12 @@ static void	async_task_remove(zbx_async_task_t *task)
 {
 	task->free_cb(task->data);
 
-	event_free(task->rx_event);
-	event_free(task->tx_event);
+	if (NULL != task->rx_event)
+		event_free(task->rx_event);
+
+	if (NULL != task->tx_event)
+		event_free(task->tx_event);
+
 	event_free(task->timeout_event);
 
 	zbx_free(task);
@@ -61,13 +65,12 @@ static const char	*task_state_to_str(zbx_async_task_state_t task_state)
 static void	async_event(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
-	int			ret;
-
-	ZBX_UNUSED(fd);
+	int			ret, fd_in = fd;
+	struct event_base	*ev;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	ret = task->process_cb(what, task->data);
+	ret = task->process_cb(what, task->data, &fd);
 
 	switch (ret)
 	{
@@ -75,9 +78,27 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			async_task_remove(task);
 			break;
 		case ZBX_ASYNC_TASK_READ:
+			if (fd_in != fd)
+			{
+				ev = event_get_base(task->timeout_event);
+
+				if (NULL != task->rx_event)
+					event_free(task->rx_event);
+
+				task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
+			}
 			event_add(task->rx_event, NULL);
 			break;
 		case ZBX_ASYNC_TASK_WRITE:
+			if (fd_in != fd)
+			{
+				ev = event_get_base(task->timeout_event);
+
+				if (NULL != task->tx_event)
+					event_free(task->tx_event);
+
+				task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
+			}
 			event_add(task->tx_event, NULL);
 			break;
 
@@ -96,12 +117,20 @@ void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int ti
 	task->data = data;
 	task->process_cb = process_cb;
 	task->free_cb = clear_cb;
-	task->timeout_event = evtimer_new(ev,  async_event, (void *)task);
+	task->timeout_event = evtimer_new(ev, async_event, (void *)task);
 
 	evtimer_add(task->timeout_event, &tv);
 
-	task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
-	task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
+	if (-1 != fd)
+	{
+		task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
+		task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
+	}
+	else
+	{
+		task->rx_event = NULL;
+		task->tx_event = NULL;
+	}
 
 	/* call initialization event */
 	async_event(fd, 0, task);

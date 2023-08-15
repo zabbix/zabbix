@@ -39,7 +39,8 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_HTTPAGENT	7
 #define	ZBX_POLLER_TYPE_AGENT		8
-#define	ZBX_POLLER_TYPE_COUNT		9	/* number of poller types */
+#define	ZBX_POLLER_TYPE_SNMP		9
+#define	ZBX_POLLER_TYPE_COUNT		10	/* number of poller types */
 
 typedef enum
 {
@@ -98,6 +99,21 @@ typedef struct
 	char		port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 }
 zbx_dc_interface2_t;
+
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	unsigned char		value_type;
+	unsigned char		flags;
+	char			*key;
+	char			*key_orig;
+	char			host[ZBX_HOSTNAME_BUF_LEN];
+	zbx_dc_interface_t	interface;
+	int			ret;
+	AGENT_RESULT		result;
+}
+zbx_dc_item_context_t;
 
 #define ZBX_HOST_IPMI_USERNAME_LEN	16
 #define ZBX_HOST_IPMI_USERNAME_LEN_MAX	(ZBX_HOST_IPMI_USERNAME_LEN + 1)
@@ -792,7 +808,7 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
-/* options for hk.history_mode, trends_mode */
+/* options for hk.history_mode, trends_mode, audit_mode */
 #define ZBX_HK_MODE_DISABLED		ZBX_HK_OPTION_DISABLED
 #define ZBX_HK_MODE_REGULAR		ZBX_HK_OPTION_ENABLED
 #define ZBX_HK_MODE_PARTITION		2

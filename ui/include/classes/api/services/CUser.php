@@ -1689,27 +1689,27 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sessionid = array_key_exists('sessionid', $session) ? $session['sessionid'] : null;
-		$token = array_key_exists('token', $session) ? $session['token'] : null;
+		$session += ['sessionid' => null, 'token' => null];
 
-		if (($token === null && $sessionid === null) || ($token !== null && $sessionid !== null)) {
+		if (($session['sessionid'] === null && $session['token'] === null)
+				|| ($session['sessionid'] !== null && $session['token'] !== null)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session ID or token is expected.'));
 		}
 
 		$time = time();
 
 		// Access DB only once per page load.
-		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
+		if (self::$userData !== null && self::$userData['sessionid'] === $session['sessionid']) {
 			return self::$userData;
 		}
 
-		if ($token !== null) {
-			$db_token = self::tokenAuthentication($token, $time);
-			$userid = $db_token['userid'];
+		if ($session['sessionid'] !== null) {
+			$db_session = self::sessionidAuthentication($session['sessionid']);
+			$userid = $db_session['userid'];
 		}
 		else {
-			$db_session = self::sessionidAuthentication($sessionid);
-			$userid = $db_session['userid'];
+			$db_token = self::tokenAuthentication($session['token'], $time);
+			$userid = $db_token['userid'];
 		}
 
 		$db_users = DB::select('users', [
@@ -1733,20 +1733,7 @@ class CUser extends CApiService {
 			$db_user['deprovisioned'] = true;
 		}
 
-		if ($token !== null) {
-			// Check permissions.
-			if ($permissions['users_status'] == GROUP_STATUS_DISABLED || $db_user['deprovisioned']) {
-				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-			}
-
-			DB::update('token', [
-				'values' => ['lastaccess' => $time],
-				'where' => ['tokenid' => $db_token['tokenid']]
-			]);
-		}
-		else {
-			$db_user['sessionid'] = $sessionid;
-			$db_user['secret'] = $db_session['secret'];
+		if ($session['sessionid'] !== null) {
 			$autologout = timeUnitToSeconds($db_user['autologout']);
 
 			// Check system permissions.
@@ -1759,7 +1746,7 @@ class CUser extends CApiService {
 				]);
 				DB::update('sessions', [
 					'values' => ['status' => ZBX_SESSION_PASSIVE],
-					'where' => ['sessionid' => $sessionid]
+					'where' => ['sessionid' => $session['sessionid']]
 				]);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
@@ -1768,12 +1755,27 @@ class CUser extends CApiService {
 			if ($session['extend'] && $time != $db_session['lastaccess']) {
 				DB::update('sessions', [
 					'values' => ['lastaccess' => $time],
-					'where' => ['sessionid' => $sessionid]
+					'where' => ['sessionid' => $session['sessionid']]
 				]);
 			}
-		}
 
-		self::$userData = $db_user;
+			self::$userData = $db_user + ['sessionid' => $session['sessionid']];
+			$db_user['sessionid'] = $session['sessionid'];
+			$db_user['secret'] = $db_session['secret'];
+		}
+		else {
+			// Check permissions.
+			if ($permissions['users_status'] == GROUP_STATUS_DISABLED || $db_user['deprovisioned']) {
+				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			DB::update('token', [
+				'values' => ['lastaccess' => $time],
+				'where' => ['tokenid' => $db_token['tokenid']]
+			]);
+
+			self::$userData = $db_user + ['token' => $session['token']];
+		}
 
 		return $db_user;
 	}

@@ -33,7 +33,7 @@ typedef enum
 }
 zbx_async_task_state_t;
 
-typedef int (*zbx_async_task_process_cb_t)(short event, void *data);
+typedef int (*zbx_async_task_process_cb_t)(short event, void *data, int *fd);
 typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
 
