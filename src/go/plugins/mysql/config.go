@@ -50,6 +50,12 @@ type PluginOptions struct {
 
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]Session `conf:"optional"`
+
+	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
+	CustomQueriesPath string `conf:"optional"`
+
+	// Default stores default connection parameter values from configuration file
+	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

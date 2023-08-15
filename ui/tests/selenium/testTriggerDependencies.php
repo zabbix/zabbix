@@ -89,7 +89,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 
 		$this->zbxTestClick('bnt1');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
-		$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+		$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
 		$host->fill([
 			'values' => $data['template'],
 			'context' => 'Templates'
@@ -110,12 +110,12 @@ class testTriggerDependencies extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'trigger' => 'Zabbix agent is not available',
+					'trigger' => 'Zabbix agent: Zabbix agent is not available',
 					'template' => self::TEMPLATE_FREEBSD,
-					'dependency' => '/etc/passwd has been changed on FreeBSD by Zabbix agent',
-					'error_message' => 'Trigger "Zabbix agent is not available" cannot depend on the trigger "/etc/passwd has been changed'.
-							' on {HOST.NAME}" from the template "FreeBSD by Zabbix agent", because dependencies on triggers'.
-							' from a child template or host are not allowed.'
+					'dependency' => 'FreeBSD: /etc/passwd has been changed on FreeBSD by Zabbix agent',
+					'error_message' => 'Trigger "Zabbix agent: Zabbix agent is not available" cannot depend on the'.
+							' trigger "FreeBSD: /etc/passwd has been changed on {HOST.NAME}" from the template "FreeBSD by'.
+							' Zabbix agent", because dependencies on triggers from a child template or host are not allowed.'
 				]
 			],
 			[
@@ -132,18 +132,18 @@ class testTriggerDependencies extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'trigger' => 'Apache: has been restarted',
+					'trigger' => 'Apache: Host has been restarted',
 					'template' => self::TEMPLATE_APACHE,
-					'dependency' => 'Apache: has been restarted',
-					'error_message' => 'Trigger "Apache: has been restarted" cannot depend on the trigger "Apache: '.
-							'has been restarted", because a circular linkage ("Apache: has been restarted" -> "Apache: '.
-							'has been restarted") would occur.'
+					'dependency' => 'Apache: Host has been restarted',
+					'error_message' => 'Trigger "Apache: Host has been restarted" cannot depend on the trigger "Apache:'.
+							' Host has been restarted", because a circular linkage ("Apache: Host has been restarted" ->'.
+							' "Apache: Host has been restarted") would occur.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_GOOD,
-					'trigger' => 'Apache: has been restarted',
+					'trigger' => 'Apache: Host has been restarted',
 					'template' => self::TEMPLATE_APACHE,
 					'dependency' => 'Apache: Service is down'
 				]

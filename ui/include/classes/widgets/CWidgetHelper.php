@@ -461,18 +461,18 @@ class CWidgetHelper {
 			] + $field->getFilterParameters());
 	}
 
-	public static function getSelectResource($field, $caption, $form_name) {
-		return [
-			(new CTextBox($field->getName().'_caption', $caption, true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field)),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", '.json_encode($field->getPopupOptions($form_name)).',
-					{dialogue_class: "modal-popup-generic"}
-				);')
-		];
+	/**
+	 * @param CWidgetFieldMsSysmap $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getSysmap($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'sysmaps', [
+			'srctbl' => 'sysmaps',
+			'srcfld1' => 'sysmapid'
+		] + $field->getFilterParameters());
 	}
 
 	/**
@@ -621,9 +621,8 @@ class CWidgetHelper {
 			}
 
 			$table->addRow((new CRow([
-				(new CCol((new CDiv)
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('top: 0px;')
+				(new CCol(
+					(new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)
 				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CDiv($column['name']))->addClass('text'),
 				(new CDiv($label))->addClass('text'),
@@ -796,7 +795,7 @@ class CWidgetHelper {
 			(new CDiv([
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('position: absolute; margin-left: -25px;'),
+					->addStyle('margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv(
 						(new CPatternSelect([
@@ -1152,7 +1151,7 @@ class CWidgetHelper {
 			(new CDiv([
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('position: absolute; margin-left: -25px;'),
+					->addStyle('margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv([
 						(new CButton())

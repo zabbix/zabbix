@@ -456,8 +456,6 @@ class testFormGraphs extends CWebTest {
 					'details' => [
 						'Incorrect value "65536" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "65536" for "Height" field: must be between 20 and 65535.',
-						'Field "yaxismin" is not correct: a number is too large',
-						'Field "yaxismax" is not correct: a number is too large',
 						'Incorrect value "101" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
 						'Incorrect value "101" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
 					]
@@ -511,10 +509,10 @@ class testFormGraphs extends CWebTest {
 					'details' => [
 						'Incorrect value "1" for "Width" field: must be between 20 and 65535.',
 						'Incorrect value "19" for "Height" field: must be between 20 and 65535.',
-						'Field "yaxismin" is not correct: a number has too many fractional digits',
-						'Field "yaxismax" is not correct: a number has too many fractional digits',
-						'Field "Percentile line (left)" is not correct: a number has too many fractional digits',
-						'Field "Percentile line (right)" is not correct: a number has too many fractional digits'
+						'Incorrect value "1.99999" for "Percentile line (left)" field: must be between 0 and 100, and '.
+								'have no more than 4 digits after the decimal point.',
+						'Incorrect value "2.12345" for "Percentile line (right)" field: must be between 0 and 100, and '.
+								'have no more than 4 digits after the decimal point.'
 					]
 				]
 			],
@@ -534,8 +532,6 @@ class testFormGraphs extends CWebTest {
 					],
 					'error' => 'Page received incorrect data',
 					'details' => [
-						'Field "yaxismin" is not correct: a number is too large',
-						'Field "yaxismax" is not correct: a number is too large',
 						'Incorrect value "-900000" for "Percentile line (left)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.',
 						'Incorrect value "-900000" for "Percentile line (right)" field: must be between 0 and 100, and have no more than 4 digits after the decimal point.'
 					]
@@ -642,7 +638,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['items'] as $i => $item) {
 				$items_container->query('button', CTestArrayHelper::get($item, 'prototype', false) ? 'Add prototype' : 'Add')
 						->waitUntilClickable()->one()->click();
-				$dialog = COverlayDialogElement::find()->one();
+				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$dialog->query('link', $item['item'])->waitUntilClickable()->one()->click();
 				$dialog->ensureNotPresent();
 
@@ -770,8 +766,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 					],
 					'yaxis_items' => [
-						'min' => 'Failed step of scenario "testFormWeb3".',
-						'max' => 'Download speed for scenario "testFormWeb4".'
+						'min' => 'Failed step of scenario "Scenario for Update".',
+						'max' => 'Download speed for scenario "Scenario for Delete".'
 					],
 					'items' => [
 						[

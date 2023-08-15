@@ -18,11 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
+ * @dataSource DiscoveredHosts, HostGroups
+ *
  * @backup items
  */
 class testPageLowLevelDiscovery extends CWebTest {
@@ -53,8 +56,16 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
+			$filter_space = $this->query('xpath://div['.CXPathHelper::fromClass('filter-space').']')->one();
 			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
 			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+
+			if ($status === 'true') {
+				$filter_space->query('id:tab_0')->one()->waitUntilNotVisible();
+			}
+			else {
+				$filter_space->query('id:tab_0')->one()->waitUntilVisible();
+			}
 		}
 
 		// Check all dropdowns.
@@ -413,7 +424,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 					],
 					'expected' => [
 						'Linux by Zabbix agent: Block devices discovery',
-						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
+						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
+						'LLD for Discovered host tests',
+						'LLD for host group test',
 						'Linux by Zabbix agent: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery'
 					]

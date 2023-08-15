@@ -293,6 +293,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -941,6 +948,10 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -1232,6 +1243,7 @@ form {
 		.subfilter-disable-btn {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
+			-webkit-text-fill-color: $multiselect-item-disabled-color;
 		}
 	}
 
@@ -1369,11 +1381,32 @@ form {
 			padding: 0 11px 0 0;
 			vertical-align: middle;
 		}
+	}
 
+	.drag-icon {
+		position: absolute;
+		top: 1px;
+		margin-right: 5px;
+	}
+
+	.list-vertical-accordion,
+	.table-forms-separator {
 		.drag-icon {
-			position: absolute;
 			top: 5px;
-			margin-right: 5px;
+		}
+	}
+
+	.httpconf-steps-dynamic-row,
+	.list-accordion-item-head,
+	.overrides-list-item {
+		.drag-icon {
+			top: 0;
+		}
+	}
+
+	.trigger-list {
+		.drag-icon {
+			top: 1px;
 		}
 	}
 
@@ -1429,6 +1462,16 @@ form {
 
 			&:last-child {
 				padding-right: 0;
+			}
+
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.average-bg,
+			&.warning-bg,
+			&.high-bg,
+			&.disaster-bg {
+				padding-left: 5px;
 			}
 		}
 
@@ -1606,8 +1649,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 	}
 }
 
@@ -1618,7 +1660,9 @@ textarea {
 	}
 	padding: 4px 5px;
 	margin: 0;
+	min-height: 24px;
 	overflow: auto;
+	resize: vertical;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
@@ -1627,8 +1671,7 @@ textarea {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 
 		&:focus {
 			border-color: $form-border-focus-color;
@@ -1842,6 +1885,12 @@ select {
 
 	&:focus {
 		border-color: $form-border-focus-color;
+	}
+
+	&::placeholder {
+		color: $input-placeholder-color;
+		-webkit-text-fill-color: $input-placeholder-color;
+		opacity: 1;
 	}
 }
 
@@ -2519,10 +2568,24 @@ $icon-widget-btn: (
 	}
 }
 
+%form-readonly {
+	color: $font-color;
+	-webkit-text-fill-color: $font-color;
+	background-color: $form-disabled-bg-color;
+	border-color: $form-disabled-border-color;
+}
+
 %form-disabled {
 	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color !important;
+	-webkit-text-fill-color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
 	border-color: $form-disabled-border-color;
+
+	&::placeholder {
+		color: $input-disabled-placeholder-color;
+		-webkit-text-fill-color: $input-disabled-placeholder-color;
+		opacity: 1;
+	}
 }
 
 .inaccessible {
@@ -3064,6 +3127,10 @@ $form-icon-btn: (
 			position: relative;
 			@extend %webkit-scrollbar;
 
+			> form {
+				padding: 2px 0;
+			}
+
 			.table-forms {
 				.table-forms-td-right {
 					padding-right: 8px;
@@ -3187,14 +3254,6 @@ $form-icon-btn: (
 	.list-table {
 		white-space: normal;
 		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
-		}
-
-		td {
-			@extend %dashboard-widget-td;
-		}
 	}
 
 	.table-paging {
@@ -4752,6 +4811,10 @@ svg {
 	.overrides-list-item {
 		display: table-row;
 
+		.columns-wrapper {
+			position: relative;
+		}
+
 		.btn-remove {
 			position: relative;
 			right: -73px;
@@ -4840,6 +4903,10 @@ svg {
 			right: -10px;
 			top: 3px;
 		}
+	}
+
+	.list-accordion-item-head {
+		position: relative;
 	}
 
 	.list-accordion-item-head,
@@ -5309,18 +5376,6 @@ svg {
 			margin-right: 5px;
 		}
 	}
-}
-
-:-ms-input-placeholder {
-	color: $input-placeholder-color !important;
-}
-
-::-ms-input-placeholder {
-	color: $input-placeholder-color;
-}
-
-::placeholder {
-	color: $input-placeholder-color;
 }
 
 .icon-action-command,

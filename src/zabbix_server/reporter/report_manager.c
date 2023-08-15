@@ -2169,7 +2169,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 {
 	zbx_uint64_t		dashboardid, userid, access_userid;
 	zbx_vector_ptr_pair_t	params;
-	int			report_time, ret, width, height;
+	int			report_time, ret, width, height, i;
 	unsigned char		period;
 	zbx_rm_job_t		*job;
 	char			*name;
@@ -2180,6 +2180,16 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 			&period, &params);
 
 	rm_get_report_dimensions(dashboardid, &width, &height);
+
+	for (i = 0; i < params.values_num; i++)
+	{
+		if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_BODY) ||
+				0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
+		{
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, (char **)&params.values[i].second, MACRO_TYPE_REPORT, NULL, 0);
+		}
+	}
 
 	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
 			width, height, &params, error)))

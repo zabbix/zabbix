@@ -134,9 +134,10 @@ function createFontSelect(string $name): CSelect {
 					)
 					->addRow(_('Label'),
 						(new CTextArea('label'))
+							->setId('elementLabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
-							->setId('elementLabel')
+							->disableSpellcheck()
 					)
 					->addRow(new CLabel(_('Label location'), 'label-label-location'),
 						(new CSelect('label_location'))
@@ -174,6 +175,7 @@ function createFontSelect(string $name): CSelect {
 								->setId('triggerContainer')
 								->setAttribute('style', 'width: 100%;')
 								->addClass('ui-sortable')
+								->addClass('trigger-list')
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
@@ -205,27 +207,16 @@ function createFontSelect(string $name): CSelect {
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 						'triggerSelectRow'
 					)
-					->addRow((new CLabel(_('Map'), 'elementName'))->setAsteriskMark(), [
-						(new CTextBox('elementName'))
-							->setReadonly(true)
-							->setId('elementNameMap')
+					->addRow((new CLabel(_('Map'), 'elementNameMap_ms'))->setAsteriskMark(),
+						(new CMultiSelect([
+							'name' => 'elementNameMap',
+							'object_name' => 'sysmaps',
+							'multiple' => false
+						]))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
-						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick(
-								'return PopUp("popup.generic", jQuery.extend('.json_encode([
-									'srctbl' => 'sysmaps',
-									'srcfld1' => 'sysmapid',
-									'srcfld2' => 'name',
-									'dstfrm' => 'selementForm',
-									'dstfld1' => 'sysmapid',
-									'dstfld2' => 'elementNameMap'
-								]).', {excludeids: [#{sysmapid}]}), {dialogue_class: "modal-popup-generic"});'
-							)
-					], 'mapSelectRow')
+						'mapSelectRow'
+					)
 					->addRow(_('Tags'),
 						(new CDiv([
 							(new CTable())
@@ -645,9 +636,10 @@ function createFontSelect(string $name): CSelect {
 							->setId('chkboxLabel')
 							->setLabel(_('Label')),
 						(new CTextArea('label'))
+							->setId('massLabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
-							->setId('massLabel')
+							->disableSpellcheck()
 					)
 					->addRow(
 						(new CCheckBox('chkbox_label_location'))
@@ -763,9 +755,10 @@ function createFontSelect(string $name): CSelect {
 				(new CFormList())
 					->addRow(_('Label'),
 						(new CTextArea('label'))
+							->setId('linklabel')
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
-							->setId('linklabel')
+							->disableSpellcheck()
 					)
 					->addRow(new CLabel(_('Connect to'), 'label-selementid2'), (new CSelect('selementid2'))
 							->setFocusableElementId('label-selementid2')

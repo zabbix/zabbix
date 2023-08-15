@@ -84,13 +84,12 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[post_type]', 'post_type_container', _('Original')))
 			->setLabel(_('Request body type')),
-		(new CDiv(
-			(new CRadioButtonList('post_type', (int) DB::getDefault('items', 'post_type')))
-				->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
-				->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
-				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
-				->setModern(true)
-		))->setId('post_type_container')
+		(new CRadioButtonList('post_type', (int) DB::getDefault('items', 'post_type')))
+			->addValue(_('Raw data'), ZBX_POSTTYPE_RAW)
+			->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
+			->addValue(_('XML data'), ZBX_POSTTYPE_XML)
+			->setId('post_type_container')
+			->setModern(true)
 	)
 	->addRow(
 		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))->setLabel(_('Timeout')),
@@ -99,7 +98,9 @@ $item_form_list
 	// Append ITEM_TYPE_HTTPAGENT Request body.
 	->addRow(
 		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))->setLabel(_('Request body')),
-		(new CTextArea('posts', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('posts', ''))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append ITEM_TYPE_HTTPAGENT Headers fields.
@@ -126,7 +127,7 @@ $item_form_list
 				->addItem(new CRow([
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
@@ -207,13 +208,6 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 			->setId('preprocessing_div')
 	);
 
-// Prepare Update interval for form list.
-$update_interval = (new CTable())
-	->setId('update_interval')
-	->addRow([_('Delay'),
-		(new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
-	]);
-
 $custom_intervals = (new CTable())
 	->setId('custom_intervals')
 	->setHeader([
@@ -266,19 +260,25 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-$update_interval->addRow(
-	(new CRow([
-		(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
-		new CCol($custom_intervals)
-	]))
-);
+// Prepare Update interval for form list.
+$update_interval = (new CTable())
+	->setId('update_interval')
+	->addRow([_('Delay'),
+		(new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
+	])
+	->addRow(
+		(new CRow([
+			(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
+			new CCol($custom_intervals)
+		]))
+	);
 
 // Append update interval to form list.
 $item_form_list
 	// Append delay to form list.
 	->addRow(
-		(new CVisibilityBox('visible[delay]', 'update_interval_div', _('Original')))->setLabel(_('Update interval')),
-		(new CDiv($update_interval))->setId('update_interval_div')
+		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
+		$update_interval
 	)
 	// Append history to form list.
 	->addRow(

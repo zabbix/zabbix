@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
@@ -51,6 +52,13 @@ class CTableElement extends CElement {
 	 * @var array
 	 */
 	protected $headers_text;
+
+	/**
+	 * Array of column names.
+	 *
+	 * @var array
+	 */
+	protected $column_names;
 
 	/**
 	 * @inheritdoc
@@ -98,6 +106,37 @@ class CTableElement extends CElement {
 	}
 
 	/**
+	 * Get sortable table headers.
+	 *
+	 * @return array
+	 */
+	public function getSortableHeaders() {
+		return $this->getHeaders()->query('tag:a')->asText();
+	}
+
+	/**
+	 * Get array of header element texts for column naming.
+	 *
+	 * @return array
+	 */
+	public function getColumnNames() {
+		if ($this->column_names === null) {
+			$this->column_names = $this->getHeadersText();
+		}
+
+		return $this->column_names;
+	}
+
+	/**
+	 * Set array of header element texts for column naming.
+	 *
+	 * @param array $names array of names
+	 */
+	public function setColumnNames($names) {
+		$this->column_names = $names;
+	}
+
+	/**
 	 * Get collection of table rows.
 	 *
 	 * @return CElementCollection
@@ -129,7 +168,7 @@ class CTableElement extends CElement {
 	 * @return array
 	 */
 	public function getCells() {
-		$headers = $this->getHeadersText();
+		$headers = $this->getColumnNames();
 
 		$table = [];
 		foreach ($this->getRows() as $row) {
@@ -154,7 +193,7 @@ class CTableElement extends CElement {
 	 * @return CTableRow|CNullElement
 	 */
 	public function findRow($column, $value, $contains = false) {
-		$headers = $this->getHeadersText();
+		$headers = $this->getColumnNames();
 
 		if (is_string($column)) {
 			$index = array_search($column, $headers);
