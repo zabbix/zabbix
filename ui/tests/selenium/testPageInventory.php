@@ -26,7 +26,7 @@ class testPageInventory extends CLegacyWebTest {
 		return CDBHelper::getDataProvider(
 			'SELECT hi.*,h.name AS hostname'.
 			' FROM host_inventory hi,hosts h'.
-			' WHERE hi.hostid=h.hostid'
+			' WHERE hi.hostid=h.hostid AND NOT h.flags=2'
 		);
 	}
 
