@@ -116,6 +116,9 @@ class CControllerHousekeepingEdit extends CController {
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 			$dbversion_status = CSettingsHelper::getDbVersionStatus();
 
+			// Temporary state to show checkbox checked and disabled before the real state is detected.
+			$data['compression_not_detected'] = true;
+
 			foreach ($dbversion_status as $dbversion) {
 				if ($dbversion['database'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 					$data['timescaledb_min_version'] = $dbversion['min_version'];
@@ -125,9 +128,8 @@ class CControllerHousekeepingEdit extends CController {
 					$data['compression_availability'] = array_key_exists('compression_availability', $dbversion)
 						&& $dbversion['compression_availability'];
 
-					// Temporary state to show checkbox checked and disabled before the real state is detected.
-					if (!array_key_exists('compression_availability', $dbversion)) {
-						$data['compression_not_detected'] = true;
+					if (array_key_exists('compression_availability', $dbversion)) {
+						$data['compression_not_detected'] = false;
 					}
 
 					if ($data['compression_availability']) {
