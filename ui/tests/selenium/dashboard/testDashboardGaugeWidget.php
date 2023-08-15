@@ -948,8 +948,7 @@ class testDashboardGaugeWidget extends CWebTest {
 	public function testDashboardGaugeWidget_CheckAvailableItems() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
-		$dashboard->edit()->addWidget()->asForm();
-		$dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$dialog =  $dashboard->edit()->addWidget()->asForm();
 		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
 		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
 		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
@@ -1079,8 +1078,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$dashboard->selectPage('Screenshot page');
 		$dashboard->invalidate();
-		$dashboard->edit()->addWidget()->asForm();
-		$dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$dialog = $dashboard->edit()->addWidget()->asForm();
 		$dialog->fill([
 			'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
 			'Advanced configuration' => true

@@ -26,7 +26,11 @@ class AllItemValueTypes {
 	public static function load() {
 		CDataHelper::call('host.create', [
 			'host' => self::HOST,
-			'groups' => [['groupid' => 4]]
+			'groups' => [['groupid' => 4]],
+			'inventory_mode' => 0,
+			'inventory' => [
+				'alias' => 'Item_Types_Alias'
+			]
 		]);
 		$hostids = CDataHelper::getIds('host');
 
