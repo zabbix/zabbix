@@ -90,34 +90,34 @@
 				const itemids = Object.keys(chkbxRange.getSelectedIds());
 
 				if (target.classList.contains('js-update-item')) {
-					this.#edit(target, {itemid: target.dataset.itemid});
+					this.#edit(target, {itemid: target.dataset.itemid, context: this.context});
 				}
 				else if (target.classList.contains('js-enable-item')) {
-					this.#enable(null, [target.dataset.itemid]);
+					this.#enable(null, {itemids: [target.dataset.itemid], context: this.context});
 				}
 				else if (target.classList.contains('js-disable-item')) {
-					this.#disable(null, [target.dataset.itemid]);
+					this.#disable(null, {itemids: [target.dataset.itemid], context: this.context});
 				}
 				else if (target.classList.contains('js-massenable-item')) {
-					this.#enable(target, itemids);
+					this.#enable(target, {itemids: itemids, context: this.context});
 				}
 				else if (target.classList.contains('js-massdisable-item')) {
-					this.#disable(target, itemids);
+					this.#disable(target, {itemids: itemids, context: this.context});
 				}
 				else if (target.classList.contains('js-massexecute-item')) {
-					this.#execute(target, itemids);
+					this.#execute(target, {itemids: itemids, context: this.context});
 				}
 				else if (target.classList.contains('js-massclearhistory-item')) {
-					this.#clear(target, itemids);
+					this.#clear(target, {itemids: itemids, context: this.context});
 				}
 				else if (target.classList.contains('js-masscopy-item')) {
 					this.#copy(target, itemids);
 				}
 				else if (target.classList.contains('js-massupdate-item')) {
-					this.#massupdate(target, itemids);
+					this.#massupdate(target, {ids: itemids, prototype: 0, context: this.context});
 				}
 				else if (target.classList.contains('js-massdelete-item')) {
-					this.#delete(target, itemids);
+					this.#delete(target, {itemids: itemids, context: this.context});
 				}
 			});
 			document.querySelector('.js-create-item')?.addEventListener('click', (e) => this.#edit(e.target));
@@ -134,42 +134,42 @@
 			});
 		}
 
-		#enable(target, itemids) {
+		#enable(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.enable');
 
 			if (target !== null) {
-				this.#confirmAction(curl, {itemids}, target);
+				this.#confirmAction(curl, parameters, target);
 			}
 			else {
-				this.#post(curl, {itemids});
+				this.#post(curl, parameters);
 			}
 		}
 
-		#disable(target, itemids) {
+		#disable(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.disable');
 
 			if (target !== null) {
-				this.#confirmAction(curl, {itemids}, target);
+				this.#confirmAction(curl, parameters, target);
 			}
 			else {
-				this.#post(curl, {itemids});
+				this.#post(curl, parameters);
 			}
 		}
 
-		#execute(target, itemids) {
+		#execute(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
 
-			this.#confirmAction(curl, {itemids}, target);
+			this.#confirmAction(curl, parameters, target);
 		}
 
-		#clear(target, itemids) {
+		#clear(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.clear');
 
-			this.#confirmAction(curl, {itemids}, target);
+			this.#confirmAction(curl, parameters, target);
 		}
 
 		#copy(target, itemids) {
@@ -183,12 +183,7 @@
 			});
 		}
 
-		#massupdate(target, itemids) {
-			const parameters = {
-				context: this.context,
-				prototype: 0,
-				ids: itemids
-			}
+		#massupdate(target, parameters) {
 			parameters[this.token.token] = this.token.value;
 
 			this.#popup('item.massupdate', parameters, {
@@ -197,11 +192,11 @@
 			});
 		}
 
-		#delete(target, itemids) {
+		#delete(target, parameters) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.delete');
 
-			this.#confirmAction(curl, {itemids}, target);
+			this.#confirmAction(curl, parameters, target);
 		}
 
 		#confirmAction(curl, data, target) {
