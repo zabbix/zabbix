@@ -132,8 +132,10 @@ class C64ImportConverter extends CConverter {
 				$item['triggers'] = self::convertTriggers($item['triggers']);
 			}
 
-			if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
-				$item['params'] = self::convertExpression($item['params']);
+			if (array_key_exists('type', $item)) {
+				if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
+					$item['params'] = self::convertExpression($item['params']);
+				}
 			}
 		}
 		unset($item);
