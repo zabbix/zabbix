@@ -2055,6 +2055,8 @@ function prepareLldFilter(array $filter): array {
 	}
 	unset($condition);
 
+	$filter['conditions'] = array_values($filter['conditions']);
+
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
 		$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 		$filter['formula'] = '';
