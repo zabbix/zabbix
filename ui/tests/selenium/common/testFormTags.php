@@ -1327,6 +1327,13 @@ class testFormTags extends CWebTest {
 			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
+			if ($object === 'template') {
+				$this->query('button:Reset')->one()->click();
+				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+				$filter->fill(['Name' => $this->remove_name]);
+				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			}
+
 			$this->query('link', $this->remove_name)->waitUntilPresent()->one()->click();
 		}
 
@@ -1342,7 +1349,7 @@ class testFormTags extends CWebTest {
 			'template' => 'name:templatesForm'
 		];
 
-		$form = ($object === 'host' || $object === 'service' || $object === 'connector')
+		$form = ($object === 'host' || $object === 'service' || $object === 'connector' || $object === 'template')
 			? COverlayDialogElement::find()->waitUntilVisible()->asForm()->one()
 			: $this->query($locators[$object])->asForm()->waitUntilPresent()->one();
 
