@@ -1117,7 +1117,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 	zbx_lld_host_t		*host;
 	const zbx_lld_group_t	*group;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groupids:%d hosts:%d", __func__, groupids->values_num, hosts->values_num);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -2107,6 +2107,14 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_vector_lld_group_ptr_append(&new_groups, group);
+
+			for (j = 0; j < group->hosts.values_num; j++)
+			{
+				zbx_lld_host_t	*host = (zbx_lld_host_t *)group->hosts.values[j];
+
+				/* hosts will be linked to a new host groups */
+				zbx_vector_uint64_append(&host->new_groupids, group->groupid);
+			}
 		}
 		else  if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 		{
