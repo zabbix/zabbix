@@ -1026,7 +1026,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'screenshot_id' => 'Gauge with two thresholds',
 					'fields' => [
-						'Name' => 'All settings',
+						'Name' => 'All settings + treshholds',
 						'Item' => self::GAUGE_ITEM,
 						'Min' => 1,
 						'Max' => 300,
