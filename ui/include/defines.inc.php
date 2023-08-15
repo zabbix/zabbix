@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0alpha4');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050033);
+define('ZABBIX_DB_VERSION',		6050063);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -340,8 +340,9 @@ define('ZBX_TAG_AUTOMATIC',	1);
 define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
 define('HOST_STATUS_TEMPLATE',		3);
-define('HOST_STATUS_PROXY_ACTIVE',	5);
-define('HOST_STATUS_PROXY_PASSIVE',	6);
+
+define('PROXY_MODE_ACTIVE',		0);
+define('PROXY_MODE_PASSIVE',	1);
 
 define('HOST_DISCOVER',		0);
 define('HOST_NO_DISCOVER',	1);
@@ -1113,7 +1114,7 @@ define('ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS', 'suppress');
 define('ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS', 'unsuppress');
 
 define('ZBX_TM_DATA_TYPE_DIAGINFO',			1);
-define('ZBX_TM_DATA_TYPE_PROXY_HOSTIDS',	2);
+define('ZBX_TM_DATA_TYPE_PROXYIDS',	        2);
 define('ZBX_TM_DATA_TYPE_TEMP_SUPPRESSION', 5);
 define('ZBX_TM_DATA_TYPE_RANK_EVENT',		6);
 
@@ -1539,6 +1540,7 @@ define('API_XML',					65);
 define('API_PREPROC_PARAMS',		66);
 define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
+define('API_HOST_ADDRESS',			69);
 
 // flags
 define('API_REQUIRED',					0x00001);

@@ -230,11 +230,11 @@ class CItem extends CItemGeneral {
 			zbx_value2array($options['proxyids']);
 
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = dbConditionId('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionId('h.proxyid', $options['proxyids']);
 			$sqlParts['where'][] = 'h.hostid=i.hostid';
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['h'] = 'h.proxy_hostid';
+				$sqlParts['group']['h'] = 'h.proxyid';
 			}
 		}
 
