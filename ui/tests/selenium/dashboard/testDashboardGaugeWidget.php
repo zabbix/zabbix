@@ -970,7 +970,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-			// #0 Minimal settings No data.
+			// #1 Minimal settings No data.
 			[
 				[
 					'screenshot_id' => 'Empty gauge with no data',
@@ -979,7 +979,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-			// #1 All settings + Threshold default color.
+			// #2 All settings + Threshold default color.
 			[
 				[
 					'screenshot_id' => 'Full gauge',
@@ -1021,7 +1021,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-			// #2 Macros in description + Thresholds with color.
+			// #3 Macros in description + Thresholds with color.
 			[
 				[
 					'screenshot_id' => 'Gauge with two thresholds',
@@ -1039,6 +1039,28 @@ class testDashboardGaugeWidget extends CWebTest {
 					'Thresholds' => [
 						['threshold' => '100', 'color' => '4000FF'],
 						['threshold' => '200', 'color' => 'E91E63']
+					]
+				]
+			],
+			// #4 More macros in description.
+			[
+				[
+					'screenshot_id' => 'More macros',
+					'fields' => [
+						'Name' => 'Macros',
+						'Item' => self::GAUGE_ITEM,
+						'id:description' => '{HOST.*} {ITEM.*}'
+					]
+				]
+			],
+			// #5 User macros in description.
+			[
+				[
+					'screenshot_id' => 'User macro',
+					'fields' => [
+						'Name' => 'User macro',
+						'Item' => self::GAUGE_ITEM,
+						'id:description' => '{INVENTORY.*} {$A}'
 					]
 				]
 			]
