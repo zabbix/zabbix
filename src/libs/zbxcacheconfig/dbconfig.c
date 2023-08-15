@@ -1367,8 +1367,6 @@ static ZBX_DC_PSK	*dc_psk_sync(char *tls_psk_identity, char *tls_psk, const char
 		/* New PSKid differs from old PSKid. Unlink and delete old PSK. */
 
 		dc_psk_unlink(tls_dc_psk);
-
-		tls_dc_psk = NULL;
 	}
 
 	psk_i_local.tls_psk_identity = tls_psk_identity;
