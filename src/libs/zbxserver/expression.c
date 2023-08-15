@@ -2780,7 +2780,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 
 					pos = token.loc.r;
 				}
-				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
+				else if (ZBX_TOKEN_EXPRESSION_MACRO == inner_token.type)
 				{
 					zbx_timespec_t	ts;
 					char		*errmsg = NULL;
