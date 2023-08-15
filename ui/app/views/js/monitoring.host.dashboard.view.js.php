@@ -184,6 +184,7 @@
 				tab_contents.appendChild(tab_contents_name);
 
 				tab_contents_name.textContent = host_dashboard.name;
+				tab_contents_name.title = host_dashboard.name;
 
 				this.#dashboard_tabs.insertItemBefore(tab);
 				this.#host_dashboard_tabs.set(host_dashboard.dashboardid, tab);
