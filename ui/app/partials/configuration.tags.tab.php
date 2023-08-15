@@ -144,9 +144,9 @@ $table->setFooter(new CCol(
 		->setEnabled(!$data['readonly'])
 ));
 
-$form_grid->addItem(new CLabel(_('Tags')));
-
 if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
+	$label = null;
+
 	switch ($data['source']) {
 		case 'trigger':
 		case 'trigger_prototype':
@@ -160,6 +160,8 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 			break;
 
 		case 'item':
+			$label = new CLabel(_('Tags'));
+			$table = (new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
 			$on_change = null;
 			break;
@@ -173,8 +175,11 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 				->setModern()
 		)
 	);
+	$form_grid->addItem($label);
 }
 
-$form_grid->addItem(new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)));
+$form_grid->addItem(
+	new CFormField($table)
+);
 
 $form_grid->show();
