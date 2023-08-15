@@ -62,25 +62,27 @@ if (count($data['dashboard']['pages']) >= 2) {
 	foreach ($data['dashboard']['pages'] as $index => $dashboard_page) {
 		$page_number = $index + 1;
 
-		$page_title = (new CDiv())
-			->addItem(
-				new CTag(
-					'h1', true, $dashboard_page['name'] !== '' ? $dashboard_page['name'] : _('Page').' '.$page_number
+		$dashboard_container->addItem(
+			(new CDiv())
+				->addClass('dashboard-page')
+				->addItem(
+					new CTag('h1', true,
+						$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
+					)
 				)
-			);
-
-		$dashboard_container
-			->addItem(
-				$page_title
-			)
-			->addItem(
-				(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
-			);
+				->addItem(
+					(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+				)
+		);
 	}
 }
 else {
 	$dashboard_container->addItem(
-		(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+		(new CDiv())
+			->addClass('dashboard-page')
+			->addItem(
+				(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+			)
 	);
 }
 
