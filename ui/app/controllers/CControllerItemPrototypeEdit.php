@@ -78,11 +78,28 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 
 		if ($data['form']['valuemapid']) {
-			$valuemaps = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
-				'output' => ['valuemapid', 'name'],
+			$valuemap = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name', 'hostid'],
 				'valuemapids' => [$data['form']['valuemapid']]
-			]), ['valuemapid' => 'id']);
-			$data['valuemap'] = $valuemaps ? reset($valuemaps) : [];
+			]);
+
+			if ($valuemap) {
+				$valuemap = reset($valuemap);
+
+				if (!$data['form']['templateid'] && bccomp($valuemap['hostid'], $host['hostid']) != 0) {
+					$valuemap = API::ValueMap()->get([
+						'output' => ['valuemapid', 'name'],
+						'hostids' => [$host['hostid']],
+						'filter' => ['name' => $valuemap['name']]
+					]);
+					$valuemap = $valuemap ? reset($valuemap) : [];
+				}
+
+				$data['valuemap'] = CArrayHelper::renameKeys($valuemap, ['valuemapid' => 'id']);
+			}
+			else {
+				$data['valuemapid'] = DB::getDefault('items', 'valuemapid');
+			}
 		}
 
 		if ($data['form']['master_itemid']) {
