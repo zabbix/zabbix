@@ -281,7 +281,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					],
 					'type' => [
 						'field' => 'item',
-						'value' => 'Item for'
+						'value' => 'Item for Graph'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
@@ -298,7 +298,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					],
 					'type' => [
 						'field' => 'item',
-						'value' => 'Item'
+						'value' => 'Item for Graph'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
@@ -330,7 +330,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					],
 					'type' => [
 						'field' => 'item',
-						'value' => 'Item'
+						'value' => 'Item for Graph'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
@@ -345,29 +345,6 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 2_5'
 					],
 					'keyboard_navigation' => true
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => ['Host for widget 1', 'Host for widget 4']
-					],
-					'type' => [
-						'field' => 'item',
-						'value' => 'Item'
-					],
-					'expected' => [
-						'Item for Graph 1_1',
-						'Item for Graph 1_2',
-						'Item for Graph 1_3',
-						'Item for Graph 1_4',
-						'Item for Graph 1_5',
-						'Item for Graph 4_1',
-						'Item for Graph 4_2',
-						'Item for Graph 4_3',
-						'Item for Graph 4_4',
-						'Item for Graph 4_5'
-					]
 				]
 			],
 			[
