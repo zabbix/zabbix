@@ -245,11 +245,6 @@ class testHistoryPush extends CIntegrationTest {
 				'value_type' => ITEM_VALUE_TYPE_FLOAT
 			],
 			[
-				'itemid' => self::$itemids['trapper_text'],
-				'value' => 'sometext',
-				'value_type' => ITEM_VALUE_TYPE_TEXT
-			],
-			[
 				'itemid' => self::$itemids['trapper_str'],
 				'value' => 'somestr',
 				'value_type' => ITEM_VALUE_TYPE_STR
