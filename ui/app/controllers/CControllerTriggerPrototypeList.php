@@ -32,12 +32,12 @@ class CControllerTriggerPrototypeList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>					'in '.implode(',', ['host', 'template']),
-			'page' =>						'ge 1',
-			'parent_discoveryid' =>			'required|db items.itemid',
-			'sort' =>						'in '.implode(',', ['description', 'priority', 'status']),
-			'sortorder' =>					'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
-			'uncheck' =>					'in 1'
+			'context' =>				'in '.implode(',', ['host', 'template']),
+			'page' =>					'ge 1',
+			'parent_discoveryid' =>		'required|db items.itemid',
+			'sort' =>					'in '.implode(',', ['description', 'priority', 'status']),
+			'sortorder' =>				'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
+			'uncheck' =>				'in 1'
 		];
 
 		$ret = $this->validateInput($fields);

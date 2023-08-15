@@ -64,16 +64,16 @@
 				else if (e.target.classList.contains('js-disable-trigger')) {
 					this.#disable(e.target, [e.target.dataset.triggerid]);
 				}
-				else if (e.target.classList.contains('js-massenable-trigger')) {
+				else if (e.target.id === 'js-massenable-trigger') {
 					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
-				else if (e.target.classList.contains('js-massdisable-trigger')) {
+				else if (e.target.id === 'js-massdisable-trigger') {
 					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
-				else if (e.target.classList.contains('js-massupdate-trigger')) {
+				else if (e.target.id === 'js-massupdate-trigger') {
 					this.#massupdate(e.target);
 				}
-				else if (e.target.classList.contains('js-massdelete-trigger')) {
+				else if (e.target.id === 'js-massdelete-trigger') {
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			})

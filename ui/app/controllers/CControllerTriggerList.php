@@ -27,25 +27,25 @@ class CControllerTriggerList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>					'in '.implode(',', ['host', 'template']),
-			'filter_evaltype' =>			'in '.implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
-			'filter_dependent' =>			'in '.implode(',', [-1, 0, 1]),
-			'filter_discovered' =>			'in '.implode(',', [-1, 0, 1]),
-			'filter_groupids' =>			'array_id',
-			'filter_hostids' =>				'array_id',
-			'filter_inherited' =>			'in '.implode(',', [-1, 0, 1]),
-			'filter_name' =>				'string',
-			'filter_priority' =>			'array',
-			'filter_set' =>					'in 1',
-			'filter_state' =>				'in '.implode(',', [-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]),
-			'filter_status' =>				'in '.implode(',', [-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
-			'filter_rst' =>					'in 1',
-			'filter_tags' =>				'array',
-			'filter_value' =>				'in '.implode(',', [-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]),
-			'sort' =>						'in '.implode(',', ['description', 'priority', 'status']),
-			'sortorder' =>					'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
-			'page' =>						'ge 1',
-			'uncheck' =>					'in 1'
+			'context' =>				'in '.implode(',', ['host', 'template']),
+			'filter_evaltype' =>		'in '.implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
+			'filter_dependent' =>		'in '.implode(',', [-1, 0, 1]),
+			'filter_discovered' =>		'in '.implode(',', [-1, 0, 1]),
+			'filter_groupids' =>		'array_id',
+			'filter_hostids' =>			'array_id',
+			'filter_inherited' =>		'in '.implode(',', [-1, 0, 1]),
+			'filter_name' =>			'string',
+			'filter_priority' =>		'array',
+			'filter_set' =>				'in 1',
+			'filter_state' =>			'in '.implode(',', [-1, TRIGGER_STATE_NORMAL, TRIGGER_STATE_UNKNOWN]),
+			'filter_status' =>			'in '.implode(',', [-1, TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
+			'filter_rst' =>				'in 1',
+			'filter_tags' =>			'array',
+			'filter_value' =>			'in '.implode(',', [-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]),
+			'sort' =>					'in '.implode(',', ['description', 'priority', 'status']),
+			'sortorder' =>				'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
+			'page' =>					'ge 1',
+			'uncheck' =>				'in 1'
 		];
 
 		$ret = $this->validateInput($fields);

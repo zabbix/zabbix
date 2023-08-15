@@ -174,26 +174,26 @@ $trigger_form->addItem([
 				'content' => (new CSimpleButton(_('Enable')))
 					->setAttribute('data-status', TRIGGER_STATUS_ENABLED)
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-trigger')
 					->addClass('js-no-chkbxrange')
+					->setId('js-massenable-trigger')
 			],
 			'trigger.prototype.massdisable' => [
 				'content' => (new CSimpleButton(_('Disable')))
 					->setAttribute('data-status', TRIGGER_STATUS_DISABLED)
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-trigger')
 					->addClass('js-no-chkbxrange')
+					->setId('js-massdisable-trigger')
 			],
 			'trigger.prototype.massupdate' => [
 				'content' => (new CSimpleButton(_('Mass update')))
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massupdate-trigger')
+					->setId('js-massupdate-trigger')
 			],
 			'trigger.prototype.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-trigger')
 					->addClass('js-no-chkbxrange')
+					->setId('js-massdelete-trigger')
 			]
 		],
 		$this->data['parent_discoveryid']

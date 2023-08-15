@@ -45,7 +45,6 @@ class CControllerTriggerCreate extends CController {
 			'tags' =>								'array',
 			'dependencies' =>						'array',
 			'hostid' =>								'db hosts.hostid',
-			'triggerid' =>							'db triggers.triggerid',
 			'context' =>							'in '.implode(',', ['host', 'template'])
 		];
 

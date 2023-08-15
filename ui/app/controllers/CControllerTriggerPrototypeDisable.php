@@ -27,7 +27,7 @@ class CControllerTriggerPrototypeDisable extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'triggerids' =>	'required|array_db triggers.triggerid',
+			'triggerids' =>		'required|array_db triggers.triggerid',
 			'discover' =>		'db triggers.discover|in '.ZBX_PROTOTYPE_NO_DISCOVER,
 			'status' =>			'db triggers.status|in '.TRIGGER_STATUS_DISABLED
 		];

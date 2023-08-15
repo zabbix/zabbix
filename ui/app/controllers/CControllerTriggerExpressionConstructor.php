@@ -28,18 +28,18 @@ class CControllerTriggerExpressionConstructor extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'add_expression' =>						'string',
-			'and_expression' =>						'string',
-			'expr_target_single' =>					'string',
-			'expr_temp' =>							'string',
-			'expression' =>							'string',
-			'or_expression' =>						'string',
-			'readonly' =>							'bool',
-			'recovery_expr_target_single' =>		'string',
-			'recovery_expression' =>				'string',
-			'recovery_expr_temp' =>					'string',
-			'remove_expression' =>					'string',
-			'replace_expression' =>					'string'
+			'add_expression' =>					'string',
+			'and_expression' =>					'string',
+			'expr_target_single' =>				'string',
+			'expr_temp' =>						'string',
+			'expression' =>						'string',
+			'or_expression' =>					'string',
+			'readonly' =>						'bool',
+			'recovery_expr_target_single' =>	'string',
+			'recovery_expression' =>			'string',
+			'recovery_expr_temp' =>				'string',
+			'remove_expression' =>				'string',
+			'replace_expression' =>				'string'
 		];
 
 		$ret = $this->validateInput($fields);

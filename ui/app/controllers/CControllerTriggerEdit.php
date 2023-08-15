@@ -34,28 +34,28 @@ class CControllerTriggerEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>							'in '.implode(',', ['host', 'template']),
-			'correlation_mode' =>					'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
-			'correlation_tag' =>					'db triggers.correlation_tag',
-			'dependencies' =>						'array',
-			'description' =>						'db triggers.comments',
-			'event_name' =>							'db triggers.event_name',
-			'expression' =>							'db triggers.expression',
-			'hostid' =>								'db hosts.hostid',
-			'manual_close' =>						'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
-			'name' =>								'string',
-			'opdata' =>								'db triggers.opdata',
-			'priority' =>							'db triggers.priority|in 0,1,2,3,4,5',
-			'recovery_expression' =>				'db triggers.recovery_expression',
-			'recovery_mode' =>						'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
-			'status' =>								'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
-			'show_inherited_tags' =>				'in 0,1',
-			'form_refresh' =>						'in 0,1',
-			'tags' =>								'array',
-			'triggerid' =>							'db triggers.triggerid',
-			'type' =>								'db triggers.type|in 0,1',
-			'url' =>								'db triggers.url',
-			'url_name' =>							'db triggers.url_name'
+			'context' =>				'in '.implode(',', ['host', 'template']),
+			'correlation_mode' =>		'db triggers.correlation_mode|in '.implode(',', [ZBX_TRIGGER_CORRELATION_NONE, ZBX_TRIGGER_CORRELATION_TAG]),
+			'correlation_tag' =>		'db triggers.correlation_tag',
+			'dependencies' =>			'array',
+			'description' =>			'db triggers.comments',
+			'event_name' =>				'db triggers.event_name',
+			'expression' =>				'db triggers.expression',
+			'hostid' =>					'db hosts.hostid',
+			'manual_close' =>			'db triggers.manual_close|in '.implode(',',[ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED, ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED]),
+			'name' =>					'string',
+			'opdata' =>					'db triggers.opdata',
+			'priority' =>				'db triggers.priority|in 0,1,2,3,4,5',
+			'recovery_expression' =>	'db triggers.recovery_expression',
+			'recovery_mode' =>			'db triggers.recovery_mode|in '.implode(',', [ZBX_RECOVERY_MODE_EXPRESSION, ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION, ZBX_RECOVERY_MODE_NONE]),
+			'status' =>					'db triggers.status|in '.implode(',', [TRIGGER_STATUS_ENABLED, TRIGGER_STATUS_DISABLED]),
+			'show_inherited_tags' =>	'in 0,1',
+			'form_refresh' =>			'in 0,1',
+			'tags' =>					'array',
+			'triggerid' =>				'db triggers.triggerid',
+			'type' =>					'db triggers.type|in 0,1',
+			'url' =>					'db triggers.url',
+			'url_name' =>				'db triggers.url_name'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -76,7 +76,10 @@ class CControllerTriggerEdit extends CController {
 	protected function checkPermissions(): bool {
 		if ($this->hasInput('triggerid')) {
 			$parameters = [
-				'output' => API_OUTPUT_EXTEND,
+				'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
+					'templateid', 'type', 'state', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode',
+					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name'
+				],
 				'triggerids' => $this->getInput('triggerid'),
 				'selectHosts' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],

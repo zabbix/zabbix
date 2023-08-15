@@ -351,31 +351,30 @@ $triggers_form->addItem([
 			'trigger.massenable' => [
 				'content' => (new CSimpleButton(_('Enable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massenable-trigger')
 					->addClass('js-no-chkbxrange')
+					->setId('js-massenable-trigger')
 			],
 			'trigger.massdisable' => [
 				'content' => (new CSimpleButton(_('Disable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdisable-trigger')
 					->addClass('js-no-chkbxrange')
+					->setId('js-massdisable-trigger')
 			],
 			'trigger.masscopyto' => [
 				'content' => (new CSimpleButton(_('Copy')))
-					->addClass('js-copy')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeId()
+					->setId('js-copy')
 			],
 			'trigger.massupdate' => [
 				'content' => (new CSimpleButton(_('Mass update')))
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massupdate-trigger')
+					->setId('js-massupdate-trigger')
 			],
 			'trigger.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-massdelete-trigger')
 					->addClass('js-no-chkbxrange')
+					->setId('js-massdelete-trigger')
 			]
 		],
 		'trigger'
