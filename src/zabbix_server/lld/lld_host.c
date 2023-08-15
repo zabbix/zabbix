@@ -1673,7 +1673,7 @@ static void	lld_groups_validate(zbx_vector_lld_group_ptr_t *groups, zbx_vector_l
 
 			if (SUCCEED == lld_group_check_rename(left, right))
 			{
-				left->flags |= ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+				left->flags |= ZBX_FLAG_LLD_GROUP_DISCOVERED | ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
 				left->name_orig = left->name;
 				left->name = right->name;
 				right->name = NULL;
@@ -3917,7 +3917,12 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 
 			if (0 == (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_DISCOVERED))
 			{
-				int	ts_delete = lld_end_of_life(discovery->lastcheck, lifetime);
+				int	ts_delete;
+
+				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
+					ts_delete = lld_end_of_life(discovery->lastcheck, lifetime);
+				else
+					ts_delete = 0;
 
 				if (lastcheck > ts_delete)
 				{
