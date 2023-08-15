@@ -1,0 +1,1 @@
+...G...... [ZBX-22758] fixed Zabbix Agent 2 startup error on domain controllers by increasing go-winio version (asestakovs)
