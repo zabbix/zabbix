@@ -972,7 +972,9 @@ $tab = (new CTabView())
 			->addItem([
 				new CLabel(_('Preprocessing steps')),
 				new CFormField(
-					getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'])
+					getItemPreprocessing($data['preprocessing'], $data['limited'], $data['preprocessing_types'],
+						$data['type']
+					)
 				)
 			]),
 		TAB_INDICATOR_PREPROCESSING

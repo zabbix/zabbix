@@ -1860,7 +1860,8 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_REGSUB:
 			case ZBX_PREPROC_ERROR_FIELD_REGEX:
 			case ZBX_PREPROC_STR_REPLACE:
-				$step['params'] = implode("\n", $step['params']);
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				$step['params'] = array_key_exists('params', $step) ? implode("\n", $step['params']) : '';
 				break;
 
 			case ZBX_PREPROC_CSV_TO_JSON:

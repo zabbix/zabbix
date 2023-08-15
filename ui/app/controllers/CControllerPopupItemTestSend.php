@@ -105,7 +105,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',
-			'not_supported'			=> 'in 1'
+			'not_supported'			=> 'in 1',
+			'runtime_error'			=> 'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -399,6 +400,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		}
 		else {
 			$preproc_test_data['state'] = $this->getInput('not_supported', 0);
+
+			if ($preproc_test_data['state'] == 1) {
+				$preproc_test_data['runtime_error'] = $this->getInput('runtime_error', '');
+			}
 		}
 
 		// Test preprocessing steps.

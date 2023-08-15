@@ -405,6 +405,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'value' => array_key_exists('value', $data) ? $data['value'] : '',
 			'eol' => array_key_exists('eol', $data) ? (int) $data['eol'] : ZBX_EOL_LF,
 			'macros' => $usermacros['macros'],
+			'runtime_error' => array_key_exists('runtime_error', $data) ? $data['runtime_error'] : '',
 			'show_prev' => $show_prev,
 			'prev_value' => $prev_value,
 			'prev_time' => $prev_time,

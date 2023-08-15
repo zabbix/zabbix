@@ -4080,6 +4080,13 @@ class CApiInputValidator {
 				]];
 				break;
 
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
+				]];
+				break;
+
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],

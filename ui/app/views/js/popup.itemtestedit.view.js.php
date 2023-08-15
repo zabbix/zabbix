@@ -253,7 +253,8 @@ function itemCompleteTest(overlay) {
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
 		value: form_data['value'],
-		not_supported: form_data['not_supported']
+		not_supported: form_data['not_supported'],
+		runtime_error: form_data['runtime_error'] || ''
 	});
 
 	<?php if ($data['show_prev']): ?>
@@ -459,6 +460,16 @@ jQuery(document).ready(function($) {
 		rows: 0
 	});
 
+	$('#runtime_error').multilineInput({
+		placeholder: <?= json_encode(_('error text')) ?>,
+		value: <?= json_encode($data['runtime_error']) ?>,
+		monospace_font: false,
+		autofocus: true,
+		disabled: <?= array_key_exists('not_supported', $data) ? 'false' : 'true' ?>,
+		grow: 'auto',
+		rows: 0
+	});
+
 	$('#prev_value').multilineInput({
 		placeholder: <?= $data['show_prev'] ? json_encode(_('value')) : '""' ?>,
 		value: <?= json_encode($data['prev_value']) ?>,
@@ -474,9 +485,11 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+				$('#runtime_error', $form).multilineInput('enable');
 			}
 			else {
 				$('#value', $form).multilineInput('unsetReadOnly');
+				$('#runtime_error', $form).multilineInput('disable');
 			}
 		});
 
@@ -488,6 +501,7 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
+				$('#runtime_error', $form).multilineInput('disable');
 				$not_supported.prop('disabled', true);
 
 				<?php if ($data['show_prev']): ?>
@@ -558,6 +572,7 @@ jQuery(document).ready(function($) {
 			}
 			else {
 				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
+				$not_supported.is(':checked') && $('#runtime_error', $form).multilineInput('enable');
 				$not_supported.prop('disabled', false);
 
 				<?php if ($data['show_prev']): ?>
