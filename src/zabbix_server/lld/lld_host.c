@@ -3993,19 +3993,19 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 		zbx_vector_uint64_clear(&del_ids);
 		sql_offset = 0;
 
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select groupid from groups g where");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select groupid from hstgrp g where");
 
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", groupids.values,
 				groupids.values_num);
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 				" and not exists"
-					" select null from group_discovery gd"
-						" where g.groupid=gd.groupid");
+					" (select null from group_discovery gd"
+						" where g.groupid=gd.groupid)");
 
 		result = zbx_db_select("%s", sql);
 
-		while (NULL != zbx_db_fetch(result))
+		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_t	groupid;
 
