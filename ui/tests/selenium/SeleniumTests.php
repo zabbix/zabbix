@@ -193,6 +193,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteMapsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardForm.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidgetSelectedHosts.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
@@ -411,6 +412,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
 		$suite->addTestSuite('testDashboardForm');
 		$suite->addTestSuite('testDashboardGraphWidget');
+		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
