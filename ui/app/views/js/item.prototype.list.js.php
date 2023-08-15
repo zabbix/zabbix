@@ -35,8 +35,10 @@
 		}
 
 		initEvents() {
-			document.querySelector('.js-create-item-prototype')
-				?.addEventListener('click', (e) => this.#edit(e.target, e.target.dataset));
+			document.querySelector('.js-create-item-prototype')?.addEventListener('click', (e) => this.#edit(
+				e.target,
+				{...e.target.dataset, action: 'item.prototype.edit'}
+			));
 			this.form.addEventListener('click', e => {
 				const target = e.target;
 				const selectedids = Object.keys(chkbxRange.getSelectedIds());
