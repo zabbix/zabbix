@@ -1630,7 +1630,7 @@ class testProxyConfSync extends CIntegrationTest
 			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
 			'tls_issuer' => 'iss',
-			'tls_subject' => 'sub',
+			'tls_subject' => 'sub'
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertEquals(1, count($response['result']['hostids']));

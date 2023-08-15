@@ -1430,7 +1430,7 @@ class testInitialConfSync extends CIntegrationTest
 			'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 			'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
 			'tls_issuer' => 'iss',
-			'tls_subject' => 'sub',
+			'tls_subject' => 'sub'
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
 		$this->assertEquals(1, count($response['result']['hostids']));
@@ -1545,7 +1545,7 @@ class testInitialConfSync extends CIntegrationTest
 			'tls_connect' => HOST_ENCRYPTION_PSK,
 			'tls_accept' => HOST_ENCRYPTION_NONE,
 			'tls_psk_identity' => '2790d1e1781449f8879714a21fb706f9f008910ccf6b7339bb1975bc33e0c449',
-			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8',
+			'tls_psk' => '1e07e499695b1c5f8fc1ccb5ee935240ae1b85d0ac0f821c7133aa17852bf7d8'
 		]);
 		$this->assertArrayHasKey('proxyids', $response['result']);
 		self::$proxyid_passive = $response['result']['proxyids'][0];

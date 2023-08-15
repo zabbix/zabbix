@@ -970,7 +970,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'proxy_fields' => [
 						'Proxy name' => 'All fields Passive proxy Certificate',
 						'Proxy mode' => 'Passive',
-						'id:address' => '192.168.3.99',
+						'id:address' => '192.168.3.99'
 					],
 					'encryption_fields' => [
 						'Connections to proxy' => 'Certificate',
