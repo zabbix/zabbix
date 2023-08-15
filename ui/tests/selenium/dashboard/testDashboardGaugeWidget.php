@@ -1048,8 +1048,6 @@ class testDashboardGaugeWidget extends CWebTest {
 	/**
 	 * Test function for assuring that form settings affect Gauge image.
 	 *
-	 * @backup widget
-	 *
 	 * @dataProvider getScreenshotsData
 	 */
 	public function testDashboardGaugeWidget_Screenshots($data) {
@@ -1077,12 +1075,12 @@ class testDashboardGaugeWidget extends CWebTest {
 			: self::HOST.': '.$data['fields']['Item'];
 
 		// Wait until widget with header appears on the Dashboard.
-		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$dashboard->save();
+		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$this->page->removeFocus();
 
 		// Sleep waits until the gauge is animated.
 		sleep(1);
-		$this->assertScreenshot($widget->query('class:dashboard-grid-widget')->one(), $data['screenshot_id']);
+		$this->assertScreenshot($widget->query('class:dashboard-grid-widget-container')->one(), $data['screenshot_id']);
 	}
 }
