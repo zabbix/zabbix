@@ -109,7 +109,7 @@ class testDashboardGaugeWidget extends CWebTest {
 							'height' => 5,
 							'fields' => [
 								[
-									'type' => '4',
+									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 									'name' => 'itemid',
 									'value' => CDataHelper::get('AllItemValueTypes.Float item')
 								]
@@ -125,7 +125,7 @@ class testDashboardGaugeWidget extends CWebTest {
 							'view_mode' => 0,
 							'fields' => [
 								[
-									'type' => '4',
+									'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 									'name' => 'itemid',
 									'value' => CDataHelper::get('AllItemValueTypes.Float item')
 								]
@@ -875,7 +875,7 @@ class testDashboardGaugeWidget extends CWebTest {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
 		}
 		else {
-			$values = $form->getFields()->asValues();
+			$values = $form->getValues();
 		}
 
 		if ($cancel || !$save_dashboard) {
@@ -915,7 +915,7 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		// Check that updating widget form values did not change in frontend.
 		if (!$create && !$save_dashboard) {
-			$this->assertEquals($values, $dashboard->getWidget(self::$update_gauge)->edit()->getFields()->asValues());
+			$this->assertEquals($values, $dashboard->getWidget(self::$update_gauge)->edit()->getValues());
 		}
 
 		// Check that DB hash is not changed.
@@ -956,14 +956,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
 		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST);
 		$table->waitUntilReloaded();
-
-		$visible_items = [
-			'Float item',
-			'Unsigned item',
-			'Unsigned_dependent item'
-		];
-
-		$this->assertTableDataColumn($visible_items);
+		$this->assertTableDataColumn(['Float item', 'Unsigned item', 'Unsigned_dependent item']);
 	}
 
 	public static function getScreenshotsData() {
@@ -1091,8 +1084,8 @@ class testDashboardGaugeWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		$header = array_key_exists('Name', $data['fields'])
-			?  $data['fields']['Name']
-			:  self::HOST.': '.$data['fields']['Item'];
+			? $data['fields']['Name']
+			: self::HOST.': '.$data['fields']['Item'];
 
 		// Wait until widget with header appears on the Dashboard.
 		$dashboard->waitUntilReady()->getWidget($header);
@@ -1105,7 +1098,6 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		// Sleep waits until the gauge is animated.
 		sleep(1);
-		$screenshot_area = $this->query('class:dashboard-grid-widget')->one();
-		$this->assertScreenshot($screenshot_area, $data['screenshot_id']);
+		$this->assertScreenshot($this->query('class:dashboard-grid-widget')->one(), $data['screenshot_id']);
 	}
 }
