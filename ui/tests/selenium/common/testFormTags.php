@@ -926,16 +926,11 @@ class testFormTags extends CWebTest {
 
 		// Navigate to host or template for cloning.
 		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
-		$host_modal = ($object !== 'host prototype' && $parent !== 'Template')
-			? COverlayDialogElement::find()->one()->waitUntilReady()
-			: $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()->waitUntilPresent()->one();
+		$host_modal = ($object === 'host prototype' && $parent === 'Host')
+			? $this->query('id:host-form')->asForm()->waitUntilPresent()->one()
+			: COverlayDialogElement::find()->one()->waitUntilReady();
 
-		if ($parent === 'Template') {
-			$host_modal->asForm(['normalized' => true])->fill([$parent.' name' => $new_name]);
-		}
-		else {
-			$host_modal->asGridForm(['normalized' => true])->fill([$parent.' name' => $new_name]);
-		}
+		$host_modal->asForm()->fill([$parent.' name' => $new_name]);
 
 		$host_modal->query('button:Clone')->one()->click();
 		$this->query('xpath://div[@class="overlay-dialogue-footer" or contains(@class, "tfoot-buttons")]//button[text()="Add"]')
@@ -943,43 +938,35 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, $parent.' added');
 
-		if ($parent === 'Host') {
-			if ($object !== 'host prototype') {
-				$this->query('link:All hosts')->one()->click();
-			}
-			$this->page->waitUntilReady();
-			$this->query('button:Reset')->one()->click();
-			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-			$form->fill(['Name' => $new_name]);
-			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->page->open('zabbix.php?action='.(($parent === 'Host') ? 'host.list' : 'template.list'));
+		$this->page->waitUntilReady();
+		$this->query('button:Reset')->one()->click();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$form->fill(['Name' => $new_name]);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 
-			switch ($object) {
-				case 'trigger':
-					$column = 'Triggers';
-					break;
+		switch ($object) {
+			case 'trigger':
+				$column = 'Triggers';
+				break;
 
-				case 'item':
-					$column = 'Items';
-					break;
+			case 'item':
+				$column = 'Items';
+				break;
 
-				case 'web scenario':
-					$column = 'Web';
-					break;
+			case 'web scenario':
+				$column = 'Web';
+				break;
 
-				case 'host prototype':
-				case 'item prototype':
-				case 'trigger prototype':
-					$column = 'Discovery';
-					break;
-			}
-
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $new_name)
-					->getColumn($column)->query('link', $column)->one()->click();
+			case 'host prototype':
+			case 'item prototype':
+			case 'trigger prototype':
+				$column = 'Discovery';
+				break;
 		}
-		else {
-			// Open cloned host/template.
-			$this->query('link', $new_name)->one()->click();
-		}
+
+		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $new_name)
+				->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
 			case 'trigger':
