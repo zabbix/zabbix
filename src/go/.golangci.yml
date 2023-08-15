@@ -78,8 +78,8 @@ linters-settings:
     # switch
     default-signifies-exhaustive: true
   funlen:
-    lines: 1000
-    statements: 40
+    lines: 120
+    statements: 70
   gci:
     # put imports beginning with prefix after 3rd-party packages;
     # only support one prefix
