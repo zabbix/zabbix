@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:22:30Z'
+  date: '2023-07-20T06:35:23Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -758,6 +758,15 @@ zabbix_export:
             - tag: component
               value: system
           triggers:
+            - uuid: 2f314a33e06444d88fd99b5442b10a9e
+              expression: 'nodata(/Remote Zabbix proxy health/rcache.buffer.pused,{$ZABBIX.PROXY.NODATA_TIMEOUT})=1'
+              name: 'Remote Zabbix proxy: Failed to fetch stats data'
+              event_name: 'Remote Zabbix proxy: Failed to fetch stats data (or no data for {$ZABBIX.PROXY.NODATA_TIMEOUT})'
+              priority: WARNING
+              description: 'Zabbix has not received statistics data for {$ZABBIX.PROXY.NODATA_TIMEOUT}.'
+              tags:
+                - tag: scope
+                  value: availability
             - uuid: 6aaad09f92f3419c9aa7164f2191a45a
               expression: 'max(/Remote Zabbix proxy health/rcache.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}'
               name: 'Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache'
@@ -1147,10 +1156,11 @@ zabbix_export:
           value: zabbix
       macros:
         - macro: '{$ZABBIX.PROXY.ADDRESS}'
-          value: 127.0.0.1
           description: 'IP/DNS/network mask list of proxies to be remotely queried (default is 127.0.0.1).'
+        - macro: '{$ZABBIX.PROXY.NODATA_TIMEOUT}'
+          value: 5m
+          description: 'The time threshold after which statistics are considered unavailable. Used in trigger expression.'
         - macro: '{$ZABBIX.PROXY.PORT}'
-          value: '10051'
           description: 'Port of proxy to be remotely queried (default is 10051).'
         - macro: '{$ZABBIX.PROXY.UTIL.MAX}'
           value: '75'
