@@ -520,17 +520,24 @@ class testFormTags extends CWebTest {
 
 		$data['name'] = $this->update_name;
 
-		$this->page->login()->open($this->link);
+		$this->page->login()->open($this->link)->waitUntilReady();
 
 		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 			$table->findRow('Name', $data['name'], true)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
+			if ($object === 'template') {
+				$this->query('button:Reset')->one()->click();
+				$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+				$form->fill(['Name' => $this->update_name]);
+				$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			}
+
 			$this->query('link', $this->update_name)->waitUntilClickable()->one()->click();
 		}
 
-		$form = ($object === 'host' || $object === 'service' || $object === 'connector')
+		$form = ($object === 'host' || $object === 'service' || $object === 'connector' || $object === 'template')
 				? COverlayDialogElement::find()->waitUntilVisible()->asForm()->one()
 				: $this->query($locator)->asForm()->waitUntilPresent()->one();
 
