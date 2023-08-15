@@ -86,7 +86,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'hostids' => $hostids,
 				'evaltype' => $this->fields_values['evaltype'],
 				'tags' => $this->fields_values['tags'],
-				'filter' => ['maintenance_status' => 0],
+				'filter' => [HOST_MAINTENANCE_STATUS_OFF],
 				'monitored_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -119,7 +119,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'output' => ['name'],
 					'groupids' => $groupids,
 					'hostids' => $hostids,
-					'filter' => ['maintenance_status' => 0],
+					'filter' => ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF],
 					'monitored_hosts' => true,
 					'preservekeys' => true
 				]);
@@ -132,7 +132,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'output' => ['name'],
 					'groupids' => $groupids,
 					'hostids' => $hostids,
-					'filter' => ['maintenance_status' => 0],
+					'filter' => ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF],
 					'monitored_hosts' => true,
 					'preservekeys' => true
 				]);
@@ -144,8 +144,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				foreach ($master_entity_values as $key => $value) {
 					if ($value === '') {
-						unset($master_entity_values[$key]);
-						unset($master_entities[$key]);
+						unset($master_entity_values[$key], $master_entities[$key]);
 					}
 				}
 
