@@ -497,7 +497,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_arc_size' => '1a'
 					],
 					'Thresholds' => [
-						[ 'threshold' => '1', 'color' => 'ERERER']
+						['threshold' => '1', 'color' => 'ERERER']
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
@@ -1017,7 +1017,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_show_labels' => true
 					],
 					'Thresholds' => [
-						['value' => '100']
+						['threshold' => '100']
 					]
 				]
 			],
@@ -1037,8 +1037,8 @@ class testDashboardGaugeWidget extends CWebTest {
 						'id:th_show_labels' => true
 					],
 					'Thresholds' => [
-						['value' => '100', 'color' => '4000FF'],
-						['value' => '200', 'color' => 'E91E63']
+						['threshold' => '100', 'color' => '4000FF'],
+						['threshold' => '200', 'color' => 'E91E63']
 					]
 				]
 			]
@@ -1065,18 +1065,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		]);
 
 		if (array_key_exists('Thresholds', $data)) {
-			foreach ($data['Thresholds'] as $i => $threshold) {
-				$dialog->getField('Thresholds')->query('button:Add')->one()->waitUntilClickable()->click();
-
-				if (array_key_exists('value', $threshold)) {
-					$dialog->fill(['id:thresholds_'.$i.'_threshold' => $threshold['value']]);
-				}
-
-				if (array_key_exists('color', $threshold)) {
-					$dialog->query('xpath:.//input[@id="thresholds_'.$i.'_color"]/..')->asColorPicker()->one()
-						->fill($threshold['color']);
-				}
-			}
+			$this->getThresholdsTable()->fill($data['Thresholds']);
 		}
 
 		$dialog->fill($data['fields']);
