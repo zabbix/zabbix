@@ -1562,6 +1562,7 @@ static void	lld_groups_validate(zbx_vector_lld_group_ptr_t *groups, zbx_vector_l
 		if (SUCCEED != lld_validate_group_name(group->name))
 		{
 			zbx_replace_invalid_utf8(group->name);
+
 			*error = zbx_strdcatf(*error, "Cannot discover group: invalid group name \"%s\".\n",
 					group->name);
 
@@ -1648,9 +1649,9 @@ static void	lld_groups_validate(zbx_vector_lld_group_ptr_t *groups, zbx_vector_l
 					}
 
 					zbx_vector_lld_group_ptr_remove_noorder(groups_in, i);
-				}
 
-				break;
+					break;
+				}
 			}
 		}
 		zbx_db_free_result(result);
