@@ -1,1 +1,1 @@
-A......... [ZBX-21644] fixed state of Allow manual close setting of Trigger prototype getting lost on template cloning (jfreibergs)
+A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
