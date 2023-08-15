@@ -1026,20 +1026,14 @@ class testFormTags extends CWebTest {
 
 		// Open host group, host or template and check object tags.
 		if ($target_type !== 'Host group') {
-			$this->page->open(($target_type === 'Host') ? self::HOST_LIST_PAGE : 'templates.php')->waitUntilReady();
+			$this->page->open(($target_type === 'Host') ? self::HOST_LIST_PAGE : 'zabbix.php?action=template.list')->waitUntilReady();
 
-			if ($target_type === 'Host') {
-				$this->query('button:Reset')->one()->click();
-				$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-				$filter->fill(['Name' => $parent]);
-				$this->query('button:Apply')->one()->waitUntilClickable()->click();
-				$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $parent)
-						->getColumn(ucfirst($object).'s')->query('link', ucfirst($object).'s')->one()->click();
-			}
-			else {
-				$this->query('link', $parent)->waitUntilClickable()->one()->click();
-				$this->query('link', ucfirst($object).'s')->waitUntilClickable()->one()->click();
-			}
+			$this->query('button:Reset')->one()->click();
+			$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+			$filter->fill(['Name' => $parent]);
+			$this->query('button:Apply')->one()->waitUntilClickable()->click();
+			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $parent)
+					->getColumn(ucfirst($object).'s')->query('link', ucfirst($object).'s')->one()->click();
 
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 			$form->invalidate();
