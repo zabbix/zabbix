@@ -1049,7 +1049,8 @@ class testDashboardGaugeWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'Macros',
 						'Item' => self::GAUGE_ITEM,
-						'id:description' => '{HOST.*} {ITEM.*}'
+						'id:description' => '{HOST.CONN} {ITEM.ID}',
+						'id:desc_size' => 5
 					]
 				]
 			],
@@ -1060,7 +1061,8 @@ class testDashboardGaugeWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'User macro',
 						'Item' => self::GAUGE_ITEM,
-						'id:description' => '{INVENTORY.*} {$A}'
+						'id:description' => '{$A} {INVENTORY.ALIAS}',
+						'id:desc_size' => 5
 					]
 				]
 			]
@@ -1098,7 +1100,6 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		// Wait until widget with header appears on the Dashboard.
 		$dashboard->save();
-		var_dump($header);
 		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$this->page->removeFocus();
 
