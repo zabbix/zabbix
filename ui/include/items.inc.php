@@ -2322,6 +2322,11 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
 
 				return strnatcasecmp($condition_a['value'], $condition_b['value']);
 			});
+
+			foreach ($conditions as $i => &$condition) {
+				$condition['formulaid'] = num2letter($i);
+			}
+			unset($condition);
 			break;
 
 		case CONDITION_EVAL_TYPE_EXPRESSION:
