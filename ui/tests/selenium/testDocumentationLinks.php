@@ -570,7 +570,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 								[
 									'callback' => 'openFormWithLink',
-									'element' => 'xpath://a[text()="1 template for removing tags"]'
+									'element' => 'xpath://a[text()="AIX by Zabbix agent"]'
 								]
 							],
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
