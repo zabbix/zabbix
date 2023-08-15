@@ -1076,6 +1076,7 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		// Wait until widget with header appears on the Dashboard.
 		$dashboard->save();
+		var_dump($header);
 		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$this->page->removeFocus();
 
