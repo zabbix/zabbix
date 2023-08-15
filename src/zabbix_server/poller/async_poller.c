@@ -19,6 +19,7 @@
 #include "poller.h"
 #include "async_httpagent.h"
 #include "async_agent.h"
+#include "checks_snmp.h"
 #include "zbxasynchttppoller.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
@@ -38,6 +39,7 @@
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbxtypes.h"
 
 ZBX_VECTOR_IMPL(int32, int)
 
@@ -52,28 +54,24 @@ typedef struct
 }
 zbx_interface_status_t;
 
-static void	process_agent_result(void *data)
+static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_t *poller_config)
 {
-	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	zbx_timespec_t		timespec;
 	zbx_interface_status_t	*interface_status;
-	int			ret;
-	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, agent_context->key,
-			agent_context->host, agent_context->interface.addr,
-			zbx_tcp_connection_type_name(agent_context->tls_connect));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, item->key, item->host,
+			item->interface.addr);
 
 	zbx_timespec(&timespec);
 
 	/* don't try activating interface if there were no errors detected */
-	if (SUCCEED != agent_context->ret || ZBX_INTERFACE_AVAILABLE_TRUE != agent_context->interface.available ||
-			0 != agent_context->interface.errors_from)
+	if (SUCCEED != item->ret || ZBX_INTERFACE_AVAILABLE_TRUE != item->interface.available ||
+			0 != item->interface.errors_from)
 	{
 		if (NULL == (interface_status = zbx_hashset_search(&poller_config->interfaces,
-				&agent_context->interface.interfaceid)))
+				&item->interface.interfaceid)))
 		{
-			zbx_interface_status_t	interface_status_local = {.interface = agent_context->interface};
+			zbx_interface_status_t	interface_status_local = {.interface = item->interface};
 
 			interface_status_local.interface.addr = NULL;
 			interface_status = zbx_hashset_insert(&poller_config->interfaces,
@@ -83,62 +81,80 @@ static void	process_agent_result(void *data)
 			zabbix_log(LOG_LEVEL_DEBUG, "updating existing interface");
 
 		zbx_free(interface_status->error);
-		interface_status->errcode = agent_context->ret;
-		interface_status->itemid = agent_context->itemid;
-		zbx_strlcpy(interface_status->host, agent_context->host, sizeof(interface_status->host));
+		interface_status->errcode = item->ret;
+		interface_status->itemid = item->itemid;
+		zbx_strlcpy(interface_status->host, item->host, sizeof(interface_status->host));
 		zbx_free(interface_status->key_orig);
-		interface_status->key_orig = agent_context->key_orig;
-		agent_context->key_orig = NULL;
+		interface_status->key_orig = item->key_orig;
+		item->key_orig = NULL;
 	}
 
-	if (SUCCEED == agent_context->ret)
+	if (SUCCEED == item->ret)
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(agent_context->itemid,
-				agent_context->hostid,agent_context->value_type, agent_context->flags,
-				&agent_context->result, &timespec, ITEM_STATE_NORMAL, NULL);
+			zbx_preprocess_item_value(item->itemid,
+				item->hostid,item->value_type,item->flags,
+				&item->result, &timespec, ITEM_STATE_NORMAL, NULL);
 		}
 	}
 	else
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid,
-					agent_context->value_type, agent_context->flags, NULL, &timespec,
-					ITEM_STATE_NOTSUPPORTED, agent_context->result.msg);
+			zbx_preprocess_item_value(item->itemid, item->hostid,
+					item->value_type, item->flags, NULL, &timespec,
+					ITEM_STATE_NOTSUPPORTED, item->result.msg);
 		}
-		interface_status->error = agent_context->result.msg;
-		SET_MSG_RESULT(&agent_context->result, NULL);
+		interface_status->error = item->result.msg;
+		SET_MSG_RESULT(&item->result, NULL);
 	}
 
-	zbx_vector_uint64_append(&poller_config->itemids, agent_context->itemid);
-	zbx_vector_int32_append(&poller_config->errcodes, agent_context->ret);
+	zbx_vector_uint64_append(&poller_config->itemids, item->itemid);
+	zbx_vector_int32_append(&poller_config->errcodes, item->ret);
 	zbx_vector_int32_append(&poller_config->lastclocks, timespec.sec);
 
 	poller_config->processing--;
 	poller_config->processed++;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, agent_context->itemid);
-	ret = agent_context->ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, item->itemid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(item->ret));
+}
+
+static void	process_agent_result(void *data)
+{
+	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg;
+
+	process_async_result(&agent_context->item, poller_config);
 
 	zbx_async_check_agent_clean(agent_context);
 	zbx_free(agent_context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
+#ifdef HAVE_NETSNMP
+static void	process_snmp_result(void *data)
+{
+	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)zbx_async_check_snmp_get_arg(snmp_context);
+
+	process_async_result(zbx_async_check_snmp_get_item_context(snmp_context), poller_config);
+
+	zbx_async_check_snmp_clean(snmp_context);
+}
+#endif
 #ifdef HAVE_LIBCURL
 static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 {
-	long			response_code;
-	char			*error, *out = NULL;
-	AGENT_RESULT		result;
-	char			*status_codes;
-	zbx_httpagent_context	*httpagent_context;
-	zbx_dc_item_context_t	*item_context;
-	zbx_timespec_t		timespec;
-	zbx_poller_config_t	*poller_config;
-	CURLcode		err_info;
+	long				response_code;
+	char				*error, *out = NULL;
+	AGENT_RESULT			result;
+	char				*status_codes;
+	zbx_httpagent_context		*httpagent_context;
+	zbx_dc_httpitem_context_t	*item_context;
+	zbx_timespec_t			timespec;
+	zbx_poller_config_t		*poller_config;
+	CURLcode			err_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -218,13 +234,16 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 
 	while (NULL != (interface_status = (zbx_interface_status_t *)zbx_hashset_iter_next(&iter)))
 	{
+		int	type = INTERFACE_TYPE_SNMP == interface_status->interface.type ? ITEM_TYPE_SNMP :
+				ITEM_TYPE_ZABBIX;
+
 		switch (interface_status->errcode)
 		{
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
 				zbx_activate_item_interface(&timespec, &interface_status->interface,
-						interface_status->itemid, ITEM_TYPE_ZABBIX,
+						interface_status->itemid, type,
 						interface_status->host, &data, &data_alloc, &data_offset);
 				break;
 			case NETWORK_ERROR:
@@ -232,7 +251,7 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 			case TIMEOUT_ERROR:
 				zbx_deactivate_item_interface(&timespec, &interface_status->interface,
 						interface_status->itemid,
-						ITEM_TYPE_ZABBIX, interface_status->host,
+						type, interface_status->host,
 						interface_status->key_orig, &data, &data_alloc, &data_offset,
 						poller_config->config_unavailable_delay,
 						poller_config->config_unreachable_period,
@@ -276,6 +295,23 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(events);
+#ifdef HAVE_NETSNMP
+	if (1 == poller_config->clear_cache)
+	{
+		if (0 != poller_config->processing)
+		{
+			num = 0;
+			goto exit;
+		}
+		else
+		{
+			zbx_unset_snmp_bulkwalk_options();
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
+			zbx_set_snmp_bulkwalk_options();
+			poller_config->clear_cache = 0;
+		}
+	}
+#endif
 
 	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
 			poller_config->processing, poller_config->config_max_concurrent_checks_per_poller, &items);
@@ -290,6 +326,9 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	for (i = 0; i < num; i++)
 	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
 		if (ITEM_TYPE_HTTPAGENT == items[i].type)
 		{
 #ifdef HAVE_LIBCURL
@@ -297,14 +336,29 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 					poller_config->config_source_ip, poller_config->curl_handle);
 #else
 			errcodes[i] = NOTSUPPORTED;
-			SET_MSG_RESULT(&results[i], zbx_strdup(NULL,"Support for HTTP agent was not compiled in:"
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for HTTP agent was not compiled in:"
 					" missing cURL library"));
 #endif
 		}
-		else
+		else if (ITEM_TYPE_ZABBIX == items[i].type)
+		{
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
 					poller_config, poller_config, poller_config->base,
 					poller_config->config_timeout, poller_config->config_source_ip);
+		}
+		else
+		{
+#ifdef HAVE_NETSNMP
+			zbx_set_snmp_bulkwalk_options();
+
+			errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
+					poller_config, poller_config, poller_config->base,
+					poller_config->config_timeout, poller_config->config_source_ip);
+#else
+			errcodes[i] = NOTSUPPORTED;
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));
+#endif
+		}
 
 		if (SUCCEED == errcodes[i])
 			poller_config->processing++;
@@ -315,7 +369,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
-		if (NOTSUPPORTED == errcodes[i] || CONFIG_ERROR == errcodes[i])
+		if (SUCCEED != errcodes[i])
 		{
 			if (ZBX_IS_RUNNING())
 			{
@@ -375,7 +429,7 @@ static void	zbx_interface_status_clean(zbx_interface_status_t *interface_status)
 }
 
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
-		event_callback_fn async_check_items_callback)
+		int process_num, event_callback_fn async_check_items_callback)
 {
 	struct timeval	tv = {1, 0};
 
@@ -401,6 +455,8 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	poller_config->config_unreachable_delay = poller_args_in->config_unreachable_delay;
 	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
 	poller_config->config_max_concurrent_checks_per_poller = poller_args_in->config_max_concurrent_checks_per_poller;
+	poller_config->clear_cache = 0;
+	poller_config->process_num = process_num;
 
 	if (NULL == (poller_config->async_check_items_timer = event_new(poller_config->base, -1, EV_PERSIST,
 		async_check_items_callback, poller_config)))
@@ -470,9 +526,12 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	unsigned char			poller_type = poller_args_in->poller_type;
 	zbx_poller_config_t		poller_config = {.queued = 0, .processed = 0};
 	struct event			*rtc_event;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
+	int				msgs_num;
 #ifdef HAVE_LIBCURL
 	zbx_asynchttppoller_config	*asynchttppoller_config;
 #endif
+	msgs_num = ZBX_POLLER_TYPE_SNMP == poller_type ? 1 : 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -483,9 +542,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, msgs_num, poller_args_in->config_comms->config_timeout,
+			&rtc);
 
-	async_poller_init(&poller_config, poller_args_in, async_check_items);
+	async_poller_init(&poller_config, poller_args_in, process_num, async_check_items);
 	rtc_event = event_new(poller_config.base, zbx_ipc_client_get_fd(rtc.client), EV_READ | EV_PERSIST,
 			socket_read_event_cb, NULL);
 	event_add(rtc_event, NULL);
@@ -502,7 +562,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		poller_config.curl_handle = asynchttppoller_config->curl_handle;
 #endif
 	}
-	else
+	else if (ZBX_POLLER_TYPE_AGENT == poller_type)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
@@ -541,6 +601,13 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		{
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
+#ifdef HAVE_NETSNMP
+			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
+			{
+				if (ZBX_POLLER_TYPE_SNMP == poller_type)
+					poller_config.clear_cache = 1;
+			}
+#endif
 		}
 	}
 
