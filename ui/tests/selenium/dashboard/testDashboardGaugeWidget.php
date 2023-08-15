@@ -1077,16 +1077,12 @@ class testDashboardGaugeWidget extends CWebTest {
 			: self::HOST.': '.$data['fields']['Item'];
 
 		// Wait until widget with header appears on the Dashboard.
-		$dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
+		$widget = $dashboard->waitUntilReady()->getWidget($header)->waitUntilReady();
 		$dashboard->save();
-
-		// Wait until loader disappears.
-//		$this->query("xpath://h4[text()=".CXPathHelper::escapeQuotes($header).
-//				"]/../../div[not(contains(@class,\"is-loading\"))]")->waitUntilPresent()->one();
 		$this->page->removeFocus();
 
 		// Sleep waits until the gauge is animated.
 		sleep(1);
-		$this->assertScreenshot($this->query('class:dashboard-grid-widget')->one(), $data['screenshot_id']);
+		$this->assertScreenshot($widget->query('class:dashboard-grid-widget')->one(), $data['screenshot_id']);
 	}
 }
