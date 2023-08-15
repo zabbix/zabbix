@@ -78,12 +78,6 @@ class CControllerPopupLldOverride extends CController {
 			'overrides_names' => $this->getInput('overrides_names', [])
 		];
 
-		if (!$this->hasInput('validate')) {
-			$page_options['overrides_filters'] = sortLldRuleFilterConditions($page_options['overrides_filters'],
-				$page_options['overrides_evaltype']
-			);
-		}
-
 		if ($this->hasInput('validate')) {
 			if ($page_options['name'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
@@ -98,14 +92,18 @@ class CControllerPopupLldOverride extends CController {
 				}
 			}
 
-			$filter = prepareLldFilter([
+			$overrides_filter = prepareLldFilter([
 				'evaltype' => $page_options['overrides_evaltype'],
 				'formula' => $page_options['overrides_formula'],
 				'conditions' => $page_options['overrides_filters']
 			]);
 
-			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-					&& $filter['formula'] === '') {
+			$overrides_filter['conditions'] = sortLldRuleFilterConditions($overrides_filter['conditions'],
+				$overrides_filter['evaltype']
+			);
+
+			if ($overrides_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+					&& $overrides_filter['formula'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
 			}
 
@@ -118,9 +116,9 @@ class CControllerPopupLldOverride extends CController {
 				$params = [
 					'name' => $page_options['name'],
 					'stop' => $page_options['stop'],
-					'overrides_evaltype' => $filter['evaltype'],
-					'overrides_formula' => $filter['formula'],
-					'overrides_filters' => $filter['conditions'],
+					'overrides_evaltype' => $overrides_filter['evaltype'],
+					'overrides_formula' => $overrides_filter['formula'],
+					'overrides_filters' => $overrides_filter['conditions'],
 					'operations' => $page_options['operations'],
 					'no' => $page_options['no']
 				];
@@ -135,6 +133,10 @@ class CControllerPopupLldOverride extends CController {
 			);
 		}
 		else {
+			$page_options['overrides_filters'] = sortLldRuleFilterConditions($page_options['overrides_filters'],
+				$page_options['overrides_evaltype']
+			);
+
 			$data = [
 				'title' => _('Override'),
 				'options' => $page_options,

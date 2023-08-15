@@ -2055,8 +2055,6 @@ function prepareLldFilter(array $filter): array {
 	}
 	unset($condition);
 
-	$filter['conditions'] = sortLldRuleFilterConditions($filter['conditions'], $filter['evaltype']);
-
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
 		$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 		$filter['formula'] = '';
@@ -2454,6 +2452,11 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
 
 				return strnatcasecmp($condition_a['value'], $condition_b['value']);
 			});
+
+			foreach ($conditions as $i => &$condition) {
+				$condition['formulaid'] = num2letter($i);
+			}
+			unset($condition);
 			break;
 
 		case CONDITION_EVAL_TYPE_EXPRESSION:
