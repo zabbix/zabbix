@@ -89,7 +89,6 @@ class WidgetForm extends CWidgetForm {
 
 		if (array_key_exists('columns', $values)) {
 			foreach ($values['columns'] as $key => $value) {
-				sdff($value, '/home/test/work/logs/zabbix.log');
 				switch ($value['data']) {
 					case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 						$this->field_column_values[$key] = $value['name'] === '' ? $value['item'] : $value['name'];
