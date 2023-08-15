@@ -1629,7 +1629,7 @@ static void	lld_groups_validate(zbx_vector_lld_group_ptr_t *groups, zbx_vector_l
 		{
 			for (i = 0; i < groups_in->values_num; i++)
 			{
-				zbx_lld_group_t	*group = groups->values[i];
+				zbx_lld_group_t	*group = groups_in->values[i];
 
 				if (0 == strcmp(group->name, row[0]))
 				{
