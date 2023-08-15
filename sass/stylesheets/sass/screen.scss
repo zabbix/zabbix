@@ -726,10 +726,12 @@ form {
 		.subfilter-enabled {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
+			-webkit-text-fill-color: $multiselect-item-disabled-color;
 
 			.btn-icon {
 				pointer-events: none;
 				color: $multiselect-item-disabled-color;
+				-webkit-text-fill-color: $multiselect-item-disabled-color;
 			}
 		}
 	}
@@ -1119,8 +1121,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 	}
 }
 
@@ -1143,8 +1144,7 @@ textarea {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 
 		&:focus {
 			border-color: $form-focus-border-color;
@@ -1360,6 +1360,12 @@ select {
 	&:focus {
 		border-color: $form-focus-border-color;
 	}
+
+	&::placeholder {
+		color: $input-placeholder-color;
+		-webkit-text-fill-color: $input-placeholder-color;
+		opacity: 1;
+	}
 }
 
 .filter-space {
@@ -1530,24 +1536,23 @@ select {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
-%form-disabled {
-	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color !important;
+%form-readonly {
+	color: $font-color;
+	-webkit-text-fill-color: $font-color;
+	background-color: $form-disabled-bg-color;
 	border-color: $form-disabled-border-color;
 }
 
-/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
-.safari {
-	%form-disabled {
-		-webkit-text-fill-color: $form-disabled-font-color;
-	}
+%form-disabled {
+	color: $form-disabled-font-color;
+	-webkit-text-fill-color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border-color: $form-disabled-border-color;
 
-	input,
-	textarea {
-		&[readonly] {
-			-webkit-text-fill-color: $font-color !important;
-			@extend %form-disabled;
-		}
+	&::placeholder {
+		color: $input-disabled-placeholder-color;
+		-webkit-text-fill-color: $input-disabled-placeholder-color;
+		opacity: 1;
 	}
 }
 
@@ -3417,18 +3422,6 @@ svg {
 	&:focus {
 		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
-}
-
-:-ms-input-placeholder {
-	color: $input-placeholder-color !important;
-}
-
-::-ms-input-placeholder {
-	color: $input-placeholder-color;
-}
-
-::placeholder {
-	color: $input-placeholder-color;
 }
 
 .ui-sortable {
