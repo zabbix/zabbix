@@ -434,6 +434,12 @@ class CWidgetBase {
 	 */
 	#startDataExchange() {
 		for (const accessor of this.#getFieldsReferencesAccessors()) {
+			if (accessor.getReference() === '') {
+				this.#fields_referred_data.set(accessor, null);
+
+				continue;
+			}
+
 			this.requireDataSource(accessor.getReference());
 
 			const subscription = ZABBIX.EventHub.subscribe({

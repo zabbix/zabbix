@@ -1933,7 +1933,7 @@ class CDashboard {
 			}
 
 			if (has_updates) {
-				widget.updateProperties({fields});
+				widget.updateProperties({fields, fields_references});
 			}
 		}
 	}
