@@ -219,7 +219,8 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'context' => $data['context']
+		'context' => $data['context'],
+		'checkbox_hash' => $data['discovery_rule']['itemid']
 	]).');
 '))
 	->setOnDocumentReady()

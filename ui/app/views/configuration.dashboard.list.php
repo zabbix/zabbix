@@ -91,3 +91,11 @@ $form->addItem([
 	->setNavigation(getHostNavigation('dashboards', $data['templateid']))
 	->addItem($form)
 	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $checkbox_hash,
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

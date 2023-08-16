@@ -246,6 +246,8 @@
 					}
 				}
 
+				uncheckTableRows('items_' + this.checkbox_hash, [], false);
+
 				location.href = curl === null ? location.href : curl.getUrl();
 			}
 		}

@@ -26,6 +26,11 @@
 
 <script>
 	const view = new class {
+
+		init({checkbox_hash}) {
+			this.checkbox_hash = checkbox_hash;
+		}
+
 		editTemplate(e, templateid) {
 			e.preventDefault();
 			const template_data = {templateid};
@@ -58,6 +63,8 @@
 					curl.setArgument('action', 'template.list');
 				}
 			}
+
+			uncheckTableRows(this.checkbox_hash);
 
 			if (curl == null) {
 				location.href = location.href;

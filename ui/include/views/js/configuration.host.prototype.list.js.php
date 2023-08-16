@@ -26,8 +26,9 @@
 
 <script>
 	const view = {
-		init({context}) {
+		init({context, checkbox_hash}) {
 			this.context = context;
+			this.checkbox_hash = checkbox_hash;
 
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-template')) {
@@ -95,6 +96,8 @@
 						curl.setArgument('context', context);
 					}
 				}
+
+				uncheckTableRows('host_prototypes_' + this.checkbox_hash, [] ,false);
 
 				if (curl) {
 					location.href = curl.getUrl();

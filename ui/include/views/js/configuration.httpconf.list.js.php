@@ -30,7 +30,9 @@
 
 <script>
 	const view = {
-		init() {
+		init({checkbox_hash}) {
+			this.checkbox_hash = checkbox_hash;
+
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function()  {
@@ -92,6 +94,8 @@
 						postMessageDetails('success', data.success.messages);
 					}
 				}
+
+				uncheckTableRows('httpconf_'+ view.checkbox_hash, [], false);
 
 				location.href = location.href;
 			}

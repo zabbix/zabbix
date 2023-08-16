@@ -27,8 +27,9 @@
 <script>
 	const view = {
 
-		init({context}) {
+		init({context, checkbox_hash}) {
 			this.context = context;
+			this.checkbox_hash = checkbox_hash;
 		},
 
 		editHost(e, hostid) {
@@ -90,6 +91,8 @@
 						curl.setArgument('context', context);
 					}
 				}
+
+				uncheckTableRows('disc_prototypes_' + this.checkbox_hash, [] ,false);
 
 				if (curl) {
 					location.href = curl.getUrl();
