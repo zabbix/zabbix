@@ -60,7 +60,7 @@ int	zbx_proxy_get_delay(zbx_uint64_t lastid);
 int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
 		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
-void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, int lastaccess, int compress,
+void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, int lastaccess,
 		zbx_uint64_t flags_add);
 
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
@@ -96,7 +96,7 @@ void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned ch
 		const zbx_uint64_t hostid);
 
 /* event support */
-void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_ptr_t *events);
+void		zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_event_t *events);
 void		zbx_db_free_event(zbx_db_event *event);
 void		zbx_db_get_eventid_r_eventid_pairs(zbx_vector_uint64_t *eventids, zbx_vector_uint64_pair_t *event_pairs,
 		zbx_vector_uint64_t *r_eventids);

@@ -20,24 +20,25 @@ This template has been tested on:
 
 ## Setup
 
-Specify the address of the remote Zabbix server by changing `{$ADDRESS}` and `{$PORT}` macros. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
+Specify the address of the remote Zabbix server by changing `{$ZABBIX.SERVER.ADDRESS}` and `{$ZABBIX.SERVER.PORT}` macros. Don't forget to adjust the `StatsAllowedIP` parameter in the remote server's configuration file to allow the collection of statistics.
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ADDRESS}|||
-|{$PORT}|||
+|{$ZABBIX.SERVER.ADDRESS}|<p>IP/DNS/network mask list of servers to be remotely queried (default is 127.0.0.1).</p>||
+|{$ZABBIX.SERVER.PORT}|<p>Port of server to be remotely queried (default is 10051).</p>||
 |{$PROXY.LAST_SEEN.MAX}|<p>The maximum number of seconds that Zabbix proxy has not been seen.</p>|`600`|
+|{$ZABBIX.SERVER.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expression.</p>|`5m`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Remote Zabbix server: Zabbix stats|<p>The master item of Zabbix server statistics.</p>|Zabbix internal|zabbix[stats,{$ADDRESS},{$PORT}]|
+|Remote Zabbix server: Zabbix stats|<p>The master item of Zabbix server statistics.</p>|Zabbix internal|zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT}]|
 |Zabbix proxies stats|<p>The master item of Zabbix proxies' statistics.</p>|Dependent item|zabbix.proxies.stats<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.proxy`</p></li></ul>|
-|Remote Zabbix server: Zabbix stats queue over 10m|<p>The number of monitored items in the queue, which are delayed at least by 10 minutes.</p>|Zabbix internal|zabbix[stats,{$ADDRESS},{$PORT},queue,10m]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue`</p></li></ul>|
-|Remote Zabbix server: Zabbix stats queue|<p>The number of monitored items in the queue, which are delayed at least by 6 seconds.</p>|Zabbix internal|zabbix[stats,{$ADDRESS},{$PORT},queue]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue`</p></li></ul>|
+|Remote Zabbix server: Zabbix stats queue over 10m|<p>The number of monitored items in the queue, which are delayed at least by 10 minutes.</p>|Zabbix internal|zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT},queue,10m]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue`</p></li></ul>|
+|Remote Zabbix server: Zabbix stats queue|<p>The number of monitored items in the queue, which are delayed at least by 6 seconds.</p>|Zabbix internal|zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT},queue]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.queue`</p></li></ul>|
 |Remote Zabbix server: Utilization of alert manager internal processes, in %|<p>The average percentage of the time during which the alert manager processes have been busy for the last minute.</p>|Dependent item|process.alert_manager.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['alert manager'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "alert manager" processes started.`</p></li></ul>|
 |Remote Zabbix server: Utilization of alert syncer internal processes, in %|<p>The average percentage of the time during which the alert syncer processes have been busy for the last minute.</p>|Dependent item|process.alert_syncer.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['alert syncer'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "alert syncer" processes started.`</p></li></ul>|
 |Remote Zabbix server: Utilization of alerter internal processes, in %|<p>The average percentage of the time during which the alerter processes have been busy for the last minute.</p>|Dependent item|process.alerter.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['alerter'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "alerter" processes started.`</p></li></ul>|
@@ -76,6 +77,7 @@ Specify the address of the remote Zabbix server by changing `{$ADDRESS}` and `{$
 |Remote Zabbix server: Utilization of vmware data collector processes, in %|<p>The average percentage of the time during which the vmware collector processes have been busy for the last minute.</p>|Dependent item|process.vmware_collector.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['vmware collector'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "vmware collector" processes started.`</p></li></ul>|
 |Remote Zabbix server: Utilization of agent poller data collector processes, in %|<p>The average percentage of the time during which the agent poller processes have been busy for the last minute.</p>|Dependent item|process.agent_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['agent poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "agent poller" processes started.`</p></li></ul>|
 |Remote Zabbix server: Utilization of http agent poller data collector processes, in %|<p>The average percentage of the time during which the http agent poller processes have been busy for the last minute.</p>|Dependent item|process.http_agent_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['http agent poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "http agent poller" processes started.`</p></li></ul>|
+|Remote Zabbix server: Utilization of snmp poller data collector processes, in %|<p>The average percentage of the time during which the snmp poller processes have been busy for the last minute.</p>|Dependent item|process.snmp_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['snmp poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `No "snmp poller" processes started.`</p></li></ul>|
 |Remote Zabbix server: Configuration cache, % used|<p>The availability statistics of Zabbix configuration cache. The percentage of used data buffer.</p>|Dependent item|rcache.buffer.pused<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.rcache.pused`</p></li></ul>|
 |Remote Zabbix server: Trend function cache, % of unique requests|<p>The effectiveness statistics of Zabbix trend function cache. The percentage of cached items calculated from the sum of cached items plus requests.</p><p>Low percentage most likely means that the cache size can be reduced.</p>|Dependent item|tcache.pitems<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.tcache.pitems`</p><p>⛔️Custom on fail: Set error to: `Not supported in this version.`</p></li></ul>|
 |Remote Zabbix server: Trend function cache, % of misses|<p>The effectiveness statistics of Zabbix trend function cache. The percentage of cache misses.</p>|Dependent item|tcache.pmisses<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.tcache.pmisses`</p><p>⛔️Custom on fail: Set error to: `Not supported in this version.`</p></li></ul>|
@@ -104,7 +106,7 @@ Specify the address of the remote Zabbix server by changing `{$ADDRESS}` and `{$
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Remote Zabbix server: More than 100 items having missing data for more than 10 minutes|<p>The `zabbix[stats,{$IP},{$PORT},queue,10m]` item collects data about the number of items that have been missing the data for more than 10 minutes.</p>|`min(/Remote Zabbix server health/zabbix[stats,{$ADDRESS},{$PORT},queue,10m],10m)>100`|Warning|**Manual close**: Yes|
+|Remote Zabbix server: More than 100 items having missing data for more than 10 minutes|<p>The `zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT},queue,10m]` item collects data about the number of items that have been missing the data for more than 10 minutes.</p>|`min(/Remote Zabbix server health/zabbix[stats,{$ZABBIX.SERVER.ADDRESS},{$ZABBIX.SERVER.PORT},queue,10m],10m)>100`|Warning|**Manual close**: Yes|
 |Remote Zabbix server: Utilization of alert manager processes is high||`avg(/Remote Zabbix server health/process.alert_manager.avg.busy,10m)>75`|Average|**Manual close**: Yes|
 |Remote Zabbix server: Utilization of alert syncer processes is high||`avg(/Remote Zabbix server health/process.alert_syncer.avg.busy,10m)>75`|Average|**Manual close**: Yes|
 |Remote Zabbix server: Utilization of alerter processes is high||`avg(/Remote Zabbix server health/process.alerter.avg.busy,10m)>75`|Average|**Manual close**: Yes|
@@ -143,7 +145,9 @@ Specify the address of the remote Zabbix server by changing `{$ADDRESS}` and `{$
 |Remote Zabbix server: Utilization of vmware collector processes is high||`avg(/Remote Zabbix server health/process.vmware_collector.avg.busy,10m)>75`|Average|**Manual close**: Yes|
 |Remote Zabbix server: Utilization of agent poller processes is high||`avg(/Remote Zabbix server health/process.agent_poller.avg.busy,10m)>75`|Average|**Manual close**: Yes|
 |Remote Zabbix server: Utilization of http agent poller processes is high||`avg(/Remote Zabbix server health/process.http_agent_poller.avg.busy,10m)>75`|Average|**Manual close**: Yes|
+|Remote Zabbix server: Utilization of snmp poller processes is high||`avg(/Remote Zabbix server health/process.snmp_poller.avg.busy,10m)>75`|Average|**Manual close**: Yes|
 |Remote Zabbix server: More than 75% used in the configuration cache|<p>Consider increasing `CacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Remote Zabbix server health/rcache.buffer.pused,10m)>75`|Average|**Manual close**: Yes|
+|Remote Zabbix server: Failed to fetch stats data|<p>Zabbix has not received statistics data for {$ZABBIX.SERVER.NODATA_TIMEOUT}.</p>|`nodata(/Remote Zabbix server health/rcache.buffer.pused,{$ZABBIX.SERVER.NODATA_TIMEOUT})=1`|Warning||
 |Remote Zabbix server: More than 95% used in the value cache|<p>Consider increasing `ValueCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Remote Zabbix server health/vcache.buffer.pused,10m)>95`|Average|**Manual close**: Yes|
 |Remote Zabbix server: Zabbix value cache working in low memory mode|<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p>|`last(/Remote Zabbix server health/vcache.cache.mode)=1`|High|**Manual close**: Yes|
 |Remote Zabbix server: Version has changed|<p>Zabbix server version has changed. Acknowledge to close the problem manually.</p>|`last(/Remote Zabbix server health/version,#1)<>last(/Remote Zabbix server health/version,#2) and length(last(/Remote Zabbix server health/version))>0`|Info|**Manual close**: Yes|

@@ -47,7 +47,7 @@ foreach ($data['inputs'] as $name => $value) {
 		$form->addVar('hostid', $value['hostid']);
 		continue;
 	}
-	elseif ($name === 'proxy_hostid') {
+	elseif ($name === 'proxyid') {
 		continue;
 	}
 	elseif ($name === 'query_fields' || $name === 'headers' || $name === 'parameters') {
@@ -71,8 +71,8 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 		(new CCol(
 			(new CTextAreaFlexible('macro_rows['.$i++.']', $macro_name, ['readonly' => true]))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->removeAttribute('name')
 				->removeId()
+				->removeAttribute('name')
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
 		(new CCol(
@@ -80,6 +80,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))
+				->disableSpellcheck()
 				->removeId()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 	]);
@@ -248,12 +249,12 @@ if ($data['is_item_testable']) {
 	$form_grid->addItem([
 		(new CLabel(_('Proxy'), 'label-proxy-hostid'))->addClass('js-proxy-hostid-row'),
 		(new CFormField(
-			(new CSelect('proxy_hostid'))
+			(new CSelect('proxyid'))
 				->setReadonly(!$data['proxies_enabled'])
 				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
 				->setFocusableElementId('label-proxy-hostid')
-				->setValue(array_key_exists('proxy_hostid', $data['inputs']) ? $data['inputs']['proxy_hostid'] : 0)
-				->setId('proxy_hostid')
+				->setValue(array_key_exists('proxyid', $data['inputs']) ? $data['inputs']['proxyid'] : 0)
+				->setId('proxyid')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)

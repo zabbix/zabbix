@@ -114,7 +114,8 @@
 				class: 'multilineinput-textarea' + monospace_font,
 				text: obj.$hidden.val(),
 				readonly: obj.options.readonly ? true : null,
-				placeholder: obj.options.placeholder_textarea
+				placeholder: obj.options.placeholder_textarea,
+				spellcheck: false
 			}).attr('wrap', 'off'),
 			$line_numbers = $('<ul>', {class: 'multilineinput-line-numbers' + monospace_font}).append('<li>'),
 			$footer = $('<div>', {class: 'multilineinput-char-count'});

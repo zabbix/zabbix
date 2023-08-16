@@ -20,7 +20,7 @@
 #include "zbxdbwrap.h"
 
 #include "zbxdbhigh.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 /* temporary cache of trigger related data */
 typedef struct
@@ -175,7 +175,7 @@ static int	db_trigger_expand_macros(const zbx_db_trigger *trigger, zbx_eval_cont
 		}
 
 		if (SUCCEED == zbx_substitute_simple_macros(NULL, &db_event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, &value, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0))
+				NULL, NULL, NULL, &value, ZBX_MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0))
 		{
 			zbx_variant_clear(&token->value);
 			zbx_variant_set_str(&token->value, value);
@@ -607,7 +607,7 @@ static void	evaluate_function_by_id(zbx_uint64_t functionid, char **value, zbx_t
 
 			evaluate_item.itemid = item.itemid;
 			evaluate_item.value_type = item.value_type;
-			evaluate_item.proxy_hostid = item.host.proxy_hostid;
+			evaluate_item.proxyid = item.host.proxyid;
 			evaluate_item.host = item.host.host;
 			evaluate_item.key_orig = item.key_orig;
 

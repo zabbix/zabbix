@@ -250,7 +250,7 @@ class C10FunctionParser extends CParser {
 	 *
 	 * @return string
 	 */
-	public static function unquoteParam($param) {
+	private static function unquoteParam($param) {
 		$unquoted = '';
 
 		for ($p = 1; isset($param[$p]); $p++) {
@@ -287,5 +287,24 @@ class C10FunctionParser extends CParser {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns unquoted parameters.
+	 *
+	 * @return array
+	 */
+	public function getParams(): array {
+		if (!array_key_exists('parameters', $this->params_raw)) {
+			return [];
+		}
+
+		$parameters = [];
+
+		foreach ($this->params_raw['parameters'] as $param) {
+			$parameters[] = $param['type'] == self::PARAM_QUOTED ? $this->unquoteParam($param['raw']) : $param['raw'];
+		}
+
+		return $parameters;
 	}
 }

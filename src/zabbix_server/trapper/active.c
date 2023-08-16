@@ -19,7 +19,7 @@
 
 #include "active.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
@@ -313,8 +313,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
@@ -384,7 +384,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6) || 0 == strncmp(key, "log.count[", 10) ||
 			0 == strncmp(key, "logrt.count[", 12))
 		item_key = ZBX_KEY_LOG;
-	else if (0 == strncmp(key, "eventlog[", 9))
+	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 15))
 		item_key = ZBX_KEY_EVENTLOG;
 	else
 		return;
@@ -579,15 +579,15 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
 			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
-					MACRO_TYPE_ITEM_KEY, NULL, 0);
+					ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, dc_items[i].key, ZBX_JSON_TYPE_STRING);
