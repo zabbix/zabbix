@@ -987,6 +987,7 @@ class testFormTabIndicators extends CWebTest {
 						$valuemap_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
 						$valuemap_form->submit();
+						$valuemap_form->waitUntilNotVisible();
 					}
 				}
 				break;
