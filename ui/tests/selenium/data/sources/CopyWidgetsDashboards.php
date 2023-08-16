@@ -1510,159 +1510,159 @@ class CopyWidgetsDashboards {
 								'height' => 4,
 								'fields' => [
 									[
-										'type' => 4,
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
 										'value' => '99142'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'min',
 										'value' => '10'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'max',
 										'value' => '350'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'angle',
 										'value' => '270'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'description',
 										'value' => 'Test description'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'desc_size',
-										'value' => '16'
+										'value' => 16
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'desc_bold',
-										'value' => '1'
+										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'desc_v_pos',
-										'value' => '0'
+										'value' => 0
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'desc_color',
 										'value' => 'FDD835'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'decimal_places',
-										'value' => '3'
+										'value' => 3
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'value_bold',
-										'value' => '1'
+										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'value_size',
-										'value' => '31'
+										'value' => 31
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'value_color',
 										'value' => 'FF6F00'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'value_arc_size',
-										'value' => '22'
+										'value' => 22
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'value_arc_color',
 										'value' => '0040FF'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'empty_color',
 										'value' => '00FF00'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'bg_color',
 										'value' => 'FFECB3'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'units',
 										'value' => 'bytes'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'units_size',
-										'value' => '26'
+										'value' => 26
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'units_bold',
-										'value' => '1'
+										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'units_color',
 										'value' => '42A5F5'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'needle_show',
-										'value' => '1'
+										'value' => 1
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'needle_color',
 										'value' => '9FA8DA'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'scale_decimal_places',
-										'value' => '2'
+										'value' => 2
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'scale_size',
-										'value' => '12'
+										'value' => 12
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.color.0',
 										'value' => '26A69A'
 									],
 									[
-										'type' => 1,
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'thresholds.threshold.0',
 										'value' => '123'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'th_show_labels',
 										'value' => '1'
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'th_show_arc',
-										'value' => '1'
+										'value' => 1
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'th_arc_size',
-										'value' => '56'
+										'value' => 56
 									],
 									[
-										'type' => 0,
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'dynamic',
-										'value' => '1'
+										'value' => 1
 									]
 								]
 							]
@@ -1803,6 +1803,171 @@ class CopyWidgetsDashboards {
 										'type' => 0,
 										'name' => 'itemid',
 										'value' => 400410
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge widget',
+								'x' => 17,
+								'y' => 4,
+								'width' => 7,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '400410'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'min',
+										'value' => '5'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'max',
+										'value' => '123'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'angle',
+										'value' => '270'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'description',
+										'value' => 'Test templated description'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_size',
+										'value' => 7
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_v_pos',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'desc_color',
+										'value' => 'BF00FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'decimal_places',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_size',
+										'value' => 13
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'value_color',
+										'value' => '26C6DA'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_arc_size',
+										'value' => 19
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'value_arc_color',
+										'value' => '66BB6A'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'empty_color',
+										'value' => 'FFFF00'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'bg_color',
+										'value' => '004D40'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'units',
+										'value' => 'KB'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'units_size',
+										'value' => 15
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'units_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'units_color',
+										'value' => '8D6E63'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'needle_show',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'needle_color',
+										'value' => 'E64A19'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'scale_decimal_places',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'scale_size',
+										'value' => 9
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'thresholds.color.0',
+										'value' => '4527A0'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'thresholds.threshold.0',
+										'value' => '15'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_show_labels',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_show_arc',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_arc_size',
+										'value' => 52
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'dynamic',
+										'value' => 1
 									]
 								]
 							]
