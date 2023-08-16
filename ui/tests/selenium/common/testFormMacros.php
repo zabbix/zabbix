@@ -1554,7 +1554,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string	$source		type of entity that is being checked (hots, hostPrototype, template)
 	 * @param string	$name		name of the host where macros are removed
 	 */
-	public function createSecretMacros($data, $url, $source, $name = null, $host_type = null) {
+	public function createSecretMacros($data, $url, $source, $name = null) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		// Check that macro values have type plain text by default.
@@ -1632,7 +1632,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @param string	$name		name of the host where macros to be updated
 	 * @param boolean	$discovered true if object is discovered host, false - if normal
 	 */
-	public function updateSecretMacros($data, $url, $source, $name = null, $discovered = false, $host_type = null) {
+	public function updateSecretMacros($data, $url, $source, $name = null, $discovered = false) {
 		$form = $this->openMacrosTab($url, $source, true, $name);
 
 		if ($discovered) {
@@ -1777,6 +1777,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 *
 	 * @param type $data		given data provider
 	 * @param type $secret		flag that indicates if the value should have type "Secret text".
+	 * @param string $source	type of entity that is being checked (hots, hostPrototype, template)
 	 * @param type $available	flag that indicates if the value should be available.
 	 */
 	public function checkInheritedTab($data, $secret, $source, $available = true) {
