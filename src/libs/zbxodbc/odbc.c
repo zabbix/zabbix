@@ -23,7 +23,6 @@
 
 #include "zbxodbc.h"
 
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"

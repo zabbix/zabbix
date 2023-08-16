@@ -19,7 +19,6 @@
 
 #include "logfiles.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
@@ -32,6 +31,7 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxtypes.h"	/* ssize_t */
 #	include "zbxwin32.h"
+#	include "zbxlog.h"
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */
@@ -48,8 +48,6 @@
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
 extern int	CONFIG_MAX_LINES_PER_SECOND;
-
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -348,7 +346,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 		else
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s",
-					filename, strerror_from_system(GetLastError()));
+					filename, zbx_strerror_from_system(GetLastError()));
 			return ret;
 		}
 	}
@@ -366,7 +364,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 			else
 			{
 				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain extended information for file"
-						" \"%s\": %s", filename, strerror_from_system(GetLastError()));
+						" \"%s\": %s", filename, zbx_strerror_from_system(GetLastError()));
 				return ret;
 			}
 		}
@@ -406,7 +404,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 			sizeof(mount_point) / sizeof(wchar_t)))
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume mount point for file \"%s\": %s", path,
-				strerror_from_system(GetLastError()));
+				zbx_strerror_from_system(GetLastError()));
 		zbx_free(path_uni);
 		return FAIL;
 	}
@@ -419,7 +417,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume information for directory \"%s\": %s", utf8,
-				strerror_from_system(GetLastError()));
+				zbx_strerror_from_system(GetLastError()));
 		zbx_free(utf8);
 		return FAIL;
 	}
@@ -1590,31 +1588,48 @@ void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int
  *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
+ *     err_msg        - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  * Comments: This is a helper function for pick_logfiles()                    *
  *                                                                            *
  ******************************************************************************/
-static void	pick_logfile(const char *directory, const char *filename, int mtime, const zbx_regexp_t *re,
-		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+static int	pick_logfile(const char *directory, const char *filename, int mtime, const zbx_regexp_t *re,
+		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, char **err_msg)
 {
 	char		*logfile_candidate;
 	zbx_stat_t	file_buf;
+	int		ret = SUCCEED;
 
 	logfile_candidate = zbx_dsprintf(NULL, "%s%s", directory, filename);
 
 	if (0 == zbx_stat(logfile_candidate, &file_buf))
 	{
-		if (S_ISREG(file_buf.st_mode) &&
-				mtime <= file_buf.st_mtime &&
-				0 == zbx_regexp_match_precompiled(filename, re))
+		if (S_ISREG(file_buf.st_mode) && mtime <= file_buf.st_mtime)
 		{
-			add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate, &file_buf);
+			char	*error = NULL;
+			int	res;
+
+			if (ZBX_REGEXP_MATCH == (res = zbx_regexp_match_precompiled2(filename, re, &error)))
+			{
+				add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate, &file_buf);
+			}
+			else if (FAIL == res)
+			{
+				*err_msg = zbx_dsprintf(*err_msg, "error occurred while matching file name pattern"
+						" regular expression: %s", error);
+				zbx_free(error);
+				ret = FAIL;
+			}
 		}
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s': %s", logfile_candidate, zbx_strerror(errno));
 
 	zbx_free(logfile_candidate);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1672,7 +1687,16 @@ static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *r
 	{
 		char	*file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
 
-		pick_logfile(directory, file_name_utf8, mtime, re, logfiles, logfiles_alloc, logfiles_num);
+		if (SUCCEED != pick_logfile(directory, file_name_utf8, mtime, re, logfiles, logfiles_alloc,
+				logfiles_num, err_msg))
+		{
+			zbx_free(find_wpath);
+			zbx_free(find_path);
+			zbx_free(file_name_utf8);
+			_findclose(find_handle);	/* ignore _findclose() error, report pick_logfile() error */
+			return FAIL;
+		}
+
 		zbx_free(file_name_utf8);
 	}
 	while (0 == _wfindnext(find_handle, &find_data));
@@ -1704,7 +1728,14 @@ clean:
 	*use_ino = 1;
 
 	while (NULL != (d_ent = readdir(dir)))
-		pick_logfile(directory, d_ent->d_name, mtime, re, logfiles, logfiles_alloc, logfiles_num);
+	{
+		if (SUCCEED != pick_logfile(directory, d_ent->d_name, mtime, re, logfiles, logfiles_alloc,
+				logfiles_num, err_msg))
+		{
+			closedir(dir);	/* ignore closedir() error, report pick_logfile() error */
+			return FAIL;
+		}
+	}
 
 	if (-1 == closedir(dir))
 	{
@@ -1731,13 +1762,13 @@ clean:
  ******************************************************************************/
 static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **re, char **err_msg)
 {
-	const char	*regexp_err;
+	char	*regexp_err = NULL;
 
 	if (SUCCEED != zbx_regexp_compile(filename_regexp, re, &regexp_err))
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot compile a regular expression describing filename pattern: %s",
 				regexp_err);
-		zbx_regexp_err_msg_free(regexp_err);
+		zbx_free(regexp_err);
 		return FAIL;
 	}
 
@@ -2017,15 +2048,21 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static int	zbx_match_log_rec(const zbx_vector_expression_t *regexps, const char *value, const char *pattern,
-		const char *output_template, char **output, char **err_msg)
+static void	log_regexp_runtime_error(const char *key, const char *err_msg, zbx_uint64_t itemid,
+		int *runtime_error_logging_allowed)
 {
-	int	ret;
+	/* Simple throttling. Log no more than one regexp runtime error per log*[] item check. */
+	/* Throttling is necessary to allow Zabbix agent monitor its own log file at DebugLevel <= 3. */
 
-	if (FAIL == (ret = zbx_regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template, output)))
-		*err_msg = zbx_dsprintf(*err_msg, "cannot compile regular expression");
+	if (0 == *runtime_error_logging_allowed)
+		return;
 
-	return ret;	/* ZBX_REGEXP_MATCH, ZBX_REGEXP_NO_MATCH or FAIL */
+	*runtime_error_logging_allowed = 0;
+
+	if (0 == itemid)	/* Agent 1, use key.orig to identify item */
+		zabbix_log(LOG_LEVEL_WARNING, "item key '%s': regexp runtime error: %s", key, err_msg);
+	else			/* Agent 2, key.orig not available, use itemid */
+		zabbix_log(LOG_LEVEL_WARNING, "itemid " ZBX_FS_UI64 ": regexp runtime error: %s", itemid, err_msg);
 }
 
 /******************************************************************************
@@ -2039,11 +2076,12 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		zbx_process_value_func_t process_value, zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip, char **err_msg)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
-	int				ret, nbytes, regexp_ret;
+	int				ret, nbytes;
 	const char			*cr, *lf, *p_end;
 	char				*p_start, *p, *p_nl, *p_next, *item_value = NULL;
 	size_t				szbyte;
@@ -2057,6 +2095,11 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
+
+	/* Corner case: only one record is allowed to be analyzed per log*[] item check. */
+	/* Disable logging runtime errors for this case. */
+	int	runtime_error_logging_allowed = (1 < *p_count) ? 1 : 0;
+
 	if (NULL == buf)
 		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
@@ -2125,7 +2168,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					/* database). */
 
 					char	*value;
-					int	send_err;
+					int	send_err, regexp_ret;
 
 					buf[BUF_SIZE] = '\0';
 
@@ -2142,12 +2185,13 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					processed_size = (size_t)offset + (size_t)nbytes;
 					send_err = FAIL;
 
-					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+					regexp_ret = zbx_regexp_sub_ex2(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret))
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret))
 					{
 						/* Prepare 'prep_vec' element even if the current record won't match. */
 						/* Its mtime and lastlogsize could be sent to server later as */
@@ -2177,7 +2221,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT,
-									config_tls, config_timeout, config_source_ip)))
+									config_tls, config_timeout, config_source_ip,
+									config_buffer_send, config_buffer_size)))
 							{
 								*lastlogsize_sent = processed_size;
 
@@ -2207,16 +2252,26 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					if ('\0' != *encoding)
 						zbx_free(value);
 
-					if (FAIL == regexp_ret)
+					if (ZBX_REGEXP_COMPILE_FAIL == regexp_ret)
 					{
 						ret = FAIL;
 						goto out;
 					}
 
+					if (ZBX_REGEXP_RUNTIME_FAIL == regexp_ret)
+					{
+						/* regexp runtime error does not cause log*[] item state */
+						/* NOTSUPPORTED. Log it and continue to analyze log file records. */
+						log_regexp_runtime_error(key, *err_msg, itemid,
+								&runtime_error_logging_allowed);
+						zbx_free(*err_msg);
+					}
+
 					(*p_count)--;
 
 					if (0 != is_count_item ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret || SUCCEED == send_err)
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret || SUCCEED == send_err)
 					{
 						*lastlogsize = processed_size;
 						*big_rec = 1;	/* ignore the rest of this record */
@@ -2248,24 +2303,28 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 				if (0 == *big_rec)
 				{
 					char	*value;
-					int	send_err;
+					int	send_err, regexp_ret;
 
 					*p_nl = '\0';
 
 					if ('\0' != *encoding)
-						value = zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
+					{
+						value = zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start),
+								encoding);
+					}
 					else
 						value = p_start;
 
 					processed_size = (size_t)offset + (size_t)(p_next - buf);
 					send_err = FAIL;
 
-					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+					regexp_ret = zbx_regexp_sub_ex2(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret))
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret))
 					{
 						/* Prepare 'prep_vec' element even if the current record won't match. */
 						/* Its mtime and lastlogsize could be sent to server later as */
@@ -2292,7 +2351,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT,
-									config_tls, config_timeout, config_source_ip)))
+									config_tls, config_timeout, config_source_ip,
+									config_buffer_send, config_buffer_size)))
 							{
 								*lastlogsize_sent = processed_size;
 
@@ -2322,16 +2382,26 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					if ('\0' != *encoding)
 						zbx_free(value);
 
-					if (FAIL == regexp_ret)
+					if (ZBX_REGEXP_COMPILE_FAIL == regexp_ret)
 					{
 						ret = FAIL;
 						goto out;
 					}
 
+					if (ZBX_REGEXP_RUNTIME_FAIL == regexp_ret)
+					{
+						/* regexp runtime error does not cause log*[] item state */
+						/* NOTSUPPORTED. Log it and continue to analyze log file records. */
+						log_regexp_runtime_error(key, *err_msg, itemid,
+								&runtime_error_logging_allowed);
+						zbx_free(*err_msg);
+					}
+
 					(*p_count)--;
 
 					if (0 != is_count_item ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret || SUCCEED == send_err)
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret || SUCCEED == send_err)
 					{
 						*lastlogsize = processed_size;
 					}
@@ -2418,6 +2488,8 @@ out:
  *     config_tls      - [IN]                                                 *
  *     config_timeout  - [IN]                                                 *
  *     config_source_ip - [IN]                                                *
+ *     itemid          - [IN] item id for logging when called from Agent 2.   *
+ *                            It is 0 when called from Agent 1.               *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
  *                                                                            *
@@ -2437,7 +2509,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset, const char *persistent_file_name,
 		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, char **err_msg)
+		const char *config_source_ip, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size, char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -2456,7 +2528,8 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
 				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
 				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec,
-				config_tls, config_timeout, config_source_ip, err_msg)))
+				config_tls, config_timeout, config_source_ip, itemid, config_buffer_send,
+				config_buffer_size, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -3291,6 +3364,8 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     config_tls       - [IN]                                                *
  *     config_timeout   - [IN]                                                *
  *     config_source_ip - [IN]                                                *
+ *     itemid           - [IN] item id for logging when called from Agent 2.  *
+ *                             It is 0 when called from Agent 1.              *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -3307,7 +3382,8 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, int *jumped, float max_delay,
 		double *start_time, zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3513,7 +3589,8 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
 						output_template, p_count, s_count, process_value, addrs, agent2_result,
 						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
-						prep_vec, config_tls, config_timeout, config_source_ip, err_msg);
+						prep_vec, config_tls, config_timeout, config_source_ip, itemid,
+						config_buffer_send, config_buffer_size, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3843,7 +3920,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 
 /******************************************************************************
  *                                                                            *
- * Comments: Function body is thread-safe if CONFIG_HOSTNAME is not updated   *
+ * Comments: Function body is thread-safe if config_hostname is not updated   *
  *           while log checks are running. Uses callback function             *
  *           process_value_cb, so overall thread-safety depends on caller.    *
  *           Otherwise supposed to be thread-safe, see pick_logfiles()        *
@@ -3853,7 +3930,8 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -4080,10 +4158,10 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
-			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
+			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, config_hostname,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type, metric->persistent_file_name, prep_vec, config_tls, config_timeout,
-			config_source_ip);
+			config_source_ip, itemid, config_buffer_send, config_buffer_size);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
@@ -4109,10 +4187,10 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
+			if (SUCCEED == process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
 					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout,
-					config_source_ip) || 0 != jumped)
+					config_source_ip, config_buffer_send, config_buffer_size) || 0 != jumped)
 			{
 				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
 				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */

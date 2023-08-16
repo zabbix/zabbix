@@ -19,13 +19,41 @@
 
 #include "checks_agent.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
 #endif
 
+void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
+
+	if (0 == strcmp(s->buffer, ZBX_NOTSUPPORTED))
+	{
+		/* 'ZBX_NOTSUPPORTED\0<error message>' */
+		if (sizeof(ZBX_NOTSUPPORTED) < s->read_bytes)
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s->buffer + sizeof(ZBX_NOTSUPPORTED)));
+		else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
+
+		*ret = NOTSUPPORTED;
+	}
+	else if (0 == strcmp(s->buffer, ZBX_ERROR))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
+		*ret = AGENT_ERROR;
+	}
+	else if (0 == received_len)
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
+				" Assuming that agent dropped connection because of access permissions.",
+				addr));
+		*ret = NETWORK_ERROR;
+	}
+	else
+		zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s->buffer);
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from Zabbix agent                                   *
@@ -101,37 +129,13 @@ int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_s
 			ret = NETWORK_ERROR;
 	}
 	else
+	{
 		ret = NETWORK_ERROR;
+		goto out;
+	}
 
 	if (SUCCEED == ret)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s.buffer);
-
-		if (0 == strcmp(s.buffer, ZBX_NOTSUPPORTED))
-		{
-			/* 'ZBX_NOTSUPPORTED\0<error message>' */
-			if (sizeof(ZBX_NOTSUPPORTED) < s.read_bytes)
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "%s", s.buffer + sizeof(ZBX_NOTSUPPORTED)));
-			else
-				SET_MSG_RESULT(result, zbx_strdup(NULL, "Not supported by Zabbix Agent"));
-
-			ret = NOTSUPPORTED;
-		}
-		else if (0 == strcmp(s.buffer, ZBX_ERROR))
-		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Zabbix Agent non-critical error"));
-			ret = AGENT_ERROR;
-		}
-		else if (0 == received_len)
-		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Received empty response from Zabbix Agent at [%s]."
-					" Assuming that agent dropped connection because of access permissions.",
-					item->interface.addr));
-			ret = NETWORK_ERROR;
-		}
-		else
-			zbx_set_agent_result_type(result, ITEM_VALUE_TYPE_TEXT, s.buffer);
-	}
+		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result);
 	else
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 

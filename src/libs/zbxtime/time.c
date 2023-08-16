@@ -141,9 +141,14 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 #endif	/* not _WINDOWS */
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
+			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+#else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
+#endif
 	{
-		ts->ns += ++corr;
+		ts->ns = last_ts.ns + (++corr);
 
 		while (ts->ns >= 1000000000)
 		{

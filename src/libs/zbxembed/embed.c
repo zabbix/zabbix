@@ -21,14 +21,13 @@
 #include "embed_xml.h"
 #include "embed.h"
 
-#include "log.h"
 #include "httprequest.h"
 #include "zabbix.h"
 #include "global.h"
 #include "console.h"
 #include "zbxstr.h"
 
-#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 64)
+#define ZBX_ES_MEMORY_LIMIT	(1024 * 1024 * 512)
 #define ZBX_ES_STACK_LIMIT	1000
 
 /* maximum number of consequent runtime errors after which it's treated as fatal error */
@@ -62,6 +61,9 @@ static void	*es_malloc(void *udata, duk_size_t size)
 	zbx_es_env_t	*env = (zbx_es_env_t *)udata;
 	uint64_t	*uptr;
 
+	if (env->total_alloc + size + 8 > env->max_total_alloc)
+		env->max_total_alloc = env->total_alloc + size + 8;
+
 	if (env->total_alloc + size + 8 > ZBX_ES_MEMORY_LIMIT)
 	{
 		if (NULL == env->ctx)
@@ -90,6 +92,9 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
 	}
 	else
 		old_size = 0;
+
+	if (env->total_alloc + size + 8 - old_size > env->max_total_alloc)
+		env->max_total_alloc = env->total_alloc + size + 8 - old_size;
 
 	if (env->total_alloc + size + 8 - old_size > ZBX_ES_MEMORY_LIMIT)
 	{
@@ -299,6 +304,7 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 
 	es->env = zbx_malloc(NULL, sizeof(zbx_es_env_t));
 	memset(es->env, 0, sizeof(zbx_es_env_t));
+	es->env->max_total_alloc = 0;
 
 	es->env->config_source_ip = config_source_ip;
 
@@ -329,13 +335,11 @@ int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 
 	/* put environment object to be accessible from duktape C calls */
 	duk_push_global_stash(es->env->ctx);
+
+	duk_push_string(es->env->ctx, "\xff""\xff""zbx_env");
 	duk_push_pointer(es->env->ctx, (void *)es->env);
-	if (1 != duk_put_prop_string(es->env->ctx, -2, "\xff""\xff""zbx_env"))
-	{
-		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
-		duk_pop(es->env->ctx);
-		return FAIL;
-	}
+	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	/* initialize HttpRequest prototype */
 	if (FAIL == zbx_es_init_httprequest(es, error))
@@ -654,7 +658,11 @@ out:
 		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration_ms(&es->env->start_time));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated or requested "
+			"memory: " ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error), (zbx_fs_size_t)es->env->total_alloc,
+			(zbx_fs_size_t)es->env->max_total_alloc, ZBX_ES_MEMORY_LIMIT);
+	es->env->max_total_alloc = 0;
 
 	return ret;
 }

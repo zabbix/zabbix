@@ -22,13 +22,13 @@
 #include "proxyconfigread/proxyconfig_read.h"
 #include "../trapper/proxydata.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxdbhigh.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"
@@ -36,7 +36,6 @@
 #include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
-#include "zbx_host_constants.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
@@ -68,7 +67,7 @@ static int	connect_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, int
 		case ZBX_TCP_SEC_TLS_CERT:
 		case ZBX_TCP_SEC_TLS_PSK:
 			zabbix_log(LOG_LEVEL_ERR, "TLS connection is configured to be used with passive proxy \"%s\""
-					" but support for TLS was not compiled into %s.", proxy->host,
+					" but support for TLS was not compiled into %s.", proxy->name,
 					get_program_type_string(zbx_get_program_type_cb()));
 			ret = CONFIG_ERROR;
 			goto out;
@@ -81,7 +80,7 @@ static int	connect_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, int
 	if (FAIL == (ret = zbx_tcp_connect(sock, config_source_ip, proxy->addr, proxy->port, timeout,
 			proxy->tls_connect, tls_arg1, tls_arg2)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->name, zbx_socket_strerror());
 		ret = NETWORK_ERROR;
 	}
 out:
@@ -99,7 +98,7 @@ static int	send_data_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, c
 
 	if (FAIL == (ret = zbx_tcp_send_ext(sock, data, size, reserved, flags, 0)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->name, zbx_socket_strerror());
 
 		ret = NETWORK_ERROR;
 	}
@@ -117,11 +116,11 @@ static int	recv_data_from_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock)
 
 	if (FAIL == (ret = zbx_tcp_recv(sock)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot obtain data from proxy \"%s\": %s", proxy->host,
+		zabbix_log(LOG_LEVEL_ERR, "cannot obtain data from proxy \"%s\": %s", proxy->name,
 				zbx_socket_strerror());
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": [%s]", proxy->host, sock->buffer);
+		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": [%s]", proxy->name, sock->buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -161,7 +160,7 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 {
 	zbx_socket_t	s;
 	struct zbx_json	j;
-	int		ret, flags = ZBX_TCP_PROTOCOL;
+	int		ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS;
 	char		*buffer = NULL;
 	size_t		buffer_size, reserved = 0;
 
@@ -171,19 +170,15 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
 
-	if (0 != proxy->auto_compress)
+	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
-		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
-		{
-			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
-			ret = FAIL;
-			goto out;
-		}
-
-		flags |= ZBX_TCP_COMPRESS;
-		reserved = j.buffer_size;
-		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+		ret = FAIL;
+		goto out;
 	}
+
+	reserved = j.buffer_size;
+	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
 	if (SUCCEED == (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT, config_source_ip)))
 	{
@@ -191,24 +186,13 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 		if (NULL != ts)
 			zbx_timespec(ts);
 
-		if (0 != proxy->auto_compress)
-		{
-			ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
-			zbx_free(buffer);
-		}
-		else
-		{
-			ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, 0, flags);
-			zbx_json_free(&j);
-		}
+		ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
+		zbx_free(buffer);
 
 		if (SUCCEED == ret)
 		{
 			if (SUCCEED == (ret = recv_data_from_proxy(proxy, &s)))
 			{
-				if (0 != (s.protocol & ZBX_TCP_COMPRESS))
-					proxy->auto_compress = 1;
-
 				if (!ZBX_IS_RUNNING())
 				{
 					int	flags_response = ZBX_TCP_PROTOCOL;
@@ -264,7 +248,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 		const char *config_source_ip)
 {
 	char				*error = NULL, *buffer = NULL;
-	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel;
+	int				ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, loglevel;
 	zbx_socket_t			s;
 	struct zbx_json			j;
 	struct zbx_json_parse		jp;
@@ -284,14 +268,14 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	if (FAIL == (ret = zbx_tcp_recv_ext(&s, 0, 0)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive configuration information from proxy \"%s\": %s",
-				proxy->host, zbx_socket_strerror());
+				proxy->name, zbx_socket_strerror());
 		goto clean;
 	}
 
 	if (SUCCEED != (ret = zbx_json_open(s.buffer, &jp)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse configuration information from proxy \"%s\": %s",
-				proxy->host, zbx_socket_strerror());
+				proxy->name, zbx_socket_strerror());
 		goto clean;
 	}
 
@@ -301,58 +285,43 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 			&error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
-				proxy->host, error);
+				proxy->name, error);
 		goto clean;
 	}
 
-	if (0 != proxy->auto_compress)
+	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
-		if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
-		{
-			zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
-			ret = FAIL;
-			goto clean;
-		}
-
-		flags |= ZBX_TCP_COMPRESS;
-		reserved = j.buffer_size;
-		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
+		ret = FAIL;
+		goto clean;
 	}
+
+	reserved = j.buffer_size;
+	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
 	loglevel = (ZBX_PROXYCONFIG_STATUS_DATA == status ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG);
 
-	if (0 != proxy->auto_compress)
-	{
-		zabbix_log(loglevel, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
-				ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy->host,
-				s.peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
-				(double)reserved / buffer_size);
+	zabbix_log(loglevel, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
+			ZBX_FS_SIZE_T ", bytes " ZBX_FS_SIZE_T " with compression ratio %.1f", proxy->name,
+			s.peer, (zbx_fs_size_t)reserved, (zbx_fs_size_t)buffer_size,
+			(double)reserved / buffer_size);
 
-		ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
-		zbx_free(buffer);		/* json buffer can be large, free as fast as possible */
-	}
-	else
-	{
-		zabbix_log(loglevel, "sending configuration data to proxy \"%s\" at \"%s\", datalen "
-				ZBX_FS_SIZE_T, proxy->host, s.peer, (zbx_fs_size_t)j.buffer_size);
-
-		ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, flags);
-		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
-	}
+	ret = send_data_to_proxy(proxy, &s, buffer, buffer_size, reserved, flags);
+	zbx_free(buffer);		/* json buffer can be large, free as fast as possible */
 
 	if (SUCCEED == ret)
 	{
 		if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
-					" \"%s\" at \"%s\": %s", proxy->host, s.peer, error);
+					" \"%s\" at \"%s\": %s", proxy->name, s.peer, error);
 		}
 		else
 		{
 			if (SUCCEED != zbx_json_open(s.buffer, &jp))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "invalid configuration data response received from proxy"
-						" \"%s\" at \"%s\": %s", proxy->host, s.peer, zbx_json_strerror());
+						" \"%s\" at \"%s\": %s", proxy->name, s.peer, zbx_json_strerror());
 			}
 			else
 			{
@@ -361,7 +330,6 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 				version_str = zbx_get_proxy_protocol_version_str(&jp);
 				zbx_strlcpy(proxy->version_str, version_str, sizeof(proxy->version_str));
 				proxy->version_int = zbx_get_proxy_protocol_version_int(version_str);
-				proxy->auto_compress = (0 != (s.protocol & ZBX_TCP_COMPRESS) ? 1 : 0);
 				proxy->lastaccess = time(NULL);
 				zbx_free(version_str);
 			}
@@ -410,14 +378,14 @@ static int	proxy_process_proxy_data(zbx_dc_proxy_t *proxy, const char *answer, z
 	if ('\0' == *answer)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no proxy data:"
-				" check allowed connection types and access rights", proxy->host, proxy->addr);
+				" check allowed connection types and access rights", proxy->name, proxy->addr);
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_open(answer, &jp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
-				proxy->host, proxy->addr, zbx_json_strerror());
+				proxy->name, proxy->addr, zbx_json_strerror());
 		goto out;
 	}
 
@@ -432,11 +400,11 @@ static int	proxy_process_proxy_data(zbx_dc_proxy_t *proxy, const char *answer, z
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, HOST_STATUS_PROXY_PASSIVE, events_cbs,
+	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, PROXY_MODE_PASSIVE, events_cbs,
 			proxydata_frequency, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",
-				proxy->host, proxy->addr, error);
+				proxy->name, proxy->addr, error);
 	}
 
 out:
@@ -600,14 +568,16 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 			char	*port = NULL;
 			int	check_tasks = 0;
 
-			proxy.addr = proxy.addr_orig;
+			proxy.addr = zbx_strdup(NULL, proxy.addr_orig);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, &proxy.addr, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			port = zbx_strdup(port, proxy.port_orig);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+					NULL, &port, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 			if (FAIL == zbx_is_ushort(port, &proxy.port))
 			{
-				zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.host, port);
+				zabbix_log(LOG_LEVEL_ERR, "invalid proxy \"%s\" port: \"%s\"", proxy.name, port);
 				ret = CONFIG_ERROR;
 				zbx_free(port);
 				goto error;
@@ -630,7 +600,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 				do
 				{
-					if (FAIL == zbx_hc_check_proxy(proxy.hostid))
+					if (FAIL == zbx_hc_check_proxy(proxy.proxyid))
 						break;
 
 					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout, events_cbs,
@@ -654,15 +624,14 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 			}
 		}
 error:
+		zbx_free(proxy.addr);
 		if (0 != strcmp(proxy_old.version_str, proxy.version_str) ||
-				proxy_old.auto_compress != proxy.auto_compress ||
 				proxy_old.lastaccess != proxy.lastaccess)
 		{
-			zbx_update_proxy_data(&proxy_old, proxy.version_str, proxy.version_int, proxy.lastaccess,
-					proxy.auto_compress, 0);
+			zbx_update_proxy_data(&proxy_old, proxy.version_str, proxy.version_int, proxy.lastaccess, 0);
 		}
 
-		zbx_dc_requeue_proxy(proxy.hostid, update_nextcheck, ret, proxyconfig_frequency, proxydata_frequency);
+		zbx_dc_requeue_proxy(proxy.proxyid, update_nextcheck, ret, proxyconfig_frequency, proxydata_frequency);
 	}
 
 	zbx_dc_close_user_macros(um_handle);

@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testItemTest.php';
  *
  * @backup items
  */
-class testFormTestItem extends testItemTest{
+class testFormTestItem extends testItemTest {
 
 	/**
 	 * Check Test item Button enabled/disabled state depending on item type for Host.

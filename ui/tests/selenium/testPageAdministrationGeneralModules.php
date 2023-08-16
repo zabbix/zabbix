@@ -59,6 +59,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Discovery status' => 'Displays the status summary of the active network discovery rules.',
 		'Favorite graphs' => 'Displays shortcuts to the most needed graphs (marked as favorite).',
 		'Favorite maps' => 'Displays shortcuts to the most needed network maps (marked as favorite).',
+		'Gauge' => 'Displays the value of a single item as gauge.',
 		'Geomap' => 'Displays hosts as markers on a geographical map.',
 		'Graph' => 'Displays data of up to 50 items as line, points, staircase, or bar charts.',
 		'Graph (classic)' => 'Displays a single custom graph or a simple graph.',
@@ -79,6 +80,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				'associated components.',
 		'Top hosts' => 'Displays top N hosts that have the highest or the lowest item value (for example, CPU load) '.
 				'with an option to add progress-bar visualizations and customize report columns.',
+		'Top triggers' => 'Displays top N triggers that have the most problems within the period of evaluation,'.
+				' sorted by the number of problems.',
 		'Trigger overview' => 'Displays trigger states for selected hosts.',
 		'URL' => 'Displays the content retrieved from the specified URL.',
 		'Web monitoring' => 'Displays the status summary of the active web monitoring scenarios.'
@@ -370,7 +373,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			]
 		];
 
-		// Create an array with widgt modules that should be present by default.
+		// Create an array with widget modules that should be present by default.
 		$widget_modules = [];
 		$i = 0;
 
@@ -959,7 +962,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 	public function getWidgetDimensions() {
 		return [
-			// Widget with pre-defined dimentions.
+			// Widget with pre-defined dimensions.
 			[
 				[
 					'module_name' => 'Clock2',
@@ -967,10 +970,10 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'widget_type' => 'ALARM CLOCK',
 					'enable' => true,
 					'page' => 'Map page',
-					'dimentions' => ['width: 33.3333%', 'height: 280px']
+					'dimensions' => ['width: 33.3333%', 'height: 280px']
 				]
 			],
-			// Widget with pre-defined dimentions on template.
+			// Widget with pre-defined dimensions on template.
 			[
 				[
 					'module_name' => 'Clock2',
@@ -978,10 +981,10 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'widget_type' => 'ALARM CLOCK',
 					'page' => 'Alarm clock page',
 					'template' => true,
-					'dimentions' => ['width: 33.3333%', 'height: 280px']
+					'dimensions' => ['width: 33.3333%', 'height: 280px']
 				]
 			],
-			// Widget with default dimentions.
+			// Widget with default dimensions.
 			[
 				[
 					'module_name' => 'Empty widget',
@@ -989,7 +992,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 					'widget_type' => 'Empty widget',
 					'enable' => true,
 					'page' => 'Map page',
-					'dimentions' => ['width: 50%', 'height: 350px']
+					'dimensions' => ['width: 50%', 'height: 350px']
 				]
 			]
 		];
@@ -1001,7 +1004,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 	 *
 	 * @dataProvider getWidgetDimensions
 	 */
-	public function testPageAdministrationGeneralModules_CheckWidgetDimentions($data) {
+	public function testPageAdministrationGeneralModules_CheckWidgetDimensions($data) {
 		$this->page->login();
 
 		if (array_key_exists('enable', $data)) {
@@ -1009,19 +1012,18 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			$this->enableModule($data, 'list');
 		}
 
-		$this->checkWidgetDimentions($data);
+		$this->checkWidgetDimensions($data);
 
 		// Cancel editing dashboard not to interfere with following cases from data provider.
 		$this->query('link:Cancel')->one()->click();
-		$this->page->acceptAlert();
 	}
 
 	/**
-	 * Add a widget of a specific type to dashboard or template dashboard and check its default dimentions.
+	 * Add a widget of a specific type to dashboard or template dashboard and check its default dimensions.
 	 *
 	 * @param array	$data	data provider.
 	 */
-	private function checkWidgetDimentions($data) {
+	private function checkWidgetDimensions($data) {
 		// Open required dashboard page in edit mode.
 		$url = (array_key_exists('template', $data))
 			? 'zabbix.php?action=template.dashboard.edit&dashboardid='.self::$template_dashboardid
@@ -1040,13 +1042,13 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$widget_form->fill(['Type' => CFormElement::RELOADABLE_FILL($data['widget_type'])]);
 		$widget_form->submit();
 
-		// Get widget dimentions from the style attribute of the widget grid element and compare with expected values.
+		// Get widget dimensions from the style attribute of the widget grid element and compare with expected values.
 		$grid_selector = 'xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/../..';
-		$widget_dimentions = $dashboard->getWidget($data['widget_name'])->query($grid_selector)->one()->getAttribute('style');
-		$dimention_array = array_map('trim', explode(';', $widget_dimentions));
+		$widget_dimensions = $dashboard->getWidget($data['widget_name'])->query($grid_selector)->one()->getAttribute('style');
+		$dimension_array = array_map('trim', explode(';', $widget_dimensions));
 
-		foreach ($data['dimentions'] as $dimention) {
-			$this->assertContains($dimention, $dimention_array);
+		foreach ($data['dimensions'] as $dimension) {
+			$this->assertContains($dimension, $dimension_array);
 		}
 	}
 
@@ -1197,14 +1199,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			 * Check that edit widget button on disabled module widget is hidden and that it doesn't exist
 			 * if the dashboard is opened in Monitoring => Hosts view (where All hosts link is present) or in kiosk mode.
 			 */
-			$edit_button = $inaccessible_widget->query('xpath:.//button[contains(@class, "btn-widget-edit")]');
+			$edit_button = $inaccessible_widget->query('xpath:.//button['.CXPathHelper::fromClass('js-widget-edit').']');
 			$this->assertFalse(($mode === 'kiosk' || $this->query('link:All hosts')->one(false)->isValid())
 					? $edit_button->one(false)->isValid()
 					: $edit_button->one()->isDisplayed()
 			);
 
 			// It should not be possible only to Delete the widget and only when the dashboard is in edit mode.
-			$button = $inaccessible_widget->query('xpath:.//button[contains(@class, "btn-widget-action")]')->one();
+			$button = $inaccessible_widget->query('xpath:.//button['.CXPathHelper::fromClass('js-widget-action').']')->one();
 
 			if ($mode === 'edit') {
 				$popup_menu = $button->waitUntilPresent()->asPopupButton()->getMenu();

@@ -19,7 +19,7 @@
 
 #include "connector_manager.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxconnector.h"
 #include "zbxipcservice.h"
@@ -234,7 +234,7 @@ static void	connector_get_next_task(zbx_connector_t *connector, zbx_connector_wo
 		/* return back to list if over the limit */
 		if (0 == i)
 		{
-			zbx_list_prepend(&connector->data_point_link_queue, data_point_link, NULL);
+			(void)zbx_list_prepend(&connector->data_point_link_queue, data_point_link, NULL);
 			break;
 		}
 
@@ -378,7 +378,8 @@ static void	connector_enqueue(zbx_connector_manager_t *manager, zbx_vector_conne
 						sizeof(data_point_link_local));
 				zbx_vector_connector_data_point_create(&data_point_link->connector_data_points);
 
-				zbx_list_insert_after(&connector->data_point_link_queue, NULL, data_point_link, NULL);
+				(void)zbx_list_insert_after(&connector->data_point_link_queue, NULL, data_point_link,
+						NULL);
 			}
 
 			connector_data_point.ts = connector_objects->values[i].ts;
@@ -442,9 +443,14 @@ static void	connector_add_result(zbx_connector_manager_t *manager, zbx_ipc_clien
 			}
 
 			if (0 == data_point_link->connector_data_points.values_num)
+			{
 				zbx_hashset_remove_direct(&connector->data_point_links, data_point_link);
+			}
 			else
-				zbx_list_insert_after(&connector->data_point_link_queue, NULL, data_point_link, NULL);
+			{
+				(void)zbx_list_insert_after(&connector->data_point_link_queue, NULL, data_point_link,
+						NULL);
+			}
 		}
 
 		connector->senders--;

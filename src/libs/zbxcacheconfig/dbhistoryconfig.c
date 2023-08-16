@@ -19,7 +19,7 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "actions.h"
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"
@@ -33,7 +33,7 @@ static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZB
 	const ZBX_DC_HOST_INVENTORY	*host_inventory;
 
 	dst_host->hostid = src_host->hostid;
-	dst_host->proxy_hostid = src_host->proxy_hostid;
+	dst_host->proxyid = src_host->proxyid;
 	dst_host->status = src_host->status;
 
 	zbx_strscpy(dst_host->host, src_host->host);
@@ -105,7 +105,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 	if (NULL != item->trends_period)
 	{
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+				NULL, NULL, &item->trends_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
@@ -119,7 +119,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 	if (NULL != item->history_period)
 	{
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+				NULL, NULL, &item->history_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
@@ -286,14 +286,13 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t *functionids,
-		size_t functionids_num, zbx_vector_ptr_t *item_tags)
+		size_t functionids_num, zbx_vector_item_tag_t *item_tags)
 {
 	const ZBX_DC_FUNCTION	*dc_function;
-	size_t			i;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	for (i = 0; i < functionids_num; i++)
+	for (size_t i = 0; i < functionids_num; i++)
 	{
 		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
 				&functionids[i])))
@@ -319,7 +318,7 @@ void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t 
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info,
-		zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
+		zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
 		int itemids_num)
 {
 	int			i, j, found;
@@ -353,7 +352,7 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 			if (0 == found)
 			{
 				DCget_trigger(trigger, dc_trigger, ZBX_TRIGGER_GET_ALL);
-				zbx_vector_ptr_append(trigger_order, trigger);
+				zbx_vector_dc_trigger_append(trigger_order, trigger);
 			}
 
 			/* copy latest change timestamp */
@@ -487,7 +486,7 @@ static void	dc_get_history_recv_host(zbx_history_recv_host_t *dst_host, const ZB
 		unsigned int mode)
 {
 	dst_host->hostid = src_host->hostid;
-	dst_host->proxy_hostid = src_host->proxy_hostid;
+	dst_host->proxyid = src_host->proxyid;
 	dst_host->status = src_host->status;
 
 	if (ZBX_ITEM_GET_HOST & mode)
@@ -878,7 +877,7 @@ static void	substitute_orig_unmasked(const char *orig, char **data)
 
 	*data = zbx_strdup(*data, orig);
 	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			data, MACRO_TYPE_COMMON, NULL, 0);
+			data, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 }
 
 static void	substitute_orig(const char *orig, char **data)
@@ -888,7 +887,7 @@ static void	substitute_orig(const char *orig, char **data)
 
 	*data = zbx_strdup(*data, orig);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, data,
-			MACRO_TYPE_COMMON, NULL, 0);
+			ZBX_MACRO_TYPE_COMMON, NULL, 0);
 }
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,

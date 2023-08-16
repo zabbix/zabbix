@@ -29,28 +29,25 @@
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});')))),
 			'#{stop_verbose}',
-			(new CCol((new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-				->setEnabled(false)
+			(new CCol(
+				(new CButtonLink(_('Remove')))
+					->addClass('element-table-remove')
+					->setEnabled(false)
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="lldoverride-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
-				->addClass(ZBX_STYLE_TD_DRAG_ICON)
-				->setWidth('15'),
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol((new CSpan('1:'))->setAttribute('data-row-num', '')))
 				->setWidth('15'),
 			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});'))))
 				->setWidth('350'),
 			(new CCol('#{stop_verbose}'))
 				->setWidth('100'),
-			(new CCol((new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+			(new CCol(
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			))
 				->addClass(ZBX_STYLE_NOWRAP)
 				->setWidth('50')
@@ -102,8 +99,7 @@
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			(new CCol(
-				(new CButton(null, _('View')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('View')))
 					->addClass('element-table-open')
 					->onClick('lldoverrides.operations.open(#{no});')
 			))->addClass(ZBX_STYLE_NOWRAP)
@@ -114,13 +110,10 @@
 	<?= (new CRow([
 			['#{condition_object} #{condition_operator} ', italic('#{value}')],
 			(new CHorList([
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Edit')))
 					->addClass('element-table-open')
 					->onClick('lldoverrides.operations.open(#{no});'),
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>
@@ -526,21 +519,17 @@
 			frag.appendChild(hiddenInput('name', override.data.name, prefix_override));
 			frag.appendChild(hiddenInput('stop', override.data.stop, prefix_override));
 
-			if (override.data.overrides_filters.length > 0) {
-				frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
+			frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
+			frag.appendChild(hiddenInput('formula', override.data.overrides_formula, prefix_filter));
 
-				if (override.data.overrides_evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
-					frag.appendChild(hiddenInput('formula', override.data.overrides_formula, prefix_filter));
-				}
+			override.data.overrides_filters.forEach(function(override_filter) {
+				var prefix = prefix_filter + '[conditions][' + (iter_filters++) + ']';
 
-				override.data.overrides_filters.forEach(function(override_filter) {
-					var prefix = prefix_filter + '[conditions][' + (iter_filters++) + ']';
-					frag.appendChild(hiddenInput('formulaid', override_filter.formulaid, prefix));
-					frag.appendChild(hiddenInput('macro', override_filter.macro, prefix));
-					frag.appendChild(hiddenInput('value', override_filter.value, prefix));
-					frag.appendChild(hiddenInput('operator', override_filter.operator, prefix));
-				});
-			}
+				frag.appendChild(hiddenInput('formulaid', override_filter.formulaid, prefix));
+				frag.appendChild(hiddenInput('macro', override_filter.macro, prefix));
+				frag.appendChild(hiddenInput('value', override_filter.value, prefix));
+				frag.appendChild(hiddenInput('operator', override_filter.operator, prefix));
+			});
 
 			override.data.operations.forEach(function(operation) {
 				var prefix = prefix_override + '[operations][' + (iter_operations++) + ']';
@@ -765,6 +754,7 @@
 			.dynamicRows({
 				template: '#override-filters-row',
 				counter: this.override.filter_counter,
+				allow_empty: true,
 				dataCallback: function(data) {
 					data.formulaId = num2letter(data.rowNum);
 					that.override.filter_counter++;
@@ -826,16 +816,10 @@
 		this.$form.trimValues(['input[type="text"]']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
-		var form_data = this.$form.serializeJSON();
-		if (Object.keys(form_data.overrides_filters).length <= 1) {
-			delete form_data.overrides_formula;
-			delete form_data.overrides_evaltype;
-		}
-
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: form_data,
+			data: this.$form.serializeJSON(),
 			dataType: 'json',
 			type: 'post'
 		})
@@ -870,6 +854,25 @@
 		this.data = {};
 		this.new_id = 0;
 		this.sort_index = [];
+
+		operations.sort((a, b) => {
+			const a_operator = this.operatorName(a.operator);
+			const b_operator = this.operatorName(b.operator);
+
+			if (a.operationobject < b.operationobject
+					|| (a.operationobject === b.operationobject && a_operator < b_operator)
+					|| (a.operationobject === b.operationobject && a_operator === b_operator && a.value < b.value)) {
+				return -1;
+			}
+
+			if (a.operationobject > b.operationobject
+					|| (a.operationobject === b.operationobject && a_operator > b_operator)
+					|| (a.operationobject === b.operationobject && a_operator === b_operator && a.value > b.value)) {
+				return 1;
+			}
+
+			return 0;
+		});
 
 		operations.forEach(function(operation, no) {
 			this.data[no + 1] = new Operation(operation, no + 1);
@@ -1055,9 +1058,7 @@
 			}
 		});
 
-		$custom_intervals.dynamicRows({
-			template: '#lldoverride-custom-intervals-row'
-		});
+		$custom_intervals.dynamicRows({template: '#lldoverride-custom-intervals-row', allow_empty: true});
 
 		jQuery('#ophistory_history_mode', this.$form)
 			.change(function() {
@@ -1083,7 +1084,7 @@
 
 		jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 		jQuery('.tags-table', this.$form)
-			.dynamicRows({template: '#lldoverride-tag-row'})
+			.dynamicRows({template: '#lldoverride-tag-row', allow_empty: true})
 			.on('click', 'button.element-table-add', function() {
 				jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 			});

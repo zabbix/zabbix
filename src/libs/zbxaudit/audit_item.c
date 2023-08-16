@@ -19,14 +19,35 @@
 
 #include "audit/zbxaudit_item.h"
 #include "audit/zbxaudit.h"
+
 #include "audit.h"
 
-#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
-static int	item_flag_to_resource_type(int flag)
+int	zbx_audit_item_resource_is_only_item(int resource_type)
+{
+	return AUDIT_RESOURCE_ITEM == resource_type;
+}
+
+int	zbx_audit_item_resource_is_only_item_prototype(int resource_type)
+{
+	return AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type;
+}
+
+int	zbx_audit_item_resource_is_only_item_and_item_prototype(int resource_type)
+{
+	return (AUDIT_RESOURCE_ITEM == resource_type || AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type);
+}
+
+int	zbx_audit_item_resource_is_only_lld_rule(int resource_type)
+{
+	return	AUDIT_RESOURCE_DISCOVERY_RULE == resource_type;
+}
+
+int	zbx_audit_item_flag_to_resource_type(int flag)
 {
 	if (ZBX_FLAG_DISCOVERY_NORMAL == flag || ZBX_FLAG_DISCOVERY_CREATED == flag)
 	{
@@ -57,7 +78,7 @@ void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const ch
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(flags);
 
 	local_audit_item_entry.id = itemid;
 	local_audit_item_entry.cuid = NULL;
@@ -76,153 +97,6 @@ void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const ch
 	}
 }
 
-#define ONLY_ITEM (AUDIT_RESOURCE_ITEM == resource_type)
-#define ONLY_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
-#define ONLY_LLD_RULE (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)
-#define IT_OR_ITP_OR_DR(s) ONLY_ITEM ? "item."#s : (ONLY_ITEM_PROTOTYPE ? "itemprototype."#s : "discoveryrule."#s)
-
-void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item, zbx_uint64_t hostid)
-{
-	int	resource_type;
-
-	RETURN_IF_AUDIT_OFF();
-
-	resource_type = item_flag_to_resource_type(item->flags);
-
-#define ONLY_ITEM_AND_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM == resource_type || \
-		AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
-#define ADD_JSON_S(x, t, f)	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,\
-		IT_OR_ITP_OR_DR(x), item->x, t, f)
-#define ADD_JSON_UI(x, t, f)	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,\
-		IT_OR_ITP_OR_DR(x), item->x, t, f)
-#define AUDIT_TABLE_NAME	"items"
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(itemid),
-			itemid, AUDIT_TABLE_NAME, "itemid");
-	ADD_JSON_S(delay, AUDIT_TABLE_NAME, "delay");
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, IT_OR_ITP_OR_DR(hostid),
-			hostid, AUDIT_TABLE_NAME, "hostid");
-	ADD_JSON_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
-	ADD_JSON_S(key, AUDIT_TABLE_NAME, "key_");
-	ADD_JSON_S(name, AUDIT_TABLE_NAME, "name");
-	ADD_JSON_UI(type, AUDIT_TABLE_NAME, "type");
-	ADD_JSON_S(url, AUDIT_TABLE_NAME, "url");
-
-	if ONLY_ITEM_AND_ITEM_PROTOTYPE
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ?
-				"item.value_type" : "itemprototype.value_type", item->value_type, AUDIT_TABLE_NAME,
-				"value_type");
-	}
-
-	ADD_JSON_UI(allow_traps, AUDIT_TABLE_NAME, "allow_traps");
-	ADD_JSON_UI(authtype, AUDIT_TABLE_NAME, "authtype");
-	ADD_JSON_S(description, AUDIT_TABLE_NAME, "description");
-
-	if ONLY_ITEM
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, "item.flags",
-				item->flags, AUDIT_TABLE_NAME, "flags");
-	}
-
-	ADD_JSON_UI(follow_redirects, AUDIT_TABLE_NAME, "follow_redirects");
-	ADD_JSON_S(headers, AUDIT_TABLE_NAME, "headers");
-
-	if ONLY_ITEM_AND_ITEM_PROTOTYPE
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ?
-				"item.history" : "itemprototype.history", item->history, AUDIT_TABLE_NAME, "history");
-	}
-
-	ADD_JSON_S(http_proxy, AUDIT_TABLE_NAME, "http_proxy");
-
-	if ONLY_ITEM
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"item.inventory_link", item->inventory_link, AUDIT_TABLE_NAME, "inventory_link");
-	}
-
-	ADD_JSON_S(ipmi_sensor, AUDIT_TABLE_NAME, "ipmi_sensor");
-	ADD_JSON_S(jmx_endpoint, AUDIT_TABLE_NAME, "jmx_endpoint");
-
-	if ONLY_LLD_RULE
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.lifetime", item->lifetime, AUDIT_TABLE_NAME, "lifetime");
-	}
-
-	if ONLY_ITEM_AND_ITEM_PROTOTYPE
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ?
-				"item.logtimefmt" : "itemprototype.logtimefmt", item->logtimefmt, AUDIT_TABLE_NAME,
-				"logtimefmt");
-	}
-
-	ADD_JSON_UI(master_itemid, AUDIT_TABLE_NAME, "master_itemid");
-	ADD_JSON_UI(output_format, AUDIT_TABLE_NAME, "output_format");
-	ADD_JSON_S(params, AUDIT_TABLE_NAME, "params");
-
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-			IT_OR_ITP_OR_DR(password), item->password, AUDIT_TABLE_NAME, "password");
-
-	ADD_JSON_UI(post_type, AUDIT_TABLE_NAME, "post_type");
-	ADD_JSON_S(posts, AUDIT_TABLE_NAME, "posts");
-	ADD_JSON_S(privatekey, AUDIT_TABLE_NAME, "privatekey");
-	ADD_JSON_S(publickey, AUDIT_TABLE_NAME, "publickey");
-	ADD_JSON_S(query_fields, AUDIT_TABLE_NAME, "query_fields");
-	ADD_JSON_UI(request_method, AUDIT_TABLE_NAME, "request_method");
-	ADD_JSON_UI(retrieve_mode, AUDIT_TABLE_NAME, "retrieve_mode");
-	ADD_JSON_S(snmp_oid, AUDIT_TABLE_NAME, "snmp_oid");
-	ADD_JSON_S(ssl_cert_file, AUDIT_TABLE_NAME, "ssl_cert_file");
-	ADD_JSON_S(ssl_key_file, AUDIT_TABLE_NAME, "ssl_key_file");
-
-	zbx_audit_update_json_append_string_secret(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-			IT_OR_ITP_OR_DR(ssl_key_password), item->ssl_key_password, AUDIT_TABLE_NAME,
-			"ssl_key_password");
-
-	ADD_JSON_UI(status, AUDIT_TABLE_NAME, "status");
-	ADD_JSON_S(status_codes, AUDIT_TABLE_NAME, "status_codes");
-	ADD_JSON_UI(templateid, AUDIT_TABLE_NAME, "templateid");
-	ADD_JSON_S(timeout, AUDIT_TABLE_NAME, "timeout");
-	ADD_JSON_S(trapper_hosts, AUDIT_TABLE_NAME, "trapper_hosts");
-
-	if ONLY_ITEM_AND_ITEM_PROTOTYPE
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ?
-				"item.trends" : "itemprototype.trends", item->trends, AUDIT_TABLE_NAME, "trends");
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ?
-				"item.units" : "itemprototype.units", item->units, AUDIT_TABLE_NAME, "units");
-	}
-
-	ADD_JSON_S(username, AUDIT_TABLE_NAME, "username");
-
-	if ONLY_ITEM_AND_ITEM_PROTOTYPE
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ONLY_ITEM ?
-				"item.valuemapid" : "itemprototype.valuemapid", item->valuemapid, AUDIT_TABLE_NAME,
-				"valuemapid");
-	}
-
-	ADD_JSON_UI(verify_host, AUDIT_TABLE_NAME, "verify_host");
-	ADD_JSON_UI(verify_peer, AUDIT_TABLE_NAME, "verify_peer");
-
-	if ONLY_ITEM_PROTOTYPE
-	{
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"itemprototype.discover", item->discover, AUDIT_TABLE_NAME, "discover");
-	}
-
-	if ONLY_LLD_RULE
-	{
-		zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.filter.formula", item->formula, AUDIT_TABLE_NAME, "formula");
-		zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
-				"discoveryrule.filter.evaltype", item->evaltype, AUDIT_TABLE_NAME, "evaltype");
-	}
-#undef AUDIT_TABLE_NAME
-#undef ADD_JSON_UI
-#undef ADD_JSON_S
-}
-
 #define PREPARE_AUDIT_ITEM_UPDATE(resource, type1, type2)							\
 void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,				\
 		type1 resource##_old, type1 resource##_new)							\
@@ -231,9 +105,9 @@ void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	resource_type = item_flag_to_resource_type(flags);							\
-	zbx_audit_update_json_update_##type2(itemid, AUDIT_ITEM_ID, IT_OR_ITP_OR_DR(resource), resource##_old,	\
-			resource##_new);									\
+	resource_type = zbx_audit_item_flag_to_resource_type(flags);						\
+	zbx_audit_update_json_update_##type2(itemid, AUDIT_ITEM_ID, ZBX_AUDIT_IT_OR_ITP_OR_DR(resource),	\
+			resource##_old,	resource##_new);							\
 }
 
 PREPARE_AUDIT_ITEM_UPDATE(interfaceid,		zbx_uint64_t,	uint64)
@@ -291,7 +165,7 @@ PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
 #undef ONLY_ITEM
 #undef ONLY_ITEM_PROTOTYPE
 #undef ONLY_LLD_RULE
-#undef IT_OR_ITP_OR_DR
+#undef ZBX_AUDIT_IT_OR_ITP_OR_DR
 
 /******************************************************************************
  *                                                                            *
@@ -308,7 +182,7 @@ void	zbx_audit_item_create_entry_for_delete(zbx_uint64_t id, const char *name, i
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(flag);
+	resource_type = zbx_audit_item_flag_to_resource_type(flag);
 
 	local_audit_item_entry.id = id;
 	local_audit_item_entry.cuid = NULL;
@@ -463,7 +337,7 @@ void	zbx_audit_item_update_json_add_item_preproc(zbx_uint64_t itemid, zbx_uint64
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(,)
 	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(step, .)
@@ -495,7 +369,7 @@ void	zbx_audit_item_update_json_update_item_preproc_create_entry(zbx_uint64_t it
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(,)
 
@@ -510,7 +384,7 @@ void	zbx_audit_item_update_json_update_item_preproc_##resource(zbx_uint64_t item
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 														\
 	RETURN_IF_AUDIT_OFF();											\
-	resource_type = item_flag_to_resource_type(item_flags);							\
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);					\
 														\
 	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(resource,.)								\
 														\
@@ -530,7 +404,7 @@ void	zbx_audit_item_delete_preproc(zbx_uint64_t itemid, int item_flags, zbx_uint
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(,)
 
@@ -568,7 +442,7 @@ void	zbx_audit_item_update_json_add_item_tag(zbx_uint64_t itemid, zbx_uint64_t t
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE_TAG(,)
 	ITEM_RESOURCE_KEY_RESOLVE_TAG(tag, .)
@@ -591,7 +465,7 @@ void	zbx_audit_item_update_json_update_item_tag_create_entry(zbx_uint64_t itemid
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE_TAG(,)
 
@@ -606,7 +480,7 @@ void	zbx_audit_item_update_json_update_item_tag_##resource(zbx_uint64_t itemid, 
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 														\
 	RETURN_IF_AUDIT_OFF();											\
-	resource_type = item_flag_to_resource_type(item_flags);							\
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);					\
 														\
 	ITEM_RESOURCE_KEY_RESOLVE_TAG(resource,.)								\
 														\
@@ -624,7 +498,7 @@ void	zbx_audit_item_delete_tag(zbx_uint64_t itemid, int item_flags, zbx_uint64_t
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE_TAG(,)
 
@@ -662,7 +536,7 @@ void	zbx_audit_item_update_json_add_params(zbx_uint64_t itemid, int item_flags, 
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE(,)
 	ITEM_RESOURCE_KEY_RESOLVE(name, .)
@@ -685,7 +559,7 @@ void	zbx_audit_item_update_json_update_params_create_entry(zbx_uint64_t itemid, 
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE(,)
 	zbx_audit_update_json_append_no_value(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_UPDATE, audit_key_);
@@ -700,7 +574,7 @@ void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, in
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	resource_type = item_flag_to_resource_type(item_flags);							\
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);					\
 	ITEM_RESOURCE_KEY_RESOLVE(resource, .)									\
 														\
 	zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key_##resource, resource##_orig,	\
@@ -717,7 +591,7 @@ void	zbx_audit_item_delete_params(zbx_uint64_t itemid, int item_flags, zbx_uint6
 
 	RETURN_IF_AUDIT_OFF();
 
-	resource_type = item_flag_to_resource_type(item_flags);
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);
 
 	ITEM_RESOURCE_KEY_RESOLVE(,)
 

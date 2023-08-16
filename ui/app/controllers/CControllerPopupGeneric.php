@@ -214,7 +214,7 @@ class CControllerPopupGeneric extends CController {
 			'proxies' => [
 				'title' => _('Proxies'),
 				'min_user_type' => USER_TYPE_ZABBIX_ADMIN,
-				'allowed_src_fields' => 'proxyid,host',
+				'allowed_src_fields' => 'proxyid,name',
 				'form' => [
 					'name' => 'proxiesform',
 					'id' => 'proxies'
@@ -329,7 +329,8 @@ class CControllerPopupGeneric extends CController {
 				'allowed_src_fields' => 'key',
 				'table_columns' => [
 					_('Key'),
-					_('Name')
+					_('Name'),
+					''
 				]
 			],
 			'graphs' => [
@@ -1560,19 +1561,26 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'sysmaps':
-				$options += [
-					'output' => API_OUTPUT_EXTEND
-				];
+				$records = API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'preservekeys' => true
+				]);
 
-				$records = API::Map()->get($options);
+				$records = CArrayHelper::renameObjectsKeys($records, ['sysmapid' => 'id']);
 
 				CArrayHelper::sort($records, ['name']);
 				break;
 
 			case 'drules':
+				$filter = [];
+
+				if ($this->getInput('enabled_only', 0)) {
+					$filter['status'] = DRULE_STATUS_ACTIVE;
+				}
+
 				$records = API::DRule()->get([
 					'output' => ['druleid', 'name'],
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'filter' => $filter,
 					'preservekeys' => true
 				]);
 
@@ -1591,12 +1599,12 @@ class CControllerPopupGeneric extends CController {
 
 			case 'proxies':
 				$options += [
-					'output' => ['proxyid', 'host']
+					'output' => ['proxyid', 'name']
 				];
 
 				$records = API::Proxy()->get($options);
-				CArrayHelper::sort($records, ['host']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id', 'host' => 'name']);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['proxyid' => 'id']);
 				break;
 
 			case 'roles':

@@ -723,17 +723,17 @@ class CImportReferencer {
 	/**
 	 * Get proxy ID by name.
 	 *
-	 * @param string $host
+	 * @param string $name
 	 *
 	 * @return string|null
 	 */
-	public function findProxyidByHost(string $host): ?string {
+	public function findProxyidByName(string $name): ?string {
 		if ($this->db_proxies === null) {
 			$this->selectProxies();
 		}
 
 		foreach ($this->db_proxies as $proxyid => $proxy) {
-			if ($proxy['host'] === $host) {
+			if ($proxy['name'] === $name) {
 				return $proxyid;
 			}
 		}
@@ -1371,18 +1371,20 @@ class CImportReferencer {
 			}
 		}
 
-		$db_triggers = API::Trigger()->get([
-			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
-			'filter' => [
-				'uuid' => array_keys($uuids),
-				'flags' => [
-					ZBX_FLAG_DISCOVERY_NORMAL,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE,
-					ZBX_FLAG_DISCOVERY_CREATED
-				]
-			],
-			'preservekeys' => true
-		]);
+		$db_triggers = $uuids
+			? API::Trigger()->get([
+				'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
+				'filter' => [
+					'uuid' => array_keys($uuids),
+					'flags' => [
+						ZBX_FLAG_DISCOVERY_NORMAL,
+						ZBX_FLAG_DISCOVERY_PROTOTYPE,
+						ZBX_FLAG_DISCOVERY_CREATED
+					]
+				],
+				'preservekeys' => true
+			])
+			: [];
 
 		$db_triggers += API::Trigger()->get([
 			'output' => ['uuid', 'description', 'expression', 'recovery_expression', 'templateid'],
@@ -1776,8 +1778,8 @@ class CImportReferencer {
 		}
 
 		$this->db_proxies = API::Proxy()->get([
-			'output' => ['host'],
-			'filter' => ['host' => array_keys($this->proxies)],
+			'output' => ['name'],
+			'filter' => ['name' => array_keys($this->proxies)],
 			'preservekeys' => true
 		]);
 

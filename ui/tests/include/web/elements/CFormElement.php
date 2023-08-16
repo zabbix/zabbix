@@ -58,7 +58,7 @@ class CFormElement extends CElement {
 	public static function createInstance(RemoteWebElement $element, $options = []) {
 		$instance = parent::createInstance($element, $options);
 
-		if (get_class($instance) !== CGridFormElement::class) {
+		if (!$instance->normalized && get_class($instance) !== CGridFormElement::class) {
 			$grid = $instance->query('xpath:.//div[contains(@class, "form-grid")]')->one(false);
 			if ($grid->isValid() && !$grid->parents('xpath:*[contains(@class, "table-forms-td-right")]')->exists()) {
 				return $instance->asGridForm($options);
@@ -408,7 +408,7 @@ class CFormElement extends CElement {
 
 				foreach ($values as $name => $value) {
 					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
-					$this->setUTFValue($container->query('xpath', $xpath)->one()->detect(), $value);
+					$container->query('xpath', $xpath)->one()->detect()->fill($value);
 				}
 			}
 
@@ -424,24 +424,9 @@ class CFormElement extends CElement {
 			return $this;
 		}
 
-		$this->setUTFValue($element, $values);
+		$element->fill($values);
 
 		return $this;
-	}
-
-	/**
-	 * Function for utf8mb4 values detection and filling.
-	 *
-	 * @param CElement $element   element to be filled
-	 * @param string   $value     value to be filled in
-	 */
-	protected function setUTFValue($element, $value) {
-		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
-		}
-		else {
-			$element->fill($value);
-		}
 	}
 
 	/**

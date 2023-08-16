@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -41,7 +41,6 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of alerter internal processes, in %|<p>The average percentage of the time during which the alerter processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,alerter,avg,busy]|
 |Zabbix server: Utilization of availability manager internal processes, in %|<p>The average percentage of the time during which the availability manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,availability manager,avg,busy]|
 |Zabbix server: Utilization of configuration syncer internal processes, in %|<p>The average percentage of the time during which the configuration syncer processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,configuration syncer,avg,busy]|
-|Zabbix server: Utilization of discoverer data collector processes, in %|<p>The average percentage of the time during which the discoverer processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,discoverer,avg,busy]|
 |Zabbix server: Utilization of escalator internal processes, in %|<p>The average percentage of the time during which the escalator processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,escalator,avg,busy]|
 |Zabbix server: Utilization of history poller data collector processes, in %|<p>The average percentage of the time during which the history poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,history poller,avg,busy]|
 |Zabbix server: Utilization of ODBC poller data collector processes, in %|<p>The average percentage of the time during which the ODBC poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,odbc poller,avg,busy]|
@@ -56,6 +55,8 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of LLD worker internal processes, in %|<p>The average percentage of the time during which the lld worker processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,lld worker,avg,busy]|
 |Zabbix server: Utilization of connector manager internal processes, in %|<p>The average percentage of the time during which the connector manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,connector manager,avg,busy]|
 |Zabbix server: Utilization of connector worker internal processes, in %|<p>The average percentage of the time during which the connector worker processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,connector worker,avg,busy]|
+|Zabbix server: Utilization of discovery manager internal processes, in %|<p>The average percentage of the time during which the discovery manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,discovery manager,avg,busy]|
+|Zabbix server: Utilization of discovery worker internal processes, in %|<p>The average percentage of the time during which the discovery worker processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,discovery worker,avg,busy]|
 |Zabbix server: Utilization of poller data collector processes, in %|<p>The average percentage of the time during which the poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,poller,avg,busy]|
 |Zabbix server: Utilization of preprocessing worker internal processes, in %|<p>The average percentage of the time during which the preprocessing worker processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,preprocessing worker,avg,busy]|
 |Zabbix server: Utilization of preprocessing manager internal processes, in %|<p>The average percentage of the time during which the preprocessing manager processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,preprocessing manager,avg,busy]|
@@ -71,6 +72,9 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of trapper data collector processes, in %|<p>The average percentage of the time during which the trapper processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,trapper,avg,busy]|
 |Zabbix server: Utilization of unreachable poller data collector processes, in %|<p>The average percentage of the time during which the unreachable poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,unreachable poller,avg,busy]|
 |Zabbix server: Utilization of vmware data collector processes, in %|<p>The average percentage of the time during which the vmware collector processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,vmware collector,avg,busy]|
+|Zabbix server: Utilization of agent poller data collector processes, in %|<p>The average percentage of the time during which the agent poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,agent poller,avg,busy]|
+|Zabbix server: Utilization of http agent poller data collector processes, in %|<p>The average percentage of the time during which the http agent poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,http agent poller,avg,busy]|
+|Zabbix server: Utilization of snmp poller data collector processes, in %|<p>The average percentage of the time during which the snmp poller processes have been busy for the last minute.</p>|Zabbix internal|zabbix[process,snmp poller,avg,busy]|
 |Zabbix server: Configuration cache, % used|<p>The availability statistics of Zabbix configuration cache. The percentage of used data buffer.</p>|Zabbix internal|zabbix[rcache,buffer,pused]|
 |Zabbix server: Trend function cache, % of unique requests|<p>The effectiveness statistics of Zabbix trend function cache. The percentage of cached items calculated from the sum of cached items plus requests.</p><p>Low percentage most likely means that the cache size can be reduced.</p>|Zabbix internal|zabbix[tcache,cache,pitems]|
 |Zabbix server: Trend function cache, % of misses|<p>The effectiveness statistics of Zabbix trend function cache. The percentage of cache misses.</p>|Zabbix internal|zabbix[tcache,cache,pmisses]|
@@ -92,6 +96,7 @@ Link this template to the local Zabbix server host.
 |Zabbix server: LLD queue|<p>The count of values enqueued in the low-level discovery processing queue.</p>|Zabbix internal|zabbix[lld_queue]|
 |Zabbix server: Preprocessing queue|<p>The count of values enqueued in the preprocessing queue.</p>|Zabbix internal|zabbix[preprocessing_queue]|
 |Zabbix server: Connector queue|<p>The count of values enqueued in the connector queue.</p>|Zabbix internal|zabbix[connector_queue]|
+|Zabbix server: Discovery queue|<p>The count of values enqueued in the discovery queue.</p>|Zabbix internal|zabbix[discovery_queue]|
 |Zabbix server: Number of processed numeric (unsigned) values per second|<p>The statistics and availability of Zabbix write cache.</p><p>The number of processed numeric (unsigned) values.</p>|Zabbix internal|zabbix[wcache,values,uint]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 
 ### Triggers
@@ -104,7 +109,6 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of alerter processes is high||`avg(/Zabbix server health/zabbix[process,alerter,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of availability manager processes is high||`avg(/Zabbix server health/zabbix[process,availability manager,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of configuration syncer processes is high||`avg(/Zabbix server health/zabbix[process,configuration syncer,avg,busy],10m)>75`|Average|**Manual close**: Yes|
-|Zabbix server: Utilization of discoverer processes is high||`avg(/Zabbix server health/zabbix[process,discoverer,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of escalator processes is high||`avg(/Zabbix server health/zabbix[process,escalator,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of history poller processes is high||`avg(/Zabbix server health/zabbix[process,history poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of ODBC poller processes is high||`avg(/Zabbix server health/zabbix[process,odbc poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
@@ -119,6 +123,8 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of lld worker processes is high||`avg(/Zabbix server health/zabbix[process,lld worker,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of connector manager processes is high||`avg(/Zabbix server health/zabbix[process,connector manager,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of connector worker processes is high||`avg(/Zabbix server health/zabbix[process,connector worker,avg,busy],10m)>75`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of discovery manager processes is high||`avg(/Zabbix server health/zabbix[process,discovery manager,avg,busy],10m)>75`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of discovery worker processes is high||`avg(/Zabbix server health/zabbix[process,discovery worker,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of poller processes is high||`avg(/Zabbix server health/zabbix[process,poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of preprocessing worker processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing worker,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of preprocessing manager processes is high||`avg(/Zabbix server health/zabbix[process,preprocessing manager,avg,busy],10m)>75`|Average|**Manual close**: Yes|
@@ -134,6 +140,9 @@ Link this template to the local Zabbix server host.
 |Zabbix server: Utilization of trapper processes is high||`avg(/Zabbix server health/zabbix[process,trapper,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of unreachable poller processes is high||`avg(/Zabbix server health/zabbix[process,unreachable poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: Utilization of vmware collector processes is high||`avg(/Zabbix server health/zabbix[process,vmware collector,avg,busy],10m)>75`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of agent poller processes is high||`avg(/Zabbix server health/zabbix[process,agent poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of http agent poller processes is high||`avg(/Zabbix server health/zabbix[process,http agent poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
+|Zabbix server: Utilization of snmp poller processes is high||`avg(/Zabbix server health/zabbix[process,snmp poller,avg,busy],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: More than 75% used in the configuration cache|<p>Consider increasing `CacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[rcache,buffer,pused],10m)>75`|Average|**Manual close**: Yes|
 |Zabbix server: More than 95% used in the value cache|<p>Consider increasing `ValueCacheSize` in the `zabbix_server.conf` configuration file.</p>|`max(/Zabbix server health/zabbix[vcache,buffer,pused],10m)>95`|Average|**Manual close**: Yes|
 |Zabbix server: Zabbix value cache working in low memory mode|<p>Once the low memory mode has been switched on, the value cache will remain in this state for 24 hours, even if the problem that triggered this mode is resolved sooner.</p>|`last(/Zabbix server health/zabbix[vcache,cache,mode])=1`|High|**Manual close**: Yes|

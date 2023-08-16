@@ -18,8 +18,7 @@
 **/
 
 #include "zbxalgo.h"
-
-#include "zbxcommon.h"
+#include "zbxstr.h"
 
 ZBX_VECTOR_IMPL(uint64, zbx_uint64_t)
 ZBX_VECTOR_IMPL(uint32, zbx_uint32_t)
@@ -54,6 +53,24 @@ int	zbx_compare_tags(const void *d1, const void *d2)
 	const zbx_tag_t *tag2 = *(const zbx_tag_t * const *)d2;
 
 	return strcmp(tag1->tag, tag2->tag);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: comparison function to sort tags by tag/value.                    *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_compare_tags_natural(const void *d1, const void *d2)
+{
+	int	ret;
+
+	const zbx_tag_t	*tag1 = *(const zbx_tag_t * const *)d1;
+	const zbx_tag_t	*tag2 = *(const zbx_tag_t * const *)d2;
+
+	if (0 == (ret = zbx_strcmp_natural(tag1->tag, tag2->tag)))
+		ret = zbx_strcmp_natural(tag1->value, tag2->value);
+
+	return ret;
 }
 
 int	zbx_compare_tags_and_values(const void *d1, const void *d2)

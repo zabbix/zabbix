@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcommon.h"
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 
 #include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxnix.h"
-#include "log.h"
 #include "zbxdiag.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
@@ -219,10 +219,6 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	else if (0 == strcmp(buf, ZBX_DIAG_LOCKS))
 	{
 		scope = 1 << ZBX_DIAGINFO_LOCKS;
-	}
-	else if (0 == strcmp(buf, ZBX_DIAG_CONNECTOR))
-	{
-		scope = 1 << ZBX_DIAGINFO_CONNECTOR;
 	}
 	else
 	{
@@ -434,6 +430,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			return;
 		case ZBX_RTC_SNMP_CACHE_RELOAD:
 #ifdef HAVE_NETSNMP
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_SNMP_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNREACHABLE, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);

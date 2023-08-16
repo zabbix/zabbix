@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 func (p *Plugin) exportContents(params []string) (result interface{}, err error) {
@@ -31,10 +32,10 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 		return nil, errors.New("Wrong number of parameters")
 	}
 
-	var encoder string
+	var encoding string
 
 	if len(params) == 2 {
-		encoder = params[1]
+		encoding = params[1]
 	}
 
 	f, err := stdOs.Stat(params[0])
@@ -54,13 +55,13 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 	}
 	defer file.Close()
 
-	buf := bytes.Buffer{}
-	if _, err = buf.ReadFrom(file); err != nil {
+	undecodedBuf := bytes.Buffer{}
+	if _, err = undecodedBuf.ReadFrom(file); err != nil {
 		return nil, fmt.Errorf("Cannot read from file: %s", err)
 	}
+	encoding = findEncodingFromBOM(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
 
-	outbuf := decode(encoder, buf.Bytes())
-
-	return string(bytes.TrimRight(outbuf, "\n\r")), nil
-
+	return strings.TrimRight(utf8_bufStr, "\n\r"), nil
 }

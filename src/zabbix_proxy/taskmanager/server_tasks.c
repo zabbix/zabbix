@@ -27,21 +27,21 @@
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on the server                  *
  *                                                                            *
- * Parameters: tasks         - [OUT] the tasks to execute                     *
- *             proxy_hostid  - [IN] (ignored)                                 *
+ * Parameters: tasks         - [OUT] tasks to execute                         *
+ *             proxyid       - [IN] (ignored)                                 *
  *             compatibility - [IN] (ignored)                                 *
  *                                                                            *
  * Comments: This function is used by proxy to get tasks to be sent to the    *
  *           server.                                                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
 		zbx_proxy_compatibility_t compatibility)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	ZBX_UNUSED(proxy_hostid);
+	ZBX_UNUSED(proxyid);
 	ZBX_UNUSED(compatibility);
 
 	result = zbx_db_select(

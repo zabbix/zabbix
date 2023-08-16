@@ -11,8 +11,8 @@
 	}
 }
 
-.dashboard-toggle-slideshow,
-.dashboard-kioskmode-toggle-slideshow {
+.btn-dashboard-toggle-slideshow,
+.btn-dashboard-kioskmode-toggle-slideshow {
 	&.slideshow-state-started .slideshow-state-stopped,
 	&.slideshow-state-stopped .slideshow-state-started {
 		display: none;
@@ -24,18 +24,6 @@
 	margin-right: 5px;
 	position: relative;
 
-	&::after {
-		content: '';
-		position: absolute;
-		min-height: 24px;
-		z-index: -1;
-		top: -5px;
-		right: -5px;
-		bottom: -5px;
-		left: -5px;
-		border: 1px solid $ui-border-color;
-	}
-
 	ul {
 		li {
 			vertical-align: middle;
@@ -43,9 +31,22 @@
 			&:first-child {
 				padding: 0;
 			}
+		}
+	}
+}
 
-			.btn-dashboard-conf {
-				vertical-align: middle;
+.dashboard-navigation {
+	display: flex;
+	margin-top: 10px;
+	padding-bottom: 2px;
+
+	&.is-scrollable {
+		.dashboard-navigation-controls {
+			button {
+				&.btn-dashboard-previous-page,
+				&.btn-dashboard-next-page {
+					display: inline-block;
+				}
 			}
 		}
 	}
@@ -71,12 +72,12 @@
 
 		& > .sortable-item:focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
-			padding: 0 3.5px 0 3.5px;
+			padding: 0 3.5px;
 
 			& > div {
 				padding: 0 8px;
 				border: 1px solid transparent;
-				box-shadow: 0 0 0 2px rgba($blue, .35);
+				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -86,7 +87,7 @@
 		box-sizing: border-box;
 		display: block;
 		// Invisible padding for tab separation.
-		padding: 0 1.5px 0 1.5px;
+		padding: 0 1.5px;
 		margin: 0;
 		list-style-type: none;
 		outline: none;
@@ -121,7 +122,7 @@
 			}
 
 			button {
-				margin: 0 -9px 0 4px;
+				margin: -1px -9px -1px 4px;
 			}
 
 			&:not(.selected-tab) {
@@ -148,9 +149,17 @@
 		}
 	}
 
-	.sortable-dragging {
-		.sortable-item {
-			opacity: 1;
+	.sortable-item {
+		&.sortable-dragging > div {
+			@extend %cursor-dragging;
+		}
+	}
+
+	.btn-dashboard-page-properties {
+		&:hover,
+		&:focus,
+		&:active {
+			color: $btn-color;
 		}
 	}
 }
@@ -162,27 +171,10 @@
 	button {
 		margin-left: 10px;
 
-		&.dashboard-previous-page,
-		&.dashboard-next-page {
+		&.btn-dashboard-previous-page,
+		&.btn-dashboard-next-page {
 			display: none;
 			margin: 0;
-		}
-	}
-}
-
-.dashboard-navigation {
-	display: flex;
-	margin-top: 10px;
-	padding-bottom: 2px;
-
-	&.is-scrollable {
-		.dashboard-navigation-controls {
-			button {
-				&.dashboard-previous-page,
-				&.dashboard-next-page {
-					display: inline-block;
-				}
-			}
 		}
 	}
 }
@@ -203,7 +195,7 @@
 	}
 
 	@if $ui-transitions {
-		transition: margin-top .3s;
+		transition: margin-top $ui-transition-duration;
 	}
 }
 
@@ -216,7 +208,7 @@
 
 	&.dashboard-is-edit-mode,
 	&:not(.dashboard-is-multipage) {
-		.dashboard-toggle-slideshow {
+		.btn-dashboard-toggle-slideshow {
 			display: none;
 		}
 	}
@@ -241,40 +233,38 @@
 	user-select: none;
 
 	.dashboard-widget-placeholder-box {
+		position: relative;
+		overflow: hidden;
 		background-color: rgba($ui-bg-color, .7);
 		border: 1px dashed $form-border-color;
 		box-shadow: 2px 2px 6px $action-shadow-color;
 		flex: 1;
-		position: relative;
-		overflow: hidden;
 	}
 
 	.dashboard-widget-placeholder-label {
-		$icon-height: 28px;
+		$icon-size: 46px;
 
 		position: absolute;
 		left: 0;
-		top: calc(50% - #{$icon-height / 2});
+		top: calc(50% - #{$icon-size / 2});
 		right: 0;
 		bottom: 0;
-		padding: ($icon-height + 10px) 5px 5px;
 		text-align: center;
 
 		&::before {
-			background: url($sprite-path) no-repeat -157px -888px;
-			content: ' ';
-			height: $icon-height;
-			width: 36px;
-			position: absolute;
-			top: 0;
-			left: 50%;
-			transform: translateX(-50%);
+			@extend %icons-font;
+
+			content: $zi-widget-add;
+			margin: 0 -4px;
+			font-size: $icon-size;
 		}
 
-		span {
-			&.hidden {
-				display: none;
-			}
+		.hidden {
+			display: none;
+		}
+
+		div {
+			padding: 0 5px 5px;
 		}
 	}
 
@@ -284,7 +274,7 @@
 
 		.dashboard-widget-placeholder-label {
 			&::before {
-				background: url($sprite-path) no-repeat -345px -888px;
+				content: $zi-widget-resize;
 			}
 		}
 	}
@@ -294,10 +284,6 @@
 
 		.dashboard-widget-placeholder-box {
 			background-color: rgba($ui-bg-color, .7);
-
-			.dashboard-widget-placeholder-label::before {
-				background: url($sprite-path) no-repeat -122px -284px;
-			}
 		}
 	}
 
@@ -362,7 +348,15 @@
 
 .dashboard-grid-widget-actions {
 	opacity: 0;
-	transition: opacity .2s ease-out;
+
+	@if $ui-transitions {
+		transition: opacity $ui-controls-transition-duration ease-out;
+	}
+
+	li {
+		margin-top: 2px;
+		margin-right: 2px;
+	}
 }
 
 .dashboard-grid-widget-messages {
@@ -453,7 +447,8 @@
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
 			height: 0;
-			transition: height .3s, margin-top .3s, box-shadow .3s;
+			transition: height $ui-transition-duration, margin-top $ui-transition-duration,
+				box-shadow $ui-transition-duration;
 		}
 
 		.dashboard-grid-widget-contents {
@@ -539,7 +534,8 @@
 	opacity: 0;
 
 	// Transition for opacity is set for best border disappearance on different themes.
-	transition: margin-top .3s ease-out, height .3s ease-out, opacity .15s .15s ease-out, box-shadow .3s ease-out;
+	transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
+		opacity .15s .15s ease-out, box-shadow $ui-transition-duration ease-out;
 
 	// Not to loose hovered header while widget underneath is updating.
 	z-index: 3;
@@ -592,7 +588,7 @@
 	// To allow overflowing of the floating headers of child widgets.
 	overflow: visible;
 
-	transition: margin-top .3s ease-out;
+	transition: margin-top $ui-transition-duration ease-out;
 }
 
 .dashboard-grid-iterator-placeholder {
@@ -661,7 +657,8 @@
 			opacity: 1;
 
 			// Not inheriting opacity transition here.
-			transition: margin-top .3s ease-out, height .3s ease-out, box-shadow .3s ease-out;
+			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
+				box-shadow $ui-transition-duration ease-out;
 		}
 
 		&.dashboard-grid-iterator-hidden-header.iterator-double-header {
@@ -942,7 +939,7 @@
 			left: .25rem;
 			right: .25rem;
 			bottom: .25rem;
-			background-color: darken($body-bg-color, 6%) !important;
+			background-color: darken($body-bg-color, 6%);
 		}
 	}
 }
@@ -960,7 +957,7 @@
 }
 
 .new-widget {
-	animation: zoom-in-out .2s linear;
+	animation: zoom-in-out $ui-controls-transition-duration linear;
 }
 
 .dashboard-widget {

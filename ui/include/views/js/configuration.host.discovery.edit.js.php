@@ -76,6 +76,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->addClass(ZBX_STYLE_UPPERCASE)
 					->setAttribute('placeholder', '{#MACRO}')
+					->disableSpellcheck()
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '', [
@@ -84,6 +85,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				]))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setAttribute('placeholder', _('$.path.to.node'))
+					->disableSpellcheck()
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CButton('lld_macro_paths[#{rowNum}][remove]', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
@@ -105,6 +107,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				.dynamicRows({
 					template: '#condition-row',
 					counter: counter,
+					allow_empty: true,
 					dataCallback: (data) => {
 						data.formulaId = num2letter(data.rowNum);
 
@@ -166,7 +169,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}).trigger('change');
 
 			$('#lld_macro_paths')
-				.dynamicRows({template: '#lld_macro_path-row'})
+				.dynamicRows({template: '#lld_macro_path-row', allow_empty: true})
 				.on('click', 'button.element-table-add', () => {
 					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 				});

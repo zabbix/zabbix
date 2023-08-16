@@ -22,7 +22,7 @@
 
 #include "zbxnum.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 #include <uvm/uvm_extern.h>
 
 static int	get_cpu_num()

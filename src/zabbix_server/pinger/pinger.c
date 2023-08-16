@@ -18,9 +18,9 @@
 **/
 
 #include "pinger.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxnix.h"
@@ -422,13 +422,13 @@ static void	get_pinger_hosts(icmpitem_t **icmp_items, int *icmp_items_alloc, int
 	um_handle = zbx_dc_open_user_macros();
 
 	items = &item;
-	num = zbx_dc_config_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, &items);
+	num = zbx_dc_config_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, 0, 0, &items);
 
 	for (i = 0; i < num; i++)
 	{
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL, MACRO_TYPE_ITEM_KEY, error,
-				sizeof(error));
+		rc = zbx_substitute_key_macros(&items[i].key, NULL, &items[i], NULL, NULL, ZBX_MACRO_TYPE_ITEM_KEY,
+				error, sizeof(error));
 
 		if (SUCCEED == rc)
 		{

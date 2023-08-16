@@ -18,8 +18,7 @@
 **/
 
 #include "checks_calculated.h"
-#include "zbxserver.h"
-#include "log.h"
+#include "zbxexpression.h"
 
 int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result)
 {

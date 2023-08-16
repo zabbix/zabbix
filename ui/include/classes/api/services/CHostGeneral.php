@@ -235,7 +235,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			if ($check_double_linkage) {
-				$this->checkDoubleLinkageNew($ins_templates, $del_links);
+				$this->checkDoubleLinkageNew($ins_templates, $del_links, null);
 			}
 
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
@@ -312,7 +312,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, ?array $db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTemplates(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		parent::updateTemplates($hosts, $db_hosts);
@@ -617,21 +617,9 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		CItem::linkTemplateObjects($templateids, $hostids);
-		$ruleids = API::DiscoveryRule()->syncTemplates($templateids, $hostids);
-
-		if ($ruleids) {
-			CItemPrototype::linkTemplateObjects($templateids, $hostids);
-			API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
-		}
-
 		API::Trigger()->syncTemplates($link_request);
-
-		if ($ruleids) {
-			API::TriggerPrototype()->syncTemplates($link_request);
-			API::GraphPrototype()->syncTemplates($link_request);
-		}
-
 		API::Graph()->syncTemplates($link_request);
+		CDiscoveryRule::linkTemplateObjects($templateids, $hostids);
 
 		CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 	}
@@ -850,23 +838,15 @@ abstract class CHostGeneral extends CHostBase {
 
 		foreach ($link_requests as $link_request) {
 			CItem::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
-			$ruleids = API::DiscoveryRule()->syncTemplates($link_request['templateids'], $link_request['hostids']);
-
-			if ($ruleids) {
-				CItemPrototype::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
-				API::HostPrototype()->linkTemplateObjects($ruleids, $link_request['hostids']);
-			}
 		}
 
-		// we do linkage in two separate loops because for triggers you need all items already created on host
-		foreach ($link_requests as $link_request){
+		foreach ($link_requests as $link_request) {
 			API::Trigger()->syncTemplates($link_request);
-			API::TriggerPrototype()->syncTemplates($link_request);
-			API::GraphPrototype()->syncTemplates($link_request);
 			API::Graph()->syncTemplates($link_request);
 		}
 
 		foreach ($link_requests as $link_request){
+			CDiscoveryRule::linkTemplateObjects($link_request['templateids'], $link_request['hostids']);
 			CTriggerGeneral::syncTemplateDependencies($link_request['templateids'], $link_request['hostids']);
 		}
 

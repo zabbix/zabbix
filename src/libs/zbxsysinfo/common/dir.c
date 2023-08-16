@@ -25,10 +25,10 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxregexp.h"
-#include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxwin32.h"
+#	include "zbxlog.h"
 #endif
 
 /******************************************************************************
@@ -113,7 +113,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		zbx_stat_t *status, int depth_param, int excl_dir_param, int param_count)
 {
 	char	*dir_param, *regex_incl_str, *regex_excl_str, *regex_excl_dir_str, *max_depth_str;
-	const char	*error = NULL;
+	char	*error = NULL;
 
 	if (param_count < request->nparam)
 	{
@@ -139,7 +139,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in second parameter: %s", error));
-			zbx_regexp_err_msg_free(error);
+			zbx_free(error);
 			return FAIL;
 		}
 	}
@@ -150,7 +150,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL,
 					"Invalid regular expression in third parameter: %s", error));
-			zbx_regexp_err_msg_free(error);
+			zbx_free(error);
 			return FAIL;
 		}
 	}
@@ -161,7 +161,7 @@ static int	prepare_common_parameters(const AGENT_REQUEST *request, AGENT_RESULT 
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in %s parameter: %s",
 					(5 == excl_dir_param ? "sixth" : "eleventh"), error));
-			zbx_regexp_err_msg_free(error);
+			zbx_free(error);
 			return FAIL;
 		}
 	}
@@ -436,7 +436,7 @@ static BOOL	has_timed_out(HANDLE timeout_event)
 			return FALSE;
 		case WAIT_FAILED:
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_FAILED: %s",
-					strerror_from_system(GetLastError()));
+					zbx_strerror_from_system(GetLastError()));
 			return TRUE;
 		default:
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned 0x%x", (unsigned int)rc);
@@ -454,14 +454,14 @@ static int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *l
 
 	if (INVALID_HANDLE_VALUE == file_handle)
 	{
-		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
+		*error = zbx_strdup(NULL, zbx_strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 
 	if (0 == GetFileInformationByHandle(file_handle, link_info))
 	{
 		CloseHandle(file_handle);
-		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
+		*error = zbx_strdup(NULL, zbx_strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 

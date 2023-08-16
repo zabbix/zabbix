@@ -831,8 +831,8 @@ class CSvgGraphHelper {
 		}
 
 		$options = [
-			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
-			'select_acknowledges' => ['action'],
+			'output' => ['eventid', 'objectid', 'name', 'severity', 'clock', 'r_eventid'],
+			'selectAcknowledges' => ['action'],
 			'problem_time_from' => $time_period['time_from'],
 			'problem_time_till' => $time_period['time_to'],
 			'symptom' => false,
@@ -857,12 +857,24 @@ class CSvgGraphHelper {
 			}
 		}
 
+		if ($problem_options['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS) {
+			$itemids = [];
+
+			foreach ($metrics as $metric) {
+				$itemids += $metric['options']['aggregate_function'] != AGGREGATE_NONE
+					? array_column($metric['items'], 'itemid', 'itemid')
+					: [$metric['itemid'] => $metric['itemid']];
+			}
+			$itemids = array_values($itemids);
+		}
+		else {
+			$itemids = null;
+		}
+
 		$options['objectids'] = array_keys(API::Trigger()->get([
 			'output' => [],
 			'hostids' => $options['hostids'] ?? null,
-			'itemids' => $problem_options['graph_item_problems']
-				? array_unique(array_column($metrics, 'itemid'))
-				: null,
+			'itemids' => $itemids,
 			'monitored' => true,
 			'preservekeys' => true
 		]));
@@ -875,10 +887,7 @@ class CSvgGraphHelper {
 		}
 
 		// Add severity filter.
-		$filter_severities = implode(',', $problem_options['severities']);
-		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
+		if ($problem_options['severities']) {
 			$options['severities'] = $problem_options['severities'];
 		}
 

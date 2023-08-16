@@ -28,7 +28,7 @@
 
 if (array_key_exists('itemid', $data['fields'])) {
 	$field_itemid = (new CWidgetFieldMultiSelectItemPrototypeView($data['fields']['itemid'],
-		$data['captions']['ms']['item_prototypes']['itemid'])
+		$data['captions']['item_prototypes']['itemid'])
 	)->setPopupParameter('numeric', true);
 
 	if (!$data['fields']['itemid']->isTemplateDashboard()) {
@@ -46,7 +46,7 @@ else {
 	->addField($field_itemid)
 	->addField(array_key_exists('graphid', $data['fields'])
 		? new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid'],
-			$data['captions']['ms']['graph_prototypes']['graphid']
+			$data['captions']['graph_prototypes']['graphid']
 		)
 		: null
 	)

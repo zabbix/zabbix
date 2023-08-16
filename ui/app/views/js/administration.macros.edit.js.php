@@ -31,6 +31,7 @@
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
+					->disableSpellcheck()
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
@@ -62,7 +63,7 @@
 				// check if the macro has an hidden ID element, if it does - increment the deleted macro counter
 				removed += $('#macros_' + $(this).attr('id').split('_')[1] + '_globalmacroid').length;
 			})
-			.dynamicRows({template: '#macro-row-tmpl'})
+			.dynamicRows({template: '#macro-row-tmpl', allow_empty: true})
 			.on('afteradd.dynamicRows', function() {
 				$('.macro-input-group', table).macroValue();
 				$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', table).textareaFlexible();

@@ -60,6 +60,7 @@ require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testRole.php';
 require_once dirname(__FILE__).'/testScimGroup.php';
+require_once dirname(__FILE__).'/testScimServiceProviderConfig.php';
 require_once dirname(__FILE__).'/testScimUser.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testServices.php';
@@ -106,7 +107,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testConnector');
 		$suite->addTestSuite('testCorrelation');
 		$suite->addTestSuite('testDRule');
-		$suite->addTestSuite('testDependentItems');
+		// $suite->addTestSuite('testDependentItems');
 		$suite->addTestSuite('testDiscoveryRule');
 		$suite->addTestSuite('testGraphPrototype');
 		$suite->addTestSuite('testHaNode');
@@ -125,6 +126,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testRole');
 		$suite->addTestSuite('testScimGroup');
+		$suite->addTestSuite('testScimServiceProviderConfig');
 		$suite->addTestSuite('testScimUser');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testServices');

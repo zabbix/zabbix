@@ -123,6 +123,7 @@ share/man/man8/zabbix_agent2.8
 share/man/man8/zabbix_web_service.8
 src/libs/zbxcunit/cu_modules.h
 src/libs/zbxdbschema/dbschema.c
+src/modules/dummy/dummy.so
 src/zabbix_agent/zabbix_agent
 src/zabbix_agent/zabbix_agentd
 src/zabbix_get/zabbix_get
@@ -134,6 +135,7 @@ src/zabbix_sender/zabbix_sender
 src/zabbix_server/zabbix_server
 tests/libs/zbxalgo/evaluate
 tests/libs/zbxalgo/evaluate_unknown
+tests/libs/zbxalgo/list
 tests/libs/zbxalgo/queue
 tests/libs/zbxcommon/calculate_item_nextcheck
 tests/libs/zbxcommon/calculate_item_nextcheck_unreachable
@@ -182,6 +184,9 @@ tests/libs/zbxdbcache/zbx_vc_get_values
 tests/libs/zbxdbcache/dc_function_calculate_nextcheck
 tests/libs/zbxdbhigh/DBadd_condition_alloc
 tests/libs/zbxdbhigh/DBselect_uint64
+tests/libs/zbxdbhigh/zbx_add_tags
+tests/libs/zbxdbhigh/zbx_del_tags
+tests/libs/zbxdbhigh/zbx_merge_tags
 tests/libs/zbxeval/zbx_eval_compose_expression
 tests/libs/zbxeval/zbx_eval_execute
 tests/libs/zbxeval/zbx_eval_execute_ext
@@ -204,13 +209,13 @@ tests/libs/zbxprometheus/prometheus_parse_row
 tests/libs/zbxprometheus/zbx_prometheus_pattern
 tests/libs/zbxprometheus/zbx_prometheus_to_json
 tests/libs/zbxregexp/wildcard_match
-tests/libs/zbxserver/evaluate_function
-tests/libs/zbxserver/evaluate_percentage_deviations_in_remainder
-tests/libs/zbxserver/evaluate_stl
-tests/libs/zbxserver/get_trigger_expression_constant
-tests/libs/zbxserver/macro_fmttime
-tests/libs/zbxserver/substitute_lld_macros
-tests/libs/zbxserver/valuemaps
+tests/libs/zbxexpression/evaluate_function
+tests/libs/zbxexpression/evaluate_percentage_deviations_in_remainder
+tests/libs/zbxexpression/evaluate_stl
+tests/libs/zbxexpression/get_trigger_expression_constant
+tests/libs/zbxexpression/macro_fmttime
+tests/libs/zbxexpression/substitute_lld_macros
+tests/libs/zbxexpression/valuemaps
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxsysinfo/zbx_execute_agent_check
 tests/libs/zbxsysinfo/zbx_execute_agent_check_http
@@ -253,6 +258,9 @@ tests/zabbix_server/service/service_get_main_status
 tests/zabbix_server/service/service_get_rule_status
 tests/zabbix_server/service/service_get_status
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
+tests/libs/zbxmodules/server_module_load
+tests/libs/zbxmodules/proxy_module_load
+tests/libs/zbxmodules/agent_module_load
 ui/.buildpath
 ui/.htpasswd
 ui/.idea

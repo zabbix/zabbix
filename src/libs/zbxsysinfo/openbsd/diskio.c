@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxstr.h"
 
 int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)

@@ -90,10 +90,11 @@ class CMacroValue extends CInput {
 	 * Allow to revert macro value.
 	 */
 	public function addRevertButton() {
-		$this->revert_button = (new CButton(null))
-			->setAttribute('title', _('Revert changes'))
+		$this->revert_button = (new CSimpleButton())
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass(self::ZBX_STYLE_BTN_UNDO);
+			->addClass(ZBX_ICON_ARROW_BACK)
+			->addClass(self::ZBX_STYLE_BTN_UNDO)
+			->setAttribute('title', _('Revert changes'));
 
 		return $this;
 	}
@@ -120,34 +121,36 @@ class CMacroValue extends CInput {
 		$name = $this->getAttribute('name');
 		$value_type = $this->getAttribute('type');
 		$value = $this->getAttribute('value');
-		$readonly = $this->getAttribute('readonly');
+		$readonly = (bool) $this->getAttribute('readonly');
 		$elements = [];
 
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
-			$dropdown_btn_class = ZBX_STYLE_ICON_TEXT;
+			$dropdown_btn_class = ZBX_ICON_TEXT;
 
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
+				->disableSpellcheck()
 				->setReadonly($readonly);
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
-			$dropdown_btn_class = ZBX_STYLE_ICON_SECRET_TEXT;
+			$dropdown_btn_class = ZBX_ICON_LOCK;
 
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
+				->disableSpellcheck()
 				->setReadonly($readonly);
 		}
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
-			$dropdown_btn_class = ZBX_STYLE_ICON_INVISIBLE;
+			$dropdown_btn_class = ZBX_ICON_EYE_OFF;
 
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
-				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
+				->setAttribute('disabled', $readonly ? 'disabled' : null)
 				->setAttribute('placeholder', _('value'));
 		}
 
@@ -156,13 +159,13 @@ class CMacroValue extends CInput {
 		}
 
 		$elements[] = (new CButtonDropdown($name.'[type]',  $value_type, [
-				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_STYLE_ICON_TEXT],
-				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_STYLE_ICON_INVISIBLE],
-				['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_STYLE_ICON_SECRET_TEXT]
-			]))
-				->addClass($dropdown_btn_class)
-				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
-				->setAttribute('aria-label', _('Change type'));
+			['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_ICON_TEXT],
+			['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_ICON_EYE_OFF],
+			['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_ICON_LOCK]
+		]))
+			->addClass($dropdown_btn_class)
+			->setAttribute('disabled', $readonly ? 'disabled' : null)
+			->setAttribute('aria-label', _('Change type'));
 
 		$node = (new CDiv())
 			->addClass($wrapper_class)

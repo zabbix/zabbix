@@ -26,8 +26,10 @@
 
 // create form
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('copy')))->removeId())
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('copy')))->removeId());
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 switch ($data['element_type']) {
 	case 'items':
@@ -41,6 +43,11 @@ switch ($data['element_type']) {
 		$form
 			->addVar('triggerids', $data['triggerids'])
 			->addVar('source', 'triggers');
+
+		if (array_key_exists('src_hostid', $data)) {
+			$form->addVar('src_hostid', $data['src_hostid']);
+		}
+
 		$header = _n('Copy %1$s trigger', 'Copy %1$s triggers', count($data['triggerids']));
 		break;
 

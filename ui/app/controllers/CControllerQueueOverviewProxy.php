@@ -54,13 +54,13 @@ class CControllerQueueOverviewProxy extends CController {
 		}
 		else {
 			$queue_data = array_column($queue_data, null, 'proxyid');
-			$proxies = API::proxy()->get([
-				'output' => ['host'],
+			$proxies = API::Proxy()->get([
+				'output' => ['name'],
 				'preservekeys' => true
 			]);
-			$proxies[0] = ['host' => _('Server')];
+			$proxies[0] = ['name' => _('Server')];
 
-			CArrayHelper::sort($proxies, ['host']);
+			CArrayHelper::sort($proxies, ['name']);
 		}
 
 		$response = new CControllerResponseData([

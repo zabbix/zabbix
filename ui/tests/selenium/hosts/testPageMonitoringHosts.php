@@ -865,7 +865,7 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'name' => 'ЗАББИКС Сервер',
 					'link_name' => 'Dashboards',
-					'page_header' => 'Network interfaces'
+					'page_header' => 'Host dashboards'
 				]
 			],
 			[
@@ -1162,7 +1162,7 @@ class testPageMonitoringHosts extends CWebTest {
 						],
 						[
 							'column' => 'Problems',
-							'counter' => "1\n5"
+							'counter' => "15"
 						]
 					]
 				]

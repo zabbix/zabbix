@@ -178,7 +178,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20000,
+				'proxyid' => 20000,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -186,7 +186,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20000,
+				'proxyid' => 20000,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -275,7 +275,7 @@ class testFormHost extends CWebTest {
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1st row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
-				->asForm(['normalized' => true])->one();
+				->asGridForm(['normalized' => true])->one();
 		$data = [
 			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
 			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],
@@ -312,14 +312,14 @@ class testFormHost extends CWebTest {
 		}
 
 		// Check hintbox.
-		$form->query('class:icon-help-hint')->one()->waitUntilClickable()->click();
+		$form->query('class:zi-help-filled-small')->one()->waitUntilClickable()->click();
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
 		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		// Close host form popup to avoid unexpected alert in further cases.
@@ -2094,8 +2094,8 @@ class testFormHost extends CWebTest {
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
-						['name' => 'Host groups', 'value' => ['Group created from host prototype 1', 'Group for discovered host test'],
-								'enabled' => false],
+						['name' => 'Host groups', 'value' => ['Group created from host prototype 1',
+								'Group for discovered host test'], 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',
@@ -2121,7 +2121,7 @@ class testFormHost extends CWebTest {
 					$this->assertEquals(self::DISCOVERED_HOST, $form->getField('Visible name')->getAttribute('placeholder'));
 
 					// Check hintbox.
-					$form->query('class:icon-help-hint')->one()->click();
+					$form->query('class:zi-help-filled-small')->one()->click();
 					$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 					$this->assertEquals("Templates linked by host discovery cannot be unlinked.".
 							"\nUse host prototype configuration form to remove automatically linked templates on upcoming discovery.",
@@ -2129,7 +2129,7 @@ class testFormHost extends CWebTest {
 					);
 
 					// Close the hint-box.
-					$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+					$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 					$hint->waitUntilNotPresent();
 
 					$host_templates = [

@@ -19,11 +19,8 @@
 
 #include "history_compress.h"
 
-#include "log.h"
-
 #if defined(HAVE_POSTGRESQL)
 
-#define ZBX_TS_SEGMENT_BY	"itemid"
 #define ZBX_TS_UNIX_NOW		"zbx_ts_unix_now"
 #define ZBX_TS_UNIX_NOW_CREATE	"create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql" \
 				" stable as $$ select extract(epoch from now())::integer $$"
@@ -34,26 +31,22 @@
 #define COMPRESSION_POLICY_ADD		(0 == ZBX_DB_TSDB_V1 ? "add_compression_policy" : \
 					"add_compress_chunks_policy")
 
-typedef enum
-{
-	ZBX_COMPRESS_TABLE_HISTORY = 0,
-	ZBX_COMPRESS_TABLE_TRENDS
-} zbx_compress_table_t;
-
 typedef struct
 {
-	const char		*name;
-	zbx_compress_table_t	type;
+	const char	*name;
+	const char	*segmentby;
+	const char	*orderby;
 } zbx_history_table_compression_options_t;
 
 static zbx_history_table_compression_options_t	compression_tables[] = {
-	{"history",		ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_uint",	ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_str",		ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_text",	ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_log",		ZBX_COMPRESS_TABLE_HISTORY},
-	{"trends",		ZBX_COMPRESS_TABLE_TRENDS},
-	{"trends_uint",		ZBX_COMPRESS_TABLE_TRENDS}
+	{"history",		"itemid",	"clock,ns"},
+	{"history_uint",	"itemid",	"clock,ns"},
+	{"history_str",		"itemid",	"clock,ns"},
+	{"history_text",	"itemid",	"clock,ns"},
+	{"history_log",		"itemid",	"clock,ns"},
+	{"trends",		"itemid",	"clock"},
+	{"trends_uint",		"itemid",	"clock"},
+	{"auditlog",		"auditid",	"clock"}
 };
 
 static unsigned char	compression_status_cache = 0;
@@ -61,13 +54,14 @@ static int		compress_older_cache = 0;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check that hypertables are segmented by itemid                    *
+ * Purpose: check that hypertables are segmented by                           *
  *                                                                            *
  * Parameters: table_name - [IN] hypertable name                              *
- *             type       - [IN] history or trends                            *
+ *             segmentby  - [IN] field to segment by                          *
+ *             orderby    - [IN] field to order by                            *
  *                                                                            *
  ******************************************************************************/
-static void	hk_check_table_segmentation(const char *table_name, zbx_compress_table_t type)
+static void	hk_check_table_segmentation(const char *table_name, const char *segmentby, const char *orderby)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -92,15 +86,14 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 
 	for (i = 0; NULL != (row = zbx_db_fetch(result)); i++)
 	{
-		if (0 != strcmp(row[0], ZBX_TS_SEGMENT_BY))
+		if (0 != strcmp(row[0], segmentby))
 			i++;
 	}
 
 	if (1 != i)
 	{
 		zbx_db_execute("alter table %s set (timescaledb.compress,timescaledb.compress_segmentby='%s',"
-				"timescaledb.compress_orderby='%s')", table_name, ZBX_TS_SEGMENT_BY,
-				(ZBX_COMPRESS_TABLE_HISTORY == type) ? "clock,ns" : "clock");
+				"timescaledb.compress_orderby='%s')", table_name, segmentby, orderby);
 	}
 
 	zbx_db_free_result(result);
@@ -191,15 +184,24 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
  ******************************************************************************/
 static void	hk_history_enable_compression(int age)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < (int)ARRSIZE(compression_tables); i++)
+	for (size_t i = 0; i < ARRSIZE(compression_tables); i++)
 	{
-		zbx_db_free_result(zbx_db_select("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
-				compression_tables[i].name));
-		hk_check_table_segmentation(compression_tables[i].name, compression_tables[i].type);
+		zbx_db_result_t	res;
+
+		res = zbx_db_select("select set_integer_now_func('%s', '"ZBX_TS_UNIX_NOW"', true)",
+				compression_tables[i].name);
+		if(NULL == res)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Table \"%s\"is not hypertable. Run timescaledb.sql script to "
+					"upgrade configuration.", compression_tables[i].name);
+			continue;
+		}
+
+		zbx_db_free_result(res);
+		hk_check_table_segmentation(compression_tables[i].name, compression_tables[i].segmentby,
+				compression_tables[i].orderby);
 		hk_check_table_compression_age(compression_tables[i].name, age);
 	}
 
@@ -213,16 +215,15 @@ static void	hk_history_enable_compression(int age)
  ******************************************************************************/
 static void	hk_history_disable_compression(void)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < (int)ARRSIZE(compression_tables); i++)
+	for (size_t i = 0; i < ARRSIZE(compression_tables); i++)
 	{
 		if (0 == hk_get_table_compression_age(compression_tables[i].name))
 			continue;
 
-		zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE, compression_tables[i].name));
+		zbx_db_free_result(zbx_db_select("select %s('%s')", COMPRESSION_POLICY_REMOVE,
+				compression_tables[i].name));
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

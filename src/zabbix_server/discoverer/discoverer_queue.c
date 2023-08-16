@@ -19,7 +19,6 @@
 
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
-#include "log.h"
 
 #define DISCOVERER_QUEUE_INIT_NONE	0x00
 #define DISCOVERER_QUEUE_INIT_LOCK	0x01
@@ -111,7 +110,7 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 *******************************************************************************/
 void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_job_t *job)
 {
-	zbx_list_append(&queue->jobs, job, NULL);
+	(void)zbx_list_append(&queue->jobs, job, NULL);
 }
 
 /******************************************************************************

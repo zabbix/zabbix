@@ -23,7 +23,7 @@ package zbxlib
 #cgo CFLAGS: -I${SRCDIR}/../../../../include
 
 #include "zbxsysinfo.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 #include "zbx_item_constants.h"
@@ -86,7 +86,7 @@ int metric_set_supported(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sen
 
 		if (lastlogsize_sent != metric->lastlogsize || mtime_sent != metric->mtime ||
 				(lastlogsize_last == lastlogsize_sent && mtime_last == mtime_sent &&
-						(old_state != metric->state || 0 != (ZBX_METRIC_FLAG_NEW & metric->flags))))
+				(old_state != metric->state || 0 != (ZBX_METRIC_FLAG_NEW & metric->flags))))
 		{
 			ret = SUCCEED;
 		}
@@ -152,7 +152,8 @@ static void add_log_value(log_result_t *result, const char *value, int state, zb
 	zbx_vector_ptr_append(&result->values, log);
 }
 
-static int get_log_value(log_result_t *result, int index, char **value, int *state, zbx_uint64_t *lastlogsize, int *mtime)
+static int	get_log_value(log_result_t *result, int index, char **value, int *state, zbx_uint64_t *lastlogsize,
+		int *mtime)
 {
 	log_value_t *log;
 
@@ -181,8 +182,8 @@ static void free_log_result(log_result_t *result)
 	zbx_free(result);
 }
 
-int	process_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host, const char *key,
-		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
+int	process_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
+		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
 {
@@ -251,10 +252,10 @@ import (
 	"time"
 	"unsafe"
 
-	"zabbix.com/pkg/itemutil"
-	"zabbix.com/internal/agent"
-	"zabbix.com/pkg/tls"
 	"git.zabbix.com/ap/plugin-support/log"
+	"zabbix.com/internal/agent"
+	"zabbix.com/pkg/itemutil"
+	"zabbix.com/pkg/tls"
 )
 
 const (
@@ -300,16 +301,20 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 		flags |= MetricFlagLogLogrt
 	case "log.count":
 		if len(params) >= 8 && params[7] != "" {
-			return nil, errors.New("The eighth parameter (persistent directory) is not supported by Agent2.")
+			return nil, errors.New("The eighth parameter (persistent directory) is not supported by " +
+				"Agent2.")
 		}
 		flags |= MetricFlagLogCount | MetricFlagLogLog
 	case "logrt.count":
 		if len(params) >= 8 && params[7] != "" {
-			return nil, errors.New("The eighth parameter (persistent directory) is not supported by Agent2.")
+			return nil, errors.New("The eighth parameter (persistent directory) is not supported by " +
+				"Agent2.")
 		}
 		flags |= MetricFlagLogCount | MetricFlagLogLogrt
 	case "eventlog":
 		flags |= MetricFlagLogEventlog
+	case "eventlog.count":
+		flags |= MetricFlagLogCount | MetricFlagLogEventlog
 	default:
 		return nil, errors.New("Unsupported item key.")
 	}
@@ -324,7 +329,7 @@ func FreeActiveMetric(data unsafe.Pointer) {
 	C.metric_free(C.ZBX_ACTIVE_METRIC_LP(data))
 }
 
-func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer) {
+func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer, itemid uint64) {
 	log.Tracef("Calling C function \"metric_set_refresh()\"")
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
@@ -335,30 +340,31 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	clastLogsizeLast = clastLogsizeSent
 	cmtimeLast = cmtimeSent
 
-	log.Tracef("Calling C function \"new_log_result()\"")
-	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
-
 	var tlsConfig *tls.Config
 	var err error
-	var ctlsConfig C.zbx_config_tls_t;
-	var ctlsConfig_p *C.zbx_config_tls_t;
+	var ctlsConfig C.zbx_config_tls_t
+	var ctlsConfig_p *C.zbx_config_tls_t
 
 	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
-		result := &LogResult{
+		r := &LogResult{
 			Ts:    time.Now(),
 			Error: err,
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, r)
 
 		return
 	}
-	if (nil != tlsConfig) {
+
+	log.Tracef("Calling C function \"new_log_result()\"")
+	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
+
+	if nil != tlsConfig {
 		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
 		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
 			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
 			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
 			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),
-			(C.CString)(tlsConfig.ServerCertSubject));
+			(C.CString)(tlsConfig.ServerCertSubject))
 		ctlsConfig_p = &ctlsConfig
 	}
 
@@ -366,10 +372,12 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	log.Tracef("Calling C function \"new_prep_vec()\"")
 	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
 	log.Tracef("Calling C function \"process_log_check()\"")
-	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_expression_lp_t(cblob),
-		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
+	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
+		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
+		C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, cprepVec, ctlsConfig_p, (C.int)(agent.Options.Timeout),
-		(C.CString)(agent.Options.SourceIP))
+		(C.CString)(agent.Options.SourceIP), (C.CString)(agent.Options.Hostname),
+		C.zbx_uint64_t(itemid), (C.int)(agent.Options.BufferSend), (C.int)(agent.Options.BufferSize))
 
 	log.Tracef("Calling C function \"free_prep_vec()\"")
 	C.free_prep_vec(cprepVec)
@@ -420,25 +428,25 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		} else {
 			err = errors.New("Unknown error.")
 		}
-		result := &LogResult{
+		r := &LogResult{
 			Ts:    time.Now(),
 			Error: err,
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, r)
 	} else {
 		log.Tracef("Calling C function \"metric_set_supported()\"")
-		ret := C.metric_set_supported(C.ZBX_ACTIVE_METRIC_LP(data), clastLogsizeSent, cmtimeSent, clastLogsizeLast,
-			cmtimeLast)
+		ret := C.metric_set_supported(C.ZBX_ACTIVE_METRIC_LP(data), clastLogsizeSent, cmtimeSent,
+			clastLogsizeLast, cmtimeLast)
 
 		if ret == Succeed {
 			log.Tracef("Calling C function \"metric_get_meta()\"")
 			C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeLast, &cmtimeLast)
-			result := &LogResult{
+			r := &LogResult{
 				Ts:          time.Now(),
 				LastLogsize: uint64(clastLogsizeLast),
 				Mtime:       int(cmtimeLast),
 			}
-			item.Results = append(item.Results, result)
+			item.Results = append(item.Results, r)
 		}
 	}
 }

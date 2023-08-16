@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, EntitiesTags
+ * @dataSource TagFilter, EntitiesTags, WebScenarios
  */
 class testPageTemplates extends CLegacyWebTest {
 
@@ -45,12 +45,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->templateName);
 
-		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
 				'Version', 'Linked templates', 'Linked to templates', 'Tags'
 		];
@@ -76,7 +77,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$sqlTemplate = "select * from hosts where host='$host'";
 		$oldHashTemplate = CDBHelper::getHash($sqlTemplate);
 		$sqlHosts =
-				'SELECT hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'SELECT hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
 				'ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,'.
 				'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
@@ -426,12 +427,11 @@ class testPageTemplates extends CLegacyWebTest {
 	 * Test opening Hosts filtered by corresponding Template.
 	 */
 	public function testPageTemplates_CheckHostsColumn() {
-		$template = 'Form test template';
+		$template = 'Template for web scenario testing';
 		$hosts = ['Simple form test host'];
 
-		$this->page->login()->open('templates.php?groupid=0');
-		// Reset Templates filter from possible previous scenario.
-		$this->resetFilter();
+		$this->page->login()->open('templates.php?page=3');
+
 		// Click on Hosts link in Template row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();

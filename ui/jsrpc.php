@@ -342,19 +342,19 @@ switch ($data['method']) {
 
 			case 'proxies':
 				$proxies = API::Proxy()->get([
-					'output' => ['proxyid', 'host'],
-					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
+					'output' => ['proxyid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $limit
 				]);
 
 				if ($proxies) {
-					CArrayHelper::sort($proxies, ['host']);
+					CArrayHelper::sort($proxies, ['name']);
 
 					if (isset($data['limit'])) {
 						$proxies = array_slice($proxies, 0, $data['limit']);
 					}
 
-					$result = CArrayHelper::renameObjectsKeys($proxies, ['proxyid' => 'id', 'host' => 'name']);
+					$result = CArrayHelper::renameObjectsKeys($proxies, ['proxyid' => 'id']);
 				}
 				break;
 
@@ -476,10 +476,16 @@ switch ($data['method']) {
 				break;
 
 			case 'drules':
+				$filter = [];
+
+				if (array_key_exists('enabled_only', $data) && $data['enabled_only']) {
+					$filter['status'] = DRULE_STATUS_ACTIVE;
+				}
+
 				$drules = API::DRule()->get([
 					'output' => ['druleid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'filter' => $filter,
 					'limit' => $limit
 				]);
 
@@ -695,6 +701,26 @@ switch ($data['method']) {
 							'name' => $media_type['name']
 						];
 					}
+				}
+				break;
+
+			case 'sysmaps':
+				$sysmaps = API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($sysmaps) {
+					CArrayHelper::sort($sysmaps, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$sysmaps = array_slice($sysmaps, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($sysmaps, ['sysmapid' => 'id']);
 				}
 				break;
 		}

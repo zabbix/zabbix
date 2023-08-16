@@ -48,12 +48,14 @@
 #define PARAM_FLAGS	("flags")
 #define PARAM_RESULT	("result")
 #define PARAM_REF	("ref")
+#define PARAM_SNMP_OID	("snmp_oid")
 
 typedef struct
 {
 	enum { DIRECT, PROXY }	monitored;
 	zbx_item_type_t		type;
 	const char		*key;
+	const char		*snmp_oid;
 	unsigned char		poller_type;
 	unsigned char		flags;
 	unsigned char		result_poller_type;
@@ -96,6 +98,7 @@ static unsigned char str2pollertype(const char *str)
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_UNREACHABLE),	_ZBX_MKMAP(ZBX_POLLER_TYPE_IPMI),
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_PINGER),		_ZBX_MKMAP(ZBX_POLLER_TYPE_JAVA),
 		_ZBX_MKMAP(ZBX_POLLER_TYPE_HISTORY), _ZBX_MKMAP(ZBX_POLLER_TYPE_ODBC),
+		_ZBX_MKMAP(ZBX_POLLER_TYPE_AGENT), _ZBX_MKMAP(ZBX_POLLER_TYPE_SNMP),
 		{ 0 }
 	};
 
@@ -154,7 +157,8 @@ static const char	*read_string(const zbx_mock_handle_t *handle, const char *read
 
 static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_config)
 {
-	const char	*str;
+	const char		*str;
+	zbx_mock_handle_t	string_handle;
 
 	str = read_string(handle, PARAM_MONITORED);
 	test_config->monitored = 0 == strcmp(str, "DIRECT") ? DIRECT : PROXY;
@@ -164,6 +168,14 @@ static void	read_test(const zbx_mock_handle_t *handle, test_config_t *test_confi
 
 	str = read_string(handle, PARAM_KEY);
 	test_config->key = str;
+
+	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(*handle, PARAM_SNMP_OID, &string_handle))
+	{
+		str = read_string(handle, PARAM_SNMP_OID);
+		test_config->snmp_oid = str;
+	}
+	else
+		test_config->snmp_oid = "1.3.6.1.2.1.1";
 
 	str = read_string(handle, PARAM_POLLER);
 	test_config->poller_type = str2pollertype(str);
@@ -207,19 +219,34 @@ void	zbx_mock_test_entry(void **state)
 		item.type = test_config.type;
 		item.key = test_config.key;
 		item.poller_type = test_config.poller_type;
+		item.itemid = 1;
+
+		if (ITEM_TYPE_SNMP == item.type)
+		{
+			int		found;
+			const char	*snmp_oid = test_config.snmp_oid;
+
+			ZBX_DC_SNMPITEM	*snmpitem = (ZBX_DC_SNMPITEM *)DCfind_id(&config->snmpitems, item.itemid,
+					sizeof(ZBX_DC_SNMPITEM), &found);
+
+			if (0 == found)
+				snmpitem->snmp_oid = NULL;
+
+			snmpitem->snmp_oid = zbx_strdup((char *)snmpitem->snmp_oid, snmp_oid);
+		}
 
 		if (PROXY == test_config.monitored)
 		{
-			while (0 == host.proxy_hostid)
-				host.proxy_hostid = rand();
+			while (0 == host.proxyid)
+				host.proxyid = rand();
 		}
 
 		zbx_snprintf(buffer, sizeof(buffer), "host is monitored %s and is %sreachable, item type is %d, "
-				"item key is %s, poller type is %d, flags %d, ref %d",
+				"item key is %s, oid is %s, poller type is %d, flags %d, ref %d",
 				PROXY == test_config.monitored ? "by proxy" : "directly",
 				test_config.flags & ZBX_HOST_UNREACHABLE ? "un" : "",
-				(int)test_config.type, test_config.key, (int)test_config.poller_type,
-				(int)test_config.flags, (int)test_config.test_number);
+				(int)test_config.type, test_config.key, test_config.snmp_oid,
+				(int)test_config.poller_type, (int)test_config.flags, (int)test_config.test_number);
 
 		DCitem_poller_type_update_test(&item, &host, test_config.flags);
 

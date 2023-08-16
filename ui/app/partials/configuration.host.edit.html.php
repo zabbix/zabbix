@@ -39,7 +39,7 @@ $host_form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('clone_hostid', $data['clone_hostid'])
 	->addVar('clone', $data['clone'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Host tab.
 $discovered_by = null;
@@ -144,14 +144,11 @@ if ($data['host']['parentTemplates']) {
 			(new CCol(
 				($template['link_type'] == TEMPLATE_LINK_MANUAL)
 					? new CHorList([
-						(new CSimpleButton(_('Unlink')))
-							->onClick('host_edit.unlinkTemplate(this)')
-							->addClass(ZBX_STYLE_BTN_LINK),
+						(new CButtonLink(_('Unlink')))->onClick('host_edit.unlinkTemplate(this)'),
 						($data['clone_hostid'] === null)
-							? (new CSimpleButton(_('Unlink and clear')))
+							? (new CButtonLink(_('Unlink and clear')))
 								->setAttribute('data-templateid', $template['templateid'])
 								->onClick('host_edit.unlinkAndClearTemplate(this, this.dataset.templateid)')
-								->addClass(ZBX_STYLE_BTN_LINK)
 							: null
 					])
 					: ''
@@ -236,8 +233,7 @@ $host_tab
 			$host_is_discovered
 				? null
 				: new CDiv(
-					(new CButton(null, _('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))
 						->setMenuPopup([
 							'type' => 'submenu',
 							'data' => [
@@ -259,8 +255,8 @@ $host_tab
 	->addItem([
 		new CLabel(_('Monitored by proxy'), 'label-proxy'),
 		new CFormField(
-			(new CSelect('proxy_hostid'))
-				->setValue($data['host']['proxy_hostid'])
+			(new CSelect('proxyid'))
+				->setValue($data['host']['proxyid'])
 				->setFocusableElementId('label-proxy')
 				->setReadonly($host_is_discovered)
 				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))

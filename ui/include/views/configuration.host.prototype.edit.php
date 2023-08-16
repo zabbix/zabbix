@@ -143,12 +143,11 @@ else {
 			$linked_templates->addRow([
 				$template_link->addClass(ZBX_STYLE_WORDWRAP),
 				(new CCol(
-					(new CSimpleButton(_('Unlink')))
+					(new CButtonLink(_('Unlink')))
 						->setAttribute('data-templateid', $template['templateid'])
 						->onClick('
 							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
 						')
-						->addClass(ZBX_STYLE_BTN_LINK)
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]);
 		}
@@ -279,8 +278,8 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	$host_tab->addRow(
 		_('Monitored by proxy'),
 		(new CTextBox(
-			'proxy_hostid',
-			($parent_host['proxy_hostid'] != 0) ? $this->data['proxy']['host'] : _('(no proxy)'),
+			'proxyid',
+			($parent_host['proxyid'] != 0) ? $this->data['proxy']['name'] : _('(no proxy)'),
 			true
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);

@@ -144,14 +144,33 @@ elseif (hasRequest('templateid') && hasRequest('clone')) {
 	$_REQUEST['form'] = 'clone';
 	$warnings = [];
 
-	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+	// Reset macro type and value.
+	foreach ($macros as &$macro) {
+		if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
+			$macro['deny_revert'] = true;
 
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	$secret_macro_reset = false;
+
+	foreach ($macros as &$macro) {
+		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+			$macro = [
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'value' => ''
+			] + $macro;
+
+			$secret_macro_reset = true;
+
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	if ($secret_macro_reset) {
 		$warnings[] = _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.');
 	}
 
@@ -341,53 +360,16 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		// clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'clone') {
-
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
 			 * item.
 			 */
-			if (!copyHttpTests($cloneTemplateId, $input_templateid)) {
+			if (!copyHttpTests($cloneTemplateId, $input_templateid)
+					|| !CItemHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)
+					|| !CTriggerHelper::cloneTemplateTriggers($cloneTemplateId, $input_templateid)
+					|| !CGraphHelper::cloneTemplateGraphs($cloneTemplateId, $input_templateid)
+					|| !CLldRuleHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)) {
 				throw new Exception();
-			}
-
-			if (!copyItemsToHosts('templateids', [$cloneTemplateId], true, [$input_templateid])) {
-				throw new Exception();
-			}
-
-			// copy triggers
-			if (!copyTriggersToHosts([$input_templateid], $cloneTemplateId)) {
-				throw new Exception();
-			}
-
-			// copy graphs
-			$dbGraphs = API::Graph()->get([
-				'output' => ['graphid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			foreach ($dbGraphs as $dbGraph) {
-				copyGraphToHost($dbGraph['graphid'], $input_templateid);
-			}
-
-			// copy discovery rules
-			$dbDiscoveryRules = API::DiscoveryRule()->get([
-				'output' => ['itemid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			if ($dbDiscoveryRules) {
-				if (!API::DiscoveryRule()->copy([
-					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
-					'hostids' => [$input_templateid]
-				])) {
-					$result = false;
-				}
-
-				if (!$result) {
-					throw new Exception();
-				}
 			}
 
 			// Copy template dashboards.
@@ -606,7 +588,8 @@ if (hasRequest('form')) {
 			$data['macros'] = $data['dbTemplate']['macros'];
 
 			foreach ($data['macros'] as &$macro) {
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+						&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
 					$macro['allow_revert'] = true;
 				}
 			}

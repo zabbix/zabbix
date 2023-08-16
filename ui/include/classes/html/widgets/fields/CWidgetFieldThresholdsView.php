@@ -38,9 +38,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			])
 			->setFooter(new CRow(
 				new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-add')
+					(new CButtonLink(_('Add')))->addClass('element-table-add')
 				)
 			));
 
@@ -50,9 +48,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			);
 		}
 
-		return (new CDiv($thresholds_table))
-			->addClass('table-forms-separator')
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		return (new CDiv($thresholds_table))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	public function getJavaScript(): string {
@@ -60,7 +56,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			var $thresholds_table = jQuery("#'.$this->field->getName().'-table");
 
 			$thresholds_table
-				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl"})
+				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl", allow_empty: true})
 				.on("afteradd.dynamicRows", function(opt) {
 					const rows = this.querySelectorAll(".form_row");
 					const colors = jQuery("#widget-dialogue-form")[0]

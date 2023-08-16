@@ -75,8 +75,7 @@ class CControllerPopupActionOperationEdit extends CController {
 
 			return (bool) API::Action()->get([
 				'output' => [],
-				'actionids' => $this->getInput('actionid'),
-				'editable' => true
+				'actionids' => $this->getInput('actionid')
 			]);
 		}
 
@@ -134,6 +133,10 @@ class CControllerPopupActionOperationEdit extends CController {
 
 		if (array_key_exists('optemplate', $operation_data)) {
 			$operation['optemplate'] = $operation_data['optemplate'];
+		}
+
+		if (array_key_exists('optag', $operation_data)) {
+			$operation['optag'] = $operation_data['optag'];
 		}
 
 		$data = [
@@ -236,6 +239,12 @@ class CControllerPopupActionOperationEdit extends CController {
 			$result['optemplate'] = array_values($templates);
 		}
 
+		if ($operation['optag']) {
+			CArrayHelper::sort($operation['optag'], ['tag', 'value']);
+
+			$result['optag'] = array_values($operation['optag']);
+		}
+
 		return $result;
 	}
 
@@ -263,6 +272,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 			'opconditions' => [],
 			'opgroup' => [],
+			'optag' => [],
 			'optemplate' => [],
 			'opinventory' => [
 				'inventory_mode' => (string) HOST_INVENTORY_MANUAL
