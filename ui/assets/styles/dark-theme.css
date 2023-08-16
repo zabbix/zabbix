@@ -3327,7 +3327,7 @@ section {
     fill: #737373; }
 
 .svg-pie-chart-legend {
-  position: absolute;
+  position: relative;
   bottom: 4px;
   left: 0;
   box-sizing: border-box;
@@ -4290,7 +4290,7 @@ form.dashboard-widget-piechart {
     color: #737373; }
 
 div.dashboard-widget-piechart {
-  overflow: hidden; }
+  overflow-x: hidden; }
 
 div.dashboard-widget-slareport .date-vertical {
   writing-mode: vertical-lr;

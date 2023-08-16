@@ -3280,7 +3280,7 @@ section {
     fill: #cacaca; }
 
 .svg-pie-chart-legend {
-  position: absolute;
+  position: relative;
   bottom: 4px;
   left: 0;
   box-sizing: border-box;
@@ -4262,7 +4262,7 @@ form.dashboard-widget-piechart {
     color: #cacaca; }
 
 div.dashboard-widget-piechart {
-  overflow: hidden; }
+  overflow-x: hidden; }
 
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;

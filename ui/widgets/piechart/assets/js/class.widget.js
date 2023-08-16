@@ -153,13 +153,16 @@ class CWidgetPieChart extends CWidget {
 
 		if (legend !== null) {
 			const box = legend.getBoundingClientRect();
-			const offset = 8;
 
-			size.height -= box.height + offset;
+			size.height -= box.height + CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V;
+		}
 
-			if (size.height < 0) {
-				size.height = 0;
-			}
+		const offset = 5;
+
+		size.height -= offset;
+
+		if (size.height < 0) {
+			size.height = 0;
 		}
 
 		return size;
