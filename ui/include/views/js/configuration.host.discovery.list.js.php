@@ -87,7 +87,7 @@
 				itemids: Object.keys(chkbxRange.getSelectedIds()),
 				discovery_rule: 1
 			}
-			data[token[0]] = token[1];
+			data[this.token[0]] = this.token[1];
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
