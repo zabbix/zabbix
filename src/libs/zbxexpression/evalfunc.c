@@ -2088,11 +2088,11 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 	zbx_timespec(&ts);
 	nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 
-	if (0 != item->proxy_hostid && 0 != lazy)
+	if (0 != item->proxyid && 0 != lazy)
 	{
 		int			lastaccess;
 
-		if (SUCCEED != zbx_dc_get_proxy_nodata_win(item->proxy_hostid, &nodata_win, &lastaccess))
+		if (SUCCEED != zbx_dc_get_proxy_nodata_win(item->proxyid, &nodata_win, &lastaccess))
 		{
 			*error = zbx_strdup(*error, "cannot retrieve proxy last access");
 			goto out;
@@ -2133,7 +2133,7 @@ static int	evaluate_NODATA(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 
 		zbx_variant_set_dbl(value, 1);
 
-		if (0 != item->proxy_hostid && 0 != lazy)
+		if (0 != item->proxyid && 0 != lazy)
 		{
 			zabbix_log(LOG_LEVEL_TRACE, "Nodata in %s() flag:%d values_num:%d start_time:%d period:%d",
 					__func__, nodata_win.flags, nodata_win.values_num, ts.sec - period, period);
@@ -3378,7 +3378,7 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, zbx_dc_item_t *item, const char *par
 
 	evaluate_item.itemid = item->itemid;
 	evaluate_item.value_type = item->value_type;
-	evaluate_item.proxy_hostid = item->host.proxy_hostid;
+	evaluate_item.proxyid = item->host.proxyid;
 	evaluate_item.host = item->host.host;
 	evaluate_item.key_orig = item->key_orig;
 

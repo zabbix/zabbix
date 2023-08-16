@@ -865,7 +865,7 @@ class testPageMonitoringHosts extends CWebTest {
 				[
 					'name' => 'ЗАББИКС Сервер',
 					'link_name' => 'Dashboards',
-					'page_header' => 'Network interfaces'
+					'page_header' => 'Host dashboards'
 				]
 			],
 			[

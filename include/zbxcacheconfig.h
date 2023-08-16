@@ -39,7 +39,8 @@
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_HTTPAGENT	7
 #define	ZBX_POLLER_TYPE_AGENT		8
-#define	ZBX_POLLER_TYPE_COUNT		9	/* number of poller types */
+#define	ZBX_POLLER_TYPE_SNMP		9
+#define	ZBX_POLLER_TYPE_COUNT		10	/* number of poller types */
 
 typedef enum
 {
@@ -99,6 +100,21 @@ typedef struct
 }
 zbx_dc_interface2_t;
 
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	unsigned char		value_type;
+	unsigned char		flags;
+	char			*key;
+	char			*key_orig;
+	char			host[ZBX_HOSTNAME_BUF_LEN];
+	zbx_dc_interface_t	interface;
+	int			ret;
+	AGENT_RESULT		result;
+}
+zbx_dc_item_context_t;
+
 #define ZBX_HOST_IPMI_USERNAME_LEN	16
 #define ZBX_HOST_IPMI_USERNAME_LEN_MAX	(ZBX_HOST_IPMI_USERNAME_LEN + 1)
 #define ZBX_HOST_IPMI_PASSWORD_LEN	20
@@ -109,7 +125,7 @@ zbx_dc_interface2_t;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	char		host[ZBX_HOSTNAME_BUF_LEN];
 	char		name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	unsigned char	maintenance_status;
@@ -197,7 +213,7 @@ ZBX_PTR_VECTOR_DECL(dc_item, zbx_dc_item_t *)
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	char		host[ZBX_HOSTNAME_BUF_LEN];
 	char		name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	signed char	inventory_mode;
@@ -232,7 +248,7 @@ zbx_history_sync_item_t;
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	char		host[ZBX_HOSTNAME_BUF_LEN];
 	char		name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 	unsigned char	maintenance_status;
@@ -269,7 +285,7 @@ zbx_history_recv_item_t;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	const char	*host;
 	const char	*key_orig;
 	unsigned char	value_type;
@@ -337,8 +353,8 @@ ZBX_PTR_VECTOR_DECL(dc_trigger, zbx_dc_trigger_t *)
 
 typedef struct
 {
-	zbx_uint64_t			hostid;
-	char				host[ZBX_HOSTNAME_BUF_LEN];
+	zbx_uint64_t			proxyid;
+	char				name[ZBX_HOSTNAME_BUF_LEN];
 	int				proxy_config_nextcheck;
 	int				proxy_data_nextcheck;
 	int				proxy_tasks_nextcheck;
@@ -353,7 +369,6 @@ typedef struct
 	char				*addr;
 	unsigned short			port;
 
-	unsigned char			auto_compress;
 	unsigned char			tls_connect;
 	unsigned char			tls_accept;
 
@@ -363,10 +378,10 @@ typedef struct
 	char				tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 	char				tls_psk[HOST_TLS_PSK_LEN_MAX];
 #endif
-					zbx_uint64_t	revision;
-					zbx_uint64_t	macro_revision;
+	zbx_uint64_t			revision;
+	zbx_uint64_t			macro_revision;
 
-	char				proxy_address[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
+	char				allowed_addresses[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
 	int				last_version_error_time;
 }
 zbx_dc_proxy_t;
@@ -547,7 +562,7 @@ zbx_correlation_rules_t;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	int		type;
 	int		nextcheck;
 }
@@ -658,7 +673,7 @@ ZBX_PTR_VECTOR_DECL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
 typedef struct
 {
 	zbx_uint64_t			druleid;
-	zbx_uint64_t			proxy_hostid;
+	zbx_uint64_t			proxyid;
 	time_t				nextcheck;
 	int				delay;
 	char				*delay_str;
@@ -831,9 +846,8 @@ int	zbx_dc_config_get_proxypoller_nextcheck(void);
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
-void	zbx_dc_requeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err,
+void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, int proxy_conn_err,
 		int proxyconfig_frequency, int proxydata_frequency);
-int	zbx_dc_check_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_uint64_t *revision, char **error);
 int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const char *host_metadata,
@@ -992,7 +1006,7 @@ zbx_trigger_dep_t;
 
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
-void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids);
+void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxyids);
 
 /* data session support */
 
@@ -1159,8 +1173,8 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
 
 typedef struct
 {
-	zbx_uint64_t	hostid;
-	unsigned char	status;
+	zbx_uint64_t	proxyid;
+	unsigned char	mode;
 	char		*name;
 }
 zbx_cached_proxy_t;
@@ -1203,7 +1217,7 @@ void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
 zbx_uint64_t	zbx_dc_get_received_revision(void);
 void	zbx_dc_update_received_revision(zbx_uint64_t revision);
 
-void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxy_hostid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
+void	zbx_dc_get_proxy_config_updates(zbx_uint64_t proxyid, zbx_uint64_t revision, zbx_vector_uint64_t *hostids,
 		zbx_vector_uint64_t *updated_hostids, zbx_vector_uint64_t *removed_hostids,
 		zbx_vector_uint64_t *httptestids);
 
