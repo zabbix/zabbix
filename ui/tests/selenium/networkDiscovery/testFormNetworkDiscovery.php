@@ -1271,7 +1271,8 @@ class testFormNetworkDiscovery extends CWebTest {
 			}
 
 			// Check saved fields in form.
-			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
+			$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
+					$data['fields']['Name'])->query('tag:a')->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
