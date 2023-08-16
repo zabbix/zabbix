@@ -108,9 +108,8 @@ class testFormTemplate extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormTemplate_Create($data) {
-		$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=template.list&filter_rst=1')->waitUntilReady();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
-		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Template groups')->select('Templates');
 		$filter->submit();
 		$this->zbxTestContentControlButtonClickTextWait('Create template');
@@ -298,7 +297,7 @@ class testFormTemplate extends CLegacyWebTest {
 	 */
 	protected function clickModalFooterButton($text) {
 		COverlayDialogElement::find()->one()
-			->query('xpath:./div[@class="overlay-dialogue-footer"]/button[text()="'.$text.'"]')
-			->WaitUntilClickable()->one()->click();
+				->query('xpath:./div[@class="overlay-dialogue-footer"]/button[text()='.CXPathHelper::escapeQuotes($text).']')
+				->WaitUntilClickable()->one()->click();
 	}
 }
