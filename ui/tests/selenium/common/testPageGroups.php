@@ -167,21 +167,19 @@ class testPageGroups extends CWebTest {
 
 		// Check link to the host or template edit form.
 		$row->getColumn(ucfirst($this->object).'s')->query('link', $links['host_template'])->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+
 		if ($this->object === 'host') {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->assertStringContainsString('zabbix.php?action=host.edit&hostid='.$id, $this->page->getCurrentUrl());
-			$this->assertEquals('Host', $dialog->getTitle());
-			$dialog->asForm()->checkValue(['Host name' => $links['host_template']]);
-			$dialog->close();
 		}
 		else {
-			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertStringContainsString($this->link, $this->page->getCurrentUrl());
-			$this->assertEquals('Template', $dialog->getTitle());
-			COverlayDialogElement::find()->asForm()->waitUntilVisible()->one()->checkValue(['Template name' => $links['host_template']]);
-			$dialog->query('button:Cancel')->one()->click();
-			$dialog->ensureNotPresent();
 		}
+
+		$this->assertEquals(ucfirst($this->object), $dialog->getTitle());
+		$dialog->asForm()->checkValue([ucfirst($this->object).' name' => $links['host_template']]);
+		$dialog->close();
+		$dialog->ensureNotPresent();
 
 		// Check link to hosts or templates page with selected group in filer.
 		$group_id = CDBHelper::getValue('SELECT groupid FROM hstgrp WHERE name='.zbx_dbstr($links['name']));
