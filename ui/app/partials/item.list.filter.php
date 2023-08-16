@@ -199,6 +199,7 @@ $filter_column_3
 			->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 			->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
 			->setModern(true)
+			->setEnabled($data['filter_data']['filter_state'] == -1)
 	)
 	->addRow(_('Triggers'),
 		(new CRadioButtonList('filter_with_triggers', (int) $data['filter_data']['filter_with_triggers']))

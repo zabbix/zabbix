@@ -38,7 +38,7 @@
 			this.hostids = hostids;
 
 			this.form = document.forms[form_name];
-			this.subfilter_form = document.querySelector('form[name="zbx_filter"]');
+			this.filter_form = document.querySelector('form[name="zbx_filter"]');
 
 			this.initForm();
 			this.initEvents();
@@ -59,7 +59,7 @@
 		}
 
 		initEvents() {
-			this.subfilter_form.addEventListener('click', e => {
+			this.filter_form.addEventListener('click', e => {
 				const target = e.target;
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
@@ -67,7 +67,7 @@
 
 					if (subfilter.matches('.subfilter-enabled')) {
 						subfilter.querySelector('input[type="hidden"]').remove();
-						this.subfilter_form.submit();
+						this.filter_form.submit();
 					}
 					else {
 						const name = target.getAttribute('data-name');
@@ -80,7 +80,7 @@
 				else if (target.matches('[name="filter_state"]')) {
 					const disabled = e.target.getAttribute('value') != -1;
 
-					this.subfilter_form.querySelectorAll('input[name=filter_status]').forEach(checkbox => {
+					this.filter_form.querySelectorAll('input[name=filter_status]').forEach(checkbox => {
 						checkbox.toggleAttribute('disabled', disabled);
 					});
 				}

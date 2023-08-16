@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerItemList extends CController {
+class CControllerItemList extends CControllerItem {
 
 	protected function init() {
 		$this->disableCsrfValidation();
@@ -96,29 +96,6 @@ class CControllerItemList extends CController {
 		}
 
 		return $ret;
-	}
-
-	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)) {
-			return false;
-		}
-
-		$context = $this->getInput('context');
-		$ids = $this->getInput('hostids', []);
-
-		if (!$ids) {
-			return true;
-		}
-
-		if ($context === 'host') {
-			return (bool) API::Host()->get(['hostids' => $ids, 'countOutput' => true]);
-		}
-
-		if ($context === 'template') {
-			return (bool) API::Template()->get(['templateids' => $ids, 'countOutput' => true]);
-		}
-
-		return false;
 	}
 
 	public function doAction() {
@@ -674,6 +651,14 @@ class CControllerItemList extends CController {
 			if ($input['filter_value_type'] == -1) {
 				$options['filter']['value_type'] = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
 			}
+		}
+
+		if ($input['filter_state'] != -1) {
+			$options['filter']['status'] = ITEM_STATUS_ACTIVE;
+			$options['filter']['state'] = $input['filter_state'];
+		}
+		elseif ($input['filter_status'] != -1) {
+			$options['filter']['status'] = $input['filter_status'];
 		}
 
 		if ($input['filter_inherited'] != -1) {
