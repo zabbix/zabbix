@@ -419,7 +419,7 @@ static void	force_config_sync(const char *config_hostname)
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROXY_NAME, config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&j);
 
-	task->data = zbx_tm_data_create(taskid, j.buffer, j.buffer_size, ZBX_TM_DATA_TYPE_PROXY_HOSTNAME);
+	task->data = zbx_tm_data_create(taskid, j.buffer, j.buffer_size, ZBX_TM_DATA_TYPE_PROXYNAME);
 
 	zbx_tm_save_task(task);
 
