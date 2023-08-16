@@ -612,7 +612,7 @@ class CControllerItemList extends CControllerItem {
 		}
 
 		if ($input['filter_value_type'] != -1) {
-			$options['search']['value_type'] = $input['filter_value_type'];
+			$options['filter']['value_type'] = $input['filter_value_type'];
 		}
 
 		if ($input['filter_snmp_oid'] !== '') {
