@@ -248,11 +248,13 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByProxy() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_1 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
@@ -262,7 +264,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Proxies');
 		$this->zbxTestClickLinkTextWait('Proxy_1 for filter');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestWaitForPageToLoad();
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}

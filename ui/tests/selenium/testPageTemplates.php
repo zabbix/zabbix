@@ -418,7 +418,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$template = 'Template for web scenario testing';
 		$hosts = ['Simple form test host'];
 
-		$this->page->login()->open('templates.php?page=3');
+		$this->page->login()->open('templates.php?page=4');
 		// Click on Hosts link in Template row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();
