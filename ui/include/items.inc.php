@@ -1535,32 +1535,31 @@ function isBinaryUnits(string $units): bool {
 
 /**
  * Retrieves from DB historical data for items and applies functional calculations.
- * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
+ * If fails for some reason, returns null.
  *
  * @param array		$item
- * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
  * @param string	$item['itemid']		ID of item
- * @param string	$item['units']		units of item
+ * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
  * @param string	$function			function to apply to time period from param, allowed: min, max and avg
  * @param string	$parameter			formatted parameter for function, example: "2w" meaning 2 weeks
  *
- * @return string item functional value from history
+ * @return string|null item functional value from history
  */
 function getItemFunctionalValue($item, $function, $parameter) {
 	// Check whether function is allowed and parameter is specified.
 	if (!in_array($function, ['min', 'max', 'avg']) || $parameter === '') {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	// Check whether item type is allowed for min, max and avg functions.
 	if ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 	if ($number_parser->parse($parameter) != CParser::PARSE_SUCCESS) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	$parameter = $number_parser->calcValue();
@@ -1568,17 +1567,10 @@ function getItemFunctionalValue($item, $function, $parameter) {
 	$time_from = time() - $parameter;
 
 	if ($time_from < 0 || $time_from > ZBX_MAX_DATE) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
-	$result = Manager::History()->getAggregatedValue($item, $function, $time_from);
-
-	if ($result !== null) {
-		return convertUnits(['value' => $result, 'units' => $item['units']]);
-	}
-	else {
-		return UNRESOLVED_MACRO_STRING;
-	}
+	return Manager::History()->getAggregatedValue($item, $function, $time_from);
 }
 
 /**

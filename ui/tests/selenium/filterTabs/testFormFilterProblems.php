@@ -172,8 +172,7 @@ class testFormFilterProblems extends testFormFilter {
 					],
 					'filter' => [
 						'Show number of records' => true
-					],
-					'tab_id' => '1'
+					]
 				]
 			],
 			[
@@ -184,8 +183,7 @@ class testFormFilterProblems extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'simple_name'
-					],
-					'tab_id' => '2'
+					]
 				]
 			],
 			// Dataprovider with symbols instead of name.
@@ -198,8 +196,7 @@ class testFormFilterProblems extends testFormFilter {
 					'filter' => [
 						'Name' => '*;%№:?(',
 						'Show number of records' => true
-					],
-					'tab_id' => '3'
+					]
 				]
 			],
 			// Dataprovider with name as cyrillic.
@@ -211,8 +208,7 @@ class testFormFilterProblems extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'кириллица'
-					],
-					'tab_id' => '4'
+					]
 				]
 			],
 			// Two dataproviders with same name and options.
@@ -221,8 +217,7 @@ class testFormFilterProblems extends testFormFilter {
 					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
-					],
-					'tab_id' => '5'
+					]
 				]
 			],
 			[
@@ -231,7 +226,8 @@ class testFormFilterProblems extends testFormFilter {
 					'filter' => [
 						'Name' => 'duplicated_name'
 					],
-					'tab_id' => '6'
+					// Should be added previous 5 filter tabs from data provider.
+					'tab' => '6'
 				]
 			]
 		];
@@ -301,9 +297,8 @@ class testFormFilterProblems extends testFormFilter {
 	 */
 	public function testFormFilterProblems_TimePeriod($data) {
 		$this->createFilter($data, 'Admin', 'zabbix');
-		$filter_container = $this->query('xpath://ul[@class="ui-sortable-container ui-sortable"]')->asFilterTab()->one();
-		$formid = $this->query('xpath://a[text()="'.$data['filter']['Name'].'"]/parent::li')->waitUntilVisible()->one()->getAttribute('data-target');
-		$form = $this->query('id:'.$formid)->asForm()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
+		$form = $filter->getForm();
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Checking result amount before changing time period.
@@ -311,7 +306,7 @@ class testFormFilterProblems extends testFormFilter {
 
 		if ($data['filter']['Name'] === 'Timeselect_1') {
 			// Enable Set custom time period option.
-			$filter_container->editProperties();
+			$filter->editProperties();
 			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 			$dialog->fill(['Set custom time period' => true, 'From' => 'now-2y']);
 			$dialog->submit();
@@ -322,11 +317,12 @@ class testFormFilterProblems extends testFormFilter {
 		else {
 			// Changing time period from timeselector tab.
 			$form->fill(['Show' => 'History']);
-			$this->query('xpath://a[@class="tabfilter-item-link btn-time"]')->one()->click();
+			$filter->setContext(CFilterElement::CONTEXT_RIGHT);
+			$filter->selectTab('Last 1 hour');
 			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
-			$this->query('id:apply')->one()->click();
-			$filter_container->selectTab($data['filter']['Name']);
-			$this->query('button:Update')->one()->click();
+			$filter->query('id:apply')->one()->click();
+			$filter->setContext(CFilterElement::CONTEXT_LEFT)->selectTab($data['filter']['Name']);
+			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$table->waitUntilReloaded();
 		}
