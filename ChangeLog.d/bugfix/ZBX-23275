@@ -1,0 +1,1 @@
+A......... [ZBX-23275] prevented the apprearance of undefined index error when unlinking a template containing an item with value map (vmaksimovs)
