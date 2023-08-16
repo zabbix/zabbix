@@ -54,6 +54,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardGaugeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidgetSelectedHosts.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
@@ -101,6 +102,8 @@ require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormHostGroupStandalo
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroup.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupSearchPage.php';
 require_once dirname(__FILE__).'/hostAndTemplateGroups/testFormTemplateGroupStandalone.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageHostGroups.php';
+require_once dirname(__FILE__).'/hostAndTemplateGroups/testPageTemplateGroups.php';
 
 // Hosts.
 require_once dirname(__FILE__).'/hosts/testFormHostFromConfiguration.php';
@@ -224,8 +227,13 @@ require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
-require_once dirname(__FILE__).'/testExecuteNow.php';
+// Web scenarios.
+require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
+require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
+
+require_once dirname(__FILE__).'/testExecuteNow.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
@@ -275,11 +283,8 @@ require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWeb.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWebStep.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
@@ -334,6 +339,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
+		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPages');
@@ -381,6 +387,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTemplateGroup');
 		$suite->addTestSuite('testFormTemplateGroupSearchPage');
 		$suite->addTestSuite('testFormTemplateGroupStandalone');
+		$suite->addTestSuite('testPageHostGroups');
+		$suite->addTestSuite('testPageTemplateGroups');
 
 		// Hosts.
 		$suite->addTestSuite('testFormHostFromConfiguration');
@@ -549,8 +557,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
-		$suite->addTestSuite('testFormWeb');
-		$suite->addTestSuite('testFormWebStep');
+		$suite->addTestSuite('testFormWebScenario');
+		$suite->addTestSuite('testFormWebScenarioStep');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceWeb');
