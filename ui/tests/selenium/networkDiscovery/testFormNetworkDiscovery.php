@@ -1271,8 +1271,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			}
 
 			// Check saved fields in form.
-			$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
-					$data['fields']['Name'])->query('tag:a')->waitUntilClickable()->one()->click();
+			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
@@ -1295,6 +1294,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					foreach ($data['Checks'] as &$check) {
 						$check = array_map('trim', $check);
 					}
+					unset($check);
 				}
 
 				// Compare Discovery rule's Checks form.
