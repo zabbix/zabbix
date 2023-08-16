@@ -111,7 +111,7 @@ class WidgetForm extends CWidgetForm {
 						break;
 
 					case CWidgetFieldColumnsList::DATA_TEXT:
-						$this->field_column_values[$key] = $value['name'] === '' ? $value['name'] : $value['text'];
+						$this->field_column_values[$key] = $value['name'] === '' ? $value['text'] : $value['name'];
 						break;
 				}
 			}
