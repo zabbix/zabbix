@@ -1197,10 +1197,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->addClass('js-update-item')
-											->setAttribute('data-itemid', $function['itemid'])
-											->setAttribute('data-parent_discoveryid', $function['parent_itemid'])
-											->setAttribute('context', $options['context'])
+											->onClick('view.openItemForm(this, '.json_encode([
+												'context' => $options['context'],
+												'itemid' => $function['itemid'],
+												'parent_discoveryid' => $function['parent_itemid']
+											]).')')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
@@ -1209,9 +1210,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->addClass('js-update-item')
-											->setAttribute('data-itemid', $function['itemid'])
-											->setAttribute('data-context', $options['context'])
+											->onClick('view.openItemForm(this, '.json_encode([
+												'context' => $options['context'],
+												'itemid' => $function['itemid']
+											]).')')
 										: (new CSpan('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style);
 								}
