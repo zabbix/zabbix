@@ -28,6 +28,8 @@ typedef struct
 {
 	const zbx_thread_info_t	*info;
 	int			state;
+	int			clear_cache;
+	int			process_num;
 	unsigned char		poller_type;
 	int			processed;
 	int			queued;
