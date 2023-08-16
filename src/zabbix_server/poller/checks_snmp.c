@@ -3086,9 +3086,10 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
 
-		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, item->interface.addr,  item->interface.port,
-			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname, item->snmpv3_securitylevel,
-			item->snmpv3_authprotocol, item->snmpv3_authpassphrase, item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
+		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
+			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
+			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
 			config_timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
@@ -3147,9 +3148,10 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
 
-		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, item->interface.addr,  item->interface.port,
-			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname, item->snmpv3_securitylevel,
-			item->snmpv3_authprotocol, item->snmpv3_authpassphrase, item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
+		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
+			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
+			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
 			config_timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
@@ -3170,9 +3172,10 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
 
-		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, item->interface.addr,  item->interface.port,
-			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname, item->snmpv3_securitylevel,
-			item->snmpv3_authprotocol, item->snmpv3_authpassphrase, item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
+		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
+			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
+			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
 			config_timeout, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
