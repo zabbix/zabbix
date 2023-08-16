@@ -131,6 +131,7 @@ if ($item['itemid']) {
 		'class' => ZBX_STYLE_BTN_ALT,
 		'keepOpen' => true,
 		'isSubmit' => false,
+		'enabled' => !$item['templateid'],
 		'action' => 'item_edit_form.delete();'
 	];
 }
