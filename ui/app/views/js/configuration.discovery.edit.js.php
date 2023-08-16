@@ -199,8 +199,6 @@ window.drule_edit_popup = new class {
 		if (row !== null) {
 			row.insertAdjacentHTML('afterend', template.evaluate(input));
 			this._addInputFields(input);
-
-
 		}
 		else {
 			document
@@ -210,11 +208,7 @@ window.drule_edit_popup = new class {
 			this._addInputFields(input);
 		}
 
-		let available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
-
-		if (available_device_types.includes(parseInt(input.type))) {
-			this._addRadioButtonRows(input, update, row);
-		}
+		this._updateRadioButtonRows(input, update, row);
 	}
 
 	_addInputFields(input) {
@@ -231,30 +225,47 @@ window.drule_edit_popup = new class {
 		}
 	}
 
-	_addRadioButtonRows(input, update, row = null) {
-		if (update === false) {
-			const templates = {
-				unique_template: ['#unique-row-tmpl', '#device-uniqueness-list'],
-				host_template: ['#host-source-row-tmpl', '#host_source'],
-				name_template: ['#name-source-row-tmpl', '#name_source']
-			};
+	_updateRadioButtonRows(input, update, row = null) {
+		const templates = {
+			unique_template: ['#unique-row-tmpl', '#device-uniqueness-list', 'uniqueness_criteria_', 'ip'],
+			host_template: ['#host-source-row-tmpl', '#host_source', 'host_source_', 'chk_dns'],
+			name_template: ['#name-source-row-tmpl', '#name_source', 'name_source_', 'chk_host']
+		};
 
-			for (const [template, element] of Object.values(templates)) {
-				const template_html = document.querySelector(template).innerHTML;
+		const available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+		const need_to_add_row = available_device_types.includes(parseInt(input.type));
 
-				document.querySelector(element)
-					.insertAdjacentHTML('beforeend', new Template(template_html).evaluate(input));
+		for (const [template, list, key, def] of Object.values(templates)) {
+			if (need_to_add_row) {
+				if (update === false) {
+					const template_html = document.querySelector(template).innerHTML;
+
+					document.querySelector(list)
+						.insertAdjacentHTML('beforeend', new Template(template_html).evaluate(input));
+				}
+				else {
+					const template_html = document.querySelector(template).innerHTML;
+					const li = document.querySelector(`${list} input[value$="${input.dcheckid}"]`)?.closest('li');
+
+					if (li) {
+						li.outerHTML = new Template(template_html).evaluate(input);
+					}
+					else {
+						document.querySelector(list).insertAdjacentHTML('beforeend', new Template(template_html).evaluate(input));
+					}
+				}
 			}
-		}
-		else {
-			document.querySelector(`#device-uniqueness-list input[value="${input.dcheckid}"]`).closest('li')
-				.outerHTML = new Template(document.querySelector('#unique-row-tmpl').innerHTML).evaluate(input);
+			else {
+				const input_el = document.querySelector(`${list} input[value$="${input.dcheckid}"]`);
 
-			document.querySelector(`#host_source input[value="_${input.dcheckid}"]`).closest('li')
-				.outerHTML = new Template(document.querySelector('#host-source-row-tmpl').innerHTML).evaluate(input);
+				if (input_el) {
+					if (input_el.checked) {
+						document.querySelector(`#${key}${def}`).checked = true;
+					}
 
-			document.querySelector(`#name_source input[value="_${input.dcheckid}"]`).closest('li')
-				.outerHTML = new Template(document.querySelector('#name-source-row-tmpl').innerHTML).evaluate(input);
+					input_el.closest('li')?.remove();
+				}
+			}
 		}
 
 		if (update === false) {
