@@ -30,19 +30,27 @@
 		checkbox_hash: null,
 		token: null,
 
-		init({checkbox_hash, checkbox_object, token}) {
+		init({checkbox_hash, checkbox_object, context, token}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
+			this.context = context;
 			this.token = token;
 
-			// Disable the status filter when using the state filter.
-			$('#filter_state')
-				.on('change', () => {
-					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
-				})
-				.trigger('change');
+			this.initEvents();
+		},
 
-			document.querySelector('.js-massexecute-item').addEventListener('click', e => this.executeNow(e.target));
+		initEvents() {
+			if (this.context === 'host') {
+				document.getElementById('filter_state').addEventListener('change', e => this.updateFieldsVisibility());
+				document.querySelector('.js-massexecute-item')
+					.addEventListener('click', e => this.executeNow(e.target));
+			}
+		},
+
+		updateFieldsVisibility() {
+			const disabled = document.querySelector('[name="filter_state"]:checked').value != -1;
+
+			document.querySelectorAll('[name="filter_status"]').forEach(radio => radio.disabled = disabled);
 		},
 
 		editHost(e, hostid) {

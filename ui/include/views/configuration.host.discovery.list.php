@@ -172,6 +172,7 @@ $filter_column3->addRow(_('Status'),
 		->addValue(_('all'), -1)
 		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 		->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
+		->setEnabled($data['context'] !== 'host' || $data['filter']['state'] == -1)
 		->setModern(true)
 );
 
@@ -385,6 +386,7 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'context' => $data['context'],
 		'checkbox_hash' => $data['checkbox_hash'],
 		'checkbox_object' => 'g_hostdruleid',
 		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')]
