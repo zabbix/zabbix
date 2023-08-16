@@ -1048,7 +1048,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'Macros',
 						'Item' => self::GAUGE_ITEM,
-						'id:description' => '{HOST.CONN} {ITEM.ID}',
+						'id:description' => '{HOST.CONN} {ITEM.KEY}',
 						'id:desc_size' => 5
 					]
 				]
