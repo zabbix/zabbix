@@ -33,13 +33,13 @@ $formgrid = (new CFormGrid())
 	)
 	->addItem($data['discovered'] ? [
 		new CLabel(_('Discovered by')),
-		new CFormField(
-			new CLink($data['discovery_rule']['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'item.prototype.edit')
-				->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-				->setArgument('itemid', $data['discovery_itemid'])
-				->setArgument('context', $data['form']['context'])
-		))
+		(new CFormField(
+			(new CLink($data['discovery_rule']['name']))
+				->setAttribute('data-action', 'item.prototype.edit')
+				->setAttribute('data-parent_discoveryid', $data['discovery_rule']['itemid'])
+				->setAttribute('data-itemid', $data['discovery_itemid'])
+				->setAttribute('data-context', $data['form']['context'])
+		))->addClass('js-parent-items')
 	] : null)
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),

@@ -210,8 +210,7 @@ window.item_edit_form = new class {
 
 				if (!this.#isFormModified()
 						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
-					const data = new URLSearchParams(target.getAttribute('href').replace(/^.*\?/g, ''));
-					this.#openRelatedItem(Object.fromEntries(data));
+					this.#openRelatedItem(target.dataset);
 				}
 			}
 		});

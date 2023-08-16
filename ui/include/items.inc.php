@@ -558,7 +558,8 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 				->setArgument('context', 'template');
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url = (new CUrl('disc_prototypes.php'))
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.prototype.list')
 				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 				->setArgument('context', 'template');
 		}
@@ -603,24 +604,23 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->setArgument('context', 'template');
+				$name = new CLink($template['name'], $url);
 			}
 			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('disc_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.prototype.edit')
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setAttribute('data-context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl())
-					->setArgument('action', 'item.edit')
-					->setArgument('hostid', $parent_templates['links'][$itemid]['hostid'])
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.edit')
+					->setAttribute('data-hostid', $parent_templates['links'][$itemid]['hostid'])
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-context', 'template');
 			}
-
-			$name = new CLink($template['name'], $url);
 		}
 		else {
 			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
