@@ -904,7 +904,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Default theme' => 'High-contrast dark'
 					],
-					'link' => 'zabbix.php?action=template.list&filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'color' => 'rgba(224, 224, 224, 1)'
 				]
 			],
@@ -913,7 +913,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Default theme' => 'High-contrast light'
 					],
-					'link' => 'zabbix.php?action=template.list&filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'color' => 'rgba(85, 85, 85, 1)'
 				]
 			],
@@ -922,7 +922,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Default theme' => 'Dark'
 					],
-					'link' => 'zabbix.php?action=template.list&filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'color' => 'rgba(105, 128, 141, 1)'
 				]
 			],
@@ -931,7 +931,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Limit for search and filter results' => '2'
 					],
-					'link' => 'zabbix.php?action=template.list&filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'row_count' => 2
 				]
 			],
