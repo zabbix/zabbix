@@ -84,7 +84,6 @@ class testFormValueMappings extends CWebTest {
 
 		// Check value mapping configuration form layout.
 		$this->query('name:valuemap_add')->one()->click();
-		//$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals('Value mapping', $dialog->getTitle());
 		$mapping_form = $dialog->getContent()->asForm();
@@ -141,20 +140,9 @@ class testFormValueMappings extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD);
 
-		// Get the id of the created host/template clone.
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Clone Valuemap Test'));
+		$this->page->open('zabbix.php?action='.$source.'.list&filter_name=Clone Valuemap Test&filter_set=1')->waitUntilReady();
 
-		// Get name of host or template for the filter and link.
-		$name = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid='.zbx_dbstr($hostid));
-
-		if ($source === 'host') {
-			$this->page->open('zabbix.php?action=host.list&filter_name='.$name.'&filter_set=1');
-		}
-		else {
-			$this->page->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-		}
-
-		$this->query('link', $name)->one()->click();
+		$this->query('link', 'Clone Valuemap Test')->one()->click();
 		COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Value mapping');
 		$this->assertTableData(self::EXISTING_VALUEMAPS, 'id:valuemap-formlist');
 		COverlayDialogElement::find()->one()->close();
@@ -869,6 +857,7 @@ class testFormValueMappings extends CWebTest {
 		}
 		else {
 			// Save the configuration of the host with created/updated value mappings.
+			$dialog->waitUntilNotVisible();
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->assertMessage(TEST_GOOD, ucfirst($source).' updated');
 
@@ -942,13 +931,7 @@ class testFormValueMappings extends CWebTest {
 		// Get name of host or template for the filter and link.
 		$name = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid='.zbx_dbstr($sourceid));
 
-		if ($source === 'host') {
-			$this->page->open('zabbix.php?action=host.list&filter_name='.$name.'&filter_set=1');
-		}
-		else {
-			$this->page->open('zabbix.php?action=template.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-		}
-
+		$this->page->open('zabbix.php?action='.$source.'.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
 		$this->query('link', $name)->one()->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
@@ -1077,15 +1060,9 @@ class testFormValueMappings extends CWebTest {
 			]
 		];
 
-		// Create a new host/template, populate the hosthroup but leave the name empty.
-		if ($source === 'host') {
-			$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-			$this->query('button:Create host')->one()->click();
-		}
-		else {
-			$this->page->login()->open('zabbix.php?action=template.list')->waitUntilReady();
-			$this->query('button:Create template')->one()->click();
-		}
+		// Create a new host/template, populate the hosthgroup but leave the name empty.
+		$this->page->login()->open('zabbix.php?action='.$source.'.list')->waitUntilReady();
+		$this->query('button:Create '.$source)->one()->click();
 
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		$form->getField(ucfirst($source).' groups')->fill(($source === 'host') ? 'Discovered hosts' : 'Templates');
