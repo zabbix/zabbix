@@ -289,8 +289,17 @@ $form_grid->addItem([
 
 	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
 		? null
-		: (new CFormField((new CCheckBox('not_supported'))->setLabel(_('Not supported'))))
-			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
+		: (new CFormField([
+			(new CCheckBox('not_supported'))->setLabel(_('Not supported')),
+			(new CFormFieldset(null, [
+				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
+				(new CMultilineInput('runtime_error', '', ['readonly' => false]))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->addStyle('display: inline-flex;')
+			]))
+		]))
+			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; display: flex; justify-content: space-between;'),
 
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(

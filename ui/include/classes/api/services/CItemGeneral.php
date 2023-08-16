@@ -56,7 +56,8 @@ abstract class CItemGeneral extends CApiService {
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
 		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
 		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_SNMP_WALK_VALUE,
+		ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
 
 	/**
@@ -267,6 +268,85 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
+			if (array_key_exists('preprocessing', $item)) {
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'preprocessing' => [
+						'type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['type', 'params']],
+						'fields' => [
+							'type' =>	['type' => API_ANY],
+							'params' =>	['type' => API_ANY]
+						]
+					]
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $item, '/'.($i + 1).'/preprocessing', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, str_replace("\n", '\n', $error));
+				}
+
+				foreach ($item['preprocessing'] as &$step) {
+					if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+						$params = [];
+
+						foreach (explode("\n", $step['params']) as $i => $param) {
+							$params[$i + 1] = $param;
+						}
+
+						$params[1] = $params[1] === '' ? ZBX_PREPROC_MATCH_ERROR_ANY : (int) $params[1];
+						$step['params'] = $params;
+					}
+				}
+				unset($step);
+
+				$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+					'type' =>					['type' => API_ANY],
+					'params' =>					[],
+					'error_handler' =>			['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'type', 'in' => implode(',', array_diff(static::PREPROC_TYPES_WITH_ERR_HANDLING, [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]))], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DEFAULT, ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
+													['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_FAIL_DISCARD_VALUE, ZBX_PREPROC_FAIL_SET_VALUE, ZBX_PREPROC_FAIL_SET_ERROR])],
+													['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('item_preproc', 'error_handler')]
+					]],
+					'error_handler_params' =>	['type' => API_MULTIPLE, 'rules' => [
+													['if' => static function (array $data): bool {
+														return array_key_exists('error_handler', $data) && $data['error_handler'] == ZBX_PREPROC_FAIL_SET_VALUE;
+													},  'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
+													['if' => static function (array $data): bool {
+														return array_key_exists('error_handler', $data) && $data['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR;
+													},  'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('item_preproc', 'error_handler_params')],
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('item_preproc', 'error_handler_params')]
+					]]
+				]];
+
+				$api_input_rules['fields']['params'] = $item['type'] == ITEM_TYPE_SSH
+					? ['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_OBJECT, 'fields' => [
+														'1' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])],
+														'2' =>	['type' => API_MULTIPLE, 'rules' => [
+																	['if' => ['field' => '1', 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ? API_ALLOW_LLD_MACRO : 0)],
+																	['else' => true, 'type' => API_STRING_UTF8, 'in' => '']
+														]]
+													]],
+													['else' => true, 'type' => API_ANY]
+					]]
+					: ['type' => API_MULTIPLE, 'rules' => [
+														['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_OBJECT, 'fields' => [
+															'1' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_ANY])],
+															'2' =>	['type' => API_STRING_UTF8, 'in' => '']
+														]],
+														['else' => true, 'type' => API_ANY]
+					]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $item['preprocessing'], '/'.($i + 1).'/preprocessing', $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, str_replace("\n", '\n', $error));
+				}
+
+				foreach ($item['preprocessing'] as &$step) {
+					if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+						$step['params'] = implode("\n", $step['params']);
+					}
+				}
+				unset($step);
+			}
+
 			if (array_key_exists('query_fields', $item)) {
 				foreach ($item['query_fields'] as $query_field) {
 					if (count($query_field) != 1 || key($query_field) === '') {
@@ -343,8 +423,7 @@ abstract class CItemGeneral extends CApiService {
 			'uniq_by_values' => [
 				['type' => [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED]],
 				['type' => [ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
-				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]],
-				['type' => [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]]
+				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]]
 			],
 			'fields' => [
 				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
@@ -1517,10 +1596,12 @@ abstract class CItemGeneral extends CApiService {
 				? array_column($db_items[$item['itemid']]['preprocessing'], null, 'step')
 				: [];
 
+			$item['preprocessing'] = self::sortPreprocessingSteps($item['preprocessing']);
+
 			$step = 1;
 
 			foreach ($item['preprocessing'] as &$item_preproc) {
-				$item_preproc['step'] = ($item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++;
+				$item_preproc['step'] = $step++;
 
 				if (array_key_exists($item_preproc['step'], $db_item_preprocs)) {
 					$db_item_preproc = $db_item_preprocs[$item_preproc['step']];
@@ -1586,6 +1667,35 @@ abstract class CItemGeneral extends CApiService {
 			unset($item_preproc);
 		}
 		unset($item);
+	}
+
+	/**
+	 * @param array $steps
+	 *
+	 * @return array
+	 */
+	private static function sortPreprocessingSteps(array $steps): array {
+		usort($steps, static function (array $step_a, array $step_b): int {
+			if ($step_a['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+				if ($step_b['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+					$params_a = explode("\n", $step_a['params']);
+
+					if ($params_a[0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+						return 1;
+					}
+
+					$params_b = explode("\n", $step_b['params']);
+
+					return $params_b[0] == ZBX_PREPROC_MATCH_ERROR_ANY ? -1 : 0;
+				}
+
+				return -1;
+			}
+
+			return $step_b['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 1 : 0;
+		});
+
+		return $steps;
 	}
 
 	/**
@@ -2647,7 +2757,8 @@ abstract class CItemGeneral extends CApiService {
 			'output' => [
 				'item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'
 			],
-			'filter' => ['itemid' => $itemids]
+			'filter' => ['itemid' => $itemids],
+			'sortfield' => ['step']
 		];
 		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
 

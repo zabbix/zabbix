@@ -44,10 +44,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @inheritDoc
 	 */
 	const SUPPORTED_PREPROCESSING_TYPES = [ZBX_PREPROC_REGSUB, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
-		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_TO_JSON,
-		ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
-		ZBX_PREPROC_SNMP_WALK_TO_JSON
+		ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON,
+		ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
+		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_XML_TO_JSON,
+		ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
 
 	/**
@@ -1112,11 +1112,11 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($item);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_', 'flags']);
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid']);
 
 		self::validateUniqueness($items);
 
@@ -1137,6 +1137,7 @@ class CDiscoveryRule extends CItemGeneral {
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>		['type' => API_ANY],
+			'flags' =>				['type' => API_ANY],
 			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
@@ -1161,6 +1162,7 @@ class CDiscoveryRule extends CItemGeneral {
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>		['type' => API_ANY],
+			'flags' =>				['type' => API_ANY],
 			'uuid' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>				['type' => API_ANY],
 			'name' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
