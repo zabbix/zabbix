@@ -57,6 +57,23 @@ class CItemHelper extends CItemGeneralHelper {
 	}
 
 	/**
+	 * Convert form submited data to be ready to send to API for update or create operation.
+	 *
+	 * @param array $input  Array of form input fields.
+	 */
+	public static function convertFormInputForApi(array $input): array {
+		$input = parent::convertFormInputForApi($input);
+
+		if ($input['delay_flex']) {
+			$custom_intervals = $input['delay_flex'];
+			isValidCustomIntervals($custom_intervals);
+			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
+		}
+
+		return $input;
+	}
+
+	/**
 	 * @param array $src_options
 	 * @param array $dst_options
 	 *

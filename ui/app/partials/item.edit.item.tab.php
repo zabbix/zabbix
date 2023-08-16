@@ -163,12 +163,12 @@ $formgrid = (new CFormGrid())
 						))->setColSpan(3)
 					),
 				new CTemplateTag('parameter-row-tmpl', (new CRow([
-						(new CTextBox('parameters[#{rowNum}][name]', '#{name}', $data['readonly'],
+						(new CTextBox('parameters[name][#{rowNum}]', '#{name}', $data['readonly'],
 							DB::getFieldLength('item_parameter', 'name')
 						))
 							->setAttribute('style', 'width: 100%;')
 							->removeId(),
-						(new CTextBox('parameters[#{rowNum}][value]', '#{value}', $data['readonly'],
+						(new CTextBox('parameters[value][#{rowNum}]', '#{value}', $data['readonly'],
 							DB::getFieldLength('item_parameter', 'value')
 						))
 							->setAttribute('style', 'width: 100%;')

@@ -119,8 +119,7 @@ abstract class CControllerItem extends CController {
 		$parameters = $this->getInput('parameters', []);
 
 		if ($ret && $parameters) {
-			$ret = count($parameters) == count(array_column($parameters, 'name'))
-				&& count($parameters) == count(array_column($parameters, 'value'));
+			$ret = array_key_exists('name', $parameters) && array_key_exists('value', $parameters);
 			$field = 'parameters';
 		}
 
@@ -313,93 +312,7 @@ abstract class CControllerItem extends CController {
 	 */
 	protected function getInputForApi(): array {
 		$input = $this->getInputForForm();
-		$field_map = [];
 
-		if ($this->hasInput('key')) {
-			$field_map['key'] = 'key_';
-		}
-
-		if ($this->getInput('history_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-			$input['history'] = ITEM_NO_STORAGE_VALUE;
-		}
-
-		if ($this->getInput('trends_mode', ITEM_STORAGE_CUSTOM) == ITEM_STORAGE_OFF) {
-			$input['trends'] = ITEM_NO_STORAGE_VALUE;
-		}
-
-		if ($this->getInput('type') == ITEM_TYPE_HTTPAGENT) {
-			$field_map['http_authtype'] = 'authtype';
-			$field_map['http_username'] = 'username';
-			$field_map['http_password'] = 'password';
-		}
-
-		if ($input['delay_flex']) {
-			$custom_intervals = $this->getInput('delay_flex', []);
-			isValidCustomIntervals($custom_intervals);
-			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
-		}
-
-		if ($input['query_fields']) {
-			$query_fields = [];
-
-			foreach ($input['query_fields'] as $query_field) {
-				if ($query_field['name'] === '' && $query_field['value'] === '') {
-					continue;
-				}
-
-				$query_fields[] = [$query_field['name'] => $query_field['value']];
-			}
-
-			$input['query_fields'] = $query_fields;
-		}
-
-		if ($input['headers']) {
-			$headers = [];
-
-			foreach ($input['headers'] as $header) {
-				if ($header['name'] === '' && $header['value'] === '') {
-					continue;
-				}
-
-				$headers[$header['name']] = $header['value'];
-			}
-
-			$input['headers'] = $headers;
-		}
-
-		if ($input['preprocessing']) {
-			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
-		}
-
-		if ($input['tags']) {
-			$tags = [];
-
-			foreach ($input['tags'] as $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					continue;
-				}
-
-				$tags[] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
-			}
-
-			$input['tags'] = $tags;
-		}
-
-		$parameters = [];
-
-		foreach ($input['parameters'] as $parameter) {
-			if ($parameter['name'] === '' || $parameter['value'] === '') {
-				continue;
-			}
-
-			$parameters[] = $parameter;
-		}
-
-		$input['parameters'] = $parameters;
-
-		return CArrayHelper::renameKeys($input, $field_map);
+		return CItemHelper::convertFormInputForApi($input);
 	}
 }

@@ -124,6 +124,92 @@ class CItemGeneralHelper {
 	}
 
 	/**
+	 * Convert form submited data to be ready to send to API for update or create operation.
+	 *
+	 * @param array $input  Array of form input fields.
+	 */
+	public static function convertFormInputForApi(array $input): array {
+		$field_map = ['key' => 'key_'];
+
+		if ($input['history_mode'] == ITEM_STORAGE_OFF) {
+			$input['history'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($input['trends_mode'] == ITEM_STORAGE_OFF) {
+			$input['trends'] = ITEM_NO_STORAGE_VALUE;
+		}
+
+		if ($input['type'] == ITEM_TYPE_HTTPAGENT) {
+			$field_map['http_authtype'] = 'authtype';
+			$field_map['http_username'] = 'username';
+			$field_map['http_password'] = 'password';
+		}
+
+		if ($input['query_fields']) {
+			$query_fields = [];
+
+			foreach ($input['query_fields'] as $query_field) {
+				if ($query_field['name'] === '' && $query_field['value'] === '') {
+					continue;
+				}
+
+				$query_fields[] = [$query_field['name'] => $query_field['value']];
+			}
+
+			$input['query_fields'] = $query_fields;
+		}
+
+		if ($input['headers']) {
+			$headers = [];
+
+			foreach ($input['headers'] as $header) {
+				if ($header['name'] === '' && $header['value'] === '') {
+					continue;
+				}
+
+				$headers[$header['name']] = $header['value'];
+			}
+
+			$input['headers'] = $headers;
+		}
+
+		if ($input['preprocessing']) {
+			$input['preprocessing'] = normalizeItemPreprocessingSteps($input['preprocessing']);
+		}
+
+		if ($input['tags']) {
+			$tags = [];
+
+			foreach ($input['tags'] as $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				$tags[] = [
+					'tag' => $tag['tag'],
+					'value' => $tag['value']
+				];
+			}
+
+			$input['tags'] = $tags;
+		}
+
+		$parameters = [];
+
+		foreach ($input['parameters']['name'] as $i => $name) {
+			if ($name === '' || $input['parameters']['value'][$i] === '') {
+				continue;
+			}
+
+			$parameters[] = ['name' => $name, 'value' => $input['parameters']['value'][$i]];
+		}
+
+		$input['parameters'] = $parameters;
+
+		return CArrayHelper::renameKeys($input, $field_map);
+	}
+
+	/**
 	 * @param array  $src_items
 	 * @param array  $dst_items
 	 *
