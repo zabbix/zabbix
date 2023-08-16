@@ -237,6 +237,7 @@ class testFormTemplate extends CLegacyWebTest {
 
 		$this->clickModalFooterButton('Clone');
 		$this->zbxTestInputTypeOverwrite('template_name', $cloned_template_name);
+		$this->query('xpath://h4["New template"]')->waitUntilVisible();
 		$this->clickModalFooterButton('Add');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good','Template added');
 		$this->assertEquals(1, CDBHelper::getCount("SELECT hostid FROM hosts WHERE host='".$cloned_template_name."'"));
