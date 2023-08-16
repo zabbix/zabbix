@@ -20,7 +20,7 @@
 package ceph
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -32,15 +32,19 @@ var fixtures map[command][]byte
 const cmdBroken command = "broken"
 
 func TestMain(m *testing.M) {
-	var err error
-
 	fixtures = make(map[command][]byte)
 
 	for _, cmd := range []command{
 		cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth, cmdStatus,
 	} {
-		fixtures[cmd], err = ioutil.ReadFile("testdata/" +
-			strings.ReplaceAll(string(cmd), " ", "_") + ".json")
+		f, err := os.Open(
+			"testdata/" + strings.ReplaceAll(string(cmd), " ", "_") + ".json",
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fixtures[cmd], err = io.ReadAll(f)
 		if err != nil {
 			log.Fatal(err)
 		}
