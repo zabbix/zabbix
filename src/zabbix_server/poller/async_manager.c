@@ -41,8 +41,8 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 
 	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
 
- 	manager->workers_num = workers_num;
- 	manager->workers = (zbx_async_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_async_worker_t));
+	manager->workers_num = workers_num;
+	manager->workers = (zbx_async_worker_t *)zbx_calloc(NULL, (size_t)workers_num, sizeof(zbx_async_worker_t));
 
 	for (i = 0; i < workers_num; i++)
 	{
@@ -55,12 +55,12 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 		async_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
 	}
 
- 	/* wait for threads to start */
- 	time_start = time(NULL);
+	/* wait for threads to start */
+	time_start = time(NULL);
 
- #define PP_STARTUP_TIMEOUT	10
+#define PP_STARTUP_TIMEOUT	10
 
- 	while (started_num != workers_num)
+	while (started_num != workers_num)
 	{
 		if (time_start + PP_STARTUP_TIMEOUT < time(NULL))
 		{
@@ -78,7 +78,7 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 #undef PP_STARTUP_TIMEOUT
 
 	ret = SUCCEED;
- out:
+out:
 	if (FAIL == ret)
 	{
 		for (i = 0; i < manager->workers_num; i++)
