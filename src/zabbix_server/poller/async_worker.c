@@ -101,7 +101,6 @@ static void	poller_update_interfaces(zbx_vector_interface_status_t *interfaces,
 
 	}
 
-	
 	zbx_vector_interface_status_clear(interfaces); //!! pointer free
 
 	if (NULL != data)
