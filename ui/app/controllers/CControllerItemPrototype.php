@@ -293,6 +293,7 @@ abstract class CControllerItemPrototype extends CController {
 				];
 			}
 
+			CArrayHelper::sort($preprocessings, ['sortorder']);
 			$input['preprocessing'] = $preprocessings;
 		}
 
