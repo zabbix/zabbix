@@ -1662,10 +1662,10 @@ class CDashboard {
 	}
 
 	_warnDashboardExhausted() {
-		this._warn(sprintf(
-			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),
-			this._max_dashboard_pages
-		));
+		this._warn(
+			t('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.')
+				.replace('%1$d', this._max_dashboard_pages)
+		);
 	}
 
 	_warnDashboardPageExhausted() {
@@ -1726,7 +1726,7 @@ class CDashboard {
 
 			data.index = max_index + 1;
 
-			const name = sprintf(t('Page %1$d'), data.index);
+			const name = t('Page %1$d').replace('%1$d', data.index);
 
 			tab_contents_name.textContent = name;
 			tab_contents_name.title = name;
@@ -1779,7 +1779,7 @@ class CDashboard {
 
 			data.index = is_tab_index_available ? tab_index : max_index + 1;
 
-			const name = sprintf(t('Page %1$d'), data.index);
+			const name = t('Page %1$d').replace('%1$d', data.index);
 
 			tab_contents_name.textContent = name;
 			tab_contents_name.title = name;

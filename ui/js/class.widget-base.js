@@ -81,6 +81,8 @@ class CWidgetBase {
 
 	#fields_referred_data_subscriptions = [];
 
+	#feedback_cache = new Map();
+
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
 	 *
@@ -373,14 +375,14 @@ class CWidgetBase {
 	 * @param {Object} data  Object containing key-value pairs, like { _hostid: "123", _itemid: "789" }.
 	 */
 	broadcast(data) {
-		const declared_types = new Set();
+		const declared_out_types = new Set();
 
 		for (const {type} of this._defaults.out) {
-			declared_types.add(type);
+			declared_out_types.add(type);
 		}
 
 		for (const type of Object.keys(data)) {
-			if (!declared_types.has(type)) {
+			if (!declared_out_types.has(type)) {
 				throw new Error('Cannot broadcast data of undeclared type.');
 			}
 		}
@@ -390,12 +392,17 @@ class CWidgetBase {
 				data: value,
 				descriptor: {
 					context: 'dashboard',
+					sender_unique_id: this._unique_id,
 					sender_type: 'widget',
 					widget_type: this._type,
+					event_type: 'broadcast',
+					event_origin: this._unique_id,
 					reference: this._fields.reference,
 					type
 				}
 			});
+
+			this.#feedback_cache.set(type, value);
 		}
 	}
 
@@ -406,16 +413,82 @@ class CWidgetBase {
 		for (const {type} of this._defaults.out) {
 			const descriptor = {
 				context: 'dashboard',
+				sender_unique_id: this._unique_id,
 				sender_type: 'widget',
 				widget_type: this._type,
+				event_type: 'broadcast',
+				event_origin: this._unique_id,
 				reference: this._fields.reference,
 				type
 			};
 
-			if (!ZABBIX.EventHub.isDataAvailable(descriptor)) {
+			if (ZABBIX.EventHub.getData(descriptor) === undefined) {
 				ZABBIX.EventHub.publish({data: null, descriptor});
+
+				this.#feedback_cache.set(type, null);
 			}
 		}
+	}
+
+	/**
+	 * Send feedback data to the referred data sources.
+	 *
+	 * @param {Object}   data
+	 *        {Object[]} data[field]             Feedback data for the specified field.
+	 *        {Array}    data[field][]['path']   Field reference path as specified for setFieldsReferences.
+	 *        {*}        data[field][]['value']  Feedback value for the specified field and reference path.
+	 */
+	feedback(data) {
+		const fields_references_accessors_by_path = {};
+
+		for (const accessor of this.#getFieldsReferencesAccessors()) {
+			const path_hash = JSON.stringify(accessor.path);
+
+			if (!(accessor.field in fields_references_accessors_by_path)) {
+				fields_references_accessors_by_path[accessor.field] = {};
+			}
+
+			fields_references_accessors_by_path[accessor.field][path_hash] = accessor;
+		}
+
+		for (const [field, field_data] of Object.entries(data)) {
+			if (!(field in fields_references_accessors_by_path)) {
+				throw new Error('Cannot send feedback: widget field does not exist.');
+			}
+
+			for (const {path, value} of field_data) {
+				const path_hash = JSON.stringify(path);
+
+				if (!(path_hash in fields_references_accessors_by_path[field])) {
+					throw new Error('Cannot send feedback: referred data path does not exist.');
+				}
+
+				const field_reference_accessor = fields_references_accessors_by_path[field][path_hash];
+
+				if (field_reference_accessor.getReference() !== '') {
+					ZABBIX.EventHub.publish({
+						data: value,
+						descriptor: {
+							context: 'dashboard',
+							sender_unique_id: this._unique_id,
+							sender_type: 'widget',
+							widget_type: this._type,
+							event_type: 'feedback',
+							event_origin: this._unique_id,
+							reference: field_reference_accessor.getReference(),
+							type: field_reference_accessor.type
+						}
+					});
+				}
+			}
+		}
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	onFeedback({type, value, descriptor}) {
+		return false;
 	}
 
 	/**
@@ -435,21 +508,26 @@ class CWidgetBase {
 	#startDataExchange() {
 		for (const accessor of this.#getFieldsReferencesAccessors()) {
 			if (accessor.getReference() === '') {
-				this.#fields_referred_data.set(accessor, null);
+				this.#fields_referred_data.set(accessor, {value: null, descriptor: null});
 
 				continue;
 			}
 
 			this.requireDataSource(accessor.getReference());
 
-			const subscription = ZABBIX.EventHub.subscribe({
+			const broadcast_subscription = ZABBIX.EventHub.subscribe({
 				require: {
 					context: 'dashboard',
+					event_type: 'broadcast',
 					reference: accessor.getReference(),
 					type: accessor.type
 				},
-				callback: ({data}) => {
-					this.#fields_referred_data.set(accessor, data);
+				callback: ({data, descriptor}) => {
+					if (descriptor.event_origin === this._unique_id) {
+						return;
+					}
+
+					this.#fields_referred_data.set(accessor, {value: data, descriptor});
 
 					if (this._state === WIDGET_STATE_ACTIVE) {
 						this._startUpdating();
@@ -457,8 +535,49 @@ class CWidgetBase {
 				}
 			});
 
-			this.#fields_referred_data_subscriptions.push(subscription);
+			this.#fields_referred_data_subscriptions.push(broadcast_subscription);
 		}
+
+		const declared_out_types = new Set();
+
+		for (const {type} of this._defaults.out) {
+			declared_out_types.add(type);
+		}
+
+		const feedback_subscription = ZABBIX.EventHub.subscribe({
+			require: {
+				context: 'dashboard',
+				event_type: 'feedback',
+				reference: this._fields.reference
+			},
+			callback: ({data, descriptor}) => {
+				if (!('type' in descriptor) || !declared_out_types.has(descriptor.type)) {
+					return;
+				}
+
+				if (this.#feedback_cache.get(descriptor.type) !== data) {
+					this.#feedback_cache.set(descriptor.type, data);
+
+					if (this.onFeedback({type: descriptor.type, value: data})) {
+						ZABBIX.EventHub.publish({
+							data,
+							descriptor: {
+								context: 'dashboard',
+								sender_unique_id: this._unique_id,
+								sender_type: 'widget',
+								widget_type: this._type,
+								event_type: 'broadcast',
+								event_origin: descriptor.event_origin,
+								reference: this._fields.reference,
+								type: descriptor.type
+							}
+						});
+					}
+				}
+			}
+		});
+
+		this.#fields_referred_data_subscriptions.push(feedback_subscription);
 	}
 
 	/**
@@ -469,9 +588,7 @@ class CWidgetBase {
 	#stopDataExchange() {
 		ZABBIX.EventHub.invalidateData({
 			context: 'dashboard',
-			sender_type: 'widget',
-			widget_type: this._type,
-			reference: this._fields.reference
+			sender_unique_id: this._unique_id
 		});
 
 		for (const subscription of this.#fields_referred_data_subscriptions) {
@@ -501,7 +618,7 @@ class CWidgetBase {
 	getFieldsReferredData() {
 		const referred_data = {};
 
-		for (const [accessor, value] of this.#fields_referred_data.entries()) {
+		for (const [accessor, {value}] of this.#fields_referred_data.entries()) {
 			if (!(accessor.field in referred_data)) {
 				referred_data[accessor.field] = [];
 			}
@@ -513,6 +630,26 @@ class CWidgetBase {
 		}
 
 		return referred_data;
+	}
+
+	/**
+	 * Get event descriptor of the referred value for the specified field and path.
+	 *
+	 * @param {string} field  Widget configuration data field.
+	 * @param {Array}  path   Field reference path as specified for setFieldsReferences.
+	 *
+	 * @returns {*}
+	 */
+	getFieldReferredValueDescriptor({field, path}) {
+		const path_json = JSON.stringify(path);
+
+		for (const [accessor, {descriptor}] of this.#fields_referred_data.entries()) {
+			if (field === accessor.field && path_json === JSON.stringify(accessor.path)) {
+				return descriptor;
+			}
+		}
+
+		return null;
 	}
 
 	// External events management methods.
@@ -1117,6 +1254,8 @@ class CWidgetBase {
 	/**
 	 * Start updating the widget. Invoked on activation of the widget or when the update is required immediately.
 	 *
+	 * This method implements asynchronous delay, if delay_sec is set to zero.
+	 *
 	 * @param {number} delay_sec  Delay seconds before the update.
 	 */
 	_startUpdating({delay_sec = 0} = {}) {
@@ -1130,10 +1269,10 @@ class CWidgetBase {
 			this._update_interval_id = null;
 		}
 
-		if (delay_sec > 0) {
+		if (delay_sec >= 0) {
 			this._update_timeout_id = setTimeout(() => {
 				this._update_timeout_id = null;
-				this._startUpdating();
+				this._startUpdating({delay_sec: -1});
 			}, delay_sec * 1000);
 
 			return;

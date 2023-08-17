@@ -38,19 +38,19 @@ class CEventHub {
 		const descriptor_hash = JSON.stringify(descriptor);
 
 		this.latest_data.delete(descriptor_hash);
-		this.latest_data.set(descriptor_hash, {descriptor, data});
+		this.latest_data.set(descriptor_hash, {data, descriptor});
 
 		for (const {require, callback} of this.subscribers.values()) {
 			if (CEventHub.#match(require, descriptor)) {
-				callback({descriptor, data});
+				callback({data, descriptor});
 			}
 		}
 	}
 
 	subscribe({require = {}, callback}) {
-		for (const {descriptor, data} of [...this.latest_data.values()].reverse()) {
+		for (const {data, descriptor} of [...this.latest_data.values()].reverse()) {
 			if (CEventHub.#match(require, descriptor)) {
-				callback({descriptor, data});
+				callback({data, descriptor});
 
 				break;
 			}
@@ -67,14 +67,14 @@ class CEventHub {
 		return this.subscribers.delete(subscription);
 	}
 
-	isDataAvailable(require) {
-		for (const {descriptor} of this.latest_data.values()) {
+	getData(require) {
+		for (const {data, descriptor} of [...this.latest_data.values()].reverse()) {
 			if (CEventHub.#match(require, descriptor)) {
-				return true;
+				return data;
 			}
 		}
 
-		return false;
+		return undefined;
 	}
 
 	invalidateData(require) {

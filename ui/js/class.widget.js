@@ -107,6 +107,25 @@ class CWidget extends CWidgetBase {
 	}
 
 	/**
+	 * Feedback event callback.
+	 *
+	 * Invoked when the feedback is received from another widget listening to this one for a particular type of data.
+	 * Invoked only if the feedback value is different from the broadcast one.
+	 *
+	 * Must return true to re-broadcast the feedback value or false to ignore the event.
+	 * Feedbacks-aware widgets must generally re-broadcast the value.
+	 *
+	 * @param {string} type        Out data type, as specified in the manifest.json.
+	 * @param {*}      value       Feedback value.
+	 * @param {Object} descriptor  Feedback descriptor.
+	 *
+	 * @returns {boolean}  Whether to rebroadcast the value automatically.
+	 */
+	onFeedback({type, value, descriptor}) {
+		return false;
+	}
+
+	/**
 	 * Promise to update the widget.
 	 *
 	 * Invoked immediately when a dashboard page is displayed, and periodically later on, until the dashboard page is
