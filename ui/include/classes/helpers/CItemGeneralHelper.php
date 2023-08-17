@@ -267,17 +267,19 @@ class CItemGeneralHelper {
 			$input['tags'] = $tags;
 		}
 
-		$parameters = [];
+		if ($input['parameters']) {
+			$parameters = [];
 
-		foreach ($input['parameters']['name'] as $i => $name) {
-			if ($name === '' || $input['parameters']['value'][$i] === '') {
-				continue;
+			foreach ($input['parameters']['name'] as $i => $name) {
+				if ($name === '' || $input['parameters']['value'][$i] === '') {
+					continue;
+				}
+
+				$parameters[] = ['name' => $name, 'value' => $input['parameters']['value'][$i]];
 			}
 
-			$parameters[] = ['name' => $name, 'value' => $input['parameters']['value'][$i]];
+			$input['parameters'] = $parameters;
 		}
-
-		$input['parameters'] = $parameters;
 
 		return CArrayHelper::renameKeys($input, $field_map);
 	}
