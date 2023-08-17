@@ -63,6 +63,7 @@ class CItemHelper extends CItemGeneralHelper {
 	 */
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
+		$item['discovered'] = $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED ? 1 : 0;
 		$item['delay_flex'] = [];
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,

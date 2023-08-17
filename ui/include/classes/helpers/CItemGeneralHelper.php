@@ -129,7 +129,6 @@ class CItemGeneralHelper {
 	 * @param array $item  Array of API fields data.
 	 */
 	public static function convertApiInputForForm(array $item): array {
-
 		$i = 0;
 		foreach ($item['preprocessing'] as &$step) {
 			$step['params'] = $step['type'] == ZBX_PREPROC_SCRIPT
@@ -145,7 +144,6 @@ class CItemGeneralHelper {
 			'history_mode' => ITEM_STORAGE_CUSTOM,
 			'trends_mode' => ITEM_STORAGE_CUSTOM,
 			'show_inherited_tags' => 0,
-			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED ? 1 : 0,
 			'key' => $item['key_']
 		];
 		unset($item['key_']);
