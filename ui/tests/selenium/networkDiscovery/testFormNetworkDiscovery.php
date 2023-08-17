@@ -37,7 +37,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	const DELETE_RULES = [
 		'success' => 'Discovery rule for successful deleting',
 		'action_used' => 'Discovery rule for deleting, used in Action',
-		'action_check_used' =>  'Discovery rule for deleting, check used in Action'
+		'action_check_used' => 'Discovery rule for deleting, check used in Action'
 	];
 
 	/**
@@ -1846,8 +1846,8 @@ class testFormNetworkDiscovery extends CWebTest {
 	}
 
 	/**
-	 * Function for testing Discovery rule's checks validation when similar,
-	 * but not the same checks are removed and added again, but in opposite order.
+	 * Function for testing Discovery rule's checks validation when similar, but not the same
+	 * checks are removed and added again, but in opposite order. Issue was first discovered in ZBX-22640.
 	 */
 	public function testFormNetworkDiscovery_DuplicateChecksValidation() {
 		$discovery_name = 'Double checks validation';
@@ -2014,7 +2014,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Function for filling Network discovery's checks.
 	 *
-	 * @param CFormElement $data    filled values
+	 * @param array $data           filled values
 	 * @param CFormElement $form    discovery rule's form
 	 */
 	protected function changeDiscoveryChecks($data, $form) {
@@ -2052,7 +2052,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Function that opens every Network discovery check and asserts form's values.
 	 *
-	 * @param CFormElement $data    checked values
+	 * @param array $data           checked values
 	 * @param CFormElement $form    discovery rule's edit form
 	 */
 	protected function compareChecksFormValues($data, $form) {
@@ -2070,7 +2070,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Function for checking Network discovery's radio fields.
 	 *
-	 * @param CFormElement $data    filled values
+	 * @param array $data           filled values
 	 * @param CFormElement $form    discovery rule's edit form
 	 */
 	protected function fillRadioFields($data, $form) {
@@ -2083,7 +2083,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Function for checking Network discovery's radio fields.
 	 *
-	 * @param CFormElement $data    checked values
+	 * @param array $data           checked values
 	 * @param CFormElement $form    discovery rule's edit form
 	 */
 	protected function compareRadioFields($data, $form) {

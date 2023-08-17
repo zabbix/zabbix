@@ -66,7 +66,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Disabled discovery rule for update',
 				'iprange' => '192.168.1.1-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						'type' => SVC_IMAP,
@@ -77,7 +77,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for changing checks',
 				'iprange' => '192.168.1.1-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						// SNMPv1 agent.
@@ -162,7 +162,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for successful deleting',
 				'iprange' => '192.168.1.1-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						'type' => SVC_ICMPPING
@@ -172,7 +172,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for deleting, used in Action',
 				'iprange' => '192.168.2.2-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						'type' => SVC_IMAP,
@@ -183,7 +183,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for deleting, check used in Action',
 				'iprange' => '192.168.2.2-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						'type' => SVC_TELNET,
