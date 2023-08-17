@@ -108,7 +108,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible()->one()->findRow('Name', $name)
 				->getColumn('Name')->query('link', $name)->one()->click();
 
-		$modal = COverlayDialogElement::find()->one();
+		$modal = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Template', $modal->getTitle());
 		$modal->query('button:Update')->WaitUntilClickable()->one()->click();
 		$this->assertMessage(TEST_GOOD, 'Template updated');
