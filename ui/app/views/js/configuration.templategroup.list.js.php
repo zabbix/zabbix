@@ -56,7 +56,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('templates');
+				uncheckTableRows('templategroup');
 				postMessageOk(e.detail.title);
 
 				if ('success' in e.detail) {
