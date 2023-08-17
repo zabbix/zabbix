@@ -1596,7 +1596,7 @@ abstract class CItemGeneral extends CApiService {
 				? array_column($db_items[$item['itemid']]['preprocessing'], null, 'step')
 				: [];
 
-			$item['preprocessing'] = self::sortPreprocessingSteps($item['preprocessing']);
+			$item['preprocessing'] = sortPreprocessingSteps($item['preprocessing']);
 
 			$step = 1;
 
@@ -1667,35 +1667,6 @@ abstract class CItemGeneral extends CApiService {
 			unset($item_preproc);
 		}
 		unset($item);
-	}
-
-	/**
-	 * @param array $steps
-	 *
-	 * @return array
-	 */
-	private static function sortPreprocessingSteps(array $steps): array {
-		usort($steps, static function (array $step_a, array $step_b): int {
-			if ($step_a['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-				if ($step_b['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-					$params_a = explode("\n", $step_a['params']);
-
-					if ($params_a[0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
-						return 1;
-					}
-
-					$params_b = explode("\n", $step_b['params']);
-
-					return $params_b[0] == ZBX_PREPROC_MATCH_ERROR_ANY ? -1 : 0;
-				}
-
-				return -1;
-			}
-
-			return $step_b['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 1 : 0;
-		});
-
-		return $steps;
 	}
 
 	/**
