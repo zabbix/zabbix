@@ -155,4 +155,22 @@ ZBX_THREAD_ENTRY(collector_thread, args);
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
 
+#if defined(_WINDOWS)
+/* perfstat */
+#include "zbxwin32.h"
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
+		zbx_perf_counter_lang_t lang, char **error);
+void			remove_perf_counter(zbx_perf_counter_data_t *counter);
+
+typedef enum
+{
+	ZBX_SINGLE_THREADED,
+	ZBX_MULTI_THREADED
+}
+zbx_threadedness_t;
+
+int	zbx_init_perf_collector(zbx_threadedness_t threadedness, char **error);
+void	zbx_free_perf_collector(void);
+#endif
+
 #endif /* ZABBIX_ZBXSYSINFO_H */

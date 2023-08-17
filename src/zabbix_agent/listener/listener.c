@@ -19,7 +19,7 @@
 
 #include "listener.h"
 
-#include "zbxconf.h"
+#include "../zbxconf.h"
 #include "zbxsysinfo.h"
 #include "zbxlog.h"
 #include "zbxstr.h"
@@ -109,13 +109,12 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char				*msg = NULL;
 #endif
-	int				ret;
 	zbx_socket_t			s;
 	zbx_thread_listener_args	*init_child_args_in;
 	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int				ret, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	init_child_args_in = (zbx_thread_listener_args *)((((zbx_thread_args_t *)args))->args);
 

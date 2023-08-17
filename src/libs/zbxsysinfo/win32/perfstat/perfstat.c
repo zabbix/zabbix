@@ -25,7 +25,6 @@
 #include "zbxstr.h"
 
 #define OBJECT_CACHE_REFRESH_INTERVAL	60
-#define NAMES_UPDATE_INTERVAL		60
 
 struct object_name_ref
 {
@@ -74,11 +73,11 @@ static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Comments: if the specified counter exists or the new one is successfully   *
- *           added, a pointer to that counter is returned, NULL otherwise     *
+ * Comments: If the specified counter exists or the new one is successfully   *
+ *           added, a pointer to that counter is returned, NULL otherwise.    *
  *                                                                            *
  ******************************************************************************/
-zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
 		zbx_perf_counter_lang_t lang, char **error)
 {
 	zbx_perf_counter_data_t	*cptr = NULL;
@@ -163,11 +162,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extends the performance counter buffer to store the new data      *
- *          interval                                                          *
+ * Purpose: extends performance counter buffer to store new data interval     *
  *                                                                            *
- * Parameters: result    - [IN] the performance counter                       *
- *             interval  - [IN] the new data collection interval in seconds   *
+ * Parameters: counter   - [IN]                                               *
+ *             interval  - [IN] new data collection interval in seconds       *
  *                                                                            *
  ******************************************************************************/
 static void	extend_perf_counter_interval(zbx_perf_counter_data_t *counter, int interval)
@@ -180,13 +178,12 @@ static void	extend_perf_counter_interval(zbx_perf_counter_data_t *counter, int i
 	/* move the data to the end to keep the ring buffer intact */
 	if (counter->value_current < counter->value_count)
 	{
-		int	i;
 		double	*src, *dst;
 
 		src = &counter->value_array[counter->interval - 1];
 		dst = &counter->value_array[interval - 1];
 
-		for (i = 0; i < counter->value_count - counter->value_current; i++)
+		for (int i = 0; i < counter->value_count - counter->value_current; i++)
 			*dst-- = *src--;
 	}
 
@@ -195,9 +192,7 @@ static void	extend_perf_counter_interval(zbx_perf_counter_data_t *counter, int i
 
 static void	free_object_names(void)
 {
-	int	i;
-
-	for (i = 0; i < object_num; i++)
+	for (int i = 0; i < object_num; i++)
 	{
 		zbx_free(object_names[i].eng_name);
 		zbx_free(object_names[i].loc_name);
@@ -209,8 +204,8 @@ static void	free_object_names(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: obtains PDH object localized names and associates them with       *
- *          English names, to be used by perf_instance_en.discovery           *
+ * Purpose: Obtains PDH object localized names and associates them with       *
+ *          English names, to be used by perf_instance_en.discovery.          *
  *                                                                            *
  * Return value: SUCCEED/FAIL                                                 *
  *                                                                            *
@@ -226,12 +221,13 @@ static int	set_object_names(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	LOCK_PERFCOUNTERS;
-
+#define NAMES_UPDATE_INTERVAL		60
 	if (ppsd.lastupdate_names + NAMES_UPDATE_INTERVAL >= time(NULL))
 	{
 		ret = SUCCEED;
 		goto out;
 	}
+#undef NAMES_UPDATE_INTERVAL
 
 	if (ppsd.lastrefresh_objects + OBJECT_CACHE_REFRESH_INTERVAL > time(NULL))
 		refresh = FALSE;
@@ -335,8 +331,8 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Comments: counter is removed from the collector and                        *
- *           the memory is freed - do not use it again                        *
+ * Comments: Counter is removed from the collector and                        *
+ *           the memory is freed - do not use it again.                       *
  *                                                                            *
  ******************************************************************************/
 void	remove_perf_counter(zbx_perf_counter_data_t *counter)
@@ -392,8 +388,8 @@ static void	free_perf_counter_list(void)
 
 /******************************************************************************
  *                                                                            *
- * Comments: must be called only for PERF_COUNTER_ACTIVE counters,            *
- *           interval must be less than or equal to counter->interval         *
+ * Comments: Must be called only for PERF_COUNTER_ACTIVE counters,            *
+ *           interval must be less than or equal to counter->interval.        *
  *                                                                            *
  ******************************************************************************/
 static double	compute_average_value(zbx_perf_counter_data_t *counter, int interval)
@@ -418,7 +414,7 @@ static double	compute_average_value(zbx_perf_counter_data_t *counter, int interv
 	return sum / (double)count;
 }
 
-int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
+int	zbx_init_perf_collector(zbx_threadedness_t threadedness, char **error)
 {
 	int	ret = FAIL;
 
@@ -463,7 +459,7 @@ out:
 	return ret;
 }
 
-void	free_perf_collector(void)
+void	zbx_free_perf_collector(void)
 {
 	zbx_perf_counter_data_t	*cptr;
 
@@ -621,13 +617,13 @@ out:
  *                                                                            *
  * Purpose: gets average named performance counter value                      *
  *                                                                            *
- * Parameters: name  - [IN] the performance counter name                      *
- *             value - [OUT] the calculated value                             *
- *             error - [OUT] the error message, it is not always produced     *
- *                     when FAIL is returned. It is a caller responsibility   *
+ * Parameters: name  - [IN] performance counter name                          *
+ *             value - [OUT] calculated value                                 *
+ *             error - [OUT] Error message, it is not always produced         *
+ *                     when FAIL is returned. It is a caller's responsibility *
  *                     to check if the error message is not NULL.             *
  *                                                                            *
- * Returns:  SUCCEED - the value was retrieved successfully                   *
+ * Returns:  SUCCEED - value was retrieved successfully                       *
  *           FAIL    - otherwise                                              *
  *                                                                            *
  * Comments: The value is retrieved from collector (if it has been requested  *
@@ -698,13 +694,13 @@ out:
  *                                                                            *
  * Purpose: gets average performance counter value                            *
  *                                                                            *
- * Parameters: counterpath - [IN] the performance counter path                *
- *             interval    - [IN] the data collection interval in seconds     *
+ * Parameters: counterpath - [IN] performance counter path                    *
+ *             interval    - [IN] data collection interval in seconds         *
  *             lang        - [IN] counterpath language (default or English)   *
- *             value       - [OUT] the calculated value                       *
- *             error       - [OUT] the error message                          *
+ *             value       - [OUT] calculated value                           *
+ *             error       - [OUT] error message                              *
  *                                                                            *
- * Returns:  SUCCEED - the value was retrieved successfully                   *
+ * Returns:  SUCCEED - value was retrieved successfully                       *
  *           FAIL    - otherwise                                              *
  *                                                                            *
  * Comments: The value is retrieved from collector (if it has been requested  *
@@ -748,7 +744,7 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_pe
 
 	/* if the requested counter is not already being monitored - start monitoring */
 	if (NULL == perfs)
-		perfs = add_perf_counter(NULL, counterpath, interval, lang, error);
+		perfs = zbx_add_perf_counter(NULL, counterpath, interval, lang, error);
 out:
 	UNLOCK_PERFCOUNTERS;
 
@@ -766,14 +762,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets average value of the specified performance counter interval  *
+ * Purpose: gets average value of specified performance counter interval      *
  *                                                                            *
- * Parameters: counter  - [IN] the performance counter                        *
- *             interval - [IN] the data collection interval in seconds        *
- *             value    - [OUT] the calculated value                          *
- *             error    - [OUT] the error message                             *
+ * Parameters: counter  - [IN] performance counter                            *
+ *             interval - [IN] data collection interval in seconds            *
+ *             value    - [OUT] calculated value                              *
+ *             error    - [OUT] error message                                 *
  *                                                                            *
- * Returns:  SUCCEED - the value was retrieved successfully                   *
+ * Returns:  SUCCEED - value was retrieved successfully                       *
  *           FAIL    - otherwise                                              *
  *                                                                            *
  ******************************************************************************/
@@ -837,14 +833,13 @@ out:
 static wchar_t	*get_object_name(char *eng_name)
 {
 	wchar_t	*loc_name = NULL;
-	int	i;
 	size_t	len;
 
 	LOCK_PERFCOUNTERS;
 
 	len = strlen(eng_name);
 
-	for (i = 0; i < object_num; i++)
+	for (int i = 0; i < object_num; i++)
 	{
 		if (NULL != object_names[i].eng_name && len == strlen(object_names[i].eng_name) &&
 				0 == zbx_strncasecmp(object_names[i].eng_name, eng_name, len))
@@ -865,11 +860,9 @@ static wchar_t	*get_object_name(char *eng_name)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get localized name of the object                                  *
+ * Purpose: gets localized name of object                                     *
  *                                                                            *
- * Parameters: eng_name - [IN] english name                                   *
- *                                                                            *
- * Returns:  localized name of the object                                     *
+ * Parameters: eng_name - [IN]                                                *
  *                                                                            *
  ******************************************************************************/
 wchar_t	*get_object_name_local(char *eng_name)

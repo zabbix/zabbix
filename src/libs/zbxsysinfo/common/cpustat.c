@@ -21,7 +21,7 @@
 
 #include "stats.h"
 #ifdef _WINDOWS
-#	include "perfstat.h"
+#	include "../win32/perfstat/perfstat.h"
 #	include "../win32/win32_cpu.h"
 #	include <strsafe.h> /* StringCchPrintf */
 #endif
@@ -172,7 +172,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 				goto clean;
 
-			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath,
+			if (NULL == (pcpus->cpu_counter[idx] = zbx_add_perf_counter(NULL, counterPath,
 					ZBX_MAX_COLLECTOR_PERIOD, PERF_COUNTER_LANG_DEFAULT, &error)))
 			{
 				goto clean;
@@ -220,7 +220,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 					goto clean;
 
 				if (NULL == (pcpus->cpu_counter[gidx * cpus_per_group + idx] =
-						add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
+						zbx_add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
 								PERF_COUNTER_LANG_DEFAULT, &error)))
 				{
 					goto clean;
@@ -236,7 +236,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 		goto clean;
 
-	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
+	if (NULL == (pcpus->queue_counter = zbx_add_perf_counter(NULL, counterPath, ZBX_MAX_COLLECTOR_PERIOD,
 			PERF_COUNTER_LANG_DEFAULT, &error)))
 	{
 		goto clean;
