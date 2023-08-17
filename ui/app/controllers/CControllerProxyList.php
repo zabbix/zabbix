@@ -31,10 +31,10 @@ class CControllerProxyList extends CController {
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'sort' =>			'in '.implode(',', ['host', 'status', 'tls_accept', 'version', 'lastaccess']),
+			'sort' =>			'in '.implode(',', ['name', 'mode', 'tls_accept', 'version', 'lastaccess']),
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'filter_status' =>	'in '.implode(',', ['-1', HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]),
-			'filter_version' =>	'in '.implode(',', ['-1', ZBX_PROXY_VERSION_CURRENT, ZBX_PROXY_VERSION_ALL_OUTDATED])
+			'filter_mode' =>	'in -1,'.implode(',', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE]),
+			'filter_version' =>	'in -1,'.implode(',', [ZBX_PROXY_VERSION_ANY_OUTDATED, ZBX_PROXY_VERSION_CURRENT])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,7 +51,7 @@ class CControllerProxyList extends CController {
 	}
 
 	protected function doAction() {
-		$sortField = $this->getInput('sort', CProfile::get('web.proxies.php.sort', 'host'));
+		$sortField = $this->getInput('sort', CProfile::get('web.proxies.php.sort', 'name'));
 		$sortOrder = $this->getInput('sortorder', CProfile::get('web.proxies.php.sortorder', ZBX_SORT_UP));
 
 		CProfile::update('web.proxies.php.sort', $sortField, PROFILE_TYPE_STR);
@@ -60,18 +60,18 @@ class CControllerProxyList extends CController {
 		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.proxies.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.proxies.filter_mode', $this->getInput('filter_mode', -1), PROFILE_TYPE_INT);
 			CProfile::update('web.proxies.filter_version', $this->getInput('filter_version', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.proxies.filter_name');
-			CProfile::delete('web.proxies.filter_status');
+			CProfile::delete('web.proxies.filter_mode');
 			CProfile::delete('web.proxies.filter_version');
 		}
 
 		$filter = [
 			'name' => CProfile::get('web.proxies.filter_name', ''),
-			'status' => CProfile::get('web.proxies.filter_status', -1),
+			'mode' => CProfile::get('web.proxies.filter_mode', -1),
 			'version' => CProfile::get('web.proxies.filter_version', -1)
 		];
 
@@ -84,7 +84,7 @@ class CControllerProxyList extends CController {
 			'allowed_ui_conf_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 		];
 
-		if ($filter['version'] == ZBX_PROXY_VERSION_ALL_OUTDATED) {
+		if ($filter['version'] == ZBX_PROXY_VERSION_ANY_OUTDATED) {
 			$filter['version'] = [ZBX_PROXY_VERSION_OUTDATED, ZBX_PROXY_VERSION_UNSUPPORTED];
 		}
 
@@ -92,10 +92,10 @@ class CControllerProxyList extends CController {
 		$data['proxies'] = API::Proxy()->get([
 			'output' => ['proxyid', $sortField],
 			'search' => [
-				'host' => ($filter['name'] === '') ? null : $filter['name']
+				'name' => ($filter['name'] === '') ? null : $filter['name']
 			],
 			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status'],
+				'mode' => ($filter['mode'] == -1) ? null : $filter['mode'],
 				'compatibility' => ($filter['version'] == -1) ? null : $filter['version']
 			],
 			'limit' => $limit,
@@ -104,7 +104,7 @@ class CControllerProxyList extends CController {
 		]);
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept', 'version',
+			'output' => ['name', 'mode', 'lastaccess', 'tls_connect', 'tls_accept', 'version',
 				'compatibility'
 			],
 			'selectHosts' => ['hostid', 'name', 'status'],

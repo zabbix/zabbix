@@ -5,10 +5,11 @@
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ZABBIX.PROXY.ADDRESS}|<p>IP/DNS/network mask list of proxies to be remotely queried (default is 127.0.0.1).</p>|`127.0.0.1`|
-|{$ZABBIX.PROXY.PORT}|<p>Port of proxy to be remotely queried (default is 10051).</p>|`10051`|
+|{$ZABBIX.PROXY.ADDRESS}|<p>IP/DNS/network mask list of proxies to be remotely queried (default is 127.0.0.1).</p>||
+|{$ZABBIX.PROXY.PORT}|<p>Port of proxy to be remotely queried (default is 10051).</p>||
 |{$ZABBIX.PROXY.UTIL.MAX}|<p>Maximum average percentage of time processes busy in the last minute (default is 75).</p>|`75`|
 |{$ZABBIX.PROXY.UTIL.MIN}|<p>Minimum average percentage of time processes busy in the last minute (default is 65).</p>|`65`|
+|{$ZABBIX.PROXY.NODATA_TIMEOUT}|<p>The time threshold after which statistics are considered unavailable. Used in trigger expression.</p>|`5m`|
 
 ### Items
 
@@ -40,6 +41,9 @@
 |Remote Zabbix proxy: Utilization of trapper data collector processes, in %|<p>Average percentage of time trapper processes have been busy in the last minute.</p>|Dependent item|process.trapper.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['trapper'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes trapper not started`</p></li></ul>|
 |Remote Zabbix proxy: Utilization of unreachable poller data collector processes, in %|<p>Average percentage of time unreachable poller processes have been busy in the last minute.</p>|Dependent item|process.unreachable_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['unreachable poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes unreachable poller not started`</p></li></ul>|
 |Remote Zabbix proxy: Utilization of vmware data collector processes, in %|<p>Average percentage of time vmware collector processes have been busy in the last minute.</p>|Dependent item|process.vmware_collector.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['vmware collector'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes vmware collector not started`</p></li></ul>|
+|Remote Zabbix proxy: Utilization of agent poller data collector processes, in %|<p>Average percentage of time agent poller processes have been busy in the last minute.</p>|Dependent item|process.agent_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['agent poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes agent poller not started`</p></li></ul>|
+|Remote Zabbix proxy: Utilization of http agent poller data collector processes, in %|<p>Average percentage of time http agent poller processes have been busy in the last minute.</p>|Dependent item|process.http_agent_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['http agent poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes http agent poller not started`</p></li></ul>|
+|Remote Zabbix proxy: Utilization of snmp poller data collector processes, in %|<p>Average percentage of time snmp poller processes have been busy in the last minute.</p>|Dependent item|process.snmp_poller.avg.busy<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.process['snmp poller'].busy.avg`</p><p>⛔️Custom on fail: Set error to: `Processes snmp poller not started`</p></li></ul>|
 |Remote Zabbix proxy: Configuration cache, % used|<p>Availability statistics of Zabbix configuration cache. Percentage of used buffer.</p>|Dependent item|rcache.buffer.pused<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.rcache.pused`</p></li></ul>|
 |Remote Zabbix proxy: Version|<p>Version of Zabbix proxy.</p>|Dependent item|version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.version`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Remote Zabbix proxy: VMware cache, % used|<p>Availability statistics of Zabbix vmware cache. Percentage of used buffer.</p>|Dependent item|vmware.buffer.pused<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.vmware.pused`</p><p>⛔️Custom on fail: Set error to: `No vmware collector processes started`</p></li></ul>|
@@ -85,7 +89,11 @@
 |Remote Zabbix proxy: Utilization of trapper processes is high||`avg(/Remote Zabbix proxy health/process.trapper.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"trapper"}`|Average|**Manual close**: Yes|
 |Remote Zabbix proxy: Utilization of unreachable poller processes is high||`avg(/Remote Zabbix proxy health/process.unreachable_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}`|Average|**Manual close**: Yes|
 |Remote Zabbix proxy: Utilization of vmware collector processes is high||`avg(/Remote Zabbix proxy health/process.vmware_collector.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}`|Average|**Manual close**: Yes|
+|Remote Zabbix proxy: Utilization of agent poller processes is high||`avg(/Remote Zabbix proxy health/process.agent_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"agent poller"}`|Average|**Manual close**: Yes|
+|Remote Zabbix proxy: Utilization of http agent poller processes is high||`avg(/Remote Zabbix proxy health/process.http_agent_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}`|Average|**Manual close**: Yes|
+|Remote Zabbix proxy: Utilization of snmp poller processes is high||`avg(/Remote Zabbix proxy health/process.snmp_poller.avg.busy,10m)>{$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}`|Average|**Manual close**: Yes|
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache|<p>Consider increasing CacheSize in the zabbix_server.conf configuration file.</p>|`max(/Remote Zabbix proxy health/rcache.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
+|Remote Zabbix proxy: Failed to fetch stats data|<p>Zabbix has not received statistics data for {$ZABBIX.PROXY.NODATA_TIMEOUT}.</p>|`nodata(/Remote Zabbix proxy health/rcache.buffer.pused,{$ZABBIX.PROXY.NODATA_TIMEOUT})=1`|Warning||
 |Remote Zabbix proxy: Version has changed|<p>Zabbix proxy version has changed. Acknowledge to close the problem manually.</p>|`last(/Remote Zabbix proxy health/version,#1)<>last(/Remote Zabbix proxy health/version,#2) and length(last(/Remote Zabbix proxy health/version))>0`|Info|**Manual close**: Yes|
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache|<p>Consider increasing VMwareCacheSize in the zabbix_server.conf configuration file.</p>|`max(/Remote Zabbix proxy health/vmware.buffer.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
 |Remote Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the history cache|<p>Consider increasing HistoryCacheSize in the zabbix_server.conf configuration file.</p>|`max(/Remote Zabbix proxy health/wcache.history.pused,10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|

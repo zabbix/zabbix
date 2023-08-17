@@ -163,7 +163,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'proxies',
 								'srcfld1' => 'proxyid',
-								'srcfld2' => 'host',
+								'srcfld2' => 'name',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_proxyids_'
 							]
@@ -441,8 +441,8 @@ foreach ($data['hosts'] as $host) {
 	$monitored_by = null;
 
 	if ($show_monitored_by) {
-		$monitored_by = ($host['proxy_hostid'] != 0)
-			? $data['proxies'][$host['proxy_hostid']]['host']
+		$monitored_by = ($host['proxyid'] != 0)
+			? $data['proxies'][$host['proxyid']]['name']
 			: '';
 	}
 

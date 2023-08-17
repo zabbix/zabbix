@@ -20,7 +20,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 

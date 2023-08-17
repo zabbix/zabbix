@@ -793,6 +793,9 @@ void	zbx_shmem_get_stats(const zbx_shmem_info_t *info, zbx_shmem_stats_t *stats)
 		stats->chunks_num[i] = counter;
 	}
 
+	if (__UINT64_C(0xffffffffffffffff) == stats->min_chunk_size)
+		stats->min_chunk_size = 0;
+
 	stats->overhead = info->total_size - info->used_size - info->free_size;
 	stats->used_chunks = stats->overhead / (2 * SHMEM_SIZE_FIELD) + 1 - stats->free_chunks;
 	stats->free_size = info->free_size;

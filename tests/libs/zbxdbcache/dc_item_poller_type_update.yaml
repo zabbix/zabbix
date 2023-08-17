@@ -10,168 +10,168 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 2
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 3
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 4
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 5
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 6
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 7
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 8
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 9
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 10
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 11
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 12
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_IPMI
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 13
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 14
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 15
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 16
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_PINGER
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 17
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 18
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 19
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 20
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_JAVA
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 21
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: 0
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 22
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 23
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 24
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 25
     access: DIRECT
     type: ITEM_TYPE_SNMP
@@ -340,6 +340,198 @@ in:
     poller: ZBX_POLLER_TYPE_UNREACHABLE
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_POLLER_TYPE_UNREACHABLE
+  - ref: 25
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: 0
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 26
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 27
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 28
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_NO_POLLER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 29
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: 0
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 30
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 31
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 32
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_NORMAL
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 33
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: 0
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 34
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 35
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 36
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_IPMI
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 37
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: 0
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 38
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 39
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 40
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_PINGER
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 41
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: 0
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 42
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 43
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 44
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_JAVA
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 45
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: 0
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 46
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 47
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
+  - ref: 48
+    access: DIRECT
+    type: ITEM_TYPE_SNMP
+    key: k
+    poller: ZBX_POLLER_TYPE_UNREACHABLE
+    flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
+    snmp_oid: walk[1.3.6.1.2.1.1]
+    result: ZBX_POLLER_TYPE_SNMP
   - ref: 49
     access: DIRECT
     type: ITEM_TYPE_TRAPPER
@@ -1979,28 +2171,28 @@ in:
     access: PROXY
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: 0
     result: ZBX_NO_POLLER
   - ref: 6
     access: PROXY
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: ZBX_HOST_UNREACHABLE
     result: ZBX_NO_POLLER
   - ref: 7
     access: PROXY
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 8
     access: PROXY
     type: ITEM_TYPE_ZABBIX
     key: k
-    poller: ZBX_POLLER_TYPE_NORMAL
+    poller: ZBX_POLLER_TYPE_AGENT
     flags: ZBX_HOST_UNREACHABLE|ZBX_ITEM_COLLECTED
     result: ZBX_NO_POLLER
   - ref: 9

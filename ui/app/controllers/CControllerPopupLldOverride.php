@@ -78,11 +78,6 @@ class CControllerPopupLldOverride extends CController {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
 			}
 
-			if ($page_options['overrides_evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-					&& $page_options['overrides_formula'] === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
-			}
-
 			// Validate if override names are unique.
 			if ($page_options['name'] !== $page_options['old_name']) {
 				foreach ($page_options['overrides_names'] as $name) {
@@ -92,12 +87,16 @@ class CControllerPopupLldOverride extends CController {
 				}
 			}
 
-			foreach ($page_options['overrides_filters'] as $i => $filter) {
-				if ($filter['macro'] === '' && $filter['value'] === '') {
-					unset($page_options['overrides_filters'][$i]);
-				}
+			$filter = prepareLldFilter([
+				'evaltype' => $page_options['overrides_evaltype'],
+				'formula' => $page_options['overrides_formula'],
+				'conditions' => $page_options['overrides_filters']
+			]);
+
+			if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+					&& $filter['formula'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
 			}
-			$page_options['overrides_filters'] = array_values($page_options['overrides_filters']);
 
 			// Return collected error messages.
 			if ($messages = get_and_clear_messages()) {
@@ -108,9 +107,9 @@ class CControllerPopupLldOverride extends CController {
 				$params = [
 					'name' => $page_options['name'],
 					'stop' => $page_options['stop'],
-					'overrides_evaltype' => $page_options['overrides_evaltype'],
-					'overrides_formula' => $page_options['overrides_formula'],
-					'overrides_filters' => $page_options['overrides_filters'],
+					'overrides_evaltype' => $filter['evaltype'],
+					'overrides_formula' => $filter['formula'],
+					'overrides_filters' => $filter['conditions'],
 					'operations' => $page_options['operations'],
 					'no' => $page_options['no']
 				];

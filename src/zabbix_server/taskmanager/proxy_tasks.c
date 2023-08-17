@@ -28,7 +28,7 @@
  * Purpose: get tasks scheduled to be executed on a proxy                     *
  *                                                                            *
  * Parameters: tasks         - [OUT] the tasks to execute                     *
- *             proxy_hostid  - [IN] the target proxy                          *
+ *             proxyid       - [IN] the target proxy                          *
  *             compatibility - [IN] proxy version compatibility with server   *
  *                                                                            *
  * Comments: This function is used by server to get tasks to be sent to the   *
@@ -38,7 +38,7 @@
  *           command and check now are supported by outdated proxies.         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
 		zbx_proxy_compatibility_t compatibility)
 {
 	zbx_db_result_t	result;
@@ -62,10 +62,10 @@ void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hos
 			" left join task_data d"
 				" on t.taskid=d.taskid"
 			" where t.status=%d"
-				" and t.proxy_hostid=" ZBX_FS_UI64
+				" and t.proxyid=" ZBX_FS_UI64
 				" and (t.ttl=0 or t.clock+t.ttl>" ZBX_FS_TIME_T ")"
 			" order by t.taskid",
-			ZBX_TM_STATUS_NEW, proxy_hostid, (zbx_fs_time_t)time(NULL));
+			ZBX_TM_STATUS_NEW, proxyid, (zbx_fs_time_t)time(NULL));
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
