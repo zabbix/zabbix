@@ -643,13 +643,16 @@ class testFormTags extends CWebTest {
 			? 'Tags - Clone '.$object.' {#KEY}'
 			: '1Tags - Clone '.$object;
 
-		$this->page->login()->open($this->link);
+		$this->page->login()->open($this->link)->waitUntilReady();
 
 		if ($object === 'service') {
 			$table = $this->query('class:list-table')->asTable()->one();
 			$table->findRow('Name', $this->clone_name)->query(self::EDIT_BUTTON_PATH)->waitUntilClickable()->one()->click();
 		}
 		else {
+			if ($object === 'host' || $object === 'template') {
+				$this->query('button:Reset')->one()->click();
+			}
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 		}
 
