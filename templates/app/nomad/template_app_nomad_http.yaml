@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-16T20:40:43Z'
+  date: '2023-08-17T08:29:29Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -5768,7 +5768,7 @@ zabbix_export:
           master_item:
             key: nomad.server.stats.get
           triggers:
-            - uuid: 0b24bb0ebc964981936712561abdca21
+            - uuid: 3c7dfd5ec21144b6b58c603d60142200
               expression: 'change(/HashiCorp Nomad Server by HTTP/nomad.server.version)<>0'
               name: 'HashiCorp Nomad Server: Nomad server version has changed'
               event_name: 'HashiCorp Nomad Server: Nomad server version has changed to {ITEM.LASTVALUE}'
