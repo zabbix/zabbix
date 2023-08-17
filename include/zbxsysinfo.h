@@ -155,7 +155,7 @@ ZBX_THREAD_ENTRY(collector_thread, args);
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
 
-#if defined(_WINDOWS)
+#if defined(_WINDOWS) || defined(__MINGW32__)
 /* perfstat */
 #include "zbxwin32.h"
 zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
