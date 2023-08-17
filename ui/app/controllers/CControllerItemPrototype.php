@@ -214,7 +214,7 @@ abstract class CControllerItemPrototype extends CController {
 			'inventory_link' => 0,
 			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
 			'itemid' => 0,
-			'jmx_endpoint' => DB::getDefault('items', 'jmx_endpoint'),
+			'jmx_endpoint' => ZBX_DEFAULT_JMX_ENDPOINT,
 			'key' => '',
 			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
 			'master_itemid' => 0,
@@ -326,6 +326,10 @@ abstract class CControllerItemPrototype extends CController {
 		if (array_key_exists($input['type'], $params_field)) {
 			$field = $params_field[$input['type']];
 			$input['params'] = $input[$field];
+		}
+
+		if ($input['type'] != ITEM_TYPE_JMX) {
+			$input['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
 		return $input;

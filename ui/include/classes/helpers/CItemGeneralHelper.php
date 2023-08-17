@@ -191,6 +191,10 @@ class CItemGeneralHelper {
 			$item['headers'] = $headers;
 		}
 
+		if ($item['type'] != ITEM_TYPE_JMX) {
+			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		}
+
 		return $item;
 	}
 

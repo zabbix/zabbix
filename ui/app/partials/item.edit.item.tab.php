@@ -508,7 +508,8 @@ $formgrid
 			->setId('js-item-jmx-endpoint-label'),
 		(new CFormField(
 			(new CTextBox('jmx_endpoint', $data['form']['jmx_endpoint'], $data['discovered'],
-				DB::getFieldLength('items', 'jmx_endpoint')))
+				DB::getFieldLength('items', 'jmx_endpoint')
+			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		))->setId('js-item-jmx-endpoint-field')
