@@ -293,7 +293,7 @@ class WidgetForm extends CWidgetForm {
 
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('history', _('History data selection'), [
+				(new CWidgetFieldRadioButtonList('history', _('History data'), [
 					ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
 					ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
 					ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')

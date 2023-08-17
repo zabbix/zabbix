@@ -42,6 +42,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
+			'dynamic_hostid' => 'db hosts.hostid',
 			'from' => 'range_time',
 			'to' => 'range_time'
 		]);
@@ -198,16 +199,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$range_time_parser->parse($to);
 					$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
-					$interval = $time_to;
 					$aggregate_interval = $time_to-$time_from;
 				}
 				else {
-					$interval = $history_period;
 					$aggregate_interval = $history_period;
 				}
-
 				$last_results = Manager::History()->getAggregationByInterval(
-					$items, $time_from, $time_to, $aggregate_function, $interval
+					$items, $time_from, $time_to, $aggregate_function, $time_to
 				);
 
 				if (!empty($last_results)) {
@@ -215,7 +213,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 					$prev_results = Manager::History()->getAggregationByInterval(
 						$items, $time_from-$aggregate_interval, time()-$aggregate_interval,
-						$aggregate_function, $interval
+						$aggregate_function, $time_to
 					);
 
 					if (!empty($prev_results)) {
