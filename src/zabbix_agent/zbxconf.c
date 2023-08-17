@@ -24,10 +24,6 @@
 #include "zbxparam.h"
 #include "zbxexpr.h"
 
-//#ifdef _WINDOWS
-//#	include "perfstat.h"
-//#endif
-
 /******************************************************************************
  *                                                                            *
  * Purpose: load aliases from configuration                                   *
