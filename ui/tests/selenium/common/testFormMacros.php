@@ -1777,7 +1777,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 *
 	 * @param type $data		given data provider
 	 * @param type $secret		flag that indicates if the value should have type "Secret text".
-	 * @param string $source	type of entity that is being checked (hots, hostPrototype, template)
+	 * @param string $source	type of entity that is being checked (host, hostPrototype, template)
 	 * @param type $available	flag that indicates if the value should be available.
 	 */
 	public function checkInheritedTab($data, $secret, $source, $available = true) {
