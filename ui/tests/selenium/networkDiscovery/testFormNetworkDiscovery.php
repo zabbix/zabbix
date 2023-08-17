@@ -1823,7 +1823,8 @@ class testFormNetworkDiscovery extends CWebTest {
 	 */
 	public function testFormNetworkDiscovery_Delete($data) {
 		if (CTestArrayHelper::get($data, 'error')) {
-			$old_hash = $this->getHash();
+			// Add actions table to hash to check that dependent Action is also not changed.
+			$old_hash = $this->getHash().CDBHelper::getHash('SELECT * FROM actions');
 		}
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
@@ -1835,7 +1836,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'error')) {
 			$this->assertMessage(TEST_BAD, 'Cannot delete discovery rule', $data['error']);
-			$this->assertEquals($old_hash, $this->getHash());
+			$this->assertEquals($old_hash, $this->getHash().CDBHelper::getHash('SELECT * FROM actions'));
 			$dialog->close();
 		}
 		else {
@@ -1952,7 +1953,8 @@ class testFormNetworkDiscovery extends CWebTest {
 	 * @dataProvider getNoChangesData
 	 */
 	public function testFormNetworkDiscovery_NoChanges($data) {
-		$old_hash = $this->getHash();
+		// Add actions table to hash to check that dependent Action is also not changed.
+		$old_hash = $this->getHash().CDBHelper::getHash('SELECT * FROM actions');
 		$new_name = microtime(true).' Cancel '.self::CANCEL_RULE;
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
@@ -2008,7 +2010,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		$dialog->waitUntilNotVisible();
 		$this->page->assertHeader('Discovery rules');
-		$this->assertEquals($old_hash, $this->getHash());
+		$this->assertEquals($old_hash, $this->getHash().CDBHelper::getHash('SELECT * FROM actions'));
 	}
 
 	/**

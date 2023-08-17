@@ -31,12 +31,12 @@ class NetworkDiscovery {
 		$proxies = CDataHelper::call('proxy.create',
 			[
 				[
-					'host' => 'Proxy for Network discovery',
-					'status' => 5
+					'name' => 'Proxy for Network discovery',
+					'mode' => 0
 				],
 				[
-					'host' => 'Proxy for Network discovery cloning',
-					'status' => 5
+					'name' => 'Proxy for Network discovery cloning',
+					'mode' => 0
 				]
 			]
 		);
@@ -211,8 +211,11 @@ class NetworkDiscovery {
 			]
 		]);
 		$discovery_ruleids = CDataHelper::getIds('name');
-		$check_id = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
+		$check_id_delete = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
 				.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
+		);
+		$check_id_cancel = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
+			.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
 		);
 
 		CDataHelper::call('action.create', [
@@ -247,9 +250,14 @@ class NetworkDiscovery {
 					'evaltype' => 0,
 					'conditions' => [
 						[
-							'conditiontype' => 19,
+							'conditiontype' => CONDITION_TYPE_DCHECK,
 							'operator' => 0,
-							'value' => $check_id
+							'value' => $check_id_delete
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_DCHECK,
+							'operator' => 0,
+							'value' => $check_id_cancel
 						]
 					]
 				],
