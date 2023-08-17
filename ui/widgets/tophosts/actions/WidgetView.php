@@ -69,6 +69,40 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getData(): array {
+		$dashboard_time = false;
+
+		foreach ($this->fields_values['columns'] as $column) {
+			if (array_key_exists('item_time', $column) && $column['item_time'] === 0) {
+				$dashboard_time = true;
+			}
+		}
+
+		if ($dashboard_time) {
+			$from = $this->getInput('from');
+			$to = $this->getInput('to');
+		}
+		else {
+			foreach ($this->fields_values['columns'] as $column) {
+				$from = $column['time_from'];
+				$to = $column['time_to'];
+			}
+		}
+
+		foreach ($this->fields_values['columns'] as $key => $column) {
+			if ($column['item_time'] === 0) {
+				$this->fields_values['columns'][$key]['time_from'] = $from;
+				$this->fields_values['columns'][$key]['time_to'] = $to;
+			}
+		}
+
+		$range_time_parser = new CRangeTimeParser();
+
+		$range_time_parser->parse($from);
+		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+		$range_time_parser->parse($to);
+		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+
 		$configuration = $this->fields_values['columns'];
 
 		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
@@ -90,7 +124,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'evaltype' => $this->fields_values['evaltype'],
 				'tags' => $this->fields_values['tags'],
 				'monitored_hosts' => true,
-				'preservekeys' => true
+				'preservekeys' => true,
+				'dashboard_time' => $dashboard_time,
+				'time_period' => [
+					'time_from' => $time_from,
+					'time_to' => $time_to
+				]
 			]);
 
 			$hostids = array_keys($hosts);
@@ -378,26 +417,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 		self::addDataSource($items, $time_from, $time_now, $column['history']);
 
 		if ($aggregate_function === AGGREGATE_NONE) {
-			$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, AGGREGATE_LAST, $time_to);
+			$values = Manager::History()->getAggregationByInterval(
+				$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
+			);
 		}
 		else {
-			if ($column['item_time'] === 0) {
-				$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $aggregate_function, $time_to);
-			}
-			else {
-				$from = $column['time_from'];
-				$to = $column['time_to'];
+			$from = $column['time_from'];
+			$to = $column['time_to'];
 
-				$range_time_parser = new CRangeTimeParser();
+			$range_time_parser = new CRangeTimeParser();
 
-				$range_time_parser->parse($from);
-				$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+			$range_time_parser->parse($from);
+			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
 
-				$range_time_parser->parse($to);
-				$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+			$range_time_parser->parse($to);
+			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
-				$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $aggregate_function, $time_to);
-			}
+			$values = Manager::History()->getAggregationByInterval(
+				$items, $time_from, $time_to, $aggregate_function, $time_to
+			);
 		}
 
 		$result = [];

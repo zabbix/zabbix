@@ -31,8 +31,6 @@ window.tophosts_column_edit_form = new class {
 		this._item_time = document.getElementById('item_time');
 		this._aggregate_function = document.getElementById('aggregate_function');
 
-		this._item_time.checked = Number(this._aggregate_function.value) !== 0;
-
 		for (const element of this._$widget_form[0].querySelectorAll('.override-time')) {
 			element.style.display = Number(this._aggregate_function.value) === 0 ? 'none' : '';
 		}
@@ -130,8 +128,6 @@ window.tophosts_column_edit_form = new class {
 				form_field.toggle(is_visible);
 			}
 		});
-
-		this._item_time.value = (this._item_time.checked) ? 1 : 0;
 
 		for (const element of document.querySelectorAll('#time_from, #time_from_calendar, #time_to, #time_to_calendar')) {
 			element.disabled = !this._item_time.checked;

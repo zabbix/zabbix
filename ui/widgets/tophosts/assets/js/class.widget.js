@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,23 +18,20 @@
 **/
 
 
-namespace Widgets\TopHosts;
+class CWidgetTopHosts extends CWidget {
+	setTimePeriod(time_period) {
+		super.setTimePeriod(time_period);
 
-use Widgets\TopHosts\Includes\WidgetForm;
-use Zabbix\Core\CWidget;
-
-class Widget extends CWidget {
-
-	public const DEFAULT_FILL = '#97AAB3';
-
-	public const ORDER_TOP_N = 2;
-	public const ORDER_BOTTOM_N = 3;
-
-	public function getDefaultName(): string {
-		return _('Top hosts');
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
 	}
 
-	public function usesTimeSelector(array $fields_values): bool {
-		return !WidgetForm::hasOverrideTime($fields_values);
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			from: this._time_period.from,
+			to: this._time_period.to
+		};
 	}
 }

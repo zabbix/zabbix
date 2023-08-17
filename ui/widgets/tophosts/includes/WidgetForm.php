@@ -45,6 +45,7 @@ class WidgetForm extends CWidgetForm {
 
 	private const DEFAULT_HOSTS_COUNT = 10;
 	private const DEFAULT_ORDER_COLUMN = 0;
+	private const TOP_HOSTS_CUSTOM_TIME_OFF = '0';
 
 	private array $field_column_values = [];
 
@@ -142,5 +143,21 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::DEFAULT_HOSTS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			);
+	}
+
+	/**
+	 * Check if widget configuration is set to use overridden time.
+	 */
+	public static function hasOverrideTime(array $fields_values): bool {
+		$item_time = 'columns.item_time.';
+		$override_time = [];
+
+		foreach ($fields_values as $key => $field_value) {
+			if (substr($key, 0, 18) === $item_time && $field_value === self::TOP_HOSTS_CUSTOM_TIME_OFF) {
+				$override_time = ['true'];
+			}
+		}
+
+		return empty($override_time);
 	}
 }

@@ -245,16 +245,16 @@ $form_grid->addItem([
 ]);
 
 $form_grid->addItem([
-	(new CLabel(_('Override time period selector'), 'item_time'))->addClass('override-time'),
+	(new CLabel(_('Override time period selector'), 'item_time')),
 	(new CFormField(
-		new CCheckBox('item_time', $data['item_time'])
+		(new CCheckBox('item_time'))
+			->setChecked($data['item_time'] == 1)
 	))->addClass('override-time')
 ]);
 
 $form_grid->addItem([
 	(new CLabel(_('From'), 'time_from'))
-		->setAsteriskMark()
-		->addClass('override-time'),
+		->setAsteriskMark(),
 	(new CFormField(
 		(new CDateSelector('time_from', $data['time_from']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
@@ -264,8 +264,7 @@ $form_grid->addItem([
 
 $form_grid->addItem([
 	(new CLabel(_('To'), 'time_to'))
-		->setAsteriskMark()
-		->addClass('override-time'),
+		->setAsteriskMark(),
 	(new CFormField(
 		(new CDateSelector('time_to', $data['time_to']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
