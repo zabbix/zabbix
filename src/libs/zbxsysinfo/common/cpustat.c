@@ -305,12 +305,12 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #ifdef _WINDOWS
-	remove_perf_counter(pcpus->queue_counter);
+	zbx_remove_perf_counter(pcpus->queue_counter);
 	pcpus->queue_counter = NULL;
 
 	for (idx = 0; idx <= pcpus->count; idx++)
 	{
-		remove_perf_counter(pcpus->cpu_counter[idx]);
+		zbx_remove_perf_counter(pcpus->cpu_counter[idx]);
 		pcpus->cpu_counter[idx] = NULL;
 	}
 #else

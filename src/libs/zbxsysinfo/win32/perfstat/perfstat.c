@@ -335,7 +335,7 @@ out:
  *           the memory is freed - do not use it again.                       *
  *                                                                            *
  ******************************************************************************/
-void	remove_perf_counter(zbx_perf_counter_data_t *counter)
+void	zbx_remove_perf_counter(zbx_perf_counter_data_t *counter)
 {
 	zbx_perf_counter_data_t	*cptr;
 
