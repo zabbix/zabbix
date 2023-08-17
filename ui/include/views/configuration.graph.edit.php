@@ -439,7 +439,8 @@ $items_table->addRow(
 					(new CButton('add_item', _('Add')))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam())
+								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam()),
+								{dialogue_class: "modal-popup-generic", trigger_element: this}
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
