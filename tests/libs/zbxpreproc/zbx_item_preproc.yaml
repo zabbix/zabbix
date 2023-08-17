@@ -3995,7 +3995,7 @@ in:
     data: "error any"
   step:
     type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
-    params: "123"
+    params: "0\n123"
     error_handler: ZBX_PREPROC_FAIL_SET_ERROR
     error_handler_params: custom error
 out:
@@ -4009,7 +4009,7 @@ in:
     data: "error 123"
   step:
     type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
-    params: "123"
+    params: "0\n123"
     error_handler: ZBX_PREPROC_FAIL_SET_ERROR
     error_handler_params: custom error
 out:
@@ -4023,7 +4023,7 @@ in:
     data: "error 123"
   step:
     type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
-    params: "123"
+    params: "0\n123"
     error_handler: ZBX_PREPROC_FAIL_SET_ERROR
     error_handler_params: custom error \0
 out:

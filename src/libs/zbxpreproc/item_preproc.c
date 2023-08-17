@@ -1058,25 +1058,23 @@ int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *param
 {
 #define ZBX_PP_MATCH_TYPE_MATCHES	0
 #define ZBX_PP_MATCH_TYPE_NOT_MATCH	1
+#define ZBX_PP_MATCH_TYPE_ANY		-1
 	zbx_variant_t	value_str;
-	int		ret = SUCCEED, match_type = 0;
+	int		ret = SUCCEED, match_type = ZBX_PP_MATCH_TYPE_ANY;
 	char		*pattern = NULL, *newline, *out = NULL, *errptr = NULL;
 	zbx_regexp_t	*regex;
 
-	if (0 == strcmp("", params))
-		return ret;
-
 	zbx_variant_copy(&value_str, value);
 
-	pattern = zbx_strdup(NULL, params);
-
-	if (NULL != (newline = strchr(pattern, '\n')))
+	if (NULL != (newline = strchr(params, '\n')))
 	{
-		match_type = atoi(newline);
-
-		if (ZBX_PP_MATCH_TYPE_NOT_MATCH != match_type)
-			match_type = ZBX_PP_MATCH_TYPE_MATCHES;
+		newline++;
+		pattern = zbx_strdup(NULL, newline);
+		match_type = atoi(params);
 	}
+
+	if (ZBX_PP_MATCH_TYPE_ANY == match_type)
+		goto out;
 
 	if (ZBX_PP_MATCH_TYPE_MATCHES == match_type)
 	{
@@ -1132,6 +1130,7 @@ out:
 	return ret;
 #undef ZBX_PP_MATCH_TYPE_MATCHES
 #undef ZBX_PP_MATCH_TYPE_NOT_MATCH
+#undef ZBX_PP_MATCH_TYPE_ANY
 }
 
 /******************************************************************************

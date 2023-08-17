@@ -342,9 +342,9 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value_raw.data.err,
 						ZBX_JSON_TYPE_STRING);
 
-				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action && NULL != preproc_error)
+				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
 				{
-					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, preproc_error,
+					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, result->value.data.err,
 							ZBX_JSON_TYPE_STRING);
 				}
 			}
