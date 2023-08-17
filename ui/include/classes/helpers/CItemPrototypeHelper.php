@@ -29,6 +29,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	public static function convertApiInputForForm(array $item): array {
 		$item = parent::convertApiInputForForm($item);
 		$item['delay_flex'] = [];
+		$item['parent_discoveryid'] = $item['discoveryRule']['itemid'];
 		$update_interval_parser = new CUpdateIntervalParser([
 			'usermacros' => true,
 			'lldmacros' => true
