@@ -433,6 +433,7 @@ static void	async_poller_stop(zbx_poller_config_t *poller_config)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	evtimer_del(poller_config->async_timer);
 	evtimer_del(poller_config->async_wake_timer);
 	event_base_dispatch(poller_config->base);
 

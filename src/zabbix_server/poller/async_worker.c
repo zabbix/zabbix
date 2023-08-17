@@ -8,8 +8,8 @@
 #include "poller.h"
 #include "zbx_availability_constants.h"
 
-#define PP_WORKER_INIT_NONE	0x00
-#define PP_WORKER_INIT_THREAD	0x01
+#define ASYNC_WORKER_INIT_NONE	0x00
+#define ASYNC_WORKER_INIT_THREAD	0x01
 
 static zbx_poller_item_t	dc_config_async_get_poller_items(zbx_async_queue_t *queue)
 {
@@ -43,9 +43,6 @@ static void	poller_update_interfaces(zbx_vector_interface_status_t *interfaces,
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
 	zbx_timespec_t		timespec;
-
-	if (0 == interfaces->values_num)
-		return;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, interfaces->values_num);
 
@@ -105,10 +102,10 @@ static void	poller_update_interfaces(zbx_vector_interface_status_t *interfaces,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: preprocessing worker thread entry                                 *
+ * Purpose: work with configuration cache without blocking main thread        *
  *                                                                            *
  ******************************************************************************/
-static void	*pp_worker_entry(void *args)
+static void	*async_worker_entry(void *args)
 {
 	zbx_async_worker_t		*worker = (zbx_async_worker_t *)args;
 	zbx_async_queue_t		*queue = worker->queue;
@@ -123,8 +120,7 @@ static void	*pp_worker_entry(void *args)
 	zbx_snprintf(component, sizeof(component), "%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started", worker->id);
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
@@ -158,6 +154,7 @@ static void	*pp_worker_entry(void *args)
 		if (0 != queue->interfaces.values_num)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "interfaces num:%d", queue->interfaces.values_num);
+
 			zbx_vector_interface_status_append_array(&interfaces, queue->interfaces.values,
 					queue->interfaces.values_num);
 			zbx_vector_interface_status_clear(&queue->interfaces);
@@ -166,9 +163,11 @@ static void	*pp_worker_entry(void *args)
 		if (0 != queue->itemids.values_num)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "requeue num:%d", queue->itemids.values_num);
-			zbx_vector_uint64_append_array(&itemids,  queue->itemids.values, queue->itemids.values_num);
+
+			zbx_vector_uint64_append_array(&itemids, queue->itemids.values, queue->itemids.values_num);
 			zbx_vector_int32_append_array(&errcodes, queue->errcodes.values, queue->errcodes.values_num);
-			zbx_vector_int32_append_array(&lastclocks, queue->lastclocks.values, queue->lastclocks.values_num);
+			zbx_vector_int32_append_array(&lastclocks, queue->lastclocks.values,
+					queue->lastclocks.values_num);
 
 			zbx_vector_uint64_clear(&queue->itemids);
 			zbx_vector_int32_clear(&queue->lastclocks);
@@ -179,9 +178,12 @@ static void	*pp_worker_entry(void *args)
 
 		async_task_queue_unlock(queue);
 
-		poller_update_interfaces(&interfaces, queue->config_unavailable_delay, queue->config_unreachable_period,
-				queue->config_unreachable_delay);
-		zbx_vector_interface_status_clear_ext(&interfaces, zbx_interface_status_free);
+		if (0 != interfaces.values_num)
+		{
+			poller_update_interfaces(&interfaces, queue->config_unavailable_delay,
+					queue->config_unreachable_period, queue->config_unreachable_delay);
+			zbx_vector_interface_status_clear_ext(&interfaces, zbx_interface_status_free);
+		}
 
 		if (0 != itemids.values_num)
 		{
@@ -202,10 +204,11 @@ static void	*pp_worker_entry(void *args)
 			zabbix_log(LOG_LEVEL_DEBUG, "requeue items nextcheck:%d", nextcheck);
 		}
 
-		/* only check queue if requested */
+		/* only check queue if requested to preserve resources */
 		if (1 == check_queue)
 		{
 			poller_item = dc_config_async_get_poller_items(queue);
+
 			zabbix_log(LOG_LEVEL_DEBUG, "queue processing_num:" ZBX_FS_UI64 " pending:%d",
 					queue->processing_num, queue->poller_items.values_num);
 		}
@@ -221,8 +224,6 @@ static void	*pp_worker_entry(void *args)
 				worker->finished_cb(worker->finished_data);
 		}
 
-		//zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
-
 		if (SUCCEED != async_task_queue_wait(queue, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->id, error);
@@ -234,35 +235,33 @@ static void	*pp_worker_entry(void *args)
 	async_task_queue_deregister_worker(queue);
 	async_task_queue_unlock(queue);
 
+	zbx_vector_interface_status_clear_ext(&interfaces, zbx_interface_status_free);
 	zbx_vector_interface_status_destroy(&interfaces);
 
 	zbx_vector_int32_destroy(&lastclocks);
 	zbx_vector_int32_destroy(&errcodes);
 	zbx_vector_uint64_destroy(&itemids);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
 
 	return NULL;
 }
 
-int	async_worker_init(zbx_async_worker_t *worker, int id, zbx_async_queue_t *queue, zbx_timekeeper_t *timekeeper,
-		char **error)
+int	async_worker_init(zbx_async_worker_t *worker, int id, zbx_async_queue_t *queue, char **error)
 {
 	int		err, ret = FAIL;
 	pthread_attr_t	attr;
 
 	worker->id = id;
 	worker->queue = queue;
-	worker->timekeeper = timekeeper;
 
 	zbx_pthread_init_attr(&attr);
-	if (0 != (err = pthread_create(&worker->thread, &attr, pp_worker_entry, (void *)worker)))
+	if (0 != (err = pthread_create(&worker->thread, &attr, async_worker_entry, (void *)worker)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;
 	}
-	worker->init_flags |= PP_WORKER_INIT_THREAD;
+	worker->init_flags |= ASYNC_WORKER_INIT_THREAD;
 
 	ret = SUCCEED;
 out:
@@ -274,20 +273,20 @@ out:
 
 void	async_worker_stop(zbx_async_worker_t *worker)
 {
-	if (0 != (worker->init_flags & PP_WORKER_INIT_THREAD))
+	if (0 != (worker->init_flags & ASYNC_WORKER_INIT_THREAD))
 		worker->stop = 1;
 }
 
 void	async_worker_destroy(zbx_async_worker_t *worker)
 {
-	if (0 != (worker->init_flags & PP_WORKER_INIT_THREAD))
+	if (0 != (worker->init_flags & ASYNC_WORKER_INIT_THREAD))
 	{
 		void	*retval;
 
 		pthread_join(worker->thread, &retval);
 	}
 
-	worker->init_flags = PP_WORKER_INIT_NONE;
+	worker->init_flags = ASYNC_WORKER_INIT_NONE;
 }
 
 /******************************************************************************

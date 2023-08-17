@@ -7,34 +7,28 @@
 
 typedef struct
 {
-	zbx_uint32_t	init_flags;
-	int		workers_num;
-	zbx_uint64_t	pending_num;
-	zbx_uint64_t	finished_num;
-	zbx_uint64_t	processing_num;
+	zbx_uint32_t			init_flags;
+	int				workers_num;
+	zbx_uint64_t			pending_num;
+	zbx_uint64_t			finished_num;
+	zbx_uint64_t			processing_num;
 
-	zbx_uint64_t	processing_max;
-	unsigned char	poller_type;
-	int		config_timeout;
-	int		config_unavailable_delay;
-	int		config_unreachable_delay;
-	int		config_unreachable_period;
+	zbx_uint64_t			processing_max;
+	unsigned char			poller_type;
+	int				config_timeout;
+	int				config_unavailable_delay;
+	int				config_unreachable_delay;
+	int				config_unreachable_period;
 
-	zbx_vector_poller_item_t poller_items;
+	zbx_vector_poller_item_t	poller_items;
 	zbx_vector_interface_status_t	interfaces;
-	zbx_vector_uint64_t	itemids;
-	zbx_vector_int32_t	errcodes;
-	zbx_vector_int32_t	lastclocks;
-	unsigned char		check_queue;
+	zbx_vector_uint64_t		itemids;
+	zbx_vector_int32_t		errcodes;
+	zbx_vector_int32_t		lastclocks;
+	unsigned char			check_queue;
 
-	// zbx_hashset_t	sequences;
-
-	// zbx_list_t	pending;
-	// zbx_list_t	immediate;
-	// zbx_list_t	finished;
-
-	pthread_mutex_t	lock;
-	pthread_cond_t	event;
+	pthread_mutex_t			lock;
+	pthread_cond_t			event;
 }
 zbx_async_queue_t;
 
