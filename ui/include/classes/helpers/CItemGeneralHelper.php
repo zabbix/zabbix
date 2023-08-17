@@ -124,6 +124,77 @@ class CItemGeneralHelper {
 	}
 
 	/**
+	 * Convert API data to be ready to use for edit or create form.
+	 *
+	 * @param array $item  Array of API fields data.
+	 */
+	public static function convertApiInputForForm(array $item): array {
+
+		$i = 0;
+		foreach ($item['preprocessing'] as &$step) {
+			$step['params'] = $step['type'] == ZBX_PREPROC_SCRIPT
+				? [$step['params'], ''] : explode("\n", $step['params']);
+			$step['sortorder'] = $i++;
+		}
+		unset($step);
+
+		$item += [
+			'http_authtype' => ZBX_HTTP_AUTH_NONE,
+			'http_username' => '',
+			'http_password' => '',
+			'history_mode' => ITEM_STORAGE_CUSTOM,
+			'trends_mode' => ITEM_STORAGE_CUSTOM,
+			'show_inherited_tags' => 0,
+			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED ? 1 : 0,
+			'key' => $item['key_']
+		];
+		unset($item['key_']);
+		$history_seconds = timeUnitToSeconds($item['history']);
+		$trends_seconds = timeUnitToSeconds($item['trends']);
+
+		if ($history_seconds !== null && $history_seconds == ITEM_NO_STORAGE_VALUE) {
+			$item['history_mode'] = ITEM_STORAGE_OFF;
+			$item['history'] = DB::getDefault('items', 'history');
+		}
+
+		if ($trends_seconds !== null && $trends_seconds == ITEM_NO_STORAGE_VALUE) {
+			$item['trends_mode'] = ITEM_STORAGE_OFF;
+			$item['trends'] = DB::getDefault('items', 'trends');
+		}
+
+		if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
+			$item['http_authtype'] = $item['authtype'];
+			$item['http_username'] = $item['username'];
+			$item['http_password'] = $item['password'];
+			$item['authtype'] = DB::getDefault('items', 'authtype');
+			$item['username'] = '';
+			$item['password'] = '';
+			$query_fields = [];
+
+			foreach ($item['query_fields'] as $query_field) {
+				$query_fields[] = [
+					'name' => key($query_field),
+					'value' => reset($query_field)
+				];
+			}
+
+			$item['query_fields'] = $query_fields;
+			$headers = [];
+
+			foreach ($item['headers'] as $header => $value) {
+				$headers[] = [
+					'name' => $header,
+					'value' => $value
+				];
+			}
+
+			$item['headers'] = $headers;
+		}
+
+		return $item;
+	}
+
+	/**
 	 * Convert form submited data to be ready to send to API for update or create operation.
 	 *
 	 * @param array $input  Array of form input fields.
