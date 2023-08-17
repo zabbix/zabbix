@@ -106,8 +106,14 @@ abstract class CControllerItem extends CController {
 		$field = '';
 		$ret = $this->validateInput($fields);
 
-		if ($ret) {
-			foreach ($this->getInput('tags', []) as $tag) {
+		if ($ret && $this->hasInput('type') && $this->hasInput('key')) {
+			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
+		}
+
+		$tags = $this->getInput('tags', []);
+
+		if ($ret && $tags) {
+			foreach ($tags as $tag) {
 				if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)) {
 					$ret = false;
 					$field = 'tags';

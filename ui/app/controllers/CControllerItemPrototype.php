@@ -104,6 +104,54 @@ abstract class CControllerItemPrototype extends CController {
 		$field = '';
 		$ret = $this->validateInput($fields);
 
+		if ($ret && $this->hasInput('type') && $this->hasInput('key')) {
+			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
+		}
+
+		$tags = $this->getInput('tags', []);
+
+		if ($ret && $tags) {
+			foreach ($tags as $tag) {
+				if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)) {
+					$ret = false;
+					$field = 'tags';
+					break;
+				}
+			}
+		}
+
+		$parameters = $this->getInput('parameters', []);
+
+		if ($ret && $parameters) {
+			$ret = array_key_exists('name', $parameters) && array_key_exists('value', $parameters);
+			$field = 'parameters';
+		}
+
+		$query_fields = $this->getInput('query_fields', []);
+
+		if ($ret && $query_fields) {
+			$ret = array_key_exists('sortorder', $query_fields)
+				&& array_key_exists('name', $query_fields)
+				&& array_key_exists('value', $query_fields);
+			$field = 'query_fields';
+		}
+
+		$headers = $this->getInput('headers', []);
+
+		if ($ret && $headers) {
+			$ret = array_key_exists('sortorder', $headers)
+				&& array_key_exists('name', $headers)
+				&& array_key_exists('value', $headers);
+			$field = 'headers';
+		}
+
+		$delay_flex = $this->getInput('delay_flex', []);
+
+		if ($ret && $delay_flex) {
+			$ret = isValidCustomIntervals($delay_flex);
+			$field = 'delay_flex';
+		}
+
 		if ($ret) {
 			$ret = $this->hasInput('parent_discoveryid') || $this->hasInput('itemid');
 			$field = $this->hasInput('parent_discoveryid') ? 'itemid' : 'parent_discoveryid';
