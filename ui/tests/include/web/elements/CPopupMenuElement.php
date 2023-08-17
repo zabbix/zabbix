@@ -161,8 +161,7 @@ class CPopupMenuElement extends CElement {
 		$target = $this;
 
 		return function () use ($target) {
-			return (new CElementQuery('id:menu-popup-preloader'))->one(false)->isValid() === false &&
-					$target->isDisplayed();
+			return $target->isDisplayed();
 		};
 	}
 }
