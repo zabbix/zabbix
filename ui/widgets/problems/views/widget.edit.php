@@ -26,11 +26,13 @@
  * @var array $data
  */
 
+$form = (new CWidgetFormView($data));
+
 $groupids = array_key_exists('groupids', $data['fields'])
 	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
 	: null;
 
-(new CWidgetFormView($data))
+$form
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['show'])
 	)
@@ -74,7 +76,7 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
-	->addItem(getAcknowledgementStatusFieldsGroupViews($data['fields']))
+	->addItem(getAcknowledgementStatusFieldsViews($form, $data['fields']))
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
 	)
@@ -93,9 +95,11 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getAcknowledgementStatusFieldsGroupViews(array $fields): array {
-	$acknowledgement_status_field = new CWidgetFieldRadioButtonListView($fields['acknowledgement_status']);
-	$acknowledged_by_me_field = new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']);
+function getAcknowledgementStatusFieldsViews(CWidgetFormView $form, array $fields): array {
+	$acknowledgement_status_field = $form->registerField(
+		new CWidgetFieldRadioButtonListView($fields['acknowledgement_status'])
+	);
+	$acknowledged_by_me_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']));
 
 	return [
 		new CLabel(_('Acknowledgement status')),

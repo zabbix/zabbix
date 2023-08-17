@@ -50,7 +50,7 @@ class CHostGroup extends CApiService {
 		$result = [];
 
 		$output_fields = ['groupid', 'name', 'flags', 'uuid'];
-		$host_fields = ['hostid', 'host', 'name', 'description', 'proxy_hostid', 'status', 'ipmi_authtype',
+		$host_fields = ['hostid', 'host', 'name', 'description', 'proxyid', 'status', 'ipmi_authtype',
 			'ipmi_privilege', 'ipmi_password', 'ipmi_username', 'inventory_mode', 'tls_connect', 'tls_accept',
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
 			'maintenance_from', 'maintenance_status', 'flags'

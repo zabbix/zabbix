@@ -1508,24 +1508,24 @@ class CWidgetBase {
 	/**
 	 * Calculate viewport dimensions of the contents' container.
 	 *
-	 * @returns {{contents_height: number, contents_width: number}}
+	 * @returns {{height: number, width: number}}
 	 */
 	_getContentsSize() {
 		const computed_style = getComputedStyle(this._contents);
 
-		const contents_width = Math.floor(
+		const width = Math.floor(
 			parseFloat(computed_style.width)
 				- parseFloat(computed_style.paddingLeft) - parseFloat(computed_style.paddingRight)
 				- parseFloat(computed_style.borderLeftWidth) - parseFloat(computed_style.borderRightWidth)
 		);
 
-		const contents_height = Math.floor(
+		const height = Math.floor(
 			parseFloat(computed_style.height)
 				- parseFloat(computed_style.paddingTop) - parseFloat(computed_style.paddingBottom)
 				- parseFloat(computed_style.borderTopWidth) - parseFloat(computed_style.borderBottomWidth)
 		);
 
-		return {contents_width, contents_height};
+		return {width, height};
 	}
 
 	/**

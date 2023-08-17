@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @dataSource TagFilter, Proxies
+ * @dataSource TagFilter, Proxies, WebScenarios
  *
  * @backup hosts
  *
@@ -128,7 +128,7 @@ class testPageHosts extends CLegacyWebTest {
 		$name = $host['name'];
 
 		$sqlHosts =
-			'SELECT hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+			'SELECT hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
 			'ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,'.
 			'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
@@ -346,11 +346,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
-		$filter->fill([
-			'Templates' => [
-				'values' =>'Form test template',
-				'context' => 'Templates']
-		]);
+		$filter->fill(['Templates' => ['values' =>'Template for web scenario testing', 'context' => 'Templates']]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Simple form test host']");

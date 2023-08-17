@@ -37,25 +37,19 @@ window.condition_popup = new class {
 	}
 
 	_loadViews() {
-		if (document.querySelector('#condition-type').value == <?= CONDITION_TYPE_SERVICE ?>) {
+		if (this.form.querySelector('#condition-type').value == <?= CONDITION_TYPE_SERVICE ?>) {
 			$('#service-new-condition')
 				.multiSelect('getSelectButton')
-				.addEventListener('click', () => {
-					this.selectServices();
-				});
+				.addEventListener('click', () => this.selectServices());
 		}
 
-		this.form.addEventListener('click', (e) => {
-			document.querySelector('#condition-type').onchange = function() {
-				reloadPopup(e.target.closest('form'), 'popup.condition.edit');
-			}
+		this.form.querySelector('#condition-type').onchange = () => reloadPopup(this.form, 'popup.condition.edit');
 
-			if (document.querySelector('#trigger_context')) {
-				document.querySelector('#trigger_context').onchange = function() {
-					reloadPopup(e.target.closest("form"), 'popup.condition.edit');
-				}
-			}
-		})
+		const trigger_context = this.form.querySelector('#trigger_context');
+
+		if (trigger_context !== null) {
+			trigger_context.onchange = () => reloadPopup(this.form, 'popup.condition.edit');
+		}
 
 		this._disableChosenMultiselectValues();
 	}

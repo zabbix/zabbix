@@ -106,10 +106,12 @@
 		.subfilter-enabled {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
+			-webkit-text-fill-color: $multiselect-item-disabled-color;
 
 			.btn-icon {
 				pointer-events: none;
 				color: $multiselect-item-disabled-color;
+				-webkit-text-fill-color: $multiselect-item-disabled-color;
 			}
 		}
 	}

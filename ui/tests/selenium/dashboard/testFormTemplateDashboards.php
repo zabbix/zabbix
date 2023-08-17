@@ -1053,7 +1053,8 @@ class testFormTemplateDashboards extends CWebTest {
 	public function testFormTemplateDashboards_ViewDashboardOnHost() {
 		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::HOST_FOR_TEMPLATE);
 		$this->page->waitUntilReady();
-		$this->query('id:dashboardid')->asDropdown()->one()->select('Dashboard with all widgets');
+		$this->query('xpath://button[@title="Dashboard list"]')->asPopupButton()->one()
+				->select('Dashboard with all widgets');
 
 		$skip_selectors = [
 			'class:clock',
@@ -1108,10 +1109,10 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
 		}
 		else {
-			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Geomap', 'Graph',
-					'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
-					'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-					'Top hosts', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
+					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
+					'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+					'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}

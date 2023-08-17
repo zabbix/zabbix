@@ -171,6 +171,7 @@ $form-disabled-bg-color: #ebebeb !default;
 $form-disabled-border-color: #ccd5d9 !default;
 
 $input-placeholder-color: #9d9d9d !default;
+$input-disabled-placeholder-color: lighten($input-placeholder-color, 15%) !default;
 
 $form-search-color: #ffffff !default;
 $form-search-icon-color: $sidebar-color !default;
@@ -318,6 +319,12 @@ $clock-face-color: #ebebeb !default;
 $clock-hand-color: #1f2c33 !default;
 $clock-hand-sec-color: #0275b8 !default;
 $clock-lines-color: #acbbc2 !default;
+
+// Gauge arcs and needle.
+$gauge-empty-color: #ebebeb !default;
+$gauge-fill-color: #0275b8 !default;
+$gauge-needle-fill-color: #1f2c33 !default;
+$gauge-needle-stroke-color: #1f2c33 !default;
 
 // Timeline.
 $timeline-color: #aad7f0;

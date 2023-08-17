@@ -115,7 +115,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: new CWidgetFieldTags('tags', '')
+				: new CWidgetFieldTags('tags')
 			)
 			->addField(
 				(new CWidgetFieldColumnsList('columns', _('Columns')))->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
