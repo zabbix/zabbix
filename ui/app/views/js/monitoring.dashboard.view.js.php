@@ -294,7 +294,7 @@
 			window.removeEventListener('beforeunload', this.events.beforeUnload);
 		},
 
-		openItemForm(target, data) {
+		editItem(target, data) {
 			const overlay = PopUp('item.edit', data, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',

@@ -33,12 +33,9 @@
 				postMessageOk(response.success.title);
 				location.href = location.href;
 			});
-			document.querySelectorAll('.js-update-item').forEach(link => link.addEventListener('click', e => {
-				this.openItemForm(e.target, e.target.dataset);
-			}));
 		},
 
-		openItemForm(target, data) {
+		editItem(target, data) {
 			const overlay = PopUp('item.edit', data, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',

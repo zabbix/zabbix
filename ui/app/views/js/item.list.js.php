@@ -273,7 +273,7 @@
 			return overlay;
 		}
 
-		openItemForm(target, data) {
+		editItem(target, data) {
 			this.#edit(target, data);
 		}
 

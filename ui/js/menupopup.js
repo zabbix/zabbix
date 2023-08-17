@@ -543,7 +543,7 @@ function getMenuPopupMapElementTrigger(options) {
 					item_urls.push({
 						label: item.name,
 						clickCallback: () => {
-							view.openItemForm(null, {
+							view.editItem(null, {
 								context: 'host',
 								itemid: item.params.itemid
 							});
@@ -810,7 +810,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 					item_urls.push({
 						label: item.name,
 						clickCallback: () => {
-							view.openItemForm(null, {
+							view.editItem(null, {
 								context: 'host',
 								itemid: item.params.itemid
 							});
@@ -1052,7 +1052,7 @@ function getMenuPopupItem(options) {
 			config_urls.push({
 				label: t('Item'),
 				clickCallback: () => {
-					view.openItemForm(null, {
+					view.editItem(null, {
 						context: 'host',
 						itemid: options.itemid
 					});
@@ -1105,7 +1105,7 @@ function getMenuPopupItem(options) {
 			config_urls.push({
 				label: t('Create dependent item'),
 				clickCallback: () => {
-					view.openItemForm(null, {
+					view.editItem(null, {
 						context: options.context,
 						hostid: options.hostid,
 						type: 18, // ITEM_TYPE_DEPENDENT

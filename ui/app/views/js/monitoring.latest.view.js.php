@@ -412,7 +412,7 @@
 				});
 		},
 
-		openItemForm(target, data) {
+		editItem(target, data) {
 			this._removePopupMessage();
 			this.unscheduleRefresh();
 

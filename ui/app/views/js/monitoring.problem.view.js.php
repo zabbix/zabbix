@@ -54,7 +54,6 @@
 
 			this.initAcknowledge();
 			this.initExpandables();
-			this.initItemFormEvents(this.getCurrentResultsTable());
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -208,16 +207,6 @@
 			}
 		},
 
-		initItemFormEvents(form) {
-			form.addEventListener('click', e => {
-				const target = e.target;
-
-				if (target.matches('.js-update-item')) {
-					this.openItemForm(target, target.dataset);
-				}
-			});
-		},
-
 		showSymptoms(btn, idx, array) {
 			// Prevent multiple clicking by first disabling button.
 			btn.disabled = true;
@@ -281,7 +270,6 @@
 			);
 			chkbxRange.init();
 			this.initExpandables();
-			this.initItemFormEvents(this.getCurrentResultsTable());
 		},
 
 		refreshDebug(debug) {
@@ -435,7 +423,7 @@
 			this.openHostPopup({hostid});
 		},
 
-		openItemForm(target, data) {
+		editItem(target, data) {
 			clearMessages();
 
 			const overlay = PopUp('item.edit', data, {

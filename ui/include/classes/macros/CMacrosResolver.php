@@ -1197,7 +1197,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->onClick('view.openItemForm(this, '.json_encode([
+											->onClick('view.editItem(this, '.json_encode([
 												'context' => $options['context'],
 												'itemid' => $function['itemid'],
 												'parent_discoveryid' => $function['parent_itemid']
@@ -1210,7 +1210,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->onClick('view.openItemForm(this, '.json_encode([
+											->onClick('view.editItem(this, '.json_encode([
 												'context' => $options['context'],
 												'itemid' => $function['itemid']
 											]).')')
