@@ -122,15 +122,38 @@ abstract class CControllerItemPrototype extends CController {
 	 * @return array
 	 */
 	protected function getInputForForm(): array {
-		$input = [
-			'allow_traps' => DB::getDefault('items', 'allow_traps'),
+		if ($this->hasInput('form_refresh')) {
+			// Set unchecked values.
+			$input = [
+				'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
+				'output_format' => HTTPCHECK_STORE_RAW,
+				'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
+				'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
+				'status' => ITEM_STATUS_DISABLED,
+				'discover' => ZBX_PROTOTYPE_NO_DISCOVER
+			];
+		}
+		else {
+			// Set database defaults, form is open for create.
+			$input = [
+				'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
+				'output_format' => DB::getDefault('items', 'output_format'),
+				'verify_peer' => DB::getDefault('items', 'verify_peer'),
+				'verify_host' => DB::getDefault('items', 'verify_host'),
+				'allow_traps' => DB::getDefault('items', 'allow_traps'),
+				'status' => DB::getDefault('items', 'status'),
+				'discover' => DB::getDefault('items', 'discover')
+			];
+		}
+
+		$input = $input + [
 			'authtype' => DB::getDefault('items', 'authtype'),
 			'context' => '',
 			'delay' => ZBX_ITEM_DELAY_DEFAULT,
 			'delay_flex' => [],
 			'description' => DB::getDefault('items', 'description'),
 			'discover' => DB::getDefault('items', 'discover'),
-			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
 			'headers' => [],
 			'history' => DB::getDefault('items', 'history'),
 			'history_mode' => ITEM_STORAGE_CUSTOM,
@@ -148,7 +171,6 @@ abstract class CControllerItemPrototype extends CController {
 			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
 			'master_itemid' => 0,
 			'name' => '',
-			'output_format' => DB::getDefault('items', 'output_format'),
 			'parameters' => [],
 			'params_ap' => DB::getDefault('items', 'params'),
 			'params_es' => DB::getDefault('items', 'params'),
@@ -183,9 +205,7 @@ abstract class CControllerItemPrototype extends CController {
 			'url' => '',
 			'username' => DB::getDefault('items', 'username'),
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
-			'valuemapid' => 0,
-			'verify_host' => DB::getDefault('items', 'verify_host'),
-			'verify_peer' => DB::getDefault('items', 'verify_peer')
+			'valuemapid' => 0
 		];
 		$this->getInputs($input, array_keys($input));
 

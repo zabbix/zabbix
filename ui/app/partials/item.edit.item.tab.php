@@ -383,7 +383,8 @@ $formgrid = (new CFormGrid())
 	])
 	->addItem([
 		(new CLabel(_('SSL key file'), 'ssl_key_file'))->setId('js-item-ssl-key-file-label'),
-		(new CFormField((new CTextBox('ssl_key_file', $data['form']['ssl_key_file'], $data['readonly'],
+		(new CFormField(
+			(new CTextBox('ssl_key_file', $data['form']['ssl_key_file'], $data['readonly'],
 				DB::getFieldLength('items', 'ssl_key_file')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('js-item-ssl-key-file-field')
@@ -807,13 +808,14 @@ else {
 		->addItem([
 			new CLabel(_('Create enabled'), 'status'),
 			new CFormField(
-				(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($data['form']['status'] == ITEM_STATUS_ACTIVE))
+				(new CCheckBox('status', ITEM_STATUS_ACTIVE))
+					->setChecked($data['form']['status'] == ITEM_STATUS_ACTIVE))
 		])
 		->addItem([
 			new CLabel(_('Discover'), 'discover'),
-			new CFormField((new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
-				->setChecked($data['form']['discover'] == ZBX_PROTOTYPE_DISCOVER)
-				->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
+			new CFormField(
+				(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+					->setChecked($data['form']['discover'] == ZBX_PROTOTYPE_DISCOVER)
 			)
 		]);
 }
