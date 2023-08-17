@@ -105,6 +105,7 @@ if ($item['itemid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
+			'enabled' => !$data['readonly'],
 			'action' => 'item_edit_form.delete();'
 		]
 	];
@@ -188,7 +189,7 @@ $form
 			'form_data' => $item,
 			'host' => $data['host'],
 			'interface_types' => $data['interface_types'],
-			'readonly' => $data['readonly'],
+			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'source' => 'itemprototype',
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,

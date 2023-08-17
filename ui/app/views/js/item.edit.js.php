@@ -161,6 +161,7 @@ window.item_edit_form = new class {
 		node = document.createElement('button');
 		node.classList.add(ZBX_STYLE_BTN_GREY);
 		node.setAttribute('name', 'master-item-prototype');
+		node.disabled = this.form_readonly;
 		node.textContent = t('Select prototype');
 		master_item.append(node);
 	}
