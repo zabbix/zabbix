@@ -31,15 +31,8 @@ static zbx_poller_item_t	dc_config_async_get_poller_items(zbx_async_queue_t *que
 	else
 		zbx_free(poller_item.items);
 
-	// zbx_free(items);
-	// if (ZBX_IS_RUNNING())
-	// {
-	// 	poller_update_interfaces(poller_config);
-	// }
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, poller_item.num);
 
-	//poller_config->queued += num;
 	return poller_item;
 }
 
@@ -100,8 +93,6 @@ static void	poller_update_interfaces(zbx_vector_interface_status_t *interfaces,
 		}
 
 	}
-
-	zbx_vector_interface_status_clear(interfaces); //!! pointer free
 
 	if (NULL != data)
 	{
@@ -190,7 +181,7 @@ static void	*pp_worker_entry(void *args)
 
 		poller_update_interfaces(&interfaces, queue->config_unavailable_delay, queue->config_unreachable_period,
 				queue->config_unreachable_delay);
-		zbx_vector_interface_status_clear_ext(&interfaces, zbx_interface_status_clean);
+		zbx_vector_interface_status_clear_ext(&interfaces, zbx_interface_status_free);
 
 		if (0 != itemids.values_num)
 		{

@@ -20,7 +20,7 @@ void	async_task_queue_destroy(zbx_async_queue_t *queue)
 	zbx_vector_int32_destroy(&queue->errcodes);
 	zbx_vector_int32_destroy(&queue->lastclocks);
 	zbx_vector_poller_item_destroy(&queue->poller_items);
-	zbx_vector_interface_status_clear_ext(&queue->interfaces, zbx_interface_status_clean);
+	zbx_vector_interface_status_clear_ext(&queue->interfaces, zbx_interface_status_free);
 	zbx_vector_interface_status_destroy(&queue->interfaces);
 
 	//pp_task_queue_clear_tasks(&queue->pending);
