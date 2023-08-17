@@ -48,7 +48,7 @@ class Template {
 	/**
 	 * Fill template with data defined in object.
 	 *
-	 * @param {object} data
+	 * @param {Object} data
 	 *
 	 * @return {string}
 	 */
@@ -76,7 +76,7 @@ class Template {
 	/**
 	 * Fill template with data defined in object and return as HTMLElement.
 	 *
-	 * @param {object} data
+	 * @param {Object} data
 	 *
 	 * @return {HTMLElement}
 	 */
@@ -88,13 +88,13 @@ class Template {
 	 * Helper function called when match is found in template.
 	 *
 	 * @param {array}  match  Result of regex matching.
-	 * @param {object} data   Object containing data.
+	 * @param {Object} data   Object containing data.
 	 *
 	 * @return {string}
 	 */
 	#match(match, data) {
 		if (data === null) {
-			return match[1] + '';
+			return `${match[1]}`;
 		}
 
 		const before = match[1] || '';
@@ -105,7 +105,7 @@ class Template {
 
 		let expr = match[3];
 
-		const escape = (expr.substring(0, 1) !== '*');
+		const escape = expr.substring(0, 1) !== '*';
 
 		if (!escape) {
 			expr = expr.substring(1);
@@ -115,7 +115,7 @@ class Template {
 
 		match = pattern.exec(expr);
 
-		if (match == null) {
+		if (match === null) {
 			return before;
 		}
 
@@ -123,7 +123,7 @@ class Template {
 			const comp = match[1].substring(0, 1) === '[' ? match[2].replace(/\\\\]/g, ']') : match[1];
 
 			data = data[comp];
-			if (null === data || '' === match[3]) {
+			if (data === undefined || data === null || match[3] === '') {
 				break;
 			}
 
@@ -131,7 +131,7 @@ class Template {
 			match = pattern.exec(expr);
 		}
 
-		data = data === undefined || data === null ? '' : data.toString();
+		data = data === undefined || data === null ? '' : `${data}`;
 
 		return before + (escape
 			? data
