@@ -101,7 +101,7 @@ class CControllerTemplateEdit extends CController {
 				'description' => $this->getInput('description', ''),
 				'tags' => $this->getInput('tags', []),
 				'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
-				'valuemaps' => $this->getInput('valuemaps', []),
+				'valuemaps' => array_values($this->getInput('valuemaps', [])),
 				'readonly' => false,
 				'vendor' => [],
 				'clone' => true
@@ -153,9 +153,9 @@ class CControllerTemplateEdit extends CController {
 			foreach ($macros as &$macro) {
 				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
 					$macro = [
-							'type' => ZBX_MACRO_TYPE_TEXT,
-							'value' => ''
-						] + $macro;
+						'type' => ZBX_MACRO_TYPE_TEXT,
+						'value' => ''
+					] + $macro;
 
 					$secret_macro_reset = true;
 
