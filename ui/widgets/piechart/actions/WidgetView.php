@@ -50,7 +50,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->addValidationRules([
 			'from' => 'range_time',
 			'to' => 'range_time',
-			'with_config' => 'in 1'
+			'with_config' => 'in 1',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
@@ -83,6 +84,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_to' => $time_to
 			],
 			'templateid' => $this->getInput('templateid', ''),
+			'dynamic_hostid' => $this->getInput('dynamic_hostid', ''),
 			'merge_sectors' => [
 				'merge' => $this->fields_values['merge'],
 				'percent' => $this->fields_values['merge'] == self::MERGE_SECTORS_ON
@@ -139,7 +141,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$errors = [];
 		$total_value = [];
 
-		self::getItems($metrics, $options['data_sets'], $options['templateid']);
+		self::getItems($metrics, $options['data_sets'], $options['templateid'], $options['dynamic_hostid']);
 		self::sortByDataset($metrics);
 		self::getTimePeriod($metrics, $options['time_period']);
 		self::getChartDataSource($metrics, $errors, $options['data_source']);
@@ -167,148 +169,166 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $info;
 	}
 
-	private static function getItems(array &$metrics, array $data_sets, string $templateid): void {
+	private static function getItems(array &$metrics, array $data_sets, string $templateid, string $dynamic_hostid): void {
 		$metrics = [];
 		$max_metrics = 50;
 
+		if ($templateid !== '' && $dynamic_hostid === '') {
+			// Template dashboard (edit).
+			return;
+		}
+
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
-				if (!$data_set['itemids']) {
-					continue;
-				}
-
-				if ($max_metrics == 0) {
-					break;
-				}
-
-				if ($templateid !== '') {
-					$tmp_items = API::Item()->get([
-						'output' => ['key_'],
-						'itemids' => $data_set['itemids'],
-						'webitems' => true
-					]);
-
-					if ($tmp_items) {
-						$items = API::Item()->get([
-							'output' => ['itemid'],
-							'hostids' => [$templateid],
-							'webitems' => true,
-							'filter' => [
-								'key_' => array_column($tmp_items, 'key_')
-							]
-						]);
-						$data_set['itemids'] = $items ? array_column($items, 'itemid') : null;
-					}
-				}
-
-				$items_db = API::Item()->get([
-					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
-					'selectHosts' => ['name'],
-					'webitems' => true,
-					'filter' => [
-						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
-					],
-					'itemids' => $data_set['itemids'],
-					'preservekeys' => true,
-					'limit' => $max_metrics
-				]);
-
-				$items = [];
-
-				foreach ($data_set['itemids'] as $itemid) {
-					if (array_key_exists($itemid, $items_db)) {
-						$items[] = $items_db[$itemid];
-					}
-				}
-
-				if (!$items) {
-					continue;
-				}
-
-				unset($data_set['itemids']);
-
-				$colors = $data_set['color'];
-				$types = $data_set['type'];
-
-				foreach ($items as $item) {
-					$data_set['color'] = '#'.array_shift($colors);
-					$data_set['type'] = array_shift($types);
-					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
-					$max_metrics--;
-				}
-			}
-
-			if ($templateid === '') {
-				if (!$data_set['hosts'] || !$data_set['items']) {
-					continue;
-				}
-			}
-			else {
-				if (!$data_set['items']) {
-					continue;
-				}
-			}
-
-			if ($max_metrics == 0) {
+			if ($max_metrics === 0) {
 				break;
 			}
 
-			$options = [
-				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
-				'selectHosts' => ['name'],
-				'webitems' => true,
-				'filter' => [
-					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
-				],
-				'search' => [
-					'name' => self::processPattern($data_set['items'])
-				],
-				'searchWildcardsEnabled' => true,
-				'searchByAny' => true,
-				'sortfield' => 'name',
-				'sortorder' => ZBX_SORT_UP,
-				'limit' => $max_metrics
-			];
-
-			if ($templateid === '') {
-				$hosts = API::Host()->get([
-					'output' => [],
-					'search' => [
-						'name' => self::processPattern($data_set['hosts'])
-					],
-					'searchWildcardsEnabled' => true,
-					'searchByAny' => true,
-					'preservekeys' => true
-				]);
-
-				if ($hosts) {
-					$options['hostids'] = array_keys($hosts);
-				}
+			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
+				$ds_metrics = self::getMetricsSingleItemDS($data_set, $max_metrics, $dynamic_hostid);
 			}
 			else {
-				$options['hostids'] = $templateid;
+				$ds_metrics = self::getMetricsPatternItemDS($data_set, $max_metrics, $dynamic_hostid);
 			}
 
-			$items = null;
-
-			if (array_key_exists('hostids', $options) && $options['hostids']) {
-				$items = API::Item()->get($options);
-			}
-
-			if (!$items) {
-				continue;
-			}
-
-			unset($data_set['itemids'], $data_set['items']);
-
-			$colors = getColorVariations('#' . $data_set['color'], count($items));
-
-			foreach ($items as $item) {
-				$data_set['color'] = array_shift($colors);
-				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+			foreach ($ds_metrics as $ds_metric) {
+				$ds_metric['data_set'] = $index;
+				$metrics[] = $ds_metric;
 				$max_metrics--;
 			}
 		}
+	}
+
+	private static function getMetricsSingleItemDS(array $data_set, int $max_metrics, string $dynamic_hostid): array {
+		$metrics = [];
+		$ds_items = [];
+
+		if (!$data_set['itemids'] || count($data_set['color']) !== count($data_set['itemids'])
+				|| count($data_set['type']) !== count($data_set['itemids'])) {
+			return $metrics;
+		}
+
+		foreach ($data_set['itemids'] as $key => $item) {
+			$ds_items[$item] = [
+				'color' => $data_set['color'][$key],
+				'type' => $data_set['type'][$key]
+			];
+		}
+
+		unset($data_set['itemids'], $data_set['color'], $data_set['type']);
+
+		if ($dynamic_hostid !== '') {
+			// Host dashboard (view).
+			$tmp_items = API::Item()->get([
+				'output' => ['itemid', 'key_'],
+				'itemids' => array_keys($ds_items),
+				'webitems' => true
+			]);
+
+			if ($tmp_items) {
+				$items = API::Item()->get([
+					'output' => ['itemid', 'key_'],
+					'hostids' => [$dynamic_hostid],
+					'webitems' => true,
+					'filter' => [
+						'key_' => array_column($tmp_items, 'key_')
+					]
+				]);
+
+				if (!$items) {
+					$ds_items = [];
+				}
+				else {
+					$old_item_keys = array_combine(array_column($tmp_items, 'itemid'), array_column($tmp_items, 'key_'));
+					$new_itemids = array_combine(array_column($items, 'key_'), array_column($items, 'itemid'));
+
+					foreach ($ds_items as $key => $item) {
+						unset($ds_items[$key]);
+						$new_id = $new_itemids[$old_item_keys[$key]];
+						$ds_items[$new_id] = $item;
+					}
+				}
+			}
+		}
+
+		$items_db = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+			'selectHosts' => ['name'],
+			'webitems' => true,
+			'filter' => [
+				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+			],
+			'itemids' => array_keys($ds_items),
+			'preservekeys' => true,
+			'limit' => $max_metrics
+		]);
+
+		foreach ($items_db as $itemid => $item) {
+			$data_set['color'] = '#'.$ds_items[$itemid]['color'];
+			$data_set['type'] = $ds_items[$itemid]['type'];
+
+			$metrics[] = $item + ['options' => $data_set];
+		}
+
+		return $metrics;
+	}
+
+	private static function getMetricsPatternItemDS(array $data_set, int $max_metrics, string $dynamic_hostid): array {
+		$metrics = [];
+
+		if (($dynamic_hostid === '' && (!$data_set['hosts'] || !$data_set['items']))
+			|| ($dynamic_hostid !== '' && !$data_set['items'])
+		) {
+			return $metrics;
+		}
+
+		if ($dynamic_hostid === '') {
+			$hosts = API::Host()->get([
+				'output' => [],
+				'search' => [
+					'name' => self::processPattern($data_set['hosts'])
+				],
+				'searchWildcardsEnabled' => true,
+				'searchByAny' => true,
+				'preservekeys' => true
+			]);
+
+			$hostids = array_keys($hosts);
+		} else {
+			$hostids = [$dynamic_hostid];
+		}
+
+		if (!$hostids) {
+			return $metrics;
+		}
+
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+			'selectHosts' => ['name'],
+			'webitems' => true,
+			'hostids' => $hostids,
+			'filter' => [
+				'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+			],
+			'search' => [
+				'name' => self::processPattern($data_set['items'])
+			],
+			'searchWildcardsEnabled' => true,
+			'searchByAny' => true,
+			'sortfield' => 'name',
+			'sortorder' => ZBX_SORT_UP,
+			'limit' => $max_metrics
+		]);
+
+		$colors = getColorVariations('#' . $data_set['color'], count($items));
+
+		unset($data_set['hosts'], $data_set['items'], $data_set['color']);
+
+		foreach ($items as $item) {
+			$data_set['color'] = array_shift($colors);
+			$metrics[] = $item + ['options' => $data_set];
+		}
+
+		return $metrics;
 	}
 
 	private static function sortByDataset(array &$metrics): void {
