@@ -181,7 +181,7 @@ class NetworkDiscovery {
 					[
 						'type' => SVC_IMAP,
 						'ports' => 2050
-					],
+					]
 				]
 			],
 			[
