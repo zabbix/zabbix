@@ -304,6 +304,10 @@ function itemCompleteTest(overlay) {
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
 
+			if (runtime_error in ret) {
+				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
+			}
+
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}

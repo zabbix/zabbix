@@ -271,7 +271,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		 */
 		$preproc_test_data = [
 			'value' => $this->getInput('value', ''),
-			'steps' => $this->getInput('steps', []),
+			'steps' => sortPreprocessingSteps($this->getInput('steps', [])),
 			'single' => !$this->show_final_result,
 			'state' => 0
 		];
@@ -386,7 +386,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				if (array_key_exists('error', $result) && $result['error'] !== '') {
 					if ($preproc_test_data['steps']
 							&& $preproc_test_data['steps'][0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+						$preproc_test_data['runtime_error'] = $result['error'];
 						$preproc_test_data['state'] = 1;
+
+						$output['runtime_error'] = $result['error'];
 					}
 					else {
 						error($result['error']);
@@ -425,34 +428,47 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				error($server->getError());
 			}
 			elseif (is_array($result)) {
+				$test_outcome = [];
 				$test_failed = false;
-				$test_outcome = null;
 
 				foreach ($preproc_test_data['steps'] as $i => &$step) {
+					// If test considered failed, further steps are skipped.
 					if ($test_failed) {
-						// If test is failed, processing steps are skipped from results.
 						unset($preproc_test_data['steps'][$i]);
 						continue;
 					}
-					elseif (array_key_exists($i, $result['steps'])) {
-						$step += $result['steps'][$i];
 
+					if (array_key_exists($i, $result['steps'])) {
+						$test_outcome = $result['steps'][$i];
+						$step += $test_outcome;
+
+						// If error happened and no value override set, frontend shows 'No value'.
 						if (array_key_exists('error', $step)) {
-							// If error happened and no value is set, frontend shows label 'No value'.
-							if (!array_key_exists('action', $step) || $step['action'] != ZBX_PREPROC_FAIL_SET_VALUE) {
+							$output['runtime_error'] = $test_outcome['error'];
+
+							if (array_key_exists('action', $step)) {
+								switch ($step['action']) {
+									case ZBX_PREPROC_FAIL_DISCARD_VALUE:
+										unset($step['result']);
+										$test_failed = true;
+										break;
+
+									case ZBX_PREPROC_FAIL_SET_ERROR:
+										$step['error'] = $test_outcome['failed'];
+										break;
+								}
+							}
+							else {
 								unset($step['result']);
 								$test_failed = true;
 							}
-						}
-						elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-							$step['result'] = $preproc_test_data['value'];
 						}
 					}
 
 					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params']);
 
 					// Latest executed step due to the error or end of preprocessing.
-					$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
+					$test_outcome += ['action' => ZBX_PREPROC_FAIL_DEFAULT];
 				}
 				unset($step);
 
