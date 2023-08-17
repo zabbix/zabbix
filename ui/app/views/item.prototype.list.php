@@ -32,7 +32,8 @@ $form = (new CForm())
 	->addVar('parent_discoveryid', $data['parent_discoveryid'], 'form_parent_discoveryid')
 	->addVar('context', $data['context']);
 
-$list_url = (new CUrl())
+$list_url = (new CUrl('zabbix.php'))
+	->setArgument('action', $data['action'])
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();

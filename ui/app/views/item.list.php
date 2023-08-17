@@ -41,9 +41,9 @@ $form = (new CForm())
 	->addVar('context', $data['context'], uniqid('item_'))
 	->addVar('hostid', $data['hostid'] != 0 ? $data['hostid'] : null);
 
-$list_url = (new CUrl())
-	->setArgument('context', $data['context'])
+$list_url = (new CUrl('zabbix.php'))
 	->setArgument('action', $data['action'])
+	->setArgument('context', $data['context'])
 	->getUrl();
 
 $header = [

@@ -29,7 +29,7 @@ class CControllerItemList extends CControllerItem {
 		$fields = [
 			'filter_set'			=> 'in 1',
 			'filter_rst'			=> 'in 1',
-			'context'				=> 'in host,template',
+			'context'				=> 'required|in host,template',
 			'filter_groupids'		=> 'array_db hstgrp.groupid',
 			'filter_hostids'		=> 'array_db hosts.hostid',
 			'filter_name'			=> 'string',
@@ -128,7 +128,11 @@ class CControllerItemList extends CControllerItem {
 		[$items, $subfilter_fields] = $this->getItemsAndSubfilter($items, $this->getSubfilter($items, $filter));
 		$data['subfilter'] = static::sortSubfilter($subfilter_fields);
 		$items = $this->sortItems($items, ['sort' => $filter['sort'], 'sortorder' => $filter['sortorder']]);
-		$data['paging'] = CPagerHelper::paginate($page, $items, $filter['sortorder'], new CUrl());
+		$data['paging'] = CPagerHelper::paginate($page, $items, $filter['sortorder'],
+			(new CUrl('zabbix.php'))
+				->setArgument('action', $data['action'])
+				->setArgument('context', $data['context'])
+		);
 		$triggers = $this->getItemsTriggers($items);
 
 		if (count($filter['filter_hostids']) == 1) {
@@ -444,54 +448,6 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	/**
-	 * Get filter data stored in profile and data required for multiselect initialization in filter form.
-	 *
-	 * @return array
-	 */
-	protected function getFilter(): array {
-		$context = $this->getInput('context');
-		$filter = $this->getProfiles() + [
-			'ms_hostgroups' => [],
-			'ms_hosts' => [],
-			'ms_valuemaps' => []
-		];
-
-		if ($filter['filter_hostids']) {
-			if ($context === 'host') {
-				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => $filter['filter_hostids']
-				]), ['hostid' => 'id']);
-			}
-			else {
-				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
-					'output' => ['hostid', 'name'],
-					'templateids' => $filter['filter_hostids']
-				]), ['templateid' => 'id']);
-			}
-
-			if ($filter['ms_hosts'] && $filter['filter_valuemapids']) {
-				$filter['ms_valuemaps'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
-					'output' => ['valuemapid', 'name'],
-					'valuemapids' => $filter['filter_valuemapids']
-				]), ['valuemapid' => 'id']);
-			}
-		}
-
-		if ($filter['filter_groupids']) {
-			$service = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
-			$filter['ms_hostgroups'] = CArrayHelper::renameObjectsKeys($service->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter['filter_groupids']
-			]), ['groupid' => 'id']);
-		}
-
-		$this->getInputs($filter, ['sort', 'sortorder']);
-
-		return $filter;
-	}
-
-	/**
 	 * Sort results by field.
 	 *
 	 * @param array $items  Array of items to sort.
@@ -792,6 +748,58 @@ class CControllerItemList extends CControllerItem {
 		return $item_subfilter;
 	}
 
+	/**
+	 * Get filter data stored in profile and data required for multiselect initialization in filter form.
+	 *
+	 * @return array
+	 */
+	protected function getFilter(): array {
+		$context = $this->getInput('context');
+		$filter = $this->getProfiles() + [
+			'ms_hostgroups' => [],
+			'ms_hosts' => [],
+			'ms_valuemaps' => []
+		];
+
+		if ($filter['filter_hostids']) {
+			if ($context === 'host') {
+				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
+					'output' => ['hostid', 'name'],
+					'hostids' => $filter['filter_hostids']
+				]), ['hostid' => 'id']);
+			}
+			else {
+				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
+					'output' => ['hostid', 'name'],
+					'templateids' => $filter['filter_hostids']
+				]), ['templateid' => 'id']);
+			}
+
+			if ($filter['ms_hosts'] && $filter['filter_valuemapids']) {
+				$filter['ms_valuemaps'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'valuemapids' => $filter['filter_valuemapids']
+				]), ['valuemapid' => 'id']);
+			}
+		}
+
+		if ($filter['filter_groupids']) {
+			$service = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
+			$filter['ms_hostgroups'] = CArrayHelper::renameObjectsKeys($service->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter['filter_groupids']
+			]), ['groupid' => 'id']);
+		}
+
+		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
+				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
+			$this->getInputs($filter, ['sort', 'sortorder']);
+			$this->updateProfileSort();
+		}
+
+		return $filter;
+	}
+
 	protected function getProfiles(): array {
 		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.' : 'web.template.items.';
 		$filter = [
@@ -869,6 +877,19 @@ class CControllerItemList extends CControllerItem {
 		CProfile::updateArray($prefix.'filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
 		CProfile::updateArray($prefix.'filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
 		CProfile::updateArray($prefix.'filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+		$this->updateProfileSort();
+	}
+
+	protected function updateProfileSort() {
+		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.' : 'web.template.items.';
+
+		if ($this->hasInput('sort')) {
+			CProfile::update($prefix.'sort', $this->getInput('sort'), PROFILE_TYPE_STR);
+		}
+
+		if ($this->hasInput('sortorder')) {
+			CProfile::update($prefix.'sortorder', $this->getInput('sortorder'), PROFILE_TYPE_STR);
+		}
 	}
 
 	protected function deleteProfiles() {

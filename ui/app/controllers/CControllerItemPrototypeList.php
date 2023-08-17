@@ -58,14 +58,21 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 	}
 
 	public function doAction() {
-		$this->updateProfiles();
 		$profile = $this->getProfiles();
+
+		if ($this->getInput('sort', $profile['sort']) !== $profile['sort']
+				|| $this->getInput('sortorder', $profile['sortorder']) !== $profile['sortorder']) {
+			$this->getInputs($profile, ['sort', 'sortorder']);
+			$this->updateProfileSort();
+		}
+
 		[$lld_rule] = API::DiscoveryRule()->get([
 			'output' => ['hostid'],
 			'itemids' => $this->getInput('parent_discoveryid'),
 			'editable' => true
 		]);
 		$data = [
+			'action' => $this->getAction(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'context' => $this->getInput('context'),
 			'hostid' => $lld_rule['hostid'],
@@ -76,7 +83,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 		];
 		$data['paging'] = CPagerHelper::paginate($this->getInput('page', 1), $data['items'], $profile['sort'],
 			(new CUrl('zabbix.php'))
-				->setArgument('action', $this->getAction())
+				->setArgument('action', $data['action'])
 				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 				->setArgument('context', $data['context'])
 		);
@@ -151,16 +158,16 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 		return $profile;
 	}
 
-	protected function updateProfiles() {
+	protected function updateProfileSort() {
 		$prefix = $this->getInput('context') === 'host'
 			? 'web.host.items.prototypes.' : 'web.template.items.prototypes.';
 
 		if ($this->hasInput('sort')) {
-			CProfile::update($prefix.'sort', $this->getInput('sort', 'name'), PROFILE_TYPE_STR);
+			CProfile::update($prefix.'sort', $this->getInput('sort'), PROFILE_TYPE_STR);
 		}
 
 		if ($this->hasInput('sortorder')) {
-			CProfile::update($prefix.'sortorder', $this->getInput('sortorder', ZBX_SORT_UP), PROFILE_TYPE_STR);
+			CProfile::update($prefix.'sortorder', $this->getInput('sortorder'), PROFILE_TYPE_STR);
 		}
 	}
 }
