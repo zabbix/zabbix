@@ -253,14 +253,24 @@ class CControllerItemEdit extends CControllerItem {
 			'http_authtype' => '',
 			'http_username' => '',
 			'http_password' => '',
-			'history_mode' => $item['history'] == ITEM_NO_STORAGE_VALUE ? ITEM_STORAGE_OFF : ITEM_STORAGE_CUSTOM,
-			'trends_mode' => $item['trends'] == ITEM_NO_STORAGE_VALUE ? ITEM_STORAGE_OFF : ITEM_STORAGE_CUSTOM,
+			'history_mode' => ITEM_STORAGE_CUSTOM,
+			'trends_mode' => ITEM_STORAGE_CUSTOM,
 			'context' => $this->getInput('context'),
 			'show_inherited_tags' => 0,
 			'discovered' => $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED ? 1 : 0,
 			'key' => $item['key_']
 		];
 		unset($item['key_']);
+
+		if ($item['history'] == ITEM_NO_STORAGE_VALUE) {
+			$item['history_mode'] = ITEM_STORAGE_OFF;
+			$item['history'] = DB::getDefault('items', 'history');
+		}
+
+		if ($item['trends'] == ITEM_NO_STORAGE_VALUE) {
+			$item['trends_mode'] = ITEM_STORAGE_OFF;
+			$item['trends'] = DB::getDefault('items', 'trends');
+		}
 
 		if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
 			$item['http_authtype'] = $item['authtype'];
