@@ -133,25 +133,25 @@ $buttons = [
 	[
 		'content' => (new CSimpleButton(_('Create enabled')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massenable-item')
+			->addClass('js-massenable-itemprototype')
 			->addClass('js-no-chkbxrange')
 	],
 	[
 		'content' => (new CSimpleButton(_('Create disabled')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdisable-item')
+			->addClass('js-massdisable-itemprototype')
 			->addClass('js-no-chkbxrange')
 	],
 	[
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massupdate-item')
+			->addClass('js-massupdate-itemprototype')
 			->addClass('js-no-chkbxrange')
 	],
 	[
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdelete-item')
+			->addClass('js-massdelete-itemprototype')
 			->addClass('js-no-chkbxrange')
 	]
 ];
