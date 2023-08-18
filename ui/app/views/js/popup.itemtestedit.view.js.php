@@ -253,7 +253,7 @@ function itemCompleteTest(overlay) {
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
 		value: form_data['value'],
-		not_supported: form_data['not_supported'],
+		not_supported: form_data['not_supported'] || 0,
 		runtime_error: form_data['runtime_error'] || ''
 	});
 
@@ -406,6 +406,8 @@ function saveItemTestInputs() {
 		$test_obj,
 		input_values = {
 			value: jQuery('#value').multilineInput('value'),
+			not_supported: jQuery('#not_supported').is(':checked') ? 1 : 0,
+			runtime_error: jQuery('#runtime_error').multilineInput('value'),
 			eol: jQuery('#eol').find(':checked').val()
 		},
 		form_data = $form.serializeJSON(),
@@ -463,6 +465,8 @@ jQuery(document).ready(function($) {
 		grow: 'auto',
 		rows: 0
 	});
+
+	$('#not_supported').prop('checked', <?= $data['not_supported'] != 0 ? 'true' : 'false' ?>);
 
 	$('#runtime_error').multilineInput({
 		placeholder: <?= json_encode(_('error text')) ?>,

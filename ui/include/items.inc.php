@@ -1890,7 +1890,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 	}
 	unset($step);
 
-	return $preprocessing;
+	return sortPreprocessingSteps($preprocessing);
 }
 
 /**

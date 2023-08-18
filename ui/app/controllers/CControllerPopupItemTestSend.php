@@ -45,6 +45,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 	 */
 	protected $get_value_from_host;
 
+	private const SUPPORTED_STATE = 0;
+	private const NOT_SUPPORTED_STATE = 1;
+
 	/**
 	 * Time suffixes supported by Zabbix server.
 	 *
@@ -105,7 +108,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',
-			'not_supported'			=> 'in 1',
+			'not_supported'			=> 'in '.implode(',', [self::SUPPORTED_STATE, self::NOT_SUPPORTED_STATE]),
 			'runtime_error'			=> 'string'
 		];
 
@@ -271,9 +274,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		 */
 		$preproc_test_data = [
 			'value' => $this->getInput('value', ''),
-			'steps' => sortPreprocessingSteps($this->getInput('steps', [])),
+			'steps' => $this->getInput('steps', []),
 			'single' => !$this->show_final_result,
-			'state' => 0
+			'state' => self::SUPPORTED_STATE
 		];
 
 		// Get previous value and time.
@@ -387,7 +390,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					if ($preproc_test_data['steps']
 							&& $preproc_test_data['steps'][0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 						$preproc_test_data['runtime_error'] = $result['error'];
-						$preproc_test_data['state'] = 1;
+						$preproc_test_data['state'] = self::NOT_SUPPORTED_STATE;
 
 						$output['runtime_error'] = $result['error'];
 					}
@@ -402,9 +405,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			}
 		}
 		else {
-			$preproc_test_data['state'] = $this->getInput('not_supported', 0);
+			$preproc_test_data['state'] = $this->getInput('not_supported', self::SUPPORTED_STATE);
 
-			if ($preproc_test_data['state'] == 1) {
+			if ($preproc_test_data['state'] == self::NOT_SUPPORTED_STATE) {
 				$preproc_test_data['runtime_error'] = $this->getInput('runtime_error', '');
 			}
 		}
@@ -439,28 +442,29 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					}
 
 					if (array_key_exists($i, $result['steps'])) {
-						$test_outcome = $result['steps'][$i];
-						$step += $test_outcome;
+						$step += $result['steps'][$i];
 
 						// If error happened and no value override set, frontend shows 'No value'.
 						if (array_key_exists('error', $step)) {
-							$output['runtime_error'] = $test_outcome['error'];
-
 							if (array_key_exists('action', $step)) {
 								switch ($step['action']) {
 									case ZBX_PREPROC_FAIL_DISCARD_VALUE:
 										unset($step['result']);
 										$test_failed = true;
+									break;
+
+									case ZBX_PREPROC_FAIL_SET_VALUE:
+										// Code is not missing here.
 										break;
 
 									case ZBX_PREPROC_FAIL_SET_ERROR:
-										$step['error'] = $test_outcome['failed'];
+										$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 										break;
 								}
 							}
 							else {
 								unset($step['result']);
-								$test_failed = true;
+								$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 							}
 						}
 					}
@@ -468,7 +472,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params']);
 
 					// Latest executed step due to the error or end of preprocessing.
-					$test_outcome += ['action' => ZBX_PREPROC_FAIL_DEFAULT];
+					$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
 				}
 				unset($step);
 

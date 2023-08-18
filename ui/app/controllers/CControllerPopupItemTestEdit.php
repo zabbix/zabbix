@@ -161,19 +161,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps_input = $this->getInput('steps', []);
-		$preprocessing_steps_input = normalizeItemPreprocessingSteps($preprocessing_steps_input);
-		$preprocessing_steps = [];
-		foreach ($preprocessing_steps_input as $preproc) {
-			if ($preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-				array_unshift($preprocessing_steps, $preproc);
-			}
-			else {
-				$preprocessing_steps[] = $preproc;
-			}
-		}
-
-		$preprocessing_types = zbx_objectValues($preprocessing_steps, 'type');
+		$preprocessing_steps = normalizeItemPreprocessingSteps($this->getInput('steps', []));
+		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE);
 		$show_prev = (count(array_intersect($preprocessing_types, self::$preproc_steps_using_prev_value)) > 0);
@@ -403,9 +392,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'title' => _('Test item'),
 			'steps' => $preprocessing_steps,
 			'value' => array_key_exists('value', $data) ? $data['value'] : '',
+			'not_supported' => array_key_exists('not_supported', $data) ? $data['not_supported'] : 0,
+			'runtime_error' => array_key_exists('runtime_error', $data) ? $data['runtime_error'] : '',
 			'eol' => array_key_exists('eol', $data) ? (int) $data['eol'] : ZBX_EOL_LF,
 			'macros' => $usermacros['macros'],
-			'runtime_error' => array_key_exists('runtime_error', $data) ? $data['runtime_error'] : '',
 			'show_prev' => $show_prev,
 			'prev_value' => $prev_value,
 			'prev_time' => $prev_time,
