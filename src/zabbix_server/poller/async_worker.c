@@ -38,7 +38,7 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_async_queue_t *qu
 	poller_item->items = NULL;
 
 	poller_item->num = zbx_dc_config_get_poller_items(queue->poller_type, queue->config_timeout,
-			queue->processing_num, queue->processing_max, &poller_item->items);
+			queue->processing_num, queue->processing_limit, &poller_item->items);
 
 	if (0 != poller_item->num)
 	{

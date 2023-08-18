@@ -52,10 +52,8 @@ int	async_task_queue_init(zbx_async_queue_t *queue, zbx_thread_poller_args *poll
 	int	err, ret = FAIL;
 
 	queue->workers_num = 0;
-	queue->pending_num = 0;
-	queue->finished_num = 0;
 	queue->processing_num = 0;
-	queue->processing_max = poller_args_in->config_max_concurrent_checks_per_poller;
+	queue->processing_limit = poller_args_in->config_max_concurrent_checks_per_poller;
 	queue->poller_type = poller_args_in->poller_type;
 	queue->config_timeout = poller_args_in->config_comms->config_timeout;
 	queue->config_unavailable_delay = poller_args_in->config_unavailable_delay;

@@ -28,11 +28,9 @@ typedef struct
 {
 	zbx_uint32_t			init_flags;
 	int				workers_num;
-	zbx_uint64_t			pending_num;
-	zbx_uint64_t			finished_num;
 	zbx_uint64_t			processing_num;
 
-	zbx_uint64_t			processing_max;
+	zbx_uint64_t			processing_limit;
 	unsigned char			poller_type;
 	int				config_timeout;
 	int				config_unavailable_delay;
