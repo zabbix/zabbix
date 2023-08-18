@@ -3,9 +3,15 @@
 form.dashboard-grid-widget-tophosts {
 	$width-small: 150px;
 
-	#list_columns .text {
-		@extend %overflow-ellipsis;
-		max-width: $width-small;
+	#list_columns {
+		.drag-icon {
+			top: 1px;
+		}
+
+		.text {
+			@extend %overflow-ellipsis;
+			max-width: $width-small;
+		}
 	}
 
 	#column {

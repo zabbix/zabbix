@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
@@ -81,8 +82,8 @@ trait TableTrait {
 	 * @param array   $data        data array to be match with result in table
 	 * @param string  $selector    table selector
 	 */
-	public function assertTableData($data = [], $selector = 'class:list-table') {
-		$rows = $this->query($selector)->asTable()->one()->getRows();
+	public function assertTableData($data = [], $selector = null) {
+		$rows = $this->getTable($selector)->getRows();
 		if (!$data) {
 			// Check that table contain one row with text "No data found."
 			$this->assertEquals(['No data found.'], $rows->asText());
@@ -116,11 +117,11 @@ trait TableTrait {
 	 *
 	 * @throws Exception
 	 */
-	public function assertTableHasData($data = [], $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+	public function assertTableHasData($data = [], $selector = null) {
+		$table = $this->getTable($selector);
 
 		if (!$data) {
-			// Check that table contains one row with text "No data found."
+			// Check that table contain one row with text "No data found."
 			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 
 			return;
@@ -146,8 +147,9 @@ trait TableTrait {
 			}
 
 			if (!$found) {
-				throw new \Exception('Expected row data "'.implode(', ', $data_row).'" does not match row data in table "'.
-						implode(', ', $table_row).'".');
+				throw new \Exception('Row ('.implode(', ', array_map(function ($value) {
+					return '"'.$value.'"';
+				}, $data_row)).') was not found in table.');
 			}
 		}
 	}
@@ -189,8 +191,8 @@ trait TableTrait {
 	 * @param string $column		column name
 	 * @param string $selector		table selector
 	 */
-	public function selectTableRows($data = [], $column = 'Name', $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+	public function selectTableRows($data = [], $column = 'Name', $selector = null) {
+		$table = $this->getTable($selector);
 
 		if (!$data) {
 			// Select all rows in table.
@@ -220,8 +222,8 @@ trait TableTrait {
 	/**
 	 * Get data from chosen column.
 	 *
-	 * @param string $column		Column name, where value should be checked
-	 * @param string $selector		Table selector
+	 * @param string $column    column name, where value should be checked
+	 * @param string $selector  table selector
 	 */
 	private function getTableColumnData($column, $selector = null) {
 		$table = $this->getTable($selector);

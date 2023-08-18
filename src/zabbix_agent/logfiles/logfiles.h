@@ -65,7 +65,7 @@ void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int
 
 int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec);
+		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec, zbx_uint64_t itemid);
 
 struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num);
 #endif

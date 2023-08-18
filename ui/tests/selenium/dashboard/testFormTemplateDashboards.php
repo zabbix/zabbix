@@ -215,7 +215,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 			switch ($selector) {
 				case 'id:dashboard-config':
-					$controls->query($selector)->one()->click();
+					$controls->waitUntilVisible()->query($selector)->waitUntilClickable()->one()->click();
 					$this->checkDialogue('Dashboard properties');
 					break;
 
@@ -226,12 +226,12 @@ class testFormTemplateDashboards extends CWebTest {
 						'Paste widget' => false,
 						'Paste page' => false
 					];
-					$controls->query($selector)->one()->click();
+					$controls->query($selector)->waitUntilClickable()->one()->click();
 					$this->checkPopup($reference_items);
 					break;
 
 				case 'button:Add':
-					$controls->query($selector)->one()->click();
+					$controls->query($selector)->waitUntilClickable()->one()->click();
 					$this->checkDialogue('Add widget');
 					break;
 			}

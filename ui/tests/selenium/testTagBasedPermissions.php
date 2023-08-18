@@ -313,6 +313,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestLaunchOverlayDialog('Triggers');
 			COverlayDialogElement::find()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickXpathWait("//div[@class='overlay-dialogue-body']//a[text()='$name']");
+			COverlayDialogElement::ensureNotPresent();
 			// Apply filter
 			$this->query('name:filter_apply')->one()->click();
 			$table->waitUntilReloaded();
