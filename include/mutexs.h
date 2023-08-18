@@ -35,7 +35,7 @@ typedef HANDLE zbx_mutex_t;
 #	define zbx_mutex_lock(mutex)		__zbx_mutex_lock(__FILE__, __LINE__, mutex)
 #	define zbx_mutex_unlock(mutex)		__zbx_mutex_unlock(__FILE__, __LINE__, mutex)
 
-#	define zbx_mutex_glob_lock(mutex)	zbx_mutex_lock(mutex)
+#	define zbx_mutex_glob_lock(mutex)	__zbx_mutex_glob_lock(__FILE__, __LINE__, mutex)
 #	define zbx_mutex_glob_unlock(mutex)	__zbx_mutex_glob_unlock(__FILE__, __LINE__, mutex)
 #	define zbx_mutex_glob_destroy(mutex)	zbx_mutex_destroy(mutex)
 #else	/* not _WINDOWS */
@@ -112,8 +112,6 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t rwlock);
 void	zbx_rwlock_destroy(zbx_rwlock_t *rwlock);
-void	zbx_locks_disable(void);
-void	zbx_locks_enable(void);
 #else	/* fallback to semaphores if read-write locks are not available */
 #	define ZBX_RWLOCK_NULL				-1
 #	define ZBX_MUTEX_NULL				-1
@@ -152,6 +150,12 @@ void	zbx_locks_enable(void);
 typedef int zbx_mutex_t;
 typedef int zbx_rwlock_t;
 #endif
+
+#if defined(HAVE_PTHREAD_PROCESS_SHARED) || defined(_WINDOWS)
+void	zbx_locks_disable(void);
+void	zbx_locks_enable(void);
+#endif
+
 int		zbx_locks_create(char **error);
 void		zbx_locks_destroy(void);
 int		zbx_rwlock_create(zbx_rwlock_t *rwlock, zbx_rwlock_name_t name, char **error);
