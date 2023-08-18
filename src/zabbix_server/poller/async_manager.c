@@ -12,15 +12,7 @@ struct zbx_async_manager
 {
 	zbx_async_worker_t		*workers;
 	int				workers_num;
-	int				program_type;
-
-	zbx_uint64_t			revision;
-
 	zbx_async_queue_t		queue;
-
-	zbx_timekeeper_t		*timekeeper;
-
-	/*zbx_dc_um_shared_handle_t	*um_handle;*/
 };
 
 zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_cb_t finished_cb,
