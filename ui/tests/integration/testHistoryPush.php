@@ -97,6 +97,11 @@ class testHistoryPush extends CIntegrationTest {
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			[
+				'key_' => 'trapper_uint2',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			[
 				'key_' => 'trapper_uint_host_key_test',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64
@@ -347,7 +352,7 @@ class testHistoryPush extends CIntegrationTest {
 
 		for (; $idx < 5; $idx++) {
 			$values_sent_uint[] = [
-				'itemid' => self::$itemids['trapper_uint'],
+				'itemid' => self::$itemids['trapper_uint2'],
 				'value' => 1 + $idx,
 				'clock' => time() - 20 + $idx,
 				'ns' => intval(time() / 10000 + 25 * $idx)
@@ -391,9 +396,8 @@ class testHistoryPush extends CIntegrationTest {
 		$this->assertEquals($values_sent_text, $response['result']);
 
 		$response = $this->call('history.get', [
-			//'output' => 'extend',
 			'output' => ['itemid', 'value', 'clock', 'ns'],
-			'itemids' => self::$itemids['trapper_uint'],
+			'itemids' => self::$itemids['trapper_uint2'],
 			'sortfield' => 'clock',
 			'sortorder' => 'ASC'
 		]);
@@ -583,6 +587,21 @@ class testHistoryPush extends CIntegrationTest {
 			'clock' => $tm,
 			'ns' => 500
 			],
+		]);
+
+		$this->assertEquals(2, count($response['result']['data']));
+		$this->assertArrayNotHasKey('error', $response['result']['data'][0]);
+		$this->assertArrayHasKey('error', $response['result']['data'][1]);
+	}
+
+	public function testHistoryPush_malformedRequest() {
+		$response = $this->call('history.push', [
+			[
+			'host' => "10000",
+			'value' => 1,
+			'clock' => time(),
+			'ns' => 500
+			]
 		]);
 
 		$this->assertArrayHasKey('data', $response['result']);
