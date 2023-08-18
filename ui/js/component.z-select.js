@@ -58,7 +58,7 @@ class ZSelect extends HTMLElement {
 	 * @return {array}
 	 */
 	static get observedAttributes() {
-		return ['name', 'value', 'hidden', 'disabled', 'readonly', 'width'];
+		return ['name', 'value', 'disabled', 'readonly', 'width'];
 	}
 
 	attributeChangedCallback(name, old_value, new_value) {
@@ -87,10 +87,6 @@ class ZSelect extends HTMLElement {
 			case 'disabled':
 				this._button.disabled = (new_value !== null);
 				this._input.disabled = (new_value !== null);
-				break;
-
-			case 'hidden':
-				this.style.display = new_value === null ? '' : 'none';
 				break;
 
 			case 'readonly':

@@ -3254,6 +3254,16 @@ svg {
 		}
 	}
 
+	.step-parameters-toggle {
+		&:disabled {
+			display: none;
+		}
+
+		input:disabled {
+			display: none;
+		}
+	}
+
 	.step-on-fail {
 		flex: 0 0 $on-fail-width;
 		max-width: $on-fail-width;

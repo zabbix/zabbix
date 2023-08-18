@@ -1433,17 +1433,11 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 				break;
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-				if ($step_param_0_value === '') {
+				if ($step_param_0_value == '') {
 					$step_param_0_value = ZBX_PREPROC_MATCH_ERROR_ANY;
 				}
 
-				if ($item_type != ITEM_TYPE_SSH || $step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY) {
-					$step_param_1
-						->setAttribute('hidden', 'hidden')
-						->setAttribute('disabled', 'disabled');
-				}
-
-				$params = [
+				$fieldset = (new CFormFieldset(null, [
 					(new CSelect('preprocessing['.$i.'][params][0]'))
 						->addOptions(CSelect::createOptionsFromArray([
 							ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
@@ -1453,13 +1447,18 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 							->setAttribute('placeholder', _('error-matching'))
 							->addClass('js-preproc-param-error-matching')
 							->setValue($step_param_0_value)
-							->setReadonly($readonly)
-							->setHidden($item_type != ITEM_TYPE_SSH)
-							->setDisabled($item_type != ITEM_TYPE_SSH),
+							->setReadonly($readonly),
 					$step_param_1
 						->setAttribute('placeholder', _('pattern'))
 						->setReadonly($readonly)
-				];
+						->setEnabled($step_param_0_value != ZBX_PREPROC_MATCH_ERROR_ANY)
+				]))->addClass('step-parameters-toggle');
+
+				if ($item_type != ITEM_TYPE_SSH) {
+					$fieldset->setAttribute('disabled', 'disabled');
+				}
+
+				$params = [$fieldset];
 				break;
 
 

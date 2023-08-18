@@ -232,20 +232,21 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-check-not-supported-row-tmpl">
-	<?= (new CSelect('preprocessing[#{rowNum}][params][0]'))
-			->addOptions(CSelect::createOptionsFromArray([
-				ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
-				ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
-				ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
-			]))
-				->setAttribute('placeholder', _('error-matching'))
-				->addClass('js-preproc-param-error-matching')
-				->setValue(ZBX_PREPROC_MATCH_ERROR_ANY)
-		.(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
-			->removeId()
-			->setAttribute('placeholder', _('pattern'))
-			->setAttribute('hidden', 'hidden')
-			->setAttribute('disabled', 'disabled');
+	<?= (new CFormFieldset(null, [
+			(new CSelect('preprocessing[#{rowNum}][params][0]'))
+				->addOptions(CSelect::createOptionsFromArray([
+					ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
+					ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
+					ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
+				]))
+					->setAttribute('placeholder', _('error-matching'))
+					->addClass('js-preproc-param-error-matching')
+					->setValue(ZBX_PREPROC_MATCH_ERROR_ANY),
+			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
+				->removeId()
+				->setAttribute('placeholder', _('pattern'))
+				->setAttribute('disabled', 'disabled')
+		]))->addClass('step-parameters-toggle');
 	?>
 </script>
 
@@ -378,9 +379,15 @@
 					}));
 
 				case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
-					return $(preproc_param_check_not_supported_tmpl.evaluate({
+					const $params = $(preproc_param_check_not_supported_tmpl.evaluate({
 						rowNum: index
 					}));
+
+					$('#type').val() != <?= ITEM_TYPE_SSH ?>
+						? $params[0].disabled = true
+						: $params[0].removeAttribute('disabled');
+
+					return $params;
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_VALUE ?>':
 					return $(preproc_param_snmp_walk_value_tmpl.evaluate({
@@ -586,11 +593,7 @@
 				$(this).next('input').prop('disabled', $(this).val() !== '<?= ZBX_PREPROC_PROMETHEUS_LABEL ?>');
 			})
 			.on('change', '.js-preproc-param-error-matching', function() {
-				const pattern_hidden = $(this).val() == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>;
-
-				$(this).next('input')
-					.prop('hidden', pattern_hidden)
-					.prop('disabled', pattern_hidden);
+				$(this).next('input').prop('disabled', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
 			})
 			.on('click', '.js-group-json-action-delete', function() {
 				const table = this.closest('.group-json-mapping');
@@ -624,6 +627,20 @@
 				container
 					.querySelector('tbody')
 					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb}));
+			})
+			.on('item-type-change', function (e) {
+				const $preproc_steps = $('z-select[name^="preprocessing["][name$="[type]"]'),
+					no_parameters = $('#type').val() != <?= ITEM_TYPE_SSH ?>;
+
+				for (let select of $preproc_steps) {
+					for (let option of select.getOptions()) {
+						if (option.value == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
+							$(select).closest('.preprocessing-step')
+								.find('.step-parameters-toggle').prop('disabled', no_parameters);
+							break;
+						}
+					}
+				}
 			});
 	});
 </script>
