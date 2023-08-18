@@ -221,8 +221,6 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 	int				i, total = 0;
 	zbx_vector_poller_item_t	poller_items;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 	zbx_vector_poller_item_create(&poller_items);
 #ifdef HAVE_NETSNMP
 	if (1 == poller_config->clear_cache)
@@ -242,6 +240,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 #endif
 
 	zbx_async_manager_queue_get(poller_config->manager, &poller_items);
+	if (0 != poller_items.values_num)
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (int j = 0; j < poller_items.values_num; j++)
 	{
@@ -320,7 +320,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 		zbx_free(items);
 	}
 exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): num:%d", __func__, total);
+	if (0 != total)
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): num:%d", __func__, total);
 
 	poller_config->queued += total;
 
