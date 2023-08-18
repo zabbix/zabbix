@@ -50,7 +50,6 @@ $form = (new CForm('post'))
 	->addVar('context', $item['context'])
 	->addVar('hostid', $data['host']['hostid'])
 	->addVar('itemid', $item['itemid'] ? $item['itemid'] : null)
-	->addVar('discovered', $item['discovered'])
 	->addVar('templateid', $item['itemid'] ? $item['templateid'] : null)
 	->addVar('form_refresh', 1);
 

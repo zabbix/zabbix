@@ -33,68 +33,68 @@ abstract class CControllerItemPrototype extends CController {
 
 	protected function validateFormInput(array $required_fields): bool {
 		$fields = [
-			'allow_traps'			=> 'in 0,1',
-			'authtype'				=> 'db items.authtype',
-			'context'				=> 'required|in host,template',
-			'delay'					=> 'db items.delay',
-			'delay_flex'			=> 'array',
-			'description'			=> 'db items.description',
-			'follow_redirects'		=> 'in 0,1',
-			'form_refresh'			=> 'in 1',
-			'headers'				=> 'array',
-			'history'				=> 'db items.history',
-			'history_mode'			=> 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
-			'hostid'				=> 'id',
-			'http_authtype'			=> 'db items.authtype',
-			'http_password'			=> 'db items.password',
-			'http_proxy'			=> 'string',
-			'http_username'			=> 'db items.username',
-			'interfaceid'			=> 'id',
-			'inventory_link'		=> 'db items.inventory_link',
-			'ipmi_sensor'			=> 'db items.ipmi_sensor',
-			'itemid'				=> 'id',
-			'jmx_endpoint'			=> 'db items.jmx_endpoint',
-			'key'					=> 'db items.key_',
-			'logtimefmt'			=> 'db items.logtimefmt',
-			'master_itemid'			=> 'id',
 			'name'					=> 'db items.name',
-			'output_format'			=> 'in 0,1',
-			'parameters'			=> 'array',
-			'params_ap'				=> 'db items.params',
-			'params_es'				=> 'db items.params',
-			'params_f'				=> 'db items.params',
-			'parent_discoveryid'	=> 'id',
-			'password'				=> 'db items.password',
-			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
-			'posts'					=> 'db items.posts',
-			'preprocessing'			=> 'array',
-			'privatekey'			=> 'db items.privatekey',
-			'publickey'				=> 'db items.publickey',
+			'type'					=> 'db items.type',
+			'key'					=> 'db items.key_',
+			'value_type'			=> 'db items.value_type',
+			'url'					=> 'db items.url',
 			'query_fields'			=> 'array',
-			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
-			'retrieve_mode'			=> 'in '.implode(',', [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH]),
+			'parameters'			=> 'array',
 			'script'				=> 'db items.params',
-			'show_inherited_tags'	=> 'in 0,1',
-			'snmp_oid'				=> 'db items.snmp_oid',
+			'request_method'		=> 'db items.request_method',
+			'timeout'				=> 'db items.timeout',
+			'post_type'				=> 'db items.post_type',
+			'posts'					=> 'db items.posts',
+			'headers'				=> 'array',
+			'status_codes'			=> 'db items.status_codes',
+			'follow_redirects'		=> 'db items.follow_redirects',
+			'retrieve_mode'			=> 'db items.retrieve_mode',
+			'output_format'			=> 'db items.output_format',
+			'http_proxy'			=> 'string',
+			'http_authtype'			=> 'db items.authtype',
+			'http_username'			=> 'db items.username',
+			'http_password'			=> 'db items.password',
+			'verify_peer'			=> 'db items.verify_peer',
+			'verify_host'			=> 'db items.verify_host',
 			'ssl_cert_file'			=> 'db items.ssl_cert_file',
 			'ssl_key_file'			=> 'db items.ssl_key_file',
 			'ssl_key_password'		=> 'db items.ssl_key_password',
-			'status'				=> 'db items.status',
-			'status_codes'			=> 'db items.status_codes',
-			'tags'					=> 'array',
-			'templateid'			=> 'id',
-			'timeout'				=> 'db items.timeout',
-			'trapper_hosts'			=> 'db items.trapper_hosts',
-			'trends'				=> 'db items.trends',
-			'trends_mode'			=> 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
-			'type'					=> 'db items.type',
-			'units'					=> 'db items.units',
-			'url'					=> 'db items.url',
+			'master_itemid'			=> 'id',
+			'interfaceid'			=> 'id',
+			'snmp_oid'				=> 'db items.snmp_oid',
+			'ipmi_sensor'			=> 'db items.ipmi_sensor',
+			'authtype'				=> 'db items.authtype',
+			'jmx_endpoint'			=> 'db items.jmx_endpoint',
 			'username'				=> 'db items.username',
-			'value_type'			=> 'db items.value_type',
+			'publickey'				=> 'db items.publickey',
+			'privatekey'			=> 'db items.privatekey',
+			'password'				=> 'db items.password',
+			'params_es'				=> 'db items.params',
+			'params_ap'				=> 'db items.params',
+			'params_f'				=> 'db items.params',
+			'units'					=> 'db items.units',
+			'delay'					=> 'db items.delay',
+			'delay_flex'			=> 'array',
+			'history_mode'			=> 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'history'				=> 'db items.history',
+			'trends_mode'			=> 'in '.implode(',', [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]),
+			'trends'				=> 'db items.trends',
+			'logtimefmt'			=> 'db items.logtimefmt',
 			'valuemapid'			=> 'id',
-			'verify_host'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
-			'verify_peer'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON])
+			'allow_traps'			=> 'db items.allow_traps',
+			'trapper_hosts'			=> 'db items.trapper_hosts',
+			'description'			=> 'db items.description',
+			'status'				=> 'db items.status',
+			'discover'				=> 'db items.discover',
+			'show_inherited_tags'	=> 'in 0,1',
+			'tags'					=> 'array',
+			'preprocessing'			=> 'array',
+			'context'				=> 'required|in host,template',
+			'hostid'				=> 'id',
+			'itemid'				=> 'id',
+			'parent_discoveryid'	=> 'id',
+			'templateid'			=> 'id',
+			'form_refresh'			=> 'in 1'
 		];
 
 		foreach ($required_fields as $field) {
@@ -111,13 +111,8 @@ abstract class CControllerItemPrototype extends CController {
 		$tags = $this->getInput('tags', []);
 
 		if ($ret && $tags) {
-			foreach ($tags as $tag) {
-				if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)) {
-					$ret = false;
-					$field = 'tags';
-					break;
-				}
-			}
+			$ret = count(array_column($tags, 'tag')) == count(array_column($tags, 'value'));
+			$field = 'tags';
 		}
 
 		$parameters = $this->getInput('parameters', []);
@@ -170,48 +165,25 @@ abstract class CControllerItemPrototype extends CController {
 	 * @return array
 	 */
 	protected function getInputForForm(): array {
-		if ($this->hasInput('form_refresh')) {
-			// Set unchecked values.
-			$input = [
-				'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
-				'output_format' => HTTPCHECK_STORE_RAW,
-				'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF,
-				'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
-				'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
-				'status' => ITEM_STATUS_DISABLED,
-				'discover' => ZBX_PROTOTYPE_NO_DISCOVER
-			];
-		}
-		else {
-			// Set database defaults, form is open for create.
-			$input = [
-				'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
-				'output_format' => DB::getDefault('items', 'output_format'),
-				'verify_peer' => DB::getDefault('items', 'verify_peer'),
-				'verify_host' => DB::getDefault('items', 'verify_host'),
-				'allow_traps' => DB::getDefault('items', 'allow_traps'),
-				'status' => DB::getDefault('items', 'status'),
-				'discover' => DB::getDefault('items', 'discover')
-			];
-		}
-
-		$input = $input + [
+		$input = [
+			'allow_traps' => DB::getDefault('items', 'allow_traps'),
 			'authtype' => DB::getDefault('items', 'authtype'),
 			'context' => '',
-			'delay' => ZBX_ITEM_DELAY_DEFAULT,
 			'delay_flex' => [],
+			'delay' => ZBX_ITEM_DELAY_DEFAULT,
 			'description' => DB::getDefault('items', 'description'),
 			'discover' => DB::getDefault('items', 'discover'),
+			'discover' => DB::getDefault('items', 'discover'),
+			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
 			'headers' => [],
-			'history' => DB::getDefault('items', 'history'),
 			'history_mode' => ITEM_STORAGE_CUSTOM,
+			'history' => DB::getDefault('items', 'history'),
 			'hostid' => 0,
 			'http_authtype' => ZBX_HTTP_AUTH_NONE,
 			'http_password' => '',
 			'http_proxy' => DB::getDefault('items', 'http_proxy'),
 			'http_username' => '',
 			'interfaceid' => 0,
-			'inventory_link' => 0,
 			'ipmi_sensor' => DB::getDefault('items', 'ipmi_sensor'),
 			'itemid' => 0,
 			'jmx_endpoint' => ZBX_DEFAULT_JMX_ENDPOINT,
@@ -219,6 +191,7 @@ abstract class CControllerItemPrototype extends CController {
 			'logtimefmt' => DB::getDefault('items', 'logtimefmt'),
 			'master_itemid' => 0,
 			'name' => '',
+			'output_format' => DB::getDefault('items', 'output_format'),
 			'parameters' => [],
 			'params_ap' => DB::getDefault('items', 'params'),
 			'params_es' => DB::getDefault('items', 'params'),
@@ -239,22 +212,37 @@ abstract class CControllerItemPrototype extends CController {
 			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
 			'ssl_key_file' => DB::getDefault('items', 'ssl_key_file'),
 			'ssl_key_password' => DB::getDefault('items', 'ssl_key_password'),
-			'status' => DB::getDefault('items', 'status'),
 			'status_codes' => DB::getDefault('items', 'status_codes'),
 			'status' => DB::getDefault('items', 'status'),
 			'tags' => [],
 			'templateid' => 0,
 			'timeout' => DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
-			'trends' => DB::getDefault('items', 'trends'),
 			'trends_mode' => ITEM_STORAGE_CUSTOM,
+			'trends' => DB::getDefault('items', 'trends'),
 			'type' => DB::getDefault('items', 'type'),
 			'units' => DB::getDefault('items', 'units'),
 			'url' => '',
 			'username' => DB::getDefault('items', 'username'),
 			'value_type' => ITEM_VALUE_TYPE_UINT64,
-			'valuemapid' => 0
+			'valuemapid' => 0,
+			'verify_host' => DB::getDefault('items', 'verify_host'),
+			'verify_peer' => DB::getDefault('items', 'verify_peer')
 		];
+
+		if ($this->hasInput('form_refresh')) {
+			// Set unchecked values.
+			$input = [
+				'allow_traps' => HTTPCHECK_ALLOW_TRAPS_OFF,
+				'discover' => ZBX_PROTOTYPE_NO_DISCOVER,
+				'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
+				'output_format' => HTTPCHECK_STORE_RAW,
+				'status' => ITEM_STATUS_DISABLED,
+				'verify_host' => ZBX_HTTP_VERIFY_HOST_OFF,
+				'verify_peer' => ZBX_HTTP_VERIFY_PEER_OFF
+			] + $input;
+		}
+
 		$this->getInputs($input, array_keys($input));
 
 		if ($input['query_fields']) {
