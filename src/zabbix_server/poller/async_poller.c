@@ -314,7 +314,9 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 
 		zbx_poller_item_free(poller_items.values[j]);
 	}
+#ifdef HAVE_NETSNMP
 exit:
+#endif
 	if (0 != total)
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): num:%d", __func__, total);
 
