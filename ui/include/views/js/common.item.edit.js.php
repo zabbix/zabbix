@@ -187,6 +187,8 @@
 				if (item_type_lookup.form !== null) {
 					item_type_lookup.update();
 				}
+
+				$('#preprocessing').trigger('item-type-change');
 			})
 			.trigger('change');
 

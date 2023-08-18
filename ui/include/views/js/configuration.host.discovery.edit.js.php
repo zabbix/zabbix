@@ -23,8 +23,8 @@
  * @var CView $this
  */
 
-include __DIR__.'/common.item.edit.js.php';
 include __DIR__.'/item.preprocessing.js.php';
+include __DIR__.'/common.item.edit.js.php';
 include __DIR__.'/editabletable.js.php';
 include __DIR__.'/itemtest.js.php';
 include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
