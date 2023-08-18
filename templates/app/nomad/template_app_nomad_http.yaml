@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-17T08:29:29Z'
+  date: '2023-08-18T06:52:45Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -38,7 +38,7 @@ zabbix_export:
                       });
                   
                       return response.pop();
-                  } 
+                  }
                   catch (error) {
                       return "HTTP/1.1 408 Request timeout";
                   }
@@ -57,9 +57,8 @@ zabbix_export:
               event_name: 'HashiCorp Nomad: Client nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
-                Client nodes API connection has failed. 
+                Client nodes API connection has failed.
                 Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -152,9 +151,8 @@ zabbix_export:
               event_name: 'HashiCorp Nomad: Server-related API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
-                Server-related API connection has failed. 
+                Server-related API connection has failed.
                 Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -619,7 +617,6 @@ zabbix_export:
               description: |
                 Cannot establish the connection to [rpc] service port {$NOMAD.CLIENT.RPC.PORT}.
                 Check the Nomad state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -649,7 +646,6 @@ zabbix_export:
               description: |
                 Cannot establish the connection to [serf] service port {$NOMAD.CLIENT.SERF.PORT}.
                 Check the Nomad state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1083,7 +1079,7 @@ zabbix_export:
                       });
                   
                       return response.pop();
-                  } 
+                  }
                   catch (error) {
                       return "HTTP/1.1 408 Request timeout";
                   }
@@ -1102,9 +1098,8 @@ zabbix_export:
               event_name: 'HashiCorp Nomad Client: Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
-                Monitoring API connection has failed. 
+                Monitoring API connection has failed.
                 Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1157,7 +1152,7 @@ zabbix_export:
                       });
                   
                       return response.pop();
-                  } 
+                  }
                   catch (error) {
                       return "HTTP/1.1 408 Request timeout";
                   }
@@ -1176,9 +1171,8 @@ zabbix_export:
               event_name: 'HashiCorp Nomad Client: Allocations API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
-                Allocations API connection has failed. 
+                Allocations API connection has failed.
                 Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               dependencies:
                 - name: 'HashiCorp Nomad Client: Monitoring API connection has failed'
@@ -1342,7 +1336,7 @@ zabbix_export:
                       });
                   
                       return response.pop();
-                  } 
+                  }
                   catch (error) {
                       return "HTTP/1.1 408 Request timeout";
                   }
@@ -1361,9 +1355,8 @@ zabbix_export:
               event_name: 'HashiCorp Nomad Client: Nodes API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
-                Nodes API connection has failed. 
+                Nodes API connection has failed.
                 Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               dependencies:
                 - name: 'HashiCorp Nomad Client: Monitoring API connection has failed'
@@ -2356,7 +2349,7 @@ zabbix_export:
                       return data;
                   }
                   
-                  var keys = Object.keys(getField(body,'Drivers')); 
+                  var keys = Object.keys(getField(body,'Drivers'));
                   
                       for (k in keys) {
                           arr.push({
@@ -2882,7 +2875,6 @@ zabbix_export:
               description: |
                 Cannot establish the connection to [rpc] service port {$NOMAD.SERVER.RPC.PORT}.
                 Check the Nomad state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -2912,7 +2904,6 @@ zabbix_export:
               description: |
                 Cannot establish the connection to [serf] service port {$NOMAD.SERVER.SERF.PORT}.
                 Check the Nomad state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -3555,7 +3546,7 @@ zabbix_export:
                       });
                   
                       return response.pop();
-                  } 
+                  }
                   catch (error) {
                       return "HTTP/1.1 408 Request timeout";
                   }
@@ -3574,9 +3565,8 @@ zabbix_export:
               event_name: 'HashiCorp Nomad Server: Monitoring API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
-                Monitoring API connection has failed. 
+                Monitoring API connection has failed.
                 Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -5597,7 +5587,7 @@ zabbix_export:
                       });
                   
                       return response.pop();
-                  } 
+                  }
                   catch (error) {
                       return "HTTP/1.1 408 Request timeout";
                   }
@@ -5616,9 +5606,8 @@ zabbix_export:
               event_name: 'HashiCorp Nomad Server: Internal stats API connection has failed. HTTP response code: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+(\d{3})", \1")}. Response message: {{ITEM.VALUE}.regsub("HTTP\/[\d.]+\s+\d{3}\s+(.*)", \1")}'
               priority: AVERAGE
               description: |
-                Internal stats API connection has failed. 
+                Internal stats API connection has failed.
                 Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
-                
               manual_close: 'YES'
               dependencies:
                 - name: 'HashiCorp Nomad Server: Monitoring API connection has failed'
