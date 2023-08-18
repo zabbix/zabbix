@@ -1636,7 +1636,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Discovery by proxy' => 'Proxy for Network discovery',
 						'IP range' => '192.168.2.3-255',
 						'Update interval' => '25h',
-						'id:concurrency_max_type' => 'Unlimited',
+						'id:concurrency_max_type' => 'Unlimited'
 					],
 					'expected_checks_table' => [
 						'LDAP (555)',

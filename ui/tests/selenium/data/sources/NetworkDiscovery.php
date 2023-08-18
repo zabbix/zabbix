@@ -40,7 +40,7 @@ class NetworkDiscovery {
 				]
 			]
 		);
-		$proxyid = $proxies['proxyids'][0];;
+		$proxyid= $proxies['proxyids'][0];
 
 		CDataHelper::call('drule.create', [
 			[
@@ -85,9 +85,7 @@ class NetworkDiscovery {
 						'ports' => 161,
 						'key_' => '.1.3.6.1.2.1.9.9.9',
 						'snmp_community'=> 'test SNMP community',
-						'host_source' => 1,
-						'name_source' => 0
-						// TODO: Change host_source and name_source to commented lines when ZBX-23088 is fixed.
+						// TODO: Uncomment lines when ZBX-23088 is fixed.
 						//'host_source' => 3,
 						//'name_source' => 2
 					],
@@ -98,26 +96,22 @@ class NetworkDiscovery {
 						'snmpv3_contextname name' => 'test_context_name',
 						'snmpv3_securityname' => 'test_security_name',
 						'snmpv3_securitylevel' => 0,
-						'host_source' => 1,
-						// TODO: Change  name_source to commented line when ZBX-23088 is fixed.
+						// TODO: Uncomment line when ZBX-23088 is fixed.
 						//'name_source' => 2
-						'name_source' => 0,
 						'uniq' => 1
 					],
 					[
 						'type' => SVC_TELNET,
 						'ports' => 23,
-						'host_source' => 1,
-						// TODO: Change  name_source to commented line when ZBX-23088 is fixed.
+						// TODO: Uncomment line when ZBX-23088 is fixed.
 						//'name_source' => 2
-						'name_source' => 0
 					]
 				]
 			],
 			[
 				'name' => 'Discovery rule for clone',
 				'iprange' => '192.168.2.3-255',
-				'proxy_hostid' => $proxyid,
+				'proxyid' => $proxyid,
 				'delay' => '25h',
 				'status' =>  1,
 				'concurrency_max' => 0,
@@ -125,13 +119,11 @@ class NetworkDiscovery {
 					[
 						'type' => SVC_LDAP,
 						'ports' => 555,
-						'host_source' => 1,
 						'name_source' => 2
 					],
 					[
 						'type' => SVC_TCP,
 						'ports' => 9988,
-						'host_source' => 1,
 						'name_source' => 2
 					],
 					[
@@ -140,7 +132,6 @@ class NetworkDiscovery {
 						'key_' => '.1.9.6.1.10.1.9.9.9',
 						'snmp_community'=> 'original SNMP community',
 						'uniq' => 1,
-						'host_source' => 1,
 						'name_source' => 2
 					],
 					[
@@ -177,7 +168,7 @@ class NetworkDiscovery {
 					[
 						'type' => SVC_IMAP,
 						'ports' => 2050
-					],
+					]
 				]
 			],
 			[
@@ -215,7 +206,7 @@ class NetworkDiscovery {
 				.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
 		);
 		$check_id_cancel = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
-			.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
+				.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
 		);
 
 		CDataHelper::call('action.create', [
