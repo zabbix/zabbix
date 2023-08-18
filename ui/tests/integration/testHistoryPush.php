@@ -595,6 +595,9 @@ class testHistoryPush extends CIntegrationTest {
 	}
 
 	public function testHistoryPush_malformedRequest() {
+		// CAPITest::call() has assertions for 'result' key in a response, these will throw an exception
+		$this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+
 		$response = $this->call('history.push', [
 			[
 			'host' => "10000",
@@ -603,9 +606,5 @@ class testHistoryPush extends CIntegrationTest {
 			'ns' => 500
 			]
 		]);
-
-		$this->assertArrayHasKey('data', $response['result']);
-		$this->assertArrayHasKey(0, $response['result']['data']);
-		$this->assertArrayHasKey('error', $response['result']['data'][0]);
 	}
 }
