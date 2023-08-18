@@ -927,7 +927,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					],
 					'trigger_data' => [
 						['id' => '100550', 'name' => 'Problem Not classified', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '0'],
-						['id' => '100560', 'name' => 'Trigger from {HOST.HOST}', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1'],
+						['id' => '100560', 'name' => 'Trigger from {HOST.HOST}', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1']
 					],
 					'expected' => [
 						[
@@ -951,7 +951,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'trigger_data' => [
 						['id' => '100550', 'name' => 'Problem High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
 						['id' => '100560', 'name' => 'Severity status: High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
-						['id' => '100570', 'name' => 'Problem Information', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1'],
+						['id' => '100570', 'name' => 'Problem Information', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1']
 					],
 					'expected' => [
 						[
@@ -985,7 +985,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						['id' => '100550', 'name' => 'Problem Disaster', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '5'],
 						['id' => '100560', 'name' => 'Problem Average', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '3'],
 						['id' => '100570', 'name' => 'Severity status: High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
-						['id' => '100580', 'name' => 'Problem Information', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1'],
+						['id' => '100580', 'name' => 'Problem Information', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1']
 					],
 					'expected' => [
 						[
