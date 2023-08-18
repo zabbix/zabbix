@@ -498,13 +498,12 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 	while (WAIT_TIMEOUT == (dwWaitResult = WaitForSingleObject(mutex, 1000)))
 	{
 		if (0 != locks_disabled)
-			break;
+			return;
 	}
 
 	switch (dwWaitResult)
 	{
 		case WAIT_OBJECT_0:
-		case WAIT_TIMEOUT:
 			break;
 		case WAIT_ABANDONED:
 			THIS_SHOULD_NEVER_HAPPEN;
