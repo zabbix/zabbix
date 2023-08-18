@@ -168,10 +168,18 @@ out:
 		hp = NULL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64 " host:%s key:%s ts:%d.%09d value:%s error:%s",
-			__func__, zbx_result_string(ret), hp->itemid, ZBX_NULL2EMPTY_STR(hp->hk.host),
-			ZBX_NULL2EMPTY_STR(hp->hk.key), hp->ts.sec, hp->ts.ns, ZBX_NULL2EMPTY_STR(hp->value),
-			ZBX_NULL2EMPTY_STR(*error));
+	if (NULL != hp)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64
+				" host:%s key:%s ts:%d.%09d value:%s error:%s",
+				__func__, zbx_result_string(ret), hp->itemid, ZBX_NULL2EMPTY_STR(hp->hk.host),
+				ZBX_NULL2EMPTY_STR(hp->hk.key), hp->ts.sec, hp->ts.ns, ZBX_NULL2EMPTY_STR(hp->value),
+				ZBX_NULL2EMPTY_STR(*error));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	}
 
 	return hp;
 }
