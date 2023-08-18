@@ -40,7 +40,6 @@
 #define REMOTE_COMMAND_RESULT_WAIT	2
 #define REMOTE_COMMAND_COMPLETED	4
 
-extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
@@ -824,28 +823,29 @@ out:
 	return ret;
 }
 
-/****************************************************************************
- *                                                                          *
- * Purpose: executing user scripts or remote commands                       *
- *                                                                          *
- * Parameters:  script           - [IN] script to be executed               *
- *              host             - [IN] host the script will be executed on *
- *              params           - [IN] parameters for the script           *
- *              config_timeout   - [IN]                                     *
- *              config_source_ip - [IN]                                     *
- *              result           - [OUT] result of a script execution       *
- *              error            - [OUT] error reported by the script       *
- *              max_error_len    - [IN] maximum error length                *
- *              debug            - [OUT] debug data (optional)              *
- *                                                                          *
- * Return value:  SUCCEED - processed successfully                          *
- *                FAIL - an error occurred                                  *
- *                TIMEOUT_ERROR - a timeout occurred                        *
- *                                                                          *
- ****************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: executing user scripts or remote commands                             *
+ *                                                                                *
+ * Parameters:  script                 - [IN] script to be executed               *
+ *              host                   - [IN] host the script will be executed on *
+ *              params                 - [IN] parameters for the script           *
+ *              config_timeout         - [IN]                                     *
+ *              config_trapper_timeout - [IN]                                     *
+ *              config_source_ip       - [IN]                                     *
+ *              result                 - [OUT] result of a script execution       *
+ *              error                  - [OUT] error reported by the script       *
+ *              max_error_len          - [IN] maximum error length                *
+ *              debug                  - [OUT] debug data (optional)              *
+ *                                                                                *
+ * Return value:  SUCCEED - processed successfully                                *
+ *                FAIL - an error occurred                                        *
+ *                TIMEOUT_ERROR - a timeout occurred                              *
+ *                                                                                *
+ **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
-		int config_timeout, const char *config_source_ip, char **result, char *error, size_t max_error_len,
-		char **debug)
+		int config_timeout, int config_trapper_timeout, const char *config_source_ip, char **result,
+		char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -869,7 +869,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
 					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
+							config_trapper_timeout, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
 					{
 						ret = FAIL;
 					}
