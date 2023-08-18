@@ -79,29 +79,36 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$hostids = $this->fields_values['hostids'] ?: null;
 		}
 
-		if (array_key_exists('tags', $this->fields_values)) {
-			$hosts = API::Host()->get([
-				'output' => ['name'],
-				'groupids' => $groupids,
-				'hostids' => $hostids,
-				'evaltype' => $this->fields_values['evaltype'],
-				'tags' => $this->fields_values['tags'],
-				'filter' => ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF],
-				'monitored_hosts' => true,
-				'preservekeys' => true
-			]);
+		$tags_exist = array_key_exists('tags', $this->fields_values);
+		$maintenance = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
+			? HOST_MAINTENANCE_STATUS_OFF
+			: null;
 
-			$hostids = array_keys($hosts);
-		}
-		else {
-			$hosts = null;
+		$hosts = API::Host()->get([
+			'output' => ['name'],
+			'groupids' => $groupids,
+			'hostids' => $hostids,
+			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
+			'tags' => $tags_exist ? $this->fields_values['tags'] : null,
+			'filter' => ['maintenance_status' => $maintenance],
+			'monitored_hosts' => true,
+			'preservekeys' => true
+		]);
+
+		$hostids = array_keys($hosts);
+
+		if (!$hostids) {
+			return [
+				'configuration' => $configuration,
+				'rows' => []
+			];
 		}
 
 		$time_now = time();
 
 		$master_column_index = $this->fields_values['column'];
 		$master_column = $configuration[$master_column_index];
-		$master_entities = [];
+		$master_entities = $hosts;
 		$master_entity_values = [];
 		$master_items_only_numeric_allowed = false;
 
@@ -115,31 +122,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				break;
 
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
-				$master_entities = $hosts !== null ? $hosts : API::Host()->get([
-					'output' => ['name'],
-					'groupids' => $groupids,
-					'hostids' => $hostids,
-					'filter' => ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF],
-					'monitored_hosts' => true,
-					'preservekeys' => true
-				]);
-
 				$master_entity_values = array_column($master_entities, 'name', 'hostid');
 				break;
 
 			case CWidgetFieldColumnsList::DATA_TEXT:
-				$master_entities = $hosts !== null ? $hosts : API::Host()->get([
-					'output' => ['name'],
-					'groupids' => $groupids,
-					'hostids' => $hostids,
-					'filter' => ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF],
-					'monitored_hosts' => true,
-					'preservekeys' => true
-				]);
-
 				$master_entity_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
 					[$master_column_index => $this->fields_values['columns'][$master_column_index]['text']],
-					$master_entities
+					$hostids
 				)[$master_column_index];
 
 				foreach ($master_entity_values as $key => $value) {
@@ -149,13 +138,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				break;
-		}
-
-		if (!$master_entity_values) {
-			return [
-				'configuration' => $configuration,
-				'rows' => []
-			];
 		}
 
 		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_entities,
@@ -198,6 +180,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$master_hostids[$master_entities[$entity]['hostid']] = true;
 		}
 
+		if (count($master_hostids) < $show_lines) {
+			foreach ($hostids as $hostid) {
+				if (!array_key_exists($hostid, $master_hostids)) {
+					$master_hostids[$hostid] = true;
+				}
+
+				if (count($master_hostids) == $show_lines) {
+					break;
+				}
+			}
+		}
+
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
 			'with_time_suffix' => true,
@@ -211,8 +205,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$item_values = [];
+		$text_columns = [];
 
 		foreach ($configuration as $column_index => &$column) {
+			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+				$text_columns[$column_index] = $column['text'];
+				continue;
+			}
+
 			if ($column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 				continue;
 			}
@@ -303,19 +303,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		unset($column);
 
-		$text_columns = [];
-
-		foreach ($configuration as $column_index => $column) {
-			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
-				$text_columns[$column_index] = $column['text'];
-			}
-		}
-
-		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_entities);
-
-		$hostid_to_itemid = $master_column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-			? array_column($master_entities, 'itemid', 'hostid')
-			: array_column($master_entities, 'hostid', 'hostid');
+		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns,
+			array_keys($master_hostids)
+		);
 
 		$rows = [];
 
@@ -325,16 +315,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($configuration as $column_index => $column) {
 				switch ($column['data']) {
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:
-						if ($hosts === null) {
-							$hosts = API::Host()->get([
-								'output' => ['name'],
-								'groupids' => $groupids,
-								'hostids' => array_keys($master_hostids),
-								'monitored_hosts' => true,
-								'preservekeys' => true
-							]);
-						}
-
 						$row[] = [
 							'value' => $hosts[$hostid]['name'],
 							'hostid' => $hostid
@@ -343,9 +323,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						break;
 
 					case CWidgetFieldColumnsList::DATA_TEXT:
-						$row[] = [
-							'value' => $text_columns[$column_index][$hostid_to_itemid[$hostid]]
-						];
+						$row[] = ['value' => $text_columns[$column_index][$hostid]];
 
 						break;
 

@@ -1801,7 +1801,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	public function resolveWidgetTopHostsTextColumns(array $columns, array $entities): array {
+	public function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
@@ -1817,31 +1817,31 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$matched_macros = self::extractMacros($columns, $types);
 
-		foreach ($entities as $key => $entity) {
-			$macro_values[$key] = [];
+		foreach ($hostids as $hostid) {
+			$macro_values[$hostid] = [];
 
 			foreach ($matched_macros['macros']['host'] as $token) {
 				if ($token === '{HOST.ID}') {
-					$macro_values[$key][$token] = $entity['hostid'];
+					$macro_values[$hostid][$token] = $hostid;
 				}
 				else {
-					$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['host'][$entity['hostid']][$key] = true;
+					$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros['host'][$hostid][$hostid] = true;
 				}
 			}
 
 			foreach ($matched_macros['macros']['interface'] as $token) {
-				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['interface'][$entity['hostid']][$key] = true;
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['interface'][$hostid][$hostid] = true;
 			}
 
 			foreach ($matched_macros['macros']['inventory'] as $token) {
-				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['inventory'][$entity['hostid']][$key] = true;
+				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+				$macros['inventory'][$hostid][$hostid] = true;
 			}
 
 			if ($matched_macros['usermacros']) {
-				$usermacros[$key] = ['hostids' => [$entity['hostid']], 'macros' => $matched_macros['usermacros']];
+				$usermacros[$hostid] = ['hostids' => [$hostid], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
@@ -1860,8 +1860,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($columns as $column => $value) {
 			$data[$column] = [];
 
-			foreach ($entities as $key => $entity) {
-				$data[$column][$key] = strtr($value, $macro_values[$key]);
+			foreach ($hostids as $hostid) {
+				$data[$column][$hostid] = strtr($value, $macro_values[$hostid]);
 			}
 		}
 

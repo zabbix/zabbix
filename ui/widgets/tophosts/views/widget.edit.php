@@ -50,6 +50,9 @@ $form
 		: null
 	)
 	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
+	)
+	->addField(
 		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addField(

@@ -556,10 +556,10 @@ class CMacrosResolverHelper {
 	 *
 	 * @return array
 	 */
-	public static function resolveWidgetTopHostsTextColumns(array $columns, array $items): array {
+	public static function resolveWidgetTopHostsTextColumns(array $columns, array $hostids): array {
 		self::init();
 
-		return self::$macrosResolver->resolveWidgetTopHostsTextColumns($columns, $items);
+		return self::$macrosResolver->resolveWidgetTopHostsTextColumns($columns, $hostids);
 	}
 
 	/**
