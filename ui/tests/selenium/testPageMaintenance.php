@@ -253,18 +253,20 @@ class testPageMaintenance extends CWebTest {
 		// Check all rows in the table
 		$this->assertTableHasData($data);
 
+		$filter = CFilterElement::find()->one();
+		$form = $filter->getForm();
+
 		// Check filter expanding/collapsing.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$filter_tab = $this->query('link:Filter')->one();
-		$filter = $filter_form->query('id:tab_0')->one();
-		$this->assertTrue($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertFalse($filter->isDisplayed());
-		$filter_tab->click();
-		$this->assertTrue($filter->isDisplayed());
+		$this->assertTrue($filter->isExpanded());
+		foreach ([false, true] as $state) {
+			$filter->expand($state);
+			// Leave the page and reopen the previous page to make sure the filter state is still saved..
+			$this->page->open('zabbix.php?action=host.list')->waitUntilReady();
+			$this->page->open('zabbix.php?action=maintenance.list')->waitUntilReady();
+			$this->assertTrue($filter->isExpanded($state));
+		}
 
 		// Check filter fields.
-		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$this->assertEquals(['Host groups', 'Name', 'State'],
 				$form->getLabels()->asText()
 		);
@@ -274,19 +276,19 @@ class testPageMaintenance extends CWebTest {
 				->getAttribute('placeholder')
 				);
 
-		// Name validation - TODO: DEV-2568
-		$this->assertEquals(255, $form->getField('id:filter_name')->getAttribute('maxlength'));
+		// Name validation
+		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
 		// State check
 		$this->assertEquals(['Any', 'Active', 'Approaching', 'Expired'], $form->getField('State')->getLabels()
 				->asText()
 		);
 
-		// Check default values of the fields - TODO: DEV-2568, to add 'Name' => '' for check
-		$this->assertEquals(['Host groups'=>'', 'State'=>'Any'], $form->getValues(CElementFilter::VISIBLE));
+		// Check default values of the fields
+		$this->assertEquals(['Host groups' => '', 'Name' => '', 'State' => 'Any'], $form->getValues(CElementFilter::VISIBLE));
 
 		// Check table headers and sortable headers.
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->getTable();
 		$this->assertEquals(['Name', 'Type', 'Active since', 'Active till'], $table->getSortableHeaders()->asText());
 		$this->assertEquals(['', 'Name', 'Type', 'Active since', 'Active till', 'State', 'Description'],
 				$table->getHeadersText()
@@ -302,7 +304,7 @@ class testPageMaintenance extends CWebTest {
 		$this->assertTrue($this->query('button:Delete')->one()->isClickable());
 
 		// Reset filter and check that maintenances are unselected.
-		$filter_form->query('button:Reset')->one()->click();
+		$form->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
 		$this->assertSelectedCount(0);
 	}
@@ -452,7 +454,8 @@ class testPageMaintenance extends CWebTest {
 	 */
 	public function testPageMaintenance_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=maintenance.list&sort=name&sortorder=ASC');
-		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$filter = CFilterElement::find()->one();
+		$form = $filter->getForm();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
@@ -472,7 +475,7 @@ class testPageMaintenance extends CWebTest {
 
 	public function testPageMaintenance_Sort() {
 		$this->page->login()->open('zabbix.php?action=maintenance.list&sortorder=DESC');
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->getTable();
 
 		foreach (['Name', 'Active since', 'Active till'] as $column) {
 			$values = $this->getTableColumnData($column);
