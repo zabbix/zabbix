@@ -44,7 +44,6 @@
 
 #include <event2/dns.h>
 
-
 static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_t *poller_config)
 {
 	zbx_timespec_t		timespec;
