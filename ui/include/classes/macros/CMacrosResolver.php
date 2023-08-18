@@ -1797,7 +1797,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
 	 * @param array $columns
-	 * @param array $entities
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
