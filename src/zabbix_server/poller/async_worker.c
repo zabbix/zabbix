@@ -27,10 +27,10 @@
 #include "poller.h"
 #include "zbx_availability_constants.h"
 
-#define ASYNC_WORKER_INIT_NONE	0x00
+#define ASYNC_WORKER_INIT_NONE		0x00
 #define ASYNC_WORKER_INIT_THREAD	0x01
 
-static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_async_queue_t *queue)
+static zbx_poller_item_t	*dc_config_async_get_poller_items(const zbx_async_queue_t *queue)
 {
 	zbx_poller_item_t	*poller_item;
 
@@ -133,10 +133,10 @@ static void	*async_worker_entry(void *args)
 	char				*error = NULL;
 	sigset_t			mask;
 	int				err;
+	zbx_vector_interface_status_t	interfaces;
 	zbx_vector_uint64_t		itemids;
 	zbx_vector_int32_t		errcodes;
 	zbx_vector_int32_t		lastclocks;
-	zbx_vector_interface_status_t	interfaces;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 
@@ -311,7 +311,7 @@ void	async_worker_destroy(zbx_async_worker_t *worker)
  *                                                                            *
  * Purpose: set callback to call after task is processed                      *
  *                                                                            *
- * Parameters: worker         - [IN] the preprocessing worker                 *
+ * Parameters: worker         - [IN] the worker                               *
  *             finished_cb   - [IN] a callback to call after finishing        *
  *                                     task                                   *
  *             finished_data - [IN] the callback data                         *
