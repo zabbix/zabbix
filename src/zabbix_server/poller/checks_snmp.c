@@ -2483,14 +2483,15 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			snmp_sess_error(snmp_context->ssp, NULL, NULL, &tmp_err_str);
 			if (NULL != snmp_context->ssp)
 			{
-				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2()"
-					" failed: %s", tmp_err_str));
+				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "cannot read from"
+						" session: %s", tmp_err_str));
 			}
 			else
 			{
-				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2()"
-					" failed"));
+				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "cannot read from"
+						" session"));
 			}
+
 			zbx_free(tmp_err_str);
 			goto stop;
 		}
