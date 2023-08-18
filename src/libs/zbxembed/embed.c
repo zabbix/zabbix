@@ -332,13 +332,11 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	/* put environment object to be accessible from duktape C calls */
 	duk_push_global_stash(es->env->ctx);
+
+	duk_push_string(es->env->ctx, "\xff""\xff""zbx_env");
 	duk_push_pointer(es->env->ctx, (void *)es->env);
-	if (1 != duk_put_prop_string(es->env->ctx, -2, "\xff""\xff""zbx_env"))
-	{
-		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
-		duk_pop(es->env->ctx);
-		return FAIL;
-	}
+	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	/* initialize HttpRequest and CurlHttpRequest prototypes */
 	if (FAIL == zbx_es_init_httprequest(es, error))
