@@ -572,13 +572,13 @@ class testHistoryPush extends CIntegrationTest {
 
 		$response = $this->call('history.push', [
 			[
-			'host' => self::$itemids['trapper_uint'],
+			'itemid' => self::$itemids['trapper_uint'],
 			'value' => 1,
 			'clock' => $tm,
 			'ns' => 500
 			],
 			[
-			'host' => self::$itemids['trapper_uint'],
+			'itemid' => self::$itemids['trapper_uint'],
 			'value' => 0,
 			'clock' => $tm,
 			'ns' => 500
