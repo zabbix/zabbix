@@ -60,6 +60,7 @@ static int			object_num = 0;
 		if (1 == perfstat_worker_counter)		\
 			LOCK_PERFCOUNTERS;			\
 		LeaveCriticalSection(&perfstat_worker_cs)
+
 #define UNLOCK_PERFCOUNTERS_RO					\
 		EnterCriticalSection(&perfstat_worker_cs);	\
 		perfstat_worker_counter--;			\
