@@ -416,7 +416,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
-		if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+		if (SUCCEED != zbx_db_fetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
 			goto fail;
 
 		for (i = 0; i < webhook_params.values_num; i++)

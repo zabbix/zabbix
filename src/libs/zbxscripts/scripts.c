@@ -792,7 +792,7 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
+int	zbx_db_fetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
 {
 	int		ret = SUCCEED;
 	zbx_db_result_t	result;

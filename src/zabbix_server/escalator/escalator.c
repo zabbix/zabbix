@@ -1499,7 +1499,8 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		}
 		else
 		{
-			if (SUCCEED != DBfetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+			if (SUCCEED != zbx_db_fetch_webhook_params(script.scriptid, &webhook_params, error,
+					sizeof(error)))
 			{
 				rc = FAIL;
 				goto fail;
