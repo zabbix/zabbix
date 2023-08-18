@@ -44,7 +44,6 @@
 
 #include <event2/dns.h>
 
-ZBX_VECTOR_IMPL(poller_item, zbx_poller_item_t)
 
 static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_t *poller_config)
 {
@@ -240,6 +239,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 #endif
 
 	zbx_async_manager_queue_get(poller_config->manager, &poller_items);
+
 	if (0 != poller_items.values_num)
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -313,11 +313,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 			}
 		}
 
-		zbx_clean_items(items, num, results);
-		zbx_dc_config_clean_items(items, NULL, (size_t)num);
-		zbx_free(results);
-		zbx_free(errcodes);
-		zbx_free(items);
+		zbx_poller_item_free(&poller_items.values[i]);
 	}
 exit:
 	if (0 != total)

@@ -38,6 +38,12 @@ void	async_task_queue_destroy(zbx_async_queue_t *queue)
 	zbx_vector_uint64_destroy(&queue->itemids);
 	zbx_vector_int32_destroy(&queue->errcodes);
 	zbx_vector_int32_destroy(&queue->lastclocks);
+
+	for (int i = 0; i < queue->poller_items.values_num; i++)
+	{
+		zbx_poller_item_free(&queue->poller_items.values[i]);
+	}
+	
 	zbx_vector_poller_item_destroy(&queue->poller_items);
 	zbx_vector_interface_status_clear_ext(&queue->interfaces, zbx_interface_status_free);
 	zbx_vector_interface_status_destroy(&queue->interfaces);

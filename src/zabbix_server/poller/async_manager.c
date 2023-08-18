@@ -25,7 +25,7 @@
 #include "poller.h"
 
 ZBX_PTR_VECTOR_IMPL(interface_status, zbx_interface_status_t *)
-
+ZBX_VECTOR_IMPL(poller_item, zbx_poller_item_t)
 struct zbx_async_manager
 {
 	zbx_async_worker_t		*workers;
@@ -202,4 +202,13 @@ void	zbx_interface_status_free(zbx_interface_status_t *interface_status)
 {
 	zbx_interface_status_clean(interface_status);
 	zbx_free(interface_status);
+}
+
+void	zbx_poller_item_free(zbx_poller_item_t *poller_item)
+{
+	zbx_clean_items(poller_item->items, poller_item->num, poller_item->results);
+	zbx_dc_config_clean_items(poller_item->items, NULL, (size_t)poller_item->num);
+	zbx_free(poller_item->results);
+	zbx_free(poller_item->errcodes);
+	zbx_free(poller_item->items);
 }
