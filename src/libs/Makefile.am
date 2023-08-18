@@ -54,6 +54,7 @@ DIST_SUBDIRS = \
 	zbxproxybuffer \
 	zbxregexp \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
