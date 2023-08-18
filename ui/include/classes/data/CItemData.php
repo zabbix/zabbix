@@ -130,6 +130,7 @@ final class CItemData {
 			'agent.variant',
 			'agent.version',
 			'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
+			'eventlog.count[name,<regexp>,<severity>,<source>,<eventid>,<maxproclines>,<mode>]',
 			'kernel.maxfiles',
 			'kernel.maxproc',
 			'kernel.openfiles',
@@ -940,6 +941,12 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_LOG,
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#eventlog'
+				]
+			],'eventlog.count[name,<regexp>,<severity>,<source>,<eventid>,<maxproclines>,<mode>]' => [
+				'description' => _('Event log monitoring. Returns count of entries'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#eventlog.count'
 				]
 			],
 			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]' => [

@@ -128,7 +128,7 @@ class testPageHosts extends CLegacyWebTest {
 		$name = $host['name'];
 
 		$sqlHosts =
-			'SELECT hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+			'SELECT hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
 			'ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,'.
 			'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
