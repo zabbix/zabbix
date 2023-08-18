@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class NetworkDiscovery {
 
 	/**
@@ -26,24 +27,36 @@ class NetworkDiscovery {
 	 * @return array
 	 */
 	public static function load() {
+		// Create proxies for Discovery rule with proxy.
+		$proxies = CDataHelper::call('proxy.create',
+			[
+				[
+					'host' => 'Proxy for Network discovery',
+					'status' => 5
+				],
+				[
+					'host' => 'Proxy for Network discovery cloning',
+					'status' => 5
+				]
+			]
+		);
+		$proxyid= $proxies['proxyids'][0];
+
 		CDataHelper::call('drule.create', [
 			[
 				'name' => 'Discovery rule for update',
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-						// IMAP.
-						'type' => 7,
+						'type' => SVC_IMAP,
 						'ports' => 10050
 					],
 					[
-						// POP.
-						'type' => 5,
+						'type' => SVC_POP,
 						'ports' => 99
 					],
 					[
-						// Zabbix agent.
-						'type' => 9,
+						'type' => SVC_AGENT,
 						'key_' => 'system.uname',
 						'ports' => 10050,
 						'uniq' => 1
@@ -53,11 +66,10 @@ class NetworkDiscovery {
 			[
 				'name' => 'Disabled discovery rule for update',
 				'iprange' => '192.168.1.1-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
-						// IMAP.
-						'type' => 7,
+						'type' => SVC_IMAP,
 						'ports' => 10050
 					]
 				]
@@ -65,76 +77,108 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for changing checks',
 				'iprange' => '192.168.1.1-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						// SNMPv1 agent.
-						'type' => 10,
+						'type' => SVC_SNMPv1,
 						'ports' => 161,
 						'key_' => '.1.3.6.1.2.1.9.9.9',
-						'snmp_community'=> 'test SNMP community',
-						'uniq' => 1
+						'snmp_community'=> 'test SNMP community'
+						// TODO: Uncomment lines when ZBX-23088 is fixed.
+						//'host_source' => 3,
+						//'name_source' => 2
 					],
 					[
-						// SNMPv3 agent.
-						'type' => 13,
+						'type' => SVC_SNMPv3,
 						'ports' => 162,
 						'key_' => '.1.3.6.1.2.1.1.1.0',
 						'snmpv3_contextname name' => 'test_context_name',
 						'snmpv3_securityname' => 'test_security_name',
-						'snmpv3_securitylevel' => 0
+						'snmpv3_securitylevel' => 0,
+						// TODO: Uncomment line when ZBX-23088 is fixed.
+						//'name_source' => 2
+						'uniq' => 1
 					],
 					[
-						// HTTPS.
-						'type' => 15,
+						'type' => SVC_TELNET,
 						'ports' => 23
+						// TODO: Uncomment line when ZBX-23088 is fixed.
+						//'name_source' => 2
 					]
 				]
 			],
 			[
 				'name' => 'Discovery rule for clone',
 				'iprange' => '192.168.2.3-255',
+				'proxyid' => $proxyid,
+				'delay' => '25h',
+				'status' =>  1,
+				'concurrency_max' => 0,
 				'dchecks' => [
 					[
-						// LDAP.
-						'type' => 1,
-						'ports' => 555
+						'type' => SVC_LDAP,
+						'ports' => 555,
+						'name_source' => 2
 					],
 					[
-						// TCP.
-						'type' => 8,
-						'ports' => 9988
+						'type' => SVC_TCP,
+						'ports' => 9988,
+						'name_source' => 2
 					],
 					[
-						// SNMPv1 agent.
-						'type' => 10,
+						'type' => SVC_SNMPv1,
 						'ports' => 165,
 						'key_' => '.1.9.6.1.10.1.9.9.9',
 						'snmp_community'=> 'original SNMP community',
-						'uniq' => 1
+						'uniq' => 1,
+						'name_source' => 2
 					],
 					[
-						// SNMPv3 agent.
-						'type' => 13,
+						'type' => SVC_SNMPv3,
 						'ports' => 130,
 						'key_' => '.1.3.6.1.2.1.1.1.999',
-						'snmpv3_contextname name' => 'original_context_name',
+						'snmpv3_contextname' => 'original_context_name',
 						'snmpv3_securityname' => 'original_security_name',
 						'snmpv3_securitylevel' => 2,
 						'snmpv3_authprotocol' => 4,
 						'snmpv3_authpassphrase' => 'original_authpassphrase',
 						'snmpv3_privprotocol' => 5,
-						'snmpv3_privpassphrase' => 'original_privpassphrase'
+						'snmpv3_privpassphrase' => 'original_privpassphrase',
+						'host_source' => 3,
+						'name_source' => 2
 					]
 				]
 			],
 			[
-				'name' => 'Discovery rule to check delete',
+				'name' => 'Discovery rule for successful deleting',
 				'iprange' => '192.168.1.1-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
-						'type' => 12
+						'type' => SVC_ICMPPING
+					]
+				]
+			],
+			[
+				'name' => 'Discovery rule for deleting, used in Action',
+				'iprange' => '192.168.2.2-255',
+				'status' => DRULE_STATUS_DISABLED,
+				'dchecks' => [
+					[
+						'type' => SVC_IMAP,
+						'ports' => 2050
+					]
+				]
+			],
+			[
+				'name' => 'Discovery rule for deleting, check used in Action',
+				'iprange' => '192.168.2.2-255',
+				'status' => DRULE_STATUS_DISABLED,
+				'dchecks' => [
+					[
+						'type' => SVC_TELNET,
+						'ports' => 15
 					]
 				]
 			],
@@ -143,8 +187,7 @@ class NetworkDiscovery {
 				'iprange' => '192.168.15.20-255',
 				'dchecks' => [
 					[
-						// SNMPv3 agent.
-						'type' => 13,
+						'type' => SVC_SNMPv3,
 						'ports' => 130,
 						'key_' => '.1.3.6.1.2.1.1.1.999',
 						'snmpv3_contextname name' => 'cancel_context_name',
@@ -154,6 +197,69 @@ class NetworkDiscovery {
 						'snmpv3_authpassphrase' => 'cancel_authpassphrase',
 						'snmpv3_privprotocol' => 5,
 						'snmpv3_privpassphrase' => 'cancel_privpassphrase'
+					]
+				]
+			]
+		]);
+		$discovery_ruleids = CDataHelper::getIds('name');
+		$check_id_delete = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
+				.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
+		);
+		$check_id_cancel = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
+				.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
+		);
+
+		CDataHelper::call('action.create', [
+			[
+				'name' => 'Action with discovery rule',
+				'eventsource' => 1,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'conditiontype' => 18,
+							'operator' => 0,
+							'value' => $discovery_ruleids['Discovery rule for deleting, used in Action']
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => 0,
+						'opmessage' => [
+							'default_msg' => 1,
+							'mediatypeid' => 0
+						],
+						'opmessage_usr' => [['userid' => 1]]
+					]
+				]
+			],
+			[
+				'name' => 'Action with discovery check',
+				'eventsource' => 1,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'conditiontype' => CONDITION_TYPE_DCHECK,
+							'operator' => 0,
+							'value' => $check_id_delete
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_DCHECK,
+							'operator' => 0,
+							'value' => $check_id_cancel
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => 0,
+						'opmessage' => [
+							'default_msg' => 1,
+							'mediatypeid' => 0
+						],
+						'opmessage_usr' => [['userid' => 1]]
 					]
 				]
 			]

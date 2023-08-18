@@ -26,6 +26,22 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 trait TableTrait {
 
 	/**
+	 * Table column names.
+	 *
+	 * @var array
+	 */
+	protected $column_names = null;
+
+	/**
+	 * Set names of columns.
+	 *
+	 * @param array $names column names
+	 */
+	protected function setColumnNames($names) {
+		$this->column_names = $names;
+	}
+
+	/**
 	 * Perform data array normalization.
 	 *
 	 * @param array $data
@@ -44,6 +60,19 @@ trait TableTrait {
 		unset($values);
 
 		return $data;
+	}
+
+	protected function getTable($selector = null) {
+		if ($selector === null) {
+			$selector = 'class:list-table';
+		}
+
+		$table = $this->query($selector)->asTable()->one();
+		if ($this->column_names !== null) {
+			$table->setColumnNames($this->column_names);
+		}
+
+		return $table;
 	}
 
 	/**
@@ -194,8 +223,8 @@ trait TableTrait {
 	 * @param string $column		Column name, where value should be checked
 	 * @param string $selector		Table selector
 	 */
-	private function getTableColumnData($column, $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+	private function getTableColumnData($column, $selector = null) {
+		$table = $this->getTable($selector);
 		$result = [];
 		foreach ($table->getRows() as $row) {
 			$result[] = $row->getColumn($column)->getText();
