@@ -35,7 +35,7 @@ typedef struct
 }
 zbx_poller_item_t;
 
-ZBX_VECTOR_DECL(poller_item, zbx_poller_item_t)
+ZBX_PTR_VECTOR_DECL(poller_item, zbx_poller_item_t *)
 
 typedef struct
 {

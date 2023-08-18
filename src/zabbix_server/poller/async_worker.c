@@ -30,27 +30,29 @@
 #define ASYNC_WORKER_INIT_NONE	0x00
 #define ASYNC_WORKER_INIT_THREAD	0x01
 
-static zbx_poller_item_t	dc_config_async_get_poller_items(zbx_async_queue_t *queue)
+static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_async_queue_t *queue)
 {
-	zbx_poller_item_t	poller_item = {.items = NULL};
+	zbx_poller_item_t	*poller_item;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	poller_item = zbx_malloc(NULL, sizeof(zbx_poller_item_t));
+	poller_item->items = NULL;
 
-	poller_item.num = zbx_dc_config_get_poller_items(queue->poller_type, queue->config_timeout,
-			queue->processing_num, queue->processing_max, &poller_item.items);
+	poller_item->num = zbx_dc_config_get_poller_items(queue->poller_type, queue->config_timeout,
+			queue->processing_num, queue->processing_max, &poller_item->items);
 
-	if (0 != poller_item.num)
+	if (0 != poller_item->num)
 	{
-		poller_item.results = zbx_malloc(NULL, (size_t)poller_item.num * sizeof(AGENT_RESULT));
-		poller_item.errcodes = zbx_malloc(NULL, (size_t)poller_item.num * sizeof(int));
+		poller_item->results = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(AGENT_RESULT));
+		poller_item->errcodes = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(int));
 
-		zbx_prepare_items(poller_item.items, poller_item.errcodes, poller_item.num, poller_item.results,
+		zbx_prepare_items(poller_item->items, poller_item->errcodes, poller_item->num, poller_item->results,
 				ZBX_MACRO_EXPAND_YES);
 	}
 	else
-		zbx_free(poller_item.items);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, poller_item.num);
+	{
+		zbx_free(poller_item->items);
+		zbx_free(poller_item);
+	}
 
 	return poller_item;
 }
@@ -162,7 +164,7 @@ static void	*async_worker_entry(void *args)
 
 	while (0 == worker->stop)
 	{
-		zbx_poller_item_t	poller_item = {0};
+		zbx_poller_item_t	*poller_item = NULL;
 		unsigned char		check_queue = queue->check_queue;
 
 		queue->check_queue = 0;
@@ -231,9 +233,9 @@ static void	*async_worker_entry(void *args)
 
 		async_task_queue_lock(queue);
 
-		if (0 != poller_item.num)
+		if (NULL != poller_item)
 		{
-			queue->processing_num += poller_item.num;
+			queue->processing_num += poller_item->num;
 			zbx_vector_poller_item_append(&queue->poller_items, poller_item);
 
 			if (NULL != worker->finished_cb)

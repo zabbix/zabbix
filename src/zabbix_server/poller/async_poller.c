@@ -246,10 +246,10 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 	{
 		int	num;
 
-		items = poller_items.values[j].items;
-		results = poller_items.values[j].results;
-		errcodes = poller_items.values[j].errcodes;
-		num = poller_items.values->num;
+		items = poller_items.values[j]->items;
+		results = poller_items.values[j]->results;
+		errcodes = poller_items.values[j]->errcodes;
+		num = poller_items.values[j]->num;
 
 		total += num;
 
@@ -312,7 +312,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 			}
 		}
 
-		zbx_poller_item_free(&poller_items.values[i]);
+		zbx_poller_item_free(poller_items.values[j]);
 	}
 exit:
 	if (0 != total)
