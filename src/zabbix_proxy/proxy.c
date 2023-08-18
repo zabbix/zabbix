@@ -65,7 +65,7 @@
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
-#include "../zabbix_server/scripts/scripts.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"

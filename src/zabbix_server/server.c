@@ -84,7 +84,7 @@
 #include "zbxdbwrap.h"
 #include "lld/lld_protocol.h"
 #include "zbxdiscovery.h"
-#include "scripts/scripts.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"

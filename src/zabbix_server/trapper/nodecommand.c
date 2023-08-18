@@ -22,7 +22,7 @@
 #include "zbxexpression.h"
 #include "trapper_auth.h"
 
-#include "../scripts/scripts.h"
+#include "zbxscripts.h"
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"
 #include "zbxdbwrap.h"

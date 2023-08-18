@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "scripts.h"
+#include "zbxscripts.h"
 #include "zbxexpression.h"
 
-#include "../poller/checks_agent.h"
-#include "../ipmi/ipmi.h"
-#include "../poller/checks_ssh.h"
-#include "../poller/checks_telnet.h"
+#include "../../zabbix_server/poller/checks_agent.h"
+#include "../../zabbix_server/ipmi/ipmi.h"
+#include "../../zabbix_server/poller/checks_ssh.h"
+#include "../../zabbix_server/poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"

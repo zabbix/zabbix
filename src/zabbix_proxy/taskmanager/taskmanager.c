@@ -19,7 +19,7 @@
 
 #include "taskmanager.h"
 
-#include "../../zabbix_server/scripts/scripts.h"
+#include "zbxscripts.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"
 #include "../../zabbix_server/poller/checks_snmp.h"
 
