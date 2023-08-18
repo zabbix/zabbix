@@ -255,8 +255,8 @@ $host_tab
 	->addItem([
 		new CLabel(_('Monitored by proxy'), 'label-proxy'),
 		new CFormField(
-			(new CSelect('proxy_hostid'))
-				->setValue($data['host']['proxy_hostid'])
+			(new CSelect('proxyid'))
+				->setValue($data['host']['proxyid'])
 				->setFocusableElementId('label-proxy')
 				->setReadonly($host_is_discovered)
 				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))

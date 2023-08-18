@@ -28,6 +28,8 @@ typedef struct
 {
 	const zbx_thread_info_t	*info;
 	int			state;
+	int			clear_cache;
+	int			process_num;
 	unsigned char		poller_type;
 	int			processed;
 	int			queued;
@@ -43,6 +45,7 @@ typedef struct
 	zbx_vector_int32_t	errcodes;
 	zbx_vector_int32_t	lastclocks;
 	struct event_base	*base;
+	struct evdns_base	*dnsbase;
 	zbx_hashset_t		interfaces;
 #ifdef HAVE_LIBCURL
 	CURLM			*curl_handle;

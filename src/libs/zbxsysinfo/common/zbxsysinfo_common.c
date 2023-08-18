@@ -91,6 +91,7 @@ static zbx_metric_t	parameters_common[] =
 	{"logrt",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"logrt.count",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"eventlog",		CF_HAVEPARAMS,	only_active,		"system"},
+	{"eventlog.count",	CF_HAVEPARAMS,	only_active,		"system"},
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	zabbix_stats,		"127.0.0.1,10051"},
 
