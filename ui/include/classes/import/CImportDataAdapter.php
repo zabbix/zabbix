@@ -107,8 +107,6 @@ class CImportDataAdapter {
 
 		if (array_key_exists('hosts', $this->data)) {
 			foreach ($this->data['hosts'] as $host) {
-				$host = CArrayHelper::renameKeys($host, ['proxyid' => 'proxy_hostid']);
-
 				if (array_key_exists('interfaces', $host)) {
 					foreach ($host['interfaces'] as $index => $interface) {
 						$host['interfaces'][$index] = CArrayHelper::renameKeys($interface, ['default' => 'main']);
