@@ -15,15 +15,9 @@ typedef struct
 	zbx_async_queue_t		*queue;
 	pthread_t			thread;
 
-	//zbx_pp_context_t		execute_ctx;
-
-	zbx_timekeeper_t		*timekeeper;
-
 	zbx_async_notify_cb_t		finished_cb;
 
 	void				*finished_data;
-
-	zbx_log_component_t		logger;
 }
 zbx_async_worker_t;
 

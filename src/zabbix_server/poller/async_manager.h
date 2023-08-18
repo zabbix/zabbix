@@ -32,16 +32,16 @@ zbx_interface_status_t;
 ZBX_PTR_VECTOR_DECL(interface_status, zbx_interface_status_t *)
 
 zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_cb_t finished_cb,
-			void *finished_data, zbx_thread_poller_args *poller_args_in, char **error);
+					void *finished_data, zbx_thread_poller_args *poller_args_in, char **error);
 void			zbx_async_manager_free(zbx_async_manager_t *manager);
 void			zbx_async_manager_queue_sync(zbx_async_manager_t *manager);
 void			zbx_async_manager_queue_get(zbx_async_manager_t *manager, zbx_vector_poller_item_t *poller_items);
 void			zbx_async_manager_requeue(zbx_async_manager_t *manager, zbx_uint64_t itemid, int errcode,
-		int lastclock);
+					int lastclock);
 void			zbx_async_manager_requeue_flush(zbx_async_manager_t *manager);
 void			zbx_async_manager_interfaces_flush(zbx_async_manager_t *manager, zbx_hashset_t *interfaces);
 void			zbx_interface_status_clean(zbx_interface_status_t *interface_status);
 void			zbx_interface_status_free(zbx_interface_status_t *interface_status);
 
-
 #endif
+

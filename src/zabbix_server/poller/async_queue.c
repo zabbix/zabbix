@@ -23,17 +23,6 @@ void	async_task_queue_destroy(zbx_async_queue_t *queue)
 	zbx_vector_interface_status_clear_ext(&queue->interfaces, zbx_interface_status_free);
 	zbx_vector_interface_status_destroy(&queue->interfaces);
 
-	//pp_task_queue_clear_tasks(&queue->pending);
-	//zbx_list_destroy(&queue->pending);
-
-	//pp_task_queue_clear_tasks(&queue->immediate);
-	//zbx_list_destroy(&queue->immediate);
-
-	//pp_task_queue_clear_tasks(&queue->finished);
-	//zbx_list_destroy(&queue->finished);
-
-	//zbx_hashset_destroy(&queue->sequences);
-
 	queue->init_flags = PP_TASK_QUEUE_INIT_NONE;
 }
 

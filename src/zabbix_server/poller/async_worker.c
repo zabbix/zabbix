@@ -109,7 +109,7 @@ static void	*async_worker_entry(void *args)
 {
 	zbx_async_worker_t		*worker = (zbx_async_worker_t *)args;
 	zbx_async_queue_t		*queue = worker->queue;
-	char				*error = NULL, component[MAX_ID_LEN + 1];
+	char				*error = NULL;
 	sigset_t			mask;
 	int				err;
 	zbx_vector_uint64_t		itemids;
@@ -117,10 +117,7 @@ static void	*async_worker_entry(void *args)
 	zbx_vector_int32_t		lastclocks;
 	zbx_vector_interface_status_t	interfaces;
 
-	zbx_snprintf(component, sizeof(component), "%d", worker->id);
-	zbx_set_log_component(component, &worker->logger);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started", worker->id);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);

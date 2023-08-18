@@ -223,6 +223,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_poller_item_create(&poller_items);
 #ifdef HAVE_NETSNMP
 	if (1 == poller_config->clear_cache)
 	{
@@ -239,7 +240,6 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 		}
 	}
 #endif
-	zbx_vector_poller_item_create(&poller_items);
 
 	zbx_async_manager_queue_get(poller_config->manager, &poller_items);
 
@@ -540,11 +540,12 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 		event_base_loop(poller_config.base, EVLOOP_ONCE);
 
-		async_initiate_queued_checks(&poller_config);
-		zbx_async_manager_requeue_flush(poller_config.manager);
-
 		if (ZBX_IS_RUNNING())
+		{
+			async_initiate_queued_checks(&poller_config);
+			zbx_async_manager_requeue_flush(poller_config.manager);
 			zbx_preprocessor_flush();
+		}
 
 		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
@@ -564,10 +565,13 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 #ifdef HAVE_NETSNMP
-			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
+			switch (rtc_cmd)
 			{
-				if (ZBX_POLLER_TYPE_SNMP == poller_type)
-					poller_config.clear_cache = 1;
+				case ZBX_RTC_SNMP_CACHE_RELOAD:
+
+					if (ZBX_POLLER_TYPE_SNMP == poller_type)
+						poller_config.clear_cache = 1;
+					break;
 			}
 #endif
 		}
