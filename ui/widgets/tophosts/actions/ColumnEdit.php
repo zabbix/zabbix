@@ -27,6 +27,9 @@ use CArrayHelper,
 	CNumberParser,
 	CParser;
 
+use CRangeTimeParser;
+use CSettingsHelper;
+use Widgets\TopHosts\Includes\WidgetForm;
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 class ColumnEdit extends CController {
@@ -77,6 +80,44 @@ class ColumnEdit extends CController {
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields($this->getInputAll());
+
+		$column = $this->getInputAll();
+
+		if ($column['aggregate_function'] != AGGREGATE_NONE) {
+			$ts = [];
+			$ts['now'] = time();
+			$range_time_parser = new CRangeTimeParser();
+
+			$from = $column['time_from'];
+			$to = $column['time_to'];
+
+			if ($column['item_time'] === WidgetForm::TOP_HOSTS_CUSTOM_TIME_ON && !empty($from) && !empty($to)) {
+
+				foreach (['from' => $from, 'to' => $to] as $field => $value) {
+					$range_time_parser->parse($value);
+					$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+				}
+
+				$period = $ts['to'] - $ts['from'] + 1;
+				$range_time_parser->parse('now-' . CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
+				$max_period = 1 + $ts['now'] - $range_time_parser->getDateTime(true)->getTimestamp();
+
+				if ($period < ZBX_MIN_PERIOD) {
+					error(_n('Minimum time period to display is %1$s minute.',
+						'Minimum time period to display is %1$s minutes.', (int)(ZBX_MIN_PERIOD / SEC_PER_MIN)
+					));
+
+					$ret = false;
+				}
+				elseif ($period > $max_period) {
+					error(_n('Maximum time period to display is %1$s day.',
+						'Maximum time period to display is %1$s days.', (int)round($max_period / SEC_PER_DAY)
+					));
+
+					$ret = false;
+				}
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(

@@ -45,7 +45,8 @@ class WidgetForm extends CWidgetForm {
 
 	private const DEFAULT_HOSTS_COUNT = 10;
 	private const DEFAULT_ORDER_COLUMN = 0;
-	private const TOP_HOSTS_CUSTOM_TIME_OFF = '0';
+	public const TOP_HOSTS_CUSTOM_TIME_OFF = '0';
+	public const TOP_HOSTS_CUSTOM_TIME_ON = '1';
 
 	private array $field_column_values = [];
 
