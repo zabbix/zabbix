@@ -48,7 +48,7 @@ class CControllerItemCreate extends CControllerItem {
 		$messages = array_column(get_and_clear_messages(), 'message');
 
 		if ($result) {
-			$output['success']['title'] = _('Item created');
+			$output['success']['title'] = _('Item added');
 
 			if ($messages) {
 				$output['success']['messages'] = $messages;
@@ -56,7 +56,7 @@ class CControllerItemCreate extends CControllerItem {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot create item'),
+				'title' => _('Cannot add item'),
 				'messages' => $messages
 			];
 		}
