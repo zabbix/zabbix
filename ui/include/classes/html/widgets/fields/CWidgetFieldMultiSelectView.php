@@ -115,28 +115,6 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 		';
 	}
 
-	public function getTemplates(): array {
-		return [
-			new CTemplateTag($this->field->getName().'-reference-table-tmpl',
-				(new CTable())
-					->addClass(ZBX_STYLE_LIST_TABLE)
-					->setHeader([_('Name')])
-			),
-			new CTemplateTag($this->field->getName().'-reference-empty-tmpl',
-				(new CRow([
-					new CCol(_('No widget with selected .'))
-				]))->addClass(ZBX_STYLE_NOTHING_TO_SHOW)
-			),
-			new CTemplateTag($this->field->getName().'-reference-row-tmpl',
-				new CRow([
-					(new CLink('#{prefix}#{name}'))
-						->addClass('js-select-reference')
-						->setAttribute('data-reference', '#{id}')
-				])
-			)
-		];
-	}
-
 	public function setFilterPreselect(array $filter_preselect): self {
 		$this->filter_preselect = $filter_preselect;
 

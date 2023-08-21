@@ -41,7 +41,6 @@ class CWidgetFieldDatePicker extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setMaxLength(255);
 	}
 

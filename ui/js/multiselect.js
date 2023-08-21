@@ -144,6 +144,7 @@
 					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
 					$('.multiselect-button', $obj.parent()).prop('disabled', false);
+					$('input', $obj).prop('disabled', false);
 					$obj.append(makeMultiSelectInput($obj));
 
 					ms.options.disabled = false;
@@ -168,6 +169,7 @@
 					$('.multiselect-list', $obj).addClass('disabled');
 					$('.multiselect-button', $obj.parent()).prop('disabled', true);
 					$('input[type="text"]', $obj).remove();
+					$('input', $obj).prop('disabled', true);
 
 					ms.options.disabled = true;
 
@@ -337,8 +339,9 @@
 		openSelectPopup: function(event_target) {
 			this.each(function() {
 				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
 
-				if ($obj.data('multiSelect') !== undefined) {
+				if (ms !== undefined && ms.options.popup.parameters !== undefined) {
 					openSelectPopup($obj, event_target);
 
 					return false;
@@ -411,6 +414,7 @@
 			addNew: false,
 			defaultValue: null,
 			custom_select: false,
+			custom_suggest_list: null,
 			suggest_list_modifier: null,
 			custom_suggest_select_handler: null,
 			disabled: false,
@@ -625,7 +629,14 @@
 						 * 3. Schedule result set retrieval for the given term otherwise.
 						 */
 
-						if (cache_key in ms.values.searches) {
+						if (ms.options.custom_suggest_list !== null) {
+							ms.values.search = search;
+							ms.values.cache_key = cache_key;
+							ms.values.searches[cache_key] = ms.options.custom_suggest_list();
+							loadAvailable($obj);
+							showAvailable($obj);
+						}
+						else if (cache_key in ms.values.searches) {
 							ms.values.search = search;
 							ms.values.cache_key = cache_key;
 							loadAvailable($obj);
@@ -1103,17 +1114,22 @@
 
 		let available_more = false;
 
-		$.each(data, function(i, item) {
-			if (ms.options.limit == 0 || ms.values.available.size < ms.options.limit) {
-				if (!ms.values.available.has(item.id) && ms.values.selected[item.id] === undefined
+		if (ms.options.custom_suggest_list !== null) {
+			ms.values.available = data;
+		}
+		else {
+			$.each(data, function(i, item) {
+				if (ms.options.limit == 0 || ms.values.available.size < ms.options.limit) {
+					if (!ms.values.available.has(item.id) && ms.values.selected[item.id] === undefined
 						&& !ms.options.excludeids.includes(item.id)) {
-					ms.values.available.set(item.id, item);
+						ms.values.available.set(item.id, item);
+					}
 				}
-			}
-			else {
-				available_more = true;
-			}
-		});
+				else {
+					available_more = true;
+				}
+			});
+		}
 
 		if (addNew) {
 			ms.values.available.set(ms.values.search, {
@@ -1128,12 +1144,12 @@
 
 		if (ms.values.available.size === 0) {
 			var div = $('<div>', {
-					'class': 'multiselect-matches',
-					text: ms.options.labels['No matches found']
-				})
-					.on('click', function() {
-						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
-					});
+				'class': 'multiselect-matches',
+				text: ms.options.labels['No matches found']
+			})
+				.on('click', function() {
+					$('input[type="text"]', $obj)[0].focus({preventScroll:true});
+				});
 
 			ms.values.available_div.append(div);
 		}

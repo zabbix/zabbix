@@ -70,5 +70,4 @@ class CList extends CTag {
 
 		return $this;
 	}
-
 }

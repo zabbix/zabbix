@@ -32,6 +32,7 @@ require_once dirname(__FILE__).'/include/classes/helpers/CCookieHelper.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
 $available_js = [
+	'defines.js' => '',
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
@@ -42,6 +43,8 @@ $available_js = [
 	'class.widget.iterator.js' => '',
 	'class.widget.paste-placeholder.js' => '',
 	'class.widget-field.multiselect.js' => '',
+	'class.widget-field.time-period.js' => '',
+	'class.widget-select.popup.js' => '',
 	'hostinterfacemanager.js' => '',
 	'hostmacrosmanager.js' => '',
 	'menupopup.js' => '',
@@ -179,6 +182,15 @@ $translate_strings = [
 		'Previous page' => _s('Previous page'),
 		'Widget is too small for the specified number of columns and rows.' =>
 			_s('Widget is too small for the specified number of columns and rows.')
+	],
+	'class.widget-select.popup.js' => [
+		'Name' => _('Name'),
+		'No compatible widgets.' => _('No compatible widgets.'),
+		'Widget' => _('Widget')
+	],
+	'class.widget-field.multiselect.js' => [
+		'Dashboard' => _('Dashboard'),
+		'Widget' => _('Widget')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
@@ -405,6 +417,7 @@ $translate_strings = [
 $js = '';
 if (empty($_GET['files'])) {
 	$files = [
+		'defines.js',
 		'jquery.js',
 		'jquery-ui.js',
 		'main.js',

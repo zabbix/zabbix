@@ -97,7 +97,7 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 
 		if (is_array($value) && array_key_exists('reference', $value)) {
 			return ['type' => API_OBJECT, 'fields' => [
-				'reference' =>    ['type' => API_STRING_UTF8]
+				'reference' => ['type' => API_STRING_UTF8]
 			]];
 		}
 

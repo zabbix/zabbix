@@ -60,20 +60,7 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
-		// Autocomplete url.
-		$url = (new CUrl('jsrpc.php'))
-			->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
-			->setArgument('method', static::SEARCH_METHOD)
-			->setArgument('object_name', $options['object_name']);
-
-		if (array_key_exists('objectOptions', $options)) {
-			foreach ($options['objectOptions'] as $option_name => $option_value) {
-				$url->setArgument($option_name, $option_value);
-			}
-		}
-
 		$params = [
-			'url' => $url->getUrl(),
 			'name' => $options['name'],
 			'labels' => [
 				'No matches found' => _('No matches found'),
@@ -83,6 +70,22 @@ class CMultiSelect extends CTag {
 				'Select' => _('Select')
 			]
 		];
+
+		if (array_key_exists('object_name', $options)) {
+			// Autocomplete url.
+			$url = (new CUrl('jsrpc.php'))
+				->setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON)
+				->setArgument('method', static::SEARCH_METHOD)
+				->setArgument('object_name', $options['object_name']);
+
+			if (array_key_exists('objectOptions', $options)) {
+				foreach ($options['objectOptions'] as $option_name => $option_value) {
+					$url->setArgument($option_name, $option_value);
+				}
+			}
+
+			$params['url'] = $url->getUrl();
+		}
 
 		if (array_key_exists('data', $options)) {
 			$params['data'] = zbx_cleanHashes($options['data']);

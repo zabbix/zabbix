@@ -27,43 +27,11 @@ class CWidgetFieldMultiselect {
 	#multiselect;
 
 	/**
-	 * @type {Overlay}
-	 */
-	#overlay;
-
-	/**
 	 * Field name.
 	 *
 	 * @type {string}
 	 */
-	#name;
-
-	/**
-	 * Field labels for single and multiple objects.
-	 */
-	#labels;
-
-	/**
-	 * Data type accepted from referred data sources.
-	 *
-	 * @type {string}
-	 */
-	#in_type;
-
-	/**
-	 * @type {string|null}
-	 */
-	#selected_reference = null;
-
-	/**
-	 * @type {boolean}
-	 */
-	#is_multiple;
-
-	/**
-	 * @type {int}
-	 */
-	#selected_limit;
+	#field_name;
 
 	/**
 	 * @type {boolean}
@@ -80,6 +48,33 @@ class CWidgetFieldMultiselect {
 	 */
 	#dashboard_accepted;
 
+	/**
+	 * Field labels for single and multiple objects.
+	 */
+	#labels;
+
+	/**
+	 * @type {boolean}
+	 */
+	#is_multiple;
+
+	/**
+	 * Data type accepted from referred data sources.
+	 *
+	 * @type {string}
+	 */
+	#in_type;
+
+	/**
+	 * @type {string|null}
+	 */
+	#selected_reference = null;
+
+	/**
+	 * @type {int}
+	 */
+	#selected_limit;
+
 	constructor(element, multiselect_params, {
 		field_name,
 		field_value,
@@ -89,14 +84,22 @@ class CWidgetFieldMultiselect {
 		widget_accepted,
 		dashboard_accepted
 	}) {
-		this.#name = field_name;
+		this.#field_name = field_name;
 		this.#labels = object_labels;
 		this.#in_type = in_type;
 		this.#default_prevented = default_prevented;
 		this.#widget_accepted = widget_accepted;
 		this.#dashboard_accepted = dashboard_accepted;
 
-		const has_optional_sources = widget_accepted && (!default_prevented || dashboard_accepted);
+		this.#initField(element, multiselect_params);
+
+		if ('reference' in field_value) {
+			this.#selectReference(field_value.reference);
+		}
+	}
+
+	#initField(element, multiselect_params) {
+		const has_optional_sources = this.#widget_accepted && (!this.#default_prevented || this.#dashboard_accepted);
 
 		this.#multiselect = jQuery(element).multiSelect({
 			...multiselect_params,
@@ -112,19 +115,19 @@ class CWidgetFieldMultiselect {
 		if (select_button !== null) {
 			$(select_button).off('click');
 			select_button.addEventListener('click', (e) => {
-				if (!default_prevented) {
+				if (!this.#default_prevented) {
 					this.#selectDefaultPopup(e);
 				}
-				else if(widget_accepted) {
+				else if(this.#widget_accepted) {
 					this.#selectWidgetPopup(e);
 				}
 			});
 		}
 
 		if (has_optional_sources) {
-			if (!default_prevented) {
+			if (!this.#default_prevented) {
 				this.#multiselect.multiSelect('addOptionalSelect',
-					this.#is_multiple ? object_labels.objects : object_labels.object,
+					this.#is_multiple ? this.#labels.objects : this.#labels.object,
 					(e) => this.#selectDefaultPopup(e)
 				);
 			}
@@ -133,21 +136,17 @@ class CWidgetFieldMultiselect {
 				this.#selectWidgetPopup(e);
 			});
 
-			if (dashboard_accepted) {
+			if (this.#dashboard_accepted) {
 				this.#multiselect.multiSelect('addOptionalSelect', t('Dashboard'), () => {
 					this.#selectReference('DASHBOARD');
 				});
 			}
 		}
-
-		if ('reference' in field_value) {
-			this.#selectReference(field_value.reference);
-		}
 	}
 
 	#selectDefaultPopup(e) {
 		this.#multiselect.multiSelect('modify', {
-			name: `${this.#name}${this.#is_multiple ? '[]' : ''}`,
+			name: `${this.#field_name}${this.#is_multiple ? '[]' : ''}`,
 			selectedLimit: this.#selected_limit
 		});
 
@@ -159,47 +158,11 @@ class CWidgetFieldMultiselect {
 		this.#multiselect.multiSelect('openSelectPopup', e.target);
 	}
 
-	#selectWidgetPopup(e) {
-		const widgets_table = new Template(
-			document.getElementById(`${this.#name}-reference-table-tmpl`).innerHTML
-		).evaluateToElement();
+	#selectWidgetPopup() {
+		const popup = new ClassWidgetSelectPopup(this.#getWidgets());
 
-		const widgets = this.#getWidgets();
-
-		let rows_html = '';
-
-		if (widgets.length > 0) {
-			const widget_row = new Template(document.getElementById(`${this.#name}-reference-row-tmpl`).innerHTML);
-
-			for (const widget of widgets) {
-				rows_html += widget_row.evaluate(widget);
-			}
-		}
-		else {
-			rows_html = document.getElementById(`${this.#name}-reference-empty-tmpl`).innerHTML;
-		}
-
-		widgets_table.querySelector('tbody').innerHTML = rows_html;
-
-		widgets_table.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-select-reference')) {
-				this.#selectReference(e.target.dataset.reference);
-
-				overlayDialogueDestroy(this.#overlay.dialogueid);
-			}
-		});
-
-		this.#overlay = overlayDialogue({
-			title: t('Widget'),
-			class: 'modal-popup modal-popup-medium',
-			content: widgets_table,
-			buttons: [{
-				title: t('Cancel'),
-				cancel: true,
-				class: ZBX_STYLE_BTN_ALT,
-				action: () => {}
-			}],
-			element: e.target
+		popup.on('dialogue.submit', (e) => {
+			this.#selectReference(e.detail.reference);
 		});
 	}
 
@@ -220,7 +183,7 @@ class CWidgetFieldMultiselect {
 
 		if (caption !== null) {
 			this.#multiselect.multiSelect('modify', {
-				name: `${this.#name}[reference]`,
+				name: `${this.#field_name}[reference]`,
 				selectedLimit: 1
 			});
 
@@ -236,7 +199,7 @@ class CWidgetFieldMultiselect {
 		}
 		else {
 			this.#multiselect.multiSelect('modify', {
-				name: `${this.#name}${this.#is_multiple ? '[]' : ''}`,
+				name: `${this.#field_name}${this.#is_multiple ? '[]' : ''}`,
 				selectedLimit: this.#selected_limit
 			});
 
