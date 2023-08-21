@@ -343,11 +343,9 @@ void	zbx_mock_test_entry(void **state)
 		else
 			step_cache = cache;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 1 %p", step.error_handler_params);
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
 				&history_value, &history_ts, get_zbx_config_source_ip())))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 2 %p", step.error_handler_params);
 			pp_error_on_fail(&value, &step);
 
 			if (ZBX_VARIANT_ERR != value.type)
@@ -428,27 +426,17 @@ void	zbx_mock_test_entry(void **state)
 		else
 			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG test zbx_variant_clear value");
 		zbx_variant_clear(&value);
-		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG test zbx_variant_clear history_value");
 		zbx_variant_clear(&history_value);
-		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG test end loop");
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG pp_cache_release");
 	pp_cache_release(cache);
-	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG zbx_variant_clear value_in");
 	zbx_variant_clear(&value_in);
-	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG zbx_variant_clear history_value_in");
 	zbx_variant_clear(&history_value_in);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG pp_context_destroy");
 	pp_context_destroy(&ctx);
 #ifdef HAVE_NETSNMP
-	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG preproc_shutdown_snmp");
 	preproc_shutdown_snmp();
 #endif
 	release_step(&step);
-	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG end");
-
 }
