@@ -262,10 +262,6 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pp_cache_t		*cache, *step_cache;
 	zbx_pp_item_preproc_t	preproc;
 
-	///zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG start wait");
-	///zbx_sleep(30);
-	///zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG finish wait");
-
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
 
