@@ -238,21 +238,16 @@ class testPageMaintenance extends CWebTest {
 		$this->page->assertTitle('Configuration of maintenance periods');
 		$this->page->assertHeader('Maintenance periods');
 
-		// Check buttons
-		$buttons = [
-			'Create maintenance period' => true,
-			'Apply' => true,
-			'Reset' => true,
-			'Select' => true,
-			'Delete' => false
-		];
-		foreach ($buttons as $button => $enabled) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled($enabled));
-		}
+		// Check buttons.
+		$this->assertEquals(4, $this->query('button', ['Create maintenance period', 'Apply', 'Reset', 'Select'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
+		$this->assertFalse($this->query('button', 'Delete')->one()->isEnabled());
 
-		// Check all rows in the table
+		// Check all rows in the table.
 		$this->assertTableHasData($data);
 
+		// Get filter element.
 		$filter = CFilterElement::find()->one();
 		$form = $filter->getForm();
 
@@ -271,12 +266,12 @@ class testPageMaintenance extends CWebTest {
 				$form->getLabels()->asText()
 		);
 
-		// Host groups - placeholder check
+		// Host groups - placeholder check.
 		$this->assertEquals('type here to search', $form->getField('id:filter_groups__ms')
 				->getAttribute('placeholder')
-				);
+		);
 
-		// Name validation
+		// Name field's validation.
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
 		// State check
@@ -284,8 +279,10 @@ class testPageMaintenance extends CWebTest {
 				->asText()
 		);
 
-		// Check default values of the fields
-		$this->assertEquals(['Host groups' => '', 'Name' => '', 'State' => 'Any'], $form->getValues(CElementFilter::VISIBLE));
+		// Check default values of the fields.
+		$this->assertEquals(['Host groups' => '', 'Name' => '', 'State' => 'Any'],
+				$form->getValues(CElementFilter::VISIBLE)
+		);
 
 		// Check table headers and sortable headers.
 		$table = $this->getTable();
@@ -311,7 +308,7 @@ class testPageMaintenance extends CWebTest {
 
 	public function getFilterData() {
 		return [
-			// #1 View results for one host group.
+			// #0 View results for one host group.
 			[
 				[
 					'filter' => [
@@ -322,7 +319,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #2 View results for two host groups.
+			// #1 View results for two host groups.
 			[
 				[
 					'filter' => [
@@ -343,7 +340,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #3 Name with 2 empty spaces.
+			// #2 Name with 2 empty spaces.
 			[
 				[
 					'filter' => [
@@ -351,7 +348,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #4 Name with special symbols.
+			// #3 Name with special symbols.
 			[
 				[
 					'filter' => [
@@ -362,7 +359,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #5 Search by description
+			// #4 Search by description.
 			[
 				[
 					'filter' => [
@@ -370,7 +367,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #6 State - Active.
+			// #5 State - Active.
 			[
 				[
 					'filter' => [
@@ -383,7 +380,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #7 State - Approaching.
+			// #6 State - Approaching.
 			[
 				[
 					'filter' => [
@@ -394,7 +391,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #8 State - Expired.
+			// #7 State - Expired.
 			[
 				[
 					'filter' => [
@@ -411,7 +408,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #9 State - Any.
+			// #8 State - Any.
 			[
 				[
 					'filter' => [
@@ -432,7 +429,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// #10 Combined filters.
+			// #9 Combined filters.
 			[
 				[
 					'filter' => [
@@ -465,11 +462,11 @@ class testPageMaintenance extends CWebTest {
 		// Check that expected maintenances are returned in the list.
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected', []));
 
-		// Check the displaying amount
+		// Check the displaying amount.
 		$maintenance_count = count((CTestArrayHelper::get($data, 'expected', [])));
 		$this-> assertTableStats($maintenance_count);
 
-		// Reset filter due to not influence further tests.
+		// Reset filter to not influence further tests.
 		$this->query('button:Reset')->one()->click();
 	}
 
@@ -502,7 +499,7 @@ class testPageMaintenance extends CWebTest {
 
 	public function getDeleteData() {
 		return [
-			// Delete 1 maintenance
+			// Delete 1 maintenance.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -511,7 +508,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
-			// Delete 2 maintenances
+			// Delete 2 maintenances.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -521,6 +518,7 @@ class testPageMaintenance extends CWebTest {
 					]
 				]
 			],
+			// Delete all maintenances.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -544,7 +542,6 @@ class testPageMaintenance extends CWebTest {
 	 */
 	public function testPageMaintenance_Delete($data) {
 		$this->page->login()->open('zabbix.php?action=maintenance.list');
-
 		// Maintenance count that will be selected before delete action.
 		$count_names = count(CTestArrayHelper::get($data, 'name', []));
 		$this->selectTableRows(CTestArrayHelper::get($data, 'name'));
@@ -557,12 +554,10 @@ class testPageMaintenance extends CWebTest {
 					CDBHelper::escape($data['name']).')')
 		);
 		$this->assertTableStats(CDBHelper::getCount(self::MAINTENANCE_SQL));
-
 	}
 
 	protected function cancelDelete($maintenances = []) {
 		$old_hash = CDBHelper::getHash(self::MAINTENANCE_SQL);
-
 		// Maintenance count that will be selected before delete action.
 		$maintenance_count = ($maintenances === []) ? CDBHelper::getCount(self::MAINTENANCE_SQL) : count($maintenances);
 
@@ -574,7 +569,6 @@ class testPageMaintenance extends CWebTest {
 		);
 		$this->page->dismissAlert();
 		$this->page->waitUntilReady();
-
 		$this->assertSelectedCount($maintenance_count);
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::MAINTENANCE_SQL));
 	}
