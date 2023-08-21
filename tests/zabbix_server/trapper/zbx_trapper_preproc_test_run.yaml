@@ -1398,7 +1398,14 @@ out:
         "steps": [
           {
              "result": "value"
+          },
+          {
+             "result": "value"
+          },
+          {
+             "result": "value"
           }
+
          ],
         "result": "value 123"
       }

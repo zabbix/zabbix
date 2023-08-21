@@ -201,7 +201,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp, char **va
 		{
 			zbx_free(step_params);
 			zbx_free(error_handler_params);
-			*bypass_first = 1;
+			(*bypass_first)++;
 		}
 
 		step_params = NULL;
@@ -321,7 +321,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
 
-	if (1 == bypass_first)
+	for (i = 0; i < bypass_first; i++)
 	{
 		zbx_json_addobject(json, NULL);
 		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, ZBX_PROTO_TAG_VALUE, ZBX_JSON_TYPE_STRING);
