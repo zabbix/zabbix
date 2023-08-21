@@ -781,7 +781,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 != tnames.values_num)
 		{
 			zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
-					(const char **)tnames.values, tnames.values_num);
+					(const char * const *)tnames.values, tnames.values_num);
 		}
 
 		if (0 != tnames.values_num && 0 != vnames.values_num)
@@ -790,7 +790,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 != vnames.values_num)
 		{
 			zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
-					(const char **)vnames.values, vnames.values_num);
+					(const char * const *)vnames.values, vnames.values_num);
 		}
 
 		if (0 != tnames.values_num && 0 != vnames.values_num)
@@ -1133,7 +1133,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_uint64_reserve(&host->new_groupids, groupids->values_num);
+		zbx_vector_uint64_reserve(&host->new_groupids, (size_t)groupids->values_num);
 		for (j = 0; j < groupids->values_num; j++)
 			zbx_vector_uint64_append(&host->new_groupids, groupids->values[j]);
 
@@ -1512,7 +1512,7 @@ static int	lld_group_add_group_discovery(zbx_lld_group_t *group, zbx_lld_group_d
 	return SUCCEED;
 }
 
-void 	lld_group_add_host(zbx_vector_ptr_t *hosts, zbx_lld_host_t *host)
+static void 	lld_group_add_host(zbx_vector_ptr_t *hosts, zbx_lld_host_t *host)
 {
 	for (int i = 0; i < hosts->values_num; i++)
 	{
@@ -1659,7 +1659,7 @@ static void	lld_group_candidates_validate_db(zbx_vector_lld_group_ptr_t *groups_
 				HOSTGROUP_TYPE_HOST);
 
 		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
-				(const char **)names.values, names.values_num);
+				(const char * const *)names.values, names.values_num);
 
 		result = zbx_db_select("%s", sql);
 
@@ -1873,8 +1873,8 @@ static void	lld_groups_validate(const zbx_vector_ptr_t *group_prototypes, zbx_ve
  ******************************************************************************/
 static int	lld_group_rights_compare(const void *d1, const void *d2)
 {
-	const zbx_lld_group_rights_t	*r1 = *(const zbx_lld_group_rights_t **)d1;
-	const zbx_lld_group_rights_t	*r2 = *(const zbx_lld_group_rights_t **)d2;
+	const zbx_lld_group_rights_t	*r1 = *(const zbx_lld_group_rights_t * const *)d1;
+	const zbx_lld_group_rights_t	*r2 = *(const zbx_lld_group_rights_t * const *)d2;
 
 	return strcmp(r1->name, r2->name);
 }
@@ -1909,22 +1909,6 @@ static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
 	zbx_free(rights->name);
 	zbx_vector_uint64_pair_destroy(&rights->rights);
 	zbx_free(rights);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: find group by its name                                            *
- *                                                                            *
- ******************************************************************************/
-static zbx_lld_group_t	*lld_groups_get_by_id(zbx_vector_lld_group_ptr_t *groups, zbx_uint64_t groupid)
-{
-	for (int i = 0; i < groups->values_num; i++)
-	{
-		if (groups->values[i]->groupid == groupid)
-			return groups->values[i];
-	}
-
-	return NULL;
 }
 
 /******************************************************************************
@@ -1987,7 +1971,7 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 				" where r.id=g.groupid"
 				" and");
 
-	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name", (const char **)group_names.values,
+	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name", (const char * const *)group_names.values,
 			group_names.values_num);
 	result = zbx_db_select("%s", sql);
 
@@ -2001,7 +1985,7 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 		rights = (zbx_lld_group_rights_t *)group_rights.values[i];
 
 		ZBX_STR2UINT64(pair.first, row[2]);
-		pair.second = atoi(row[1]);
+		pair.second = (zbx_uint64_t)atoi(row[1]);
 
 		zbx_vector_uint64_pair_append(&rights->rights, pair);
 	}
@@ -2210,7 +2194,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 					" where type=%d"
 						" and",
 				HOSTGROUP_TYPE_HOST);
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name", (const char **)names.values,
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name", (const char * const *)names.values,
 				names.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FOR_UPDATE);
 
@@ -2446,8 +2430,8 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
  ******************************************************************************/
 static int	macro_str_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_hostmacro_t *hostmacro1 = *(const zbx_lld_hostmacro_t **)d1;
-	const zbx_lld_hostmacro_t *hostmacro2 = *(const zbx_lld_hostmacro_t **)d2;
+	const zbx_lld_hostmacro_t *hostmacro1 = *(const zbx_lld_hostmacro_t * const *)d1;
+	const zbx_lld_hostmacro_t *hostmacro2 = *(const zbx_lld_hostmacro_t * const *)d2;
 
 	return strcmp(hostmacro1->macro, hostmacro2->macro);
 }
@@ -2761,7 +2745,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_uint64_reserve(&host->lnk_templateids, templateids.values_num);
+		zbx_vector_uint64_reserve(&host->lnk_templateids, (size_t)templateids.values_num);
 		for (j = 0; j < templateids.values_num; j++)
 			zbx_vector_uint64_append(&host->lnk_templateids, templateids.values[j]);
 
