@@ -262,9 +262,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pp_cache_t		*cache, *step_cache;
 	zbx_pp_item_preproc_t	preproc;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG start wait");
-	zbx_sleep(30);
-	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG finish wait");
+	///zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG start wait");
+	///zbx_sleep(30);
+	///zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG finish wait");
 
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
@@ -333,9 +333,11 @@ void	zbx_mock_test_entry(void **state)
 		else
 			step_cache = cache;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 1 %p", step->error_handler_params);
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
 				&history_value, &history_ts, get_zbx_config_source_ip())))
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 2 %p", step->error_handler_params);
 			pp_error_on_fail(&value, &step);
 
 			if (ZBX_VARIANT_ERR != value.type)
