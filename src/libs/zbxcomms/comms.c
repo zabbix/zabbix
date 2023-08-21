@@ -237,7 +237,7 @@ int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
 	{
 		const struct sockaddr_in6	*sin6 = (const struct sockaddr_in6 *) (void *)ai->ai_addr;
 
-		if (NULL == inet_ntop(AF_INET, &sin6->sin6_addr, ip, len))
+		if (NULL == inet_ntop(AF_INET6, &sin6->sin6_addr, ip, len))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv6 address: %s", zbx_strerror(errno));
 			return FAIL;
