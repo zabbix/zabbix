@@ -304,7 +304,7 @@ function itemCompleteTest(overlay) {
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
 
-			if (runtime_error in ret) {
+			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
 			}
 
@@ -407,7 +407,6 @@ function saveItemTestInputs() {
 		input_values = {
 			value: jQuery('#value').multilineInput('value'),
 			not_supported: jQuery('#not_supported').is(':checked') ? 1 : 0,
-			runtime_error: jQuery('#runtime_error').multilineInput('value'),
 			eol: jQuery('#eol').find(':checked').val()
 		},
 		form_data = $form.serializeJSON(),
@@ -415,6 +414,10 @@ function saveItemTestInputs() {
 		macros = {};
 
 	<?php if ($data['is_item_testable']): ?>
+		if (jQuery('#runtime_error').length) {
+			input_values.runtime_error = jQuery('#runtime_error').multilineInput('value');
+		}
+
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
 			proxy_hostid: jQuery('#proxy_hostid', $form).val(),
@@ -468,7 +471,7 @@ jQuery(document).ready(function($) {
 
 	$('#not_supported').prop('checked', <?= $data['not_supported'] != 0 ? 'true' : 'false' ?>);
 
-	$('#runtime_error').multilineInput({
+	$('#runtime_error').length && $('#runtime_error').multilineInput({
 		placeholder: <?= json_encode(_('error text')) ?>,
 		value: <?= json_encode($data['runtime_error']) ?>,
 		monospace_font: false,
@@ -493,11 +496,11 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
-				$('#runtime_error', $form).multilineInput('enable');
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('enable');
 			}
 			else {
 				$('#value', $form).multilineInput('unsetReadOnly');
-				$('#runtime_error', $form).multilineInput('disable');
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('disable');
 			}
 		});
 
@@ -509,7 +512,7 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
-				$('#runtime_error', $form).multilineInput('disable');
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('disable');
 				$not_supported.prop('disabled', true);
 
 				<?php if ($data['show_prev']): ?>
@@ -580,7 +583,8 @@ jQuery(document).ready(function($) {
 			}
 			else {
 				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
-				$not_supported.is(':checked') && $('#runtime_error', $form).multilineInput('enable');
+				$not_supported.is(':checked') && $('#runtime_error').length
+					&& $('#runtime_error', $form).multilineInput('enable');
 				$not_supported.prop('disabled', false);
 
 				<?php if ($data['show_prev']): ?>

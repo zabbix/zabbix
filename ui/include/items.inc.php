@@ -2441,6 +2441,10 @@ function sortPreprocessingSteps(array $steps): array {
 	usort($steps, static function (array $step_a, array $step_b): int {
 		if ($step_a['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 			if ($step_b['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+				if (!array_key_exists('params', $step_a)) {
+					return 0;
+				}
+
 				$params_a = explode("\n", $step_a['params']);
 
 				if ($params_a[0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
