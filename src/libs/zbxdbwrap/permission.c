@@ -151,3 +151,48 @@ out:
 
 	return perm;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Return user permissions for host access                           *
+ *                                                                            *
+ * Return value: PERM_DENY - if user not found, or permission otherwise       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid, char **user_timezone)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	int			perm = PERM_DENY;
+	zbx_vector_uint64_t	hostgroupids;
+	zbx_uint64_t		hostgroupid, roleid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&hostgroupids);
+
+	if (USER_TYPE_SUPER_ADMIN == zbx_get_user_info(userid, &roleid, user_timezone))
+	{
+		perm = PERM_READ_WRITE;
+		goto out;
+	}
+
+	result = zbx_db_select("select groupid from hosts_groups where hostid=" ZBX_FS_UI64, hostid);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(hostgroupid, row[0]);
+		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	perm = zbx_get_hostgroups_permission(userid, &hostgroupids);
+out:
+	zbx_vector_uint64_destroy(&hostgroupids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+
+	return perm;
+}

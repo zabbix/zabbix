@@ -134,5 +134,6 @@ const char	*zbx_permission_string(int perm);
 int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
 int	zbx_get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids);
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
+int	zbx_get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid, char **user_timezone);
 
 #endif /* ZABBIX_DBWRAP_H */
