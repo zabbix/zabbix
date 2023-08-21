@@ -19,14 +19,14 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup drules
  *
- * @dataSource NetworkDiscovery,
+ * @dataSource NetworkDiscovery
  */
 class testPageNetworkDiscovery extends CWebTest {
 
@@ -249,12 +249,12 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	public function testPageNetworkDiscovery_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
-		$this->query('button:Reset')->one()->click();
 		$this->assertTableStats(12);
 	}
 
