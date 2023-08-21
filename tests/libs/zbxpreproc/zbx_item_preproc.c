@@ -170,6 +170,19 @@ static void	read_step(const char *path, zbx_pp_step_t *step)
 		step->error_handler_params = "";
 }
 
+static void	duplicate_step(zbx_pp_step_t *step_src, zbx_pp_step_t *step_dst)
+{
+	step_dst->type = step_src->type;
+	step_dst->params = step_src->params;
+	step_dst->error_handler = step_src->error_handler;
+	step_dst->error_handler_params = zbx_strdup(NULL, step_src->error_handler_params);
+}
+
+static void	release_step(zbx_pp_step_t *step)
+{
+	zbx_free(step->error_handler_params);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: checks if the preprocessing step is supported based on build      *
@@ -256,7 +269,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_variant_t		value, value_in, history_value, history_value_in;
 	unsigned char		value_type;
 	zbx_timespec_t		ts, history_ts, history_ts_in, expected_history_ts;
-	zbx_pp_step_t		step;
+	zbx_pp_step_t		step, step_orig;
 	int			returned_ret, expected_ret, i;
 	zbx_pp_context_t	ctx = {0};
 	zbx_pp_cache_t		*cache, *step_cache;
@@ -279,7 +292,8 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	read_step("in.step", &step);
+	read_step("in.step", &step_orig);
+	duplicate_step(&step_orig, &step);
 
 #ifdef HAVE_NETSNMP
 	preproc_init_snmp();
@@ -329,11 +343,11 @@ void	zbx_mock_test_entry(void **state)
 		else
 			step_cache = cache;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 1 %p", step->error_handler_params);
+		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 1 %p", step.error_handler_params);
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
 				&history_value, &history_ts, get_zbx_config_source_ip())))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 2 %p", step->error_handler_params);
+			zabbix_log(LOG_LEVEL_DEBUG, "AKDBG step->error_handler_params 2 %p", step.error_handler_params);
 			pp_error_on_fail(&value, &step);
 
 			if (ZBX_VARIANT_ERR != value.type)
@@ -434,6 +448,7 @@ void	zbx_mock_test_entry(void **state)
 	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG preproc_shutdown_snmp");
 	preproc_shutdown_snmp();
 #endif
+	release_step(&step);
 	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG end");
 
 }
