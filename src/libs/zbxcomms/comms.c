@@ -219,6 +219,37 @@ out:
 		freeaddrinfo(ai);
 }
 
+int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
+{
+	if (AF_INET == ai->ai_addr->sa_family)
+	{
+		const struct sockaddr_in	*sin = (const struct sockaddr_in *) (void *)ai->ai_addr;
+
+		if (NULL == inet_ntop(AF_INET, &sin->sin_addr, ip, len))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv4 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+	else if (AF_INET6 == ai->ai_addr->sa_family)
+	{
+		const struct sockaddr_in6	*sin6 = (const struct sockaddr_in6 *) (void *)ai->ai_addr;
+
+		if (NULL == inet_ntop(AF_INET, &sin6->sin6_addr, ip, len))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv6 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "unknown address family:%d", ai->ai_addr->sa_family);
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve IP address by host name                                  *
@@ -239,17 +270,8 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 		goto out;
 	}
 
-	switch(ai->ai_addr->sa_family) {
-		case AF_INET:
-			inet_ntop(AF_INET, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, (socklen_t)iplen);
-			break;
-		case AF_INET6:
-			inet_ntop(AF_INET6, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, (socklen_t)iplen);
-			break;
-		default:
-			ip[0] = '\0';
-			goto out;
-	}
+	if (FAIL == zbx_inet_ntop(ai, ip, (socklen_t)iplen))
+		ip[0] = '\0';
 out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
