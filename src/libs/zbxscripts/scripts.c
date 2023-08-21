@@ -40,7 +40,7 @@
 #define REMOTE_COMMAND_RESULT_WAIT	2
 #define REMOTE_COMMAND_COMPLETED	4
 
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+//extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
 
@@ -326,7 +326,7 @@ out:
 }
 
 static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, char *error, size_t max_error_len)
+		int config_timeout, int config_forks[], char *error, size_t max_error_len)
 {
 	int			ret = FAIL, completed = 0;
 	zbx_rc_command_t	cmd, *pcmd;
@@ -334,7 +334,7 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 > CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
+	if (2 > config_forks[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
 	{
 		zbx_snprintf(error, max_error_len, "cannot execute remote command on active agent, at least two"
 				" trappers are required");
@@ -487,7 +487,7 @@ fail:
 }
 
 static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, int config_forks[], char *error, size_t max_error_len)
 {
 	zbx_dc_interface_t	interface;
 
@@ -497,8 +497,8 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
 			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
 	{
-		return active_command_send_and_result_fetch(host, command, result, config_timeout, error,
-				max_error_len);
+		return active_command_send_and_result_fetch(host, command, result, config_timeout, config_forks,
+				error, max_error_len);
 	}
 
 	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip, error,
@@ -833,6 +833,7 @@ out:
  *              config_timeout         - [IN]                                     *
  *              config_trapper_timeout - [IN]                                     *
  *              config_source_ip       - [IN]                                     *
+ *              config_forks           - [IN]                                     *
  *              result                 - [OUT] result of a script execution       *
  *              error                  - [OUT] error reported by the script       *
  *              max_error_len          - [IN] maximum error length                *
@@ -844,8 +845,8 @@ out:
  *                                                                                *
  **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
-		int config_timeout, int config_trapper_timeout, const char *config_source_ip, char **result,
-		char *error, size_t max_error_len, char **debug)
+		int config_timeout, int config_trapper_timeout, const char *config_source_ip, int config_forks[],
+		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -864,7 +865,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
-							config_source_ip, error, max_error_len);
+							config_source_ip, config_forks, error, max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
@@ -881,7 +882,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
-			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
+			if (0 == config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER])
 			{
 				zbx_strlcpy(error, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.", max_error_len);

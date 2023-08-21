@@ -28,6 +28,8 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 
+extern int   CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 /******************************************************************************
  *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
@@ -444,7 +446,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
-					config_trapper_timeout, config_source_ip, result, error, sizeof(error), debug);
+					config_trapper_timeout, config_source_ip, CONFIG_FORKS, result, error,
+					sizeof(error), debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
