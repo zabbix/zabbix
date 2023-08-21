@@ -120,6 +120,8 @@ window.tophosts_column_edit_form = new class {
 	}
 
 	handleFormSubmit(e, overlay) {
+		$.fn.trimValues(e.target);
+
 		fetch(new Curl(e.target.getAttribute('action')).getUrl(), {
 			method: 'POST',
 			body: new URLSearchParams(new FormData(e.target))

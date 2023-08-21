@@ -731,6 +731,23 @@ static int	DBpatch_6050063(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050064(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set value_str=' '"
+			" where name like 'columns.name.%%'"
+			" and value_str=''"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -801,5 +818,6 @@ DBPATCH_ADD(6050060, 0, 1)
 DBPATCH_ADD(6050061, 0, 1)
 DBPATCH_ADD(6050062, 0, 1)
 DBPATCH_ADD(6050063, 0, 1)
+DBPATCH_ADD(6050064, 0, 1)
 
 DBPATCH_END()
