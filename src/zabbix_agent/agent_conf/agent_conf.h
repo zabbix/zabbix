@@ -21,19 +21,6 @@
 #define ZABBIX_AGENT_CONF_H
 
 #include "cfg.h"
-
-/* extern char	*CONFIG_HOSTS_ALLOWED; */
-/* extern int	CONFIG_LISTEN_PORT; */
-/* extern int	CONFIG_REFRESH_ACTIVE_CHECKS; */
-/* extern char	*CONFIG_LISTEN_IP; */
-/* extern int	CONFIG_MAX_LINES_PER_SECOND; */
-/* extern char	**CONFIG_ALIASES; */
-/* extern char	**CONFIG_USER_PARAMETERS; */
-/* #ifdef _WINDOWS */
-/* extern char	**CONFIG_PERF_COUNTERS; */
-/* extern char	**CONFIG_PERF_COUNTERS_EN; */
-/* #endif */
-
 void	load_aliases(char **lines);
 int	load_user_parameters(char **lines, char **err);
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg);

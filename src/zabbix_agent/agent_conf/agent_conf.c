@@ -26,9 +26,9 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load aliases from configuration                                   *
+ * Purpose: loads aliases from configuration                                  *
  *                                                                            *
- * Parameters: lines - aliases from configuration file                        *
+ * Parameters: lines - [IN] aliases from configuration file                   *
  *                                                                            *
  * Comments: calls zbx_add_alias() for each entry                             *
  *                                                                            *
@@ -68,10 +68,10 @@ void	load_aliases(char **lines)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load user parameters from configuration                           *
+ * Purpose: loads user parameters from configuration                          *
  *                                                                            *
- * Parameters: lines - user parameter entries from configuration file         *
- *             error - error message                                          *
+ * Parameters: lines - [IN] user parameter entries from configuration file    *
+ *             error - [IN] error message                                     *
  *                                                                            *
  * Return value: SUCCEED - successfully loaded user parameters                *
  *               FAIL    - failed to load user parameters                     *
@@ -106,7 +106,7 @@ int	load_user_parameters(char **lines, char **err)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Adds key access rule from configuration                           *
+ * Purpose: adds key access rule from configuration                           *
  *                                                                            *
  * Parameters: value - [IN] key access rule parameter value                   *
  *             cfg   - [IN] configuration parameter information               *
@@ -132,7 +132,7 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 #ifdef _WINDOWS
 /******************************************************************************
  *                                                                            *
- * Purpose: load performance counters from configuration                      *
+ * Purpose: loads performance counters from configuration                     *
  *                                                                            *
  * Parameters: def_lines - array of PerfCounter configuration entries         *
  *             eng_lines - array of PerfCounterEn configuration entries       *
@@ -216,7 +216,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 #else
 /******************************************************************************
  *                                                                            *
- * Purpose: load user parameters from configuration file                      *
+ * Purpose: loads user parameters from configuration file                     *
  *                                                                            *
  ******************************************************************************/
 static int	load_config_user_params(const char *config_file, char **config_user_parameters)
