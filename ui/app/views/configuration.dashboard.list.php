@@ -94,7 +94,7 @@ $form->addItem([
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $checkbox_hash,
+		'checkbox_hash' => $checkbox_hash
 	]).');
 '))
 	->setOnDocumentReady()
