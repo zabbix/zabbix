@@ -826,9 +826,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Enabled' => false
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['Zabbix agent (100-500) "test"' => true],
-						'Host name' => ['IP address' => true],
-						'Visible name' => ['DNS name' => true]
+						'Device uniqueness criteria' => 'Zabbix agent (100-500) "test"',
+						'Host name' => 'IP address',
+						'Visible name' => 'DNS name'
 					],
 					'Checks' => [
 						[
@@ -891,9 +891,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Enabled' => true
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['Zabbix agent "key[param1, param2]"' => true],
-						'Host name' => ['SNMPv1 agent (9999,10-200) "😀"' => true],
-						'Visible name' => ['SNMPv3 agent "😀"' => true]
+						'Device uniqueness criteria' => 'Zabbix agent "key[param1, param2]"',
+						'Host name' => 'SNMPv1 agent (9999,10-200) "😀"',
+						'Visible name' => 'SNMPv3 agent "😀"'
 					],
 					'Checks' => [
 						[
@@ -1245,7 +1245,9 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		// Fill radio-fields.
 		if (array_key_exists('radios', $data)) {
-			$this->fillRadioFields($data['radios'], $form);
+			foreach ($data['radios'] as $label => $value) {
+				$form->getFieldContainer($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
+			}
 		}
 
 		// Submit Discovery rule form.
@@ -1278,7 +1280,11 @@ class testFormNetworkDiscovery extends CWebTest {
 
 			// Check radio-fields.
 			if (array_key_exists('radios', $data)) {
-				$this->compareRadioFields($data['radios'], $form);
+				foreach ($data['radios'] as $label => $value) {
+					$this->assertEquals($value, $form->getFieldContainer($label)->query('class:list-check-radio')->one()
+							->asSegmentedRadio()->getValue()
+					);
+				}
 			}
 
 			// Compare checks table to ensure that Discovery checks are saved correctly.
@@ -1487,6 +1493,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
+							'IP address' => true,
 							'SNMPv1 agent (200) "new test SNMP OID"' => false
 						],
 						'Host name' => [
@@ -1764,7 +1771,9 @@ class testFormNetworkDiscovery extends CWebTest {
 			$this->changeDiscoveryChecks($data['checks'], $form);
 
 			// Fill radios.
-			$this->fillRadioFields($data['radios'], $form);
+			foreach ($data['radios'] as $label => $value) {
+				$form->getFieldContainer($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
+			}
 		}
 
 		$form->submit();
@@ -1784,7 +1793,11 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->compareChecksFormValues($data['expected_checks'], $form);
 
 		// Compare form's radios.
-		$this->compareRadioFields($data['radios'], $form);
+		foreach ($data['radios'] as $label => $value) {
+			$this->assertEquals($value, $form->getField($label)->query('class:list-check-radio')->one()
+					->asSegmentedRadio()->getValue()
+			);
+		}
 
 		$dialog->close();
 
@@ -1997,7 +2010,9 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Visible name' => ['DNS name' => true]
 				];
 
-				$this->fillRadioFields($radios, $form);
+				foreach ($radios as $label => $value) {
+					$form->getFieldContainer($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
+				}
 
 				if ($data['action'] === 'Clone') {
 					$dialog->query('button', $data['action'])->one()->click();
@@ -2072,29 +2087,18 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Function for checking Network discovery's radio fields.
 	 *
-	 * @param array $data           filled values
-	 * @param CFormElement $form    discovery rule's edit form
-	 */
-	protected function fillRadioFields($data, $form) {
-		foreach ($data as $label => $values) {
-			$form->getFieldContainer($label)->query("xpath:.//label[text()=".
-				CXPathHelper::escapeQuotes(array_key_first($values))."]/../input")->one()->click();
-		}
-	}
-
-	/**
-	 * Function for checking Network discovery's radio fields.
-	 *
 	 * @param array $data           checked values
 	 * @param CFormElement $form    discovery rule's edit form
 	 */
 	protected function compareRadioFields($data, $form) {
 		foreach ($data as $label => $values) {
-			foreach ($values as $value => $selected) {
-				$this->assertEquals($selected, $form->getFieldContainer($label)->query("xpath:.//label[text()=".
-						CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists()
-				);
-			}
+			$field = $form->getFieldContainer($label)->query('class:list-check-radio')->one()->asSegmentedRadio();
+
+			// Check all expected radio labels.
+			$this->assertEquals(array_keys($values), $field->getLabels()->asText());
+
+			// Check selected radio label.
+			$this->assertEquals(array_keys(array_filter($values)), [$field->getValue()]);
 		}
 	}
 }
