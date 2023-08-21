@@ -2048,10 +2048,14 @@ out:
  ******************************************************************************/
 static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes)
 {
-	int			i, j, groups_insert_num = 0, groups_update_num = 0, gd_insert_num = 0,
-			gd_update_num = 0;
-	zbx_db_insert_t		db_insert_group, db_insert_gdiscovery;
-	zbx_vector_uint64_t	groupids;
+	int				i, j, groups_insert_num = 0, groups_update_num = 0, gd_insert_num = 0,
+					gd_update_num = 0;
+	zbx_db_insert_t			db_insert_group, db_insert_gdiscovery;
+	zbx_vector_uint64_t		groupids;
+	zbx_uint64_t			next_groupid, next_gdid;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	zbx_vector_lld_group_ptr_t	new_groups;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2096,11 +2100,6 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 		goto out;
 
 	/* flush discovery changes */
-
-	zbx_uint64_t			next_groupid, next_gdid;
-	char				*sql = NULL;
-	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_vector_lld_group_ptr_t	new_groups;
 
 	zbx_db_begin();
 
