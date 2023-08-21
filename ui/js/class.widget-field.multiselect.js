@@ -34,6 +34,13 @@ class CWidgetFieldMultiselect {
 	#field_name;
 
 	/**
+	 * Data type accepted from referred data sources.
+	 *
+	 * @type {string}
+	 */
+	#in_type;
+
+	/**
 	 * @type {boolean}
 	 */
 	#default_prevented;
@@ -57,13 +64,6 @@ class CWidgetFieldMultiselect {
 	 * @type {boolean}
 	 */
 	#is_multiple;
-
-	/**
-	 * Data type accepted from referred data sources.
-	 *
-	 * @type {string}
-	 */
-	#in_type;
 
 	/**
 	 * @type {string|null}

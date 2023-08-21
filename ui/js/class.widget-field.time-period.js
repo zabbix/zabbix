@@ -51,6 +51,13 @@ class CWidgetFieldTimePeriod {
 	#field_value = null;
 
 	/**
+	 * Data type accepted from referred data sources.
+	 *
+	 * @type {string}
+	 */
+	#in_type;
+
+	/**
 	 * @type {number}
 	 */
 	#data_source;
@@ -73,11 +80,13 @@ class CWidgetFieldTimePeriod {
 	constructor({
 		field_name,
 		field_value = {from: '', to: ''},
+		in_type,
 		data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT,
 		widget_accepted = false,
 		dashboard_accepted = false
 	}) {
 		this.#field_name = field_name;
+		this.#in_type = in_type;
 		this.#data_source = data_source;
 		this.#widget_accepted = widget_accepted;
 		this.#dashboard_accepted = dashboard_accepted;
@@ -135,7 +144,7 @@ class CWidgetFieldTimePeriod {
 			});
 
 			this.#reference_multiselect.multiSelect('getSelectButton').addEventListener('click', () => {
-				new ClassWidgetSelectPopup(this.DASHBOARD_getWidgets()).on('dialogue.submit', (e) => {
+				new ClassWidgetSelectPopup(this.#getWidgets()).on('dialogue.submit', (e) => {
 					this.#selectReference(e.detail.reference);
 				});
 			});
@@ -206,7 +215,7 @@ class CWidgetFieldTimePeriod {
 		const search = this.#reference_multiselect.multiSelect('getSearch');
 		const result_entities = new Map();
 
-		for (const widget of this.DASHBOARD_getWidgets()) {
+		for (const widget of this.#getWidgets()) {
 			if (widget.name.toLowerCase().includes(search)) {
 				result_entities.set(widget.id, widget);
 			}
@@ -216,7 +225,7 @@ class CWidgetFieldTimePeriod {
 	}
 
 	#selectReference(reference) {
-		for (const widget of this.DASHBOARD_getWidgets()) {
+		for (const widget of this.#getWidgets()) {
 			if (widget.id === reference) {
 				this.#reference_multiselect.multiSelect('addData', [widget]);
 				break;
@@ -224,11 +233,21 @@ class CWidgetFieldTimePeriod {
 		}
 	}
 
-	DASHBOARD_getWidgets() {
-		return [
-			{id: 'DD56KD', name: 'URL'},
-			{id: 'AFG87E', name: 'Problems'},
-			{id: '67AFCB', name: 'Problems'}
-		];
+	#getWidgets() {
+		const widgets = ZABBIX.Dashboard.getReferableWidgets({
+			type: this.#in_type,
+			widget_context: ZABBIX.Dashboard.getEditingWidgetContext()
+		});
+
+		const result = [];
+
+		for (const widget of widgets) {
+			result.push({
+				id: widget.getFields().reference,
+				name: widget.getHeaderName()
+			});
+		}
+
+		return result;
 	}
 }
