@@ -1205,9 +1205,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				$expected_checks[] = $type_text;
 			}
 
-			$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
-			array_pop($table_contents);
-			$this->assertEquals($expected_checks, $table_contents);
+			$this->compareChecksTable($expected_checks);
 		}
 
 		$form->fill($data['fields']);
@@ -1266,9 +1264,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					unset($expected_check);
 				}
 
-				$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
-				array_pop($table_contents);
-				$this->assertEquals($expected_checks, $table_contents);
+				$this->compareChecksTable($expected_checks);
 
 				// Write default check to the array for comparison.
 				if ($data['Checks'] === [['default' => true]]) {
@@ -1586,9 +1582,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			$form->invalidate();
 
 			// Compare Checks table with the expected result.
-			$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
-			array_pop($table_contents);
-			$this->assertEquals($data['expected_checks'], $table_contents);
+			$this->compareChecksTable($data['expected_checks']);
 
 			// Compare changed radio fields after save.
 			$this->compareRadioFields($data['expected_radios'], $form);
@@ -1745,9 +1739,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form->checkValue($data['expected_fields']);
 
 		// Compare Discovery rule's Checks table.
-		$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
-		array_pop($table_contents);
-		$this->assertEquals($data['expected_checks_table'], $table_contents);
+		$this->compareChecksTable($data['expected_checks']);
 
 		// Compare Discovery rule's Checks form.
 		$this->compareChecksFormValues($data['expected_checks'], $form);
@@ -2016,6 +2008,17 @@ class testFormNetworkDiscovery extends CWebTest {
 					break;
 			}
 		}
+	}
+
+	/**
+	 * Function for comparing checks table type column with expected data.
+	 *
+	 * @param array $expected    checked values
+	 */
+	protected function compareChecksTable($expected) {
+		$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
+		array_pop($table_contents);
+		$this->assertEquals($expected, $table_contents);
 	}
 
 	/**
