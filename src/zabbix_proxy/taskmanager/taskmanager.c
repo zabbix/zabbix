@@ -35,7 +35,7 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-extern int   CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /**************************************************************************************
  *                                                                                    *

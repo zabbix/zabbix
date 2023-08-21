@@ -40,8 +40,6 @@
 #define REMOTE_COMMAND_RESULT_WAIT	2
 #define REMOTE_COMMAND_COMPLETED	4
 
-//extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
 
 static zbx_mutex_t	remote_commands_lock = ZBX_MUTEX_NULL;

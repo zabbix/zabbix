@@ -446,8 +446,8 @@ static int	proxy_get_data(zbx_dc_proxy_t *proxy, int config_timeout, int config_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, config_timeout, config_trapper_timeout,
-			config_source_ip, &answer, &ts)))
+	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, config_timeout,
+			config_trapper_timeout, config_source_ip, &answer, &ts)))
 	{
 		goto out;
 	}
@@ -591,8 +591,8 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 			if (proxy.proxy_config_nextcheck <= now && proxy.compatibility == ZBX_PROXY_VERSION_CURRENT)
 			{
-				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault, config_trapper_timeout,
-						config_source_ip)))
+				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault,
+						config_trapper_timeout, config_source_ip)))
 				{
 					goto error;
 				}
@@ -611,8 +611,9 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 					if (FAIL == zbx_hc_check_proxy(proxy.proxyid))
 						break;
 
-					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout, config_trapper_timeout,
-							events_cbs, proxydata_frequency, config_source_ip, &more)))
+					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout,
+							config_trapper_timeout, events_cbs, proxydata_frequency,
+							config_source_ip, &more)))
 					{
 						goto error;
 					}
