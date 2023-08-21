@@ -1680,9 +1680,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['SNMPv1 agent (165) ".1.9.6.1.10.1.9.9.9"' => true],
-						'Host name' => ['SNMPv3 agent (130) ".1.3.6.1.2.1.1.1.999"' => true],
-						'Visible name' => ['IP address' => true]
+						'Device uniqueness criteria' => 'SNMPv1 agent (165) ".1.9.6.1.10.1.9.9.9"',
+						'Host name' => 'SNMPv3 agent (130) ".1.3.6.1.2.1.1.1.999"',
+						'Visible name' => 'IP address'
 					]
 				]
 			],
@@ -1740,9 +1740,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['Zabbix agent "key[cloned_param1, cloned_param2]"' => true],
-						'Host name' => ['IP address' => true],
-						'Visible name' => ['SNMPv2 agent (113) "v2 new cloned SNMP OID"' => true]
+						'Device uniqueness criteria' => 'Zabbix agent "key[cloned_param1, cloned_param2]"',
+						'Host name' => 'IP address',
+						'Visible name' => 'SNMPv2 agent (113) "v2 new cloned SNMP OID"'
 					]
 				]
 			]
@@ -1794,7 +1794,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		// Compare form's radios.
 		foreach ($data['radios'] as $label => $value) {
-			$this->assertEquals($value, $form->getField($label)->query('class:list-check-radio')->one()
+			$this->assertEquals($value, $form->getFieldContainer($label)->query('class:list-check-radio')->one()
 					->asSegmentedRadio()->getValue()
 			);
 		}
@@ -2005,9 +2005,9 @@ class testFormNetworkDiscovery extends CWebTest {
 				$checks_dialog->waitUntilNotVisible();
 
 				$radios = [
-					'Device uniqueness criteria' => ['SNMPv2 agent (99) "new cancel OID"' => true],
-					'Host name' => ['IP address' => true],
-					'Visible name' => ['DNS name' => true]
+					'Device uniqueness criteria' => 'SNMPv2 agent (99) "new cancel OID"',
+					'Host name' => 'IP address',
+					'Visible name' => 'DNS name'
 				];
 
 				foreach ($radios as $label => $value) {
