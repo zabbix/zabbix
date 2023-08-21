@@ -411,39 +411,33 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$aggregate_function = $column['aggregate_function'];
-		$time_from = time() - $history_period;
-		$time_to = time();
+		$time_from = $column['time_from'];
+		$time_to = $column['time_to'];
 
-		self::addDataSource($items, $time_from, $time_now, $column['history']);
+		$range_time_parser = new CRangeTimeParser();
 
-		if ($aggregate_function === AGGREGATE_NONE) {
-			$values = Manager::History()->getAggregationByInterval(
-				$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
-			);
-		}
-		else {
-			$from = $column['time_from'];
-			$to = $column['time_to'];
+		$range_time_parser->parse($time_from);
+		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
 
-			$range_time_parser = new CRangeTimeParser();
+		$range_time_parser->parse($time_to);
+		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
-			$range_time_parser->parse($from);
-			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+		$from = time() - $history_period;
 
-			$range_time_parser->parse($to);
-			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+		self::addDataSource($items, $from, $time_now, $column['history']);
 
-			$values = Manager::History()->getAggregationByInterval(
-				$items, $time_from, $time_to, $aggregate_function, $time_to
-			);
-		}
+		$function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
+
+		$values = Manager::History()->getAggregationByInterval(
+			$items, $time_from, $time_to, $function, $time_to
+		);
 
 		$result = [];
 
 		if ($values) {
 			$values = $values[$column['itemid']]['data'][0];
 
-			$result += $aggregate_function != AGGREGATE_COUNT
+			$result += $aggregate_function !== AGGREGATE_COUNT
 				? [$column['itemid'] => $values['value']]
 				: [$column['itemid'] => $values['count']];
 		}
