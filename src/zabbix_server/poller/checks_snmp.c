@@ -3049,7 +3049,7 @@ static void	process_snmp_result(void *data)
 	event_base_loopbreak(snmp_result->base);
 
 	zbx_async_check_snmp_clean(snmp_context);
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
