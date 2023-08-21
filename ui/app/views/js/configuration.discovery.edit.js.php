@@ -176,7 +176,9 @@ window.drule_edit_popup = new class {
 		if (update === false) {
 			if (typeof input.host_source === 'undefined') {
 				const checked_host_source = document.querySelector('[name="host_source"]:checked:not([data-id])');
-				input.host_source = checked_host_source === null ? '<?= ZBX_DISCOVERY_DNS ?>' : checked_host_source.value;
+				input.host_source = checked_host_source === null
+					? '<?= ZBX_DISCOVERY_DNS ?>'
+					: checked_host_source.value;
 			}
 
 			if (typeof input.name_source === 'undefined') {
