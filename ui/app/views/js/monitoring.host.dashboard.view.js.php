@@ -295,6 +295,7 @@
 		#registerEvents() {
 			this.events = {
 				elementSuccess(e) {
+					let curl = null;
 					const data = e.detail;
 
 					if ('success' in data) {
@@ -302,6 +303,11 @@
 
 						if ('messages' in data.success) {
 							postMessageDetails('success', data.success.messages);
+						}
+
+						if ('action' in data.success && data.success.action === 'delete') {
+							curl = new Curl('zabbix.php');
+							curl.setArgument('action', 'host.view');
 						}
 					}
 					else {
@@ -312,7 +318,7 @@
 						}
 					}
 
-					location.href = location.href;
+					location.href = curl === null ? location.href : curl.getUrl();
 				}
 			};
 		}
