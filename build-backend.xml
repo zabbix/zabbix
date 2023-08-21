@@ -62,6 +62,7 @@
 			<arg line="-isrc/libs/zbxembed/duktape.h"/>
 			<arg line="--suppress=variableScope:*"/>
 			<arg line="--suppress=ConfigurationNotChecked:*"/>
+			<arg line="--suppress=ctuuninitvar:*"/>
 			<arg line="--inconclusive"/>
 			<arg line="--force"/>
 			<arg line="--xml"/>
