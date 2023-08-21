@@ -178,6 +178,7 @@ typedef struct
 	AGENT_RESULT		*result;
 	int			errcode;
 	struct event_base	*base;
+	int			finished;
 }
 zbx_snmp_result_t;
 
@@ -3047,6 +3048,7 @@ static void	process_snmp_result(void *data)
 	zbx_init_agent_result(&snmp_context->item.result);
 	snmp_result->errcode = snmp_context->item.ret;
 	event_base_loopbreak(snmp_result->base);
+	snmp_result->finished = 1;
 
 	zbx_async_check_snmp_clean(snmp_context);
 
@@ -3127,7 +3129,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
 				&snmp_result, NULL, snmp_result.base, dnsbase, config_timeout, config_source_ip)))
 		{
-			if (0 == event_base_dispatch(snmp_result.base))
+			if (1 == snmp_result.finished || -1 != event_base_dispatch(snmp_result.base))
 			{
 				errcodes[j] = snmp_result.errcode;
 			}
