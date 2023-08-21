@@ -17,27 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXCONF_H
-#define ZABBIX_ZBXCONF_H
+#ifndef ZABBIX_AGENT_CONF_H
+#define ZABBIX_AGENT_CONF_H
 
 #include "cfg.h"
 
-extern char	*CONFIG_HOSTS_ALLOWED;
-extern int	CONFIG_LISTEN_PORT;
-extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
-extern char	*CONFIG_LISTEN_IP;
-extern int	CONFIG_MAX_LINES_PER_SECOND;
-extern char	**CONFIG_ALIASES;
-extern char	**CONFIG_USER_PARAMETERS;
-#ifdef _WINDOWS
-extern char	**CONFIG_PERF_COUNTERS;
-extern char	**CONFIG_PERF_COUNTERS_EN;
-#endif
+/* extern char	*CONFIG_HOSTS_ALLOWED; */
+/* extern int	CONFIG_LISTEN_PORT; */
+/* extern int	CONFIG_REFRESH_ACTIVE_CHECKS; */
+/* extern char	*CONFIG_LISTEN_IP; */
+/* extern int	CONFIG_MAX_LINES_PER_SECOND; */
+/* extern char	**CONFIG_ALIASES; */
+/* extern char	**CONFIG_USER_PARAMETERS; */
+/* #ifdef _WINDOWS */
+/* extern char	**CONFIG_PERF_COUNTERS; */
+/* extern char	**CONFIG_PERF_COUNTERS_EN; */
+/* #endif */
 
 void	load_aliases(char **lines);
 int	load_user_parameters(char **lines, char **err);
 int	load_key_access_rule(const char *value, const struct cfg_line *cfg);
-void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file);
+void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
+		char **config_user_parameters);
 #ifdef _WINDOWS
 void	load_perf_counters(const char **def_lines, const char **eng_lines);
 #endif
@@ -46,4 +47,4 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines);
 void	tl_version(void);
 #endif
 
-#endif /* ZABBIX_ZBXCONF_H */
+#endif /* ZABBIX_AGENT_CONF_H */

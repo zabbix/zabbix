@@ -140,7 +140,7 @@ const char	*help_message[] = {"mock_help_message", NULL};
 const char	*progname = "mock_progname";
 const char	syslog_app_name[] = "mock_syslog_app_name";
 
-char	*CONFIG_HOSTS_ALLOWED		= NULL;
+/*char	*CONFIG_HOSTS_ALLOWED		= NULL;*/
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;

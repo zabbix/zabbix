@@ -3,6 +3,7 @@
 SUBDIRS = \
 	listener \
 	active_checks \
+	agent_conf \
 	logfiles
 
 EXTRA_DIST = \
@@ -13,9 +14,7 @@ sbin_PROGRAMS = zabbix_agentd
 noinst_LIBRARIES = libzbxagent.a
 
 libzbxagent_a_SOURCES = \
-	metrics.h \
-	zbxconf.c \
-	zbxconf.h
+	metrics.h
 
 libzbxagent_a_CFLAGS = \
 	-DZABBIX_DAEMON \
@@ -27,6 +26,7 @@ zabbix_agentd_LDADD = \
 	libzbxagent.a \
 	active_checks/libzbxactive_checks.a \
 	listener/libzbxlistener.a \
+	agent_conf/libagent_conf.a \
 	logfiles/libzbxlogfiles.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \

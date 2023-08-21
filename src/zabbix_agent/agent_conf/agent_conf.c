@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxconf.h"
+#include "agent_conf.h"
 
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
@@ -219,13 +219,13 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
  * Purpose: load user parameters from configuration file                      *
  *                                                                            *
  ******************************************************************************/
-static int	load_config_user_params(const char *config_file)
+static int	load_config_user_params(const char *config_file, char **config_user_parameters)
 {
 	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
+		{"UserParameter",		&config_user_parameters,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
@@ -233,14 +233,15 @@ static int	load_config_user_params(const char *config_file)
 	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
 }
 
-void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file)
+void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
+		char **config_user_parameters)
 {
 	char		*error = NULL;
 	zbx_metric_t	*metrics_fallback = NULL;
 
-	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_init(&config_user_parameters);
 
-	if (FAIL == load_config_user_params(config_file))
+	if (FAIL == load_config_user_params(config_file, config_user_parameters))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d]: error processing configuration file",
 				get_process_type_string(process_type), process_num);
@@ -250,7 +251,7 @@ void	reload_user_parameters(unsigned char process_type, int process_num, const c
 	zbx_get_metrics_copy(&metrics_fallback);
 	zbx_remove_user_parameters();
 
-	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+	if (FAIL == load_user_parameters(config_user_parameters, &error))
 	{
 		zbx_set_metrics(metrics_fallback);
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
@@ -263,7 +264,7 @@ void	reload_user_parameters(unsigned char process_type, int process_num, const c
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:
-	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(&config_user_parameters);
 }
 #endif	/* _WINDOWS */
 
