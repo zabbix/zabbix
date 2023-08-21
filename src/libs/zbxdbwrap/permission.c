@@ -41,8 +41,7 @@ int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_tim
 	int		user_type = -1;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-
-	*user_timezone = NULL;
+	char		*user_tz = NULL;
 
 	result = zbx_db_select("select r.type,u.roleid,u.timezone from users u,role r where u.roleid=r.roleid and"
 			" userid=" ZBX_FS_UI64, userid);
@@ -51,8 +50,12 @@ int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_tim
 	{
 		user_type = atoi(row[0]);
 		ZBX_STR2UINT64(*roleid, row[1]);
-		*user_timezone = zbx_strdup(NULL, row[2]);
+
+		user_tz = row[2];
 	}
+
+	if (NULL != user_timezone)
+		*user_timezone = (NULL != user_tz ? zbx_strdup(NULL, user_tz) : NULL);
 
 	zbx_db_free_result(result);
 

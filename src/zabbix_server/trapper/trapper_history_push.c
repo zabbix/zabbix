@@ -255,25 +255,28 @@ static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights
 		}
 	}
 
-	zbx_host_permission_t	*perm;
-
-	if (0 == (perm = (zbx_host_permission_t *)zbx_hashset_search(rights, &item->host.hostid)))
+	if (NULL != rights)
 	{
-		zbx_host_permission_t	perm_local;
-		char			*user_timezone = NULL;
+		zbx_host_permission_t	*perm;
 
-		perm_local.hostid = item->host.hostid;
-		perm_local.permission = zbx_get_host_permission(userid, item->host.hostid, &user_timezone);
+		if (0 == (perm = (zbx_host_permission_t *)zbx_hashset_search(rights, &item->host.hostid)))
+		{
+			zbx_host_permission_t	perm_local;
+			char			*user_timezone = NULL;
 
-		perm = (zbx_host_permission_t *)zbx_hashset_insert(rights, &perm_local, sizeof(perm_local));
+			perm_local.hostid = item->host.hostid;
+			perm_local.permission = zbx_get_host_permission(userid, item->host.hostid, &user_timezone);
 
-		zbx_free(user_timezone);
-	}
+			perm = (zbx_host_permission_t *)zbx_hashset_insert(rights, &perm_local, sizeof(perm_local));
 
-	if (PERM_READ > perm->permission)
-	{
-		*error = zbx_strdup(NULL, "Insufficient permissions to upload history.");
-		return FAIL;
+			zbx_free(user_timezone);
+		}
+
+		if (PERM_READ > perm->permission)
+		{
+			*error = zbx_strdup(NULL, "Insufficient permissions to upload history.");
+			return FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -380,7 +383,16 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_host_key_t	hostkeys;
-	zbx_hashset_t		rights;
+	zbx_hashset_t		rights, *prights;
+	zbx_uint64_t		roleid;
+
+	if (USER_TYPE_SUPER_ADMIN != zbx_get_user_info(userid, &roleid, NULL))
+	{
+		zbx_hashset_create(&rights, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		prights = &rights;
+	}
+	else
+		prights = NULL;
 
 	zbx_vector_uint64_create(&itemids);
 	if (0 != itemids_num)
@@ -389,8 +401,6 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 	zbx_vector_host_key_create(&hostkeys);
 	if (0 != hostkeys_num)
 		zbx_vector_host_key_reserve(&hostkeys, (size_t)hostkeys_num);
-
-	zbx_hashset_create(&rights, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	for (int i = 0; i < values->values_num; i++)
 	{
@@ -504,7 +514,7 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
 				(*failed_num)++;
 			}
-			else if (SUCCEED != validate_item_config(ai, &rights, userid, item, values->values[i], &error))
+			else if (SUCCEED != validate_item_config(ai, prights, userid, item, values->values[i], &error))
 			{
 				zbx_item_error_t	item_err_local = {.itemid = item->itemid, .error = error};
 
@@ -556,7 +566,9 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 	zbx_free(hk_items);
 	zbx_free(hk_errcodes);
 
-	zbx_hashset_destroy(&rights);
+	if (NULL != prights)
+		zbx_hashset_destroy(&rights);
+
 	zbx_vector_uint64_destroy(&itemids);
 	zbx_vector_host_key_destroy(&hostkeys);
 }
