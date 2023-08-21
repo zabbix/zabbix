@@ -50,18 +50,14 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	}
 
 	protected function validateTagFilters(): bool {
-		$host_groups = $this->getInput('ms_new_tag_filter', []);
-
-		if (!array_key_exists('groupids', $host_groups)) {
+		if (!array_key_exists('groupids', $this->getInput('ms_new_tag_filter', []))) {
 			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
 
 			return false;
 		}
 
-		$new_tag_filters = $this->getInput('new_tag_filter', []);
-
-		if (count($new_tag_filters) !== 0) {
-			foreach ($new_tag_filters as $tag_filter) {
+		if ($this->hasInput('new_tag_filter')) {
+			foreach ($this->getInput('new_tag_filter') as $tag_filter) {
 				if (($tag_filter['tag'] === '' && $tag_filter['value'] !== '')
 						|| ($this->getInput('filter_type') == TAG_FILTER_LIST && $tag_filter['tag'] === ''
 							&& $tag_filter['value'] === '')) {
@@ -85,7 +81,9 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		$ms_groups = $this->getInput('ms_new_tag_filter', []);
 		$groupids = $ms_groups['groupids'];
 		$new_tag_filters = $this->filterDuplicates($this->getInput('new_tag_filter', []));
-		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
+		$host_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name']
+		]);
 
 		foreach ($groupids as $groupid) {
 			// Check if this groupid exists in the tag_filters, check for duplicates, delete removed tags, add new tags.

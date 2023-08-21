@@ -49,10 +49,9 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 	$tag_filter_table->addRow([$tag_filter['name'], $badges, $action]);
 }
 
-$tag_filter_table->addRow([
-	(new CSimpleButton(_('Add')))
-		->addClass('js-add-tag-filter')
-		->addClass(ZBX_STYLE_BTN_LINK)
-]);
+$tag_filter_table->addItem(
+	(new CTag('tfoot', true))
+		->addItem(new CCol((new CButtonLink(_('Add')))->addClass('js-add-tag-filter')))
+);
 
 $tag_filter_table->show();

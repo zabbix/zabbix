@@ -39,15 +39,14 @@ $new_tag_filter_table = (new CTable())
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_FILTER_STANDARD_WIDTH.'px;')
 	->setHeader([_('Tag'), _('Value'), _('Action')])
 	->addRow((new CRow())->addClass('js-tag-filter-row-placeholder'))
-	->addRow([
-		(new CSimpleButton(_('Add')))
-			->addClass('js-add-tag-filter-row')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(new CCol((new CButtonLink(_('Add')))->addClass('js-add-tag-filter-row')))
+	);
 
 $form_grid
 	->addItem([
-		(new CLabel(_('Host groups'), 'tag_filter__ms'))->setAsteriskMark(),
+		(new CLabel(_('Host groups'), 'ms_new_tag_filter_groupids__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
 				'name' => 'ms_new_tag_filter[groupids][]',

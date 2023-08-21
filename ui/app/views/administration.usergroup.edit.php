@@ -102,7 +102,7 @@ if ($data['can_update_group']) {
 			new CFormField($userdirectory)
 		])
 		->addItem([
-			new CLabel(_('Enabled')),
+			new CLabel(_('Enabled'), 'users_status'),
 			new CFormField(
 				(new CCheckBox('users_status', GROUP_STATUS_ENABLED))
 					->setUncheckedValue(GROUP_STATUS_DISABLED)
@@ -132,7 +132,7 @@ else {
 
 $form_grid
 	->addItem([
-		new CLabel(_('Debug mode')),
+		new CLabel(_('Debug mode'), 'debug_mode'),
 		new CFormField(
 			(new CCheckBox('debug_mode'))
 				->setUncheckedValue(GROUP_DEBUG_MODE_DISABLED)
@@ -140,46 +140,44 @@ $form_grid
 		)
 	]);
 
-$template_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
-
-$templategroup_right_table = (new CTable())
-	->setId('templategroup-right-table')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Template groups'), _('Permissions'), _('Action')])
-	->addRow((new CRow())->addClass('js-templategroup-right-row-placeholder'))
-	->addRow([
-		(new CSimpleButton(_('Add')))
-			->addClass('js-add-templategroup-right-row')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-$template_permissions_form_grid
+$template_permissions_form_grid = (new CFormGrid())
+	->addItem(new CLabel(_('Permissions')))
 	->addItem(
 		new CFormField(
-			(new CDiv($templategroup_right_table))
+			(new CDiv(
+				(new CTable())
+					->setId('templategroup-right-table')
+					->setAttribute('style', 'width: 100%;')
+					->setHeader([_('Template groups'), _('Permissions'), _('Action')])
+					->addRow((new CRow())->addClass('js-templategroup-right-row-placeholder'))
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(
+								new CCol((new CButtonLink(_('Add')))->addClass('js-add-templategroup-right-row')
+								)
+							)
+					)
+			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
 	);
 
-$templates_multiselect = (new CMultiSelect([
-	'name' => 'ms_templategroup_right[groupids][#{rowid}][]',
-	'object_name' => 'templateGroup',
-	'popup' => [
-		'parameters' => [
-			'srctbl' => 'template_groups',
-			'srcfld1' => 'groupid',
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'ms_templategroup_right_groupids_#{rowid}_'
-		]
-	],
-	'add_post_js' => false
-]))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
 $templategroup_right_row_template = (new CTemplateTag('templategroup-right-row-template'))->addItem(
 	(new CRow([
-		$templates_multiselect,
+		(new CMultiSelect([
+			'name' => 'ms_templategroup_right[groupids][#{rowid}][]',
+			'object_name' => 'templateGroup',
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'template_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'ms_templategroup_right_groupids_#{rowid}_'
+				]
+			],
+			'add_post_js' => false
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
 			(new CRadioButtonList('templategroup_right[permission][#{rowid}]', PERM_DENY))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
@@ -196,29 +194,29 @@ $templategroup_right_row_template = (new CTemplateTag('templategroup-right-row-t
 
 $template_permissions_form_grid->addItem($templategroup_right_row_template);
 
-$host_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
-
-$hostgroup_right_table = (new CTable())
-	->setId('hostgroup-right-table')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Host groups'), _('Permissions'), _('Action')])
-	->addRow((new CRow())->addClass('js-hostgroup-right-row-placeholder'))
-	->addRow([
-		(new CSimpleButton(_('Add')))
-			->addClass('js-add-hostgroup-right-row')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-$host_permissions_form_grid
+$host_permissions_form_grid = (new CFormGrid())
+	->addItem(new CLabel(_('Permissions')))
 	->addItem(
 		new CFormField(
-			(new CDiv($hostgroup_right_table))
+			(new CDiv(
+				(new CTable())
+					->setId('hostgroup-right-table')
+					->setAttribute('style', 'width: 100%;')
+					->setHeader([_('Host groups'), _('Permissions'), _('Action')])
+					->addRow((new CRow())->addClass('js-hostgroup-right-row-placeholder'))
+					->addItem(
+						(new CTag('tfoot', true))
+							->addItem(new CCol((new CButtonLink(_('Add')))->addClass('js-add-hostgroup-right-row')))
+					)
+			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
 	);
 
-$hosts_multiselect = (new CMultiSelect([
+$host_permissions_row_template = (new CTemplateTag('hostgroup-right-row-template'))->addItem(
+	(new CRow([
+		(new CMultiSelect([
 			'name' => 'ms_hostgroup_right[groupids][#{rowid}][]',
 			'object_name' => 'hostGroup',
 			'popup' => [
@@ -230,12 +228,7 @@ $hosts_multiselect = (new CMultiSelect([
 				]
 			],
 			'add_post_js' => false
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
-$host_permissions_row_template = (new CTemplateTag('hostgroup-right-row-template'))->addItem(
-	(new CRow([
-		$hosts_multiselect,
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
 			(new CRadioButtonList('hostgroup_right[permission][#{rowid}]', PERM_DENY))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
@@ -309,15 +302,15 @@ else {
 	));
 }
 
-$form->addItem($tabs);
-
-$form->addItem(
-	(new CScriptTag('view.init('.json_encode([
-		'templategroup_rights' => $data['templategroup_rights'],
-		'hostgroup_rights' => $data['hostgroup_rights'],
-		'tag_filters' => $data['tag_filters']
-	]).');'))->setOnDocumentReady()
-);
+$form
+	->addItem($tabs)
+	->addItem(
+		(new CScriptTag('view.init('.json_encode([
+				'templategroup_rights' => $data['templategroup_rights'],
+				'hostgroup_rights' => $data['hostgroup_rights'],
+				'tag_filters' => $data['tag_filters']
+			]).');'))->setOnDocumentReady()
+	);
 
 $html_page
 	->addItem($form)

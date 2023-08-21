@@ -30,13 +30,11 @@ class CControllerUsergroupUpdate extends CController {
 			'userdirectoryid' =>		'db usrgrp.userdirectoryid',
 			'users_status' =>			'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
 			'debug_mode' =>				'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
-
 			'ms_hostgroup_right' =>		'array',
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
 			'tag_filters' =>			'array',
-
 			'form_refresh' =>			'int32'
 		];
 
@@ -83,16 +81,16 @@ class CControllerUsergroupUpdate extends CController {
 		$user_group['hostgroup_rights'] = $this->processRights('ms_hostgroup_right', 'hostgroup_right');
 		$user_group['templategroup_rights'] = $this->processRights('ms_templategroup_right', 'templategroup_right');
 
-		$tag_filters = $this->getInput('tag_filters', []);
-
-		foreach ($tag_filters as $hostgroup) {
-			foreach ($hostgroup['tags'] as $tag_filter) {
-				if($hostgroup['groupid'] !== '0') {
-					$user_group['tag_filters'][] = [
-						'groupid' => $hostgroup['groupid'],
-						'tag' => $tag_filter['tag'],
-						'value' => $tag_filter['value']
-					];
+		if ($this->hasInput('tag_filters')) {
+			foreach ($this->getInput('tag_filters') as $hostgroup) {
+				foreach ($hostgroup['tags'] as $tag_filter) {
+					if($hostgroup['groupid'] !== '0') {
+						$user_group['tag_filters'][] = [
+							'groupid' => $hostgroup['groupid'],
+							'tag' => $tag_filter['tag'],
+							'value' => $tag_filter['value']
+						];
+					}
 				}
 			}
 		}

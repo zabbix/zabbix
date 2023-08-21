@@ -33,13 +33,11 @@ class CControllerUsergroupEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'usrgrpid' =>				'db usrgrp.usrgrpid',
-
 			'ms_hostgroup_right' =>		'array',
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
 			'tag_filters' =>			'array',
-
 			'form_refresh' =>			'int32'
 		];
 
@@ -98,19 +96,18 @@ class CControllerUsergroupEdit extends CController {
 
 		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
 
-		$host_groups = API::HostGroup()->get(['output' => ['groupid', 'name']]);
-		$template_groups = API::TemplateGroup()->get(['output' => ['groupid', 'name']]);
+		$host_groups = API::HostGroup()->get([
+			'output' => ['groupid', 'name']
+		]);
 
 		$data['hostgroup_rights'] = $this->getGroupRights($host_groups);
-		$data['templategroup_rights'] = $this->getTemplategroupRights($template_groups);
+		$data['templategroup_rights'] = $this->getTemplategroupRights();
 
 		// Get the sorted list of unique tag filters and hostgroup names.
 		$data['tag_filters'] = collapseTagFilters($this->hasInput('usrgrpid') ? $this->user_group['tag_filters'] : []);
 
 		if ($this->hasInput('tag_filters')) {
-			$new_tag_filters = $this->getInput('tag_filters', []);
-
-			foreach ($new_tag_filters as $tag_filter) {
+			foreach ($this->getInput('tag_filters') as $tag_filter) {
 				$groupid = $tag_filter['groupid'];
 				$key = array_search($groupid, array_column($host_groups, 'groupid'));
 				$name = $key !== false ? $host_groups[$key]['name'] : '';
@@ -137,10 +134,7 @@ class CControllerUsergroupEdit extends CController {
 
 		$data['users_ms'] = $this->getUsersMs();
 
-		$data['can_update_group'] = (
-			!$this->hasInput('usrgrpid')
-			|| granted2update_group($this->getInput('usrgrpid'))
-		);
+		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
 
 		if ($data['can_update_group']) {
 			$userdirectories = API::UserDirectory()->get([
@@ -165,7 +159,7 @@ class CControllerUsergroupEdit extends CController {
 		if ($this->hasInput('ms_hostgroup_right') && $this->hasInput('hostgroup_right')) {
 			$new_hostgroup_rights = $this->processNewRights($host_groups, 'ms_hostgroup_right', 'hostgroup_right');
 
-			if (count($new_hostgroup_rights) > 0) {
+			if ($new_hostgroup_rights) {
 				return $this->sortGroupRights($new_hostgroup_rights);
 			}
 		}
@@ -180,13 +174,17 @@ class CControllerUsergroupEdit extends CController {
 	 *
 	 * @return array
 	 */
-	private function getTemplategroupRights($template_groups = []) {
+	private function getTemplategroupRights() {
+		$template_groups = API::TemplateGroup()->get([
+			'output' => ['groupid', 'name']
+		]);
+
 		if ($this->hasInput('ms_templategroup_right') && $this->hasInput('templategroup_right')) {
 			$new_templategroup_rights = $this->processNewRights(
 				$template_groups, 'ms_templategroup_right', 'templategroup_right'
 			);
 
-			if (count($new_templategroup_rights) > 0) {
+			if ($new_templategroup_rights) {
 				return $this->sortGroupRights($new_templategroup_rights);
 			}
 		}

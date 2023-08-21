@@ -27,10 +27,10 @@ class CControllerUsergroupTagFilterEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'edit' => 'in 1,0',
-			'groupid' => 'db hosts_groups.groupid',
-			'name' => 'string',
-			'tag_filters' => 'array'
+			'edit' =>			'in 1,0',
+			'groupid' =>		'db hosts_groups.groupid',
+			'name' =>			'string',
+			'tag_filters' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -69,32 +69,18 @@ class CControllerUsergroupTagFilterEdit extends CController {
 		];
 
 		$data['host_groups_ms'] = [];
+
 		if ($data['groupid'] !== null) {
-			$data['host_groups_ms'] = self::getHostGroupsMs([$data['groupid']]);
+			$host_groups = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $data['groupid'],
+				'preservekeys' => true
+			]);
+			CArrayHelper::sort($host_groups, ['name']);
+
+			$data['host_groups_ms'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
-	}
-
-	/**
-	 * Returns all needed host groups formatted for multiselector.
-	 *
-	 * @param array $groupids
-	 *
-	 * @return array
-	 */
-	private static function getHostGroupsMs(array $groupids) {
-		if (!$groupids) {
-			return [];
-		}
-
-		$host_groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $groupids,
-			'preservekeys' => true
-		]);
-		CArrayHelper::sort($host_groups, ['name']);
-
-		return CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
 	}
 }

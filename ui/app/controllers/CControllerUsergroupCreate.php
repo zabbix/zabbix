@@ -29,13 +29,11 @@ class CControllerUsergroupCreate extends CController {
 			'users_status' =>			'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
 			'debug_mode' =>				'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 			'userdirectoryid' =>		'db usrgrp.userdirectoryid',
-
 			'ms_hostgroup_right' =>		'array',
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
 			'templategroup_right' =>	'array',
 			'tag_filters' =>			'array',
-
 			'form_refresh' =>			'int32'
 		];
 
