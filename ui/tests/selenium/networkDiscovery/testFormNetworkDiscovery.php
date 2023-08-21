@@ -807,9 +807,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Enabled' => false
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['Zabbix agent (100-500) "test"' => true],
-						'Host name' => ['IP address' => true],
-						'Visible name' => ['DNS name' => true]
+						'Device uniqueness criteria' => 'Zabbix agent (100-500) "test"',
+						'Host name' => 'IP address',
+						'Visible name' => 'DNS name'
 					],
 					'Checks' => [
 						[
@@ -870,9 +870,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Enabled' => true
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['Zabbix agent "key[param1, param2]"' => true],
-						'Host name' => ['SNMPv1 agent (9999,10-200) "😀"' => true],
-						'Visible name' => ['SNMPv3 agent "😀"' => true]
+						'Device uniqueness criteria' => 'Zabbix agent "key[param1, param2]"',
+						'Host name' => 'SNMPv1 agent (9999,10-200) "😀"',
+						'Visible name' => 'SNMPv3 agent "😀"'
 					],
 					'Checks' => [
 						[
@@ -1112,11 +1112,6 @@ class testFormNetworkDiscovery extends CWebTest {
 				$button->click();
 				$button->waitUntilNotPresent();
 			}
-
-//			foreach ($form->getFieldContainer('Checks')->asTable()->getRows() as $row) {
-//				$row->query('button:Remove')->one()->waitUntilClickable()->click();
-//				$row->waitUntilNotPresent();
-//			}
 		}
 
 		if (CTestArrayHelper::get($data, 'Checks')) {
@@ -1136,10 +1131,6 @@ class testFormNetworkDiscovery extends CWebTest {
 				// Trim Check fields for expected comparison.
 				if (CTestArrayHelper::get($data, 'trim', false)) {
 					$check = array_map('trim', $check);
-				}
-
-				if (array_key_exists('Port range', $check)) {
-					$check['Port range'] = ($check['Port range'] === 0) ? null : $check['Port range'];
 				}
 
 				// Submit Discovery check dialog.
@@ -1214,14 +1205,18 @@ class testFormNetworkDiscovery extends CWebTest {
 				$expected_checks[] = $type_text;
 			}
 
-			$this->assertEquals($expected_checks, $this->getTableColumnData('Type', 'id:dcheckList'));
+			$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
+			array_pop($table_contents);
+			$this->assertEquals($expected_checks, $table_contents);
 		}
 
 		$form->fill($data['fields']);
 
 		// Fill radio-fields.
 		if (array_key_exists('radios', $data)) {
-			$this->fillRadioFields($data['radios'], $form);
+			foreach ($data['radios'] as $label => $value) {
+				$form->getField($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
+			}
 		}
 
 		// Submit Discovery rule form.
@@ -1254,12 +1249,26 @@ class testFormNetworkDiscovery extends CWebTest {
 
 			// Check radio-fields.
 			if (array_key_exists('radios', $data)) {
-				$this->compareRadioFields($data['radios'], $form);
+				foreach ($data['radios'] as $label => $value) {
+					$this->assertEquals($value, $form->getField($label)->query('class:list-check-radio')->one()
+							->asSegmentedRadio()->getValue()
+					);
+				}
 			}
 
 			// Compare checks table to ensure that Discovery checks are saved correctly.
 			if (CTestArrayHelper::get($data, 'Checks')) {
-				$this->assertEquals($expected_checks, $this->getTableColumnData('Type', 'id:dcheckList'));
+				foreach ($expected_checks as &$expected_check) {
+					// In Zabbix 6.0 if port is 0, it is removed from table after saving.
+					if (str_contains($expected_check, '(0)')) {
+						$expected_check = rtrim($expected_check, ' (0)');
+					}
+					unset($expected_check);
+				}
+
+				$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
+				array_pop($table_contents);
+				$this->assertEquals($expected_checks, $table_contents);
 
 				// Write default check to the array for comparison.
 				if ($data['Checks'] === [['default' => true]]) {
@@ -1379,7 +1388,6 @@ class testFormNetworkDiscovery extends CWebTest {
 			// #1 Change SNMP to other type of checks.
 			[
 				[
-					'expected' => TEST_BAD,
 					'Checks' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1400,25 +1408,19 @@ class testFormNetworkDiscovery extends CWebTest {
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
+							'IP address' => true
 						],
 						'Host name' => [
 							'DNS name' => true,
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
+							'IP address' => false
 						],
 						'Visible name' => [
 							'Host name' => true,
 							'DNS name' => false,
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
+							'IP address' => false
 						]
-					],
-					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed.
+					]
+					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed (probably not needed).
 //					'expected_radios' => [
 //						'Device uniqueness criteria' => [
 //							'IP address' => false,
@@ -1439,7 +1441,7 @@ class testFormNetworkDiscovery extends CWebTest {
 //							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
 //						]
 //					]
-					'error_details' => 'Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.'
+//					'error_details' => 'Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.'
 				]
 			],
 			// #2 Delete two checks, one left.
@@ -1456,25 +1458,23 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'SNMPv1 agent (200) "new test SNMP OID"'
+						'ICMP ping'
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
-							'SNMPv1 agent (200) "new test SNMP OID"' => false
+							'IP address' => true
 						],
 						'Host name' => [
 							'DNS name' => true,
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false
+							'IP address' => false
 						],
 						'Visible name' => [
 							'Host name' => true,
 							'DNS name' => false,
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false
+							'IP address' => false
 						]
 					]
-					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed.
+					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed (probably not needed).
 //					'expected_radios' => [
 //						'Device uniqueness criteria' => [
 //							'SNMPv1 agent (200) "new test SNMP OID"' => false
@@ -1506,26 +1506,23 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'SNMPv1 agent (200) "new test SNMP OID"',
+						'ICMP ping',
 						'SNMPv2 agent (903) "v2 new test SNMP OID"'
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
 							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						],
 						'Host name' => [
 							'DNS name' => true,
 							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						],
 						'Visible name' => [
 							'Host name' => true,
 							'DNS name' => false,
 							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						]
 					]
@@ -1585,11 +1582,13 @@ class testFormNetworkDiscovery extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
-
-			// Compare Checks table with the expected result.
 			$this->query('link', self::CHECKS_RULE)->waitUntilClickable()->one()->click();
 			$form->invalidate();
-			$this->assertTableDataColumn($data['expected_checks'], 'Type', 'id:dcheckList');
+
+			// Compare Checks table with the expected result.
+			$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
+			array_pop($table_contents);
+			$this->assertEquals($data['expected_checks'], $table_contents);
 
 			// Compare changed radio fields after save.
 			$this->compareRadioFields($data['expected_radios'], $form);
@@ -1642,9 +1641,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['SNMPv1 agent (165) ".1.9.6.1.10.1.9.9.9"' => true],
-						'Host name' => ['SNMPv3 agent (130) ".1.3.6.1.2.1.1.1.999"' => true],
-						'Visible name' => ['IP address' => true]
+						'Device uniqueness criteria' => 'SNMPv1 agent (165) ".1.9.6.1.10.1.9.9.9"',
+						'Host name' => 'SNMPv3 agent (130) ".1.3.6.1.2.1.1.1.999"',
+						'Visible name' => 'IP address'
 					]
 				]
 			],
@@ -1701,9 +1700,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'radios' => [
-						'Device uniqueness criteria' => ['Zabbix agent "key[cloned_param1, cloned_param2]"' => true],
-						'Host name' => ['IP address' => true],
-						'Visible name' => ['SNMPv2 agent (113) "v2 new cloned SNMP OID"' => true]
+						'Device uniqueness criteria' => 'Zabbix agent "key[cloned_param1, cloned_param2]"',
+						'Host name' => 'IP address',
+						'Visible name' => 'SNMPv2 agent (113) "v2 new cloned SNMP OID"'
 					]
 				]
 			]
@@ -1731,7 +1730,9 @@ class testFormNetworkDiscovery extends CWebTest {
 			$this->changeDiscoveryChecks($data['checks'], $form);
 
 			// Fill radios.
-			$this->fillRadioFields($data['radios'], $form);
+			foreach ($data['radios'] as $label => $value) {
+				$form->getField($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
+			}
 		}
 
 		$form->submit();
@@ -1744,13 +1745,19 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form->checkValue($data['expected_fields']);
 
 		// Compare Discovery rule's Checks table.
-		$this->assertEquals($data['expected_checks_table'], $this->getTableColumnData('Type', 'id:dcheckList'));
+		$table_contents = $this->getTableColumnData('Type', 'id:dcheckList');
+		array_pop($table_contents);
+		$this->assertEquals($data['expected_checks_table'], $table_contents);
 
 		// Compare Discovery rule's Checks form.
 		$this->compareChecksFormValues($data['expected_checks'], $form);
 
 		// Compare form's radios.
-		$this->compareRadioFields($data['radios'], $form);
+		foreach ($data['radios'] as $label => $value) {
+			$this->assertEquals($value, $form->getField($label)->query('class:list-check-radio')->one()
+					->asSegmentedRadio()->getValue()
+			);
+		}
 
 		// Check Discovery rules in DB.
 		foreach([self::CLONE_RULE, $data['expected_fields']['Name']] as $name) {
@@ -1951,12 +1958,14 @@ class testFormNetworkDiscovery extends CWebTest {
 				$checks_dialog->waitUntilNotVisible();
 
 				$radios = [
-					'Device uniqueness criteria' => ['SNMPv2 agent (99) "new cancel OID"' => true],
-					'Host name' => ['IP address' => true],
-					'Visible name' => ['DNS name' => true]
+					'Device uniqueness criteria' => 'SNMPv2 agent (99) "new cancel OID"',
+					'Host name' => 'IP address',
+					'Visible name' => 'DNS name'
 				];
 
-				$this->fillRadioFields($radios, $form);
+				foreach ($radios as $label => $value) {
+					$form->getField($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
+				}
 
 				if ($data['action'] === 'Clone') {
 					$form->query('button', $data['action'])->one()->click();
@@ -2030,29 +2039,18 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Function for checking Network discovery's radio fields.
 	 *
-	 * @param array $data           filled values
-	 * @param CFormElement $form    discovery rule's edit form
-	 */
-	protected function fillRadioFields($data, $form) {
-		foreach ($data as $label => $values) {
-			$form->getFieldContainer($label)->query("xpath:.//label[text()=".
-					CXPathHelper::escapeQuotes(array_key_first($values))."]/../input")->one()->click();
-		}
-	}
-
-	/**
-	 * Function for checking Network discovery's radio fields.
-	 *
 	 * @param array $data           checked values
 	 * @param CFormElement $form    discovery rule's edit form
 	 */
 	protected function compareRadioFields($data, $form) {
 		foreach ($data as $label => $values) {
-			foreach ($values as $value => $selected) {
-//				$this->assertEquals($selected, $form->getFieldContainer($label)->query("xpath:.//label[text()=".
-//						CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists()
-//				);
-			}
+			$field = $form->getField($label)->query('class:list-check-radio')->one()->asSegmentedRadio();
+
+			// Check all expected radio labels.
+			$this->assertEquals(array_keys($values), $field->getLabels()->asText());
+
+			// Check selected radio label.
+			$this->assertEquals(array_keys(array_filter($values)), [$field->getValue()]);
 		}
 	}
 }
