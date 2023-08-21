@@ -1130,15 +1130,13 @@ void	zbx_strupper(char *str)
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **error)
 {
 #define STATIC_SIZE	1024
+	char		*out_utf8_string = NULL;
 	wchar_t		wide_string_static[STATIC_SIZE], *wide_string = NULL;
-	int		wide_size;
-	char		*utf8_string = NULL;
-	int		utf8_size;
+	int		wide_size, utf8_size, bom_detected = 0;
 	unsigned int	codepage;
-	int		bom_detected = 0;
 
 	/* try to guess encoding using BOM if it exists */
 	if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
@@ -1163,13 +1161,22 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 			encoding = "UNICODEFFFE";
 	}
 
-	if ('\0' == *encoding || FAIL == get_codepage(encoding, &codepage))
+	if ('\0' == *encoding)
 	{
 		utf8_size = (int)in_size + 1;
-		utf8_string = zbx_malloc(utf8_string, utf8_size);
-		memcpy(utf8_string, in, in_size);
-		utf8_string[in_size] = '\0';
-		return utf8_string;
+		out_utf8_string = zbx_malloc(out_utf8_string, utf8_size);
+		memcpy(out_utf8_string, in, in_size);
+		out_utf8_string[in_size] = '\0';
+
+		goto out;
+	}
+
+	if (FAIL == get_codepage(encoding, &codepage))
+	{
+		*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Failed to get codepage.",
+				encoding);
+
+		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
@@ -1187,7 +1194,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		wide_size = (int)in_size / 2;
 
 		/* remove BOM */
-		if (bom_detected)
+		if (1 == bom_detected)
 		{
 			in += 2;
 			wide_size--;
@@ -1204,7 +1211,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		wide_size = (int)in_size / 2;
 
 		/* remove BOM */
-		if (bom_detected)
+		if (1 == bom_detected)
 		{
 			in += 2;
 			wide_size--;
@@ -1231,31 +1238,43 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 			wide_string = wide_string_static;
 
 		/* convert from 'in' to 'wide_string' */
-		MultiByteToWideChar(codepage, 0, in, (int)in_size, wide_string, wide_size);
+		if (0 == MultiByteToWideChar(codepage, 0, in, (int)in_size, wide_string, wide_size))
+			goto utf8_convert_fail;
 	}
 
-	utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL);
-	utf8_string = (char *)zbx_malloc(utf8_string, (size_t)utf8_size + 1/* '\0' */);
+	if (0 == (utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL)))
+		goto utf8_convert_fail;
+
+	out_utf8_string = (char *)zbx_malloc(out_utf8_string, (size_t)utf8_size + 1/* '\0' */);
 
 	/* convert from 'wide_string' to 'utf8_string' */
-	WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, utf8_string, utf8_size, NULL, NULL);
-	utf8_string[utf8_size] = '\0';
+	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, out_utf8_string, utf8_size, NULL, NULL))
+		goto utf8_convert_fail;
+
+	out_utf8_string[utf8_size] = '\0';
 
 	if (wide_string != wide_string_static && wide_string != (wchar_t *)in)
 		zbx_free(wide_string);
 
-	return utf8_string;
+	goto out;
+utf8_convert_fail:
+	zbx_free(out_utf8_string);
+	out_utf8_string = NULL;
+	*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Error: %s.", encoding,
+			zbx_strerror_from_system(GetLastError()));
+out:
+	return out_utf8_string;
 }
 #elif defined(HAVE_ICONV)
-char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **error)
 {
 	iconv_t		cd;
 	size_t		in_size_left, out_size_left, sz, out_alloc = 0;
 	const char	to_code[] = "UTF-8";
-	char		*out = NULL, *p;
+	char		*p, *out_utf8_string = NULL;
 
 	out_alloc = in_size + 1;
-	p = out = (char *)zbx_malloc(out, out_alloc);
+	p = out_utf8_string = (char *)zbx_malloc(out_utf8_string, out_alloc);
 
 	/* try to guess encoding using BOM if it exists */
 	if ('\0' == *encoding)
@@ -1274,12 +1293,15 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		}
 	}
 
-	if ('\0' == *encoding || (iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
+	if ('\0' == *encoding )
 	{
-		memcpy(out, in, in_size);
-		out[in_size] = '\0';
-		return out;
+		memcpy(out_utf8_string, in, in_size);
+		out_utf8_string[in_size] = '\0';
+		goto out;
 	}
+
+	if ((iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
+		goto utf8_convert_fail;
 
 	in_size_left = in_size;
 	out_size_left = out_alloc - 1;
@@ -1289,22 +1311,30 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
 		if (E2BIG != errno)
 			break;
 
-		sz = (size_t)(p - out);
+		sz = (size_t)(p - out_utf8_string);
 		out_alloc += in_size;
 		out_size_left += in_size;
-		p = out = (char *)zbx_realloc(out, out_alloc);
+		p = out_utf8_string = (char *)zbx_realloc(out_utf8_string, out_alloc);
 		p += sz;
 	}
 
 	*p = '\0';
 
-	iconv_close(cd);
+	if (0 != iconv_close(cd))
+		goto utf8_convert_fail;
 
 	/* remove BOM */
-	if (3 <= p - out && 0 == strncmp("\xef\xbb\xbf", out, 3))
-		memmove(out, out + 3, (size_t)(p - out - 2));
+	if (3 <= p - out_utf8_string && 0 == strncmp("\xef\xbb\xbf", out_utf8_string, 3))
+		memmove(out_utf8_string, out_utf8_string + 3, (size_t)(p - out_utf8_string - 2));
 
-	return out;
+	goto out;
+utf8_convert_fail:
+	zbx_free(out_utf8_string);
+	out_utf8_string = NULL;
+	*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Error: %s.", encoding,
+			zbx_strerror(errno));
+out:
+	return out_utf8_string;
 }
 #endif	/* HAVE_ICONV */
 
