@@ -2073,6 +2073,7 @@ AC_CONFIG_FILES([
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
+	src/zabbix_agent/listener/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile

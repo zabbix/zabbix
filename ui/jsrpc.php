@@ -342,19 +342,19 @@ switch ($data['method']) {
 
 			case 'proxies':
 				$proxies = API::Proxy()->get([
-					'output' => ['proxyid', 'host'],
-					'search' => array_key_exists('search', $data) ? ['host' => $data['search']] : null,
+					'output' => ['proxyid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
 					'limit' => $limit
 				]);
 
 				if ($proxies) {
-					CArrayHelper::sort($proxies, ['host']);
+					CArrayHelper::sort($proxies, ['name']);
 
 					if (isset($data['limit'])) {
 						$proxies = array_slice($proxies, 0, $data['limit']);
 					}
 
-					$result = CArrayHelper::renameObjectsKeys($proxies, ['proxyid' => 'id', 'host' => 'name']);
+					$result = CArrayHelper::renameObjectsKeys($proxies, ['proxyid' => 'id']);
 				}
 				break;
 

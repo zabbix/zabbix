@@ -1046,9 +1046,6 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
-			continue;
-
 		if (NULL != (host_maintenance = zbx_hashset_search(host_maintenances, &host->hostid)))
 		{
 			maintenance_status = HOST_MAINTENANCE_STATUS_ON;
@@ -1463,6 +1460,14 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
 					&query->triggerid)))
 			{
+				continue;
+			}
+
+			if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot process event for trigger prototype"
+						" (triggerid:" ZBX_FS_UI64 ")", trigger->triggerid);
+				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 

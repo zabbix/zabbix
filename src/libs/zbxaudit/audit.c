@@ -170,12 +170,12 @@ static void	delete_json(struct zbx_json *json, const char *audit_op, const char 
  ******************************************************************************/
 int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_execute_on,
 		const char *script_command_orig, zbx_uint64_t hostid, const char *hostname, zbx_uint64_t eventid,
-		zbx_uint64_t proxy_hostid, zbx_uint64_t userid, const char *username, const char *clientip,
+		zbx_uint64_t proxyid, zbx_uint64_t userid, const char *username, const char *clientip,
 		const char *output, const char *error)
 {
 	int		ret = SUCCEED;
 	char		auditid_cuid[CUID_LEN], execute_on_s[MAX_ID_LEN + 1], hostid_s[MAX_ID_LEN + 1],
-			eventid_s[MAX_ID_LEN + 1], proxy_hostid_s[MAX_ID_LEN + 1];
+			eventid_s[MAX_ID_LEN + 1], proxyid_s[MAX_ID_LEN + 1];
 	char		*details_esc;
 	struct zbx_json	details_json;
 	zbx_config_t	cfg;
@@ -204,10 +204,10 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	zbx_snprintf(hostid_s, sizeof(hostid_s), ZBX_FS_UI64, hostid);
 	append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.hostid", hostid_s);
 
-	if (0 != proxy_hostid)
+	if (0 != proxyid)
 	{
-		zbx_snprintf(proxy_hostid_s, sizeof(proxy_hostid_s), ZBX_FS_UI64, proxy_hostid);
-		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.proxy_hostid", proxy_hostid_s);
+		zbx_snprintf(proxyid_s, sizeof(proxyid_s), ZBX_FS_UI64, proxyid);
+		append_str_json(&details_json, AUDIT_DETAILS_ACTION_ADD, "script.proxyid", proxyid_s);
 	}
 
 	if (ZBX_SCRIPT_TYPE_WEBHOOK != script_type)

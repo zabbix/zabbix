@@ -1263,7 +1263,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 	{
 		zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 				/* the 1st 'select' works if remote command target is "Host group" */
-				"select h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+				"select h.hostid,h.proxyid,h.host,s.type,s.scriptid,s.execute_on,s.port"
 					",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
 					",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
@@ -1294,7 +1294,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 
 	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			/* the 2nd 'select' works if remote command target is "Host" */
-			"select h.hostid,h.proxy_hostid,h.host,s.type,s.scriptid,s.execute_on,s.port"
+			"select h.hostid,h.proxyid,h.host,s.type,s.scriptid,s.execute_on,s.port"
 				",s.authtype,s.username,s.password,s.publickey,s.privatekey,s.command,s.groupid"
 				",s.scope,s.timeout,s.name,h.tls_connect"
 #ifdef HAVE_OPENIPMI
@@ -1408,7 +1408,7 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 		ZBX_DBROW2UINT64(groupid, row[13]);
 
 		ZBX_STR2UINT64(host.hostid, row[0]);
-		ZBX_DBROW2UINT64(host.proxy_hostid, row[1]);
+		ZBX_DBROW2UINT64(host.proxyid, row[1]);
 
 		if (ZBX_SCRIPT_SCOPE_ACTION != scope)
 		{
@@ -1526,7 +1526,7 @@ fail:
 		{
 			if (SUCCEED == (rc = zbx_script_prepare(&script, &host.hostid, error, sizeof(error))))
 			{
-				if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+				if (0 == host.proxyid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
 					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
