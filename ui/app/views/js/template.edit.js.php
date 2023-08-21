@@ -167,17 +167,34 @@ window.template_edit_popup = new class {
 		const form_fields = getFormFields(this.form);
 		delete form_fields.show_inherited_template_macros;
 
-		Object.keys(form_fields.macros).forEach((key) => {
-			if (form_fields.macros[key].inherited_type == <?= ZBX_PROPERTY_INHERITED ?>) {
-				delete form_fields.macros[key];
-			}
-			else {
-				delete form_fields.macros[key].inherited_type;
-			}
-		});
+		if (form_fields.macros !== undefined) {
+			Object.keys(form_fields.macros).forEach((key) => {
+				if (form_fields.macros[key].inherited_type == <?= ZBX_PROPERTY_INHERITED ?>) {
+					delete form_fields.macros[key];
+				}
+				else {
+					delete form_fields.macros[key].inherited_type;
+				}
+			});
+
+			form_fields.macros = Object.fromEntries(
+				Object.values(form_fields.macros).map((value, index) => [index, value])
+			);
+		}
+
+		const empty_macro_object = {
+			"macro": "",
+			"discovery_state": "3",
+			"value": "",
+			"type": "0",
+			"description": ""
+		}
+
+		if (typeof form_fields.macros === 'object' && Object.keys(form_fields.macros).length === 0) {
+			form_fields.macros['0'] = empty_macro_object;
+		}
 
 		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields);
-
 	}
 
 	/**
