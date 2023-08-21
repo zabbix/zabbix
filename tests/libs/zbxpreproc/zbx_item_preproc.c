@@ -262,6 +262,10 @@ void	zbx_mock_test_entry(void **state)
 	zbx_pp_cache_t		*cache, *step_cache;
 	zbx_pp_item_preproc_t	preproc;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG start wait");
+	zbx_sleep(30);
+	zabbix_log(LOG_LEVEL_INFORMATION, "AKDBG finish wait");
+
 #ifdef HAVE_NETSNMP
 	int			mib_translation_case = 0;
 
@@ -412,17 +416,26 @@ void	zbx_mock_test_entry(void **state)
 		else
 			zbx_mock_assert_int_eq("result variant type", ZBX_VARIANT_ERR, value.type);
 
+		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG test zbx_variant_clear value");
 		zbx_variant_clear(&value);
+		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG test zbx_variant_clear history_value");
 		zbx_variant_clear(&history_value);
+		zabbix_log(LOG_LEVEL_DEBUG, "AKDBG test end loop");
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG pp_cache_release");
 	pp_cache_release(cache);
+	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG zbx_variant_clear value_in");
 	zbx_variant_clear(&value_in);
+	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG zbx_variant_clear history_value_in");
 	zbx_variant_clear(&history_value_in);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG pp_context_destroy");
 	pp_context_destroy(&ctx);
 #ifdef HAVE_NETSNMP
+	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG preproc_shutdown_snmp");
 	preproc_shutdown_snmp();
 #endif
+	zabbix_log(LOG_LEVEL_DEBUG, "AKDBG end");
 
 }
