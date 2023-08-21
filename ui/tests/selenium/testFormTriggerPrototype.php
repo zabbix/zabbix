@@ -269,6 +269,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				case 'open_close':
 					$this->zbxTestClickButtonText('Expression constructor');
 					$this->zbxTestClickButtonText('Close expression constructor');
+					$this->page->waitUntilReady();
 					break;
 			}
 		}

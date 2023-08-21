@@ -1,6 +1,9 @@
 Changes for 7.0.0alpha4
 
 New features:
+.........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
+..F....... [ZBXNEXT-8421] implemented dashboard tabs navigation for host dashboards (ashubin, dpetra)
+A.F.I..PS. [ZBXNEXT-8500,ZBXNEXT-8506] moved proxies to separate database tables (dfofanovs, dgoloscapov, jfreibergs, mprihodko, vmaksimovs, vso)
 .........T [ZBXNEXT-8633] added asynchronous SNMP poller metrics to Zabbix health templates (drasikhov)
 ...G....S. [ZBXNEXT-4781] added new eventlog.count item key (kprutkovs)
 .........T [ZBXNEXT-8581] added support for HTTP proxy in Azure templates (egordymov)

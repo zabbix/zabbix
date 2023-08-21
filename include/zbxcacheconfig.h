@@ -355,15 +355,15 @@ typedef struct
 {
 	zbx_uint64_t			proxyid;
 	char				name[ZBX_HOSTNAME_BUF_LEN];
-	int				proxy_config_nextcheck;
-	int				proxy_data_nextcheck;
-	int				proxy_tasks_nextcheck;
-	int				last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
+	time_t				proxy_config_nextcheck;
+	time_t				proxy_data_nextcheck;
+	time_t				proxy_tasks_nextcheck;
+	time_t				last_cfg_error_time;	/* time when passive proxy misconfiguration error was */
 								/* seen or 0 if no error */
 	char				version_str[ZBX_VERSION_BUF_LEN];
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
-	int				lastaccess;
+	time_t				lastaccess;
 	char				addr_orig[ZBX_INTERFACE_ADDR_LEN_MAX];
 	char				port_orig[ZBX_INTERFACE_PORT_LEN_MAX];
 	char				*addr;
@@ -382,7 +382,7 @@ typedef struct
 	zbx_uint64_t			macro_revision;
 
 	char				allowed_addresses[ZBX_HOST_PROXY_ADDRESS_LEN_MAX];
-	int				last_version_error_time;
+	time_t				last_version_error_time;
 }
 zbx_dc_proxy_t;
 
@@ -904,7 +904,7 @@ void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx
 
 int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error);
-int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error);
+int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, time_t *lastaccess, char **error);
 int	zbx_proxy_discovery_get(char **data, char **error);
 
 unsigned int	zbx_dc_get_internal_action_count(void);
@@ -1006,7 +1006,7 @@ zbx_trigger_dep_t;
 
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
-void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxyids);
+void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
 
 /* data session support */
 
