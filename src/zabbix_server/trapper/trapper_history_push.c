@@ -238,7 +238,7 @@ static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights
 		return FAIL;
 	}
 
-	if (NULL != item->trapper_hosts && '\0' != *item->trapper_hosts)
+	if ('\0' != *item->trapper_hosts)
 	{
 		char	*allowed_peers;
 		int	ret = FAIL;
