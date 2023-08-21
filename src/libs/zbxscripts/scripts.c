@@ -219,8 +219,8 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 	int			values_num = 0, parsed_num = 0, results_num = 0;
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_commands, jp_command;
-	char 			*str = NULL, *value = NULL, *error = NULL;
-	size_t 			str_alloc = 0;
+	char			*str = NULL, *value = NULL, *error = NULL;
+	size_t			str_alloc = 0;
 	zbx_uint64_t		id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -506,7 +506,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
 		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
-	int		ret = FAIL, i;
+	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
 	int             (*function)(zbx_dc_item_t *, int timeout, const char*, AGENT_RESULT *);
@@ -523,7 +523,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	memset(&item, 0, sizeof(item));
 	memcpy(&item.host, host, sizeof(item.host));
 
-	for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
+	for (int i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid,
 				INTERFACE_TYPE_PRIORITY[i])))
@@ -711,12 +711,12 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  *                                                                                 *
  * Purpose: prepares user script                                                   *
  *                                                                                 *
- * Parameters: script        - [IN] the script to prepare                          *
- *             host          - [IN] the host the script will be executed on        *
- *             error         - [OUT] the error message buffer                      *
- *             max_error_len - [IN] the size of error message output buffer        *
+ * Parameters: script        - [IN] script to prepare                              *
+ *             hostid        - [IN] host the script will be executed on            *
+ *             error         - [OUT] error message buffer                          *
+ *             max_error_len - [IN] size of error message output buffer            *
  *                                                                                 *
- * Return value:  SUCCEED - the script has been prepared successfully              *
+ * Return value:  SUCCEED - script has been prepared successfully                  *
  *                FAIL    - otherwise, error contains error message                *
  *                                                                                 *
  * Comments: This function prepares script for execution by loading global         *
@@ -780,13 +780,13 @@ out:
  *                                                                            *
  * Purpose: fetch webhook parameters                                          *
  *                                                                            *
- * Parameters:  scriptid  - [IN] the id of script to be executed              *
- *              params    - [OUT] parameters name-value pairs                 *
- *              error     - [IN/OUT] the error message                        *
- *              error_len - [IN] the maximum error length                     *
+ * Parameters:  scriptid  - [IN] id of script to be executed                  *
+ *              params    - [OUT] parameters, name-value pairs                *
+ *              error     - [IN/OUT] error message                            *
+ *              error_len - [IN] maximum error length                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_db_fetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
@@ -838,8 +838,8 @@ out:
  *              debug                  - [OUT] debug data (optional)              *
  *                                                                                *
  * Return value:  SUCCEED - processed successfully                                *
- *                FAIL - an error occurred                                        *
- *                TIMEOUT_ERROR - a timeout occurred                              *
+ *                FAIL - error occurred                                           *
+ *                TIMEOUT_ERROR - timeout occurred                                *
  *                                                                                *
  **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
@@ -919,10 +919,9 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates remote command task from a script                         *
+ * Purpose: creates remote command task from script                           *
  *                                                                            *
- * Return value:  the identifier of the created task or 0 in the case of      *
- *                error                                                       *
+ * Return value:  identifier of created task or 0 in case of error            *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_host_t *host, zbx_uint64_t alertid,
