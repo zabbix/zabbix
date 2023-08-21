@@ -312,6 +312,7 @@ typedef struct
 	zbx_vector_ptr_t			hosts;
 	char					*name;
 	char					*name_orig;
+	char					*name_inherit;	/* name of a group to inherit rights from */
 #define ZBX_FLAG_LLD_GROUP_DISCOVERED		__UINT64_C(0x00000001)	/* groups which should be updated or added */
 #define ZBX_FLAG_LLD_GROUP_UPDATE_NAME		__UINT64_C(0x00000002)	/* groups.name field should be updated */
 #define ZBX_FLAG_LLD_GROUP_BLOCK_UPDATE		__UINT64_C(0x80000000)	/* group is discovered by other prototypes */
@@ -333,6 +334,7 @@ static void	lld_group_free(zbx_lld_group_t *group)
 	zbx_vector_ptr_destroy(&group->hosts);
 	zbx_free(group->name);
 	zbx_free(group->name_orig);
+	zbx_free(group->name_inherit);
 	zbx_free(group);
 }
 
@@ -341,8 +343,6 @@ typedef struct
 	char				*name;
 	/* permission pair (usrgrpid, permission) */
 	zbx_vector_uint64_pair_t	rights;
-	/* reference to the inherited rights */
-	zbx_vector_uint64_pair_t	*prights;
 }
 zbx_lld_group_rights_t;
 
@@ -1309,6 +1309,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 			group = (zbx_lld_group_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_t));
 
 			group->groupid = groupid;
+			group->name_inherit = NULL;
 			group->name = zbx_strdup(NULL, row[5]);
 			group->name_orig = NULL;
 			group->flags = 0x0;
@@ -1391,6 +1392,7 @@ static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const cha
 	group = (zbx_lld_group_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_t));
 
 	group->groupid = 0;
+	group->name_inherit = NULL;
 	zbx_vector_ptr_create(&group->hosts);
 	zbx_vector_lld_group_discovery_ptr_create(&group->discovery);
 	group->name = zbx_strdup(NULL, name_proto);
@@ -1823,6 +1825,8 @@ static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, z
 					zbx_vector_lld_group_ptr_append(groups_out, right);
 					zbx_vector_lld_group_ptr_remove_noorder(groups_in, k);
 				}
+				else
+					right->name_inherit = zbx_strdup(NULL, left->name);
 			}
 		}
 	}
@@ -1889,7 +1893,6 @@ static int	lld_group_rights_append(zbx_vector_ptr_t *group_rights, const char *n
 	rights = (zbx_lld_group_rights_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_rights_t));
 	rights->name = zbx_strdup(NULL, name);
 	zbx_vector_uint64_pair_create(&rights->rights);
-	rights->prights = NULL;
 
 	zbx_vector_ptr_append(group_rights, rights);
 
@@ -1910,6 +1913,22 @@ static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: find group by its name                                            *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_lld_group_t	*lld_groups_get_by_id(zbx_vector_lld_group_ptr_t *groups, zbx_uint64_t groupid)
+{
+	for (int i = 0; i < groups->values_num; i++)
+	{
+		if (groups->values[i]->groupid == groupid)
+			return groups->values[i];
+	}
+
+	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: groups - [IN] list of new groups                               *
  *                                                                            *
  ******************************************************************************/
@@ -1919,12 +1938,12 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
 	char			*ptr, *name, *sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, offset;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_lld_group_t		*group;
 	zbx_vector_str_t	group_names;
 	zbx_vector_ptr_t	group_rights;
 	zbx_db_insert_t		db_insert;
-	zbx_lld_group_rights_t	*rights, rights_local, *parent_rights;
+	zbx_lld_group_rights_t	*rights, rights_local;
 	zbx_uint64_pair_t	pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1932,18 +1951,21 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 	zbx_vector_str_create(&group_names);
 	zbx_vector_ptr_create(&group_rights);
 
-	/* make a list of direct parent group names and a list of new group rights */
+	/* make a list of direct parent group rights */
 	for (i = 0; i < groups->values_num; i++)
 	{
 		group = groups->values[i];
 
-		if (NULL == (ptr = strrchr(group->name, '/')))
-			continue;
+		if (NULL == group->name_inherit)
+		{
+			if (NULL == (ptr = strrchr(group->name, '/')))
+				continue;
 
-		lld_group_rights_append(&group_rights, group->name);
-
-		name = zbx_strdup(NULL, group->name);
-		name[ptr - group->name] = '\0';
+			name = zbx_strdup(NULL, group->name);
+			name[ptr - group->name] = '\0';
+		}
+		else
+			name = zbx_strdup(NULL, group->name_inherit);
 
 		if (FAIL != zbx_vector_str_search(&group_names, name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 		{
@@ -1972,11 +1994,11 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		rights_local.name = row[0];
+
 		if (FAIL == (i = zbx_vector_ptr_search(&group_rights, &rights_local, lld_group_rights_compare)))
 			i = lld_group_rights_append(&group_rights, row[0]);
 
 		rights = (zbx_lld_group_rights_t *)group_rights.values[i];
-		rights->prights = &rights->rights;
 
 		ZBX_STR2UINT64(pair.first, row[2]);
 		pair.second = atoi(row[1]);
@@ -1987,53 +2009,35 @@ static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 
 	zbx_vector_ptr_sort(&group_rights, lld_group_rights_compare);
 
-	/* assign rights for the new groups */
-	for (i = 0; i < group_rights.values_num; i++)
-	{
-		rights = (zbx_lld_group_rights_t *)group_rights.values[i];
-
-		if (NULL != rights->prights)
-			continue;
-
-		if (NULL == (ptr = strrchr(rights->name, '/')))
-			continue;
-
-		offset = ptr - rights->name;
-
-		for (j = 0; j < i; j++)
-		{
-			parent_rights = (zbx_lld_group_rights_t *)group_rights.values[j];
-
-			if (strlen(parent_rights->name) != offset)
-				continue;
-
-			if (0 != strncmp(parent_rights->name, rights->name, offset))
-				continue;
-
-			rights->prights = parent_rights->prights;
-			break;
-		}
-	}
-
 	/* save rights for the new groups */
 	for (i = 0; i < groups->values_num; i++)
 	{
 		group = groups->values[i];
 
-		rights_local.name = group->name;
-		if (FAIL == (j = zbx_vector_ptr_bsearch(&group_rights, &rights_local, lld_group_rights_compare)))
-			continue;
-
-		rights = (zbx_lld_group_rights_t *)group_rights.values[j];
-
-		if (NULL == rights->prights)
-			continue;
-
-		for (j = 0; j < rights->prights->values_num; j++)
+		if (NULL == group->name_inherit)
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), group->groupid,
-					(int)rights->prights->values[j].second, rights->prights->values[j].first);
+			if (NULL == (ptr = strrchr(group->name, '/')))
+				continue;
+
+			name = zbx_strdup(NULL, group->name);
+			name[ptr - group->name] = '\0';
 		}
+		else
+			name = zbx_strdup(NULL, group->name_inherit);
+
+		rights_local.name = name;
+		if (FAIL != (j = zbx_vector_ptr_bsearch(&group_rights, &rights_local, lld_group_rights_compare)))
+		{
+			rights = (zbx_lld_group_rights_t *)group_rights.values[j];
+
+			for (j = 0; j < rights->rights.values_num; j++)
+			{
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), group->groupid,
+						(int)rights->rights.values[j].second, rights->rights.values[j].first);
+			}
+		}
+
+		zbx_free(name);
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "rightid");
