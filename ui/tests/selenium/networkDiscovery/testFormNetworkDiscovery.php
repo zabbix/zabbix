@@ -65,6 +65,9 @@ class testFormNetworkDiscovery extends CWebTest {
 	public function testFormNetworkDiscovery_Layout() {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Discovery rules');
+		$this->page->assertTitle('Configuration of discovery rules');
 		$form = $this->query('id:discoveryForm')->waitUntilPresent()->one()->asForm();
 
 		// Check that all labels present and visible.
@@ -1739,7 +1742,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form->checkValue($data['expected_fields']);
 
 		// Compare Discovery rule's Checks table.
-		$this->compareChecksTable($data['expected_checks']);
+		$this->compareChecksTable($data['expected_checks_table']);
 
 		// Compare Discovery rule's Checks form.
 		$this->compareChecksFormValues($data['expected_checks'], $form);
