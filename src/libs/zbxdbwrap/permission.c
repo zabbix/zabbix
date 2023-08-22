@@ -162,19 +162,19 @@ out:
  * Return value: PERM_DENY - if user not found, or permission otherwise       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid, char **user_timezone)
+int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	int			perm = PERM_DENY;
 	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		hostgroupid, roleid;
+	zbx_uint64_t		hostgroupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_uint64_create(&hostgroupids);
 
-	if (USER_TYPE_SUPER_ADMIN == zbx_get_user_info(userid, &roleid, user_timezone))
+	if (USER_TYPE_SUPER_ADMIN == user->type)
 	{
 		perm = PERM_READ_WRITE;
 		goto out;
@@ -191,7 +191,7 @@ int	zbx_get_host_permission(zbx_uint64_t userid, zbx_uint64_t hostid, char **use
 
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	perm = zbx_get_hostgroups_permission(userid, &hostgroupids);
+	perm = zbx_get_hostgroups_permission(user->userid, &hostgroupids);
 out:
 	zbx_vector_uint64_destroy(&hostgroupids);
 

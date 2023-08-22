@@ -209,7 +209,7 @@ zbx_host_permission_t;
  *               FAIL    - item configuration error                           *
  *                                                                            *
  ******************************************************************************/
-static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights, zbx_uint64_t userid,
+static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights, const zbx_user_t *user,
 		zbx_history_recv_item_t *item, const zbx_hp_item_value_t *value, char **error)
 {
 	if (ITEM_STATUS_ACTIVE != item->status)
@@ -262,14 +262,11 @@ static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights
 		if (0 == (perm = (zbx_host_permission_t *)zbx_hashset_search(rights, &item->host.hostid)))
 		{
 			zbx_host_permission_t	perm_local;
-			char			*user_timezone = NULL;
 
 			perm_local.hostid = item->host.hostid;
-			perm_local.permission = zbx_get_host_permission(userid, item->host.hostid, &user_timezone);
+			perm_local.permission = zbx_get_host_permission(user, item->host.hostid);
 
 			perm = (zbx_host_permission_t *)zbx_hashset_insert(rights, &perm_local, sizeof(perm_local));
-
-			zbx_free(user_timezone);
 		}
 
 		if (PERM_READ > perm->permission)
@@ -375,7 +372,7 @@ static int	hk_compare(const void *d1, const void *d2)
  *               FAIL    - parsing failure                                    *
  *                                                                            *
  ******************************************************************************/
-static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
+static void	process_item_values(const zbx_user_t *user, const struct addrinfo *ai,
 		zbx_vector_hp_item_value_ptr_t *values, int itemids_num, int hostkeys_num, int *processed_num,
 		int *failed_num, struct zbx_json *j)
 {
@@ -384,9 +381,8 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_host_key_t	hostkeys;
 	zbx_hashset_t		rights, *prights;
-	zbx_uint64_t		roleid;
 
-	if (USER_TYPE_SUPER_ADMIN != zbx_get_user_info(userid, &roleid, NULL))
+	if (USER_TYPE_SUPER_ADMIN != user->type)
 	{
 		zbx_hashset_create(&rights, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		prights = &rights;
@@ -514,7 +510,7 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, item_err->error, ZBX_JSON_TYPE_STRING);
 				(*failed_num)++;
 			}
-			else if (SUCCEED != validate_item_config(ai, prights, userid, item, values->values[i], &error))
+			else if (SUCCEED != validate_item_config(ai, prights, user, item, values->values[i], &error))
 			{
 				zbx_item_error_t	item_err_local = {.itemid = item->itemid, .error = error};
 
@@ -653,8 +649,7 @@ static int	process_history_push(const struct zbx_json_parse *jp, struct zbx_json
 			itemids_num++;
 	}
 
-	process_item_values(user.userid, ai, &values, itemids_num, hostkeys_num, &processed_num, &failed_num, j);
-
+	process_item_values(&user, ai, &values, itemids_num, hostkeys_num, &processed_num, &failed_num, j);
 	zbx_auditlog_history_push(user.userid, user.username, clientip, processed_num, failed_num,
 			zbx_time() - time_start);
 
