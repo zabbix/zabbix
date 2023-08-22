@@ -48,7 +48,7 @@ window.template_edit_popup = new class {
 		this.#initTemplateTab();
 		this.#initMacrosTab();
 
-		this.initial_form_fields = this.#getInitialFormData();
+		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	#initActions() {
@@ -133,7 +133,9 @@ window.template_edit_popup = new class {
 	}
 
 	#editLinkedTemplate(templateid) {
-		if (this.#checkFormHasChanges()) {
+		const form_fields = getFormFields(this.form);
+
+		if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
 			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
 				return;
 			}
@@ -154,50 +156,6 @@ window.template_edit_popup = new class {
 		overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.close'));
 		});
-	}
-
-	#getInitialFormData() {
-		const form_fields = getFormFields(this.form);
-		delete form_fields.show_inherited_template_macros;
-
-		return form_fields;
-	}
-
-	#checkFormHasChanges() {
-		const form_fields = getFormFields(this.form);
-		const empty_macro_object = {
-			macro: '',
-			discovery_state: `${this.macros_manager.getManualDiscoveryState()}`,
-			value: '',
-			type: `${this.macros_manager.getDefaultMacroType()}`,
-			description: ''
-		};
-
-		delete form_fields.show_inherited_template_macros;
-
-		if (form_fields.macros !== undefined) {
-			Object.keys(form_fields.macros).forEach((key) => {
-				if (form_fields.macros[key].inherited_type == <?= ZBX_PROPERTY_INHERITED ?>
-						||JSON.stringify(form_fields.macros[key]) === JSON.stringify(empty_macro_object)) {
-					delete form_fields.macros[key];
-				}
-				else {
-					delete form_fields.macros[key].inherited_type;
-				}
-			});
-
-			form_fields.macros = Object.fromEntries(
-				Object.values(form_fields.macros).map((value, index) => [index, value])
-			);
-		}
-
-		Object.keys(this.initial_form_fields.macros).forEach((key) => {
-			if (JSON.stringify(this.initial_form_fields.macros[key]) === JSON.stringify(empty_macro_object)) {
-				delete this.initial_form_fields.macros[key];
-			}
-		});
-
-		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields);
 	}
 
 	/**
