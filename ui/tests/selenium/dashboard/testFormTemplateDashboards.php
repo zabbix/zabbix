@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -26,18 +27,23 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 /**
  * @backup dashboard, hosts
  *
+ * @dataSource Services, Sla
+ *
  * @onBefore prepareTemplateDashboardsData
  */
 class testFormTemplateDashboards extends CWebTest {
 
 	const UPDATE_TEMPLATEID = 50000;	// ID of the "Template ZBX6663 First" template used for template dashboards tests.
 	const HOST_FOR_TEMPLATE = 99015;	// ID of the "Empty host" host to which a template with dashboards will be linked.
+	const TEMPLATE_ITEM = 'Item ZBX6663 Second';
+	const TEMPLATE_ITEM_ID = 400400;	// ID of item "Item ZBX6663 Second" that is used to create widgets.
+	const TEMPLATE = 'Template ZBX6663 First';
 
 	protected static $dashboardid_with_widgets;
 	protected static $empty_dashboardid;
 	protected static $dashboardid_for_update;
 
-	private static $previous_widget_name = 'Widget for update';
+	protected static $previous_widget_name = 'Widget for update';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -63,8 +69,73 @@ class testFormTemplateDashboards extends CWebTest {
 						'name' => 'Page with widgets',
 						'widgets' => [
 							[
+								'type' => 'actionlog',
+								'name' => 'Action log widget',
+								'width' => 4,
+								'height' => 4
+							],
+							[
 								'type' => 'clock',
 								'name' => 'Clock widget',
+								'x' => 4,
+								'y' => 0,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'discovery',
+								'name' => 'Discovery status widget',
+								'x' => 8,
+								'y' => 0,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'favgraphs',
+								'name' => 'Favorite graphs widget',
+								'x' => 12,
+								'y' => 0,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'favmaps',
+								'name' => 'Favorite maps widget',
+								'x' => 16,
+								'y' => 0,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge widget',
+								'x' => 20,
+								'y' => 0,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'max',
+										'value' => '100'
+									],
+									[
+										'type' => 1,
+										'name' => 'min',
+										'value' => '0'
+									],
+									[
+										'type' => 4,
+										'name' => 'itemid',
+										'value' => self::TEMPLATE_ITEM_ID
+									]
+								]
+							],
+							[
+								'type' => 'geomap',
+								'name' => 'Geomap widget',
+								'x' => 0,
+								'y' => 4,
 								'width' => 4,
 								'height' => 4
 							],
@@ -72,8 +143,8 @@ class testFormTemplateDashboards extends CWebTest {
 								'type' => 'graph',
 								'name' => 'Graph (classic) widget',
 								'x' => 4,
-								'y' => 0,
-								'width' => 8,
+								'y' => 4,
+								'width' => 4,
 								'height' => 4,
 								'fields' => [
 									[
@@ -84,31 +155,272 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 4,
 										'name' => 'itemid',
-										'value' => 400410
+										'value' => self::TEMPLATE_ITEM_ID
+									]
+								]
+							],
+							[
+								'type' => 'graphprototype',
+								'name' => 'Graph prototype widget',
+								'x' => 8,
+								'y' => 4,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 7,
+										'name' => 'graphid',
+										'value' => 700016
+									]
+								]
+							],
+							[
+								'type' => 'svggraph',
+								'name' => 'Graph widget',
+								'x' => 12,
+								'y' => 4,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'righty',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.items.0.0',
+										'value' => self::TEMPLATE_ITEM
+									],
+									[
+										'type' => 1,
+										'name' => 'ds.color.0',
+										'value' => 'FF465C'
+									]
+								]
+							],
+							[
+								'type' => 'hostavail',
+								'name' => 'Host availability widget',
+								'x' => 16,
+								'y' => 4,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'item',
+								'name' => 'Item value widget',
+								'x' => 20,
+								'y' => 4,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 4,
+										'name' => 'itemid',
+										'value' => self::TEMPLATE_ITEM_ID
+									],
+									[
+										'type' => 0,
+										'name' => 'show',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'show',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'show',
+										'value' => 4
+									]
+								]
+							],
+							[
+								'type' => 'map',
+								'name' => 'Map widget',
+								'x' => 0,
+								'y' => 8,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 8,
+										'name' => 'sysmapid',
+										'value' => 1
+									]
+								]
+							],
+							[
+								'type' => 'navtree',
+								'name' => 'Map navigation tree widget',
+								'x' => 4,
+								'y' => 8,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'FFFFF'
 									]
 								]
 							],
 							[
 								'type' => 'plaintext',
 								'name' => 'Plain text widget',
-								'x' => 12,
-								'y' => 0,
-								'width' => 6,
+								'x' => 8,
+								'y' => 8,
+								'width' => 4,
 								'height' => 4,
 								'fields' => [
 									[
 										'type' => 4,
 										'name' => 'itemids',
-										'value' => 400410
+										'value' => self::TEMPLATE_ITEM_ID
 									]
 								]
 							],
 							[
+								'type' => 'problemhosts',
+								'name' => 'Problem hosts widget',
+								'x' => 12,
+								'y' => 8,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'problems',
+								'name' => 'Problems widget',
+								'x' => 16,
+								'y' => 8,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'problemsbysv',
+								'name' => 'Problems by severity widget',
+								'x' => 20,
+								'y' => 8,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'slareport',
+								'name' => 'SLA report widget',
+								'x' => 0,
+								'y' => 12,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 10,
+										'name' => 'slaid',
+										'value' => 6
+									]
+								]
+							],
+							[
+								'type' => 'systeminfo',
+								'name' => 'System info details widget',
+								'x' => 4,
+								'y' => 12,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'systeminfo',
+								'name' => 'System info HA nodes widget',
+								'x' => 8,
+								'y' => 12,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'info_type',
+										'value' => 1
+									]
+								]
+							],
+							[
+								'type' => 'tophosts',
+								'name' => 'Top hosts widget',
+								'x' => 12,
+								'y' => 12,
+								'width' => 4,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => 'columns.decimal_places.0',
+										'value' => 2
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.aggregate_function.0',
+										'value' => 0
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.base_color.0',
+										'value' => ''
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.name.0',
+										'value' => ''
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.item.0',
+										'value' => self::TEMPLATE_ITEM
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.timeshift.0',
+										'value' => ''
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.display.0',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.history.0',
+										'value' => 1
+									],
+									[
+										'type' => 0,
+										'name' => 'columns.data.0',
+										'value' => 1
+									],
+								]
+							],
+							[
+								'type' => 'toptriggers',
+								'name' => 'Top triggers widget',
+								'x' => 16,
+								'y' => 12,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'trigover',
+								'name' => 'Trigger overview widget',
+								'x' => 20,
+								'y' => 12,
+								'width' => 4,
+								'height' => 4
+							],
+							[
 								'type' => 'url',
 								'name' => 'URL widget',
-								'x' => 18,
-								'y' => 0,
-								'width' => 6,
+								'x' => 0,
+								'y' => 16,
+								'width' => 4,
 								'height' => 4,
 								'fields' => [
 									[
@@ -119,19 +431,20 @@ class testFormTemplateDashboards extends CWebTest {
 								]
 							],
 							[
-								'type' => 'graphprototype',
-								'name' => 'Graph prototype widget',
-								'x' => 0,
-								'y' => 4,
-								'width' => 12,
-								'height' => 6,
-								'fields' => [
-									[
-										'type' => 7,
-										'name' => 'graphid',
-										'value' => 700016
-									]
-								]
+								'type' => 'web',
+								'name' => 'Web monitoring widget',
+								'x' => 4,
+								'y' => 16,
+								'width' => 4,
+								'height' => 4
+							],
+							[
+								'type' => 'dataover',
+								'name' => 'Data overview widget',
+								'x' => 8,
+								'y' => 16,
+								'width' => 4,
+								'height' => 4
 							]
 						]
 					]
@@ -139,8 +452,33 @@ class testFormTemplateDashboards extends CWebTest {
 			],
 			[
 				'templateid' => self::UPDATE_TEMPLATEID,
-				'name' => 'Empty Dashboard without widgets',
-				'pages' => [[]]
+				'name' => 'Dashboard for widget ceation',
+				'pages' => [
+					[
+						'name' => '1st page',
+						'widgets' => [
+							[
+								'type' => 'navtree',
+								'name' => 'Empty navtree widget',
+								'x' => 0,
+								'y' => 0,
+								'width' => 4,
+								'height' => 2,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'ABCDE'
+									]
+								]
+							]
+						]
+					],
+					[
+						'name' => '2nd page'
+					]
+				]
 			],
 			[
 				'templateid' => self::UPDATE_TEMPLATEID,
@@ -163,6 +501,22 @@ class testFormTemplateDashboards extends CWebTest {
 								'y' => 0,
 								'width' => 4,
 								'height' => 4
+							],
+							[
+								'type' => 'navtree',
+								'name' => 'Empty navtree widget',
+								'x' => 0,
+								'y' => 4,
+								'width' => 4,
+								'height' => 2,
+								'view_mode' => 0,
+								'fields' => [
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'EDCBA'
+									]
+								]
 							]
 						]
 					]
@@ -176,7 +530,7 @@ class testFormTemplateDashboards extends CWebTest {
 	}
 
 	/**
-	 * Function that links the template with dashboards to "Empty host" host.
+	 * Link the created template with dashboards to "Empty host" host.
 	 */
 	public static function prepareHostLinkageToTemplateData() {
 		CDataHelper::call('host.update', [
@@ -258,8 +612,18 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->closeDialogue();
 	}
 
+
+	/**
+	 * Field locators are used for locating individual fields, as well as in cases when it is not possible to get the
+	 * field via label or the field element is not positioned right after the label element.
+	 * Field and field_id combination is used when locating fields that are a part of some complex field and that cannot
+	 * be located directly by label (non unique fields within the complex field, other layout anomalies).
+	 * In case if fields that are a part of a complex field are checked as individual fields, then field_locator should be
+	 * used instead of the Field and field_id combination (like when checking disable fields).
+	 */
 	public static function getWidgetLayoutData() {
 		return [
+			// #0 Action log widget.
 			[
 				[
 					'type' => 'Action log',
@@ -315,6 +679,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #1 Clock widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Clock'),
@@ -333,7 +698,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'value' => 'Analog'
 						]
 					],
-					'hidden_fields' => [
+					'hidden' => [
 						[
 							'field' => 'Item',
 							'type' => 'multiselect',
@@ -356,7 +721,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'contents' => [
 								[
 									'field' => 'Size',
-									'element_locator' => 'id:date_size',
+									'field_id' => 'date_size',
 									'value' => 20,
 									'attributes' => [
 										'maxlength' => 3
@@ -366,7 +731,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
-									'element_locator' => 'id:date_bold',
+									'field_id' => 'date_bold',
 									'value' => false
 								],
 								[
@@ -383,7 +748,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'contents' => [
 								[
 									'field' => 'Size',
-									'element_locator' => 'id:time_size',
+									'field_id' => 'time_size',
 									'value' => 30,
 									'attributes' => [
 										'maxlength' => 3
@@ -393,7 +758,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
-									'element_locator' => 'id:time_bold',
+									'field_id' => 'time_bold',
 									'value' => false
 								],
 								[
@@ -403,13 +768,13 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Seconds',
 									'type' => 'checkbox',
-									'element_locator' => 'id:time_sec',
+									'field_id' => 'time_sec',
 									'value' => true
 								],
 								[
 									'field' => 'Format',
 									'type' => 'radio_button',
-									'element_locator' => 'id:time_format',
+									'field_id' => 'time_format',
 									'possible_values' => ['24-hour', '12-hour'],
 									'value' => '24-hour'
 								]
@@ -422,7 +787,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'contents' => [
 								[
 									'field' => 'Size',
-									'element_locator' => 'id:tzone_size',
+									'field_id' => 'tzone_size',
 									'value' => 20,
 									'attributes' => [
 										'maxlength' => 3
@@ -432,7 +797,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
-									'element_locator' => 'id:tzone_bold',
+									'field_id' => 'tzone_bold',
 									'value' => false
 								],
 								[
@@ -442,12 +807,12 @@ class testFormTemplateDashboards extends CWebTest {
 							]
 						]
 					],
-					'change_values' => [
+					'fill_for_hidden' => [
 						'Time type' => 'Host time',
 						'Clock type' => 'Digital',
 						'Advanced configuration' => true
 					],
-					'second_change' => [
+					'second_fill_hidden' => [
 						'change_fields' => [
 							'id:show_1' => true,
 							'id:show_3' => true
@@ -463,24 +828,352 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #2 Discovery status widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Discovery status'),
 					'refresh_interval' => 'Default (1 minute)'
 				]
 			],
+			// #3 Favorite graphs widget
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Favorite graphs'),
 					'refresh_interval' => 'Default (15 minutes)'
 				]
 			],
+			// #4 Favorite maps widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Favorite maps'),
 					'refresh_interval' => 'Default (15 minutes)'
 				]
 			],
+			// #5 Gauge widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Gauge'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Item',
+							'type' => 'multiselect',
+							'mandatory' => true
+						],
+						[
+							'field' => 'Min',
+							'value' => 0,
+							'attributes' => [
+								'maxlength' => 255
+							],
+							'mandatory' => true
+						],
+						[
+							'field' => 'Max',
+							'value' => 100,
+							'attributes' => [
+								'maxlength' => 255
+							],
+							'mandatory' => true
+						],
+						[
+							'field' => 'Colors',
+							'contents' => [
+								[
+									'field' => 'Value arc',
+									'type' => 'color_picker'
+								],
+								[
+									'field' => 'Arc background',
+									'type' => 'color_picker'
+								],
+								[
+									'field' => 'Background',
+									'type' => 'color_picker'
+								]
+							]
+						]
+					],
+					'hidden' => [
+						[
+							'field' => 'Angle',
+							'type' => 'radio_button',
+							'possible_values' => ['180°', '270°'],
+							'value' => '180°'
+						],
+						[
+							'field' => 'Description',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-description"]',
+							'contents' => [
+								[
+									'field_locator' => 'id:description',
+									'value' => '{ITEM.NAME}',
+									'attributes' => [
+										'maxlength' => 2048,
+										'aria-required' => 'true',
+										'rows' => 7
+									]
+								],
+								[
+									'field' => 'Size',
+									'field_id' => 'desc_size',
+									'value' => 15,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Vertical position',
+									'type' => 'radio_button',
+									'possible_values' => ['Top', 'Bottom'],
+									'value' => 'Bottom'
+								],
+								[
+									'field' => 'Bold',
+									'field_id' => 'desc_bold',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Color',
+									'type' => 'color_picker'
+								]
+							]
+						],
+						[
+							'field' => 'Value',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-value"]',
+							'contents' => [
+								[
+									'field' => 'Decimal places',
+									'value' => 2,
+									'field_id' => 'decimal_places',
+									'attributes' => [
+										'maxlength' => 2
+									]
+								],
+								[
+									'field' => 'Size',
+									'field_id' => 'value_size',
+									'value' => 25,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Bold',
+									'field_id' => 'value_bold',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Color',
+									'field_locator' => 'id:lbl_value_color',
+									'type' => 'color_picker'
+								],
+								[
+									'field' => 'Arc',
+									'field_id' => 'value_arc',
+									'type' => 'checkbox',
+									'value' => true
+								],
+								[
+									'field' => 'Arc size',
+									'field_id' => 'value_arc_size',
+									'value' => 20,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field_locator' => 'id:units_show',
+									'type' => 'checkbox',
+									'value' => true
+								],
+								[
+									'field_locator' => 'xpath:.//label[text()="Units"]/../following-sibling::div[1]/input',
+									'attributes' => [
+										'maxlength' => 2048
+									]
+								],
+								[
+									'field' => 'Size',
+									'field_id' => 'units_size',
+									'value' => 25,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Bold',
+									'type' => 'checkbox',
+									'field_id' => 'units_bold',
+									'value' => false
+								],
+								[
+									'field' => 'Position',
+									'type' => 'dropdown',
+									'field_id' => 'units_pos',
+									'possible_values' => [
+										'Before value',
+										'Above value',
+										'After value',
+										'Below value'
+									],
+									'value' => 'After value'
+								],
+
+								[
+									'field' => 'Color',
+									'field_locator' => 'id:lbl_units_color',
+									'type' => 'color_picker'
+								]
+							]
+						],
+						[
+							'field' => 'Needle',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-needle"]',
+							'contents' => [
+								[
+									'field_locator' => 'id:needle_show',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field_locator' => 'xpath:.//button[@id="lbl_needle_color"]/..',
+									'type' => 'color_picker'
+								],
+							]
+						],
+						[
+							'field' => 'Scale',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-scale"]',
+							'contents' => [
+								[
+									'field_locator' => 'id:scale_show',
+									'type' => 'checkbox',
+									'value' => true
+								],
+								[
+									'field_locator' => 'id:scale_show_units',
+									'type' => 'checkbox',
+									'value' => true
+								],
+								[
+									'field' => 'Size',
+									'field_id' => 'scale_size',
+									'value' => 10,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Decimal places',
+									'value' => 0,
+									'field_id' => 'scale_decimal_places',
+									'attributes' => [
+										'maxlength' => 2
+									]
+								]
+							]
+						],
+						[
+							'field' => 'Thresholds',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-thresholds"]',
+							'type' => 'complex_field',
+							'contents' => [
+								[
+									'field_locator' => 'id:thresholds-table',
+									'type' => 'table',
+									'value' => true,
+									'headers' => ['', 'Threshold', 'Action'],
+									'buttons' => ['', 'Remove', 'Add']
+								],
+								[
+									'field' => 'Show labels',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Show arc',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								// Field parameters are checked in the Disabled section. Here only the presence is checked.
+								[
+									'field' => 'Arc size'
+								]
+							]
+						]
+					],
+					/**
+					 * Disabled fields are duplicated in hidden fields in order to properly check their default values,
+					 * as in Gauge widget to enable some of the fields value of other disabled fields needs to be changed.
+					 */
+					'disabled' => [
+						[
+							'field' => 'Color',
+							'field_id' => 'lbl_needle_color',
+							'disabled_locator' => 'id:needle_color',
+							'type' => 'color_picker'
+						],
+						[
+							'field' => 'Show labels',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show arc',
+							'type' => 'checkbox',
+							'value' => true
+						],
+						[
+							'field_locator' => 'id:th_arc_size',
+							'value' => 10,
+							'attributes' => [
+								'maxlength' => 3
+							],
+							'symbol_after' => '%',
+							'skip_mandatory_check' => true
+						]
+					],
+					'fill_for_hidden' => [
+						'Advanced configuration' => true
+					],
+					'click_hidden' => [
+						'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]'
+					],
+					'fill_for_disabled' => [
+						'id:needle_show' => true,
+						'id:thresholds_0_threshold' => '33',
+						'Show arc' => true
+					],
+					'hints' => [
+						[
+							'label' => 'Description',
+							'text' => "Supported macros:\n".
+									"{HOST.*}\n".
+									"{ITEM.*}\n".
+									"{INVENTORY.*}\n".
+									"User macros"
+						],
+						[
+							'label' => 'Position',
+							'text' => 'Position is ignored for s, uptime and unixtime units.'
+						]
+					]
+				]
+			],
+			// #6 Geomap widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Geomap'),
@@ -508,6 +1201,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #7 Graph (classic) widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
@@ -530,7 +1224,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'value' => true
 						]
 					],
-					'hidden_fields' => [
+					'hidden' => [
 						[
 							'field' => 'Item',
 							'type' => 'multiselect',
@@ -538,11 +1232,12 @@ class testFormTemplateDashboards extends CWebTest {
 							'replaces' => 'Graph'
 						]
 					],
-					'change_values' => [
+					'fill_for_hidden' => [
 						'Source' => 'Simple graph'
 					]
 				]
 			],
+			// #8 Graph prototype widget.
 			[
 				[
 
@@ -582,18 +1277,19 @@ class testFormTemplateDashboards extends CWebTest {
 							'mandatory' => true
 						]
 					],
-					'hidden_fields' => [
+					'hidden' => [
 						[
 							'field' => 'Item prototype',
 							'type' => 'multiselect',
 							'mandatory' => true
 						]
 					],
-					'change_values' => [
+					'fill_for_hidden' => [
 						'Source' => 'Simple graph prototype'
 					]
 				]
 			],
+			// #9 Host availability widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Host availability'),
@@ -618,6 +1314,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			#10 Item value widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Item value'),
@@ -636,7 +1333,7 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 
 					],
-					'hidden_fields' => [
+					'hidden' => [
 						[
 							'field' => 'Description',
 							'type' => 'complex_field',
@@ -659,7 +1356,7 @@ class testFormTemplateDashboards extends CWebTest {
 								],
 								[
 									'field' => 'Size',
-									'element_locator' => 'id:desc_size',
+									'field_id' => 'desc_size',
 									'value' => 15,
 									'attributes' => [
 										'maxlength' => 3
@@ -691,14 +1388,14 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Decimal places',
 									'value' => 2,
-									'element_locator' => 'id:decimal_places',
+									'field_id' => 'decimal_places',
 									'attributes' => [
 										'maxlength' => 2
 									]
 								],
 								[
 									'field' => 'Size',
-									'element_locator' => 'id:decimal_size',
+									'field_id' => 'decimal_size',
 									'value' => 35,
 									'attributes' => [
 										'maxlength' => 3
@@ -728,7 +1425,7 @@ class testFormTemplateDashboards extends CWebTest {
 								],
 								[
 									'field' => 'Bold',
-									'element_locator' => 'id:value_bold',
+									'field_id' => 'value_bold',
 									'type' => 'checkbox',
 									'value' => true
 								],
@@ -795,7 +1492,7 @@ class testFormTemplateDashboards extends CWebTest {
 								],
 								[
 									'field' => 'Size',
-									'element_locator' => 'id:time_size',
+									'field_id' => 'time_size',
 									'value' => 15,
 									'attributes' => [
 										'maxlength' => 3
@@ -861,7 +1558,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'buttons' => ['Add']
 						]
 					],
-					'change_values' => [
+					'fill_for_hidden' => [
 						'Advanced configuration' => true
 					],
 					'hints' => [
@@ -885,6 +1582,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #11 Map widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Map'),
@@ -902,7 +1600,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'mandatory' => true
 						]
 					],
-					'hidden_fields' => [
+					'hidden' => [
 						[
 							'field' => 'Filter',
 							'type' => 'dropdown',
@@ -912,11 +1610,12 @@ class testFormTemplateDashboards extends CWebTest {
 							'replaces' => 'Map'
 						]
 					],
-					'change_values' => [
+					'fill_for_hidden' => [
 						'Source type' => 'Map navigation tree'
 					]
 				]
 			],
+			// #12 Map navigation tree widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Map navigation tree'),
@@ -930,6 +1629,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			#13 Plain text widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Plain text'),
@@ -962,6 +1662,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #14 PRoblems hosts widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Problem hosts'),
@@ -1005,6 +1706,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #15 Problems widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Problems'),
@@ -1095,7 +1797,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'mandatory' => true
 						]
 					],
-					'disabled_fields' => [
+					'disabled' => [
 						[
 							'field' => 'Tag name',
 							'type' => 'radio_button',
@@ -1116,12 +1818,13 @@ class testFormTemplateDashboards extends CWebTest {
 							'value' => false
 						]
 					],
-					'change_values' => [
+					'fill_for_disabled' => [
 						'Show tags' => '3',
 						'Acknowledgement status' => 'Acknowledged'
 					]
 				]
 			],
+			// #16 Problems by severity widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Problems by severity'),
@@ -1182,6 +1885,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #17 SLA report widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('SLA report'),
@@ -1222,6 +1926,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #18 System information widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('System information'),
@@ -1236,6 +1941,48 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #19 Top triggers widget.
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Top triggers'),
+					'refresh_interval' => 'Default (No refresh)',
+					'fields' => [
+						[
+							'field' => 'Problem',
+							'attributes' => [
+								'maxlength' => 2048
+							]
+						],
+						[
+							'field' => 'Severity',
+							'type' => 'checkbox_list',
+							'checkboxes' => [
+								'Not classified' => false,
+								'Information' => false,
+								'Warning' => false,
+								'Average' => false,
+								'High' => false,
+								'Disaster' => false
+							]
+						],
+						[
+							'field' => 'Problem tags',
+							'type' => 'tags_table',
+							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
+							'default_operator' => 'Contains'
+						],
+						[
+							'field' => 'Trigger count',
+							'attributes' => [
+								'maxlength' => 3
+							],
+							'value' => 10,
+							'mandatory' => true
+						],
+					]
+				]
+			],
+			// #20 Trigger overview widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Trigger overview'),
@@ -1267,6 +2014,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #21 URL widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('URL'),
@@ -1282,6 +2030,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #22 Web monitoring widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Web monitoring'),
@@ -1301,6 +2050,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
+			// #23 Data overview widget.
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Data overview'),
@@ -1336,8 +2086,6 @@ class testFormTemplateDashboards extends CWebTest {
 		];
 	}
 
-	// Graph and Top hosts layout should be checked separately.
-
 	/**
 	 * Function that checks the layout and the default settings of widget configuration forms.
 	 *
@@ -1354,6 +2102,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$widget_form = $widget_dialog->asForm();
 		$widget_form->fill(['Type' => $data['type']]);
 
+		// Add Name and refresh interval fields to refeence data before checking configuration.
 		$refresh_intervals = array_merge([$data['refresh_interval']], ['No refresh', '10 seconds', '30 seconds',
 			'1 minute', '2 minutes', '10 minutes', '15 minutes']
 		);
@@ -1376,37 +2125,45 @@ class testFormTemplateDashboards extends CWebTest {
 
 		$this->checkFormFields($data['fields'], $widget_form);
 
-		foreach (['hidden_fields', 'disabled_fields'] as $no_access_fields) {
+		// Check that hidden/disabled fields aren't visible/enabled, perform changes and check that they become available.
+		foreach (['hidden', 'disabled'] as $no_access_fields) {
 			if (array_key_exists($no_access_fields, $data)) {
+				// Check that each of the fields in the list is hidden/disabled.
 				foreach ($data[$no_access_fields] as $no_access_field) {
-					if ($no_access_fields === 'hidden_fields') {
+					if ($no_access_fields === 'hidden') {
+						// TODO: should be fixed after git-hook improvements in DEV-2396
 						$this->assertFalse($widget_form->query("xpath:.//label[text()=".
 								CXPathHelper::escapeQuotes($no_access_field['field'])."]/following-sibling::div[1]")
 								->one(false)->isDisplayed()
 						);
 					}
 					else {
-						$field_locator = (array_key_exists('field', $no_access_field))
-							? $no_access_field['field']
-							: $no_access_field['field_locator'];
+						$field_locator = (array_key_exists('disabled_locator', $no_access_field))
+							? $no_access_field['disabled_locator']
+							: (array_key_exists('field', $no_access_field)
+								? $no_access_field['field']
+								: $no_access_field['field_locator']);
 						$this->assertFalse($widget_form->getField($field_locator)->isEnabled());
 					}
 				}
-
-				/**
-				 * There is no widget in data provider that has both hidden and disabled fields, so change_values is
-				 * filled and field check is performed within the foreach loop.
-				 */
+				// Reference values are filled in to defined form fields to access the hidden/disabled fields.
 				$widget_form->invalidate();
-				$widget_form->fill($data['change_values']);
+				$widget_form->fill($data['fill_for_'.$no_access_fields]);
+
+				// In some cases it is required to click on link or button for hidden/disabled element to become available.
+				if (array_key_exists('click_'.$no_access_fields, $data)) {
+					foreach ($data['click_'.$no_access_fields] as $link) {
+						$this->query($link)->one()->click();
+					}
+				}
 
 				// In case if no access fields need to be filled to expand the form, they are checked before being filled.
-				if (array_key_exists('second_change', $data)) {
+				if (array_key_exists('second_fill_'.$no_access_fields, $data)) {
 					// Check default configuration of field before changing its value.
-					$this->checkFormFields($data['second_change']['check_fields'], $widget_form);
+					$this->checkFormFields($data['second_fill_'.$no_access_fields]['check_fields'], $widget_form);
 
 					// Exclude the checked field from further checks and fill data.
-					foreach ($data['second_change']['check_fields'] as $checked_field) {
+					foreach ($data['second_fill_'.$no_access_fields]['check_fields'] as $checked_field) {
 						foreach ($data[$no_access_fields] as $i => $all_fields) {
 							if ($checked_field['field'] === $all_fields['field']) {
 								unset($data[$no_access_fields][$i]);
@@ -1414,7 +2171,7 @@ class testFormTemplateDashboards extends CWebTest {
 						}
 					}
 
-					$widget_form->fill($data['second_change']['change_fields']);
+					$widget_form->fill($data['second_fill_'.$no_access_fields]['change_fields']);
 				}
 
 				$widget_dialog->waitUntilReady();
@@ -1422,6 +2179,7 @@ class testFormTemplateDashboards extends CWebTest {
 			}
 		}
 
+		// Check the content of hints in the configuration form.
 		if (array_key_exists('hints', $data)) {
 			foreach ($data['hints'] as $hint) {
 				// Open hint and check text.
@@ -1436,19 +2194,25 @@ class testFormTemplateDashboards extends CWebTest {
 				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint_dialog->waitUntilNotPresent();
 			}
-
 		}
 
+		// Check that show header field is set to true.
 		$this->assertTrue($widget_form->getField('Show header')->getValue());
 
 		// Close editing dashboard so that next test case would not fail with "Unexpected alert" error.
 		$this->closeDialogue();
 	}
 
-	private function checkFormFields($fields, $widget_form) {
+	/**
+	 * Function that locates each and every field from the reference list and passes it for verification of parameters.
+	 *
+	 * @param	array			$fields			reference array of fields and their parameters
+	 * @param	CFormElement	$widget_form	form, in which the field should be checked
+	 */
+	protected function checkFormFields($fields, $widget_form) {
 		// Check form fields and their attributes based on field type.
 		foreach ($fields as $field_details) {
-			// Field locator is temporary workaround until issue in framework is not solved (complex field + radio button).
+			// Field locator is used for stand-alone fields that cannot be located via label.
 			if (array_key_exists('field_locator', $field_details)) {
 				$field = $widget_form->query($field_details['field_locator'])->one();
 			}
@@ -1456,13 +2220,21 @@ class testFormTemplateDashboards extends CWebTest {
 				$field = $widget_form->getField($field_details['field']);
 			}
 
+			// If the field replaces some other field, make sure that this other field is not displayed anymore.
 			if (array_key_exists('replaces', $field_details)) {
 				$this->assertFalse($widget_form->getField($field_details['replaces'])->isDisplayed());
 			}
 
+			// In case of complex fields each of their subfields is sent for parameter check separately.
 			if (CTestArrayHelper::get($field_details, 'type') === 'complex_field') {
 				foreach ($field_details['contents'] as $sub_field_details) {
 					if (array_key_exists('field', $sub_field_details)) {
+						/**
+						 * Locate the field from the perspective of its label. It's either the following div or one of
+						 * the div elements right after the label with the specified id.
+						 *
+						 * TODO: should be fixed after git-hook improvements in DEV-2396
+						 */
 						$label_xpath = "xpath:.//label[text()=".CXPathHelper::escapeQuotes($sub_field_details['field'])."]";
 						$field_locator =  array_key_exists('field_id', $sub_field_details)
 							? $label_xpath."/following-sibling::div/*[@id=".CXPathHelper::escapeQuotes($sub_field_details['field_id'])."]"
@@ -1479,133 +2251,135 @@ class testFormTemplateDashboards extends CWebTest {
 			else {
 				$this->checkFieldParameters($field_details, $widget_form, $field);
 			}
-
-
 		}
 	}
 
-	private function checkFieldParameters($field_details, $widget_form, $field) {
+	/**
+	 * Function that verifies the properties of the passed fields according to their type.
+	 *
+	 * @param array			$field_details		array of reference field parameters
+	 * @param CFormElement	$widget_form		form that the field under attention is located in
+	 * @param CElement		$field				element that represents the field to be checked
+	 */
+	protected function checkFieldParameters($field_details, $widget_form, $field) {
 		$default_value = CTestArrayHelper::get($field_details, 'value', '');
-		$element = (array_key_exists('element_locator', $field_details))
-			? $field->query($field_details['element_locator'])->one()
-			: $field;
 
 		switch (CTestArrayHelper::get($field_details, 'type', 'input')) {
-				case 'input':
-					$this->assertEquals($default_value, $element->getValue());
+			case 'input':
+				$this->assertEquals($default_value, $field->getValue());
 
-					if (array_key_exists('attributes', $field_details)) {
-						foreach ($field_details['attributes'] as $attribute => $value) {
-							$this->assertEquals($value, $element->getAttribute($attribute));
-						}
+				if (array_key_exists('attributes', $field_details)) {
+					foreach ($field_details['attributes'] as $attribute => $value) {
+						$this->assertEquals($value, $field->getAttribute($attribute));
 					}
-
-					if (array_key_exists('symbol_after', $field_details)) {
-						$this->assertEquals($field_details['symbol_after'], CElementQuery::getDriver()
-								->executeScript('return arguments[0].nextSibling.textContent;', [$element])
-						);
-					}
-
-					break;
-
-				case 'checkbox':
-					$element = $element->asCheckbox();
-					$this->assertEquals($default_value, $element->isChecked());
-					break;
-
-				case 'multiselect':
-					$default_value = '';
-					$this->assertEquals($default_value, $element->getValue());
-					$this->assertEquals('type here to search', $element->query('xpath:.//input')->one()->getAttribute('placeholder'));
-					break;
-
-				case 'dropdown':
-					$element = $element->asDropdown();
-					$this->assertEquals($default_value, $element->getValue());
-					$this->assertEquals($field_details['possible_values'], $element->getOptions()->asText());
-					break;
-
-				case 'radio_button':
-					$element = $element->asSegmentedRadio();
-					$this->assertEquals($default_value, $element->getValue());
-					$this->assertEquals($field_details['possible_values'], $element->getLabels()->asText());
-					break;
-
-				case 'checkbox_list':
-					$checkbox_list = $element->asCheckboxList();
-
-					foreach ($field_details['checkboxes'] as $label => $value) {
-						$this->assertEquals($value, $checkbox_list->query("xpath:.//label[text()=".
-								CXPathHelper::escapeQuotes($label)."]/../input")->one()->asCheckbox()->isChecked()
-						);
-					}
-
-					break;
-
-				case 'composite_input':
-					$input = $field->getInput();
-					$this->assertEquals($default_value, $input->getValue());
-
-					if (array_key_exists('attributes', $field_details)) {
-						foreach ($field_details['attributes'] as $attribute => $value) {
-							$this->assertEquals($value, $input->getAttribute($attribute));
-						}
-					}
-
-					$this->assertTrue($field->query('name:date_'.lcfirst($field_details['field']).'_calendar')->one()->isClickable());
-					break;
-
-				case 'color_picker':
-					$element = $element->asColorPicker();
-					$this->assertEquals($default_value, $element->getValue());
-					break;
-
-				case 'table':
-					$table = $element->asTable();
-					$this->assertEquals($field_details['headers'], $table->getHeadersText());
-
-					$this->assertEquals($field_details['buttons'], $table->query('tag:button')->all()
-							->filter(CElementFilter::CLICKABLE)->asText()
+				}
+				// Some input elements have a symbol placed right after them, like the "%" gign after Size field.
+				if (array_key_exists('symbol_after', $field_details)) {
+					$this->assertEquals($field_details['symbol_after'], CElementQuery::getDriver()
+							->executeScript('return arguments[0].nextSibling.textContent;', [$field])
 					);
-					break;
+				}
+				break;
 
-				case 'tags_table':
-					$radio = $element->asSegmentedRadio();
-					$this->assertEquals('And/Or', $radio->getValue());
-					$this->assertEquals(['And/Or', 'Or'], $radio->getLabels()->asText());
+			case 'checkbox':
+				$field = $field->asCheckbox();
+				$this->assertEquals($default_value, $field->isChecked());
+				break;
 
-					$table = $radio->query('xpath:./../following-sibling::div[1]')->one();
-					$inputs = [
-						'id:tags_0_tag' => 'tag',
-						'id:tags_0_value' => 'value'
-					];
+			case 'multiselect':
+				$default_value = '';
+				$this->assertEquals($default_value, $field->getValue());
+				$this->assertEquals('type here to search', $field->query('xpath:.//input')->one()->getAttribute('placeholder'));
+				break;
 
-					foreach ($inputs as $locator => $placeholder) {
-						$input = $table->query($locator)->one();
-						$this->assertEquals(255, $input->getAttribute('maxlength'));
-						$this->assertEquals($placeholder, $input->getAttribute('placeholder'));
-					}
+			case 'dropdown':
+				$field = $field->asDropdown();
+				$this->assertEquals($default_value, $field->getValue());
+				$this->assertEquals($field_details['possible_values'], $field->getOptions()->asText());
+				break;
 
-					$operator = $table->query('id:tags_0_operator')->one()->asDropdown();
-					$this->assertEquals($field_details['default_operator'], $operator->getValue());
-					$this->assertEquals($field_details['operators'], $operator->getOptions()->asText());
+			case 'radio_button':
+				$field = $field->asSegmentedRadio();
+				$this->assertEquals($default_value, $field->getValue());
+				$this->assertEquals($field_details['possible_values'], $field->getLabels()->asText());
+				break;
 
-					$this->assertEquals(['Remove', 'Add'], $table->query('class:btn-link')->all()
-							->filter(CElementFilter::CLICKABLE)->asText()
+			case 'checkbox_list':
+				$checkbox_list = $field->asCheckboxList();
+
+				foreach ($field_details['checkboxes'] as $label => $value) {
+					// TODO: should be fixed after git-hook improvements in DEV-2396
+					$this->assertEquals($value, $checkbox_list->query("xpath:.//label[text()=".
+							CXPathHelper::escapeQuotes($label)."]/../input")->one()->asCheckbox()->isChecked()
 					);
-					break;
+				}
+				break;
 
-				case 'indicator':
-					$this->assertTrue($element->isDisplayed());
-					$this->assertEquals('', $element->query('tag:polygon')->one()->getAttribute('style'));
-					break;
-			}
+			case 'composite_input':
+				$input = $field->getInput();
+				$this->assertEquals($default_value, $input->getValue());
 
-			// Complex field elements don't have mandatory fields, so no use wasting time on checkingif they are mandatory.
-			if ($widget_form && !CTestArrayHelper::get($field_details, 'skip_mandatory_check')) {
-				$mandatory = CTestArrayHelper::get($field_details, 'mandatory');
-				$this->assertEquals($mandatory, $widget_form->isRequired($field_details['field']));
-			}
+				if (array_key_exists('attributes', $field_details)) {
+					foreach ($field_details['attributes'] as $attribute => $value) {
+						$this->assertEquals($value, $input->getAttribute($attribute));
+					}
+				}
+
+				$this->assertTrue($field->query('name:date_'.lcfirst($field_details['field']).'_calendar')->one()->isClickable());
+				break;
+
+			case 'color_picker':
+				$field = $field->asColorPicker();
+				$this->assertEquals($default_value, $field->getValue());
+				break;
+
+			case 'table':
+				$table = $field->asTable();
+				$this->assertEquals($field_details['headers'], $table->getHeadersText());
+				$this->assertEquals($field_details['buttons'], $table->query('tag:button')->all()
+						->filter(CElementFilter::CLICKABLE)->asText()
+				);
+				break;
+
+			case 'tags_table':
+				$radio = $field->asSegmentedRadio();
+				$this->assertEquals('And/Or', $radio->getValue());
+				$this->assertEquals(['And/Or', 'Or'], $radio->getLabels()->asText());
+
+				$table = $radio->query('xpath:./../following-sibling::div[1]')->one();
+				$inputs = [
+					'id:tags_0_tag' => 'tag',
+					'id:tags_0_value' => 'value'
+				];
+
+				foreach ($inputs as $locator => $placeholder) {
+					$input = $table->query($locator)->one();
+					$this->assertEquals(255, $input->getAttribute('maxlength'));
+					$this->assertEquals($placeholder, $input->getAttribute('placeholder'));
+				}
+
+				$operator = $table->query('id:tags_0_operator')->one()->asDropdown();
+				$this->assertEquals($field_details['default_operator'], $operator->getValue());
+				$this->assertEquals($field_details['operators'], $operator->getOptions()->asText());
+				$this->assertEquals(['Remove', 'Add'], $table->query('class:btn-link')->all()
+						->filter(CElementFilter::CLICKABLE)->asText()
+				);
+				break;
+
+			case 'indicator':
+				$this->assertTrue($field->isDisplayed());
+				$this->assertEquals('', $field->query('tag:polygon')->one()->getAttribute('style'));
+				break;
+		}
+
+		/**
+		 * Check is skipped for complex field elements that are checked as individual fields and that cannot be located
+		 * by their label. Complex field elements are never marked as mandatory.
+		 */
+		if ($widget_form && !CTestArrayHelper::get($field_details, 'skip_mandatory_check')) {
+			$mandatory = CTestArrayHelper::get($field_details, 'mandatory');
+			$this->assertEquals($mandatory, $widget_form->isRequired($field_details['field']));
+		}
 	}
 
 	public static function getDashboardPropertiesData() {
@@ -1639,9 +2413,9 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'dashboard_properties' => [
-						'Name' => 'Empty Dashboard without widgets'
+						'Name' => 'Dashboard for widget ceation'
 					],
-					'error_message' => 'Dashboard "Empty Dashboard without widgets" already exists.',
+					'error_message' => 'Dashboard "Dashboard for widget ceation" already exists.',
 					'check_save' => true
 				]
 			],
@@ -1679,10 +2453,10 @@ class testFormTemplateDashboards extends CWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		$form->fill($data['dashboard_properties']);
-		$old_values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
+		$filled_data = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 		$form->submit();
 
-		$this->checkSettings($data, $old_values);
+		$this->checkSettings($data, $filled_data);
 	}
 
 	/**
@@ -1698,10 +2472,10 @@ class testFormTemplateDashboards extends CWebTest {
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		$form->fill($data['dashboard_properties']);
-		$old_values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
+		$filled_data = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 		$form->submit();
 
-		$this->checkSettings($data, $old_values, 'updated');
+		$this->checkSettings($data, $filled_data, 'updated');
 	}
 
 	/**
@@ -1744,7 +2518,60 @@ class testFormTemplateDashboards extends CWebTest {
 
 	public static function getWidgetsCreateData() {
 		return [
-			// Renaming a widget
+			// #0 Action log widget with Show lines = 0
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Action log'),
+						'Name' => 'Action log with 0 show lines',
+						'Show lines' => 0
+					],
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// #1 Action log widget with too big value in Show lines field
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Action log'),
+						'Name' => 'Action log with 101 show lines',
+						'Show lines' => 101
+					],
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// #2 Action log with default values
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Action log'),
+						'Name' => 'Action log with default params'
+					]
+				]
+			],
+			// #3 Action log with all possible fields specified
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Action log'),
+						'Name' => 'Action log with all fields specified',
+						'Refresh interval' => '10 minutes',
+						'Recipients' => ['Admin', 'guest'],
+						'Actions' => 'Report problems to Zabbix administrators',
+						'Media types' => ['Email', 'SMS'],
+						'Status' => ['In progress', 'Sent/Executed', 'Failed'],
+						'Search string' => 'Action log',
+						'Sort entries by' => 'Status (ascending)',
+						'Show lines' => 100
+					],
+					'swap_expected' => [
+						'Recipients' => ['Admin (Zabbix Administrator)', 'guest']
+					]
+				]
+			],
+			// #4 Renaming a widget
 			[
 				[
 					'fields' => [
@@ -1753,7 +2580,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// Two identical widgets
+			// #5 Two identical widgets
 			[
 				[
 					'fields' => [
@@ -1763,7 +2590,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'duplicate widget' => true
 				]
 			],
-			// Clock widget with no name
+			// #6 Clock widget with no name
 			[
 				[
 					'fields' => [
@@ -1772,7 +2599,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// Change time type to Server time
+			// #7 Change time type to Server time
 			[
 				[
 					'fields' => [
@@ -1782,7 +2609,7 @@ class testFormTemplateDashboards extends CWebTest {
 					]
 				]
 			],
-			// Change time type to Host time and leave item empty
+			// #8 Change time type to Host time and leave item empty
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1794,18 +2621,21 @@ class testFormTemplateDashboards extends CWebTest {
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
 			],
-			// Change time type to Host time and specify item
+			// #9 Change time type to Host time and specify item
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
 						'Name' => 'Clock widget with Host time',
 						'Time type' => CFormElement::RELOADABLE_FILL('Host time'),
-						'Item' => 'Item ZBX6663 Second'
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					]
 				]
 			],
-			// Widget with trailing and leading spaces in name
+			// #10 Widget with trailing and leading spaces in name
 			[
 				[
 					'fields' => [
@@ -1815,7 +2645,473 @@ class testFormTemplateDashboards extends CWebTest {
 					'trim' => 'Name'
 				]
 			],
-			// Graph Classic widget with missing graph
+			// #11 Clock widget with empty date size
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
+						'Name' => 'Clock widget with empty date size',
+						'Clock type' => 'Digital',
+						'Show' => ['Date', 'Time', 'Time zone'],
+						'Advanced configuration' => true,
+						'id:date_size' => '',
+						'id:time_size' => '',
+						'id:tzone_size' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #12 Clock widget with 0 date size
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
+						'Name' => 'Clock widget with 0 date size',
+						'Clock type' => 'Digital',
+						'Show' => ['Date', 'Time', 'Time zone'],
+						'Advanced configuration' => true,
+						'id:date_size' => 0,
+						'id:time_size' => 0,
+						'id:tzone_size' => 0
+					],
+					'error_message' => [
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #13 Clock widget with out of range date size
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Clock'),
+						'Name' => 'Clock widget with too big date size',
+						'Clock type' => 'Digital',
+						'Show' => ['Date', 'Time', 'Time zone'],
+						'Advanced configuration' => true,
+						'id:date_size' => 101,
+						'id:time_size' => 101,
+						'id:tzone_size' => 101
+					],
+					'error_message' => [
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #14 Discovery status widget
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Discovery status'),
+						'Name' => 'Discovery status widget'
+					]
+				]
+			],
+			// #15 Favorite graphs widget
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Favorite graphs'),
+						'Name' => 'Favorite graphs widget'
+					]
+				]
+			],
+			// #16 Favorite maps widget
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Favorite maps'),
+						'Name' => 'Favorite maps widget'
+					]
+				]
+			],
+			// #17 Gauge widget with empty Item, Min, Mix and Description
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with missing mandatory input fields',
+						'Min' => '',
+						'Max' => '',
+						'Advanced configuration' => true,
+						'id:description' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item": cannot be empty.',
+						'Invalid parameter "Min": cannot be empty.',
+						'Invalid parameter "Max": cannot be empty.',
+						'Invalid parameter "Description": cannot be empty.'
+					]
+				]
+			],
+			// #18 Gauge widget with non-numeric Min and Max
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with non-numeric min and max',
+						'Item' => self::TEMPLATE_ITEM,
+						'Min' => 'abc',
+						'Max' => 'def'
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => [
+						'Invalid parameter "Min": a number is expected.',
+						'Invalid parameter "Max": a number is expected.'
+					]
+				]
+			],
+			// #19 Gauge widget with non-numeric gauge element sizes
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with non-numeric gauge element sizes',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true,
+						'id:desc_size' => 'abc',
+						'id:value_size' => 'abc',
+						'id:value_arc_size' => 'abc',
+						'id:units_size' => 'abc',
+						'id:scale_size' => 'abc'
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM,
+						'id:desc_size' => 0,
+						'id:value_size' => 0,
+						'id:value_arc_size' => 0,
+						'id:units_size' => 0,
+						'id:scale_size' => 0
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => '9',
+							'id:th_show_arc' => true,
+							'id:th_arc_size' => 'abc'
+						]
+					],
+					'error_message' => [
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #20 Gauge widget with 0 gauge element sizes
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with 0 gauge element sizes',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true,
+						'id:desc_size' => 0,
+						'id:value_size' => 0,
+						'id:value_arc_size' => 0,
+						'id:units_size' => 0,
+						'id:scale_size' => 0
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => '9',
+							'id:th_show_arc' => true,
+							'id:th_arc_size' => 0
+						]
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => [
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #21 Gauge widget with too big gauge element sizes
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with too big gauge element sizes',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true,
+						'id:desc_size' => 101,
+						'id:value_size' => 101,
+						'id:value_arc_size' => 101,
+						'id:units_size' => 101,
+						'id:scale_size' => 101
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => '5',
+							'id:th_show_arc' => true,
+							'id:th_arc_size' => 101
+						]
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => [
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #22 Gauge widget with non-numeric threshold
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with non-numeric threshold',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => 'abc'
+						]
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => 'Invalid parameter "Thresholds/1/threshold": a number is expected.'
+				]
+			],
+			// #23 Gauge widget with negative threshold
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with negative threshold',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => '-1'
+						]
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => 'Invalid parameter "Thresholds": value must be no less than "0".'
+				]
+			],
+			// #24 Gauge widget with too high threshold
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with too high threshold',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => '101'
+						]
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => 'Invalid parameter "Thresholds": value must be no greater than "100".'
+				]
+			],
+			// #25 Gauge widget with too much value and scale decimal places
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with too much value and scale decimal places',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true,
+						'id:decimal_places' => 11,
+						'id:scale_decimal_places' => 11
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => [
+						'Invalid parameter "Decimal places": value must be one of 0-10.',
+						'Invalid parameter "Decimal places": value must be one of 0-10.'
+					]
+				]
+			],
+			// #26 Gauge widget with minimum parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with minimal set of parameters',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					]
+				]
+			],
+			// #27 Gauge widget with all parameters defined
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Gauge'),
+						'Name' => 'Gauge with all possible parameters',
+						'Refresh interval' => '10 minutes',
+						'Item' => self::TEMPLATE_ITEM,
+						'Min' => 11,
+						'Max' => 99,
+						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
+						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
+						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
+						'Advanced configuration' => true,
+						'Angle' => '270°',
+						'id:description' => '𒀐 New test Description 😁🙂😁🙂',
+						'id:desc_size' => 30,
+						'id:desc_bold' => true,
+						'id:desc_v_pos' => 'Top',
+						'xpath:.//input[@id="desc_color"]/..' => 'FFB300',
+						'id:decimal_places' => 10,
+						'id:value_size' => 50,
+						'id:value_bold' => true,
+						'xpath:.//input[@id="value_color"]/..' => '283593',
+						'id:value_arc' => true,
+						'id:value_arc_size' => 12,
+						'id:units' => 'Bytes 𒀐  😁',
+						'id:units_size' => 27,
+						'id:units_bold' => true,
+						'id:units_pos' => 'Above value',
+						'xpath:.//input[@id="units_color"]/..' => '4E342E',
+						'id:needle_show' => true,
+						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
+						'id:scale_size' => 33,
+						'id:scale_decimal_places' => 8
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'xpath:.//input[@id="thresholds_0_color"]/..' => 'FFC107',
+							'id:thresholds_0_threshold' => "50",
+							'id:th_show_labels' => true,
+							'id:th_show_arc' => true,
+							'id:th_arc_size' => 55
+						]
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					]
+				]
+			],
+			// #28 Geomap with non-numeric Initial view
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Geomap'),
+						'Name' => 'Geomap with non-numeric Initial view',
+						'Initial view' => 'abc'
+					],
+					'error_message' => 'Invalid parameter "Initial view": geographical coordinates (values of comma'.
+							' separated latitude and longitude) are expected.'
+				]
+			],
+			// #29 Geomap with a single coordinate in Initial view
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Geomap'),
+						'Name' => 'Geomap with one coordinate in Initial view',
+						'Initial view' => '40.68543,'
+					],
+					'error_message' => 'Invalid parameter "Initial view": geographical coordinates (values of comma'.
+							' separated latitude and longitude) are expected.'
+				]
+			],
+			// #30 Geomap with out of range lattitude in Initial view
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Geomap'),
+						'Name' => 'Geomap with out of range lattitude in Initial view',
+						'Initial view' => '90.000001,-74'
+					],
+					'error_message' => 'Invalid parameter "Initial view": geographical coordinates (values of comma'.
+							' separated latitude and longitude) are expected.'
+				]
+			],
+			// #31 Geomap with out of range longitude in Initial view
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Geomap'),
+						'Name' => 'Geomap with out of range longitude in Initial view',
+						'Initial view' => '46,180.0001'
+					],
+					'error_message' => 'Invalid parameter "Initial view": geographical coordinates (values of comma'.
+							' separated latitude and longitude) are expected.'
+				]
+			],
+			// #32 Geomap with minimal set of parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Geomap'),
+						'Name' => 'Geomap with minimal set of parameters'
+					]
+				]
+			],
+			// #33 Geomap with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Geomap'),
+						'Name' => 'Geomap with all possible parameters',
+						'Refresh interval' => '10 seconds',
+						'Initial view' => '89.99999,180'
+					]
+				]
+			],
+			// #34 Graph Classic widget with missing graph
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1823,12 +3119,12 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with empty graph',
 						'Source' => 'Graph',
-						'Graph' => []
+						'Graph' => ''
 					],
 					'error_message' => 'Invalid parameter "Graph": cannot be empty.'
 				]
 			],
-			// Graph Classic widget with missing item
+			// #35 Graph Classic widget with missing item
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1836,36 +3132,42 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with empty item',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
-						'Item' => []
+						'Item' => ''
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
 				]
 			],
-			// Graph Classic widget with graph and legend
+			// #36 Graph Classic widget with graph and legend
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with graph and legend',
 						'Source' => 'Graph',
-						'Graph' => ['Graph ZBX6663 Second'],
+						'Graph' => 'Graph ZBX6663 Second',
 						'Show legend' => true
+					],
+					'swap_expected' => [
+						'Graph' => self::TEMPLATE.': '.'Graph ZBX6663 Second'
 					]
 				]
 			],
-			// Graph Classic widget with Simple graph and without legend
+			// #37 Graph Classic widget with Simple graph and without legend
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Simple graph without legend',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
-						'Item' => ['Item ZBX6663 Second'],
+						'Item' => self::TEMPLATE_ITEM,
 						'Show legend' => false
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					]
 				]
 			],
-			// Graph prototype widget with missing graph prototype
+			// #38 Graph prototype widget with missing graph prototype, Columns and Rows
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1873,12 +3175,18 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty graph',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => []
+						'Graph prototype' => '',
+						'Columns' => '',
+						'Rows' => ''
 					],
-					'error_message' => 'Invalid parameter "Graph prototype": cannot be empty.'
+					'error_message' => [
+						'Invalid parameter "Graph prototype": cannot be empty.',
+						'Invalid parameter "Columns": value must be one of 1-24.',
+						'Invalid parameter "Rows": value must be one of 1-16.'
+					]
 				]
 			],
-			// Graph prototype widget with missing item prototype
+			// #39 Graph prototype widget with missing item prototype
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1886,26 +3194,12 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty item prototype',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
-						'Item prototype' => []
+						'Item prototype' => ''
 					],
 					'error_message' => 'Invalid parameter "Item prototype": cannot be empty.'
 				]
 			],
-			// Graph prototype widget with empty Columns parameter
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
-						'Name' => 'Graph prototype widget with empty Columns (dropped to 0)',
-						'Source' => 'Graph prototype',
-						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
-						'Columns' => ''
-					],
-					'error_message' => 'Invalid parameter "Columns": value must be one of 1-24.'
-				]
-			],
-			// Graph prototype widget with too high number of Columns
+			// #40 Graph prototype widget with too high number of Columns and Rows
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1913,195 +3207,872 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
-						'Columns' => 55
-					],
-					'error_message' => 'Invalid parameter "Columns": value must be one of 1-24.'
-				]
-			],
-			// Graph prototype widget with negative number of Columns
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
-						'Name' => 'Graph prototype widget with too much Columns',
-						'Source' => 'Graph prototype',
-						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
-						'Columns' => '-5'
-					],
-					'error_message' => 'Invalid parameter "Columns": value must be one of 1-24.'
-				]
-			],
-			// Graph prototype widget with missing number of Rows
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
-						'Name' => 'Graph prototype widget with missing Rows (dropped to 0)',
-						'Source' => 'Graph prototype',
-						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
-						'Rows' => ''
-					],
-					'error_message' => 'Invalid parameter "Rows": value must be one of 1-16.'
-				]
-			],
-			// Graph prototype widget with number of Rows too high
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
-						'Name' => 'Graph prototype widget with too much rows',
-						'Source' => 'Graph prototype',
-						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
+						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
+						'Columns' => 55,
 						'Rows' => 55
 					],
-					'error_message' => 'Invalid parameter "Rows": value must be one of 1-16.'
+					'swap_expected' => [
+						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
+					],
+					'error_message' => [
+						'Invalid parameter "Columns": value must be one of 1-24.',
+						'Invalid parameter "Rows": value must be one of 1-16.'
+					]
 				]
 			],
-			// Graph prototype widget with negative number of Rows
+			// #41 Graph prototype widget with negative number of Columns
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
-						'Name' => 'Graph prototype widget with too much rows',
+						'Name' => 'Graph prototype widget with too much Columns',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
+						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
+						'Columns' => '-5',
 						'Rows' => '-5'
 					],
-					'error_message' => 'Invalid parameter "Rows": value must be one of 1-16.'
+					'swap_expected' => [
+						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
+					],
+					'error_message' => [
+						'Invalid parameter "Columns": value must be one of 1-24.',
+						'Invalid parameter "Rows": value must be one of 1-16.'
+					]
 				]
 			],
-			// Graph prototype widget with graph prototype, legend, 2 rows and 2 columns
+			// #42 Graph prototype widget with graph prototype, legend, 2 rows and 2 columns
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget legend',
 						'Source' => 'Graph prototype',
-						'Graph prototype' => ['GraphPrototype ZBX6663 Second'],
+						'Graph prototype' => 'GraphPrototype ZBX6663 Second',
 						'Show legend' => true,
 						'Columns' => 2,
 						'Rows' => 2
+					],
+					'swap_expected' => [
+						'Graph prototype' => self::TEMPLATE.': '.'GraphPrototype ZBX6663 Second'
 					]
 				]
 			],
-			// Graph prototype widget with simple graph prototype, without legend, 2 row and 2 column
+			// #43 Graph prototype widget with simple graph prototype, without legend, 1 row and 1 column
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Simple Graph prototype without legend',
 						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
-						'Item prototype' => ['ItemProto ZBX6663 Second'],
+						'Item prototype' => 'ItemProto ZBX6663 Second',
 						'Show legend' => false,
 						'Columns' => 1,
 						'Rows' => 1
+					],
+					'swap_expected' => [
+						'Item prototype' => self::TEMPLATE.': '.'ItemProto ZBX6663 Second'
 					]
 				]
 			],
-			// Plain text widget with empty Items parameter
+			// #44 Host availability widget with minimal set of parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Host availability'),
+						'Name' => 'Host availability with minimal set of parameters'
+					]
+				]
+			],
+			// #45 Host availability widget with all possible parameters defined
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Host availability'),
+						'Name' => 'Host availability with all possible parameters',
+						'Refresh interval' => '10 minutes',
+						'Interface type' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
+						'Layout' => 'Vertical',
+						'Show data in maintenance' => true
+					]
+				]
+			],
+			// #46 Item value widget with missing field vlues
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item value'),
+						'Name' => 'Item value with missing field values',
+						'Advanced configuration' => true,
+						'id:description' => '',
+						'id:desc_size' => '',
+						'id:time_size' => '',
+						'id:decimal_size' => '',
+						'id:value_size' => '',
+						'id:units_size' => ''
+					],
+					'error_message' => [
+						'Invalid parameter "Item": cannot be empty',
+						'Invalid parameter "Description": cannot be empty.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #47 Item value widget with non-numeric field values
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item value'),
+						'Name' => 'Item value with non-numeric field values',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true,
+						'id:desc_size' => 'abc',
+						'id:time_size' => 'abc',
+						'id:decimal_size' => 'abc',
+						'id:value_size' => 'abc',
+						'id:units_size' => 'abc'
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM,
+						'id:desc_size' => 0,
+						'id:time_size' => 0,
+						'id:decimal_size' => 0,
+						'id:value_size' => 0,
+						'id:units_size' => 0
+					],
+					'error_message' => [
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #48 Item value widget with too low field values
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item value'),
+						'Name' => 'Item value with out of range description size',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true,
+						'id:desc_size' => 0,
+						'id:decimal_places' => -1,
+						'id:time_size' => 0,
+						'id:decimal_size' => 0,
+						'id:value_size' => 0,
+						'id:units_size' => 0
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => [
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Decimal places": value must be one of 0-10.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #49 Item value widget with out of range field values
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item value'),
+						'Name' => 'Item value with out of range time size',
+						'Item' => self::TEMPLATE_ITEM,
+						'Advanced configuration' => true,
+						'id:desc_size' => 101,
+						'id:decimal_places' => 11,
+						'id:time_size' => 101,
+						'id:decimal_size' => 101,
+						'id:value_size' => 101,
+						'id:units_size' => 101
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					],
+					'error_message' => [
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Decimal places": value must be one of 0-10.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #50 Item value widget with minimal set of parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item value'),
+						'Name' => 'Item value with minimal set of parameters',
+						'Item' => self::TEMPLATE_ITEM
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					]
+				]
+			],
+			// #51 Item value widget with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Item value'),
+						'Name' => 'Item value with all possible parameters',
+						'Refresh interval' => '15 minutes',
+						'Item' => self::TEMPLATE_ITEM,
+						'Show' => ['Description', 'Time', 'Value', 'Change indicator'],
+						'Advanced configuration' => true,
+						'id:description' => '!@#$%^&*()_+𒀐😁 description',
+						'id:desc_h_pos' => 'Right',
+						'id:desc_size' => 11,
+						'id:desc_v_pos' => 'Top',
+						'id:desc_bold' => true,
+						'xpath:.//input[@id="desc_color"]/..' => '0080FF',
+						'id:decimal_places' => 7,
+						'id:decimal_size' => 23,
+						'id:value_h_pos' => 'Left',
+						'id:value_size' => 24,
+						'id:value_v_pos' => 'Bottom',
+						'id:value_bold' => false,
+						'xpath:.//input[@id="value_color"]/..' => 'BF00FF',
+						'id:units' => '!@#$%^&*()_+𒀐😁 units',
+						'Position' => 'Below value',
+						'id:units_size' => 15,
+						'id:units_bold' => false,
+						'xpath:.//input[@id="units_color"]/..' => '00FF00',
+						'id:time_h_pos' => 'Right',
+						'id:time_size' => 17,
+						'id:time_v_pos' => 'Middle',
+						'id:time_bold' => true,
+						'xpath:.//input[@id="time_color"]/..' => 'B0BEC5',
+						'xpath:.//input[@id="up_color"]/..' => 'FFBF00',
+						'xpath:.//input[@id="down_color"]/..' => '7B1FA2',
+						'xpath:.//input[@id="updown_color"]/..' => 'AFB42B',
+						'xpath:.//input[@id="bg_color"]/..' => '00131D'
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => 50,
+							'xpath:.//input[@id="thresholds_0_color"]/..' => '8D6E63'
+						]
+					],
+					'swap_expected' => [
+						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
+					]
+				]
+			],
+			// #52 Map widget with missing map
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Map'),
+						'Name' => 'Map widget with missing map'
+					],
+					'error_message' => 'Invalid parameter "Map": cannot be empty.'
+				]
+			],
+			// #53 Map widget with not defined filter
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Map'),
+						'Name' => 'Map widget with not defined filter',
+						'Source type' => 'Map navigation tree'
+					],
+					'form_reload' => true,
+					'error_message' => 'Invalid parameter "Filter": cannot be empty.'
+				]
+			],
+			// #54 Map widget with map
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Map'),
+						'Name' => 'Map widget with map',
+						'Map' => 'Local network'
+					]
+				]
+			],
+			// #55 Map widget with defined filter
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Map'),
+						'Name' => 'Map widget with defined filter',
+						'Refresh interval' => '2 minutes',
+						'Source type' => 'Map navigation tree'
+					],
+					'form_reload' => true,
+					'actions' => [
+						'fill' => [
+							'Filter' => 'Empty navtree widget'
+						]
+					],
+				]
+			],
+			// #56 Map navigation tree widget
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Map navigation tree'),
+						'Name' => 'Map navigation tree widget',
+						'Refresh interval' => '1 minute',
+						'Show unavailable maps' => true
+					]
+				]
+			],
+			// #57 Plain text widget with empty Items parameter
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget with empty Items',
-						'Items' => []
-					],
-					'error_message' => 'Invalid parameter "Items": cannot be empty.'
-				]
-			],
-			// Plain text widget with empty Show lines parameter (reset to 0)
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
-						'Name' => 'Plain text widget with empty Show lines',
-						'Items' => ['Item ZBX6663 Second'],
+						'Items' => '',
 						'Show lines' => ''
 					],
-					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+					'error_message' => [
+						'Invalid parameter "Items": cannot be empty.',
+						'Invalid parameter "Show lines": value must be one of 1-100.'
+					]
 				]
 			],
-			// Plain text widget with too high value of Show lines parameter
+			// #58 Plain text widget with too high value of Show lines parameter
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget with too much lines',
-						'Items' => ['Item ZBX6663 Second'],
+						'Items' => self::TEMPLATE_ITEM,
 						'Show lines' => 999
+					],
+					'swap_expected' => [
+						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// Plain text widget with negative Show lines parameter
+			// #59 Plain text widget with negative Show lines parameter
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget with negative Show lines',
-						'Items' => ['Item ZBX6663 Second'],
-						'Show lines' => '-9'
+						'Items' => self::TEMPLATE_ITEM,
+						'Show lines' => -9
+					],
+					'swap_expected' => [
+						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// Plain text widget with Items location = top and text shown as HTML
+			// #60 Plain text widget with Items location = top and text shown as HTML
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget top location HTML',
-						'Items' => ['Item ZBX6663 Second'],
+						'Items' => self::TEMPLATE_ITEM,
 						'Show lines' => 9,
 						'Items location' => 'Top',
 						'Show text as HTML' => true
+					],
+					'swap_expected' => [
+						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					]
 				]
 			],
-			// Plain text widget with Items location = left and text shown as plain text
+			// #61 Plain text widget with Items location = left and text shown as plain text
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Plain text'),
 						'Name' => 'Plain text widget left location no HTML',
-						'Items' => ['Item ZBX6663 Second'],
+						'Items' => self::TEMPLATE_ITEM,
 						'Show lines' => 9,
 						'Items location' => 'Left',
 						'Show text as HTML' => false
+					],
+					'swap_expected' => [
+						'Items' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					]
 				]
 			],
-			// URL widget with empty URL
+			// #62 Problem hosts widget with default parameters
+			[
+				[
+
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problem hosts'),
+						'Name' => 'Problem hosts with default parameters'
+					]
+				]
+			],
+			// #63 Problem hosts widget with all possible parameters
+			[
+				[
+
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problem hosts'),
+						'Name' => 'Problem hosts with all possible parameters',
+						'Refresh interval' => '10 minutes',
+						'Problem' => 'Everything became so expensive',
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+						'Problem tags' => 'Or',
+						'id:tags_0_tag' => 'tag_name',
+						'id:tags_0_operator' => 'Does not contain',
+						'id:tags_0_value' => 'tag_value',
+						'Show suppressed problems' => true,
+						'Problem display' => 'Unacknowledged only'
+					]
+				]
+			],
+			// #64 Problems widget with empty Show lines parameter (reset to 0)
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Type' => CFormElement::RELOADABLE_FILL('URL'),
-						'Name' => 'URL widget with empty URL'
+						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
+						'Name' => 'Problems widget with empty Show lines',
+						'Show lines' => ''
 					],
-					'error_message' => 'Invalid parameter "URL": cannot be empty.'
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
-			// URL widget with incorrect URL
+			// #65 Problems widget with too high value of Show lines parameter
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
+						'Name' => 'roblems widget with too much lines',
+						'Show lines' => 101
+					],
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// #66 Problems widget with negative Show lines parameter
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
+						'Name' => 'Problems widget with negative Show lines',
+						'Show lines' => -1
+					],
+					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			// #67 Problems widget with default parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
+						'Name' => 'Problems widget with default parameters'
+					]
+				]
+			],
+			// #68 Problems widget with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
+						'Name' => 'Problems widget with all parameters',
+						'Refresh interval' => 'No refresh',
+						'Show' => 'History',
+						'Problem' => 'Education and healthcare are regressing in my country',
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+						'Problem tags' => 'Or',
+						'id:tags_0_tag' => 'tag_name',
+						'id:tags_0_operator' => 'Does not contain',
+						'id:tags_0_value' => 'tag_value',
+						'Show tags' => 2,
+						'Tag name' => 'Shortened',
+						'Tag display priority' => 'young,old',
+						'Show operational data' => 'With problem name',
+						'Show symptoms' => true,
+						'Show suppressed problems' => true,
+						'id:acknowledgement_status' => 'Acknowledged',
+						'id:acknowledged_by_me' => true,
+						'Sort entries by' => 'Time (ascending)',
+						'Show timeline' => true,
+						'Show lines' => 11
+					]
+				]
+			],
+			// #69 Problems by severity widget with default parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problems by severity'),
+						'Name' => 'Problems by severity widget with default parameters'
+					]
+				]
+			],
+			// #70 Problems by severity widget with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Problems by severity'),
+						'Name' => 'Problems by severity widget with all parameters',
+						'Refresh interval' => '10 seconds',
+						'Problem' => 'Our reality is disapointing',
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+						'Problem tags' => 'Or',
+						'id:tags_0_tag' => 'tag_name',
+						'id:tags_0_operator' => 'Does not equal',
+						'id:tags_0_value' => 'tag_value',
+						'Layout' => 'Vertical',
+						'Show operational data' => 'Separately',
+						'Show suppressed problems' => true,
+						'Problem display' => 'Separated',
+						'Show timeline' => true
+					]
+				]
+			],
+			// #71 SLA report widget with missing SLA
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with missing SLA'
+					],
+					'error_message' => 'Invalid parameter "SLA": cannot be empty.'
+				]
+			],
+			// #72 SLA widget with non-numeric show periods.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with non-numeric show periods',
+						'SLA' => 'SLA Daily',
+						'Show periods' => 'abc'
+					],
+					'swap_expected' => [
+						'Show periods' => 0
+					],
+					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
+				]
+			],
+			// #73 SLA widget with too large value in show periods.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with too large value in show periods',
+						'SLA' => 'SLA Daily',
+						'Show periods' => '101'
+					],
+					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
+				]
+			],
+			// #74 SLA widget with floating point value in show periods.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with float in show periods',
+						'SLA' => 'SLA Daily',
+						'Show periods' => '0.5'
+					],
+					'swap_expected' => [
+						'Show periods' => 0
+					],
+					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
+				]
+			],
+			// #75 SLA widget with negative value in show periods.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with negative show periods',
+						'SLA' => 'SLA Daily',
+						'Show periods' => '-5'
+					],
+					'error_message' => 'Invalid parameter "Show periods": value must be one of 1-100.'
+				]
+			],
+			// #76 SLA widget with string type From and To dates.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with strings in From and To',
+						'SLA' => 'SLA Daily',
+						'From' => 'yesterday',
+						'To' => 'today + 1 day'
+					],
+					'error_message' => [
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
+					]
+				]
+			],
+			// #77 SLA widget with wrong From date and TO date format.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with wrong From and To format',
+						'SLA' => 'SLA Daily',
+						'From' => '2022/01/01',
+						'To' => '2022/02/01'
+					],
+					'error_message' => [
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
+					]
+				]
+			],
+			// #78 SLA widget with from date and To date too far in the past.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with From and To too far in the past',
+						'SLA' => 'SLA Daily',
+						'From' => '1968-01-01',
+						'To' => '1969-10-10'
+					],
+					'error_message' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
+				]
+			],
+			// #79 SLA widget with from date and To date too far in the future.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with From and To too far in the future',
+						'SLA' => 'SLA Daily',
+						'From' => '2040-01-01',
+						'To' => '2050-10-10'
+					],
+					'error_message' => [
+						'Incorrect value for field "From": a date is expected.',
+						'Incorrect value for field "To": a date is expected.'
+					]
+				]
+			],
+			// #80 SLA widget with minimal set of parameters.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with minimal set of parameters',
+						'SLA' => 'SLA Daily'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #81 SLA widget with all possible parameters set.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with all possible parameters',
+						'Refresh interval' => '15 minutes',
+						'SLA' => 'SLA Daily',
+						'Service' => 'Simple actions service',
+						'Show periods' => 15,
+						'From' => '2023-08-01',
+						'To' => '2023-08-10'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #82 SLA widget with dynamic From and To.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('SLA report'),
+						'Name' => 'SLA report widget with dynamic From and To',
+						'SLA' => 'SLA Daily',
+						'From' => 'now/y',
+						'To' => 'now/y+1M-1w-1d'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #83 System information widget with default parameters.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('System information'),
+						'Name' => 'System information widget with default parameters'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #84 System information widget with all parameters specified.
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('System information'),
+						'Name' => 'System information widget with all parameters',
+						'Refresh interval' => '2 minutes',
+						'Show' => 'High availability nodes'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #85 Top triggers widget with empty Trigger count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
+						'Name' => 'Top triggers widget with empty Trigger count',
+						'Trigger count' => ''
+					],
+					'page' => '2nd page',
+					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+				]
+			],
+			// #86 Top triggers widget with non-numeric Trigger count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
+						'Name' => 'Top triggers widget with non-numeric Trigger count',
+						'Trigger count' => 'abc'
+					],
+					'swap_expected' => [
+						'Trigger count' => 0
+					],
+					'page' => '2nd page',
+					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+				]
+			],
+			// #87 Top triggers widget with zero Trigger count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
+						'Name' => 'Top triggers widget with zero Trigger count',
+						'Trigger count' => 0
+					],
+					'page' => '2nd page',
+					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+				]
+			],
+			// #88 Top triggers widget with out of range Trigger count.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
+						'Name' => 'Top triggers widget with out of range Trigger count',
+						'Trigger count' => 101
+					],
+					'page' => '2nd page',
+					'error_message' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+				]
+			],
+			// #89 Top triggers widget with default parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
+						'Name' => 'Top triggers widget with default parameters'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #90 Top triggers widget with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Top triggers'),
+						'Name' => 'Top triggers widget with all possible parameters',
+						'Refresh interval' => '30 seconds',
+						'Problem' => 'Our plnet is doomed',
+						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+						'Problem tags' => 'Or',
+						'id:tags_0_tag' => 'tag_name',
+						'id:tags_0_operator' => 'Does not contain',
+						'id:tags_0_value' => 'tag_value',
+						'Trigger count' => 100
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #91 Trigger overview widget with default parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Trigger overview'),
+						'Name' => 'Trigger overview widget with default parameters'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #92 Trigger overview widget with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Trigger overview'),
+						'Name' => 'Trigger overview widget with all parameters',
+						'Refresh interval' => '10 seconds',
+						'Show' => 'Any',
+						'Problem tags' => 'Or',
+						'id:tags_0_tag' => 'tag_name',
+						'id:tags_0_operator' => 'Contains',
+						'id:tags_0_value' => 'tag_value',
+						'Show suppressed problems' => true,
+						'Host location' => 'Top'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #93 URL widget with special symbols in URL
 			[
 				[
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('URL'),
 						'Name' => 'URL widget with text URL',
-						'URL' => 'home_sweet_home'
-					]
+						'Refresh interval' => '10 minutes',
+						'URL' => '!@#$%^&*()_+ļūāšķ'
+					],
+					'page' => '2nd page'
 				]
 			],
-			// URL widget with trailing and leading spaces in URL
+			// #94 URL widget with trailing and leading spaces in URL
 			[
 				[
 					'fields' => [
@@ -2109,10 +4080,11 @@ class testFormTemplateDashboards extends CWebTest {
 						'Name' => 'URL widget with trailing and leading spaces in URL',
 						'URL' => '    URL    '
 					],
-					'trim' => 'URL'
+					'trim' => 'URL',
+					'page' => '2nd page'
 				]
 			],
-			// URL widget with spaces in URL
+			// #95 URL widget with empty URL (after trimming)
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2122,7 +4094,61 @@ class testFormTemplateDashboards extends CWebTest {
 						'URL' => '     '
 					],
 					'trim' => 'URL',
+					'page' => '2nd page',
 					'error_message' => 'Invalid parameter "URL": cannot be empty.'
+				]
+			],
+			// #96 Web monitoring widget with default parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Web monitoring'),
+						'Name' => 'Web monitoring widget with default parameters'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #97 Web monitoring widget with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Web monitoring'),
+						'Name' => 'Web monitoring widget with all parameters',
+						'Refresh interval' => '30 seconds',
+						'Scenario tags' => 'Or',
+						'id:tags_0_tag' => 'tag_name',
+						'id:tags_0_operator' => 'Equals',
+						'id:tags_0_value' => 'tag_value',
+						'Show data in maintenance' => true
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #98 Data overview widget with default parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Data overview'),
+						'Name' => 'Data overview widget with default parameters'
+					],
+					'page' => '2nd page'
+				]
+			],
+			// #99 Data overview widget with all possible parameters
+			[
+				[
+					'fields' => [
+						'Type' => CFormElement::RELOADABLE_FILL('Data overview'),
+						'Name' => 'Data overview widget with all parameters',
+						'Refresh interval' => '10 seconds',
+						'Item tags' => 'Or',
+						'id:tags_0_tag' => 'tag_name',
+						'id:tags_0_operator' => 'Equals',
+						'id:tags_0_value' => 'tag_value',
+						'Show suppressed problems' => true,
+						'Host location' => 'Top'
+					],
+					'page' => '2nd page'
 				]
 			]
 		];
@@ -2143,13 +4169,82 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
 		}
 
+		if (CTestArrayHelper::get($data, 'page')) {
+			CDashboardElement::find()->one()->selectPage($data['page']);
+		}
+
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+
+		// Set widget configuration and save filled in data for further validation.
+		$filled_data = $this->fillWidgetConfigurationFrom($data);
+
+		// For some fields default values or contextshould be added to the reference aray befor comparison.
+		if (array_key_exists('swap_expected', $data)) {
+			foreach ($data['swap_expected'] as $swap_field => $new_value) {
+				$data['fields'][$swap_field] = $new_value;
+			}
+		}
+
+		$this->checkSettings($data, $filled_data, 'updated', 'widget create');
+	}
+
+	/**
+	 * Function that checks update of template dashboards widgets parameters.
+	 *
+	 * @dataProvider getWidgetsCreateData
+	 */
+	public function testFormTemplateDashboards_UpdateWidget($data) {
+		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_for_update);
+		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
+
+		// Update widget configuration and save filled in data for further validation.
+		$filled_data = $this->fillWidgetConfigurationFrom($data);
+
+		// For some fields default values or contextshould be added to the reference aray befor comparison.
+		if (array_key_exists('swap_expected', $data)) {
+			foreach ($data['swap_expected'] as $swap_field => $new_value) {
+				$data['fields'][$swap_field] = $new_value;
+			}
+		}
+
+		$this->checkSettings($data, $filled_data, 'updated', 'widget update');
+	}
+
+	/**
+	 * Fill in widget configuration and save filled in data for further validation.
+	 *
+	 * @param array	$data	data provider
+	 *
+	 * @return array
+	 */
+	protected function fillWidgetConfigurationFrom($data) {
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$form->fill($data['fields']);
+
+		// Some field changes, like changing the type of map widget, result in dialog reload, so need to wait until its done.
+		if (CTestArrayHelper::get($data, 'form_reload')) {
+			$dialog->waitUntilReady();
+		}
+
+		// To reach some fields additional actions need to be taken, sometimes even more than one action.
+		if (array_key_exists('actions', $data)) {
+			foreach ($data['actions'] as $type => $action_element) {
+				if ($type === 'click') {
+					$form->query($action_element)->one()->click();
+				}
+				else {
+					foreach ($action_element as $field => $value) {
+						$form->getField($field)->fill($value);
+					}
+				}
+			}
+		}
 
 		// Trimming is only triggered together with an on-change event which is generated once focus is removed.
 		$this->page->removeFocus();
-		$old_values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
+		$form->invalidate();
+		$filled_data = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 		$form->submit();
 
 		// In case of the scenario with identical widgets the same widget needs to be added once again.
@@ -2161,26 +4256,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$form->submit();
 		}
 
-		$this->checkSettings($data, $old_values, 'updated', 'widget create');
-	}
-
-	/**
-	 * Function that checks update of template dashboards widgets parameters.
-	 *
-	 * @dataProvider getWidgetsCreateData
-	 */
-	public function testFormTemplateDashboards_UpdateWidget($data) {
-		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_for_update);
-
-		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
-		COverlayDialogElement::find()->waitUntilReady();
-		$form->fill($data['fields']);
-		$this->page->removeFocus();
-		COverlayDialogElement::find()->waitUntilReady();
-		$old_values = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
-		$form->submit();
-
-		$this->checkSettings($data, $old_values, 'updated', 'widget update');
+		return $filled_data;
 	}
 
 	/**
@@ -2193,13 +4269,19 @@ class testFormTemplateDashboards extends CWebTest {
 	 */
 	public function testFormTemplateDashboards_ViewDashboardOnHost() {
 		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::HOST_FOR_TEMPLATE);
+		$this->query('xpath://span[text()="Dashboard with all widgets"]')->one()->waitUntilVisible()->click();
 		$this->page->waitUntilReady();
-		$this->query('xpath://button[@title="Dashboard list"]')->asPopupButton()->one()
-				->select('Dashboard with all widgets');
 
+		// TODO: should be fixed after git-hook improvements in DEV-2396
 		$skip_selectors = [
 			'class:clock',
 			'class:flickerfreescreen',
+			'class:svg-graph-grid',
+			'class:svg-graph-axis-bottom',
+			"xpath://div[@class='dashboard-grid-widget-contents dashboard-widget-slareport']//thead//th[3]",
+			"xpath://div[@class='dashboard-grid-widget-contents dashboard-widget-slareport']//thead//th[4]",
+			"xpath://div[@class='dashboard-grid-widget-contents dashboard-widget-slareport']//thead//th[5]",
+			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
 			'xpath://footer'
 		];
@@ -2297,21 +4379,25 @@ class testFormTemplateDashboards extends CWebTest {
 	 * Function that checks the previously saved dashboard settings form.
 	 *
 	 * @param array		$data			Data provider.
-	 * @param array		$old_values		Values obtained from the configuration form before saving the dashboard.
+	 * @param array		$filled_data	Values obtained from the configuration form before saving the dashboard.
 	 * @param string	$status			Expected successful action that was made to the dashboard after saving it.
 	 * @param string	$check			Action that should be checked.
 	 */
-	private function checkSettings($data, $old_values, $status = 'created', $check = 'dashboard action') {
+	private function checkSettings($data, $filled_data, $status = 'created', $check = 'dashboard action') {
+		$reference_data = ($check === 'dashboard action') ? $data['dashboard_properties'] : $data['fields'];
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if (CTestArrayHelper::get($data, 'check_save')) {
 				$this->query('button:Save changes')->one()->click();
 			}
 			else {
 				if (array_key_exists('trim', $data)) {
-					$old_values[$data['trim']] = trim($old_values[$data['trim']]);
+					$filled_data[$data['trim']] = trim($filled_data[$data['trim']]);
+					$reference_data[$data['trim']] = trim($data['fields'][$data['trim']]);
 				}
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
-				$this->assertEquals($old_values, $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
+				$this->assertEquals($filled_data, $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
+				$form->checkValue($reference_data);
 			}
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			$this->closeDialogue();
@@ -2337,16 +4423,21 @@ class testFormTemplateDashboards extends CWebTest {
 			}
 
 			// Trim trailing and leading spaces from reference dashboard name if necessary.
-			$created_values = $old_values;
+			$created_values = $filled_data;
 			if (array_key_exists('trim', $data)) {
 				$created_values[$data['trim']] = trim($created_values[$data['trim']]);
+				$reference_data[$data['trim']] = trim($reference_data[$data['trim']]);
 			}
 
 			$dashboard_name = ($check === 'dashboard action')
-					? $created_values['Name']
-					: (($check === 'widget create') ? 'Empty Dashboard without widgets' : 'Dashboard for widget update');
+					? $reference_data['Name']
+					: (($check === 'widget create') ? 'Dashboard for widget ceation' : 'Dashboard for widget update');
 			$this->query('link', $dashboard_name)->one()->waitUntilClickable()->click();
 			$this->page->waitUntilReady();
+
+			if (CTestArrayHelper::get($data, 'page') && $check === 'widget create') {
+				CDashboardElement::find()->one()->selectPage($data['page']);
+			}
 
 			if ($check !== 'dashboard action') {
 				$reopened_form = CDashboardElement::find()->waitUntilReady()->one()->getWidget($name)->edit();
@@ -2356,7 +4447,14 @@ class testFormTemplateDashboards extends CWebTest {
 				$reopened_form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
 
-			$this->assertEquals($created_values, $reopened_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
+			if (array_key_exists('Advanced configuration', $reference_data)) {
+				$reopened_form->fill(['Advanced configuration' => true]);
+			}
+
+			$this->assertEquals($created_values, $reopened_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))
+					->asValues()
+			);
+			$reopened_form->checkValue($reference_data);
 
 			$this->closeDialogue();
 		}
