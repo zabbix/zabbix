@@ -195,6 +195,9 @@ class CApiInputValidator {
 			case API_DNS:
 				return self::validateDns($rule, $data, $path, $error);
 
+			case API_HOST_ADDRESS:
+				return self::validateHostAddress($rule, $data, $path, $error);
+
 			case API_PORT:
 				return self::validatePort($rule, $data, $path, $error);
 
@@ -322,6 +325,7 @@ class CApiInputValidator {
 			case API_IP:
 			case API_IP_RANGES:
 			case API_DNS:
+			case API_HOST_ADDRESS:
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
 			case API_EVENT_NAME:
@@ -2597,6 +2601,20 @@ class CApiInputValidator {
 			return false;
 		}
 
+		return self::checkIp($flags, $data, $path, $error);
+	}
+
+	/**
+	 * Check IP syntax.
+	 *
+	 * @param int    $flags  API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkIp($flags, &$data, $path, &$error) {
 		$ip_parser = new CIPParser([
 			'v6' => ZBX_HAVE_IPV6,
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
@@ -2688,6 +2706,20 @@ class CApiInputValidator {
 			return false;
 		}
 
+		return self::checkDns($flags, $data, $path, $error);
+	}
+
+	/**
+	 * Check DNS syntax.
+	 *
+	 * @param int    $flags  API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO, API_ALLOW_MACRO
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function checkDns($flags, &$data, $path, &$error) {
 		$dns_parser = new CDnsParser([
 			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
 			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
@@ -2700,6 +2732,47 @@ class CApiInputValidator {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Proxy host address validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+
+	private static function validateHostAddress($rule, &$data, $path, &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+			return true;
+		}
+
+		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			return false;
+		}
+
+		$e = '';
+
+		if (self::checkIp($flags, $data, $path, $e) || self::checkDns($flags, $data, $path, $e)) {
+			return true;
+		}
+
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP or DNS is expected'));
+
+		return false;
 	}
 
 	/**

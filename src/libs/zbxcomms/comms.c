@@ -319,10 +319,11 @@ int	zbx_socket_start(char **error)
  * Purpose: initialize socket                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_clean(zbx_socket_t *s)
+void	zbx_socket_clean(zbx_socket_t *s)
 {
 	memset(s, 0, sizeof(zbx_socket_t));
 
+	s->socket = ZBX_SOCKET_ERROR;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 }
 
