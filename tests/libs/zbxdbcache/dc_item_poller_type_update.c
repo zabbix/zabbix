@@ -237,8 +237,8 @@ void	zbx_mock_test_entry(void **state)
 
 		if (PROXY == test_config.monitored)
 		{
-			while (0 == host.proxy_hostid)
-				host.proxy_hostid = rand();
+			while (0 == host.proxyid)
+				host.proxyid = rand();
 		}
 
 		zbx_snprintf(buffer, sizeof(buffer), "host is monitored %s and is %sreachable, item type is %d, "

@@ -1,14 +1,36 @@
 Changes for 7.0.0alpha4
 
 New features:
-.........T [ZBXNEXT-8581] added support HTTP proxy in Azure templates (egordymov)
+.........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
+..F....... [ZBXNEXT-8421] implemented dashboard tabs navigation for host dashboards (ashubin, dpetra)
+A.F.I..PS. [ZBXNEXT-8500,ZBXNEXT-8506] moved proxies to separate database tables (dfofanovs, dgoloscapov, jfreibergs, mprihodko, vmaksimovs, vso)
+.........T [ZBXNEXT-8633] added asynchronous SNMP poller metrics to Zabbix health templates (drasikhov)
+...G....S. [ZBXNEXT-4781] added new eventlog.count item key (kprutkovs)
+.........T [ZBXNEXT-8581] added support for HTTP proxy in Azure templates (egordymov)
 ....I...S. [ZBXNEXT-8520] turned auditlog table into hypertable (askolmeisters)
 .........T [ZBXNEXT-8558] added MantisBT webhook (abiba)
-.........T [ZBXNEXT-8589] updated documentation, unified metrics names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
+.........T [ZBXNEXT-8589] updated documentation, unified metric names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
 ..F....... [ZBXNEXT-8563] added warning messages that Oracle DB is deprecated on setup page and in System information widget and report (kkuzmina)
 .........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
 
 Bug fixes:
+..F....... [ZBX-21255] added support of the fmtnum() function for {ITEM.VALUE}, {ITEM.LASTVALUE} and expression macros (Sasha)
+........S. [ZBX-22771] fixed handling of large unsigned integers in jsonpath (dgoloscapov)
+...G...... [ZBX-22871] fixed regular expression crash with invalid utf-8 sequences when pcre2 is used (wiper)
+.......PS. [ZBX-23141] fixed crash when maintenance is enabled and unexpected event exists for trigger prototype (vso)
+...G...... [ZBX-23068] fixed crash and memory leak when using system.sw.os.get key (vso)
+........S. [ZBX-21695] fixed {TIME} macro not being resolved during scheduled report test (vso)
+...G...PS. [ZBX-23221] fixed memory leaks when using certificate-based encryption in Zabbix Agent 1 and Agent 2; thanks to Masato Hirahata for the patch (akozlovs, Andris)
+.......PS. [ZBX-22864] fixed calculation of max_repetitions sent out to device in SNMP PDUs (mprihodko)
+A......... [ZBX-23234] fixed inability to link a template containing an item that depends on web scenario item (vmaksimovs)
+A......... [ZBX-23210] fixed inability to unlink a template containing items with empty value map from a template (vmaksimovs)
+.......PS. [ZBXNEXT-8567] added asynchronous SNMP pollers (vso)
+..F....... [ZBX-22677] adjusted font colors for placeholders, disabled and readonly fields (dfofanovs)
+.........T [ZBX-21574] optimized Asterisk by HTTP template (egordymov)
+...G...PS. [ZBX-18168] added regexp runtime error logging for log*[] items (Andris)
+..F....... [ZBX-22972] fixed displaying of dashboard pages when scrolling is enabled (apoga)
+........S. [ZBX-23067] enhanced audit logging with reason of switching of HA node to active mode (arimdjonoks)
+...G...... [ZBX-22535] fixed Zabbix agent 2 configuration with empty values (esneiders)
 ..F....... [ZBX-22027] fixed "Update problem" position in trigger context menu (agriscenko)
 ..F....... [ZBX-22757] fixed action condition labels when custom expression is set (esekace)
 A......... [ZBX-22613] fixed script execution with API token as authentication (epulke)
@@ -180,14 +202,30 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.6rc1
 
 New features:
-.........T [ZBXNEXT-8581] added support HTTP proxy in Azure templates (egordymov)
+.........T [ZBXNEXT-8581] added support for HTTP proxy in Azure templates (egordymov)
 .........T [ZBXNEXT-8558] added MantisBT webhook (abiba)
-.........T [ZBXNEXT-8589] updated documentation, unified metrics names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
+.........T [ZBXNEXT-8589] updated documentation, unified metric names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
 .........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
 ..F....PS. [ZBXNEXT-8190] increased MariaDB maximum supported version to 11.0 (mprihodko)
 ..F....PS. [ZBXNEXT-8582] increased MySQL maximum supported version to 8.1 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-22771] fixed handling of large unsigned integers in jsonpath (dgoloscapov)
+...G...... [ZBX-22871] fixed regular expression crash with invalid utf-8 sequences when pcre2 is used (wiper)
+.......PS. [ZBX-23141] fixed crash when maintenance is enabled and unexpected event exists for trigger prototype (vso)
+..F....... [ZBX-21255] added support of the fmtnum() function for {ITEM.VALUE}, {ITEM.LASTVALUE} and expression macros (Sasha)
+...G...... [ZBX-23068] fixed crash and memory leak when using system.sw.os.get key (vso)
+........S. [ZBX-21695] fixed {TIME} macro not being resolved during scheduled report test (vso)
+...G...PS. [ZBX-23221] fixed memory leaks when using certificate-based encryption in Zabbix Agent 1 and Agent 2; thanks to Masato Hirahata for the patch (akozlovs, Andris)
+..F....... [ZBX-23139] fixed incorrect response on enter key for configuration discovery edit form (dfofanovs)
+.......PS. [ZBX-22864] fixed calculation of max_repetitions sent out to device in SNMP PDUs (mprihodko)
+A......... [ZBX-23234] fixed inability to link a template containing an item that depends on web scenario item (vmaksimovs)
+.........T [ZBX-21574] optimized Asterisk by HTTP template (egordymov)
+...G...PS. [ZBX-18168] added regexp runtime error logging for log*[] items (Andris)
+..F....... [ZBX-22677] adjusted font colors for placeholders, disabled and readonly fields (dfofanovs)
+..F....... [ZBX-22972] fixed displaying of dashboard pages when scrolling is enabled (apoga)
+..F....... [ZBX-22528] fixed draggable element position (ashubin, dpetra)
+........S. [ZBX-23067] enhanced audit logging with reason of switching of HA node to active mode (arimdjonoks)
 ..F....... [ZBX-22027] fixed "Update problem" position in trigger context menu (agriscenko)
 ..F....... [ZBX-22757] fixed action condition labels when custom expression is set (esekace)
 A......... [ZBX-22613] fixed script execution with API token as authentication (epulke)
@@ -1531,14 +1569,27 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.21rc1
 
 New features:
-.........T [ZBXNEXT-8581] added support HTTP proxy in Azure templates (egordymov)
+.........T [ZBXNEXT-8581] added support for HTTP proxy in Azure templates (egordymov)
 .........T [ZBXNEXT-8558] added MantisBT webhook (abiba)
-.........T [ZBXNEXT-8589] updated documentation, unified metrics names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
+.........T [ZBXNEXT-8589] updated documentation, unified metric names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
 .........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
 ..F....PS. [ZBXNEXT-8190] increased MariaDB maximum supported version to 11.0 (mprihodko)
 ..F....PS. [ZBXNEXT-8582] increased MySQL maximum supported version to 8.1 (mprihodko)
 
 Bug fixes:
+........S. [ZBX-22771] fixed handling of large unsigned integers in jsonpath (dgoloscapov)
+...G...... [ZBX-22871] fixed regular expression crash with invalid utf-8 sequences when pcre2 is used (wiper)
+.......PS. [ZBX-23141] fixed crash when maintenance is enabled and unexpected event exists for trigger prototype (vso)
+..F....... [ZBX-21255] added support of the fmtnum() function for {ITEM.VALUE}, {ITEM.LASTVALUE} and expression macros (Sasha)
+........S. [ZBX-21695] fixed {TIME} macro not being resolved during scheduled report test (vso)
+...G...PS. [ZBX-23221] fixed memory leaks when using certificate-based encryption in Zabbix Agent 1 and Agent 2; thanks to Masato Hirahata for the patch (akozlovs, Andris)
+.......PS. [ZBX-22864] fixed calculation of max_repetitions sent out to device in SNMP PDUs (mprihodko)
+.........T [ZBX-21574] optimized Asterisk by HTTP template (egordymov)
+...G...PS. [ZBX-18168] added regexp runtime error logging for log*[] items (Andris)
+..F....... [ZBX-22677] adjusted font colors for placeholders, disabled and readonly fields (dfofanovs)
+..F....... [ZBX-22972] fixed displaying of dashboard pages when scrolling is enabled (apoga)
+..F....... [ZBX-22528] fixed draggable element position (ashubin, dpetra)
+........S. [ZBX-23067] enhanced audit logging with reason of switching of HA node to active mode (arimdjonoks)
 A......... [ZBX-22613] fixed script execution with API token as authentication (epulke)
 .........T [ZBX-23060] removed unused endpoints in JavaScript for Veeam Backup and Replication template (egordymov)
 ........S. [ZBX-22772] added trends cleanup for non-numeric value types (wiper)
@@ -4198,9 +4249,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.37rc1
+Changes for 5.0.38rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37
+
+5.0.37rc1 was released as 5.0.37 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37rc1
 
 Bug fixes:
 ...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
@@ -7031,9 +7092,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.48rc1
+Changes for 4.0.49rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48
+
+4.0.48rc1 was released as 4.0.48 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48rc1
 
 Bug fixes:
 

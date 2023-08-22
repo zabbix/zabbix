@@ -804,52 +804,55 @@ out:
 #undef EVT_VARIANT_TYPE_MASK
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose:  processes Event Log file in batch                                *
- *                                                                            *
- * Parameters: addrs            - [IN] vector for passing server and port     *
- *                                     where to send data                     *
- *             agent2_result    - [IN] address of buffer where to store       *
- *                                     matching log records (used only in     *
- *                                     Agent2)                                *
- *             eventlog_name    - [IN]                                        *
- *             render_context   - [IN] handle to rendering context            *
- *             query            - [IN] handle to query results                *
- *             lastlogsize      - [IN] position of last processed record      *
- *             FirstID          - [IN] first record in Event Log file         *
- *             LastID           - [IN] last record in Event Log file          *
- *             regexps          - [IN] set of regexp rules for Event Log test *
- *             pattern          - [IN] regular expression or global regular   *
- *                                     expression name (@<global regexp       *
- *                                     name>).                                *
- *             key_severity     - [IN] severity of logged data sources        *
- *             key_source       - [IN] name of logged data source             *
- *             key_logeventid   - [IN] application-specific identifier for    *
- *                                     event                                  *
- *             rate             - [IN] threshold of records count at time     *
- *             process_value_cb - [IN] callback function for sending data to  *
- *                                     server                                 *
- *             config_tls       - [IN]                                        *
- *             config_timeout   - [IN]                                        *
- *             config_source_ip - [IN]                                        *
- *             config_hostname  - [IN]                                        *
- *             metric           - [IN/OUT] parameters for Event Log process   *
- *             lastlogsize_sent - [OUT] position of last record sent to       *
- *                                      server                                *
- *             prov_meta        - [IN/OUT] provider metadata cache            *
- *             error            - [OUT] error message in case of failure      *
- *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose:  processes Event Log file in batch                                  *
+ *                                                                              *
+ * Parameters: addrs              - [IN] vector for passing server and port     *
+ *                                       where to send data                     *
+ *             agent2_result      - [IN] address of buffer where to store       *
+ *                                       matching log records (used only in     *
+ *                                       Agent2)                                *
+ *             eventlog_name      - [IN]                                        *
+ *             render_context     - [IN] handle to rendering context            *
+ *             query              - [IN] handle to query results                *
+ *             lastlogsize        - [IN] position of last processed record      *
+ *             FirstID            - [IN] first record in Event Log file         *
+ *             LastID             - [IN] last record in Event Log file          *
+ *             regexps            - [IN] set of regexp rules for Event Log test *
+ *             pattern            - [IN] regular expression or global regular   *
+ *                                       expression name (@<global regexp       *
+ *                                       name>).                                *
+ *             key_severity       - [IN] severity of logged data sources        *
+ *             key_source         - [IN] name of logged data source             *
+ *             key_logeventid     - [IN] application-specific identifier for    *
+ *                                       event                                  *
+ *             rate               - [IN] threshold of records count at time     *
+ *             process_value_cb   - [IN] callback function for sending data to  *
+ *                                       server                                 *
+ *             config_tls         - [IN]                                        *
+ *             config_timeout     - [IN]                                        *
+ *             config_source_ip   - [IN]                                        *
+ *             config_hostname    - [IN]                                        *
+ *             config_buffer_send - [IN]                                        *
+ *             config_buffer_size - [IN]                                        *
+ *             metric             - [IN/OUT] parameters for Event Log process   *
+ *             lastlogsize_sent   - [OUT] position of last record sent to       *
+ *                                        server                                *
+ *             prov_meta          - [IN/OUT] provider metadata cache            *
+ *             error              - [OUT] error message in case of failure      *
+ *                                                                              *
+ * Return value: SUCCEED or FAIL                                                *
+ *                                                                              *
+ ********************************************************************************/
 int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *eventlog_name, EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize,
 		zbx_uint64_t FirstID, zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern,
 		const char *key_severity, const char *key_source, const char *key_logeventid, int rate,
 		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, ZBX_ACTIVE_METRIC *metric,
-		zbx_uint64_t *lastlogsize_sent, zbx_vector_prov_meta_t *prov_meta, char **error)
+		const char *config_source_ip, const char *config_hostname, int config_buffer_send,
+		int config_buffer_size, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent,
+		zbx_vector_prov_meta_t *prov_meta, char **error)
 {
 #define EVT_ARRAY_SIZE	100
 #define EVT_LOG_ITEM 0
@@ -1045,7 +1048,8 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 							metric->key_orig, evt_message, ITEM_STATE_NORMAL, &lastlogsize,
 							NULL, &evt_timestamp, evt_provider, &evt_severity, &evt_eventid,
 							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-							config_timeout, config_source_ip);
+							config_timeout, config_source_ip, config_buffer_send,
+							config_buffer_size);
 
 					if (SUCCEED == send_err)
 					{
@@ -1098,7 +1102,8 @@ finish:
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
 		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
-				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
+				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip,
+				config_buffer_send, config_buffer_size);
 
 		if (SUCCEED == send_err)
 		{

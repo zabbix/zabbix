@@ -77,7 +77,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$sqlTemplate = "select * from hosts where host='$host'";
 		$oldHashTemplate = CDBHelper::getHash($sqlTemplate);
 		$sqlHosts =
-				'SELECT hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
+				'SELECT hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,'.
 				'ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,'.
 				'name,flags,templateid,description,tls_connect,tls_accept'.
 			' FROM hosts'.
