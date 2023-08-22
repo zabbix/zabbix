@@ -71,21 +71,26 @@
 			});
 		}
 
+		/**
+		 * Adds a new row to the permissions tables, either for template or host groups, with the specified permission.
+		 * Initializes the multiselect input with the provided groups and sets the permission radio button accordingly.
+		 *
+		 * @param {string}	group_type	The type of group, either 'templategroup' or 'hostgroup'.
+		 * @param {array}	groups		An array of groups for the row's multiselect.
+		 * @param {number}	permission	The permission level..
+		 */
 		#addRightRow(group_type = '', groups = [], permission = <?= PERM_DENY ?>) {
 			const rowid = group_type === 'templategroup' ? this.template_counter++ : this.host_counter++;
-			const data = {
-				'rowid': rowid
-			};
 			const template = group_type === 'templategroup'
 				? this.template_permission_template
 				: this.host_permission_template;
-
-			const new_row = template.evaluate(data);
-
+			const new_row = template.evaluate({'rowid': rowid});
 			const placeholder_row = document.querySelector(`.js-${group_type}-right-row-placeholder`);
+
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById(`ms_${group_type}_right_groupids_${rowid}_`);
+
 			$(ms).multiSelect();
 
 			for (const id in groups) {
@@ -100,11 +105,17 @@
 
 			const permission_radio = document
 				.querySelector(`input[name="${group_type}_right[permission][${rowid}]"][value="${permission}"]`);
+
 			permission_radio.checked = true;
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
 		}
 
+		/**
+		 * Removes the table row and triggers an event to update the tab indicator.
+		 *
+		 * @param {HTMLElement} button	The button element whose closest table row should be removed.
+		 */
 		#removeRow(button) {
 			button
 				.closest('tr')
@@ -113,6 +124,13 @@
 			document.dispatchEvent(new Event('tab-indicator-update'));
 		}
 
+		/**
+		 * Opens a popup to add or edit a tag filter, pre-filling the form with existing data if provided.
+		 * After submission, the popup reloads the page with the new or updated tag filter data.
+		 *
+		 * @param {HTMLElement|null} row	An optional table row element containing the tag filter data to edit.
+		 * 									If null, the popup will be initialized for adding a new tag filter.
+		 */
 		#openAddPopup(row = null) {
 			let popup_params = {
 				tag_filters: this.tag_filters
@@ -138,12 +156,19 @@
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#reload(e.detail));
 		}
 
+		/**
+		 * Reloads the tag filters table partial with the new or updated tag filter data from the response.
+		 *
+		 * @param {object} response	An object containing the updated tag filter data.
+		 */
 		#reload(response) {
 			this.tag_filters = response.tag_filters;
 			const tag_filter_form_field = document.getElementById('js-tag-filter-form-field');
+
 			tag_filter_form_field.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
+
 			curl.setArgument('action', 'usergroup.tagfilter.list');
 			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
 
@@ -179,7 +204,7 @@
 	};
 
 	jQuery(function($) {
-		let $form = $('form[name="user_group_form"]'),
+		const $form = $('form[name="user_group_form"]'),
 			$userdirectory = $form.find('[name="userdirectoryid"]'),
 			$gui_access = $form.find('[name="gui_access"]');
 
@@ -190,11 +215,9 @@
 			$form.trimValues(['#name']);
 		});
 
-		/**
-		 * Handle "Frontend access" selector change.
-		 */
+		// Handle "Frontend access" selector change.
 		function onFrontendAccessChange() {
-			let gui_access = $(this).val();
+			const gui_access = $(this).val();
 
 			if (gui_access == <?= GROUP_GUI_ACCESS_INTERNAL ?> || gui_access == <?= GROUP_GUI_ACCESS_DISABLED ?>) {
 				$userdirectory.attr('disabled', 'disabled');

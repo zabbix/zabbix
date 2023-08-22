@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -39,7 +39,7 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 
 	$first_index = key($tag_filter['tags']);
 
-	if ($tag_filter['tags'][$first_index]['tag'] == '' && $tag_filter['tags'][$first_index]['value'] == '') {
+	if ($tag_filter['tags'][$first_index]['tag'] === '' && $tag_filter['tags'][$first_index]['value'] === '') {
 		$badges = italic(_('All tags'));
 	}
 	else {

@@ -1009,7 +1009,7 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return document
 			.querySelectorAll('#tag-filter-table tbody tr')
-			.length > 1;
+			.length > 0;
 	}
 
 	initObserver() {
@@ -1414,11 +1414,7 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return [...document.querySelectorAll('#templategroup-right-table .form_row')]
-			.filter((row) => {
-				const liElements = row.querySelectorAll('.multiselect-list li');
-
-				return liElements.length > 0;
-			})
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
 			.length;
 	}
 
@@ -1426,9 +1422,7 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 		const target_node = document.getElementById('templategroup-right-table');
 
 		if (target_node !== null) {
-			const observer = new MutationObserver(() => {
-				this.addAttributes();
-			});
+			const observer = new MutationObserver(() => this.addAttributes());
 
 			observer.observe(target_node, {
 				childList: true,
@@ -1448,11 +1442,7 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return [...document.querySelectorAll('#hostgroup-right-table .form_row')]
-			.filter((row) => {
-				const liElements = row.querySelectorAll('.multiselect-list li');
-
-				return liElements.length > 0;
-			})
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
 			.length;
 	}
 
@@ -1460,9 +1450,7 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 		const target_node = document.getElementById('hostgroup-right-table');
 
 		if (target_node !== null) {
-			const observer = new MutationObserver(() => {
-				this.addAttributes();
-			});
+			const observer = new MutationObserver(() => this.addAttributes());
 
 			observer.observe(target_node, {
 				childList: true,

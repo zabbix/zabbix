@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -74,14 +74,22 @@ class CControllerUsergroupCreate extends CController {
 
 		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userdirectoryid']);
 
-		$user_group['hostgroup_rights'] = $this->processRights('ms_hostgroup_right', 'hostgroup_right');
-		$user_group['templategroup_rights'] = $this->processRights('ms_templategroup_right', 'templategroup_right');
+		$hostgroup_rights = [];
+		$templategroup_rigts = [];
+
+		$this->getInputs($hostgroup_rights, ['ms_hostgroup_right', 'hostgroup_right']);
+		$this->getInputs($templategroup_rigts, ['ms_templategroup_right', 'templategroup_right']);
+
+		$user_group['hostgroup_rights'] = processRights($hostgroup_rights, 'ms_hostgroup_right', 'hostgroup_right');
+		$user_group['templategroup_rights'] = processRights($templategroup_rigts,'ms_templategroup_right',
+			'templategroup_right'
+		);
 
 		$tag_filters = $this->getInput('tag_filters', []);
 
 		foreach ($tag_filters as $hostgroup) {
 			foreach ($hostgroup['tags'] as $tag_filter) {
-				if($hostgroup['groupid'] !== '0') {
+				if ($hostgroup['groupid'] != 0) {
 					$user_group['tag_filters'][] = [
 						'groupid' => $hostgroup['groupid'],
 						'tag' => $tag_filter['tag'],
@@ -110,33 +118,5 @@ class CControllerUsergroupCreate extends CController {
 		}
 
 		$this->setResponse($response);
-	}
-
-	/**
-	 * Returns host or template group rights formatted for writing in the database.
-	 *
-	 * @return array
-	 */
-	private function processRights($groupId_key, $permission_key) {
-		$rights = [];
-		$processed_rights = [];
-		$this->getInputs($rights, [$groupId_key, $permission_key]);
-
-		$groupIds = $rights[$groupId_key]['groupids'] ?? [];
-		$permissions = $rights[$permission_key]['permission'] ?? [];
-
-		foreach ($groupIds as $index => $group) {
-			foreach ($group as $groupId) {
-				$permission = $permissions[$index] ?? PERM_DENY;
-
-				if ($groupId !== '0') {
-					$processed_rights[] = [
-						'id' => (string) $groupId,
-						'permission' => $permission
-					];
-				}
-			}
-		}
-		return $processed_rights;
 	}
 }

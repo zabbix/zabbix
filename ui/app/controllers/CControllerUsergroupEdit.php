@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -125,15 +125,13 @@ class CControllerUsergroupEdit extends CController {
 		foreach ($tag_filters_badges as $key => $group) {
 			$tags = $group['tags'];
 
-			if (empty($tags) || (count($tags) === 1 && $tags[key($tags)]['tag'] === '')) {
+			if (!$tags || (count($tags) == 1 && $tags[key($tags)]['tag'] === '')) {
 				unset($tag_filters_badges[$key]);
 			}
 		}
 
 		$data['tag_filters_badges'] = makeTags($tag_filters_badges, true, 'groupid');
-
 		$data['users_ms'] = $this->getUsersMs();
-
 		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
 
 		if ($data['can_update_group']) {
@@ -153,9 +151,12 @@ class CControllerUsergroupEdit extends CController {
 	/**
 	 * Returns the sorted list of permissions to the host groups.
 	 *
+	 * @param array $host_groups	Optional array of host groups to process.
+	 * 								If not provided, will use the host groups from the input.
+	 *
 	 * @return array
 	 */
-	private function getGroupRights($host_groups = []) {
+	private function getGroupRights(array $host_groups = []): array {
 		if ($this->hasInput('ms_hostgroup_right') && $this->hasInput('hostgroup_right')) {
 			$new_hostgroup_rights = $this->processNewRights($host_groups, 'ms_hostgroup_right', 'hostgroup_right');
 
@@ -174,7 +175,7 @@ class CControllerUsergroupEdit extends CController {
 	 *
 	 * @return array
 	 */
-	private function getTemplategroupRights() {
+	private function getTemplategroupRights(): array {
 		$template_groups = API::TemplateGroup()->get([
 			'output' => ['groupid', 'name']
 		]);
@@ -195,11 +196,15 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
-	 * Returns host or template group rights formatted for providing in response.
+	 * Formats the new host or template group rights from the input suitable for providing in the response.
+	 *
+	 * @param array		$groups			An array of host or template groups.
+	 * @param string	$groupid_key	The key in the input for the group IDs.
+	 * @param string	$permission_key	The key in the input for the permissions.
 	 *
 	 * @return array
 	 */
-	function processNewRights($groups, $groupid_key, $permission_key) {
+	function processNewRights(array $groups, string $groupid_key, string $permission_key): array {
 		$new_rights = [];
 		$this->getInputs($new_rights, [$groupid_key, $permission_key]);
 
@@ -212,7 +217,7 @@ class CControllerUsergroupEdit extends CController {
 			foreach ($group as $groupid) {
 				$permission = $permissions[$index] ?? PERM_DENY;
 
-				if ($groupid !== '0') {
+				if ($groupid != 0) {
 					$key = array_search($groupid, array_column($groups, 'groupid'));
 					$name = $key !== false ? $groups[$key]['name'] : '';
 
@@ -232,7 +237,7 @@ class CControllerUsergroupEdit extends CController {
 	 *
 	 * @return array
 	 */
-	private function sortGroupRights($group_rights) {
+	private function sortGroupRights(array $group_rights): array {
 		$sorted_group_rights = [];
 
 		foreach ($group_rights as $id => $right) {
@@ -240,21 +245,9 @@ class CControllerUsergroupEdit extends CController {
 				continue;
 			}
 
-			switch ($right['permission']) {
-				case PERM_DENY:
-					$group = PERM_DENY;
-					break;
-				case PERM_READ:
-					$group = PERM_READ;
-					break;
-				case PERM_READ_WRITE:
-					$group = PERM_READ_WRITE;
-					break;
-				default:
-					$group = PERM_DENY;
-			}
+			$group = $right['permission'];
 
-			if (!isset($sorted_group_rights[$group])) {
+			if (!array_key_exists($group, $sorted_group_rights)) {
 				$sorted_group_rights[$group] = [];
 			}
 

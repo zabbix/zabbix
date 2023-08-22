@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -78,13 +78,21 @@ class CControllerUsergroupUpdate extends CController {
 			'userdirectoryid'
 		]);
 
-		$user_group['hostgroup_rights'] = $this->processRights('ms_hostgroup_right', 'hostgroup_right');
-		$user_group['templategroup_rights'] = $this->processRights('ms_templategroup_right', 'templategroup_right');
+		$hostgroup_rights = [];
+		$templategroup_rigts = [];
+
+		$this->getInputs($hostgroup_rights, ['ms_hostgroup_right', 'hostgroup_right']);
+		$this->getInputs($templategroup_rigts, ['ms_templategroup_right', 'templategroup_right']);
+
+		$user_group['hostgroup_rights'] = processRights($hostgroup_rights, 'ms_hostgroup_right', 'hostgroup_right');
+		$user_group['templategroup_rights'] = processRights($templategroup_rigts, 'ms_templategroup_right',
+			'templategroup_right'
+		);
 
 		if ($this->hasInput('tag_filters')) {
 			foreach ($this->getInput('tag_filters') as $hostgroup) {
 				foreach ($hostgroup['tags'] as $tag_filter) {
-					if($hostgroup['groupid'] !== '0') {
+					if ($hostgroup['groupid'] != 0) {
 						$user_group['tag_filters'][] = [
 							'groupid' => $hostgroup['groupid'],
 							'tag' => $tag_filter['tag'],
@@ -115,45 +123,5 @@ class CControllerUsergroupUpdate extends CController {
 		}
 
 		$this->setResponse($response);
-	}
-
-	/**
-	 * Returns host or template group rights formatted for writing in the database.
-	 *
-	 * @return array
-	 */
-	private function processRights($groupid_key, $permission_key) {
-		$rights = [];
-		$this->getInputs($rights, [$groupid_key, $permission_key]);
-
-		$groupids = $rights[$groupid_key]['groupids'] ?? [];
-		$permissions = $rights[$permission_key]['permission'] ?? [];
-
-		$processed_rights = [];
-		$unique_rights = [];
-
-		foreach ($groupids as $index => $group) {
-			foreach ($group as $groupid) {
-				$permission = $permissions[$index] ?? PERM_DENY;
-
-				if ($groupid !== '0') {
-					// If duplicates submitted, saves the one with most strict permission type.
-					if (!isset($unique_rights[$groupid])) {
-						$unique_rights[$groupid] = $permission;
-					} else {
-						$unique_rights[$groupid] = min($unique_rights[$groupid], $permission);
-					}
-				}
-			}
-		}
-
-		foreach ($unique_rights as $groupid => $permission) {
-			$processed_rights[] = [
-				'id' => (string) $groupid,
-				'permission' => $permission
-			];
-		}
-
-		return $processed_rights;
 	}
 }

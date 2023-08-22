@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CControllerUsergroupTagFilterList extends CController {
 
 	protected function init(): void {
@@ -61,7 +62,7 @@ class CControllerUsergroupTagFilterList extends CController {
 		foreach ($tag_filters_badges as $key => $group) {
 			$tags = $group['tags'];
 
-			if (empty($tags) || (count($tags) === 1 && $tags[key($tags)]['tag'] === '')) {
+			if (!$tags || (count($tags) == 1 && $tags[key($tags)]['tag'] === '')) {
 				unset($tag_filters_badges[$key]);
 			}
 		}

@@ -359,7 +359,7 @@ function collapseTagFilters(array $tag_filters) {
 		$name = array_key_exists($tag_filter['groupid'], $groups) ? $groups[$tag_filter['groupid']]['name'] : '';
 		$tag = ['tag' => $tag_filter['tag'], 'value' => $tag_filter['value']];
 
-		if (!isset($combined_tag_filters[$groupid])) {
+		if (!array_key_exists($groupid, $combined_tag_filters)) {
 			$combined_tag_filters[$groupid] = [
 				'groupid' => $groupid,
 				'name' => $name,
@@ -396,4 +396,47 @@ function permissionText($perm) {
 		case PERM_DENY: return _('Deny');
 		case PERM_NONE: return _('None');
 	}
+}
+
+/**
+ * Formats host or template group rights for writing in the database.
+ * Filters out duplicates, and applies the most strict permission type for duplicates.
+ *
+ * @param array		$rights			An array of host or template group rights.
+ * @param string	$groupid_key	The key in the rights array for the group IDs.
+ * @param string	$permission_key	The key in the rights array for the permissions.
+ *
+ * @return array
+ */
+function processRights(array $rights, string $groupid_key, string $permission_key): array {
+	$groupids = $rights[$groupid_key]['groupids'] ?? [];
+	$permissions = $rights[$permission_key]['permission'] ?? [];
+
+	$processed_rights = [];
+	$unique_rights = [];
+
+	foreach ($groupids as $index => $group) {
+		foreach ($group as $groupid) {
+			$permission = $permissions[$index] ?? PERM_DENY;
+
+			if ($groupid != 0) {
+				// If duplicates submitted, saves the one with most strict permission type.
+				if (!array_key_exists($groupid, $unique_rights)) {
+					$unique_rights[$groupid] = $permission;
+				}
+				else {
+					$unique_rights[$groupid] = min($unique_rights[$groupid], $permission);
+				}
+			}
+		}
+	}
+
+	foreach ($unique_rights as $groupid => $permission) {
+		$processed_rights[] = [
+			'id' => (string) $groupid,
+			'permission' => $permission
+		];
+	}
+
+	return $processed_rights;
 }

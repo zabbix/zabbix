@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -49,7 +49,7 @@ class CControllerUsergroupTagFilterEdit extends CController {
 	}
 
 	protected function checkPermissions() {
-		return true;
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_USER_GROUPS);
 	}
 
 	protected function doAction() {

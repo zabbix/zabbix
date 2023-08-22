@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -31,25 +31,17 @@ window.tag_filter_edit = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.tag_filters = tag_filters;
-		this.group_tag_filters = groupid !== 0 ? this.tag_filters[groupid]['tags'] : [];
+		this.group_tag_filters = groupid === 0 ? [] : this.tag_filters[groupid]['tags'];
 		this.groupid = groupid;
 		this.tag_filter_template = new Template(document.getElementById('tag-filter-row-template').innerHTML);
 		this.tag_filter_counter = 0;
 
-		if (typeof this.group_tag_filters === 'object' && !Array.isArray(this.group_tag_filters)) {
-			let result = [];
-
-			for (let key in this.group_tag_filters) {
-				result.push(this.group_tag_filters[key]);
-			}
-
-			this.group_tag_filters = result;
-		}
-
 		const indices = Object.keys(this.group_tag_filters);
 		const first_index = indices[0];
+
 		if (this.group_tag_filters.length !== 0 && this.group_tag_filters[first_index]['tag'] !== '') {
 			const tag_list_option = document.querySelector(`input[name="filter_type"][value='<?= TAG_FILTER_LIST ?>']`);
+
 			tag_list_option.checked = true;
 
 			for (const tag of this.group_tag_filters) {
@@ -59,11 +51,9 @@ window.tag_filter_edit = new class {
 
 		this.#toggleTagList();
 
-		document.querySelectorAll('[name=filter_type]').forEach((type) => {
-			type.addEventListener('change', () =>
-				this.#toggleTagList()
-			);
-		});
+		document.querySelectorAll('[name=filter_type]').forEach((type) =>
+			type.addEventListener('change', () => this.#toggleTagList())
+		);
 
 		document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 
@@ -74,28 +64,38 @@ window.tag_filter_edit = new class {
 		});
 
 		const multiselect = document.getElementById('ms_new_tag_filter_groupids_');
+
 		jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
 	}
 
+	/**
+	 * Adds a new row for the tag filter with the specified tag and value.
+	 * If no tag is provided, the row will be initialized with empty values.
+	 *
+	 * @param {array} tag	The tag and value information for the filter row.
+	 */
 	#addTagFilterRow(tag = []) {
 		const rowid = this.tag_filter_counter++;
 		const data = {
 			'rowid': rowid,
-			'tag': tag.length !== 0 ? tag.tag : '',
-			'value': tag.length !== 0 ? tag.value : ''
+			'tag': tag.length === 0 ? '' : tag.tag,
+			'value': tag.length === 0 ? '' : tag.value
 		};
 
 		const new_row = this.tag_filter_template.evaluate(data);
-
 		const placeholder_row = document.querySelector('.js-tag-filter-row-placeholder');
+
 		placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 	}
 
+	/**
+	 * Toggles the visibility of the tag list form fields based on the selected filter type.
+	 */
 	#toggleTagList() {
 		const tag_list_radio = document.querySelector('[name="filter_type"]:checked').value;
 		const tags = document.getElementById('tag-list-form-field');
 		const tags_label = document.querySelector("label[for='tag_filters']");
-		const show_tags = tag_list_radio == '<?= TAG_FILTER_LIST?>';
+		const show_tags = tag_list_radio == '<?= TAG_FILTER_LIST ?>';
 
 		tags.style.display = show_tags ? '' : 'none';
 		tags_label.style.display = show_tags ? '' : 'none';
@@ -103,13 +103,15 @@ window.tag_filter_edit = new class {
 
 	submit() {
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', 'usergroup.tagfilter.check');
 
 		const fields = getFormFields(this.form);
+
 		fields.tag_filters = this.tag_filters;
 		fields.groupid = this.groupid;
 
-		if (fields.filter_type == <?= TAG_FILTER_ALL?>) {
+		if (fields.filter_type == '<?= TAG_FILTER_ALL ?>') {
 			delete fields.new_tag_filter;
 		}
 
@@ -120,13 +122,17 @@ window.tag_filter_edit = new class {
 			}
 		}
 
-		if (fields.esc_period != null ) {
-			fields.esc_period = fields.esc_period.trim();
-		}
-
 		this.#post(curl.getUrl(), fields);
 	}
 
+	/**
+	 * Sends a POST request to the specified URL with the provided data.
+	 * Handles the response, destroys the overlay, and triggers a custom event to be used for reloading tag filters.
+	 *
+	 * @param {string}		url					The URL to send the POST request to.
+	 * @param {object}		data				The data to be sent in the POST request.
+	 * @param {function}	success_callback	The callback function to be executed after a successful response.
+	 */
 	#post(url, data, success_callback) {
 		this.overlay.setLoading();
 
@@ -163,10 +169,9 @@ window.tag_filter_edit = new class {
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
+
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
 }

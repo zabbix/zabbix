@@ -362,6 +362,7 @@
 			var $obj = $(this);
 
 			let options = JSON.parse(this.dataset.params);
+
 			options = $.extend({}, defaults, options);
 
 			if ($obj.data('multiSelect') !== undefined) {

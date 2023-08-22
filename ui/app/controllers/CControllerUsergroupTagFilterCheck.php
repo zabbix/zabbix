@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CControllerUsergroupTagFilterCheck extends CController {
 
 	protected function init(): void {
@@ -49,6 +50,11 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		return $ret;
 	}
 
+	/**
+	 * Validates the tag filters provided in the input and checks if the host groups and tag values are provided.
+	 *
+	 * @return bool
+	 */
 	protected function validateTagFilters(): bool {
 		if (!array_key_exists('groupids', $this->getInput('ms_new_tag_filter', []))) {
 			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
@@ -87,7 +93,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 		foreach ($groupids as $groupid) {
 			// Check if this groupid exists in the tag_filters, check for duplicates, delete removed tags, add new tags.
-			if (isset($data['tag_filters'][$groupid])) {
+			if (array_key_exists($groupid, $data['tag_filters'])) {
 				$existing_tag_filters = &$data['tag_filters'][$groupid]['tags'];
 
 				if ($filter_type == TAG_FILTER_ALL) {
@@ -151,18 +157,28 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
 	}
 
-	private function filterDuplicates($tag_filters): array {
+	/**
+	 * Filters out duplicate tag filters from the given array of tag filters.
+	 *
+	 * @param array $tag_filters	Array of tag filters to be filtered for duplicates.
+	 *
+	 * @return array
+	 */
+	private function filterDuplicates(array $tag_filters): array {
 		$unique_tag_filters = [];
-		$used = [];
 
 		foreach ($tag_filters as $tag_filter) {
-			$unique_pair = $tag_filter['tag'].NAME_DELIMITER.$tag_filter['value'];
-			if (!isset($used[$unique_pair])) {
-				$used[$unique_pair] = true;
-				$unique_tag_filters[] = $tag_filter;
+			$unique_tag_filters[$tag_filter['tag']][$tag_filter['value']] = $tag_filter;
+		}
+
+		$tag_filters = [];
+
+		foreach ($unique_tag_filters as $tag) {
+			foreach ($tag as $value) {
+				$tag_filters[] = $value;
 			}
 		}
 
-		return $unique_tag_filters;
+		return $tag_filters;
 	}
 }

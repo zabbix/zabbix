@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -31,10 +31,7 @@ $output = [
 	]))->getOutput()
 ];
 
-$output['messages'] = [];
 $messages = CMessageHelper::getMessages();
-if (count($messages) !== 0) {
-	$output['messages'] = [$messages[0]['message']];
-}
+$output['messages'] = $messages ? [$messages[0]['message']] : [];
 
 echo json_encode($output);
