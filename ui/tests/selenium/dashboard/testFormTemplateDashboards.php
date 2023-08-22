@@ -396,7 +396,7 @@ class testFormTemplateDashboards extends CWebTest {
 										'type' => 0,
 										'name' => 'columns.data.0',
 										'value' => 1
-									],
+									]
 								]
 							],
 							[
@@ -1049,7 +1049,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field_locator' => 'xpath:.//button[@id="lbl_needle_color"]/..',
 									'type' => 'color_picker'
-								],
+								]
 							]
 						],
 						[
@@ -1330,8 +1330,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'type' => 'checkbox_list',
 							'checkboxes' => ['Description' => true, 'Time' => true, 'Value' => true, 'Change indicator' => true],
 							'mandatory' => true
-						],
-
+						]
 					],
 					'hidden' => [
 						[
@@ -1978,7 +1977,7 @@ class testFormTemplateDashboards extends CWebTest {
 							],
 							'value' => 10,
 							'mandatory' => true
-						],
+						]
 					]
 				]
 			],
@@ -3524,7 +3523,7 @@ class testFormTemplateDashboards extends CWebTest {
 						'fill' => [
 							'Filter' => 'Empty navtree widget'
 						]
-					],
+					]
 				]
 			],
 			// #56 Map navigation tree widget
