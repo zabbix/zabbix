@@ -68,6 +68,9 @@
 				if (event.target.classList.contains('js-edit-tag-filter')) {
 					this.#openAddPopup(event.target.closest('tr'));
 				}
+				if (event.target.classList.contains('js-remove-tag-filter')) {
+					this.#removeTagFilterRow(event.target.closest('tr'));
+				}
 			});
 		}
 
@@ -117,6 +120,26 @@
 		 * @param {HTMLElement} button	The button element whose closest table row should be removed.
 		 */
 		#removeRow(button) {
+			button
+				.closest('tr')
+				.remove();
+
+			document.dispatchEvent(new Event('tab-indicator-update'));
+		}
+
+		/**
+		 * Removes the tag filter table row and triggers an event to update the tab indicator.
+		 * Removes the respective tag filters from tag filters array.
+		 *
+		 * @param {HTMLElement} button	The button element whose closest table row should be removed.
+		 */
+		#removeTagFilterRow(button) {
+			const groupid = button.querySelector('input[name^="tag_filters["][name$="[groupid]"]').value;
+
+			if (this.tag_filters.hasOwnProperty(groupid)) {
+				delete this.tag_filters[groupid];
+			}
+
 			button
 				.closest('tr')
 				.remove();
