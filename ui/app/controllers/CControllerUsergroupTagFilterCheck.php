@@ -84,12 +84,17 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	protected function doAction(): void {
 		$data['tag_filters'] = $this->getInput('tag_filters', []);
 		$filter_type = $this->getInput('filter_type', TAG_FILTER_ALL);
+		$opened_groupid = $this->getInput('groupid');
 		$ms_groups = $this->getInput('ms_new_tag_filter', []);
 		$groupids = $ms_groups['groupids'];
 		$new_tag_filters = $this->filterDuplicates($this->getInput('new_tag_filter', []));
 		$host_groups = API::HostGroup()->get([
 			'output' => ['groupid', 'name']
 		]);
+
+		if (!in_array($opened_groupid, $groupids)) {
+			unset($data['tag_filters'][$opened_groupid]);
+		}
 
 		foreach ($groupids as $groupid) {
 			// Check if this groupid exists in the tag_filters, check for duplicates, delete removed tags, add new tags.
@@ -117,7 +122,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 								}
 							}
 							// If the existing tag is not found in the new tags list, remove it (only from the host group which was open for editing).
-							if (!$is_still_present && $groupid == $this->getInput('groupid')) {
+							if (!$is_still_present && $groupid == $opened_groupid) {
 								unset($existing_tag_filters[$key]);
 							}
 						}
