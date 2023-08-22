@@ -733,9 +733,6 @@ static int	DBpatch_6050063(void)
 
 static int	DBpatch_6050064(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("dashboard_user", "dashboard_user_2"))
 		return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
 
@@ -744,9 +741,6 @@ static int	DBpatch_6050064(void)
 
 static int	DBpatch_6050065(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("dashboard_usrgrp", "dashboard_usrgrp_2"))
 		return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
 
@@ -755,9 +749,6 @@ static int	DBpatch_6050065(void)
 
 static int	DBpatch_6050066(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("event_suppress", "event_suppress_4"))
 		return DBcreate_index("event_suppress", "event_suppress_4", "userid", 0);
 
@@ -766,9 +757,6 @@ static int	DBpatch_6050066(void)
 
 static int	DBpatch_6050067(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_1"))
 		return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
 
@@ -777,9 +765,6 @@ static int	DBpatch_6050067(void)
 
 static int	DBpatch_6050068(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_2"))
 		return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
 
@@ -788,9 +773,6 @@ static int	DBpatch_6050068(void)
 
 static int	DBpatch_6050069(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_3"))
 		return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
 
@@ -799,9 +781,6 @@ static int	DBpatch_6050069(void)
 
 static int	DBpatch_6050070(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_1"))
 		return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
 
@@ -810,9 +789,6 @@ static int	DBpatch_6050070(void)
 
 static int	DBpatch_6050071(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_2"))
 		return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
 
@@ -821,9 +797,6 @@ static int	DBpatch_6050071(void)
 
 static int	DBpatch_6050072(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("hosts", "hosts_7"))
 		return DBcreate_index("hosts", "hosts_7", "templateid", 0);
 
@@ -832,9 +805,6 @@ static int	DBpatch_6050072(void)
 
 static int	DBpatch_6050073(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("interface_discovery", "interface_discovery_1"))
 		return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
 
@@ -843,9 +813,6 @@ static int	DBpatch_6050073(void)
 
 static int	DBpatch_6050074(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("report", "report_2"))
 		return DBcreate_index("report", "report_2", "userid", 0);
 
@@ -854,9 +821,6 @@ static int	DBpatch_6050074(void)
 
 static int	DBpatch_6050075(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("report", "report_3"))
 		return DBcreate_index("report", "report_3", "dashboardid", 0);
 
@@ -865,9 +829,6 @@ static int	DBpatch_6050075(void)
 
 static int	DBpatch_6050076(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("report_user", "report_user_2"))
 		return DBcreate_index("report_user", "report_user_2", "userid", 0);
 
@@ -876,9 +837,6 @@ static int	DBpatch_6050076(void)
 
 static int	DBpatch_6050077(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("report_user", "report_user_3"))
 		return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
 
@@ -887,9 +845,6 @@ static int	DBpatch_6050077(void)
 
 static int	DBpatch_6050078(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_2"))
 		return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
 
@@ -898,9 +853,6 @@ static int	DBpatch_6050078(void)
 
 static int	DBpatch_6050079(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_3"))
 		return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
 
@@ -909,9 +861,6 @@ static int	DBpatch_6050079(void)
 
 static int	DBpatch_6050080(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("sysmaps", "sysmaps_4"))
 		return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
 
@@ -920,9 +869,6 @@ static int	DBpatch_6050080(void)
 
 static int	DBpatch_6050081(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("sysmap_element_trigger", "sysmap_element_trigger_2"))
 		return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
 
@@ -931,9 +877,6 @@ static int	DBpatch_6050081(void)
 
 static int	DBpatch_6050082(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("sysmap_user", "sysmap_user_2"))
 		return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
 
@@ -943,9 +886,6 @@ static int	DBpatch_6050082(void)
 
 static int	DBpatch_6050083(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("sysmap_usrgrp", "sysmap_usrgrp_2"))
 		return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
 
@@ -954,9 +894,6 @@ static int	DBpatch_6050083(void)
 
 static int	DBpatch_6050084(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_1"))
 		return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
 
@@ -965,9 +902,6 @@ static int	DBpatch_6050084(void)
 
 static int	DBpatch_6050085(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_2"))
 		return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
 
@@ -976,9 +910,6 @@ static int	DBpatch_6050085(void)
 
 static int	DBpatch_6050086(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("task", "task_2"))
 		return DBcreate_index("task", "task_2", "proxyid", 0);
 
@@ -987,9 +918,6 @@ static int	DBpatch_6050086(void)
 
 static int	DBpatch_6050087(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
 	if (FAIL == zbx_db_index_exists("users", "users_3"))
 		return DBcreate_index("users", "users_3", "roleid", 0);
 
