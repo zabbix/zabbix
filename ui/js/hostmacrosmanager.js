@@ -299,4 +299,12 @@ class HostMacrosManager {
 			$element.val(macro_part.toUpperCase() + context_part);
 		}
 	}
+
+	getManualDiscoveryState() {
+		return HostMacrosManager.DISCOVERY_STATE_MANUAL;
+	}
+
+	getDefaultMacroType() {
+		return HostMacrosManager.ZBX_MACRO_TYPE_TEXT;
+	}
 }

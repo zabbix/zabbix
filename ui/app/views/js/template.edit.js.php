@@ -165,11 +165,20 @@ window.template_edit_popup = new class {
 
 	#checkFormHasChanges() {
 		const form_fields = getFormFields(this.form);
+		const empty_macro_object = {
+			macro: '',
+			discovery_state: `${this.macros_manager.getManualDiscoveryState()}`,
+			value: '',
+			type: `${this.macros_manager.getDefaultMacroType()}`,
+			description: ''
+		};
+
 		delete form_fields.show_inherited_template_macros;
 
 		if (form_fields.macros !== undefined) {
 			Object.keys(form_fields.macros).forEach((key) => {
-				if (form_fields.macros[key].inherited_type == <?= ZBX_PROPERTY_INHERITED ?>) {
+				if (form_fields.macros[key].inherited_type == <?= ZBX_PROPERTY_INHERITED ?>
+						||JSON.stringify(form_fields.macros[key]) === JSON.stringify(empty_macro_object)) {
 					delete form_fields.macros[key];
 				}
 				else {
@@ -182,17 +191,11 @@ window.template_edit_popup = new class {
 			);
 		}
 
-		const empty_macro_object = {
-			"macro": "",
-			"discovery_state": "3",
-			"value": "",
-			"type": "0",
-			"description": ""
-		}
-
-		if (typeof form_fields.macros === 'object' && Object.keys(form_fields.macros).length === 0) {
-			form_fields.macros['0'] = empty_macro_object;
-		}
+		Object.keys(this.initial_form_fields.macros).forEach((key) => {
+			if (JSON.stringify(this.initial_form_fields.macros[key]) === JSON.stringify(empty_macro_object)) {
+				delete this.initial_form_fields.macros[key];
+			}
+		});
 
 		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields);
 	}
