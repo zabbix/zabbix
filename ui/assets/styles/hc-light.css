@@ -4685,7 +4685,8 @@ form.is-loading {
 .btn-time-zoomout {
   color: #000000;
   background-color: transparent;
-  border-color: transparent; }
+  border-color: transparent;
+  vertical-align: top; }
   .btn-time-zoomout[disabled] {
     color: #9f9f9f;
     background-color: transparent;

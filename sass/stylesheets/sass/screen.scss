@@ -622,6 +622,7 @@ form {
 	color: $font-color;
 	background-color: transparent;
 	border-color: transparent;
+	vertical-align: top;
 
 	&[disabled] {
 		color: $form-disabled-font-color;
