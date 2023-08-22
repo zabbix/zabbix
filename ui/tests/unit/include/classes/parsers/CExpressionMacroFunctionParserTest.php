@@ -91,7 +91,12 @@ class CExpressionMacroFunctionParserTest extends TestCase {
 	 * @param array   $result
 	 */
 	public function testExpressionMacroFunctionParser(string $source, int $pos, array $result) {
-		$expression_macro_function_parser = new CExpressionMacroFunctionParser();
+		$expression_macro_function_parser = new CExpressionMacroFunctionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true
+		]);
 
 		$this->assertSame($result, [
 			'rc' => $expression_macro_function_parser->parse($source, $pos),

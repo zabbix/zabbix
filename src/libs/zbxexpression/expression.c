@@ -1491,34 +1491,34 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
-							"r.proxy_hostid")))
+							"r.proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to, "host");
+							ret = expr_db_get_proxy_value(proxyid, &replace_to, "name");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
-							"r.proxy_hostid")))
+							"r.proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 						{
 							replace_to = zbx_strdup(replace_to, "");
 						}
 						else
 						{
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to,
+							ret = expr_db_get_proxy_value(proxyid, &replace_to,
 									"description");
 						}
 					}
@@ -1592,34 +1592,34 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
-							"proxy_hostid")))
+							"proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to, "host");
+							ret = expr_db_get_proxy_value(proxyid, &replace_to, "name");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
 					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
-							"proxy_hostid")))
+							"proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 						{
 							replace_to = zbx_strdup(replace_to, "");
 						}
 						else
 						{
-							ret = expr_db_get_host_value(proxy_hostid, &replace_to,
+							ret = expr_db_get_proxy_value(proxyid, &replace_to,
 									"description");
 						}
 					}
