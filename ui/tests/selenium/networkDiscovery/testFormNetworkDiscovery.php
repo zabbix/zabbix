@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup drules
  *
- * @dataSource NetworkDiscovery, Proxies
+ * @dataSource NetworkDiscovery
  */
 class testFormNetworkDiscovery extends CWebTest {
 
@@ -819,7 +819,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'All fields',
-						'Discovery by proxy' => 'Active proxy 1',
+						'Discovery by proxy' => 'Proxy for Actions',
 						'IP range' => '192.168.251.253-254',
 						'id:concurrency_max_type' => 'One',
 						'Update interval' => 604800,
@@ -1986,7 +1986,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				// Fill form's fields.
 				$form->fill([
 					'Name' => $new_name,
-					'Discovery by proxy' => 'Passive proxy 1',
+					'Discovery by proxy' => 'Proxy for Actions',
 					'Update interval' => '15s',
 					'Enabled' => false
 				]);
