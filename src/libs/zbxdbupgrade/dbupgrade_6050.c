@@ -731,6 +731,271 @@ static int	DBpatch_6050063(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050064(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("dashboard_user", "dashboard_user_2"))
+		return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050065(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("dashboard_usrgrp", "dashboard_usrgrp_2"))
+		return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050066(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("event_suppress", "event_suppress_4"))
+		return DBcreate_index("event_suppress", "event_suppress_4", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050067(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_1"))
+		return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050068(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_2"))
+		return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050069(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_3"))
+		return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050070(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_1"))
+		return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050071(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_2"))
+		return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050072(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("hosts", "hosts_7"))
+		return DBcreate_index("hosts", "hosts_7", "templateid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050073(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("interface_discovery", "interface_discovery_1"))
+		return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050074(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("report", "report_2"))
+		return DBcreate_index("report", "report_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050075(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("report", "report_3"))
+		return DBcreate_index("report", "report_3", "dashboardid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050076(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("report_user", "report_user_2"))
+		return DBcreate_index("report_user", "report_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050077(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("report_user", "report_user_3"))
+		return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050078(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_2"))
+		return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050079(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_3"))
+		return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050080(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("sysmaps", "sysmaps_4"))
+		return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050081(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("sysmap_element_trigger", "sysmap_element_trigger_2"))
+		return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050082(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("sysmap_user", "sysmap_user_2"))
+		return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+
+static int	DBpatch_6050083(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("sysmap_usrgrp", "sysmap_usrgrp_2"))
+		return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050084(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_1"))
+		return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050085(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_2"))
+		return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050086(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("task", "task_2"))
+		return DBcreate_index("task", "task_2", "proxyid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050087(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_db_index_exists("users", "users_3"))
+		return DBcreate_index("users", "users_3", "roleid", 0);
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -801,5 +1066,29 @@ DBPATCH_ADD(6050060, 0, 1)
 DBPATCH_ADD(6050061, 0, 1)
 DBPATCH_ADD(6050062, 0, 1)
 DBPATCH_ADD(6050063, 0, 1)
+DBPATCH_ADD(6050064, 0, 1)
+DBPATCH_ADD(6050065, 0, 1)
+DBPATCH_ADD(6050066, 0, 1)
+DBPATCH_ADD(6050067, 0, 1)
+DBPATCH_ADD(6050068, 0, 1)
+DBPATCH_ADD(6050069, 0, 1)
+DBPATCH_ADD(6050070, 0, 1)
+DBPATCH_ADD(6050071, 0, 1)
+DBPATCH_ADD(6050072, 0, 1)
+DBPATCH_ADD(6050073, 0, 1)
+DBPATCH_ADD(6050074, 0, 1)
+DBPATCH_ADD(6050075, 0, 1)
+DBPATCH_ADD(6050076, 0, 1)
+DBPATCH_ADD(6050077, 0, 1)
+DBPATCH_ADD(6050078, 0, 1)
+DBPATCH_ADD(6050079, 0, 1)
+DBPATCH_ADD(6050080, 0, 1)
+DBPATCH_ADD(6050081, 0, 1)
+DBPATCH_ADD(6050082, 0, 1)
+DBPATCH_ADD(6050083, 0, 1)
+DBPATCH_ADD(6050084, 0, 1)
+DBPATCH_ADD(6050085, 0, 1)
+DBPATCH_ADD(6050086, 0, 1)
+DBPATCH_ADD(6050087, 0, 1)
 
 DBPATCH_END()
