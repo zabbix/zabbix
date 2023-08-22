@@ -60,6 +60,13 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_UNITS_SIZE = 35;
 	private const DEFAULT_TIME_SIZE = 15;
 
+	private const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
+	private const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
+	private const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
+
+	private const ITEM_VALUE_CUSTOM_TIME_OFF = 0;
+	private const ITEM_VALUE_CUSTOM_TIME_ON = 1;
+
 	private bool $is_binary_units = false;
 
 	public function __construct(array $values, ?string $templateid) {
@@ -116,7 +123,7 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		// Test item custom time period.
-		if ($this->getFieldValue('item_time') == ITEM_VALUE_CUSTOM_TIME_ON) {
+		if ($this->getFieldValue('item_time') == self::ITEM_VALUE_CUSTOM_TIME_ON) {
 			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
 				$this->getFieldValue('time_to')
 			));
@@ -294,10 +301,10 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('history', _('History data'), [
-					ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
-					ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
-					ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
-				]))->setDefault(ITEM_VALUE_DATA_SOURCE_AUTO)
+					self::ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
+					self::ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
+					self::ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
+				]))->setDefault(self::ITEM_VALUE_DATA_SOURCE_AUTO)
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
@@ -313,7 +320,7 @@ class WidgetForm extends CWidgetForm {
 	 */
 	public static function hasOverrideTime(array $fields_values): bool {
 		return array_key_exists('item_time', $fields_values)
-			&& $fields_values['item_time'] == ITEM_VALUE_CUSTOM_TIME_ON;
+			&& $fields_values['item_time'] == self::ITEM_VALUE_CUSTOM_TIME_ON;
 	}
 
 	private static function validateTimeSelectorPeriod(string $from, string $to): array {
