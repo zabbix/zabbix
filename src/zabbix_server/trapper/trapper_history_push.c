@@ -782,3 +782,5 @@ int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse
 
 	return ret;
 }
+
+#undef INVALID_ITEM_OR_NO_PERMISSION_ERROR
