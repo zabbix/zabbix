@@ -351,7 +351,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	char		ch;
 #ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
-	char		*process_path = NULL, *progname_noext = NULL;
 #endif
 	unsigned short	opt_count[256] = {0};
 
@@ -551,64 +550,39 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		goto out;
 	}
 
-	if (NULL == config_file)
-	{
 #ifdef _WINDOWS
 #define PATH_BUF_LEN	4096
-		size_t	alloc_len, offset;
-		char	*ptr;
+	if (NULL == config_file)
+	{
+		char	*ptr, *process_path = NULL;
 		wchar_t	szProcessName[PATH_BUF_LEN];
 
 		if (0 == GetModuleFileNameEx(GetCurrentProcess(), NULL, szProcessName, ARRSIZE(szProcessName)))
 		{
 			zbx_error("failed to get Zabbix agent executable file path while initializing default config"
 					" path");
-			ret = FAIL;
-			goto out;
+			goto skip;
 		}
 
 		process_path = zbx_unicode_to_utf8(szProcessName);
 
-		if (NULL == (ptr = strstr(process_path, progname)))
+		if (NULL == (ptr = get_program_name(process_path)))
 		{
 			zbx_error("got unexpected Zabbix agent executable file path '%s' while initializing"
-					" default config path", process_path);
-			ret = FAIL;
-			goto out;
-		}
-		else
-		{
-			const char	*ptr_next;
-
-			while (NULL != (ptr_next = strstr(ptr + 1, progname)))
-				ptr = ptr_next;
+					" default config path", ptr);
+			goto skip;
 		}
 
 		*ptr = '\0';
-
-		progname_noext = strdup(progname);
-
-		if (NULL == (ptr = strstr(progname_noext, ".exe")))
-		{
-			zbx_error("failed to get Zabbix agent executable file name with file extension removed for"
-					" program name '%s' while initializing default config path", progname_noext);
-			ret = FAIL;
-			goto out;
-		}
-
-		*ptr = '\0';
-
-		zbx_snprintf_alloc(&config_file, &alloc_len, &offset, "%s%s.conf", process_path, progname_noext);
-#undef PATH_BUF_LEN
-#else
-		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
-#endif
+		config_file = zbx_dsprintf(config_file, "%s%s", process_path, get_program_name(DEFAULT_CONFIG_FILE));
+skip:
+		zbx_free(process_path);
 	}
-out:
-#ifdef _WINDOWS
-	zbx_free(process_path);
-	zbx_free(progname_noext);
+#undef PATH_BUF_LEN
 #endif
+	if (NULL == config_file)
+		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+out:
 	if (FAIL == ret)
 	{
 		zbx_free(TEST_METRIC);
