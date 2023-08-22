@@ -52,6 +52,8 @@ class CWidget extends CModule {
 	public const DEFAULT_SIZE			= ['width' => 12, 'height' => 5];
 	public const DEFAULT_REFRESH_RATE	= 60;
 
+	public const REFERENCE_DASHBOARD = 'DASHBOARD';
+
 	// Dashboard widget dynamic state.
 	public const SIMPLE_ITEM = 0;
 	public const DYNAMIC_ITEM = 1;
@@ -91,7 +93,7 @@ class CWidget extends CModule {
 			if (array_key_exists($field->getName(), $in_params)) {
 				$field->setInType($in_params[$field->getName()]['type']);
 
-				if (in_array($in_params[$field->getName()]['type'], ['_host', '_hosts'])) {
+				if (in_array($in_params[$field->getName()]['type'], ['_hostid', '_hostids'])) {
 					$field->acceptDashboard();
 				}
 

@@ -321,7 +321,7 @@ class CDashboardPage {
 		}
 	}
 
-	addWidgetFromData({type, name, view_mode, fields, fields_references, widgetid, pos, is_new, rf_rate, unique_id}) {
+	addWidgetFromData({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id}) {
 		let widget;
 
 		if (type in this._widget_defaults) {
@@ -330,7 +330,6 @@ class CDashboardPage {
 				name,
 				view_mode,
 				fields,
-				fields_references,
 				defaults: this._widget_defaults[type],
 				widgetid,
 				pos,
@@ -408,14 +407,12 @@ class CDashboardPage {
 		return this.addWidgetFromData(new_widget_data);
 	}
 
-	_createWidget(widget_class, {type, name, view_mode, fields, fields_references, defaults, widgetid, pos, is_new,
-			rf_rate, unique_id}) {
+	_createWidget(widget_class, {type, name, view_mode, fields, defaults, widgetid, pos, is_new, rf_rate, unique_id}) {
 		return new widget_class({
 			type,
 			name,
 			view_mode,
 			fields,
-			fields_references,
 			defaults,
 			widgetid,
 			pos,
@@ -447,7 +444,6 @@ class CDashboardPage {
 			name: '',
 			view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
 			fields: {},
-			fields_references: {},
 			defaults: {
 				name: t('Inaccessible widget')
 			},
@@ -465,7 +461,6 @@ class CDashboardPage {
 			name,
 			view_mode,
 			fields: {},
-			fields_references: {},
 			defaults: this._widget_defaults[type],
 			widgetid: null,
 			pos,

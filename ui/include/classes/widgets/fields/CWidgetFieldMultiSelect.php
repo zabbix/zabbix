@@ -79,25 +79,12 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		return parent::preventDefault($default_prevented);
 	}
 
-	public function getReferences(): array {
-		$value = $this->getValue();
-
-		if (is_array($value) && array_key_exists('reference', $value)) {
-			return [[
-				'path' => ['reference'],
-				'type' => $this->getInType()
-			]];
-		}
-
-		return [];
-	}
-
 	protected function getValidationRules(): array {
 		$value = $this->getValue();
 
-		if (is_array($value) && array_key_exists('reference', $value)) {
+		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE, $value)) {
 			return ['type' => API_OBJECT, 'fields' => [
-				'reference' => ['type' => API_STRING_UTF8]
+				self::FOREIGN_REFERENCE => ['type' => API_STRING_UTF8]
 			]];
 		}
 
@@ -107,11 +94,11 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
-		if (is_array($value) && array_key_exists('reference', $value)) {
+		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE, $value)) {
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'[reference]',
-				'value' => $value['reference']
+				'name' => $this->name.'['.self::FOREIGN_REFERENCE.']',
+				'value' => $value[self::FOREIGN_REFERENCE]
 			];
 		}
 		else {

@@ -174,15 +174,14 @@ class CWidget extends CWidgetBase {
 	 * @returns {Object}
 	 */
 	getUpdateRequestData() {
-		const fields_referred_data = this.getFieldsReferredData();
+		const fields_data = this.getFieldsData();
 
 		return {
 			templateid: this._dashboard.templateid ?? undefined,
 			dashboardid: this._dashboard.dashboardid ?? undefined,
 			widgetid: this._widgetid ?? undefined,
 			name: this._name !== '' ? this._name : undefined,
-			fields: Object.keys(this._fields).length > 0 ? this._fields : undefined,
-			fields_referred_data: Object.keys(fields_referred_data).length > 0 ? fields_referred_data : undefined,
+			fields: Object.keys(fields_data).length > 0 ? fields_data : undefined,
 			view_mode: this._view_mode,
 			edit_mode: this._is_edit_mode ? 1 : 0,
 			dynamic_hostid: this._dashboard.templateid !== null || this.supportsDynamicHosts()

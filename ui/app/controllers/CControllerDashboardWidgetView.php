@@ -40,7 +40,6 @@ class CControllerDashboardWidgetView extends CController {
 		$this->setValidationRules([
 			'name' => 'string',
 			'fields' => 'array',
-			'fields_referred_data' => 'array',
 			'templateid' => 'db dashboard.templateid'
 		]);
 	}
@@ -64,14 +63,12 @@ class CControllerDashboardWidgetView extends CController {
 	protected function checkInput(): bool {
 		$this->widget = APP::ModuleManager()->getActionModule();
 
-		$ret = $this->validateInput($this->validation_rules) && $this->validateFieldsReferredData();
+		$ret = $this->validateInput($this->validation_rules);
 
 		if ($ret) {
 			$this->form = $this->widget->getForm($this->getInput('fields', []),
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
-
-			$this->form->useFieldsReferredData($this->getInput('fields_referred_data', []));
 
 			if ($errors = $this->form->validate()) {
 				foreach ($errors as $error) {
@@ -97,50 +94,6 @@ class CControllerDashboardWidgetView extends CController {
 		}
 
 		return $ret;
-	}
-
-	protected function validateFieldsReferredData(): bool {
-		$has_errors = false;
-
-		$fields_referred_data = $this->getInput('fields_referred_data', []);
-
-		if (!is_array($fields_referred_data)) {
-			$has_errors = true;
-		}
-
-		if (!$has_errors) {
-			foreach ($fields_referred_data as $field_referred_data) {
-				if (!is_array($field_referred_data)) {
-					$has_errors = true;
-
-					break;
-				}
-
-				foreach ($field_referred_data as $entry) {
-					if (!is_array($entry)
-							|| !array_key_exists('path', $entry) || !is_array($entry['path'])
-							|| !array_key_exists('value', $entry)) {
-						$has_errors = true;
-
-						break 2;
-					}
-
-					foreach ($entry['path'] as $step) {
-						if (!is_scalar($step)) {
-							$has_errors = true;
-
-							break 3;
-						}
-					}
-				}
-			}
-		}
-
-		if ($has_errors) {
-			error(_s('Incorrect value for "%1$s" field.', 'fields_referred_data'));
-		}
-
-		return !$has_errors;
 	}
 
 	protected function getForm(): CWidgetForm {

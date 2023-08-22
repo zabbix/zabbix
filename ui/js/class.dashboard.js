@@ -609,15 +609,20 @@ class CDashboard {
 		}
 
 		for (const widget of widgets) {
-			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(widget.fields, widget.fields_references)) {
-				const reference = accessor.getReference();
+			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(widget.fields).values()) {
+				const {reference, type} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
-				if (references_substitution.has(reference)) {
-					accessor.setReference(references_substitution.get(reference));
-				}
-				else {
-					accessor.setReference('');
-				}
+				accessor.setTypedReference(
+					CWidgetBase.createTypedReference(references_substitution.has(reference)
+						? {
+							reference: references_substitution.get(reference),
+							type
+						}
+						: {
+							reference: ''
+						}
+					)
+				);
 			}
 		}
 
@@ -642,8 +647,7 @@ class CDashboard {
 					if (response.widgets[i] !== null) {
 						sane_widgets.push({
 							...widgets[i],
-							fields: response.widgets[i].fields,
-							fields_references: response.widgets[i].fields_references
+							fields: response.widgets[i].fields
 						});
 					}
 				}
@@ -722,10 +726,11 @@ class CDashboard {
 
 		const references = this._getReferences({dashboard_page});
 
-		for (const accessor of CWidgetBase.getFieldsReferencesAccessors(new_widget_data.fields,
-				new_widget_data.fields_references)) {
-			if (!references.has(accessor.getReference())) {
-				accessor.setReference('');
+		for (const accessor of CWidgetBase.getFieldsReferencesAccessors(new_widget_data.fields).values()) {
+			const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+			if (!references.has(reference)) {
+				accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));
 			}
 		}
 
@@ -764,7 +769,6 @@ class CDashboard {
 				dashboard_page.replaceWidgetFromData(paste_placeholder_widget, {
 					...new_widget_data,
 					fields: response.widgets[0].fields,
-					fields_references: response.widgets[0].fields_references,
 					widgetid: null,
 					pos: new_widget_pos,
 					is_new: true,
@@ -1451,13 +1455,13 @@ class CDashboard {
 
 		Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
-			.then(({fields, fields_references}) => {
+			.then(({fields}) => {
 				this._is_unsaved = true;
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				if (widget !== null && widget.getType() === type) {
-					widget.updateProperties({name, view_mode, fields, fields_references});
+					widget.updateProperties({name, view_mode, fields});
 
 					return;
 				}
@@ -1476,7 +1480,6 @@ class CDashboard {
 					name,
 					view_mode,
 					fields,
-					fields_references,
 					widgetid: null,
 					pos: widget === null ? this.#edit_widget_cache.new_widget_pos_reserved : widget.getPos(),
 					is_new: widget === null,
@@ -1920,20 +1923,21 @@ class CDashboard {
 
 		for (const widget of dashboard_page.getWidgets()) {
 			const fields = widget.getFields();
-			const fields_references = widget.getFieldsReferences();
 
 			let has_updates = false;
 
-			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields, fields_references)) {
-				if (!references.has(accessor.getReference())) {
-					accessor.setReference('');
+			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
+				const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+				if (!references.has(reference)) {
+					accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));
 
 					has_updates = true;
 				}
 			}
 
 			if (has_updates) {
-				widget.updateProperties({fields, fields_references});
+				widget.updateProperties({fields});
 			}
 		}
 	}
@@ -1971,10 +1975,11 @@ class CDashboard {
 
 				for (const widget of widgets_with_reference.values()) {
 					const fields = widget.getFields();
-					const fields_references = widget.getFieldsReferences();
 
-					for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields, fields_references)) {
-						if (circular_references.has(accessor.getReference())) {
+					for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
+						const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+						if (circular_references.has(reference)) {
 							circular_references_next.add(fields.reference);
 
 							referable_widgets.delete(widget);

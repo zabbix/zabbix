@@ -93,8 +93,8 @@ class CWidgetFieldMultiselect {
 
 		this.#initField(element, multiselect_params);
 
-		if ('reference' in field_value) {
-			this.#selectReference(field_value.reference);
+		if ('_reference' in field_value) {
+			this.#selectReference(field_value._reference);
 		}
 	}
 
@@ -138,7 +138,9 @@ class CWidgetFieldMultiselect {
 
 			if (this.#dashboard_accepted) {
 				this.#multiselect.multiSelect('addOptionalSelect', t('Dashboard'), () => {
-					this.#selectReference('DASHBOARD');
+					this.#selectReference(
+						CWidgetBase.createTypedReference('DASHBOARD', this.#in_type)
+					);
 				});
 			}
 		}
@@ -169,13 +171,13 @@ class CWidgetFieldMultiselect {
 	#selectReference(reference) {
 		let caption = null;
 
-		if (reference === 'DASHBOARD') {
-			caption = {id: 'DASHBOARD', name: t('Dashboard')}
+		if (reference === CWidgetBase.createTypedReference('DASHBOARD', this.#in_type)) {
+			caption = {id: reference, name: t('Dashboard')}
 		}
 		else {
 			for (const widget of this.#getWidgets()) {
 				if (widget.id === reference) {
-					caption = widget
+					caption = widget;
 					break;
 				}
 			}
@@ -183,7 +185,7 @@ class CWidgetFieldMultiselect {
 
 		if (caption !== null) {
 			this.#multiselect.multiSelect('modify', {
-				name: `${this.#field_name}[reference]`,
+				name: `${this.#field_name}[_reference]`,
 				selectedLimit: 1
 			});
 
@@ -218,7 +220,11 @@ class CWidgetFieldMultiselect {
 		const result_entities = new Map();
 
 		if (this.#dashboard_accepted && t('Dashboard').toLowerCase().includes(search)) {
-			result_entities.set('DASHBOARD', {id: 'DASHBOARD', name: t('Dashboard'), source: 'dashboard'})
+			result_entities.set('DASHBOARD', {
+				id: CWidgetBase.createTypedReference('DASHBOARD', this.#in_type),
+				name: t('Dashboard'),
+				source: 'dashboard'
+			})
 		}
 
 		if (this.#widget_accepted) {
@@ -258,7 +264,7 @@ class CWidgetFieldMultiselect {
 
 		for (const widget of widgets) {
 			result.push({
-				id: widget.getFields().reference,
+				id: CWidgetBase.createTypedReference(widget.getFields().reference, this.#in_type),
 				name: widget.getHeaderName()
 			});
 		}

@@ -72,7 +72,7 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
  */
 class CWidgetBase {
 
-	// Require data source event: informs the dashboard page to load the referred data source.
+	// Require data source event: informs the dashboard page to load the referred foreign data source.
 	static EVENT_REQUIRE_DATA_SOURCE = 'widget-require-data-source';
 
 	#fields_references_accessors = null;
@@ -90,7 +90,6 @@ class CWidgetBase {
 	 * @param {string}      name                Widget name to display in the header.
 	 * @param {number}      view_mode           One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
 	 * @param {Object}      fields              Widget field values (widget configuration data).
-	 * @param {Object}      fields_references   Widget field reference descriptor.
 	 *
 	 * @param {Object}      defaults            Widget type defaults.
 	 *        {string}      defaults.name           Default name to display in the header, if no custom name given.
@@ -144,7 +143,6 @@ class CWidgetBase {
 		name,
 		view_mode,
 		fields,
-		fields_references,
 		defaults,
 		widgetid = null,
 		pos = null,
@@ -169,7 +167,6 @@ class CWidgetBase {
 		this._name = name;
 		this._view_mode = view_mode;
 		this._fields = {...fields};
-		this._fields_references = {...fields_references};
 
 		this._defaults = {
 			name: defaults.name,
@@ -431,55 +428,34 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Send feedback data to the referred data sources.
+	 * Send feedback data to the referred foreign data sources.
 	 *
-	 * @param {Object}   data
-	 *        {Object[]} data[field]             Feedback data for the specified field.
-	 *        {Array}    data[field][]['path']   Field reference path as specified for setFieldsReferences.
-	 *        {*}        data[field][]['value']  Feedback value for the specified field and reference path.
+	 * @param {Object} data  An object consisting of {path: value} pairs.
 	 */
 	feedback(data) {
-		const fields_references_accessors_by_path = {};
+		const accessors = this.#getFieldsReferencesAccessors();
 
-		for (const accessor of this.#getFieldsReferencesAccessors()) {
-			const path_hash = JSON.stringify(accessor.path);
-
-			if (!(accessor.field in fields_references_accessors_by_path)) {
-				fields_references_accessors_by_path[accessor.field] = {};
+		for (const [path, value] of Object.entries(data)) {
+			if (!accessors.has(path)) {
+				throw new Error('Cannot send feedback: reference path does not exist.');
 			}
 
-			fields_references_accessors_by_path[accessor.field][path_hash] = accessor;
-		}
+			const {reference, type} = CWidgetBase.parseTypedReference(accessors.get(path).getTypedReference());
 
-		for (const [field, field_data] of Object.entries(data)) {
-			if (!(field in fields_references_accessors_by_path)) {
-				throw new Error('Cannot send feedback: widget field does not exist.');
-			}
-
-			for (const {path, value} of field_data) {
-				const path_hash = JSON.stringify(path);
-
-				if (!(path_hash in fields_references_accessors_by_path[field])) {
-					throw new Error('Cannot send feedback: referred data path does not exist.');
-				}
-
-				const field_reference_accessor = fields_references_accessors_by_path[field][path_hash];
-
-				if (field_reference_accessor.getReference() !== '') {
-					ZABBIX.EventHub.publish({
-						data: value,
-						descriptor: {
-							context: 'dashboard',
-							sender_unique_id: this._unique_id,
-							sender_type: 'widget',
-							widget_type: this._type,
-							event_type: 'feedback',
-							event_origin: this._unique_id,
-							reference: field_reference_accessor.getReference(),
-							type: field_reference_accessor.type
-						}
-					});
-				}
+			if (reference !== '') {
+				ZABBIX.EventHub.publish({
+					data: value,
+					descriptor: {
+						context: 'dashboard',
+						sender_unique_id: this._unique_id,
+						sender_type: 'widget',
+						widget_type: this._type,
+						event_type: 'feedback',
+						event_origin: this._unique_id,
+						reference,
+						type
+					}
+				});
 			}
 		}
 	}
@@ -492,7 +468,7 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Require loading the specified data source.
+	 * Require loading the specified foreign data source.
 	 *
 	 * @param {string} reference
 	 */
@@ -501,33 +477,35 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Load and connect to the referred data sources.
+	 * Load and connect to the referred foreign data sources.
 	 *
-	 * Invoked before the first activation of the dashboard page, as well as on fields/fields_references updates.
+	 * Invoked before the first activation of the dashboard page, as well as on fields update.
 	 */
 	#startDataExchange() {
-		for (const accessor of this.#getFieldsReferencesAccessors()) {
-			if (accessor.getReference() === '') {
-				this.#fields_referred_data.set(accessor, {value: null, descriptor: null});
+		for (const [path, accessor] of this.#getFieldsReferencesAccessors()) {
+			const {reference, type} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+			if (reference === '') {
+				this.#fields_referred_data.set(path, {value: null, descriptor: null});
 
 				continue;
 			}
 
-			this.requireDataSource(accessor.getReference());
+			this.requireDataSource(reference);
 
 			const broadcast_subscription = ZABBIX.EventHub.subscribe({
 				require: {
 					context: 'dashboard',
 					event_type: 'broadcast',
-					reference: accessor.getReference(),
-					type: accessor.type
+					reference,
+					type
 				},
 				callback: ({data, descriptor}) => {
 					if (descriptor.event_origin === this._unique_id) {
 						return;
 					}
 
-					this.#fields_referred_data.set(accessor, {value: data, descriptor});
+					this.#fields_referred_data.set(path, {value: data, descriptor});
 
 					if (this._state === WIDGET_STATE_ACTIVE) {
 						this._startUpdating();
@@ -581,9 +559,9 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Disconnect from the referred data sources, invalidate broadcast data.
+	 * Disconnect from the referred foreign data sources, invalidate broadcast data.
 	 *
-	 * Invoked when the widget or the dashboard page gets deleted, as well as on fields/fields_references updates.
+	 * Invoked when the widget or the dashboard page gets deleted, as well as on fields update.
 	 */
 	#stopDataExchange() {
 		ZABBIX.EventHub.invalidateData({
@@ -602,54 +580,44 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Check if the referred data has been fully received from all data sources.
+	 * Check if the referred data has been fully received from all foreign data sources.
 	 *
 	 * @returns {boolean}
 	 */
 	isFieldsReferredDataReady() {
-		return this.#fields_referred_data.size === this.#getFieldsReferencesAccessors().length;
+		return this.#fields_referred_data.size === this.#getFieldsReferencesAccessors().size;
 	}
 
 	/**
-	 * Get referred data received from data sources, as specified by fields/fields_references of the widget.
+	 * Get referred data and event descriptors received from foreign data sources.
+	 *
+	 * @returns {Map}
+	 */
+	getFieldsReferredData() {
+		return this.#fields_referred_data;
+	}
+
+	/**
+	 * Get fields data with references replaced with the actual referred data received from foreign data sources.
 	 *
 	 * @returns {Object}
 	 */
-	getFieldsReferredData() {
-		const referred_data = {};
+	getFieldsData() {
+		const fields_data = JSON.parse(JSON.stringify(this._fields));
 
-		for (const [accessor, {value}] of this.#fields_referred_data.entries()) {
-			if (!(accessor.field in referred_data)) {
-				referred_data[accessor.field] = [];
+		for (const [path, {value}] of this.#fields_referred_data) {
+			let container = {fields_data};
+			let key = 'fields_data';
+
+			for (const step of path.split('/')) {
+				container = container[key];
+				key = step;
 			}
 
-			referred_data[accessor.field].push({
-				path: accessor.path,
-				value
-			});
+			container[key] = value;
 		}
 
-		return referred_data;
-	}
-
-	/**
-	 * Get event descriptor of the referred value for the specified field and path.
-	 *
-	 * @param {string} field  Widget configuration data field.
-	 * @param {Array}  path   Field reference path as specified for setFieldsReferences.
-	 *
-	 * @returns {*}
-	 */
-	getFieldReferredValueDescriptor({field, path}) {
-		const path_json = JSON.stringify(path);
-
-		for (const [accessor, {descriptor}] of this.#fields_referred_data.entries()) {
-			if (field === accessor.field && path_json === JSON.stringify(accessor.path)) {
-				return descriptor;
-			}
-		}
-
-		return null;
+		return fields_data;
 	}
 
 	// External events management methods.
@@ -939,78 +907,101 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Get widget field reference descriptor.
+	 * Get accessors to the field objects containing references to the foreign data sources.
 	 *
-	 * @returns {Object}
-	 */
-	getFieldsReferences() {
-		return this._fields_references;
-	}
-
-	/**
-	 * Set widget field reference descriptor.
-	 *
-	 * @param {Object} fields_references
-	 */
-	_setFieldsReferences(fields_references) {
-		this._fields_references = fields_references;
-	}
-
-	/**
-	 * Get accessors to the fields referenced by the field reference descriptor.
-	 *
-	 * @returns {Object[]}
+	 * @returns {Map}
 	 */
 	#getFieldsReferencesAccessors() {
 		if (this.#fields_references_accessors === null) {
-			this.#fields_references_accessors = CWidgetBase.getFieldsReferencesAccessors(this._fields,
-				this._fields_references
-			);
+			this.#fields_references_accessors = CWidgetBase.getFieldsReferencesAccessors(this._fields);
 		}
 
 		return this.#fields_references_accessors;
 	}
 
 	/**
-	 * Reset accessors to the fields referenced by the field reference descriptor.
+	 * Reset accessors to the field objects containing references to the foreign data sources.
 	 *
-	 * Invoked when fields or field_references properties are updated.
+	 * Invoked when the fields are updated.
 	 */
 	#resetFieldsReferencesAccessors() {
 		this.#fields_references_accessors = null;
 	}
 
 	/**
-	 * Get accessors to the fields referenced by the field reference descriptor.
-	 * @param {Object} fields              Widget field values (widget configuration data).
-	 * @param {Object} fields_references   Widget field reference descriptor.
+	 * Get accessors to the field objects containing references to the foreign data sources.
 	 *
-	 * @returns {Object[]}
+	 * @param {Object} fields  Widget field values (widget configuration data).
+	 *
+	 * @returns {Object}
 	 */
-	static getFieldsReferencesAccessors(fields, fields_references) {
-		const accessors = [];
+	static getFieldsReferencesAccessors(fields) {
+		const accessors = new Map();
 
-		for (const [field, field_references] of Object.entries(fields_references)) {
-			for (const {path, type} of field_references) {
-				let container = fields;
-				let key = field;
+		let traverse = [{container: fields, path: []}];
 
-				for (const step of path) {
-					container = container[key];
-					key = step;
+		while (traverse.length > 0) {
+			const traverse_next = [];
+
+			for (const {container, path} of traverse) {
+				for (const key in container) {
+					if (typeof container[key] !== 'object') {
+						continue;
+					}
+
+					if ('_reference' in container[key]) {
+						accessors.set([...path, key].join('/'), {
+							setTypedReference: (typed_reference) => container[key]._reference = typed_reference,
+							getTypedReference: () => container[key]._reference
+						});
+
+						continue;
+					}
+
+					traverse_next.push({
+						container: container[key],
+						keys: Object.keys(container[key]),
+						path: [...path, key]
+					});
 				}
-
-				accessors.push({
-					field,
-					path,
-					type,
-					setReference: (reference) => container[key] = reference,
-					getReference: () => container[key]
-				});
 			}
+
+			traverse = traverse_next;
 		}
 
 		return accessors;
+	}
+
+	/**
+	 * Parse typed reference (a reference to a foreign data source).
+	 *
+	 * @param {string} typed_reference
+	 *
+	 * @returns {{reference: string, type: string}}
+	 */
+	static parseTypedReference(typed_reference) {
+		const separator_index = typed_reference.indexOf('.');
+
+		if (separator_index === -1) {
+			return {reference: '', type: ''};
+		}
+
+		return {
+			reference: typed_reference.slice(0, separator_index),
+			type: typed_reference.slice(separator_index + 1)
+		};
+	}
+
+	/**
+	 * Create a typed reference (a reference to a foreign data source).
+	 *
+	 * @param {string} reference
+	 * @param {string} type
+	 *
+	 * @returns {string}
+	 */
+	static createTypedReference({reference, type = ''}) {
+		return type !== '' ? `${reference}.${type}` : reference;
 	}
 
 	/**
@@ -1044,9 +1035,8 @@ class CWidgetBase {
 	 * @param {number|undefined} view_mode          One of ZBX_WIDGET_VIEW_MODE_NORMAL,
 	 *                                              ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
 	 * @param {Object|undefined} fields             Widget field values (widget configuration data).
-	 * @param {Object|undefined} fields_references  Widget field reference descriptor.
 	 */
-	updateProperties({name, view_mode, fields, fields_references}) {
+	updateProperties({name, view_mode, fields}) {
 		if (name !== undefined) {
 			this._setName(name);
 		}
@@ -1055,18 +1045,12 @@ class CWidgetBase {
 			this._setViewMode(view_mode);
 		}
 
-		if (fields !== undefined || fields_references !== undefined) {
+		if (fields !== undefined) {
 			if (this._state !== WIDGET_STATE_INITIAL) {
 				this.#stopDataExchange();
 			}
 
-			if (fields !== undefined) {
-				this._setFields(fields);
-			}
-
-			if (fields_references !== undefined) {
-				this._setFieldsReferences(fields_references);
-			}
+			this._setFields(fields);
 
 			if (this._state !== WIDGET_STATE_INITIAL) {
 				this.#startDataExchange();
@@ -1135,7 +1119,6 @@ class CWidgetBase {
 			name: this._name,
 			view_mode: this._view_mode,
 			fields: this._fields,
-			fields_references: this._fields_references,
 			pos: is_single_copy
 				? {
 					width: this._pos.width,
@@ -1224,7 +1207,7 @@ class CWidgetBase {
 				[900, t('15 minutes')]
 			]);
 
-			for (const [rf_rate, label] of rf_rates.entries()) {
+			for (const [rf_rate, label] of rf_rates) {
 				refresh_interval_section.items.push({
 					label: label,
 					selected: rf_rate === this._rf_rate,

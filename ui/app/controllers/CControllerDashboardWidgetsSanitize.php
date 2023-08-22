@@ -142,8 +142,7 @@ class CControllerDashboardWidgetsSanitize extends CController {
 			$form->validate();
 
 			$output['widgets'][$index] = [
-				'fields' => $form->getFieldsValues(),
-				'fields_references' => $form->getFieldsReferences()
+				'fields' => $form->getFieldsValues()
 			];
 		}
 

@@ -91,8 +91,7 @@ class CDashboardHelper {
 						'height' => (int) $widget_data['height']
 					],
 					'rf_rate' => 0,
-					'fields' => [],
-					'fields_references' => []
+					'fields' => []
 				];
 
 				/** @var CWidget $widget */
@@ -104,7 +103,6 @@ class CDashboardHelper {
 					$form->validate();
 
 					$prepared_widget['fields'] = $form->getFieldsValues();
-					$prepared_widget['fields_references'] = $form->getFieldsReferences();
 
 					if ($with_rf_rate) {
 						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);

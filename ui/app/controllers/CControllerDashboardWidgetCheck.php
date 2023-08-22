@@ -89,7 +89,6 @@ class CControllerDashboardWidgetCheck extends CController {
 		}
 		else {
 			$output['fields'] = $form->getFieldsValues();
-			$output['fields_references'] = $form->getFieldsReferences();
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
