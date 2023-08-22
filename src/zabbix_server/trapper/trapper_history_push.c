@@ -581,7 +581,7 @@ static int	check_user_role_permmissions(const zbx_user_t *user)
 {
 #define API_METHOD		"api.method."
 
-	int		ret = FAIL, api_access = 0, api_mode = 0, history_push = 0;
+	int		ret = FAIL, api_access = 0, api_mode = 0, api_method = 0, history_push = 0;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
@@ -608,6 +608,8 @@ static int	check_user_role_permmissions(const zbx_user_t *user)
 		}
 		else if (0 == strncmp(row[0], API_METHOD, ZBX_CONST_STRLEN(API_METHOD)))
 		{
+			api_method = 1;
+
 			if (0 == strcmp(row[2], "history.push") || 0 == strcmp(row[2], "history.*"))
 				history_push = 1;
 		}
@@ -617,10 +619,15 @@ static int	check_user_role_permmissions(const zbx_user_t *user)
 
 	if (0 != api_access)
 	{
-		if (0 == api_mode)
-			history_push = !history_push;
+		if (0 != api_method)
+		{
+			if (0 == api_mode)
+				history_push = !history_push;
 
-		if (0 != history_push)
+			if (0 != history_push)
+				ret = SUCCEED;
+		}
+		else
 			ret = SUCCEED;
 	}
 out:
