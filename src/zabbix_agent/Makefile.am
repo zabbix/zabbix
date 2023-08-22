@@ -11,19 +11,9 @@ EXTRA_DIST = \
 
 sbin_PROGRAMS = zabbix_agentd
 
-noinst_LIBRARIES = libzbxagent.a
-
-libzbxagent_a_SOURCES = \
-	metrics.h
-
-libzbxagent_a_CFLAGS = \
-	-DZABBIX_DAEMON \
-	$(TLS_CFLAGS)
-
 zabbix_agentd_SOURCES = zabbix_agentd.c
 
 zabbix_agentd_LDADD = \
-	libzbxagent.a \
 	active_checks/libzbxactive_checks.a \
 	listener/libzbxlistener.a \
 	agent_conf/libagent_conf.a \
