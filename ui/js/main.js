@@ -1100,7 +1100,7 @@ jQuery(function ($) {
 	}
 });
 
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
 
 	// Event hub initialization.
 
