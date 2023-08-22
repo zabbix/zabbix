@@ -29,6 +29,7 @@
 #include "zbxthreads.h"
 #include "zbxjson.h"
 #include "zbxstats.h"
+#include "zbxcachehistory.h"
 
 #define ZBX_PREPROCESSING_BATCH_SIZE	256
 
