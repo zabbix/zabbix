@@ -143,8 +143,6 @@ require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormUser.php';
 require_once dirname(__FILE__).'/testFormUserMedia.php';
 require_once dirname(__FILE__).'/testFormUserProfile.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWeb.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWebStep.php';
 require_once dirname(__FILE__).'/testFormApplication.php';
 require_once dirname(__FILE__).'/testPageApplications.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
