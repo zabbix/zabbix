@@ -2761,7 +2761,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		item->status = status;
 		item->value_type = value_type;
 		item->interfaceid = interfaceid;
-		
+
 
 		/* update items_hk index using new data, if not done already */
 
@@ -7322,7 +7322,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	sec = zbx_time();
 	DCsync_interfaces(&if_sync, new_revision);
 	ifsec2 = zbx_time() - sec;
-	
+
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
