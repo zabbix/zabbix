@@ -99,7 +99,7 @@ class ColumnEdit extends CController {
 		unset($input['edit'], $input['update'], $input['templateid']);
 		$field->setValue([$input]);
 
-		if (!$this->hasInput('edit') && !$this->hasInput('update')) {
+		if (!$this->hasInput('update')) {
 			return true;
 		}
 
