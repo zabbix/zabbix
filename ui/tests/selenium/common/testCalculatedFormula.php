@@ -2756,6 +2756,11 @@ class testCalculatedFormula extends CWebTest {
 			// foreach() aggregated functions.
 			[
 				[
+					'formula' => 'mad(last_foreach(/*/trap))'
+				]
+			],
+			[
+				[
 					'formula' => 'sum(last_foreach(/*/trap))'
 				]
 			],
