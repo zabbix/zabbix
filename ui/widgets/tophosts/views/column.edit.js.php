@@ -91,7 +91,10 @@ window.tophosts_column_edit_form = new class {
 			<?= CWidgetFieldColumnsList::HISTORY_DATA_TRENDS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
-		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= AGGREGATE_NONE ?>;
+		const aggregate_function_avg = $('[name="aggregate_function"]').val() == <?= AGGREGATE_AVG ?>;
+		const aggregate_function_min = $('[name="aggregate_function"]').val() == <?= AGGREGATE_MIN ?>;
+		const aggregate_function_max = $('[name="aggregate_function"]').val() == <?= AGGREGATE_MAX ?>;
+		const aggregate_function_sum = $('[name="aggregate_function"]').val() == <?= AGGREGATE_SUM ?>;
 		const aggregate_options = document.getElementById('aggregate_function');
 		const override_fields = document.querySelectorAll('.override-time');
 
@@ -105,9 +108,9 @@ window.tophosts_column_edit_form = new class {
 
 		// Toggle warning icons for non-numeric items settings.
 		if (data_item_value) {
-			document.getElementById('tophosts-column-aggregate-function-warning').style.display = no_aggregate_function
-				? 'none'
-				: '';
+			document.getElementById('tophosts-column-aggregate-function-warning').style.display = aggregate_function_avg
+				|| aggregate_function_min || aggregate_function_max || aggregate_function_sum ? '' : 'none';
+
 			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
 			document.getElementById('tophosts-column-history-data-warning').style.display = history_data_trends
 				? ''
