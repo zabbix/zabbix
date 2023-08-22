@@ -73,6 +73,11 @@ class CControllerUsergroupTagFilterCheck extends CController {
 				}
 			}
 		}
+		elseif ($this->getInput('filter_type') == TAG_FILTER_LIST) {
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
+
+			return false;
+		}
 
 		return true;
 	}
