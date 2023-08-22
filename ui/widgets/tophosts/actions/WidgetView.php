@@ -72,7 +72,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$dashboard_time = false;
 
 		foreach ($this->fields_values['columns'] as $column) {
-			if (array_key_exists('item_time', $column) && $column['item_time'] === 0) {
+			if (!array_key_exists('item_time', $column)) {
 				$dashboard_time = true;
 			}
 		}
@@ -89,7 +89,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		foreach ($this->fields_values['columns'] as $key => $column) {
-			if ($column['item_time'] === 0) {
+			if (!isset($column['item_time'])) {
 				$this->fields_values['columns'][$key]['time_from'] = $from;
 				$this->fields_values['columns'][$key]['time_to'] = $to;
 			}

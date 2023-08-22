@@ -45,8 +45,6 @@ class WidgetForm extends CWidgetForm {
 
 	private const DEFAULT_HOSTS_COUNT = 10;
 	private const DEFAULT_ORDER_COLUMN = 0;
-	public const TOP_HOSTS_CUSTOM_TIME_OFF = '0';
-	public const TOP_HOSTS_CUSTOM_TIME_ON = '1';
 
 	private array $field_column_values = [];
 
@@ -150,15 +148,19 @@ class WidgetForm extends CWidgetForm {
 	 * Check if widget configuration is set to use overridden time.
 	 */
 	public static function hasOverrideTime(array $fields_values): bool {
-		$item_time = 'columns.item_time.';
-		$override_time = [];
+		$agg_function_count = 0;
+		$item_time_count = 0;
 
 		foreach ($fields_values as $key => $field_value) {
-			if (substr($key, 0, 18) === $item_time && $field_value === self::TOP_HOSTS_CUSTOM_TIME_OFF) {
-				$override_time = ['true'];
+			if (strpos($key, 'columns.aggregate_function') === 0) {
+				$agg_function_count++;
+			}
+
+			if (strpos($key, 'columns.item_time') === 0) {
+				$item_time_count++;
 			}
 		}
 
-		return empty($override_time);
+		return ($agg_function_count === $item_time_count);
 	}
 }
