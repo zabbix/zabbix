@@ -99,7 +99,7 @@
 			for (const id in groups) {
 				if (groups.hasOwnProperty(id)) {
 					const group = {
-						'id': id,
+						'id': groups[id]['groupid'],
 						'name': groups[id]['name']
 					};
 					$(ms).multiSelect('addData', [group]);

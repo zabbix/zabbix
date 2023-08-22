@@ -245,13 +245,14 @@ class CControllerUsergroupEdit extends CController {
 				continue;
 			}
 
-			$group = $right['permission'];
+			$right['groupid'] = $id;
+			$permission = $right['permission'];
 
-			if (!array_key_exists($group, $sorted_group_rights)) {
-				$sorted_group_rights[$group] = [];
+			if (!array_key_exists($permission, $sorted_group_rights)) {
+				$sorted_group_rights[$permission] = [];
 			}
 
-			$sorted_group_rights[$group][$id] = $right;
+			$sorted_group_rights[$permission][] = $right;
 		}
 
 		return $sorted_group_rights;
