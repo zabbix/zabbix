@@ -31,6 +31,8 @@
 #include "zbxpreproc.h"
 #include "audit/zbxaudit.h"
 
+#define INVALID_ITEM_OR_NO_PERMISSION_ERROR	"No permissions to referred object or it does not exist."
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -228,7 +230,7 @@ static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights
 
 		if (PERM_READ > perm->permission)
 		{
-			*error = zbx_strdup(NULL, "Insufficient permissions to upload history.");
+			*error = zbx_strdup(NULL, INVALID_ITEM_OR_NO_PERMISSION_ERROR);
 			return FAIL;
 		}
 	}
@@ -239,9 +241,15 @@ static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights
 		return FAIL;
 	}
 
-	if (ITEM_TYPE_TRAPPER != item->type && (ITEM_TYPE_HTTPAGENT != item->type || 0 == item->allow_traps))
+	if (ITEM_TYPE_TRAPPER != item->type && ITEM_TYPE_HTTPAGENT != item->type)
 	{
 		*error = zbx_strdup(NULL, "Unsupported item type.");
+		return FAIL;
+	}
+
+	if (ITEM_TYPE_HTTPAGENT == item->type && 0 == item->allow_traps)
+	{
+		*error = zbx_strdup(NULL, "HTTP agent item trapping is not enabled.");
 		return FAIL;
 	}
 
@@ -499,7 +507,8 @@ static void	process_item_values(const zbx_user_t *user, const struct addrinfo *a
 
 		if (SUCCEED != errcode)
 		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, "Cannot find item.", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, INVALID_ITEM_OR_NO_PERMISSION_ERROR,
+					ZBX_JSON_TYPE_STRING);
 		}
 		else
 		{
