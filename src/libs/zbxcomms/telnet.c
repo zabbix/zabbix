@@ -439,7 +439,7 @@ fail:
 int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *result, const char *encoding)
 {
 	char		buf[MAX_BUFFER_LEN];
-	char		*err_msg, *utf8_result, *command_lf = NULL, *command_crlf = NULL;
+	char		*utf8_result, *err_msg = NULL, *command_lf = NULL, *command_crlf = NULL;
 	size_t		sz, offset;
 	int		rc, ret = FAIL;
 	size_t		i, offset_lf, offset_crlf;
