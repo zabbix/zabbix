@@ -22,7 +22,6 @@
 
 #include "../server.h"
 #include "../db_lengths.h"
-#include "../zbxreport.h"
 #include "../alerter/alerter.h"
 
 #include "zbxcrypto.h"
@@ -32,6 +31,14 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxlog.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1

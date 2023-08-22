@@ -19,13 +19,18 @@
 
 #include "report_writer.h"
 
+#include "../alerter/alerter.h"
+#include "report_protocol.h"
+
+#include "zbxalgo.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
 #include "zbxjson.h"
-#include "../alerter/alerter.h"
-#include "report_protocol.h"
 #include "zbxtime.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxstr.h"
 
 typedef struct
 {
@@ -106,10 +111,11 @@ static int	rw_get_report(const char *url, const char *cookie, int width, int hei
 	ZBX_UNUSED(config_tls_cert_file);
 	ZBX_UNUSED(config_tls_key_file);
 	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(confi_webservice_url);
 
 	*error = zbx_strdup(NULL, "application compiled without cURL library");
-	return FAIL;
 
+	return FAIL;
 #else
 	struct zbx_json		j;
 	char			*cookie_value, buffer[MAX_ID_LEN + 1], *curl_error = NULL;
