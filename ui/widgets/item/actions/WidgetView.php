@@ -204,6 +204,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				else {
 					$aggregate_interval = $history_period;
 				}
+
 				$last_results = Manager::History()->getAggregationByInterval(
 					$items, $time_from, $time_to, $aggregate_function, $time_to
 				);
@@ -237,8 +238,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 							$data['value'] = $data['count'];
 							unset($data['count']);
 						}
+
 						unset($data);
 					}
+
 					unset($datas);
 				}
 			}
