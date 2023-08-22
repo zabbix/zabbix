@@ -212,6 +212,27 @@ zbx_host_permission_t;
 static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights, const zbx_user_t *user,
 		zbx_history_recv_item_t *item, const zbx_hp_item_value_t *value, char **error)
 {
+	if (NULL != rights)
+	{
+		zbx_host_permission_t	*perm;
+
+		if (0 == (perm = (zbx_host_permission_t *)zbx_hashset_search(rights, &item->host.hostid)))
+		{
+			zbx_host_permission_t	perm_local;
+
+			perm_local.hostid = item->host.hostid;
+			perm_local.permission = zbx_get_host_permission(user, item->host.hostid);
+
+			perm = (zbx_host_permission_t *)zbx_hashset_insert(rights, &perm_local, sizeof(perm_local));
+		}
+
+		if (PERM_READ > perm->permission)
+		{
+			*error = zbx_strdup(NULL, "Insufficient permissions to upload history.");
+			return FAIL;
+		}
+	}
+
 	if (ITEM_STATUS_ACTIVE != item->status)
 	{
 		*error = zbx_strdup(NULL, "Item is disabled.");
@@ -251,27 +272,6 @@ static int	validate_item_config(const struct addrinfo *ai, zbx_hashset_t *rights
 		if (FAIL == ret)
 		{
 			*error = zbx_strdup(NULL, "Client IP is not in item's allowed hosts list.");
-			return FAIL;
-		}
-	}
-
-	if (NULL != rights)
-	{
-		zbx_host_permission_t	*perm;
-
-		if (0 == (perm = (zbx_host_permission_t *)zbx_hashset_search(rights, &item->host.hostid)))
-		{
-			zbx_host_permission_t	perm_local;
-
-			perm_local.hostid = item->host.hostid;
-			perm_local.permission = zbx_get_host_permission(user, item->host.hostid);
-
-			perm = (zbx_host_permission_t *)zbx_hashset_insert(rights, &perm_local, sizeof(perm_local));
-		}
-
-		if (PERM_READ > perm->permission)
-		{
-			*error = zbx_strdup(NULL, "Insufficient permissions to upload history.");
 			return FAIL;
 		}
 	}
