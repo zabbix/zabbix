@@ -184,7 +184,7 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
 	return SUCCEED;
 }
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve 'hostent' by IP address                                  *
