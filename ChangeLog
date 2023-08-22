@@ -1,6 +1,9 @@
 Changes for 7.0.0alpha4
 
 New features:
+.........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
+..F....... [ZBXNEXT-8421] implemented dashboard tabs navigation for host dashboards (ashubin, dpetra)
+A.F.I..PS. [ZBXNEXT-8500,ZBXNEXT-8506] moved proxies to separate database tables (dfofanovs, dgoloscapov, jfreibergs, mprihodko, vmaksimovs, vso)
 .........T [ZBXNEXT-8633] added asynchronous SNMP poller metrics to Zabbix health templates (drasikhov)
 ...G....S. [ZBXNEXT-4781] added new eventlog.count item key (kprutkovs)
 .........T [ZBXNEXT-8581] added support for HTTP proxy in Azure templates (egordymov)
@@ -4246,9 +4249,19 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.37rc1
+Changes for 5.0.38rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37
+
+5.0.37rc1 was released as 5.0.37 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37rc1
 
 Bug fixes:
 ...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
@@ -7079,9 +7092,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.48rc1
+Changes for 4.0.49rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48
+
+4.0.48rc1 was released as 4.0.48 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48rc1
 
 Bug fixes:
 

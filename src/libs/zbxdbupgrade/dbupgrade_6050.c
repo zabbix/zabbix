@@ -21,6 +21,7 @@
 
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
+#include "zbxtypes.h"
 
 /*
  * 7.0 development database patches
@@ -382,6 +383,354 @@ static int	DBpatch_6050033(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050034(void)
+{
+	const zbx_db_table_t	table = {"proxy", "proxyid", 0,
+			{
+				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
+				{"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"allowed_addresses", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"address", "127.0.0.1", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"port", "10051", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050035(void)
+{
+	return DBcreate_index("proxy", "proxy_1", "name", 1);
+}
+
+static int	DBpatch_6050036(void)
+{
+	return DBcreate_changelog_insert_trigger("proxy", "proxyid");
+}
+
+static int	DBpatch_6050037(void)
+{
+	return DBcreate_changelog_update_trigger("proxy", "proxyid");
+}
+
+static int	DBpatch_6050038(void)
+{
+	return DBcreate_changelog_delete_trigger("proxy", "proxyid");
+}
+
+#define DEPRECATED_STATUS_PROXY_ACTIVE	5
+#define DEPRECATED_STATUS_PROXY_PASSIVE	6
+
+static int	DBpatch_6050039(void)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_db_insert_t		db_insert_proxies;
+	int			ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+			"select h.hostid,h.host,h.status,h.description,h.tls_connect,h.tls_accept,h.tls_issuer,"
+				"h.tls_subject,h.tls_psk_identity,h.tls_psk,h.proxy_address,i.useip,i.ip,i.dns,i.port"
+			" from hosts h"
+			" left join interface i"
+				" on h.hostid=i.hostid"
+			" where h.status in (%i,%i)",
+			DEPRECATED_STATUS_PROXY_PASSIVE, DEPRECATED_STATUS_PROXY_ACTIVE);
+
+	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "mode", "description", "tls_connect",
+			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
+			"address", "port", NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	proxyid;
+		int		status, tls_connect, tls_accept;
+
+		ZBX_STR2UINT64(proxyid, row[0]);
+		status = atoi(row[2]);
+		tls_connect = atoi(row[4]);
+		tls_accept = atoi(row[5]);
+
+		if (DEPRECATED_STATUS_PROXY_ACTIVE == status)
+		{
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_ACTIVE, row[3],
+					tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
+					"127.0.0.1", "10051");
+		}
+		else if (DEPRECATED_STATUS_PROXY_PASSIVE == status)
+		{
+			const char	*address;
+			const char	*port;
+
+			if (SUCCEED != zbx_db_is_null(row[11]))
+			{
+				address = (1 == atoi(row[11]) ? row[12] : row[13]);
+				port = row[14];
+			}
+			else
+			{
+				address = "127.0.0.1";
+				port = "10051";
+				zabbix_log(LOG_LEVEL_WARNING, "cannot select interface for proxy '%s'",  row[1]);
+			}
+
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_PASSIVE, row[3],
+					tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address, port);
+		}
+	}
+	zbx_db_free_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert_proxies);
+	zbx_db_insert_clean(&db_insert_proxies);
+
+	return ret;
+}
+
+static int	DBpatch_6050040(void)
+{
+	return DBdrop_foreign_key("hosts", 1);
+}
+
+static int	DBpatch_6050041(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBrename_field("hosts", "proxy_hostid", &field);
+}
+
+static int	DBpatch_6050042(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("hosts", 1, &field);
+}
+
+static int	DBpatch_6050043(void)
+{
+	return DBdrop_foreign_key("drules", 1);
+}
+
+static int	DBpatch_6050044(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBrename_field("drules", "proxy_hostid", &field);
+}
+
+static int	DBpatch_6050045(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("drules", 1, &field);
+}
+
+static int	DBpatch_6050046(void)
+{
+	return DBdrop_foreign_key("autoreg_host", 1);
+}
+
+static int	DBpatch_6050047(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBrename_field("autoreg_host", "proxy_hostid", &field);
+}
+
+static int	DBpatch_6050048(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("autoreg_host", 1, &field);
+}
+
+static int	DBpatch_6050049(void)
+{
+	return DBdrop_foreign_key("task", 1);
+}
+
+static int	DBpatch_6050050(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBrename_field("task", "proxy_hostid", &field);
+}
+
+static int	DBpatch_6050051(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task", 1, &field);
+}
+
+static int	DBpatch_6050052(void)
+{
+	const zbx_db_table_t	table = {"proxy_rtdata", "proxyid", 0,
+			{
+				{"proxyid", NULL, "proxy", "proxyid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"lastaccess", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"version", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"compatibility", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050053(void)
+{
+	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("proxy_rtdata", 1, &field);
+}
+
+static int	DBpatch_6050054(void)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_db_insert_t		db_insert_rtdata;
+	int			ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+		"select hr.hostid,hr.lastaccess,hr.version,hr.compatibility"
+		" from host_rtdata hr"
+		" join hosts h"
+			" on hr.hostid=h.hostid"
+		" where h.status in (%i,%i)",
+		DEPRECATED_STATUS_PROXY_ACTIVE, DEPRECATED_STATUS_PROXY_PASSIVE);
+
+	zbx_db_insert_prepare(&db_insert_rtdata, "proxy_rtdata", "proxyid", "lastaccess", "version", "compatibility",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		int		lastaccess, version, compatibility;
+		zbx_uint64_t	hostid;
+
+		ZBX_STR2UINT64(hostid, row[0]);
+		lastaccess = atoi(row[1]);
+		version = atoi(row[2]);
+		compatibility = atoi(row[3]);
+
+		zbx_db_insert_add_values(&db_insert_rtdata, hostid, lastaccess, version, compatibility);
+	}
+	zbx_db_free_result(result);
+
+	ret = zbx_db_insert_execute(&db_insert_rtdata);
+	zbx_db_insert_clean(&db_insert_rtdata);
+
+	return ret;
+}
+
+#undef DEPRECATED_STATUS_PROXY_ACTIVE
+#undef DEPRECATED_STATUS_PROXY_PASSIVE
+
+static int	DBpatch_6050055(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from hosts where status in (5,6)"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050056(void)
+{
+	return DBdrop_field("host_rtdata", "lastaccess");
+}
+
+static int	DBpatch_6050057(void)
+{
+	return DBdrop_field("host_rtdata", "version");
+}
+
+static int	DBpatch_6050058(void)
+{
+	return DBdrop_field("host_rtdata", "compatibility");
+}
+
+static int	DBpatch_6050059(void)
+{
+	return DBdrop_field("hosts", "proxy_address");
+}
+
+static int	DBpatch_6050060(void)
+{
+	return DBdrop_field("hosts", "auto_compress");
+}
+
+static int	DBpatch_6050061(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.proxies.filter_status'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050062(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update profiles"
+			" set value_str='name'"
+			" where value_str='host'"
+				" and idx='web.proxies.php.sort'"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050063(void)
+{
+#define TM_DATA_TYPE_TEST_ITEM	0
+#define TM_DATA_TYPE_PROXYIDS	2
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete"
+			" from task"
+			" where exists ("
+				"select null"
+				" from task_data td"
+				" where td.taskid=task.taskid and td.type in (%i,%i)"
+			")",
+			TM_DATA_TYPE_TEST_ITEM, TM_DATA_TYPE_PROXYIDS))
+	{
+		return FAIL;
+	}
+#undef TM_DATA_TYPE_TEST_ITEM
+#undef TM_DATA_TYPE_PROXYIDS
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -422,5 +771,35 @@ DBPATCH_ADD(6050030, 0, 1)
 DBPATCH_ADD(6050031, 0, 1)
 DBPATCH_ADD(6050032, 0, 1)
 DBPATCH_ADD(6050033, 0, 1)
+DBPATCH_ADD(6050034, 0, 1)
+DBPATCH_ADD(6050035, 0, 1)
+DBPATCH_ADD(6050036, 0, 1)
+DBPATCH_ADD(6050037, 0, 1)
+DBPATCH_ADD(6050038, 0, 1)
+DBPATCH_ADD(6050039, 0, 1)
+DBPATCH_ADD(6050040, 0, 1)
+DBPATCH_ADD(6050041, 0, 1)
+DBPATCH_ADD(6050042, 0, 1)
+DBPATCH_ADD(6050043, 0, 1)
+DBPATCH_ADD(6050044, 0, 1)
+DBPATCH_ADD(6050045, 0, 1)
+DBPATCH_ADD(6050046, 0, 1)
+DBPATCH_ADD(6050047, 0, 1)
+DBPATCH_ADD(6050048, 0, 1)
+DBPATCH_ADD(6050049, 0, 1)
+DBPATCH_ADD(6050050, 0, 1)
+DBPATCH_ADD(6050051, 0, 1)
+DBPATCH_ADD(6050052, 0, 1)
+DBPATCH_ADD(6050053, 0, 1)
+DBPATCH_ADD(6050054, 0, 1)
+DBPATCH_ADD(6050055, 0, 1)
+DBPATCH_ADD(6050056, 0, 1)
+DBPATCH_ADD(6050057, 0, 1)
+DBPATCH_ADD(6050058, 0, 1)
+DBPATCH_ADD(6050059, 0, 1)
+DBPATCH_ADD(6050060, 0, 1)
+DBPATCH_ADD(6050061, 0, 1)
+DBPATCH_ADD(6050062, 0, 1)
+DBPATCH_ADD(6050063, 0, 1)
 
 DBPATCH_END()

@@ -45,6 +45,7 @@ typedef struct
 	zbx_vector_int32_t	errcodes;
 	zbx_vector_int32_t	lastclocks;
 	struct event_base	*base;
+	struct evdns_base	*dnsbase;
 	zbx_hashset_t		interfaces;
 #ifdef HAVE_LIBCURL
 	CURLM			*curl_handle;

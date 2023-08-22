@@ -278,8 +278,8 @@ if ($parent_host['status'] != HOST_STATUS_TEMPLATE) {
 	$host_tab->addRow(
 		_('Monitored by proxy'),
 		(new CTextBox(
-			'proxy_hostid',
-			($parent_host['proxy_hostid'] != 0) ? $this->data['proxy']['host'] : _('(no proxy)'),
+			'proxyid',
+			($parent_host['proxyid'] != 0) ? $this->data['proxy']['name'] : _('(no proxy)'),
 			true
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);

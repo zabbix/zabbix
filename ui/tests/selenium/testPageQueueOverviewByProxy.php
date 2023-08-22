@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 class testPageQueueOverviewByProxy extends CLegacyWebTest {
 	public static function allProxies() {
-		return CDBHelper::getDataProvider("select * from hosts where status in (".HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.") order by hostid");
+		return CDBHelper::getDataProvider("select * from proxy order by proxyid");
 	}
 
 	/**
@@ -46,7 +46,7 @@ class testPageQueueOverviewByProxy extends CLegacyWebTest {
 				'More than 10 minutes'
 			]
 		);
-		$this->zbxTestTextPresent($proxy['host']);
+		$this->zbxTestTextPresent($proxy['name']);
 		$this->zbxTestTextPresent('Server');
 	}
 

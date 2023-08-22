@@ -580,19 +580,20 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		// Check the results in DB after update.
-		$proxy = DBfetch(DBselect('SELECT proxy_hostid FROM drules WHERE name='.zbx_dbstr($data['name'])));
-		if ($proxy['proxy_hostid']) {
-			$discovery_db_data = CDBHelper::getRow('SELECT hosts.host AS proxy, drules.name, iprange, delay'.
-					' FROM drules'.
-					' JOIN hosts ON drules.proxy_hostid=hostid'.
-					' WHERE drules.name='.zbx_dbstr($data['name']));
+		$proxy = DBfetch(DBselect('SELECT proxyid FROM drules WHERE name='.zbx_dbstr($data['name'])));
+		if ($proxy['proxyid']) {
+			$discovery_db_data = CDBHelper::getRow(
+				'SELECT drules.name, iprange, delay'.
+				' FROM drules'.
+				' WHERE drules.name='.zbx_dbstr($data['name'])
+			);
 		}
 		else {
 			$discovery_db_data = CDBHelper::getRow('SELECT name, iprange, delay FROM drules WHERE name='
 				.zbx_dbstr($data['name']));
 		}
 
-		$fields = ['name', 'proxy', 'iprange', 'delay'];
+		$fields = ['name', 'iprange', 'delay'];
 		foreach ($fields as $field) {
 			if (array_key_exists($field, $data)) {
 				$this->assertEquals($data[$field], $discovery_db_data[$field]);
@@ -619,6 +620,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($discovery['name']);
 			COverlayDialogElement::find()->waitUntilReady()->one()->query('button:Update')->waitUntilClickable()
 					->one()->click();
+			COverlayDialogElement::ensureNotPresent();
 
 			// Check the results in frontend.
 			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
@@ -634,7 +636,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('proxy', $data)) {
-			$this->zbxTestDropdownSelect('proxy_hostid', $data['proxy']);
+			$this->zbxTestDropdownSelect('proxyid', $data['proxy']);
 		}
 
 		if (array_key_exists('iprange', $data)) {
@@ -773,7 +775,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 			$names = [($drule['name']), 'CLONE: '.$drule['name']];
 			foreach ($names as $name) {
-				$sql_drules[] = CDBHelper::getHash('SELECT proxy_hostid, iprange, delay, status'.
+				$sql_drules[] = CDBHelper::getHash('SELECT proxyid, iprange, delay, status'.
 						' FROM drules'.
 						' WHERE name='.zbx_dbstr($name).
 						' ORDER BY druleid'

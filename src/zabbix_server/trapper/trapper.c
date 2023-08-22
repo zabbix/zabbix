@@ -198,12 +198,12 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
-				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
+				" \"%s\": %s", proxy.name, sock->peer, proxy.allowed_addresses, error);
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "ignoring heartbeat from active proxy \"%s\" at \"%s\": proxy heartbeats"
-			" are deprecated", proxy.host, sock->peer);
+			" are deprecated", proxy.name, sock->peer);
 out:
 	zbx_free(error);
 
@@ -397,7 +397,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			for (i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
-				zbx_uint64_t		id = item->proxy_hostid;
+				zbx_uint64_t		id = item->proxyid;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
@@ -988,7 +988,7 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	if (FAIL == zbx_dc_get_host_by_hostid(&dc_host, hostid))
 		return FAIL;
 
-	if (0 != dc_host.proxy_hostid || HOST_STATUS_NOT_MONITORED == dc_host.status)
+	if (0 != dc_host.proxyid || HOST_STATUS_NOT_MONITORED == dc_host.status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))

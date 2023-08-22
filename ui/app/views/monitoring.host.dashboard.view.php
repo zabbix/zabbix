@@ -68,27 +68,16 @@ $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $html_page = (new CHtmlPage())
-	->setTitle($data['dashboard']['name'])
+	->setTitle(_('Host dashboards'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
-	->setControls((new CTag('nav', true,
-		(new CList())
+	->setControls(
+		(new CTag('nav', true))
 			->addItem(
-				(new CForm('get'))
-					->addVar('action', 'host.dashboard.view')
-					->addVar('hostid', $data['host']['hostid'])
-					->addItem((new CLabel(_('Dashboard'), 'label-dashboard'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
-					->addItem(
-						(new CSelect('dashboardid'))
-							->setId('dashboardid')
-							->setFocusableElementId('label-dashboard')
-							->setValue($data['dashboard']['dashboardid'])
-							->addOptions(CSelect::createOptionsFromArray($data['host_dashboards']))
-							->addClass(ZBX_STYLE_HEADER_Z_SELECT)
-					)
+				(new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			)
-			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-	))->setAttribute('aria-label', _('Content controls')))
+			->setAttribute('aria-label', _('Content controls'))
+	)
 	->setKioskModeControls(
 		(count($data['dashboard']['pages']) > 1)
 			? (new CList())
@@ -120,21 +109,48 @@ $html_page = (new CHtmlPage())
 						->setTitle(_('Next page'))
 				)
 			: null
-	)
-	->setNavigation((new CList())->addItem(new CBreadcrumbs([
-		(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
-		(new CSpan())->addItem($data['host']['name']),
-		(new CSpan())
-			->addItem(new CLink($data['dashboard']['name'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'host.dashboard.view')
-					->setArgument('hostid', $data['host']['hostid'])
-			))
-			->addClass(ZBX_STYLE_SELECTED)
-	])));
+	);
+
+$navigation = (new CDiv())
+	->addClass(ZBX_STYLE_HOST_DASHBOARD_HEADER_NAVIGATION)
+	->addItem(
+		(new CList())->addItem(
+			new CBreadcrumbs([
+				(new CSpan())->addItem(
+					new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))
+				),
+				(new CSpan())->addItem($data['host']['name'])
+			])
+		)
+	);
+
+if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+	$dashboard_tabs = (new CDiv())
+		->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION)
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
+				->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous dashboard')))
+					->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD)
+				)
+		)
+		->addItem((new CDiv())->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS))
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
+				->addItem([
+					(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Dashboard list')))
+						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_LIST),
+					(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next dashboard')))
+						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD)
+				])
+		);
+
+	$navigation->addItem($dashboard_tabs);
+}
 
 if ($data['has_time_selector']) {
-	$html_page->addItem(
+	$navigation->addItem(
 		(new CFilter())
 			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -143,6 +159,8 @@ if ($data['has_time_selector']) {
 			)
 	);
 }
+
+$html_page->addItem($navigation);
 
 if (count($data['dashboard']['pages']) > 1
 		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets'])) {
@@ -183,7 +201,9 @@ if (count($data['dashboard']['pages']) > 1
 		);
 	}
 
-	$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
+	$dashboard->addItem(
+		(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+	);
 
 	$html_page
 		->addItem($dashboard)
@@ -202,7 +222,8 @@ else {
 		'widget_defaults' => $data['widget_defaults'],
 		'configuration_hash' => $data['configuration_hash'],
 		'time_period' => $data['time_period'],
-		'web_layout_mode' => $web_layout_mode
+		'web_layout_mode' => $web_layout_mode,
+		'host_dashboards' => $data['host_dashboards']
 	]).');
 '))
 	->setOnDocumentReady()
