@@ -99,11 +99,11 @@ $filter = (new CFilter())
 			)
 		])
 		->addItem([
-			new CLabel(_('Name')),
+			new CLabel(_('Name'), 'filter_name'),
 			new CFormField((new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
 		])
 		->addItem([
-			new CLabel(_('Vendor')),
+			new CLabel(_('Vendor'), 'filter_vendor_name'),
 			new CFormField(
 				(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
 					DB::getFieldLength('hosts', 'vendor_name')
@@ -111,7 +111,7 @@ $filter = (new CFilter())
 			)
 		])
 		->addItem([
-			new CLabel(_('Version')),
+			new CLabel(_('Version'), 'filter_vendor_version'),
 			new CFormField(
 				(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
 					DB::getFieldLength('hosts', 'vendor_version'))
