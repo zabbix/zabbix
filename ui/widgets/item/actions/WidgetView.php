@@ -118,6 +118,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$options['dashboard_time'] = $dashboard_time;
+
 		$options['time_period'] = [
 			'time_from' => $time_from,
 			'time_to' => $time_to

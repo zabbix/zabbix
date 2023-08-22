@@ -110,7 +110,6 @@ window.tophosts_column_edit_form = new class {
 		if (data_item_value) {
 			document.getElementById('tophosts-column-aggregate-function-warning').style.display = aggregate_function_avg
 				|| aggregate_function_min || aggregate_function_max || aggregate_function_sum ? '' : 'none';
-
 			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
 			document.getElementById('tophosts-column-history-data-warning').style.display = history_data_trends
 				? ''

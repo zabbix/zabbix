@@ -25,11 +25,10 @@ use CArrayHelper,
 	CController,
 	CControllerResponseData,
 	CNumberParser,
-	CParser;
+	CParser,
+	CRangeTimeParser,
+	CSettingsHelper;
 
-use CRangeTimeParser;
-use CSettingsHelper;
-use Widgets\TopHosts\Includes\WidgetForm;
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 class ColumnEdit extends CController {

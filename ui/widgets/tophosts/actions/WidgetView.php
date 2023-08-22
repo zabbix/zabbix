@@ -29,11 +29,10 @@ use API,
 	CNumberParser,
 	CParser,
 	CSettingsHelper,
-	Manager;
+	Manager,
+	CRangeTimeParser;
 
-use CRangeTimeParser;
 use Widgets\TopHosts\Widget;
-
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {

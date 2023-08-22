@@ -22,7 +22,9 @@
 class CWidgetFormFieldsetCollapsibleView extends CFormFieldsetCollapsible {
 
 	protected array $fields = [];
+
 	protected ?CTag $field_hint = null;
+
 	public function __construct(string $caption, array $fields = []) {
 		parent::__construct($caption);
 

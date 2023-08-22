@@ -64,9 +64,9 @@ window.widget_item_form = new class {
 		}
 
 		this._aggregate_warning.style.display = Number(this._aggregate_function.value) === <?= AGGREGATE_AVG ?>
-		|| Number(this._aggregate_function.value) === <?= AGGREGATE_MIN ?>
-		|| Number(this._aggregate_function.value) === <?= AGGREGATE_MAX ?>
-		|| Number(this._aggregate_function.value) === <?= AGGREGATE_SUM ?> ? '' : 'none';
+			|| Number(this._aggregate_function.value) === <?= AGGREGATE_MIN ?>
+			|| Number(this._aggregate_function.value) === <?= AGGREGATE_MAX ?>
+			|| Number(this._aggregate_function.value) === <?= AGGREGATE_SUM ?> ? '' : 'none';
 
 		for (const element of this._form.querySelectorAll('.js-row-override-time')) {
 			element.style.display = Number(this._aggregate_function.value) === 0 ? 'none' : '';
