@@ -571,6 +571,68 @@ static void	process_item_values(const zbx_user_t *user, const struct addrinfo *a
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if the user has access to history.push api method           *
+ *                                                                            *
+ * Return value:  SUCCEED - user has access                                   *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_user_role_permmissions(const zbx_user_t *user)
+{
+#define API_METHOD		"api.method."
+
+	int		ret = FAIL, api_access = 0, api_mode = 0, history_push = 0;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
+
+	if (USER_TYPE_SUPER_ADMIN == user->type)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	result = zbx_db_select("select name,value_int,value_str from role_rule where roleid=" ZBX_FS_UI64
+			" and (name='api.access' or name='api.mode' or name like 'api.method.%%')", user->roleid);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (0 == strcmp(row[0], "api.access"))
+		{
+			api_access = atoi(row[1]);
+		}
+		else if (0 == strcmp(row[0], "api.mode"))
+		{
+			api_mode = atoi(row[1]);
+		}
+		else if (0 == strncmp(row[0], API_METHOD, ZBX_CONST_STRLEN(API_METHOD)))
+		{
+			if (0 == strcmp(row[2], "history.push") || 0 == strcmp(row[2], "history.*"))
+				history_push = 1;
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	if (0 != api_access)
+	{
+		if (0 == api_mode)
+			history_push = !history_push;
+
+		if (0 != history_push)
+			ret = SUCCEED;
+	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+
+#undef API_METHOD
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process history push request                                      *
  *                                                                            *
  * Parameters: jp    - [IN] history push request in json format               *
@@ -601,7 +663,9 @@ static int	process_history_push(const struct zbx_json_parse *jp, struct zbx_json
 
 	zbx_user_init(&user);
 
-	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || SUCCEED != zbx_db_check_user_perm2system(user.userid))
+	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) ||
+			SUCCEED != zbx_db_check_user_perm2system(user.userid) ||
+			SUCCEED != check_user_role_permmissions(&user))
 	{
 		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;
