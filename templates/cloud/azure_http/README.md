@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -35,6 +35,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -200,7 +201,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -217,6 +218,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -310,7 +312,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -327,6 +329,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -394,7 +397,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -411,6 +414,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -479,7 +483,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -496,6 +500,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -568,7 +573,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -585,6 +590,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -652,7 +658,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -669,6 +675,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -742,7 +749,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -759,6 +766,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -832,7 +840,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -849,6 +857,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|

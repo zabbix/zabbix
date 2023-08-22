@@ -23,6 +23,8 @@
 
 #define ZBX_REGEXP_NO_MATCH	0
 #define ZBX_REGEXP_MATCH	1
+#define ZBX_REGEXP_COMPILE_FAIL	-1
+#define ZBX_REGEXP_RUNTIME_FAIL	-2	/* a regexp compiled successfully but an error occurred during matching */
 
 typedef struct zbx_regexp zbx_regexp_t;
 
@@ -37,10 +39,11 @@ typedef struct
 zbx_expression_t;
 
 /* regular expressions */
-int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, const char **err_msg);
-int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, const char **err_msg);
+int	zbx_regexp_compile(const char *pattern, zbx_regexp_t **regexp, char **err_msg);
+int	zbx_regexp_compile_ext(const char *pattern, zbx_regexp_t **regexp, int flags, char **err_msg);
 void	zbx_regexp_free(zbx_regexp_t *regexp);
 int	zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *regexp);
+int	zbx_regexp_match_precompiled2(const char *string, const zbx_regexp_t *regexp, char **err_msg);
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len);
 int	zbx_regexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
 int	zbx_mregexp_sub(const char *string, const char *pattern, const char *output_template, char **out);
@@ -55,13 +58,13 @@ void	add_regexp_ex(zbx_vector_ptr_t *regexps, const char *name, const char *expr
 int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive);
 int	regexp_sub_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
 		const char *output_template, char **output);
+int	regexp_sub_ex2(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive,
+		const char *output_template, char **output, char **err_msg);
 int	zbx_global_regexp_exists(const char *name, const zbx_vector_ptr_t *regexps);
 void	zbx_regexp_escape(char **string);
 
 /* wildcards */
 void	zbx_wildcard_minimize(char *str);
 int	zbx_wildcard_match(const char *value, const char *wildcard);
-
-void	zbx_regexp_err_msg_free(const char *err_msg);
 
 #endif /* ZABBIX_ZBXREGEXP_H */

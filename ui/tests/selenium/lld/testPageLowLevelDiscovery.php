@@ -18,11 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
+ * @dataSource DiscoveredHosts, HostGroups
+ *
  * @backup items
  */
 class testPageLowLevelDiscovery extends CWebTest {
@@ -290,7 +293,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 86
+					'rows' => 88
 				]
 			],
 			[
@@ -422,6 +425,8 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'expected' => [
 						'Linux by Zabbix agent: Block devices discovery',
 						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
+						'LLD for Discovered host tests',
+						'LLD for host group test',
 						'Linux by Zabbix agent: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery'
 					]
