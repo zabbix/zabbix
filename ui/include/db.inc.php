@@ -377,21 +377,19 @@ function DBexecute($query): bool {
 			break;
 
 		case ZBX_DB_ORACLE:
-			$result = oci_parse($DB['DB'], $query);
+			$handle = oci_parse($DB['DB'], $query);
+
+			$result = $handle === false
+				? false
+				: @oci_execute($handle, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS));
 
 			if ($result === false) {
-				$e = oci_error();
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
+				$e = $handle === false ? oci_error() : oci_error($handle);
 
-				break;
+				if ($e !== false) {
+					error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
+				}
 			}
-
-			if (!@oci_execute($result, ($DB['TRANSACTIONS'] ? OCI_DEFAULT : OCI_COMMIT_ON_SUCCESS))) {
-				$e = oci_error($result);
-				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']', true);
-			}
-
-			$result = true;
 
 			break;
 	}
