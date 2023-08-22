@@ -486,7 +486,7 @@ static void	process_item_values(zbx_uint64_t userid, const struct addrinfo *ai,
 					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
 				zbx_json_addobject(j, NULL);
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, 0);
+				zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, values->values[i]->itemid);
 				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, "internal itemid indexing error",
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_close(j);
