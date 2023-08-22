@@ -2851,7 +2851,8 @@ output {
       line-height: 14px; }
       output.collapsible .link-action .arrow-down,
       output.collapsible .link-action .arrow-up {
-        margin-left: 3px; }
+        margin-left: 3px;
+        pointer-events: none; }
     output.collapsible .msg-buttons,
     output.collapsible .msg-details {
       grid-column: 1 / -1; }
