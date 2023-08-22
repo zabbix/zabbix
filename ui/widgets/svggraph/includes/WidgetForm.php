@@ -288,7 +288,7 @@ class WidgetForm extends CWidgetForm {
 	private function initTimePeriodFields(): self {
 		return $this
 			->addField(
-				new CWidgetFieldCheckBox('graph_time', _('Set custom time period'))
+				new CWidgetFieldCheckBox('graph_time', _('Override time period selector'))
 			)
 			->addField(
 				(new CWidgetFieldDatePicker('time_from', _('From')))

@@ -71,7 +71,7 @@ function graph_item_drawtype2str($drawtype) {
 function graph_item_aggr_fnc2str($calc_fnc) {
 	switch ($calc_fnc) {
 		case AGGREGATE_NONE:
-			return _('none');
+			return _('not used');
 		case AGGREGATE_MIN:
 			return _('min');
 		case AGGREGATE_MAX:
