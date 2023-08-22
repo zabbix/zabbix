@@ -142,10 +142,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$total_value = [];
 
 		self::getItems($metrics, $options['data_sets'], $options['templateid'], $options['dynamic_hostid']);
-		self::sortByDataset($metrics);
-		self::getTimePeriod($metrics, $options['time_period']);
-		self::getChartDataSource($metrics, $errors, $options['data_source']);
-		self::getMetricsData($metrics, $options['data_sets'], $options['legend_aggregation_show']);
+		self::getChartDataSource($metrics, $errors, $options['data_source'], $options['time_period']);
+		self::getMetricsData($metrics, $options['time_period'], $options['legend_aggregation_show']);
 		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
 				$options['units'], $options['templateid']);
 
@@ -331,20 +329,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $metrics;
 	}
 
-	private static function sortByDataset(array &$metrics): void {
-		usort($metrics, static function(array $a, array $b): int {
-			return $a['data_set'] <=> $b['data_set'];
-		});
-	}
-
-	private static function getTimePeriod(array &$metrics, array $time_period): void {
-		foreach ($metrics as &$metric) {
-			$metric['time_period'] = $time_period;
-		}
-		unset($metric);
-	}
-
-	private static function getChartDataSource(array &$metrics, array &$errors, int $data_source): void {
+	private static function getChartDataSource(array &$metrics, array &$errors, int $data_source, array $time_period): void {
 		/**
 		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
 		 * $metric.
@@ -425,7 +410,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				 */
 				$history = $metric['history'];
 				$trends = $metric['trends'];
-				$time_from = $metric['time_period']['time_from'];
+				$time_from = $time_period['time_from'];
 
 				$metric['source'] = ($trends == 0 || (time() - $history < $time_from))
 					? WidgetForm::DATA_SOURCE_HISTORY
@@ -441,7 +426,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($metric);
 	}
 
-	private static function getMetricsData(array &$metrics, array $data_sets, bool $legend_aggregation_show): void {
+	private static function getMetricsData(array &$metrics, array $time_period, bool $legend_aggregation_show): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -457,8 +442,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 			else {
-				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
-					? $data_sets[$dataset_num]['data_set_label']
+				$name = $metric['options']['data_set_label'] !== ''
+					? $metric['options']['data_set_label']
 					: _('Data set').' #'.($dataset_num + 1);
 			}
 
@@ -469,26 +454,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
-				$metric = array_merge($metric, [
-					'name' => $name,
-					'items' => [],
-					'value' => null
-				]);
-
-				$aggregate_interval = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
-
-				if ($aggregate_interval === null || $aggregate_interval < 1
-					|| $aggregate_interval > ZBX_MAX_TIMESHIFT) {
-					continue;
-				}
-
-				$metric['options']['aggregate_interval'] = (int) $aggregate_interval;
+				$metric['name'] = $name;
+				$metric['items'] = [$item];
+				$metric['value'] = null;
 
 				if ($metric['options']['dataset_aggregation'] != AGGREGATE_NONE) {
 					$dataset_metrics[$dataset_num] = $metric_num;
 				}
-
-				$metric['items'][] = $item;
 			}
 			else {
 				$metrics[$dataset_metrics[$dataset_num]]['items'][] = $item;
@@ -498,49 +470,44 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($metric);
 
 		foreach ($metrics as &$metric) {
-			if (!$metric['items']) {
+			$results = Manager::History()->getAggregationByInterval(
+				$metric['items'], $time_period['time_from'], $time_period['time_to'],
+				$metric['options']['aggregate_function'], $time_period['time_to']
+			);
+
+			if (!$results) {
 				continue;
 			}
 
-			$results = Manager::History()->getAggregationByInterval(
-				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
-				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
-			);
+			$values = [];
 
-			if ($results) {
-				$values = [];
-
-				foreach ($results as $result) {
-					if ($metric['options']['aggregate_function'] == AGGREGATE_COUNT) {
-						$values[] = $result['data'][count($result['data'])-1]['count'];
-					}
-					else {
-						$values[] = $result['data'][count($result['data'])-1]['value'];
-					}
-				}
-
-				if ($metric['options']['dataset_aggregation'] != AGGREGATE_NONE) {
-					switch($metric['options']['dataset_aggregation']) {
-						case AGGREGATE_MAX:
-							$metric['value'] = max($values);
-							break;
-						case AGGREGATE_MIN:
-							$metric['value'] = min($values);
-							break;
-						case AGGREGATE_AVG:
-							$metric['value'] = array_sum($values)/count(array_filter($values));
-							break;
-						case AGGREGATE_COUNT:
-							$metric['value'] = count($values);
-							break;
-						case AGGREGATE_SUM:
-							$metric['value'] = array_sum($values);
-							break;
-					}
+			foreach ($results as $result) {
+				if ($metric['options']['aggregate_function'] == AGGREGATE_COUNT) {
+					$values[] = $result['data'][0]['count'];
 				}
 				else {
-					$metric['value'] = $values[0];
+					$values[] = $result['data'][0]['value'];
 				}
+			}
+
+			switch($metric['options']['dataset_aggregation']) {
+				case AGGREGATE_MAX:
+					$metric['value'] = max($values);
+					break;
+				case AGGREGATE_MIN:
+					$metric['value'] = min($values);
+					break;
+				case AGGREGATE_AVG:
+					$metric['value'] = array_sum($values) / count(array_filter($values));
+					break;
+				case AGGREGATE_COUNT:
+					$metric['value'] = count($values);
+					break;
+				case AGGREGATE_SUM:
+					$metric['value'] = array_sum($values);
+					break;
+				default:
+					$metric['value'] = $values[0];
 			}
 		}
 	}
@@ -559,20 +526,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
 					&& $metric['options']['type'] == CWidgetFieldDataSet::ITEM_TYPE_TOTAL);
 
-			if ($templateid !== '') {
-				$metric = [
-					'id' => $id++,
-					'name' => $metric['name'],
-					'color' => $metric['options']['color'],
-					'value' => null,
-					'formatted_value' => [
-						'value' => null,
-						'units' => ''
-					],
-					'is_total' => $is_total
-				];
-				continue;
-			}
+//			if ($templateid !== '') {
+//				$metric = [
+//					'id' => $id++,
+//					'name' => $metric['name'],
+//					'color' => $metric['options']['color'],
+//					'value' => null,
+//					'formatted_value' => [
+//						'value' => null,
+//						'units' => ''
+//					],
+//					'is_total' => $is_total
+//				];
+//				continue;
+//			}
 
 			foreach ($metric['items'] as $item) {
 				if ($item['itemid'] === $metric['itemid']) {
@@ -686,14 +653,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if ($templateid != '' || $raw_total_value <= 0) {
-			$total_value = [
-				'value' => null,
-				'value_text' => _('No data'),
-				'units' => ''
-			];
-		}
-		else {
+//		if ($templateid != '' || $raw_total_value <= 0) {
+//			$total_value = [
+//				'value' => null,
+//				'value_text' => _('No data'),
+//				'units' => ''
+//			];
+//		}
+//		else {
 			$formatted_total_value = convertUnitsRaw([
 				'value' => $raw_total_value,
 				'units' => $default_unit,
@@ -708,7 +675,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'formatted_value' => $formatted_total_value
 			];
 			unset($total_value['formatted_value']['is_numeric']);
-		}
+//		}
 	}
 
 	/**
