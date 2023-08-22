@@ -150,7 +150,7 @@ const char	*help_message[] = {
 	"Options:",
 	"  -c --config config-file        Path to the configuration file",
 #ifdef _WINDOWS
-	"                                 (default: \"<directory where zabbix_agentd.exe is located>\\zabbix_agentd.conf\")",
+	"                                 (default: \"{DEFAULT_CONFIG_FILE}\")",
 #else
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
 #endif
@@ -384,7 +384,12 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #endif
 			case 'h':
 				t->task = ZBX_TASK_SHOW_HELP;
+#ifdef _WINDOWS
+				goto cf_out;
+#else
 				goto out;
+#endif
+
 			case 'V':
 				t->task = ZBX_TASK_SHOW_VERSION;
 				goto out;
@@ -552,6 +557,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 
 #ifdef _WINDOWS
 #define PATH_BUF_LEN	4096
+cf_out:
 	if (NULL == config_file)
 	{
 		char	*ptr, *process_path = NULL;
@@ -1608,7 +1614,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			zbx_help();
+			zbx_help(config_file);
 			exit(EXIT_SUCCESS);
 			break;
 		default:
