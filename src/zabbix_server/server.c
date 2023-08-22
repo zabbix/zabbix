@@ -355,7 +355,7 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-char	*CONFIG_WEBSERVICE_URL	= NULL;
+char	*zbx_config_webservice_url	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
@@ -782,7 +782,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == CONFIG_WEBSERVICE_URL)
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == zbx_config_webservice_url)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
 				" setting \"StartReportWriters\" configuration parameter");
@@ -1009,7 +1009,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartReportWriters",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],		TYPE_INT,
 			PARM_OPT,	0,			100},
-		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
+		{"WebServiceURL",		&zbx_config_webservice_url,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"ProblemHousekeepingFrequency",	&CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY,	TYPE_INT,
 			PARM_OPT,	1,			3600},
@@ -1418,8 +1418,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER], zbx_config_source_ip,
 							&events_cbs};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
-							zbx_config_tls->key_file, zbx_config_source_ip};
-
+							zbx_config_tls->key_file, zbx_config_source_ip,
+							zbx_config_webservice_url};
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout};
 	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout};
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
@@ -1437,6 +1437,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_unreachable_period, config_unreachable_delay};
 #endif
 	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip};
+	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
 			zbx_config_dbhigh, zbx_config_source_ip};
@@ -1707,6 +1708,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(connector_worker_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
+				thread_args.args = &report_manager_args;
 				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
