@@ -499,7 +499,7 @@ static void	process_item_values(const zbx_user_t *user, const struct addrinfo *a
 
 		if (SUCCEED != errcode)
 		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, "Invalid item.", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, "Cannot find item in cache.", ZBX_JSON_TYPE_STRING);
 		}
 		else
 		{
