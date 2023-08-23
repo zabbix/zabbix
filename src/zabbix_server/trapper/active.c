@@ -620,7 +620,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 			if (NULL != dc_items[i].timeout_orig)
 			{
-				int	timeout_sec = 0;
+				int	timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 
 				zbx_is_time_suffix(dc_items[i].timeout_orig, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 

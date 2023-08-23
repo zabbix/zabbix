@@ -41,7 +41,7 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		i, ret = NOTSUPPORTED, timeout_sec;
+	int		i, ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
@@ -63,7 +63,8 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (NULL != item->timeout && '\0' != *(item->timeout) &&
+			SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
 		goto out;

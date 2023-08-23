@@ -46,7 +46,7 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	char			*error = NULL;
 	int			(*query_result_to_text)(zbx_odbc_query_result_t *query_result, char **text, char **error),
 				ret = NOTSUPPORTED;
-	unsigned int		timeout_sec;
+	int			timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __func__, item->key_orig, item->params);
 
@@ -82,7 +82,8 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (NULL != item->timeout && '\0' != *(item->timeout) &&
+			SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
 		ret = FAIL;

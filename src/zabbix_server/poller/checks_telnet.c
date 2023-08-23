@@ -25,7 +25,7 @@
 int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
-	int		ret = NOTSUPPORTED, timeout_sec;
+	int		ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	const char	*port, *encoding, *dns;
 
 	zbx_init_agent_request(&request);
@@ -74,7 +74,8 @@ int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RE
 	else
 		item->interface.port = ZBX_DEFAULT_TELNET_PORT;
 
-	if (SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (NULL != item->timeout && '\0' != *(item->timeout) &&
+			SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
 		goto out;

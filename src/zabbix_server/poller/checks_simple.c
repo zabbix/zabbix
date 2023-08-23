@@ -204,7 +204,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 {
 	AGENT_REQUEST	request;
 	vmfunc_t	vmfunc;
-	int		timeout_sec, ret = NOTSUPPORTED;
+	int		timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
@@ -218,7 +218,8 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 
-	if (SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (NULL != item->timeout && '\0' != *(item->timeout) &&
+			SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
 		goto out;

@@ -78,7 +78,7 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
-	int		timeout_sec = 0;
+	int		timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -121,7 +121,7 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 	if (NULL != item->timeout)
 		zabbix_log(1, "DBG itemid, timeout str = %s", item->timeout);
 
-	if (SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (NULL != item->timeout && '\0' != *(item->timeout) && SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
 		ret = FAIL;
