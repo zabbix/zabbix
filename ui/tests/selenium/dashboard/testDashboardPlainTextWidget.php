@@ -196,7 +196,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => $itemids['Test plain text']
+										'value' => $itemids['Test plain text'] // item name in widget 'Simple host with item for plain text widget: Test plain text'.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -412,7 +412,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => '',
+						'Name' => ''
 					],
 					'items' => [
 						['ЗАББИКС Сервер' => 'Linux: Available memory']
