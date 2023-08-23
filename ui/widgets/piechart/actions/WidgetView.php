@@ -145,7 +145,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		self::getChartDataSource($metrics, $errors, $options['data_source'], $options['time_period']);
 		self::getMetricsData($metrics, $options['time_period'], $options['legend_aggregation_show']);
 		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
-				$options['units'], $options['templateid']);
+				$options['units'], $options['templateid'], $options['dynamic_hostid']);
 
 		return [
 			'sectors' => $metrics,
@@ -513,169 +513,122 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getSectorsData(array &$metrics, array &$total_value, array $merge_sectors,
-			array $total_config, array $units_config, string $templateid): void {
-		$set_default_unit = true;
-		$default_unit = '';
-		$id = 1;
-		$raw_total_value = 0;
+			array $total_config, array $units_config, string $templateid, string $dynamic_hostid): void {
+		$has_total = false;
+		$chart_units = null;
+		$raw_total_value = null;
 		$others_value = 0;
 		$below_threshold_count = 0;
-		$to_remove = [];
+		$sectors = [];
 
-		foreach ($metrics as &$metric) {
-			$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
+		if ($templateid !== '' && $dynamic_hostid === '') {
+			foreach ($metrics as $metric) {
+				$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
 					&& $metric['options']['type'] == CWidgetFieldDataSet::ITEM_TYPE_TOTAL);
 
-//			if ($templateid !== '') {
-//				$metric = [
-//					'id' => $id++,
-//					'name' => $metric['name'],
-//					'color' => $metric['options']['color'],
-//					'value' => null,
-//					'formatted_value' => [
-//						'value' => null,
-//						'units' => ''
-//					],
-//					'is_total' => $is_total
-//				];
-//				continue;
-//			}
+				$sectors[] = [
+					'name' => $metric['name'],
+					'color' => $metric['options']['color'],
+					'value' => null,
+					'units' => '',
+					'is_total' => $is_total
+				];
+			}
+		}
+		else {
+			foreach ($metrics as &$metric) {
+				$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
+					&& $metric['options']['type'] == CWidgetFieldDataSet::ITEM_TYPE_TOTAL);
 
-			foreach ($metric['items'] as $item) {
-				if ($item['itemid'] === $metric['itemid']) {
-					$metric['item'] = $item;
-					break;
+				if ($is_total) {
+					$raw_total_value = $metric['value'] !== null ? max($metric['value'], 0) : null;
+					$has_total = true;
+				}
+				elseif (!$has_total && $metric['value'] !== null) {
+					if ($raw_total_value === null) {
+						$raw_total_value = 0;
+					}
+					$raw_total_value += max($metric['value'], 0);
+				}
+
+				if ($units_config['units_show'] == self::SHOW_UNITS_ON && $units_config['units_value'] !== '') {
+					$metric['units'] = $units_config['units_value'];
+				}
+
+				if ($chart_units === null || $is_total) {
+					$chart_units = $metric['units'];
+				}
+
+				$sectors[] = [
+					'name' => $metric['name'],
+					'color' => $metric['options']['color'],
+					'value' => $metric['value'],
+					'units' => $metric['units'],
+					'is_total' => $is_total
+				];
+			}
+			unset($metric);
+
+			foreach ($metrics as $key => &$metric) {
+				if ($metric['value'] <= 0 || $raw_total_value <= 0) {
+					$percentage = 0;
+				}
+				else {
+					$percentage = ($metric['value'] / $raw_total_value) * 100;
+				}
+
+				if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON
+						&& $percentage < $merge_sectors['percent']) {
+					$below_threshold_count++;
+					$others_value += max($metric['value'], 0);
+
+					unset($metrics[$key]);
 				}
 			}
+			unset($metric);
 
-			unset($metric['items']);
-
-			if ($units_config['units_show'] == self::SHOW_UNITS_ON && $units_config['units_value'] !== ''
-					&& isset($metric['item'])) {
-				$metric['item']['units'] = $units_config['units_value'];
+			if ($below_threshold_count >= 2) {
+				$sectors[] = [
+					'name' => _('Other'),
+					'color' => $merge_sectors['color'],
+					'value' => $others_value,
+					'units' => $chart_units,
+					'is_total' => false
+				];
 			}
-			else {
-				$metric['item']['units'] = $metric['units'];
-			}
+		}
 
-			if ($set_default_unit && isset($metric['item'])) {
-				$default_unit = $metric['item']['units'];
-				$set_default_unit = false;
-			}
-
+		foreach ($sectors as $key => &$sector) {
 			$formatted_value = convertUnitsRaw([
-				'value' => $metric['value'],
-				'units' => $metric['item']['units'],
+				'value' => $sector['value'],
+				'units' => $sector['units'],
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
 			unset($formatted_value['is_numeric']);
+			unset($sector['units']);
 
-			$metric = [
-				'id' => $id++,
-				'name' => $metric['name'],
-				'color' => $metric['options']['color'],
-				'value' => $metric['value'],
-				'units' => $metric['item']['units'],
-				'formatted_value' => $formatted_value,
-				'is_total' => $is_total
-			];
-
-			if ($metric['value'] < 0) {
-				continue;
-			}
-			$raw_total_value += $metric['value'];
+			$sector['id'] = $key + 1;
+			$sector['formatted_value'] = $formatted_value;
 		}
+		unset($sector);
 
-		unset($metric);
+		$metrics = $sectors;
 
-		foreach ($metrics as $metric) {
-			if ($metric['is_total']) {
-				$raw_total_value = ($metric['value'] <= 0) ? 0 : $metric['value'];
-				$default_unit = $metric['units'];
-				break;
-			}
-		}
+		$formatted_total_value = convertUnitsRaw([
+			'value' => $raw_total_value,
+			'units' => $chart_units,
+			'decimals' => $total_config['decimal_places'],
+			'decimals_exact' => true,
+			'small_scientific' => false,
+			'zero_as_zero' => false
+		]);
+		unset($formatted_total_value['is_numeric']);
 
-		foreach ($metrics as &$metric) {
-			if ($templateid != '') {
-				continue;
-			}
-
-			if ($metric['value'] <= 0 || $raw_total_value <= 0) {
-				$percentage = 0;
-			} else {
-				$percentage = ($metric['value'] / $raw_total_value) * 100;
-			}
-
-			if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON) {
-				if ($percentage < $merge_sectors['percent']) {
-					$below_threshold_count++;
-
-					if ($metric['value'] > 0) {
-						$others_value += $metric['value'];
-					}
-
-					$to_remove[] = &$metric;
-				}
-			}
-
-			unset($metric['units']);
-		}
-
-		unset($metric);
-
-		if ($below_threshold_count >= 2) {
-			$others_formatted_value = convertUnitsRaw([
-				'value' => $others_value,
-				'units' => $default_unit,
-				'small_scientific' => false,
-				'zero_as_zero' => false
-			]);
-			unset($others_formatted_value['is_numeric']);
-
-			$others_metric = [
-				'id' => $id,
-				'name' => _('Other'),
-				'color' => $merge_sectors['color'],
-				'value' => $others_value,
-				'formatted_value' => $others_formatted_value,
-				'is_total' => false
-			];
-
-			$metrics[] = &$others_metric;
-		}
-
-		foreach ($to_remove as $metric_to_remove) {
-			$index = array_search($metric_to_remove, $metrics, true);
-			if ($index !== false) {
-				unset($metrics[$index]);
-			}
-		}
-
-//		if ($templateid != '' || $raw_total_value <= 0) {
-//			$total_value = [
-//				'value' => null,
-//				'value_text' => _('No data'),
-//				'units' => ''
-//			];
-//		}
-//		else {
-			$formatted_total_value = convertUnitsRaw([
-				'value' => $raw_total_value,
-				'units' => $default_unit,
-				'decimals' => $total_config['decimal_places'],
-				'decimals_exact' => true,
-				'small_scientific' => false,
-				'zero_as_zero' => false
-			]);
-
-			$total_value = [
-				'value' => $raw_total_value,
-				'formatted_value' => $formatted_total_value
-			];
-			unset($total_value['formatted_value']['is_numeric']);
-//		}
+		$total_value = [
+			'value' => $raw_total_value,
+			'formatted_value' => $formatted_total_value
+		];
 	}
 
 	/**
