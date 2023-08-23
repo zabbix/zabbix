@@ -876,13 +876,16 @@ class testFormValueMappings extends CWebTest {
 				// Take a screenshot to test draggable object position in overlay dialog.
 				if ($action === 'create') {
 					$this->page->removeFocus();
-					$this->assertScreenshot($mapping_table, 'Value mappings popup'.$data['screenshot_id']);
+					$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();
+					$this->assertScreenshot($dialog->query('id:mappings_table')->asMultifieldTable()->one(),
+							'Value mappings popup'.$data['screenshot_id']);
 				}
 
 				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
 				$this->assertScreenshot($this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->one(),
 						$action.$data['screenshot_id']);
+				COverlayDialogElement::find()->one()->close();
 			}
 		}
 	}
