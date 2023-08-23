@@ -173,93 +173,126 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($items) {
 			$item = $items[$itemid];
 
-			$history_period = $time_to - $time_from;
-
 			$items[$itemid] += [
-				'source' => ($this->fields_values['history'] != ITEM_VALUE_DATA_SOURCE_TRENDS) ? 'history' : 'trends'
+				'source' => ($this->fields_values['history'] != WidgetForm::ITEM_VALUE_DATA_SOURCE_TRENDS)
+					? 'history'
+					: 'trends'
 			];
 
-			$history = Manager::History()->getAggregationByInterval(
-				$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
-			);
-
+			$history_period = $time_to - $time_from;
 			$value_type = $item['value_type'];
-
 			$aggregate_function = $this->fields_values['aggregate_function'];
 
-			if ($aggregate_function != AGGREGATE_NONE) {
-				if ($this->fields_values['item_time'] != 0) {
-					$from = $this->fields_values['time_from'];
-					$to = $this->fields_values['time_to'];
+			$history = [];
 
-					$range_time_parser = new CRangeTimeParser();
-
-					$range_time_parser->parse($from);
-					$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-					$range_time_parser->parse($to);
-					$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-
-					$aggregate_interval = $time_to-$time_from;
-				}
-				else {
-					$aggregate_interval = $history_period;
-				}
-
-				$last_results = Manager::History()->getAggregationByInterval(
-					$items, $time_from, $time_to, $aggregate_function, $time_to
+			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
+				$history = Manager::History()->getAggregationByInterval(
+					$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
 				);
 
-				if (!empty($last_results)) {
-					$agg_data = $last_results[$items[$itemid]['itemid']]['data'];
+				if ($aggregate_function != AGGREGATE_NONE) {
+					if ($this->fields_values['item_time'] != 0) {
+						$from = $this->fields_values['time_from'];
+						$to = $this->fields_values['time_to'];
+
+						$range_time_parser = new CRangeTimeParser();
+
+						$range_time_parser->parse($from);
+						$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+						$range_time_parser->parse($to);
+						$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+
+						$aggregate_interval = $time_to - $time_from;
+					}
+					else {
+						$aggregate_interval = $history_period;
+					}
+
+					$last_results = Manager::History()->getAggregationByInterval(
+						$items, $time_from, $time_to, $aggregate_function, $time_to
+					);
+
+					if (!empty($last_results)) {
+						$agg_data = $last_results[$items[$itemid]['itemid']]['data'];
+
+						$prev_results = Manager::History()->getAggregationByInterval(
+							$items, $time_from - $aggregate_interval, time() - $aggregate_interval,
+							$aggregate_function, $time_to
+						);
+
+						if (!empty($prev_results)) {
+							$agg_data += [
+								'1' => $prev_results[$items[$itemid]['itemid']]['data'][0]
+							];
+						}
+					}
+
+					if (!empty($last_results)) {
+						$history[$items[$itemid]['itemid']] = $agg_data;
+						$history[$itemid][0]['clock'] = $time_to;
+					}
+					else {
+						$history = $last_results;
+					}
+
+					if ($aggregate_function === AGGREGATE_COUNT && !empty($history)) {
+						foreach ($history as $itemid => &$datas) {
+							foreach ($datas as &$data) {
+								$data['value'] = $data['count'];
+								unset($data['count']);
+							}
+
+							unset($data);
+						}
+
+						unset($datas);
+					}
+				}
+				else {
+					$aggregate_interval = $time_to - $time_from;
 
 					$prev_results = Manager::History()->getAggregationByInterval(
-						$items, $time_from-$aggregate_interval, time()-$aggregate_interval,
-						$aggregate_function, $time_to
+						$items, $time_from - $aggregate_interval, $time_from, AGGREGATE_LAST, $time_from
 					);
 
 					if (!empty($prev_results)) {
-						$agg_data += [
+						$history[$items[$itemid]['itemid']]['data'] += [
 							'1' => $prev_results[$items[$itemid]['itemid']]['data'][0]
 						];
 					}
 				}
-
-				if (!empty($last_results)) {
-					$history[$items[$itemid]['itemid']] = $agg_data;
-					$history[$itemid][0]['clock'] = $time_to;
-				}
-				else {
-					$history = $last_results;
-				}
-
-				if ($aggregate_function === AGGREGATE_COUNT && !empty($history)) {
-					foreach ($history as $itemid => &$datas) {
-						foreach ($datas as &$data) {
-							$data['value'] = $data['count'];
-							unset($data['count']);
-						}
-
-						unset($data);
-					}
-
-					unset($datas);
-				}
 			}
 			else {
-				$aggregate_interval = $time_to-$time_from;
+				switch ($aggregate_function) {
+					case AGGREGATE_LAST:
+						$aggregate_function = 'max';
+						break;
 
-				$prev_results = Manager::History()->getAggregationByInterval(
-					$items, $time_from-$aggregate_interval, $time_from, AGGREGATE_LAST, $time_from
-				);
+					case AGGREGATE_FIRST:
+						$aggregate_function = 'min';
+						break;
 
-				if (!empty($prev_results)) {
-					$history[$items[$itemid]['itemid']]['data'] += [
-						'1' => $prev_results[$items[$itemid]['itemid']]['data'][0]
-					];
+					case AGGREGATE_COUNT:
+						$aggregate_function = 'count';
+						break;
 				}
 
-				$history[$items[$itemid]['itemid']] = $history[$items[$itemid]['itemid']]['data'];
+				$non_numeric_history = Manager::History()->getAggregatedValue(
+					$item, $aggregate_function, $time_from, $time_to
+				);
+
+				if ($non_numeric_history) {
+					$history = [
+						$item['itemid'] => [
+							0 => [
+								'itemid' => $item['itemid'],
+								'value' => $non_numeric_history,
+								'clock' => $time_to
+							]
+						]
+					];
+				}
 			}
 
 			if ($history) {

@@ -363,7 +363,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function isNumericOnlyColumn(array $column): bool {
-		return $column['aggregate_function'] != AGGREGATE_NONE
+		return ($column['aggregate_function'] != AGGREGATE_NONE
+			&& $column['aggregate_function'] != AGGREGATE_LAST
+			&& $column['aggregate_function'] != AGGREGATE_FIRST
+			&& $column['aggregate_function'] != AGGREGATE_COUNT)
 			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
 			|| array_key_exists('thresholds', $column);
 	}
@@ -406,9 +409,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		foreach ($items as $itemid => $item) {
-			$column += ['itemid' => $itemid];
+			$column += [
+				'itemid' => $itemid,
+				'value_type' => $item['value_type']
+				];
 		}
 
+		$value_type = $column['value_type'];
 		$aggregate_function = $column['aggregate_function'];
 		$time_from = $column['time_from'];
 		$time_to = $column['time_to'];
@@ -427,18 +434,46 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
 
-		$values = Manager::History()->getAggregationByInterval(
-			$items, $time_from, $time_to, $function, $time_to
-		);
-
 		$result = [];
 
-		if ($values) {
-			$values = $values[$column['itemid']]['data'][0];
+		if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
 
-			$result += $aggregate_function !== AGGREGATE_COUNT
-				? [$column['itemid'] => $values['value']]
-				: [$column['itemid'] => $values['count']];
+			$values = Manager::History()->getAggregationByInterval(
+				$items, $time_from, $time_to, $function, $time_to
+			);
+
+			if ($values) {
+				$values = $values[$column['itemid']]['data'][0];
+
+				$result += $aggregate_function !== AGGREGATE_COUNT
+					? [$column['itemid'] => $values['value']]
+					: [$column['itemid'] => $values['count']];
+			}
+		}
+		else {
+			switch ($function) {
+				case AGGREGATE_LAST:
+					$function = 'max';
+					break;
+
+				case AGGREGATE_FIRST:
+					$function = 'min';
+					break;
+
+				case AGGREGATE_COUNT:
+					$function = 'count';
+					break;
+			}
+
+			$non_numeric_history = Manager::History()->getAggregatedValue(
+				$column, $function, $time_from, $time_to
+			);
+
+			if ($non_numeric_history) {
+				$result = [
+					$column['itemid'] => $non_numeric_history
+				];
+			}
 		}
 
 		return $result;

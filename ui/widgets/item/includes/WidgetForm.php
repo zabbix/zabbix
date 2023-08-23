@@ -60,12 +60,12 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_UNITS_SIZE = 35;
 	private const DEFAULT_TIME_SIZE = 15;
 
-	private const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
-	private const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
-	private const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
+	public const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
+	public const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
+	public const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
 
-	private const ITEM_VALUE_CUSTOM_TIME_OFF = 0;
-	private const ITEM_VALUE_CUSTOM_TIME_ON = 1;
+	public const ITEM_VALUE_CUSTOM_TIME_OFF = 0;
+	public const ITEM_VALUE_CUSTOM_TIME_ON = 1;
 
 	private bool $is_binary_units = false;
 

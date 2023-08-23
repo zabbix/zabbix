@@ -1188,13 +1188,13 @@ class CHistoryManager {
 	 *
 	 * @return string  Aggregated history value.
 	 */
-	public function getAggregatedValue(array $item, $aggregation, $time_from) {
+	public function getAggregatedValue(array $item, $aggregation, $time_from, $time_to = null) {
 		switch (self::getDataSourceType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				return $this->getAggregatedValueFromElasticsearch($item, $aggregation, $time_from);
+				return $this->getAggregatedValueFromElasticsearch($item, $aggregation, $time_from, $time_to);
 
 			default:
-				return $this->getAggregatedValueFromSql($item, $aggregation, $time_from);
+				return $this->getAggregatedValueFromSql($item, $aggregation, $time_from, $time_to);
 		}
 	}
 
@@ -1203,7 +1203,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getAggregatedValue
 	 */
-	private function getAggregatedValueFromElasticsearch(array $item, $aggregation, $time_from) {
+	private function getAggregatedValueFromElasticsearch(array $item, $aggregation, $time_from, $time_to) {
 		$query = [
 			'aggs' => [
 				$aggregation.'_value' => [
@@ -1223,7 +1223,8 @@ class CHistoryManager {
 						[
 							'range' => [
 								'clock' => [
-									'gte' => $time_from
+									'gte' => $time_from,
+									'lte' => $time_to
 								]
 							]
 						]
@@ -1252,7 +1253,7 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::getAggregatedValue
 	 */
-	private function getAggregatedValueFromSql(array $item, $aggregation, $time_from) {
+	private function getAggregatedValueFromSql(array $item, $aggregation, $time_from, $time_to) {
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
 			$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 			$time_from = max($time_from, time() - $hk_history);
@@ -1261,8 +1262,9 @@ class CHistoryManager {
 		$result = DBselect(
 			'SELECT '.$aggregation.'(value) AS value'.
 			' FROM '.self::getTableName($item['value_type']).
-			' WHERE clock>'.$time_from.
-			' AND itemid='.zbx_dbstr($item['itemid']).
+			' WHERE itemid='.zbx_dbstr($item['itemid']).
+			' AND clock>='.zbx_dbstr($time_from).
+			' AND clock<='.zbx_dbstr($time_to).
 			' HAVING COUNT(*)>0' // Necessary because DBselect() return 0 if empty data set, for graph templates.
 		);
 
