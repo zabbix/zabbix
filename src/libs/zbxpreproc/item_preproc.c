@@ -584,7 +584,7 @@ int	item_preproc_2dec(zbx_variant_t *value, int op_type, char **errmsg)
 int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errmsg)
 {
 	char		*pattern, *output, *new_value = NULL;
-	const char	*regex_error;
+	char		*regex_error = NULL;
 	zbx_regexp_t	*regex = NULL;
 	int		ret = FAIL;
 
@@ -604,7 +604,7 @@ int	item_preproc_regsub_op(zbx_variant_t *value, const char *params, char **errm
 	if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &regex_error))	/* PCRE_MULTILINE is not used here */
 	{
 		*errmsg = zbx_dsprintf(*errmsg, "invalid regular expression: %s", regex_error);
-		zbx_regexp_err_msg_free(regex_error);
+		zbx_free(regex_error);
 		goto out;
 	}
 
@@ -724,7 +724,7 @@ int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, 
 	zbx_variant_t	value_str;
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
-	const char	*errptr = NULL;
+	char		*errptr = NULL;
 	char		*errmsg;
 
 	zbx_variant_copy(&value_str, value);
@@ -738,7 +738,7 @@ int	item_preproc_validate_regex(const zbx_variant_t *value, const char *params, 
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
 		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
-		zbx_regexp_err_msg_free(errptr);
+		zbx_free(errptr);
 		goto out;
 	}
 
@@ -779,7 +779,7 @@ int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *para
 	zbx_variant_t	value_str;
 	int		ret = FAIL;
 	zbx_regexp_t	*regex;
-	const char	*errptr = NULL;
+	char		*errptr = NULL;
 	char		*errmsg;
 
 	zbx_variant_copy(&value_str, value);
@@ -793,7 +793,7 @@ int	item_preproc_validate_not_regex(const zbx_variant_t *value, const char *para
 	if (FAIL == zbx_regexp_compile(params, &regex, &errptr))
 	{
 		errmsg = zbx_dsprintf(NULL, "invalid regular expression pattern: %s", errptr);
-		zbx_regexp_err_msg_free(errptr);
+		zbx_free(errptr);
 		goto out;
 	}
 

@@ -34,6 +34,7 @@
 #include "sddl.h"
 #include "zbxwin32.h"
 #include "zbxlog.h"
+#include <sddl.h> /* ConvertSidToStringSid */
 #endif
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
@@ -443,7 +444,15 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != contents)
 	{
-		utf8 = zbx_convert_to_utf8(contents, contents_offset, encoding);
+		char	*err_msg;
+
+		if (NULL == (utf8 = zbx_convert_to_utf8(contents, contents_offset, encoding, &err_msg)))
+		{
+			zbx_free(contents);
+			SET_MSG_RESULT(result, err_msg);
+			goto err;
+		}
+
 		zbx_free(contents);
 		zbx_rtrim_utf8(utf8, "\r\n");
 
@@ -536,6 +545,8 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
 	{
+		char	*err_msg;
+
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
@@ -545,7 +556,12 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
+		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
+		{
+			SET_MSG_RESULT(result, err_msg);
+			goto err;
+		}
+
 		zbx_rtrim(utf8, "\r\n");
 		zbx_regexp_sub(utf8, regexp, output, &ptr);
 		zbx_free(utf8);
@@ -663,6 +679,8 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 == res && 0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
 	{
+		char	*err_msg;
+
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
@@ -672,7 +690,11 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
+		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
+		{
+			SET_MSG_RESULT(result, err_msg);
+			goto err;
+		}
 
 		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, NULL))

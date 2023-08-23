@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-15 08:10+0000\n"
-"Last-Translator: Stefano <stefano.sonzogni@elelco.it>\n"
+"PO-Revision-Date: 2023-08-10 15:54+0000\n"
+"Last-Translator: Roberta <roberta.fabris.axians@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -27,7 +27,7 @@ msgstr "La data \"%1$s\" deve essere minore di \"%2$s\"."
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr "\"%1$s\" invece \"%2$s\""
+msgstr "\"%1$s\" invece di \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:323
 #: include/classes/import/validators/C10XmlValidator.php:341
@@ -45,7 +45,7 @@ msgstr "\"%1$s\" invece \"%2$s\""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr "\"%1$s\" e' previsto"
+msgstr "\"%1$s\" è previsto"
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
@@ -66,18 +66,18 @@ msgstr "prevista coppia \"host:key\""
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"hostid\" del dependant item e del master item devono corrispondere"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"ruleid\" del dependant item e del master item devono corrispondere"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
@@ -95,7 +95,7 @@ msgstr[1] "%1$d giorni"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr "%1$d corrispondenze per %2$s trovati"
+msgstr "%1$d corrispondenze per %2$s trovate"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
@@ -107,7 +107,7 @@ msgstr[1] "%1$d di %3$d%2$s problemi visualizzati"
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d problemi selezionati."
 
 #: chart4.php:94
 #, c-format
@@ -117,7 +117,7 @@ msgstr "%1$s (anno %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - generato dal modulo situato in %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
@@ -432,57 +432,57 @@ msgstr "AGGIUNGI OVERRIDE"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "SVEGLIA"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
-msgstr ""
+msgstr "Accesso API"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:287
 msgid "API methods"
-msgstr ""
+msgstr "Metodi API"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "Token API"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "Il token API \"%1$s\" esiste già per l'ID utente \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:109
 #: app/controllers/CControllerTokenCreate.php:131
 msgid "API token added"
-msgstr ""
+msgstr "Token API aggiunto"
 
 #: app/controllers/CControllerTokenDelete.php:67
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Token API rimosso"
+msgstr[1] "Tokens API rimossi"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Token API disabilitato"
+msgstr[1] "Tokens API disabilitati"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Token API abilitato"
+msgstr[1] "Tokens API abilitati "
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "Token API scaduto."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:138
 msgid "API token updated"
-msgstr ""
+msgstr "Token API aggiornato"
 
 #: app/controllers/CControllerPopupTokenEdit.php:114
 #: app/controllers/CControllerPopupTokenView.php:74
@@ -494,15 +494,15 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:396 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "Tokens API"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Valore sopra"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Ascissa"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
@@ -515,27 +515,27 @@ msgstr "Accesso negato!"
 #: app/views/administration.user.edit.php:603
 #: app/views/administration.userrole.edit.php:273
 msgid "Access to API"
-msgstr ""
+msgstr "Accesso all'API"
 
 #: app/views/administration.user.edit.php:456
 #: app/views/administration.userrole.edit.php:83
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Accesso agli elementi dell'interfaccia utente"
 
 #: app/views/administration.user.edit.php:632
 #: app/views/administration.userrole.edit.php:322
 msgid "Access to actions"
-msgstr ""
+msgstr "Accesso alle azioni"
 
 #: app/views/administration.user.edit.php:574
 #: app/views/administration.userrole.edit.php:224
 msgid "Access to modules"
-msgstr ""
+msgstr "Accesso ai moduli"
 
 #: app/views/administration.user.edit.php:478
 #: app/views/administration.userrole.edit.php:136
 msgid "Access to services"
-msgstr ""
+msgstr "Accesso ai servizi"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
@@ -548,33 +548,33 @@ msgstr "Ack"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Ack"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
-msgstr "Acknowledge"
+msgstr "Conferma"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Conferma problemi"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
 msgid "Acknowledged"
-msgstr "Con acknowledge"
+msgstr "Confermato"
 
 #: app/views/administration.trigdisplay.edit.php:53
 msgid "Acknowledged PROBLEM events"
-msgstr "Eventi PROBLEMA con acknowledge"
+msgstr "Conferma eventi PROBLEMI"
 
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
-msgstr "Acknowledged RESOLVED events"
+msgstr "Conferma eventi RISOLTI"
 
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:103
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "Stato di conferma"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -651,7 +651,7 @@ msgstr "Azione"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Azione"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
@@ -661,7 +661,7 @@ msgstr "L'azione \"%1$s\" esiste già."
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "L'azione \"%2$s\" non è disponibile per il ruolo utente \"%1$s\"."
 
 #: actionconf.php:301
 msgid "Action added"
@@ -670,7 +670,7 @@ msgstr "Azione aggiunta"
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "La classe di azione %1$s deve estendere la classe %2$s."
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -699,7 +699,7 @@ msgstr "Action log"
 #: app/views/administration.script.list.php:52
 #: app/views/administration.script.list.php:91
 msgid "Action operation"
-msgstr ""
+msgstr "Operazione azione"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -708,7 +708,7 @@ msgstr "Azione aggiornata"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "L'azione con ID \"%1$s\" non è disponibile."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -730,7 +730,7 @@ msgstr "Azioni"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Azioni"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -747,7 +747,7 @@ msgstr "Attivo"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Controlli attivi"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -912,7 +912,7 @@ msgstr "Aggiungi"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Aggiungi (limite caratteri messaggio raggiunto)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -924,37 +924,41 @@ msgstr "Aggiungi elemento child"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Aggiungi elementi figlio"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "Aggiungi un servizio figlio"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "Aggiungi servizi figlio"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Aggiungi da"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "Aggiungi da host"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "Aggiungi da template"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Aggiungi host"
 
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr "Aggiungi tag host"
+
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "Aggiungi trigger host"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
@@ -1350,6 +1354,10 @@ msgstr "And"
 msgid "And/Or"
 msgstr "And/Or"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr ""
@@ -1424,6 +1432,19 @@ msgstr "Apr"
 #: include/func.inc.php:103 include/func.inc.php:256 jsLoader.php:236
 msgid "April"
 msgstr "Aprile"
+
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -2368,6 +2389,31 @@ msgid_plural "Cannot copy graphs"
 msgstr[0] "Non è possibile copiare il grafico"
 msgstr[1] "Non è possibile copiare i grafici"
 
+#: include/classes/helpers/CGraphHelper.php:74
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:91
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:92
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:96
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:97
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
@@ -2390,9 +2436,24 @@ msgid_plural "Cannot copy triggers"
 msgstr[0] "Non è possibile copiare il trigger"
 msgstr[1] "Non è possibile copiare i trigger"
 
+#: include/classes/helpers/CTriggerGeneralHelper.php:196
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CTriggerGeneralHelper.php:197
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
+msgstr ""
+
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+msgstr ""
+
+#: include/classes/helpers/CTriggerHelper.php:75
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
 msgstr ""
 
 #: include/triggers.inc.php:226
@@ -3250,6 +3311,11 @@ msgstr ""
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:834
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
@@ -3269,6 +3335,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:717
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:835
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:711
@@ -3312,6 +3383,11 @@ msgstr ""
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr ""
 
+#: include/classes/api/services/CItemGeneral.php:840
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
@@ -3331,6 +3407,11 @@ msgstr ""
 #: include/classes/api/services/CItemGeneral.php:732
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:726
@@ -4584,6 +4665,10 @@ msgstr ""
 msgid "Color (OK)"
 msgstr ""
 
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
 msgid "Columns"
@@ -5739,6 +5824,10 @@ msgid_plural "Dashboards deleted"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr ""
@@ -6650,6 +6739,10 @@ msgstr ""
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "Descrizione"
+
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -8050,6 +8143,10 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr "Lista eventi [20 precedenti]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "Event log monitoring. Restituisce log"
@@ -8751,6 +8848,10 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "Accesso GUI disabilitato."
 
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
 msgid "General"
@@ -8903,6 +9004,16 @@ msgstr ""
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "Il grafico \"%1$s\" esiste già su \"%2$s\"."
 
+#: include/classes/api/services/CGraph.php:479
+#, c-format
+msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraph.php:480
+#, c-format
+msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:36
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
@@ -8935,6 +9046,16 @@ msgstr "Grafico rimosso"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:167
 msgid "Graph prototype"
 msgstr "Prototipo grafico"
+
+#: include/classes/api/services/CGraphPrototype.php:470
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraphPrototype.php:471
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
@@ -9485,6 +9606,10 @@ msgstr "Un host non può avere più di un'interfaccia predefinita dello stesso t
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Numero host"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -12308,6 +12433,10 @@ msgstr ""
 msgid "LLD macros"
 msgstr ""
 
+#: app/controllers/CControllerAuditLogList.php:229
+msgid "LLD rule"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneralOld.php:700
 msgid "LLD rule with the same UUID already exists"
 msgstr ""
@@ -14032,6 +14161,11 @@ msgstr ""
 msgid "Navigate to initial view"
 msgstr ""
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "Periodo storicizzazione per dati tipo Network discovery"
@@ -14223,6 +14357,10 @@ msgstr "Nuovi trigger"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
@@ -16314,6 +16452,10 @@ msgstr ""
 msgid "Preview"
 msgstr "Anteprima"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -17183,6 +17325,10 @@ msgstr "Rimuovi dai gruppi host"
 msgid "Remove host"
 msgstr "Rimuovi host"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -17563,6 +17709,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:974
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
 msgstr ""
 
 #: include/classes/data/CItemData.php:850
@@ -18010,6 +18160,15 @@ msgstr ""
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Salva come \"%1$s\""
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr ""
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18705,6 +18864,10 @@ msgstr ""
 msgid "Show"
 msgstr "Mostra"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
@@ -18724,6 +18887,10 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
 msgstr "Mostra gli host in manutenzione"
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -18815,6 +18982,10 @@ msgstr "Mostra sono unacknowledged"
 
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:110
@@ -19114,6 +19285,10 @@ msgstr "Ora di avvio del server Zabbix, Unix timestamp."
 msgid "State"
 msgstr "Stato"
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -19122,6 +19297,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
@@ -19402,6 +19581,10 @@ msgstr ""
 #: include/views/general.login.php:94
 msgid "Support"
 msgstr "Supporto"
+
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
@@ -20362,12 +20545,23 @@ msgstr ""
 msgid "Top"
 msgstr "In alto"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr ""
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
+msgstr ""
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
 msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
@@ -20578,6 +20772,10 @@ msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "Trigger copiato"
 msgstr[1] "Trigger copiati"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -21164,6 +21362,10 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:717
 msgid "Units"
 msgstr "Unità"
+
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
@@ -22709,6 +22911,10 @@ msgstr "Il valore \"%1$s\" non è valido per il parametro \"grid_show\". Le scel
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Il valore \"%1$s\" è troppo lungo per il campo \"%2$s\" - %3$d caratteri. La lunghezza consentita è di %4$d caratteri."
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Efficacia della Value Cache. I parametri validi sono: requests, hits and misses."
@@ -22777,6 +22983,10 @@ msgstr ""
 
 #: include/actions.inc.php:352
 msgid "Value of tag"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
 msgstr ""
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
@@ -22947,6 +23157,10 @@ msgstr "Attenzione"
 
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
+msgstr ""
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr ""
 
 #: app/partials/administration.system.info.php:154
@@ -23694,6 +23908,10 @@ msgstr ""
 msgid "a string, number or null value is expected"
 msgstr ""
 
+#: include/classes/api/services/CDiscoveryRule.php:1718
+msgid "a template ID is expected"
+msgstr ""
+
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:130
@@ -23783,6 +24001,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474
@@ -24177,6 +24399,10 @@ msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
+msgstr ""
+
+#: include/classes/api/services/CDiscoveryRule.php:3026
+msgid "cannot delete inherited LLD rule"
 msgstr ""
 
 #: include/classes/api/services/CItem.php:899
@@ -24994,6 +25220,11 @@ msgstr ""
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "lunghezza carattari minima è %1$s"
+
+#: include/classes/api/services/CDiscoveryRule.php:1630
+#, c-format
+msgid "missing filter condition \"%1$s\""
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "mod() - Division remainder"
@@ -25981,6 +26212,11 @@ msgid "value must be empty or %1$s"
 msgid_plural "value must be empty or one of %1$s"
 msgstr[0] ""
 msgstr[1] ""
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format

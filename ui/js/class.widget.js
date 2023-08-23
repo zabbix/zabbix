@@ -201,7 +201,8 @@ class CWidget extends CWidgetBase {
 			dynamic_hostid: this._dashboard.templateid !== null || this.supportsDynamicHosts()
 				? (this._dynamic_hostid ?? undefined)
 				: undefined,
-			...this._contents_size
+			contents_width: this._contents_size.width,
+			contents_height: this._contents_size.height
 		};
 	}
 

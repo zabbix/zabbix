@@ -135,18 +135,19 @@ int	system_sw_arch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static char	*get_registry_value(HKEY hKey, LPCTSTR name, DWORD value_type)
 {
-	DWORD	szData;
+	DWORD	szData = 0;
 	wchar_t	*value = NULL;
 	char	*ret = NULL;
 
 	if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, NULL, &szData))
 	{
-		value = zbx_malloc(NULL, szData);
+		value = zbx_malloc(NULL, szData + sizeof(wchar_t));
+
 		/* syscall RegQueryValueEx does not guarantee that the returned string will be '\0' terminated */
 		if (ERROR_SUCCESS != RegQueryValueEx(hKey, name, NULL, NULL, (LPBYTE)value, &szData))
 			zbx_free(value);
 		else
-			value[szData - 1] = '\0';
+			value[szData / sizeof(wchar_t)] = L'\0';
 	}
 
 	if (NULL == value)
@@ -183,6 +184,8 @@ static char	*get_build_string(HKEY handle, int include_descriptor)
 		minor = get_registry_value(handle, TEXT(ZBX_REGVALUE_MINOR), REG_DWORD);
 
 	str = join_nonempty_strs(".", 2, major, minor);
+	zbx_free(major);
+	zbx_free(minor);
 
 	if (include_descriptor && 0 < strlen(str))
 		return zbx_dsprintf(str, "Build %s", str);

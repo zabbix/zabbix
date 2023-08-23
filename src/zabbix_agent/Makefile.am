@@ -1,22 +1,18 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	logfiles \
-	active_checks
+	listener \
+	active_checks \
+	logfiles
 
 EXTRA_DIST = \
-	eventlog.c \
-	eventlog.h \
-	perfstat.c \
-	perfstat.h
+	eventlog
 
 sbin_PROGRAMS = zabbix_agentd
 
 noinst_LIBRARIES = libzbxagent.a
 
 libzbxagent_a_SOURCES = \
-	listener.c \
-	listener.h \
 	metrics.h \
 	zbxconf.c \
 	zbxconf.h
@@ -30,13 +26,15 @@ zabbix_agentd_SOURCES = zabbix_agentd.c
 zabbix_agentd_LDADD = \
 	libzbxagent.a \
 	active_checks/libzbxactive_checks.a \
+	listener/libzbxlistener.a \
 	logfiles/libzbxlogfiles.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
+	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/alias/libalias.a \

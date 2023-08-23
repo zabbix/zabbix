@@ -60,7 +60,11 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 		return nil, fmt.Errorf("Cannot read from file: %s", err)
 	}
 	encoding = findEncodingFromBOM(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
-	utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	utf8_buf, utf8_bufNumBytes, err := decodeToUTF8(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	if err != nil {
+		return nil, fmt.Errorf("Failed to convert from encoding to utf8: %w", err)
+	}
+
 	utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
 
 	return strings.TrimRight(utf8_bufStr, "\n\r"), nil

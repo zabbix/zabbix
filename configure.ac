@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha3])
+AC_INIT([Zabbix],[7.0.0alpha4])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -1985,7 +1985,10 @@ AC_CONFIG_FILES([
 	src/go/Makefile
 	src/libs/Makefile
 	src/libs/zbxalgo/Makefile
+	src/libs/zbxasyncpoller/Makefile
+	src/libs/zbxasynchttppoller/Makefile
 	src/libs/zbxaudit/Makefile
+	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
@@ -2032,11 +2035,12 @@ AC_CONFIG_FILES([
 	src/libs/zbxparam/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
+	src/libs/zbxproxybuffer/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
-	src/libs/zbxserver/Makefile
+	src/libs/zbxexpression/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
 	src/libs/zbxstr/Makefile
@@ -2069,6 +2073,7 @@ AC_CONFIG_FILES([
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
+	src/zabbix_agent/listener/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile

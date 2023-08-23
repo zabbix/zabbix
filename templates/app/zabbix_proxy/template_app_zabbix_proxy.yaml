@@ -32,6 +32,28 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 998df832cf58436ea7707331338d5f3b
+          name: 'Zabbix proxy: Utilization of agent poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,agent poller,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time agent poller processes have been busy in the last minute.'
+          tags:
+            - tag: component
+              value: data-collector
+          triggers:
+            - uuid: 5abbe55bf614492d982e4af0f11b01e2
+              expression: 'avg(/Zabbix proxy health/zabbix[process,agent poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"agent poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,agent poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"agent poller"}'
+              name: 'Zabbix proxy: Utilization of agent poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of agent poller processes over {$ZABBIX.PROXY.UTIL.MAX:"agent poller"}%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
         - uuid: 5131f979c17a4346a95f8ba77e7133a4
           name: 'Zabbix proxy: Utilization of availability manager internal processes, in %'
           type: INTERNAL
@@ -204,6 +226,28 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,housekeeper,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"housekeeper"}'
               name: 'Zabbix proxy: Utilization of housekeeper processes is high'
               event_name: 'Zabbix proxy: Utilization of housekeeper processes over {$ZABBIX.PROXY.UTIL.MAX:"housekeeper"}%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 584c5ee90cff40e2befc38061ce8e7e7
+          name: 'Zabbix proxy: Utilization of http agent poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,http agent poller,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time http agent poller processes have been busy in the last minute.'
+          tags:
+            - tag: component
+              value: data-collector
+          triggers:
+            - uuid: a5d7a54efea843c495795d14bbff166b
+              expression: 'avg(/Zabbix proxy health/zabbix[process,http agent poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,http agent poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"http agent poller"}'
+              name: 'Zabbix proxy: Utilization of http agent poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of http agent poller processes over {$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -424,6 +468,28 @@ zabbix_export:
               recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,self-monitoring,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"self-monitoring"}'
               name: 'Zabbix proxy: Utilization of self-monitoring processes is high'
               event_name: 'Zabbix proxy: Utilization of self-monitoring processes over {$ZABBIX.PROXY.UTIL.MAX:"self-monitoring"}%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 96b04e9605e04b26a280bc62da92879b
+          name: 'Zabbix proxy: Utilization of snmp poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,snmp poller,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time snmp poller processes have been busy in the last minute.'
+          tags:
+            - tag: component
+              value: data-collector
+          triggers:
+            - uuid: 811e08cb2382482db4054a4665e328d7
+              expression: 'avg(/Zabbix proxy health/zabbix[process,snmp poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,snmp poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"snmp poller"}'
+              name: 'Zabbix proxy: Utilization of snmp poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of snmp poller processes over {$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}%'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -934,46 +1000,61 @@ zabbix_export:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,poller,avg,busy]'
         - sortorder: '2'
+          color: 1A7C11
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,agent poller,avg,busy]'
+        - sortorder: '3'
           color: 0000EE
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,ipmi poller,avg,busy]'
-        - sortorder: '3'
+        - sortorder: '4'
           color: '007700'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,icmp pinger,avg,busy]'
-        - sortorder: '4'
+        - sortorder: '5'
           color: '003300'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,http poller,avg,busy]'
-        - sortorder: '5'
+        - sortorder: '6'
+          color: '274482'
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,http agent poller,avg,busy]'
+        - sortorder: '7'
           color: 33FFFF
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,unreachable poller,avg,busy]'
-        - sortorder: '6'
+        - sortorder: '8'
           color: DD0000
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,java poller,avg,busy]'
-        - sortorder: '7'
+        - sortorder: '9'
           color: '000099'
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,snmp trapper,avg,busy]'
-        - sortorder: '8'
+        - sortorder: '10'
+          color: F63100
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,snmp poller,avg,busy]'
+        - sortorder: '11'
           color: 00FF00
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,vmware collector,avg,busy]'
-        - sortorder: '9'
+        - sortorder: '12'
           color: 5A2B57
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,history poller,avg,busy]'
-        - sortorder: '10'
+        - sortorder: '13'
           color: 9FA8DA
           item:
             host: 'Zabbix proxy health'

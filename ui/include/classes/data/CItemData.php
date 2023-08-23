@@ -130,6 +130,7 @@ final class CItemData {
 			'agent.variant',
 			'agent.version',
 			'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
+			'eventlog.count[name,<regexp>,<severity>,<source>,<eventid>,<maxproclines>,<mode>]',
 			'kernel.maxfiles',
 			'kernel.maxproc',
 			'kernel.openfiles',
@@ -390,7 +391,10 @@ final class CItemData {
 			'zabbix[vcache,cache,<parameter>]',
 			'zabbix[version]',
 			'zabbix[vmware,buffer,<mode>]',
-			'zabbix[wcache,<cache>,<mode>]'
+			'zabbix[wcache,<cache>,<mode>]',
+			'zabbix[proxy_buffer,buffer,<mode>]',
+			'zabbix[proxy_buffer,state,current]',
+			'zabbix[proxy_buffer,state,changes]'
 		],
 		ITEM_TYPE_DB_MONITOR => [
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
@@ -937,6 +941,12 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_LOG,
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#eventlog'
+				]
+			],'eventlog.count[name,<regexp>,<severity>,<source>,<eventid>,<maxproclines>,<mode>]' => [
+				'description' => _('Event log monitoring. Returns count of entries'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#eventlog.count'
 				]
 			],
 			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]' => [
@@ -2816,6 +2826,27 @@ final class CItemData {
 				'value_type' => null,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#wcache'
+				]
+			],
+			'zabbix[proxy_buffer,buffer,<mode>]' => [
+				'description' => _('Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused).'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
+				]
+			],
+			'zabbix[proxy_buffer,state,current]' => [
+				'description' => _('State of proxy memory buffer.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
+				]
+			],
+			'zabbix[proxy_buffer,state,changes]' => [
+				'description' => _('Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
 				]
 			]
 		];

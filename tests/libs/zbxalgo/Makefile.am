@@ -13,7 +13,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
-	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \

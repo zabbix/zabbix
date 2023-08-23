@@ -22,7 +22,8 @@
 #include "zbxstr.h"
 #include "cfg.h"
 #include "zbxlog.h"
-#include "zbxconf.h"
+
+#include <strsafe.h> /* StringCchPrintf */
 
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 

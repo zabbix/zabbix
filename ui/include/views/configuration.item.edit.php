@@ -46,7 +46,8 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('backurl', $data['backurl']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -359,6 +360,7 @@ $item_tab
 		(new CLabel(_('Request body'), 'posts'))->setId('js-item-posts-label'),
 		(new CFormField((new CTextArea('posts', $data['posts'], compact('readonly')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 		))->setId('js-item-posts-field')
 	]);
 
@@ -716,8 +718,9 @@ $item_tab
 		(new CFormField((new CTextArea('params_es', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly($discovered_item)
 			->setAriaRequired()
+			->disableSpellcheck()
+			->setReadonly($discovered_item)
 		))->setId('js-item-executed-script-field')
 	])
 	->addItem([
@@ -728,6 +731,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 			->setReadonly($discovered_item)
 		))->setId('js-item-sql-query-field')
 	])
@@ -739,6 +743,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 			->setReadonly($discovered_item)
 		))->setId('js-item-formula-field')
 	])
@@ -1108,7 +1113,8 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'trends_default' => $data['trends_default']
+		'trends_default' => $data['trends_default'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

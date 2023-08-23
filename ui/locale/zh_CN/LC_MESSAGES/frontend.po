@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-22 09:29+0000\n"
+"PO-Revision-Date: 2023-07-06 12:00+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -557,7 +557,7 @@ msgstr "确认已解决的事件"
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:103
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "确认状态"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -930,6 +930,10 @@ msgstr "从模板添加"
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "添加主机"
+
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -1331,6 +1335,10 @@ msgstr "和（同时满足）"
 msgid "And/Or"
 msgstr "与/或（默认）"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr "年度"
@@ -1405,6 +1413,19 @@ msgstr "四月"
 #: include/func.inc.php:103 include/func.inc.php:256 jsLoader.php:236
 msgid "April"
 msgstr "四月"
+
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -1950,7 +1971,7 @@ msgstr "按主机"
 #: app/partials/monitoring.problem.filter.php:154
 #: widgets/problems/includes/WidgetForm.php:136
 msgid "By me"
-msgstr ""
+msgstr "我"
 
 #: report2.php:196
 msgid "By trigger template"
@@ -2345,6 +2366,31 @@ msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "无法复制图表"
 
+#: include/classes/helpers/CGraphHelper.php:74
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:91
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:92
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:96
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:97
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
@@ -2365,10 +2411,25 @@ msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
 msgstr[0] "无法复制触发器"
 
+#: include/classes/helpers/CTriggerGeneralHelper.php:196
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CTriggerGeneralHelper.php:197
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
+msgstr ""
+
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
 msgstr "无法复制触发器“%1$s”，因表达式中有多个主机。"
+
+#: include/classes/helpers/CTriggerHelper.php:75
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
+msgstr ""
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2456,7 +2517,7 @@ msgstr "无法创建用户角色"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "无法创建web场景步骤"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -3167,6 +3228,11 @@ msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主�
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
 msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主机“%3$s”，需要类型“%4$s”的主机接口。"
 
+#: include/classes/api/services/CItemGeneral.php:834
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
@@ -3187,6 +3253,11 @@ msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主�
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
 msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模板“%3$s”，已发现相同密钥的监控项。"
+
+#: include/classes/api/services/CItemGeneral.php:835
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
@@ -3229,6 +3300,11 @@ msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到�
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到主机“%3$s”，已存在相同键的 LLD 规则。"
 
+#: include/classes/api/services/CItemGeneral.php:840
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
@@ -3249,6 +3325,11 @@ msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到�
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到模板“%3$s”，已存在相同键的 LLD 规则。"
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:726
 #, c-format
@@ -4493,6 +4574,10 @@ msgstr "颜色 \"%1$s\" 设置不正确: 应使用十六进制格式颜色代码
 msgid "Color (OK)"
 msgstr "颜色 (OK)"
 
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
 msgid "Columns"
@@ -5659,6 +5744,10 @@ msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] "仪表盘已删除"
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "仪表盘页面属性"
@@ -6120,7 +6209,7 @@ msgstr "删除图表?"
 
 #: include/views/configuration.item.list.php:318
 msgid "Delete history of selected item?"
-msgstr ""
+msgstr "删除所选监控项的历史数据?"
 
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
@@ -6213,7 +6302,7 @@ msgstr "删除选定的关联项？"
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboard?"
-msgstr ""
+msgstr "删除选定的仪表盘？"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
@@ -6223,7 +6312,7 @@ msgstr "删除选定的仪表盘？"
 #: app/views/js/configuration.discovery.list.js.php:124
 #: include/views/configuration.host.discovery.list.php:369
 msgid "Delete selected discovery rule?"
-msgstr ""
+msgstr "删除选定的自动发现规则？"
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6244,7 +6333,7 @@ msgstr ""
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
-msgstr ""
+msgstr "删除所选定的数据图模板?"
 
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
@@ -6252,7 +6341,7 @@ msgstr "删除所选定的图表原型?"
 
 #: include/views/configuration.graph.list.php:270
 msgid "Delete selected graph?"
-msgstr ""
+msgstr "删除所选的图表?"
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6299,7 +6388,7 @@ msgstr "删除所选的图像?"
 
 #: include/views/configuration.item.prototype.list.php:232
 msgid "Delete selected item prototype?"
-msgstr ""
+msgstr "删除所选定的监控项原型?"
 
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
@@ -6307,7 +6396,7 @@ msgstr "删除所选定的监控项原型?"
 
 #: include/views/configuration.item.list.php:361
 msgid "Delete selected item?"
-msgstr ""
+msgstr "删除所选的监控项?"
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6331,7 +6420,7 @@ msgstr "删除选定的拓扑图？"
 
 #: app/views/administration.mediatype.list.php:217
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "删除所选的报警媒介类型?"
 
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
@@ -6347,7 +6436,7 @@ msgstr "删除所选的proxy？"
 
 #: app/views/administration.regex.list.php:83
 msgid "Delete selected regular expression?"
-msgstr ""
+msgstr "删除所选的正则表达式?"
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6371,7 +6460,7 @@ msgstr "删除所选的计划报表?"
 
 #: app/views/administration.script.list.php:224
 msgid "Delete selected script?"
-msgstr ""
+msgstr "删除所选的脚本?"
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6401,7 +6490,7 @@ msgstr "删除选定的模板组？"
 
 #: include/views/configuration.template.list.php:313
 msgid "Delete selected template?"
-msgstr ""
+msgstr "删除所选的模板?"
 
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
@@ -6419,7 +6508,7 @@ msgstr "删除选定的令牌？"
 
 #: include/views/configuration.trigger.prototype.list.php:231
 msgid "Delete selected trigger prototype?"
-msgstr ""
+msgstr "删除所选的触发器原型？"
 
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
@@ -6427,7 +6516,7 @@ msgstr "删除所选的触发器原型？"
 
 #: include/views/configuration.triggers.list.php:393
 msgid "Delete selected trigger?"
-msgstr ""
+msgstr "删除所选的触发器?"
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6443,7 +6532,7 @@ msgstr "删除所选的用户?"
 
 #: include/views/configuration.httpconf.list.php:248
 msgid "Delete selected web scenario?"
-msgstr ""
+msgstr "删除所选的 web 场景？"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6571,6 +6660,10 @@ msgstr "无法启用已取消配置的用户组。"
 msgid "Description"
 msgstr "描述"
 
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr "已安装包的详细列表。返回JSON格式文本"
@@ -6655,7 +6748,7 @@ msgstr "禁用调试模式"
 
 #: app/views/administration.usergroup.list.php:249
 msgid "Disable debug mode in selected group?"
-msgstr ""
+msgstr "停用所选群组的调试模式?"
 
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
@@ -6689,7 +6782,7 @@ msgstr "禁用所选的agent代理程序上监测的主机？"
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
-msgstr ""
+msgstr "停用所选的API令牌?"
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6722,7 +6815,7 @@ msgstr "禁用所选的连接器?"
 
 #: app/views/configuration.correlation.list.php:153
 msgid "Disable selected correlation?"
-msgstr ""
+msgstr "禁用选择的关联项？"
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -6731,7 +6824,7 @@ msgstr "禁用选择的关联项？"
 #: app/views/js/configuration.discovery.list.js.php:108
 #: include/views/configuration.host.discovery.list.php:348
 msgid "Disable selected discovery rule?"
-msgstr ""
+msgstr "停用所选的自动发现规则?"
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
@@ -6748,7 +6841,7 @@ msgstr ""
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
-msgstr ""
+msgstr "停用所选的群组?"
 
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
@@ -6756,7 +6849,7 @@ msgstr "禁用所选的用户群组?"
 
 #: app/views/configuration.host.list.php:534
 msgid "Disable selected host?"
-msgstr ""
+msgstr "停用所选的主机?"
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
@@ -6764,7 +6857,7 @@ msgstr "禁用所选的主机?"
 
 #: include/views/configuration.item.list.php:309
 msgid "Disable selected item?"
-msgstr ""
+msgstr "停用所选的监控项?"
 
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
@@ -6772,7 +6865,7 @@ msgstr "禁用所选的监控项?"
 
 #: app/views/administration.mediatype.list.php:203
 msgid "Disable selected media type?"
-msgstr ""
+msgstr "停用所选的报警媒介类型?"
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
@@ -6788,7 +6881,7 @@ msgstr "禁用所选的模块?"
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Disable selected scheduled report?"
-msgstr ""
+msgstr "禁用所选的计划报表?"
 
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
@@ -6796,7 +6889,7 @@ msgstr "禁用所选的计划报表?"
 
 #: include/views/configuration.triggers.list.php:368
 msgid "Disable selected trigger?"
-msgstr ""
+msgstr "停用所选的触发器?"
 
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
@@ -6804,7 +6897,7 @@ msgstr "禁用所选的触发器?"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Disable selected web scenario?"
-msgstr ""
+msgstr "禁用所选定的web场景？"
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -7588,7 +7681,7 @@ msgstr "开启内部管家服务"
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
-msgstr ""
+msgstr "启用选定的 API 令牌？"
 
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
@@ -7621,7 +7714,7 @@ msgstr "启用所选的连接器?"
 
 #: app/views/configuration.correlation.list.php:147
 msgid "Enable selected correlation?"
-msgstr ""
+msgstr "开启选择的关联项？"
 
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
@@ -7630,7 +7723,7 @@ msgstr "开启选择的关联项？"
 #: app/views/js/configuration.discovery.list.js.php:92
 #: include/views/configuration.host.discovery.list.php:342
 msgid "Enable selected discovery rule?"
-msgstr ""
+msgstr "启用所选的自动发现规则?"
 
 #: app/views/configuration.discovery.list.php:121
 #: include/views/configuration.host.discovery.list.php:328
@@ -7647,7 +7740,7 @@ msgstr ""
 
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
-msgstr ""
+msgstr "启用所选的群组?"
 
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
@@ -7655,7 +7748,7 @@ msgstr "启用所选的群组?"
 
 #: app/views/configuration.host.list.php:526
 msgid "Enable selected host?"
-msgstr ""
+msgstr "启用所选的主机?"
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
@@ -7664,7 +7757,7 @@ msgstr "启用所选的主机?"
 
 #: include/views/configuration.item.list.php:303
 msgid "Enable selected item?"
-msgstr ""
+msgstr "启用所选的监控项？"
 
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
@@ -7672,7 +7765,7 @@ msgstr "启用所选的监控项？"
 
 #: app/views/administration.mediatype.list.php:197
 msgid "Enable selected media type?"
-msgstr ""
+msgstr "启用所选的媒介类型?"
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
@@ -7688,7 +7781,7 @@ msgstr "启用所选的模块?"
 
 #: app/views/reports.scheduledreport.list.php:89
 msgid "Enable selected scheduled report?"
-msgstr ""
+msgstr "启用所选的定时报表?"
 
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
@@ -7696,7 +7789,7 @@ msgstr "启用所选的定时报表?"
 
 #: include/views/configuration.triggers.list.php:362
 msgid "Enable selected trigger?"
-msgstr ""
+msgstr "启用所选的触发器?"
 
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
@@ -7704,7 +7797,7 @@ msgstr "启用所选的触发器?"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Enable selected web scenario?"
-msgstr ""
+msgstr "启用所选定的web场景?"
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -7962,6 +8055,10 @@ msgstr "事件未确认"
 #: tr_events.php:187
 msgid "Event list [previous 20]"
 msgstr "事件清单[前 20]"
+
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
 
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
@@ -8662,6 +8759,10 @@ msgstr "界面设置"
 msgid "GUI access disabled."
 msgstr "图形化界面已经被禁用。"
 
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
 msgid "General"
@@ -8814,6 +8915,16 @@ msgstr "图形“%1$s”已作为从图形原型创建的图形存在于“%2$s�
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "图形\"%1$s\"已存在于\"%2$s\"中."
 
+#: include/classes/api/services/CGraph.php:479
+#, c-format
+msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraph.php:480
+#, c-format
+msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:36
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
@@ -8845,6 +8956,16 @@ msgstr "图形已删除"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:167
 msgid "Graph prototype"
 msgstr "图形原型"
+
+#: include/classes/api/services/CGraphPrototype.php:470
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraphPrototype.php:471
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
@@ -9394,6 +9515,10 @@ msgstr "主机不能有超过一个同类型的默认接口."
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "主机计数"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -10394,7 +10519,7 @@ msgstr "错误的动作操作升级步骤值."
 
 #: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
-msgstr "动作操作媒介类型不正确。媒体类型不存在或您无权访问它。"
+msgstr "动作操作媒介类型不正确。媒介类型不存在或您无权访问它。"
 
 #: app/controllers/CControllerActionOperationValidate.php:63
 #, c-format
@@ -10683,7 +10808,7 @@ msgstr "主机\"%1$s\"的状态值不正确."
 
 #: include/classes/api/services/CHttpTest.php:737
 msgid "Incorrect templated web scenario step count."
-msgstr "模板Web方案步骤计数不正确。"
+msgstr "模板Web场景步骤数不正确。"
 
 #: include/classes/parsers/C10TriggerExpression.php:526
 #: include/classes/parsers/C10TriggerExpression.php:542
@@ -12207,6 +12332,10 @@ msgstr "LLD 宏"
 msgid "LLD macros"
 msgstr "LLD 宏"
 
+#: app/controllers/CControllerAuditLogList.php:229
+msgid "LLD rule"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneralOld.php:700
 msgid "LLD rule with the same UUID already exists"
 msgstr ""
@@ -13166,7 +13295,7 @@ msgstr[0] "将要显示的最大时间区间是%1$s天"
 #: include/classes/api/services/CUser.php:941
 #, c-format
 msgid "Maximum total length of email address exceeded for media type with ID \"%1$s\"."
-msgstr "email 地址最大长度超出媒体类型 ID: \"%1$s\"。"
+msgstr "email 地址最大长度超出媒介类型 ID: \"%1$s\"。"
 
 #: app/views/administration.geomaps.edit.php:61
 msgid "Maximum zoom level of the map."
@@ -13201,7 +13330,7 @@ msgstr "媒介类型"
 #: include/classes/api/services/CMediatype.php:408
 #, c-format
 msgid "Media type \"%1$s\" already exists."
-msgstr "媒体类型 \"%1$s\" 已经存在。"
+msgstr "媒介类型 \"%1$s\" 已经存在。"
 
 #: app/controllers/CControllerMediatypeCreate.php:158
 msgid "Media type added"
@@ -13230,7 +13359,7 @@ msgstr[0] "消息介质类型已启用"
 #: app/views/popup.ldap.edit.php:255
 #: app/views/popup.mediatypemapping.edit.php:85
 msgid "Media type mapping"
-msgstr "媒体类型映射"
+msgstr "媒介类型映射"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -13252,7 +13381,7 @@ msgstr "报警媒介类型已更新"
 #: include/classes/api/services/CUser.php:865
 #, c-format
 msgid "Media type with ID \"%1$s\" is not available."
-msgstr "ID为 \"%1$s\" 的媒体类型不可用。"
+msgstr "ID为 \"%1$s\" 的媒介类型不可用。"
 
 #: app/views/administration.mediatype.edit.php:31
 #: app/views/administration.mediatype.list.php:31 app/views/popup.import.php:45
@@ -13913,6 +14042,11 @@ msgstr "导航到默认视图"
 msgid "Navigate to initial view"
 msgstr "导航到初始视图"
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "网络发现数据存储期"
@@ -14058,7 +14192,7 @@ msgstr "创建维修时段"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
-msgstr ""
+msgstr "新增媒介类型"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -14079,7 +14213,7 @@ msgstr "新的正则表达式"
 #: app/views/administration.script.edit.php:372
 #: app/views/administration.script.edit.php:412
 msgid "New script"
-msgstr ""
+msgstr "新增脚本"
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
@@ -14087,7 +14221,7 @@ msgstr "添加服务"
 
 #: app/views/webscenario.step.edit.php:286
 msgid "New step of web scenario"
-msgstr ""
+msgstr "新增web场景步骤"
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -14105,6 +14239,10 @@ msgstr "新触发器"
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
 msgstr "新用户组映射"
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16193,6 +16331,10 @@ msgstr "前期"
 msgid "Preview"
 msgstr "预览"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -17060,6 +17202,10 @@ msgstr "自主机群组移除"
 msgid "Remove host"
 msgstr "移除主机"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -17441,6 +17587,10 @@ msgstr "返回与参数匹配的 TCP 套接字数量。返回整数"
 #: include/classes/data/CItemData.php:974
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr "返回匹配参数的 UDP 套接字数量。返回整数"
+
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
+msgstr ""
 
 #: include/classes/data/CItemData.php:850
 msgid "Returns percentage of lost ICMP ping packets."
@@ -17884,6 +18034,15 @@ msgstr "保存设置"
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "保存为 \"%1$s\""
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr ""
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18573,6 +18732,10 @@ msgstr "精简"
 msgid "Show"
 msgstr "查看"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
@@ -18592,6 +18755,10 @@ msgstr "显示标题"
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
 msgstr "显示维修中主机"
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -18684,6 +18851,10 @@ msgstr "仅显示未确认"
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
 msgstr "显示不可用的地图"
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -18982,6 +19153,10 @@ msgstr "Zabbix服务器的启动时间，Unix时间截."
 msgid "State"
 msgstr "状态"
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -18991,6 +19166,10 @@ msgstr "静态"
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Zabbix 写缓存的统计和可用性。缓存 - 值之一（模式：all、float、uint、str、log、text、不支持）、历史（模式：pfree、free、total、used、pused）、索引（模式：pfree、free、total、used , pused), 趋势 (模式: pfree, free, total, used, pused)。"
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
@@ -19128,7 +19307,7 @@ msgstr "步骤持续时间"
 
 #: app/controllers/CControllerPopupHttpStep.php:145
 msgid "Step of web scenario"
-msgstr "web 方案步骤"
+msgstr "web场景步骤"
 
 #: app/controllers/CControllerPopupHttpStep.php:110
 #, c-format
@@ -19270,6 +19449,10 @@ msgstr "超级管理员"
 #: include/views/general.login.php:94
 msgid "Support"
 msgstr "支持"
+
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
@@ -20227,6 +20410,13 @@ msgstr "今天到目前为止"
 msgid "Top"
 msgstr "顶部"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "前 N 个"
@@ -20234,6 +20424,10 @@ msgstr "前 N 个"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "前排主机"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20442,6 +20636,10 @@ msgstr "触发器不能依赖从它继承的一个触发器."
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "触发器复制"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -21025,6 +21223,10 @@ msgstr "服务器意外错误。"
 #: include/views/configuration.item.prototype.edit.php:717
 msgid "Units"
 msgstr "单位"
+
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
@@ -22465,11 +22667,11 @@ msgstr "VVMware 管理程序维护状态，<url> - VMware 服务 URL，<uuid> - 
 
 #: app/views/administration.miscconfig.edit.php:105
 msgid "Valid URI schemes"
-msgstr "有效的 URI 方案"
+msgstr "有效的URI命名结构"
 
 #: app/views/administration.miscconfig.edit.php:100
 msgid "Validate URI schemes"
-msgstr "验证 URI 方案"
+msgstr "验证URI命名结构"
 
 #: include/items.inc.php:1863 include/items.inc.php:1867
 #: include/items.inc.php:1871 include/items.inc.php:1875
@@ -22564,6 +22766,10 @@ msgstr "参数 \"grid_show \"的值 \"%1$s\"是无效的. 可用的是: \"%2$s\"
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "栏位\"%2$s\"的值\"%1$s\"太长 - %3$d字元. 容许的长度是%4$d字符."
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "数值缓存无效。合法的参数有:requests, hits and misses."
@@ -22633,6 +22839,10 @@ msgstr "旧事件的标签值"
 #: include/actions.inc.php:352
 msgid "Value of tag"
 msgstr "标签值"
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
+msgstr ""
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
 msgid "Value: no data"
@@ -22803,6 +23013,10 @@ msgstr "告警"
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
 msgstr "告警信息"
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
@@ -23553,6 +23767,10 @@ msgstr "一个特殊的字符"
 msgid "a string, number or null value is expected"
 msgstr "应为字符串、数字或空值"
 
+#: include/classes/api/services/CDiscoveryRule.php:1718
+msgid "a template ID is expected"
+msgstr ""
+
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:130
@@ -23643,6 +23861,10 @@ msgstr "将超出允许的依赖监控项数"
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr "应为 IP 地址"
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481
@@ -24037,6 +24259,10 @@ msgstr "无法取消链接"
 #: include/classes/api/services/CItemGeneral.php:2602
 msgid "cannot convert to JSON, result value too long"
 msgstr "无法转换到 JSON，结果值太长"
+
+#: include/classes/api/services/CDiscoveryRule.php:3026
+msgid "cannot delete inherited LLD rule"
+msgstr ""
 
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
@@ -24853,6 +25079,11 @@ msgstr "min() - 周期 T 内的最小值"
 #, c-format
 msgid "minimum length is %1$s characters"
 msgstr "最小长度为 %1$s 个字符"
+
+#: include/classes/api/services/CDiscoveryRule.php:1630
+#, c-format
+msgid "missing filter condition \"%1$s\""
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "mod() - Division remainder"
@@ -25838,6 +26069,11 @@ msgstr "值必须为空"
 msgid "value must be empty or %1$s"
 msgid_plural "value must be empty or one of %1$s"
 msgstr[0] "值必须为空或 %1$s"
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format

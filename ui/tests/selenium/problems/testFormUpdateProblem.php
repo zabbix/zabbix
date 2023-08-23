@@ -176,7 +176,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		$event = CDataHelper::call('event.get', [
 			'eventids' => 100553,
-			'select_acknowledges' => ['clock']
+			'selectAcknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
@@ -983,7 +983,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	private function checkIconAndHint($row, $class, $text) {
 		// Assert blinking icon in Info column.
-		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink']);
+		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink'])->waitUntilVisible();
 		$this->assertTrue($icon->exists());
 
 		// Check icon hintbox.

@@ -30,9 +30,10 @@
 
 <script>
 	const view = {
-		init({checkbox_hash, checkbox_object}) {
+		init({checkbox_hash, checkbox_object, context}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
+			this.context = context;
 
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
@@ -92,12 +93,31 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
 		},
 
 		openCopyPopup() {
@@ -106,6 +126,12 @@
 				source: 'triggers'
 			};
 
+			const filter_hostids = document.getElementsByName('filter_hostids[]');
+
+			if (filter_hostids.length == 1) {
+				parameters.src_hostid = filter_hostids[0].value;
+			}
+
 			return PopUp('copy.edit', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
@@ -113,8 +139,9 @@
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(context, e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -122,26 +149,16 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				location.href = location.href;
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('triggers.php');
+						curl.setArgument('context', context);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
+				uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
 
-				location.href = curl.getUrl();
+				location.href = curl === null ? location.href : curl.getUrl();
 			}
 		}
 	};

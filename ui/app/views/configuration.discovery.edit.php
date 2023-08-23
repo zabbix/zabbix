@@ -49,13 +49,13 @@ $form_grid = (new CFormGrid())
 	]);
 
 // Append proxy to form list.
-$proxy_select = (new CSelect('proxy_hostid'))
-	->setValue($this->data['drule']['proxy_hostid'])
+$proxy_select = (new CSelect('proxyid'))
+	->setValue($this->data['drule']['proxyid'])
 	->setFocusableElementId('label-proxy')
 	->addOption(new CSelectOption(0, _('No proxy')));
 
 foreach ($this->data['proxies'] as $proxy) {
-	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['host']));
+	$proxy_select->addOption(new CSelectOption($proxy['proxyid'], $proxy['name']));
 }
 
 $form_grid
@@ -69,6 +69,7 @@ $form_grid
 			(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
 				->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px')
 				->setAriaRequired()
+				->disableSpellcheck()
 		)
 	])
 	->addItem([
