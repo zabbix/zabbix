@@ -2293,17 +2293,19 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
  *                                                                            *
  ******************************************************************************/
 #ifndef HAVE_IPV6
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR *name, int ipv6v4_mode)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode)
 {
-	struct sockaddr_in	*name4 = (struct sockaddr_in *)name,
-				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
+	const struct sockaddr_in	*name4 = (const struct sockaddr_in *)name,
+					*ai_addr4 = (const struct sockaddr_in *)current_ai->ai_addr;
 
 	ZBX_UNUSED(ipv6v4_mode);
 
 	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
 }
 #else
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR *name, int ipv6v4_mode)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode)
 {
 	/* Network Byte Order is ensured */
 	/* IPv4-compatible, the first 96 bits are zeros */
@@ -2311,10 +2313,10 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_
 	/* IPv4-mapped, the first 80 bits are zeros, 16 next - ones */
 	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
 
-	struct sockaddr_in	*name4 = (struct sockaddr_in *)name,
-				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
-	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)name,
-				*ai_addr6 = (struct sockaddr_in6 *)current_ai->ai_addr;
+	const struct sockaddr_in	*name4 = (const struct sockaddr_in *)name,
+					*ai_addr4 = (const struct sockaddr_in *)current_ai->ai_addr;
+	const struct sockaddr_in6	*name6 = (const struct sockaddr_in6 *)name,
+					*ai_addr6 = (const struct sockaddr_in6 *)current_ai->ai_addr;
 
 #ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
 	if (current_ai->ai_family == name->ss_family)

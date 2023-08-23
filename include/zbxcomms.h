@@ -307,7 +307,8 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
 
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR *name, int ipv6v4_mode);
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
 int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
