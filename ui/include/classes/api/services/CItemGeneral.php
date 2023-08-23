@@ -270,7 +270,7 @@ abstract class CItemGeneral extends CApiService {
 			if (array_key_exists('preprocessing', $item)) {
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 					'preprocessing' => [
-						'type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['type', 'params']],
+						'type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED,
 						'fields' => [
 							'type' =>	['type' => API_ANY],
 							'params' =>	['type' => API_ANY]
@@ -282,15 +282,29 @@ abstract class CItemGeneral extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, str_replace("\n", '\n', $error));
 				}
 
-				foreach ($item['preprocessing'] as &$step) {
-					if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+				$match_any_exists = false;
+
+				foreach ($item['preprocessing'] as $j => &$step) {
+					if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 						$params = [];
 
-						foreach (explode("\n", $step['params']) as $i => $param) {
-							$params[$i + 1] = $param;
+						foreach (explode("\n", $step['params']) as $_i => $param) {
+							$params[$_i + 1] = $param;
 						}
 
 						$params[1] = (int) $params[1];
+
+						if ($params[1] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+							if ($match_any_exists) {
+								$error = _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1).'/preprocessing/'.($j + 1),
+									_s('value %1$s already exists', '('.implode(', ', $params).')=('.implode(', ', $params).')')
+								);
+								self::exception(ZBX_API_ERROR_PARAMETERS, str_replace("\n", '\n', $error));
+							}
+
+							$match_any_exists = true;
+						}
+
 						$step['params'] = $params;
 					}
 				}
