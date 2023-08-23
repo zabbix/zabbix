@@ -2480,6 +2480,9 @@ int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *
 
 		if (0 == getaddrinfo(start, NULL, &hints, &ai))
 		{
+			if (NULL != end)
+				*end = ',';
+
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
 				int	prefix_size_current = prefix_size;
