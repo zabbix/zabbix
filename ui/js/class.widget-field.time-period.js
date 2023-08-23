@@ -144,7 +144,9 @@ class CWidgetFieldTimePeriod {
 			});
 
 			this.#reference_multiselect.multiSelect('getSelectButton').addEventListener('click', () => {
-				new ClassWidgetSelectPopup(this.#getWidgets()).on('dialogue.submit', (e) => {
+				const popup = new ClassWidgetSelectPopup(this.#getWidgets());
+
+				popup.on('dialogue.submit', (e) => {
 					this.#selectReference(e.detail.reference);
 				});
 			});
