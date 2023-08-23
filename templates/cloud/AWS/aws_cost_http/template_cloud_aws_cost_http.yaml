@@ -208,7 +208,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
+                    ['access_key', 'region', 'secret_key', 'month'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -216,8 +216,8 @@ zabbix_export:
                     today = new Date();
                     params.end_date = today.toDateString();
                     month = today.getMonth();
-                    today.setMonth(month - 12);
-                    params.start_time = today.toDateString();
+                    today.setMonth(month - params.month);
+                    params.start_time = new Date(today.getFullYear(), today.getMonth()).toDateString();
             
                     AwsBilling.params = params;
                 },
@@ -397,6 +397,8 @@ zabbix_export:
               value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: region
               value: '{$AWS.BILLING.REGION}'
+            - name: month
+              value: '{$AWS.BILLING.MONTH}'
             - name: proxy
               value: '{$AWS.PROXY}'
           tags:
@@ -594,6 +596,9 @@ zabbix_export:
         - macro: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered billing service by name.'
+        - macro: '{$AWS.BILLING.MONTH}'
+          value: '11'
+          description: 'Months to get historical data from AWS Cost Explore API, no more than 12 months.'
         - macro: '{$AWS.BILLING.REGION}'
           value: us-east-1
           description: 'Amazon Billing region code.'
