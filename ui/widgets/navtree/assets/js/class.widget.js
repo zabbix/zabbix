@@ -794,7 +794,7 @@ class CWidgetNavTree extends CWidget {
 		}
 	}
 
-	_itemEditDialog(id, parent, depth, trigger_elmnt) {
+	_itemEditDialog(id, parent, depth, trigger_element) {
 		const url = new Curl('zabbix.php');
 		const item_edit = id != 0;
 
@@ -945,7 +945,7 @@ class CWidgetNavTree extends CWidget {
 					],
 					'dialogueid': 'navtreeitem',
 					'script_inline': resp.script_inline
-				}, trigger_elmnt);
+				}, trigger_element);
 			}
 		});
 	}

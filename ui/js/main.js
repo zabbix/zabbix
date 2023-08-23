@@ -1105,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	// Event hub initialization.
 
 	ZABBIX.EventHub = new CEventHub();
-})
+});
 
 window.addEventListener('load', () => {
 
