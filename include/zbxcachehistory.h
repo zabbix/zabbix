@@ -92,9 +92,11 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 #define ZBX_STATS_HISTORY_BIN_COUNTER	22
 
-#define ZBX_PP_VALUE_OPT_NONE		0x0000
-#define ZBX_PP_VALUE_OPT_META		0x0001
-#define ZBX_PP_VALUE_OPT_LOG		0x0002
+/* 'zbx_pp_value_opt_t' element 'flags' values */
+#define ZBX_PP_VALUE_OPT_NONE		0x0000	/* 'zbx_pp_value_opt_t' has no data */
+#define ZBX_PP_VALUE_OPT_META		0x0001	/* 'zbx_pp_value_opt_t' has log metadata ('mtime' and 'lastlogsize') */
+#define ZBX_PP_VALUE_OPT_LOG		0x0002	/* 'zbx_pp_value_opt_t' has 'timestamp', 'severity', 'logeventid' and */
+						/* 'source' data */
 
 /* This structure is complementary data if value comes from preprocessing. */
 typedef struct
