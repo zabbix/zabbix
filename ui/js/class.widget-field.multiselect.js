@@ -139,7 +139,7 @@ class CWidgetFieldMultiselect {
 			if (this.#dashboard_accepted) {
 				this.#multiselect.multiSelect('addOptionalSelect', t('Dashboard'), () => {
 					this.#selectReference(
-						CWidgetBase.createTypedReference('DASHBOARD', this.#in_type)
+						CWidgetBase.createTypedReference({reference: 'DASHBOARD', type: this.#in_type})
 					);
 				});
 			}
@@ -171,7 +171,7 @@ class CWidgetFieldMultiselect {
 	#selectReference(reference) {
 		let caption = null;
 
-		if (reference === CWidgetBase.createTypedReference('DASHBOARD', this.#in_type)) {
+		if (reference === CWidgetBase.createTypedReference({reference: 'DASHBOARD', type: this.#in_type})) {
 			caption = {id: reference, name: t('Dashboard')}
 		}
 		else {
@@ -221,7 +221,7 @@ class CWidgetFieldMultiselect {
 
 		if (this.#dashboard_accepted && t('Dashboard').toLowerCase().includes(search)) {
 			result_entities.set('DASHBOARD', {
-				id: CWidgetBase.createTypedReference('DASHBOARD', this.#in_type),
+				id: CWidgetBase.createTypedReference({reference: 'DASHBOARD', type: this.#in_type}),
 				name: t('Dashboard'),
 				source: 'dashboard'
 			})
@@ -264,7 +264,7 @@ class CWidgetFieldMultiselect {
 
 		for (const widget of widgets) {
 			result.push({
-				id: CWidgetBase.createTypedReference(widget.getFields().reference, this.#in_type),
+				id: CWidgetBase.createTypedReference({reference: widget.getFields().reference, type: this.#in_type}),
 				name: widget.getHeaderName()
 			});
 		}
