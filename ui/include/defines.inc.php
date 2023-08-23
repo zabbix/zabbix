@@ -131,6 +131,9 @@ define('ZBX_PROXY_VERSION_CURRENT', 1);
 define('ZBX_PROXY_VERSION_OUTDATED', 2);
 define('ZBX_PROXY_VERSION_UNSUPPORTED', 3);
 
+define('ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED',	0);
+define('ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED',		1);
+
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
 define('ZBX_FLAG_DISCOVERY_PROTOTYPE',	0x2);
@@ -1817,6 +1820,7 @@ define('TAB_INDICATOR_HOST_PERMISSIONS', 'host-permissions');
 define('TAB_INDICATOR_TEMPLATE_PERMISSIONS', 'template-permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
+define('TAB_INDICATOR_PROXY_TIMEOUTS', 'proxy-timeouts');
 define('TAB_INDICATOR_SHARING', 'sharing');
 define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');

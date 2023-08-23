@@ -48,7 +48,7 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		for (const id of ['mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate']) {
+		for (const id of ['mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate', 'custom_timeouts']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this._update());
@@ -132,6 +132,15 @@ window.proxy_edit_popup = new class {
 				document.getElementById(id).disabled =
 					!(mode_active && tls_accept_psk || !mode_active && tls_connect_psk);
 			}
+		}
+
+		const custom_timeouts_disabled =
+			this.form.querySelector('#custom_timeouts input:checked').value == <?= ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED ?>;
+
+		for (const id of ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+			'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+			'timeout_telnet_agent', 'timeout_script']) {
+			document.getElementById(id).disabled = custom_timeouts_disabled;
 		}
 	}
 
