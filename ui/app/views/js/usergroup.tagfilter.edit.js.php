@@ -36,6 +36,16 @@ window.tag_filter_edit = new class {
 		this.tag_filter_template = new Template(document.getElementById('tag-filter-row-template').innerHTML);
 		this.tag_filter_counter = 0;
 
+		if (typeof this.group_tag_filters === 'object' && !Array.isArray(this.group_tag_filters)) {
+			const result = [];
+
+			for (let key in this.group_tag_filters) {
+				result.push(this.group_tag_filters[key]);
+			}
+
+			this.group_tag_filters = result;
+		}
+
 		const indices = Object.keys(this.group_tag_filters);
 		const first_index = indices[0];
 
