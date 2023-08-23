@@ -1490,6 +1490,8 @@ static  void	lld_group_merge_group_discovery(zbx_vector_lld_group_discovery_ptr_
 			if (src->values[i]->parent_group_prototypeid == dst->values[j]->parent_group_prototypeid)
 			{
 				dst->values[j]->groupdiscoveryid = src->values[i]->groupdiscoveryid;
+				dst->values[j]->lastcheck = src->values[i]->lastcheck;
+				dst->values[j]->ts_delete = src->values[i]->ts_delete;
 
 				lld_group_discovery_free(src->values[i]);
 				zbx_vector_lld_group_discovery_ptr_remove_noorder(src, i--);
@@ -1727,6 +1729,8 @@ static int	lld_group_rename_discovery_link(zbx_lld_group_t *dst, const zbx_lld_g
 			if (0 == strcmp(name, src->name))
 			{
 				gd_dst->groupdiscoveryid = gd_src->groupdiscoveryid;
+				gd_dst->lastcheck = gd_src->lastcheck;
+				gd_dst->ts_delete = gd_src->ts_delete;
 				gd_dst->flags |= ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_NAME;
 
 				if (dst->groupid != src->groupid)
@@ -2226,6 +2230,8 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 	if (0 != groups_update_num || 0 != gd_update_num)
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
+	/* first handle groups before inserting group_discovery links */
+
 	for (i = 0; i < groups->values_num; i++)
 	{
 		zbx_lld_group_t	*group = groups->values[i];
@@ -2275,8 +2281,6 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 		}
 	}
 
-	/* first insert new groups so group_discovery links can be added/updated */
-
 	if (0 != groups_insert_num)
 	{
 		zbx_db_insert_execute(&db_insert_group);
@@ -2284,12 +2288,6 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 
 		lld_groups_save_rights(&new_groups);
 		zbx_vector_lld_group_ptr_destroy(&new_groups);
-	}
-
-	if (0 != gd_insert_num)
-	{
-		zbx_db_insert_execute(&db_insert_gdiscovery);
-		zbx_db_insert_clean(&db_insert_gdiscovery);
 	}
 
 	for (i = 0; i < groups->values_num; i++)
@@ -2354,6 +2352,12 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 			}
 		}
+	}
+
+	if (0 != gd_insert_num)
+	{
+		zbx_db_insert_execute(&db_insert_gdiscovery);
+		zbx_db_insert_clean(&db_insert_gdiscovery);
 	}
 
 	if (0 != groups_update_num || 0 != gd_update_num)
@@ -4102,7 +4106,7 @@ static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int life
 			{
 				zbx_vector_uint64_append(&lc_ids, discovery->groupdiscoveryid);
 				if (0 != discovery->ts_delete)
-					zbx_vector_uint64_append(&ts_ids, group->groupid);
+					zbx_vector_uint64_append(&ts_ids, discovery->groupdiscoveryid);
 			}
 		}
 	}
