@@ -158,19 +158,15 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		u.String(), req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
 	var buf []byte
+	cookieName := "zbx_session"
+	cookieValue := strings.Replace(req.Header["Cookie"], "zbx_session=", "", 1)
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
-		chromedp.ActionFunc(func(ctx context.Context) error {
-			name := "zbx_session"
-			value := strings.ReplaceAll(req.Header["Cookie"], "zbx_session=", "")
-
-			return network.SetCookie(name, value).
-				WithURL(req.URL).
-				WithDomain(u.Hostname()).
-				WithSameSite(network.CookieSameSiteStrict).
-				WithHTTPOnly(true).
-				Do(ctx)
-		}),
+		network.SetCookie(cookieName, cookieValue).
+			WithURL(req.URL).
+			WithDomain(u.Hostname()).
+			WithSameSite(network.CookieSameSiteStrict).
+			WithHTTPOnly(true),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
 		navigateAndWaitFor(u.String(), "networkIdle"),
 		chromedp.ActionFunc(func(ctx context.Context) error {
