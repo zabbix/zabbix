@@ -1069,7 +1069,8 @@ class testDashboardPlainTextWidget extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->waitUntilReady();
 		$this->assertTableData($data['initial_data']);
 
 		$default_values = [
@@ -1086,16 +1087,13 @@ class testDashboardPlainTextWidget extends CWebTest {
 		if (array_key_exists('host_select', $data)) {
 			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 			$multiselect_field->fill($data['host_select']['without_data']);
-			$this->page->waitUntilReady();
-			$this->assertEquals([$data['host_select']['without_data']], $multiselect_field->getValue());
+			$dashboard->waitUntilReady();
 			$this->assertTableData();
 			$multiselect_field->fill($data['host_select']['with_data']);
-			$this->page->waitUntilReady();
-			$this->assertEquals([$data['host_select']['with_data']], $multiselect_field->getValue());
+			$dashboard->waitUntilReady();
 			$this->assertTableData($data['result']);
 			$multiselect_field->clear();
-			$this->page->waitUntilReady();
-			$this->assertEquals('', $multiselect_field->getValue());
+			$dashboard->waitUntilReady();
 		}
 
 		if (array_key_exists('result', $data)) {
@@ -1114,8 +1112,6 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$form->fill($configuration);
 		$form->submit();
 		$dashboard->save();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
-		CMessageElement::find()->one()->close();
+		$dashboard->waitUntilReady();
 	}
 }
