@@ -25,7 +25,7 @@
 
 #ifdef _WINDOWS
 #	include "zbxwinservice.h"
-#	include "perfstat.h"
+#	include "../win32/perfstat/perfstat.h"
 /* defined in sysinfo lib */
 extern int get_cpu_num_win32(void);
 #else

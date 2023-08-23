@@ -1388,8 +1388,8 @@ class CDashboard {
 			}
 		});
 
-		overlay.$dialogue[0].removeEventListener('overlay.close', this._events.editWidgetPropertiesClose);
-		overlay.$dialogue[0].addEventListener('overlay.close', this._events.editWidgetPropertiesClose, {once: true});
+		overlay.$dialogue[0].removeEventListener('dialogue.close', this._events.editWidgetPropertiesClose);
+		overlay.$dialogue[0].addEventListener('dialogue.close', this._events.editWidgetPropertiesClose, {once: true});
 	}
 
 	reloadWidgetProperties() {

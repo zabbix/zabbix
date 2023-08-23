@@ -463,7 +463,7 @@ function acknowledgePopUp(parameters, trigger_element) {
 		history.replaceState({}, '', url.getUrl());
 	});
 
-	overlay.$dialogue[0].addEventListener('overlay.close', () => {
+	overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 		history.replaceState({}, '', backurl);
 	}, {once: true});
 
