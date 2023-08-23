@@ -33,6 +33,11 @@ class CControllerUsergroupEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'usrgrpid' =>				'db usrgrp.usrgrpid',
+			'name' =>					'db usrgrp.name',
+			'userids' =>				'array_db users.userid',
+			'gui_access' =>				'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
+			'users_status' =>			'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
+			'debug_mode' =>				'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
 			'ms_hostgroup_right' =>		'array',
 			'hostgroup_right' =>		'array',
 			'ms_templategroup_right' =>	'array',
