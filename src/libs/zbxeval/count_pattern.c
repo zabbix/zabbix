@@ -18,8 +18,11 @@
 **/
 
 #include "zbxeval.h"
-#include "zbxcacheconfig.h"
 #include "zbxstr.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxregexp.h"
+#include "zbxvariant.h"
 
 static zbx_get_expressions_by_name_f	get_expressions_by_name_cb = NULL;
 
