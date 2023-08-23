@@ -285,7 +285,7 @@ abstract class CItemGeneral extends CApiService {
 				$match_any_exists = false;
 
 				foreach ($item['preprocessing'] as $j => &$step) {
-					if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+					if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 						$params = [];
 
 						foreach (explode("\n", $step['params']) as $_i => $param) {
