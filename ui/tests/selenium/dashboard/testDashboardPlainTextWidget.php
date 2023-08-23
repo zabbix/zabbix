@@ -45,10 +45,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 	protected static $dashboardid;
 	protected static $dashboard_create;
 	protected static $dashboard_data;
-	protected static $default_widget = 'Default Plain text Widget';
 	protected static $update_widget = 'Update Plain text Widget';
-	protected static $delete_widget = 'Widget for delete';
-	protected static $data_widget = 'Widget for data check';
+	const DEFAULT_WIDGET = 'Default Plain text Widget';
+	const DELETE_WIDGET = 'Widget for delete';
+	const DATA_WIDET = 'Widget for data check';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -102,7 +102,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'plaintext',
-								'name' => self::$default_widget,
+								'name' => self::DEFAULT_WIDGET,
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
@@ -111,7 +111,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => '42227'
+										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -122,7 +122,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 							],
 							[
 								'type' => 'plaintext',
-								'name' => self::$delete_widget,
+								'name' => self::DELETE_WIDGET,
 								'x' => 0,
 								'y' => 5,
 								'width' => 12,
@@ -131,7 +131,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => '42227'
+										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									]
 								]
 							]
@@ -156,7 +156,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => '42243'
+										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory'.
 									]
 								]
 							]
@@ -172,7 +172,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'plaintext',
-								'name' => self::$data_widget,
+								'name' => self::DATA_WIDET,
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
@@ -181,17 +181,17 @@ class testDashboardPlainTextWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => '42227'
+										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => '42243'
+										'value' => '42243' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory'.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => '42244'
+										'value' => '42244' // item name in widget 'ЗАББИКС Сервер: Linux: Available memory in %'.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -201,7 +201,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
-										'value' => '99142'
+										'value' => '99142' // item name in widget 'Test item host: Master item'.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -226,10 +226,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$dialog = $dashboard->edit()->addWidget();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form = $dialog->asForm();
-
-		if ($form->getField('Type')->getText() !== 'Plain text') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
-		}
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
 
 		// Check default state.
 		$default_state = [
@@ -273,8 +270,8 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$this->assertEquals($refresh_interval, $form->getField('Refresh interval')->getOptions()->asText());
 
 		// Check if buttons present and clickable.
-		$this->assertEquals(2, $dialog->query('button', ['Add', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
 		);
 		$dialog->close();
 		$dashboard->save();
@@ -282,10 +279,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		// Check parameter 'Dynamic items' true/false state.
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
-		$this->assertEquals('No data found.', $dashboard->getWidget(self::$default_widget)
-				->query('class:nothing-to-show')->one()->getText()
-		);
-		$dashboard->getWidget(self::$default_widget)->edit();
+		$dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
 		$form->fill(['Dynamic items' => false])->submit();
 		$dashboard->save();
@@ -297,9 +291,6 @@ class testDashboardPlainTextWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => [
-						'Items' => ''
-					],
 					'error' => 'Invalid parameter "Items": cannot be empty.'
 				]
 			],
@@ -307,9 +298,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Items' => 'Linux: Available memory',
 						'Show lines' => ''
 					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
@@ -317,9 +310,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Items' => 'Linux: Available memory',
 						'Show lines' => '0'
 					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
 			],
@@ -327,18 +322,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Items' => 'Linux: Available memory',
 						'Show lines' => '101'
 					],
-					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Items' => 'Linux: Available memory',
-						'Show lines' => ' '
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
@@ -347,7 +334,18 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Items' => '',
+						'Show lines' => ' '
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
+					],
+					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
 						'Show lines' => ''
 					],
 					'error' => [
@@ -360,13 +358,52 @@ class testDashboardPlainTextWidget extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'same_host' => true,
+					'same_host' => 'ЗАББИКС Сервер',
 					'fields' => [
-						'Name' => '',
-						'Items' => [
-							'Linux: Available memory',
-							'Linux: Available memory in %'
-						]
+						'Name' => ''
+						],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory'],
+						['ЗАББИКС Сервер' => 'Linux: Available memory in %']
+					]
+				]
+			],
+			// Test case with items from two different hosts.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => ''
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory in %'],
+						['Simple host with item for plain text widget' => 'Test plain text']
+					]
+				]
+			],
+			// Test case with items from the same host and with custom name.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Test custom name'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory'],
+						['ЗАББИКС Сервер' => 'Linux: Available memory in %']
+					]
+				]
+			],
+			// Test case with items from two different hosts and with custom name.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Test custom name2'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory'],
+						['Simple host with item for plain text widget' => 'Test plain text']
 					]
 				]
 			],
@@ -376,23 +413,21 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => '',
-						'Items' => [
-							'Linux: Available memory'
-						]
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
-			// Test case with items from two different hosts.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => '',
-						'Refresh interval' => 'Default (1 minute)',
-						'Items' => [
-							'Linux: Available memory',
-							'Test plain text'
-						]
+						'Refresh interval' => 'Default (1 minute)'
+					],
+					'items' => [
+						['Simple host with item for plain text widget' => 'Test plain text']
 					]
 				]
 			],
@@ -402,10 +437,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'Header is hidden',
 						'Show header' => false,
-						'Refresh interval' => 'No refresh',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => 'No refresh'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -415,10 +450,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'Header appears',
 						'Show header' => true,
-						'Refresh interval' => '10 seconds',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '10 seconds'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -427,10 +462,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Items location' => 'Top',
-						'Refresh interval' => '30 seconds',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '30 seconds'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -439,10 +474,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Items location' => 'Left',
-						'Refresh interval' => '1 minute',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '1 minute'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -451,10 +486,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show lines' => '1',
-						'Refresh interval' => '2 minutes',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '2 minutes'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -463,10 +498,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show lines' => '100',
-						'Refresh interval' => '10 minutes',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '10 minutes'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -475,10 +510,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show text as HTML' => true,
-						'Refresh interval' => '15 minutes',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '15 minutes'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -487,10 +522,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Show text as HTML' => false,
-						'Refresh interval' => '10 minutes',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '10 minutes'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -499,10 +534,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Dynamic items' => true,
-						'Refresh interval' => '2 minutes',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '2 minutes'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -511,10 +546,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Dynamic items' => false,
-						'Refresh interval' => '1 minute',
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Refresh interval' => '1 minute'
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			],
@@ -524,10 +559,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'fields' => [
 						'Name' => ' Widget with trimmed trailing and leading spaces ',
 						'Refresh interval' => '30 seconds',
-						'Show lines' => ' 5 ',
-						'Items' => [
-							'Test plain text'
-						]
+						'Show lines' => ' 5 '
+					],
+					'items' => [
+						['Simple host with item for plain text widget' => 'Test plain text']
 					],
 					'trim' => ['Name', 'Show lines']
 				]
@@ -542,10 +577,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Items location' => 'Top',
 						'Show lines' => '50',
 						'Show text as HTML' => true,
-						'Dynamic items' => true,
-						'Items' => [
-							'Linux: Available memory'
-						]
+						'Dynamic items' => true
+					],
+					'items' => [
+						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
 				]
 			]
@@ -598,8 +633,15 @@ class testDashboardPlainTextWidget extends CWebTest {
 			? $dashboard->getWidget(self::$update_widget)->edit()->asForm()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		if ($form->getField('Type')->getText() !== 'Plain text') {
-			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
+
+		if (array_key_exists('items', $data)) {
+			foreach($data['items'] as $array) {
+				$data['fields']['Items'][] = implode(array_values($array));
+			}
+		}
+		else {
+			$data['fields']['Items'] = '';
 		}
 
 		$form->fill($data['fields']);
@@ -614,7 +656,6 @@ class testDashboardPlainTextWidget extends CWebTest {
 			}
 		}
 
-		$items_count = (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) ? 0 : count($data['fields']['Items']);
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
@@ -624,16 +665,21 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
 		}
 		else {
+			$items_count = count($data['items']);
 			if ($items_count > 1) {
-				$header = ((!array_key_exists('same_host', $data))
-					? 'Plain text'
-					: 'ЗАББИКС Сервер: '.$items_count.' items')
-					?: $data['fields']['Name'];
+				if ($data['fields']['Name'] === '') {
+					$header = (array_key_exists('same_host', $data))
+						? $data['same_host'].': '.$items_count.' items'
+						: 'Plain text';
+				}
+				else {
+					$header = $data['fields']['Name'];
+				}
 			}
 			else {
 				// If name is empty string it is replaced by item name.
-				$header = ($data['fields']['Name'] === '') ?
-					'ЗАББИКС Сервер: '.implode($data['fields']['Items'])
+				$header = ($data['fields']['Name'] === '')
+					? implode(array_keys($data['items'][0])).': '.implode($data['fields']['Items'])
 					: $data['fields']['Name'];
 			}
 
@@ -656,10 +702,14 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$saved_form = $widget->edit();
 			$this->assertEquals($values, $saved_form->getValues());
 
-			if (array_key_exists('Show header', $data['fields'])) {
-				$saved_form->checkValue(['Show header' => $data['fields']['Show header']]);
+			$data['fields']['Items'] = [];
+			foreach ($data['items'] as $host_item) {
+				foreach ($host_item as $host => $item) {
+					$data['fields']['Items'][] = $host.': '. $item;
+				}
 			}
 
+			$saved_form->checkValue($data['fields']);
 			$saved_form->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$dashboard->save();
@@ -720,14 +770,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 		// Start updating or creating a widget.
 		if (CTestArrayHelper::get($data, 'update', false)) {
-			$form = $dashboard->getWidget(self::$default_widget)->edit();
+			$form = $dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
 		}
 		else {
 			$form = $dashboard->addWidget()->asForm();
-
-			if ($form->getField('Type')->getText() !== 'Plain text') {
-				$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
-			}
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
 		}
 		$form->fill([
 			'Name' => $new_name,
@@ -748,7 +795,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$dialog->ensureNotPresent();
 
 			if (CTestArrayHelper::get($data, 'update', false)) {
-				foreach ([self::$default_widget => true, $new_name => false] as $name => $valid) {
+				foreach ([self::DEFAULT_WIDGET => true, $new_name => false] as $name => $valid) {
 					$dashboard->getWidget($name, false)->isValid($valid);
 				}
 			}
@@ -771,16 +818,16 @@ class testDashboardPlainTextWidget extends CWebTest {
 	public function testDashboardPlainTextWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->edit();
-		$widget = $dashboard->getWidget(self::$delete_widget);
-		$dashboard->deleteWidget(self::$delete_widget);
+		$widget = $dashboard->getWidget(self::DELETE_WIDGET);
+		$dashboard->deleteWidget(self::DELETE_WIDGET);
 		$widget->waitUntilNotPresent();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Check that widget is not present on dashboard.
-		$this->assertFalse($dashboard->getWidget(self::$delete_widget, false)->isValid());
+		$this->assertFalse($dashboard->getWidget(self::DELETE_WIDGET, false)->isValid());
 		$widget_sql = 'SELECT NULL FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
-				' WHERE w.name='.zbx_dbstr(self::$delete_widget);
+				' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET);
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
@@ -789,7 +836,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			// Simple test case with one item and one data entry.
 			[
 				[
-					'expected' => [
+					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
@@ -804,7 +851,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			// Simple test case with one item and several data entries.
 			[
 				[
-					'expected' => [
+					'initial_data' => [
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
@@ -831,7 +878,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			// Test case with two items and several data entries.
 			[
 				[
-					'expected' => [
+					'initial_data' => [
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
@@ -870,7 +917,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 			// Test case with limited lines to show.
 			[
 				[
-					'expected' => [
+					'fields' => [
+						'Show lines' => '1'
+						],
+					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
@@ -882,7 +932,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 							'Value' => '8.44 GB' // value rounding is expected.
 						]
 					],
-					'displayed_lines' => [
+					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
@@ -898,8 +948,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 			// Test case for 'Items location' and 'Show text as HTML' options check.
 			[
 				[
-					'html_text' => true,
-					'expected' => [
+					'fields' => [
+						'Show text as HTML' => true,
+						'Items location' => 'Top'
+					],
+					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Test item host: Master item',
@@ -908,7 +961,12 @@ class testDashboardPlainTextWidget extends CWebTest {
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 7 hours 7 minutes 7 seconds')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => STRING_128
+							'Value' => '<b>'.STRING_128.'</b>'
+						],
+						[
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 5 hours 5 minutes 5 seconds')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Saturday + 3 hours 5 minutes')),
@@ -916,7 +974,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 							'Value' => STRING_255
 						]
 					],
-					'expected_top' => [
+					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Test item host: Master item' => '1'
@@ -926,21 +984,31 @@ class testDashboardPlainTextWidget extends CWebTest {
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_128
 						],
 						[
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 5 hours 5 minutes 5 seconds')),
+							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => 'TEST'
+						],
+						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Saturday + 3 hours 5 minutes')),
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_255
 						]
 					],
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
-						['itemid' => '42227', 'values' => STRING_128, 'time' => strtotime('last Sunday + 7 hours 7 minutes 7 seconds')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('last Sunday + 7 hours 7 minutes 7 seconds')],
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+								'time' => strtotime('last Sunday + 5 hours 5 minutes 5 seconds')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('last Saturday + 3 hours 5 minutes')]
 					]
 				]
 			],
-			// Test case for 'Enable host selection' check.
+			// Test case for 'Dynamic items' check.
 			[
 				[
-					'expected' => [
+					'host_select' => [
+						'without_data' => 'Simple host with item for plain text widget',
+						'with_data' =>'ЗАББИКС Сервер'
+						],
+					'initial_data' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
@@ -962,7 +1030,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 							'Value' => '82.0618 %' // value rounding is expected.
 						]
 					],
-					'expected_host_data' => [
+					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Linux: Host name of Zabbix agent running',
@@ -991,6 +1059,8 @@ class testDashboardPlainTextWidget extends CWebTest {
 	}
 
 	/**
+	 * @backup history, history_uint, history_str
+	 *
 	 * @dataProvider getTableData
 	 */
 	public function  testDashboardPlainTextWidget_TableData($data) {
@@ -1000,52 +1070,52 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
-		$this->assertTableData($data['expected']);
+		$this->assertTableData($data['initial_data']);
 
-		if (array_key_exists('displayed_lines', $data)) {
-			$this->widgetConfigurationChange(['Show lines' => '1']);
-			$this->assertTableData($data['displayed_lines']);
-			$this->widgetConfigurationChange(['Show lines' => '25']);
+		$default_values = [
+			'Show lines' => '25',
+			'Show text as HTML' => false,
+			'Items location' => 'Left'
+		];
+		if (array_key_exists('fields', $data)) {
+			$this->widgetConfigurationChange($data['fields'], $dashboard);
+			$this->assertTableData($data['result']);
+			$this->widgetConfigurationChange($default_values, $dashboard);
 		}
 
-		if (array_key_exists('html_text', $data)) {
-			$this->widgetConfigurationChange(['Show text as HTML' => true,'Items location' => 'Top']);
-			$this->assertTableData($data['expected_top']);
-			$this->widgetConfigurationChange(['Show text as HTML' => false,'Items location' => 'Left']);
-		}
-
-		if (array_key_exists('expected_host_data', $data)) {
-			// Select host.
-			$dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()
-				->fill('Simple host with item for plain text widget');
+		if (array_key_exists('host_select', $data)) {
+			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
+			$multiselect_field->fill($data['host_select']['without_data']);
 			$this->page->waitUntilReady();
+			$this->assertEquals([$data['host_select']['without_data']], $multiselect_field->getValue());
 			$this->assertTableData();
-			$host = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one()
-				->fill('ЗАББИКС Сервер');
+			$multiselect_field->fill($data['host_select']['with_data']);
 			$this->page->waitUntilReady();
-			$this->assertTableData($data['expected_host_data']);
-			$host->clear();
+			$this->assertEquals([$data['host_select']['with_data']], $multiselect_field->getValue());
+			$this->assertTableData($data['result']);
+			$multiselect_field->clear();
 			$this->page->waitUntilReady();
+			$this->assertEquals('', $multiselect_field->getValue());
 		}
 
-		$this->assertTableData($data['expected']);
-
-		foreach ($data['item_data'] as $params) {
-			CDataHelper::removeItemData($params['itemid']);
+		if (array_key_exists('result', $data)) {
+			$this->assertTableData($data['initial_data']);
 		}
 	}
 
 	/**
 	 * Change plain text widget configuration.
 	 *
-	 * @param array $configuration    widget parameter(s)
+	 * @param CDashboardElement		$dashboard			dashboard element
+	 * @param array 				$configuration    	widget parameter(s)
 	 */
-	protected function widgetConfigurationChange($configuration) {
-		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
-		$form = $dashboard->getWidget(self::$data_widget)->edit();
+	protected function widgetConfigurationChange($configuration, $dashboard) {
+		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
 		$form->fill($configuration);
 		$form->submit();
 		$dashboard->save();
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+		CMessageElement::find()->one()->close();
 	}
 }
