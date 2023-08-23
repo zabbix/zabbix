@@ -35,6 +35,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -217,6 +218,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -327,6 +329,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -411,6 +414,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -496,6 +500,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -585,6 +590,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -669,6 +675,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -759,6 +766,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
@@ -849,6 +857,7 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AZURE.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
 |{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|

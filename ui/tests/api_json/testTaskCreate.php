@@ -791,7 +791,7 @@ class testTaskCreate extends CAPITest {
 				],
 				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.(implode(', ', [
-					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_TASK_CHECK_NOW
+					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXYIDS, ZBX_TM_TASK_CHECK_NOW
 				])).'.'
 			],
 
@@ -916,7 +916,7 @@ class testTaskCreate extends CAPITest {
 								]
 							]
 						],
-						'proxy_hostid' => '01'
+						'proxyid' => '01'
 					]
 				],
 				'expected_results' => [],
@@ -1306,7 +1306,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			],
@@ -1330,7 +1330,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			]

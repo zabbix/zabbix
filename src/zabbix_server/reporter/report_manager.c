@@ -469,7 +469,8 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 		session = (zbx_rm_session_t *)zbx_hashset_insert(&manager->sessions, &session_local,
 				sizeof(session_local));
 
-		zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", NULL);
+		zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status",
+				(char *)NULL);
 		zbx_db_insert_add_values(&db_insert, session->sid, userid, now, ZBX_SESSION_ACTIVE);
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
@@ -2190,7 +2191,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 {
 	zbx_uint64_t		dashboardid, userid, access_userid;
 	zbx_vector_ptr_pair_t	params;
-	int			report_time, ret, width, height;
+	int			report_time, ret, width, height, i;
 	unsigned char		period;
 	zbx_rm_job_t		*job;
 	char			*name;
@@ -2201,6 +2202,16 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 			&period, &params);
 
 	rm_get_report_dimensions(dashboardid, &width, &height);
+
+	for (i = 0; i < params.values_num; i++)
+	{
+		if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_BODY) ||
+				0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
+		{
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, (char **)&params.values[i].second, ZBX_MACRO_TYPE_REPORT, NULL, 0);
+		}
+	}
 
 	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
 			width, height, &params, error)))

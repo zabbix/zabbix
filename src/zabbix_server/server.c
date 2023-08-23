@@ -144,7 +144,7 @@ const char	*help_message[] = {
 	"                                  escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, preprocessing manager, proxy poller,",
+	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
 	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
@@ -157,7 +157,7 @@ const char	*help_message[] = {
 	"                                  escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, preprocessing manager, proxy poller,",
+	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
 	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
@@ -259,6 +259,7 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -272,13 +273,7 @@ static int	get_config_forks(unsigned char process_type)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_source_ip, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_tmpdir, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
-char	*zbx_config_fping6_location = NULL;
-#ifdef HAVE_IPV6
-static const char	*get_zbx_config_fping6_location(void)
-{
-	return zbx_config_fping6_location;
-}
-#endif
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_alert_scripts_path, NULL)
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
@@ -573,6 +568,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_AGENT_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
 	}
 	else
 		return FAIL;
@@ -1029,6 +1029,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartAgentPollers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"StartSNMPPollers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{NULL}
@@ -1157,9 +1159,7 @@ int	main(int argc, char **argv)
 	static zbx_config_icmpping_t	config_icmpping = {
 		get_zbx_config_source_ip,
 		get_zbx_config_fping_location,
-#ifdef HAVE_IPV6
 		get_zbx_config_fping6_location,
-#endif
 		get_zbx_config_tmpdir};
 
 	ZBX_TASK_EX			t = {ZBX_TASK_START};
@@ -1730,6 +1730,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
+				thread_args.args = &poller_args;
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_SNMP_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;

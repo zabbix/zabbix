@@ -1,0 +1,1 @@
+..F....... [ZBX-22818] fixed some aggregation functions not working with last_foreach() (agriscenko)

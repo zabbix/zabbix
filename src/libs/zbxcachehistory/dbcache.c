@@ -376,7 +376,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
-			"value_max", NULL);
+			"value_max", (char *)NULL);
 
 	for (i = 0; i < trends_num; i++)
 	{
@@ -2676,9 +2676,9 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		DCinventory_value_add(inventory_values, item, h);
 
-		if (0 != item->host.proxy_hostid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
+		if (0 != item->host.proxyid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
 		{
-			zbx_uint64_pair_t	p = {item->host.proxy_hostid, h->ts.sec};
+			zbx_uint64_pair_t	p = {item->host.proxyid, h->ts.sec};
 
 			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
