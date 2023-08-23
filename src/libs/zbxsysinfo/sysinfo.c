@@ -2152,7 +2152,7 @@ int	zbx_validate_item_timeout(const char *timeout_str, int *timeout_out)
 		return SUCCEED;
 	}
 
-	if (SUCCEED != zbx_is_time_suffix(timeout_str, timeout_out, ZBX_LENGTH_UNLIMITED) || 
+	if (SUCCEED != zbx_is_time_suffix(timeout_str, timeout_out, ZBX_LENGTH_UNLIMITED) ||
 			ZBX_ITEM_TIMEOUT_MAX < *timeout_out)
 	{
 		return FAIL;
