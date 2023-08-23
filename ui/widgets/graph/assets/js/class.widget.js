@@ -64,14 +64,14 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
-	updateProperties({name, view_mode, fields, fields_references}) {
+	updateProperties({name, view_mode, fields}) {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._stopUpdating();
 		}
 
 		this._is_graph_mode = false;
 
-		super.updateProperties({name, view_mode, fields, fields_references});
+		super.updateProperties({name, view_mode, fields});
 	}
 
 	onEdit() {
