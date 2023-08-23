@@ -31,6 +31,8 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup actions, profiles
  *
+ * @dataSource HostGroups
+ *
  * @onBefore prepareServiceActionData
  */
 class testFormAction extends CLegacyWebTest {
@@ -979,7 +981,9 @@ class testFormAction extends CLegacyWebTest {
 			switch ($eventsource) {
 				case EVENT_SOURCE_TRIGGERS:
 				case EVENT_SOURCE_SERVICE:
-					$this->assertEquals($options->getOptions()->asText(), ['Send message', 'Reboot', 'Selenium script']);
+					$this->assertEquals(['Send message', 'Reboot', 'Script for host group testing', 'Selenium script'],
+							$options->getOptions()->asText()
+					);
 					break;
 
 				case EVENT_SOURCE_DISCOVERY:
@@ -996,6 +1000,7 @@ class testFormAction extends CLegacyWebTest {
 							'Disable host',
 							'Set host inventory mode',
 							'Reboot',
+							'Script for host group testing',
 							'Selenium script'
 					]);
 					break;
@@ -1153,7 +1158,7 @@ class testFormAction extends CLegacyWebTest {
 		// Check available operation types depending on event source and the selected operation type.
 		$message_types = ($eventsource === EVENT_SOURCE_INTERNAL)
 			? ['Send message', 'Notify all involved']
-			: ['Send message', 'Notify all involved', 'Reboot', 'Selenium script'];
+			: ['Send message', 'Notify all involved', 'Reboot', 'Script for host group testing', 'Selenium script'];
 		$this->assertEquals($message_types, $operation_details->query('id:operation-type-select')
 				->asDropdown()->one()->getOptions()->asText());
 		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());

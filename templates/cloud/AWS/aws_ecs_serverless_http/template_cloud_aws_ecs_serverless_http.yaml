@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-29T09:40:19Z'
+  date: '2023-07-25T07:11:40Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1810,7 +1810,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
           graph_prototypes:
-            - uuid: 0730b08f78fc492691877f468e35d0fe
+            - uuid: 2c511d8c02bb47e6954bce0e8d35d713
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: CPU Utilization'
               graph_items:
                 - drawtype: GRADIENT_LINE
@@ -1818,7 +1818,7 @@ zabbix_export:
                   item:
                     host: 'AWS ECS Serverless Cluster by HTTP'
                     key: 'aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"]'
-            - uuid: 6ebb55adf65e4aafbc53aa501242d5d7
+            - uuid: 962375e2a79a4b26b8c1f42f008158ae
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory Utilization'
               graph_items:
                 - drawtype: GRADIENT_LINE
@@ -1826,7 +1826,7 @@ zabbix_export:
                   item:
                     host: 'AWS ECS Serverless Cluster by HTTP'
                     key: 'aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"]'
-            - uuid: 75bff4d440544f298f35277a5d7ab90d
+            - uuid: 0823c8464d1d4f0ba4aef10f02c24cb3
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network'
               graph_items:
                 - color: 199C0D
