@@ -98,9 +98,9 @@ class CHostGroup extends CApiService {
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscovery' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
-			'selectDiscoveryRule' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
-			'selectHostPrototype' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
+			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
+			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
 			// sort and limit
 			'sortfield' =>							['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -1533,7 +1533,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// adding discovery rule
-		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+		if ($options['selectDiscoveryRules'] !== null && $options['selectDiscoveryRules'] != API_OUTPUT_COUNT) {
 			// discovered items
 			$discoveryRules = DBFetchArray(DBselect(
 				'SELECT gd.groupid,hd.parent_itemid'.
@@ -1545,15 +1545,16 @@ class CHostGroup extends CApiService {
 			$relationMap = $this->createRelationMap($discoveryRules, 'groupid', 'parent_itemid');
 
 			$discoveryRules = API::DiscoveryRule()->get([
-				'output' => $options['selectDiscoveryRule'],
+				'output' => $options['selectDiscoveryRules'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
 			]);
-			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+
+			$result = $relationMap->mapMany($result, $discoveryRules, 'discoveryRules');
 		}
 
 		// adding host prototype
-		if ($options['selectHostPrototype'] !== null) {
+		if ($options['selectHostPrototypes'] !== null) {
 			$db_links = DBFetchArray(DBselect(
 				'SELECT gd.groupid,gp.hostid'.
 					' FROM group_discovery gd,group_prototype gp'.
@@ -1562,7 +1563,7 @@ class CHostGroup extends CApiService {
 			));
 
 			$host_prototypes = API::HostPrototype()->get([
-				'output' => $options['selectHostPrototype'],
+				'output' => $options['selectHostPrototypes'],
 				'hostids' => array_column($db_links, 'hostid'),
 				'preservekeys' => true
 			]);
@@ -1574,24 +1575,25 @@ class CHostGroup extends CApiService {
 
 			foreach ($db_links as $row) {
 				if (array_key_exists($row['hostid'], $host_prototypes)) {
-					$result[$row['groupid']]['hostPrototype'] = $host_prototypes[$row['hostid']];
+					$result[$row['groupid']]['hostPrototypes'][] = $host_prototypes[$row['hostid']];
 				}
 			}
 		}
 
 		// adding group discovery
-		if ($options['selectGroupDiscovery'] !== null) {
+		if ($options['selectGroupDiscoveries'] !== null) {
 			$groupDiscoveries = API::getApiService()->select('group_discovery', [
-				'output' => $this->outputExtend($options['selectGroupDiscovery'], ['groupid']),
+				'output' => $this->outputExtend($options['selectGroupDiscoveries'], ['groupid']),
 				'filter' => ['groupid' => $groupIds],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
+			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupdiscoveryid');
 
-			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, ['groupid'],
-				$options['selectGroupDiscovery']
+			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, ['groupid', 'groupdiscoveryid'],
+				$options['selectGroupDiscoveries']
 			);
-			$result = $relationMap->mapOne($result, $groupDiscoveries, 'groupDiscovery');
+
+			$result = $relationMap->mapMany($result, $groupDiscoveries, 'groupDiscoveries');
 		}
 
 		return $result;

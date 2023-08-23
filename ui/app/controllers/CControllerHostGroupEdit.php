@@ -70,19 +70,38 @@ class CControllerHostGroupEdit extends CController{
 			$groups = API::HostGroup()->get([
 				'output' => ['name', 'flags'],
 				'selectHosts' => ['hostid'],
-				'selectDiscoveryRule' => ['itemid', 'name'],
-				'selectHostPrototype' => ['hostid'],
+				'selectDiscoveryRules' => ['itemid', 'name'],
+				'selectHostPrototypes' => ['hostid'],
 				'groupids' => $data['groupid']
 			]);
 
 			$data = array_merge($data, $groups[0]);
+			CArrayHelper::sort($data['discoveryRules'], ['name']);
 
-			$data['is_discovery_rule_editable'] = $data['discoveryRule']
+			$discovery_rule_ids = $data['discoveryRules']
+				? array_column($data['discoveryRules'], 'itemid')
+				: [];
+
+			$data['is_discovery_rule_editable'] = $discovery_rule_ids
 				&& API::DiscoveryRule()->get([
 					'output' => [],
-					'itemids' => $data['discoveryRule']['itemid'],
+					'itemids' => $discovery_rule_ids,
 					'editable' => true
 				]);
+
+			$host_prototypes_itemids = $discovery_rule_ids
+				? API::HostPrototype()->get([
+					'output' => ['hostid'],
+					'selectDiscoveryRule' => ['itemid'],
+					'hostids' => array_column($data['hostPrototypes'], 'hostid'),
+					'editable' => true,
+				]) : [];
+
+			$data['ldd_rule_to_host_prototype'] = [];
+
+			foreach ($host_prototypes_itemids as $value) {
+				$data['ldd_rule_to_host_prototype'][$value['discoveryRule']['itemid']][] = $value['hostid'];
+			}
 
 			$data['allowed_ui_conf_hosts'] = CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 		}

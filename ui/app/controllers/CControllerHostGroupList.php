@@ -109,25 +109,48 @@ class CControllerHostGroupList extends CController {
 		$data['groups'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name', 'flags'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectGroupDiscovery' => ['ts_delete'],
-			'selectDiscoveryRule' => ['itemid', 'name'],
-			'selectHostPrototype' => ['hostid'],
+			'selectGroupDiscoveries' => ['ts_delete'],
+			'selectDiscoveryRules' => ['itemid', 'name'],
+			'selectHostPrototypes' => ['hostid'],
 			'groupids' => $groupids,
 			'limitSelects' => $limit
 		]);
 		CArrayHelper::sort($data['groups'], [['field' => $sort_field, 'order' => $sort_order]]);
 
+		$host_prototype_ids = [];
+
 		foreach ($data['groups'] as &$group) {
-			$group['is_discovery_rule_editable'] = $group['discoveryRule']
-				&& API::DiscoveryRule()->get([
+			if ($group['discoveryRules']) {
+				$group['is_discovery_rule_editable'] = (bool) API::DiscoveryRule()->get([
 					'output' => [],
-					'itemids' => $group['discoveryRule']['itemid'],
+					'itemids' => array_column($group['discoveryRules'], 'itemid'),
 					'editable' => true
 				]);
 
+				foreach ($group['hostPrototypes'] as $host_prototype) {
+					$host_prototype_ids[$host_prototype['hostid']] = true;
+				}
+			}
+
 			CArrayHelper::sort($group['hosts'], ['name']);
+			CArrayHelper::sort($group['discoveryRules'], ['name']);
 		}
 		unset($group);
+
+		$host_prototypes = $host_prototype_ids !== null
+			? API::HostPrototype()->get([
+				'output' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid'],
+				'hostids' => array_keys($host_prototype_ids),
+				'editable' => true,
+			])
+			: null;
+
+		$data['ldd_rule_to_host_prototype'] = [];
+
+		foreach ($host_prototypes as $value) {
+			$data['ldd_rule_to_host_prototype'][$value['discoveryRule']['itemid']][] = $value['hostid'];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of host groups'));

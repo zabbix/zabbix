@@ -116,21 +116,41 @@ foreach ($data['groups'] as $group) {
 	$name = [];
 
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		if ($group['discoveryRule']) {
-			if ($data['allowed_ui_conf_hosts'] && $group['is_discovery_rule_editable']) {
-				$lld_name = (new CLink($group['discoveryRule']['name'],
-					(new CUrl('host_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('parent_discoveryid', $group['discoveryRule']['itemid'])
-						->setArgument('hostid', $group['hostPrototype']['hostid'])
-						->setArgument('context', 'host')
-				))->addClass(ZBX_STYLE_LINK_ALT);
-			}
-			else {
-				$lld_name = new CSpan($group['discoveryRule']['name']);
+		if ($group['discoveryRules']) {
+			$ldd_rule_count = count($group['discoveryRules']);
+
+			if ($ldd_rule_count > 2) {
+				$group['discoveryRules'] = [
+					reset($group['discoveryRules']),
+					end($group['discoveryRules'])
+				];
 			}
 
-			$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
+			foreach ($group['discoveryRules'] as $key => $ldd_rule) {
+				if ($data['allowed_ui_conf_hosts'] && $group['is_discovery_rule_editable']
+					&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
+					$lld_name = (new CLink($ldd_rule['name'],
+						(new CUrl('host_prototypes.php'))
+							->setArgument('form', 'update')
+							->setArgument('parent_discoveryid', $ldd_rule['itemid'])
+							->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$ldd_rule['itemid']]))
+							->setArgument('context', 'host')
+					))->addClass(ZBX_STYLE_LINK_ALT);
+				} else {
+					$lld_name = new CSpan($ldd_rule['name']);
+				}
+
+				$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
+
+				if ($key == 0) {
+					if ($ldd_rule_count > 2) {
+						$name[] = (new CSpan(',..., '))->addClass(ZBX_STYLE_ORANGE);
+					}
+					elseif ($ldd_rule_count === 2) {
+						$name[] = (new CSpan(', '))->addClass(ZBX_STYLE_ORANGE);
+					}
+				}
+			}
 		}
 		else {
 			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
@@ -148,8 +168,22 @@ foreach ($data['groups'] as $group) {
 		->setAttribute('data-groupid', $group['groupid']);
 
 	$info_icons = [];
-	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete'] != 0) {
-		$info_icons[] = getHostGroupLifetimeIndicator($current_time, (int) $group['groupDiscovery']['ts_delete']);
+
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+		$max = 0;
+
+		foreach ($group['groupDiscoveries'] as $group_discovery) {
+			if ($group_discovery['ts_delete'] == 0) {
+				$max = 0;
+				break;
+			}
+
+			$max = max($result, (int) $group_discovery['ts_delete']);
+		}
+
+		if ($max > 0) {
+			$info_icons[] = getHostGroupLifetimeIndicator($current_time, $max);
+		}
 	}
 
 	$count = '';

@@ -34,25 +34,41 @@ $form = (new CForm())
 $form_grid = new CFormGrid();
 
 if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	if ($data['discoveryRule']) {
-		if ($data['allowed_ui_conf_hosts'] && $data['is_discovery_rule_editable']) {
-			$discovery_rule = (new CLink($data['discoveryRule']['name'],
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-					->setArgument('hostid', $data['hostPrototype']['hostid'])
-					->setArgument('context', 'host')
-			));
-		}
-		else {
-			$discovery_rule = new CSpan($data['discoveryRule']['name']);
+	$discovery_rules = [];
+
+	if ($data['discoveryRules']) {
+		$ldd_rule_count = count($data['discoveryRules']);
+
+		foreach ($data['discoveryRules'] as $key => $ldd_rule) {
+			if ($data['allowed_ui_conf_hosts'] && $data['is_discovery_rule_editable']
+				&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
+				$discovery_rules[] = (new CLink($ldd_rule['name'],
+					(new CUrl('host_prototypes.php'))
+						->setArgument('form', 'update')
+						->setArgument('parent_discoveryid', $ldd_rule['itemid'])
+						->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$ldd_rule['itemid']]))
+						->setArgument('context', 'host')
+				));
+			}
+			else {
+				$discovery_rules[] = new CSpan($ldd_rule['name']);
+			}
+
+			if ($ldd_rule_count > 5 && $key === 5) {
+				$discovery_rules[] = (new CSpan(',...'));
+
+				break;
+			}
+			elseif ($key + 1 !== $ldd_rule_count) {
+				$discovery_rules[] = (new CSpan(', '));
+			}
 		}
 	}
 	else {
-		$discovery_rule = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
+		$discovery_rules = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_GREY);
 	}
 
-	$form_grid->addItem([[new CLabel(_('Discovered by')), new CFormField($discovery_rule)]]);
+	$form_grid->addItem([[new CLabel(_('Discovered by')), new CFormField($discovery_rules)]]);
 }
 
 $form_grid->addItem([
