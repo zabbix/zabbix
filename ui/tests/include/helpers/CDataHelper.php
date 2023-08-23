@@ -391,15 +391,8 @@ class CDataHelper extends CAPIHelper {
 			$time = array_values($time);
 		}
 
-		// Check item value type to set correct history table where to insert data.
-		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
-		$suffixes = ['', '_str', '_log', '_uint', '_text'];
-
-		if (!array_key_exists($value_type, $suffixes)) {
-			throw new Exception('Unsupported item value type: '.$value_type);
-		}
-
-		$history_table = 'history'.$suffixes[$value_type];
+		// Set correct history table where to insert data.
+		$history_table = static::getItemDataTable($itemid);
 
 		foreach (array_values($values) as $key => $value) {
 			$clock = is_array($time) ? $time[$key] : $time;
@@ -414,7 +407,19 @@ class CDataHelper extends CAPIHelper {
 	 * @param string $itemid		item id
 	 */
 	public static function removeItemData($itemid) {
-		// Check item value type to set correct history table from where to delete data.
+		// Set correct history table from where to delete data.
+		$history_table = static::getItemDataTable($history_table);
+
+		DBexecute('DELETE FROM '.$history_table.' WHERE itemid='.zbx_dbstr($itemid));
+	}
+
+	/**
+	 * Get history data table.
+	 *
+	 * @param string $itemid		item id
+	 */
+	public static function getItemDataTable($itemid) {
+		// Check item value type to set correct history table.
 		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
 		$suffixes = ['', '_str', '_log', '_uint', '_text'];
 
@@ -422,8 +427,6 @@ class CDataHelper extends CAPIHelper {
 			throw new Exception('Unsupported item value type: '.$value_type);
 		}
 
-		$history_table = 'history'.$suffixes[$value_type];
-
-		DBexecute('DELETE FROM '.$history_table.' WHERE itemid='.zbx_dbstr($itemid));
+		return 'history'.$suffixes[$value_type];
 	}
 }
