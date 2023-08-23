@@ -260,11 +260,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'limit' => $max_metrics
 		]);
 
-		foreach ($items_db as $itemid => $item) {
-			$data_set['color'] = '#'.$ds_items[$itemid]['color'];
-			$data_set['type'] = $ds_items[$itemid]['type'];
+		foreach ($ds_items as $itemid => $ds_item) {
+			if (array_key_exists($itemid, $items_db)) {
+				$data_set['color'] = '#' . $ds_item['color'];
+				$data_set['type'] = $ds_item['type'];
 
-			$metrics[] = $item + ['options' => $data_set];
+				$metrics[] = $items_db[$itemid] + ['options' => $data_set];
+			}
 		}
 
 		return $metrics;
@@ -717,14 +719,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getSVGData(array $sectors, array $total_value): array {
-		if ($total_value['value'] <= 0) {
+		if ($total_value['value'] === null || $total_value['value'] === 0) {
 			return [
 				'svg_sectors' => [],
 				'svg_total_value' => $total_value
 			];
 		}
 
-		$index = null;
+		$sector_total_value = 0;
 		$total_percentage_used = 0;
 		$non_total_sectors = [];
 
@@ -732,64 +734,63 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return $sector['value'] > 0;
 		});
 
+		// Move total sector to the end.
 		foreach ($sectors as $key => $sector) {
 			if ($sector['is_total']) {
-				$index = $key;
+				$sectors[] = $sector;
+				unset($sectors[$key]);
 				break;
 			}
-		}
-
-		if ($index !== null) {
-			$total_sector = $sectors[$index];
-			unset($sectors[$index]);
-
-			$sectors[] = $total_sector;
 		}
 
 		$svg_sectors = array_values($sectors);
 
 		foreach ($svg_sectors as &$sector) {
-			$sector['percent_of_total'] = ($sector['value'] / $total_value['value']) * 100;
+			$sector['percent_of_total'] = bcmul(bcdiv($sector['value'], $total_value['value']), 100);
 
 			if (!$sector['is_total']) {
-				$total_percentage_used += $sector['percent_of_total'];
-				$non_total_sectors[] = &$sector;
+				$total_percentage_used = bcadd($total_percentage_used, $sector['percent_of_total']);
+				$sector_total_value = bcadd($sector_total_value, $sector['value']);
+				$non_total_sectors[] = $sector;
 			}
 		}
+		unset($sector);
 
-		if (round($total_percentage_used, 6) <= 100) {
+		if (bccomp($sector_total_value, $total_value['value']) <= 0) {
+			// Sectors use full total value or less.
 			foreach ($svg_sectors as &$sector) {
 				if ($sector['is_total']) {
 					$sector['percent_of_total'] -= $total_percentage_used;
 				}
 			}
+			unset($sector);
 		}
 		else {
-			$current_percentage = 0;
-			$remaining_percentage = 100;
+			// Sectors use more than total value.
+			$current_value = 0;
+			$remaining_value = $total_value['value'];
 			$sectors_to_keep = [];
 
 			foreach ($non_total_sectors as &$sector) {
-				if (($current_percentage + $sector['percent_of_total']) <= $remaining_percentage) {
-					if ($current_percentage == 0 && $sector['percent_of_total'] > 100) {
-						$sector['percent_of_total'] = 100;
-						$sectors_to_keep[] = $sector;
-						break;
-					}
-					else {
-						$sectors_to_keep[] = $sector;
-						$current_percentage += $sector['percent_of_total'];
-						$remaining_percentage -= $sector['percent_of_total'];
-					}
+				if (bccomp(bcadd($current_value, $sector['value']), $remaining_value) <= 0) {
+					// There is enough space for this sector.
+					$sectors_to_keep[] = $sector;
+					$current_value = bcadd($current_value, $sector['value']);
+					$remaining_value = bcsub($remaining_value, $sector['value']);
 				}
-				elseif ($sector['percent_of_total'] >= $remaining_percentage && $current_percentage < 100) {
-					$sector['percent_of_total'] = $remaining_percentage;
+				elseif (bccomp($sector['value'], $remaining_value) >= 0
+						&& bccomp($current_value, $total_value['value']) < 0) {
+					// This sector needs to be cut, to fit.
+					$sector['percent_of_total'] = bcmul(bcdiv($remaining_value, $total_value['value']), 100);
 					$sectors_to_keep[] = $sector;
 					break;
-				} else {
+				}
+				else {
+					// This sector doesn't fit.
 					break;
 				}
 			}
+			unset($sector);
 
 			$svg_sectors = $sectors_to_keep;
 		}
@@ -797,6 +798,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach($svg_sectors as &$sector) {
 			unset($sector['value']);
 		}
+		unset($sector);
 
 		return [
 			'svg_sectors' => $svg_sectors,
