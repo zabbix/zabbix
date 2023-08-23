@@ -67,7 +67,8 @@ $form_grid = (new CFormGrid())
 						'srcfld1' => 'userid',
 						'srcfld2' => 'fullname',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'userids_'
+						'dstfld1' => 'userids_',
+						'disableids' => array_column($data['users_ms'], 'id')
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

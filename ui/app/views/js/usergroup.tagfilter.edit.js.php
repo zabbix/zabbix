@@ -63,9 +63,15 @@ window.tag_filter_edit = new class {
 			}
 		});
 
-		const multiselect = document.getElementById('ms_new_tag_filter_groupids_');
+		const ms = document.getElementById('ms_new_tag_filter_groupids_');
 
-		jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
+		$(ms).multiSelect($(ms).data('params'));
+
+		$(ms).on('change', () => {
+			$(ms).multiSelect('setDisabledEntries',
+				[...this.form.querySelectorAll('input[name^="ms_new_tag_filter[groupids]"]')].map(input => input.value)
+			);
+		});
 	}
 
 	/**

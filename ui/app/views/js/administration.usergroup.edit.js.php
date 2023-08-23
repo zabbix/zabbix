@@ -72,6 +72,10 @@
 					this.#removeTagFilterRow(event.target.closest('tr'));
 				}
 			});
+
+			this.#setMultiselectDisabling('userids', true);
+			this.#setMultiselectDisabling('ms_hostgroup');
+			this.#setMultiselectDisabling('ms_templategroup');
 		}
 
 		/**
@@ -93,6 +97,7 @@
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById(`ms_${group_type}_right_groupids_${rowid}_`);
+			let disable_groupids = [];
 
 			$(ms).multiSelect();
 
@@ -103,8 +108,12 @@
 						'name': groups[id]['name']
 					};
 					$(ms).multiSelect('addData', [group]);
+
+					disable_groupids.push(group['id']);
 				}
 			}
+
+			$(ms).multiSelect('setDisabledEntries', disable_groupids);
 
 			const permission_radio = document
 				.querySelector(`input[name="${group_type}_right[permission][${rowid}]"][value="${permission}"]`);
@@ -112,6 +121,37 @@
 			permission_radio.checked = true;
 
 			document.dispatchEvent(new Event('tab-indicator-update'));
+		}
+
+		/**
+		 * Sets up disabling of groups in the multiselect popup based on changes in related multiselect's row.
+		 *
+		 * @param {string}	group_type	The prefix to the ID of the multiselects to be observed and updated.
+		 *								Used to target the correct group (user, template, host) of multiselects.
+		 * @param {boolean}	is_single	Flag to indicate if only one multiselect is the target (e.g., users).
+		 */
+		#setMultiselectDisabling(group_type, is_single = false) {
+			let multiselects = [];
+
+			if (is_single) {
+				multiselects = [document.getElementById(`${group_type}_`)];
+			}
+			else {
+				multiselects = [...document.querySelectorAll(`[id^="${group_type}_right_groupids_"]`)];
+			}
+
+			multiselects.forEach(ms => {
+				$(ms).on('change', (event) => {
+					// Get all groupids to disable in the multiselect.
+					let input_name = is_single
+						? `input[name^="${group_type}"]`
+						: `input[name^="${group_type}_right[groupids]"]`;
+					const groupids = [...event.target.querySelectorAll(input_name)]
+						.map(input => input.value);
+
+					$(ms).multiSelect('setDisabledEntries', groupids);
+				});
+			});
 		}
 
 		/**

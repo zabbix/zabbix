@@ -57,7 +57,8 @@ $form_grid
 						'srctbl' => 'host_groups',
 						'srcfld1' => 'groupid',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'ms_new_tag_filter_groupids_'
+						'dstfld1' => 'ms_new_tag_filter_groupids_',
+						'disableids' => array_column($data['host_groups_ms'], 'id')
 					]
 				],
 				'add_post_js' => false
