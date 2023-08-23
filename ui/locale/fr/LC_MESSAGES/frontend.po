@@ -5842,6 +5842,10 @@ msgid_plural "Dashboards deleted"
 msgstr[0] "Tableau de bord supprimé"
 msgstr[1] "Tableaux de bord supprimés"
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "Propriétés de la page du tableau de bord"
@@ -8156,6 +8160,10 @@ msgstr "L'événement n'est pas acquitté"
 msgid "Event list [previous 20]"
 msgstr "Liste d'événements [20 précédents]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "Supervision du journal d'événements. Retourne un journal"
@@ -9614,6 +9622,10 @@ msgstr "Un hôte ne peut pas avoir plus d'une interface par défaut du même typ
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Nombre d'hôtes"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14363,6 +14375,10 @@ msgstr "Nouveaux déclencheurs"
 msgid "New user group mapping"
 msgstr "Nouvelle correspondance de groupe d'utilisateurs"
 
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr ""
+
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
 msgid "Next page"
@@ -16450,6 +16466,10 @@ msgstr "Temps précédent"
 #: include/views/configuration.graph.edit.php:451
 msgid "Preview"
 msgstr "Aperçu"
+
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -24002,6 +24022,10 @@ msgstr "le nombre autorisé d'éléments dépendants serait dépassé"
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr "une adresse IP est attendue"
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481

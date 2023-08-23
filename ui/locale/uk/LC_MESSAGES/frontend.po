@@ -5943,6 +5943,10 @@ msgstr[0] "Панель видалено"
 msgstr[1] "Панелі видалено"
 msgstr[2] "Панелі видалено"
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "Властивості сторінки панелі"
@@ -8263,6 +8267,10 @@ msgstr "Подія не підтверджена"
 msgid "Event list [previous 20]"
 msgstr "Список подій [20 попередніх]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "Моніторинг журналів подій. Повертає записи з журналу"
@@ -9725,6 +9733,10 @@ msgstr "У вузла мережі не може бути більше одно�
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Кількість вузлів мережі"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14502,6 +14514,10 @@ msgstr "Нові тригери"
 msgid "New user group mapping"
 msgstr ""
 
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr ""
+
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
 msgid "Next page"
@@ -16590,6 +16606,10 @@ msgstr "Попер. час"
 #: include/views/configuration.graph.edit.php:451
 msgid "Preview"
 msgstr "Попередній перегляд"
+
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -24161,6 +24181,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474
