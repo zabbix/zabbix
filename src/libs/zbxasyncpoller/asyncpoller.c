@@ -19,6 +19,7 @@
 
 #include "zbxasyncpoller.h"
 #include "zbxcommon.h"
+#include "zbxcomms.h"
 
 #ifdef HAVE_LIBEVENT
 #include "zbxip.h"
@@ -131,20 +132,8 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 	{
 		struct timeval	tv = {task->timeout, 0};
 
-		switch (ai->ai_addr->sa_family)
-		{
-			case AF_INET:
-				inet_ntop(AF_INET, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), task->ip,
-						(socklen_t)sizeof(task->ip));
-				break;
-			case AF_INET6:
-				inet_ntop(AF_INET6, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), task->ip,
-						(socklen_t)sizeof(task->ip));
-				break;
-			default:
-				task->ip[0] = '\0';
-				break;
-		}
+		if (FAIL == zbx_inet_ntop(ai, task->ip,  (socklen_t)sizeof(task->ip)))
+			task->ip[0] = '\0';
 
 		evutil_freeaddrinfo(ai);
 

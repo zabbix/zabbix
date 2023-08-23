@@ -753,7 +753,7 @@ class testUserRolesPermissions extends CWebTest {
 						'Event correlation',
 						'Discovery'
 					],
-					'link' => ['templates.php']
+					'link' => ['zabbix.php?action=template.list']
 				]
 			],
 			[
