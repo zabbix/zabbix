@@ -94,7 +94,7 @@ class CControllerHostGroupEdit extends CController{
 					'output' => ['hostid'],
 					'selectDiscoveryRule' => ['itemid'],
 					'hostids' => array_column($data['hostPrototypes'], 'hostid'),
-					'editable' => true,
+					'editable' => true
 				]) : [];
 
 			$data['ldd_rule_to_host_prototype'] = [];

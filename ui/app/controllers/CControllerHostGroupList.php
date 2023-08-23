@@ -142,7 +142,7 @@ class CControllerHostGroupList extends CController {
 				'output' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
 				'hostids' => array_keys($host_prototype_ids),
-				'editable' => true,
+				'editable' => true
 			])
 			: null;
 
