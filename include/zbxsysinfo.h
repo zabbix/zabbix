@@ -156,5 +156,6 @@ int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
 
 #define ZBX_CHECK_TIMEOUT_UNDEFINED	0
+int    zbx_validate_item_timeout(const char *timeout_str, int *timeout_out);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

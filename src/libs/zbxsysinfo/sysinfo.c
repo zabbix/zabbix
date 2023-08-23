@@ -33,6 +33,7 @@
 #include "zbxexpr.h"
 #include "zbxfile.h"
 #include "zbxthreads.h"
+#include "zbxtime.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -2141,4 +2142,24 @@ char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
 
 	return dst_string;
 }
+
+int	zbx_validate_item_timeout(const char *timeout_str, int *timeout_out)
+{
+#define ZBX_ITEM_TIMEOUT_MAX	600
+	if (NULL == timeout_str || '\0' == *timeout_str)
+	{
+		*timeout_out = ZBX_CHECK_TIMEOUT_UNDEFINED;
+		return SUCCEED;
+	}
+
+	if (SUCCEED != zbx_is_time_suffix(timeout_str, timeout_out, ZBX_LENGTH_UNLIMITED) || 
+			ZBX_ITEM_TIMEOUT_MAX < *timeout_out)
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+#undef ZBX_ITEM_TIMEOUT_MAX
+}
+
 #endif

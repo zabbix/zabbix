@@ -497,12 +497,12 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 
 int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_check_service_default_addr(request, "127.0.0.1", result, 0);
+	return zbx_check_service_default_addr(request, "127.0.0.1", result, 0, sysinfo_get_config_timeout());
 }
 
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1);
+	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1, sysinfo_get_config_timeout());
 }
 
 static zbx_metric_t	parameters_simple[] =
