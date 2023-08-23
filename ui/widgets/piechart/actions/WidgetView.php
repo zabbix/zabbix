@@ -143,9 +143,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		self::getItems($metrics, $options['data_sets'], $options['templateid'], $options['dynamic_hostid']);
 		self::getChartDataSource($metrics, $errors, $options['data_source'], $options['time_period']);
-		self::getMetricsData($metrics, $options['time_period'], $options['legend_aggregation_show']);
+		self::getMetricsData($metrics, $options['time_period'], $options['legend_aggregation_show'],
+			$options['templateid'], $options['dynamic_hostid']);
 		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
-				$options['units'], $options['templateid'], $options['dynamic_hostid']);
+			$options['units'], $options['templateid'], $options['dynamic_hostid']);
 
 		return [
 			'sectors' => $metrics,
@@ -171,11 +172,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$metrics = [];
 		$max_metrics = 50;
 
-		if ($templateid !== '' && $dynamic_hostid === '') {
-			// Template dashboard (edit).
-			return;
-		}
-
 		foreach ($data_sets as $index => $data_set) {
 			if ($max_metrics === 0) {
 				break;
@@ -185,7 +181,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$ds_metrics = self::getMetricsSingleItemDS($data_set, $max_metrics, $dynamic_hostid);
 			}
 			else {
-				$ds_metrics = self::getMetricsPatternItemDS($data_set, $max_metrics, $dynamic_hostid);
+				$ds_metrics = self::getMetricsPatternItemDS($data_set, $max_metrics, $templateid, $dynamic_hostid);
 			}
 
 			foreach ($ds_metrics as $ds_metric) {
@@ -272,16 +268,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $metrics;
 	}
 
-	private static function getMetricsPatternItemDS(array $data_set, int $max_metrics, string $dynamic_hostid): array {
+	private static function getMetricsPatternItemDS(array $data_set, int $max_metrics, string $templateid, string $dynamic_hostid): array {
 		$metrics = [];
 
-		if (($dynamic_hostid === '' && (!$data_set['hosts'] || !$data_set['items']))
-			|| ($dynamic_hostid !== '' && !$data_set['items'])
+		if (($templateid === '' && (!$data_set['hosts'] || !$data_set['items']))
+			|| ($templateid !== '' && !$data_set['items'])
 		) {
 			return $metrics;
 		}
 
-		if ($dynamic_hostid === '') {
+		if ($dynamic_hostid === '' && $templateid === '') {
 			$hosts = API::Host()->get([
 				'output' => [],
 				'search' => [
@@ -293,8 +289,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]);
 
 			$hostids = array_keys($hosts);
-		} else {
-			$hostids = [$dynamic_hostid];
+		}
+		else {
+			$hostids = $dynamic_hostid !== '' ? [$dynamic_hostid] : [$templateid];
 		}
 
 		if (!$hostids) {
@@ -428,7 +425,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($metric);
 	}
 
-	private static function getMetricsData(array &$metrics, array $time_period, bool $legend_aggregation_show): void {
+	private static function getMetricsData(array &$metrics, array $time_period, bool $legend_aggregation_show,
+			string $templateid, string $dynamic_hostid): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -472,6 +470,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($metric);
 
 		foreach ($metrics as &$metric) {
+			if ($templateid !== '' && $dynamic_hostid === '') {
+				continue;
+			}
+
 			$results = Manager::History()->getAggregationByInterval(
 				$metric['items'], $time_period['time_from'], $time_period['time_to'],
 				$metric['options']['aggregate_function'], $time_period['time_to']
