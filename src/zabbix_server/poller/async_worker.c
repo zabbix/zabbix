@@ -244,7 +244,7 @@ static void	*async_worker_entry(void *args)
 
 		if (SUCCEED != async_task_queue_wait(queue, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->id, error);
+			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 			zbx_free(error);
 			worker->stop = 1;
 		}
@@ -265,12 +265,11 @@ static void	*async_worker_entry(void *args)
 	return NULL;
 }
 
-int	async_worker_init(zbx_async_worker_t *worker, int id, zbx_async_queue_t *queue, char **error)
+int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, char **error)
 {
 	int		err, ret = FAIL;
 	pthread_attr_t	attr;
 
-	worker->id = id;
 	worker->queue = queue;
 
 	zbx_pthread_init_attr(&attr);

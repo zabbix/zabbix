@@ -54,7 +54,7 @@ zbx_async_manager_t	*zbx_async_manager_create(int workers_num, zbx_async_notify_
 
 	for (i = 0; i < workers_num; i++)
 	{
-		if (SUCCEED != async_worker_init(&manager->workers[i], i + 1, &manager->queue, error))
+		if (SUCCEED != async_worker_init(&manager->workers[i], &manager->queue, error))
 			goto out;
 
 		async_worker_set_finished_cb(&manager->workers[i], finished_cb, finished_data);
