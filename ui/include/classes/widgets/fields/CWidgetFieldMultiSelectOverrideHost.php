@@ -36,18 +36,16 @@ class CWidgetFieldMultiSelectOverrideHost extends CWidgetFieldMultiSelectHost {
 			->acceptDashboard();
 	}
 
-	public function getValue() {
-		$value = parent::getValue();
-
-		if ($this->isTemplateDashboard() && $value === $this->getDefault()) {
-			return [
+	public function validate(bool $strict = false): array {
+		if ($strict && $this->isTemplateDashboard()) {
+			$this->setValue([
 				CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
 					CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_HOST_ID
 				)
-			];
+			]);
 		}
 
-		return parent::getValue();
+		return parent::validate($strict);
 	}
 
 	public function isWidgetAccepted(): bool {
