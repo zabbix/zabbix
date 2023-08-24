@@ -573,8 +573,8 @@ static int	DBpatch_6000042(void)
 
 static int	DBpatch_6000043(void)
 {
-	if (FAIL == DBindex_exists("users", "users_2"))
-		return DBcreate_index("users", "users_2", "roleid", 0);
+	if (FAIL == DBindex_exists("users", "users_3"))
+		return DBcreate_index("users", "users_3", "roleid", 0);
 
 	return SUCCEED;
 }
