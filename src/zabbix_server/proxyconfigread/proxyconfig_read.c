@@ -391,36 +391,56 @@ static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct
 
 			if (0 == strncmp(table->fields[i].name, "timeout_", ZBX_CONST_STRLEN("timeout_")))
 			{
-				char	*item_type_timeout;
-				const char	*type_name;
+				char		*timeout_value;
+				const char	*item_type;
 
-				type_name = table->fields[i].name + ZBX_CONST_STRLEN("timeout_");
+				item_type = table->fields[i].name + ZBX_CONST_STRLEN("timeout_");
 
-				if (0 == strcmp(type_name, "zabbix_agent"))
-					item_type_timeout = timeouts.agent;
-				else if (0 == strcmp(type_name, "simple_check"))
-					item_type_timeout = timeouts.simple;
-				else if (0 == strcmp(type_name, "snmp_agent"))
-					item_type_timeout = timeouts.snmp;
-				else if (0 == strcmp(type_name, "external_check"))
-					item_type_timeout = timeouts.external;
-				else if (0 == strcmp(type_name, "db_monitor"))
-					item_type_timeout = timeouts.odbc;
-				else if (0 == strcmp(type_name, "ssh_agent"))
-					item_type_timeout = timeouts.ssh;
-				else if (0 == strcmp(type_name, "http_agent"))
-					item_type_timeout = timeouts.http;
-				else if (0 == strcmp(type_name, "telnet_agent"))
-					item_type_timeout = timeouts.telnet;
-				else if (0 == strcmp(type_name, "script"))
-					item_type_timeout = timeouts.script;
+				if (0 == strcmp(item_type, "zabbix_agent"))
+				{
+					timeout_value = timeouts.agent;
+				}
+				else if (0 == strcmp(item_type, "simple_check"))
+				{
+					timeout_value = timeouts.simple;
+				}
+				else if (0 == strcmp(item_type, "snmp_agent"))
+				{
+					timeout_value = timeouts.snmp;
+				}
+				else if (0 == strcmp(item_type, "external_check"))
+				{
+					timeout_value = timeouts.external;
+				}
+				else if (0 == strcmp(item_type, "db_monitor"))
+				{
+					timeout_value = timeouts.odbc;
+				}
+				else if (0 == strcmp(item_type, "ssh_agent"))
+				{
+					timeout_value = timeouts.ssh;
+				}
+				else if (0 == strcmp(item_type, "http_agent"))
+				{
+					timeout_value = timeouts.http;
+				}
+				else if (0 == strcmp(item_type, "telnet_agent"))
+				{
+					timeout_value = timeouts.telnet;
+				}
+				else if (0 == strcmp(item_type, "script"))
+				{
+					timeout_value = timeouts.script;
+				}
 				else
 				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
+					*error = zbx_dsprintf(*error, "unknown item type timeout field \"%s\"",
+							table->fields[i].name);
+
+					goto out;
 				}
 
-				zbx_json_addstring(j, NULL, item_type_timeout, ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(j, NULL, timeout_value, ZBX_JSON_TYPE_STRING);
 
 				continue;
 			}
