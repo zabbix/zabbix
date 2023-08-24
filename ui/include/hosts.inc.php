@@ -1291,11 +1291,16 @@ function prepareHostPrototypeGroupLinks(array $group_links) {
  * @return array
  */
 function prepareHostPrototypeGroupPrototypes(array $group_prototypes): array {
-	foreach ($group_prototypes as $i => $group_prototype) {
+	foreach ($group_prototypes as $i => &$group_prototype) {
+		if ($group_prototype['group_prototypeid'] === '') {
+			unset($group_prototype['group_prototypeid']);
+		}
+
 		if ($group_prototype['name'] === '') {
 			unset($group_prototypes[$i]);
 		}
 	}
+	unset($group_prototype);
 
 	return array_values($group_prototypes);
 }
