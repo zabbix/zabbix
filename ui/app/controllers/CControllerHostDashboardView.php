@@ -78,21 +78,23 @@ class CControllerHostDashboardView extends CController {
 				$dashboardid = $host_dashboards[0]['dashboardid'];
 			}
 
-			$dashboards = API::TemplateDashboard()->get([
+			$db_dashboards = API::TemplateDashboard()->get([
 				'output' => ['dashboardid', 'name', 'templateid', 'display_period', 'auto_start'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'dashboardids' => [$dashboardid]
 			]);
 
-			$dashboard = array_shift($dashboards);
+			if ($db_dashboards) {
+				$dashboard = $db_dashboards[0];
 
-			if ($dashboard !== null) {
 				CProfile::update('web.host.dashboard.dashboardid', $dashboard['dashboardid'], PROFILE_TYPE_ID,
 					$this->getInput('hostid')
 				);
 
-				$dashboard['pages'] = CDashboardHelper::prepareDashboardPages($dashboard['pages'],
-					$dashboard['templateid'], true
+				$dashboard['pages'] = CDashboardHelper::preparePages(
+					CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], $dashboard['templateid']),
+					$dashboard['pages'],
+					true
 				);
 
 				$time_selector_options = [

@@ -166,7 +166,7 @@ class CWidgetBase {
 		this._type = type;
 		this._name = name;
 		this._view_mode = view_mode;
-		this._fields = {...fields};
+		this._fields = fields;
 
 		this._defaults = {
 			name: defaults.name,

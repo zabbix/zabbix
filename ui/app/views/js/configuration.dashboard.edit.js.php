@@ -64,13 +64,13 @@
 				is_edit_mode: true,
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
-				time_period,
-				dynamic_hostid: null
+				hostid: null,
+				time_period
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);

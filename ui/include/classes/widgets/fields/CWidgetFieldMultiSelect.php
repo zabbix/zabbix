@@ -82,9 +82,9 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	protected function getValidationRules(): array {
 		$value = $this->getValue();
 
-		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE, $value)) {
+		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
 			return ['type' => API_OBJECT, 'fields' => [
-				self::FOREIGN_REFERENCE => ['type' => API_STRING_UTF8]
+				self::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8]
 			]];
 		}
 
@@ -94,11 +94,11 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
-		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE, $value)) {
+		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'['.self::FOREIGN_REFERENCE.']',
-				'value' => $value[self::FOREIGN_REFERENCE]
+				'name' => $this->name.'['.self::FOREIGN_REFERENCE_KEY.']',
+				'value' => $value[self::FOREIGN_REFERENCE_KEY]
 			];
 		}
 		else {

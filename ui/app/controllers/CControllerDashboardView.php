@@ -87,7 +87,7 @@ class CControllerDashboardView extends CController {
 	 * @throws JsonException
 	 */
 	protected function doAction() {
-		[$dashboard, $error] = $this->getDashboard();
+		[$dashboard, $stats, $error] = $this->getDashboard();
 
 		if ($error !== null) {
 			$response = new CControllerResponseData(['error' => $error]);
@@ -111,8 +111,6 @@ class CControllerDashboardView extends CController {
 		}
 
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
-		$dashboard['can_view_reports'] = $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS);
-		$dashboard['can_create_reports'] = $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS);
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',
@@ -126,19 +124,24 @@ class CControllerDashboardView extends CController {
 		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
 
 		$data = [
+			// The dashboard variable shall only contain data used by the JavaScript framework.
 			'dashboard' => $dashboard,
 			'widget_defaults' => $widget_defaults,
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
 			'configuration_hash' => $dashboard['dashboardid'] !== null
 				? CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults)
 				: null,
-			'has_time_selector' => CDashboardHelper::hasTimeSelector($dashboard['pages']),
+			'can_view_reports' => $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS),
+			'can_create_reports' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS),
+			'has_related_reports' => $stats['has_related_reports'],
+			'use_dashboard_host' => $stats['use_dashboard_host'],
+			'has_time_selector' => $stats['use_dashboard_time_period'],
 			'time_period' => getTimeSelectorPeriod($time_selector_options),
 			'clone' => $this->hasInput('clone'),
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
 
-		if (self::hasDynamicWidgets($dashboard['pages'])) {
+		if ($stats['use_dashboard_host']) {
 			$hostid = $this->getInput('hostid', CProfile::get('web.dashboard.hostid', 0));
 
 			$hosts = ($hostid != 0)
@@ -148,16 +151,10 @@ class CControllerDashboardView extends CController {
 				]), ['hostid' => 'id'])
 				: [];
 
-			$data['dynamic'] = [
-				'has_dynamic_widgets' => true,
-				'host' => $hosts ? $hosts[0] : null
-			];
+			$data['dashboard_host'] = $hosts ? $hosts[0] : null;
 		}
 		else {
-			$data['dynamic'] = [
-				'has_dynamic_widgets' => false,
-				'host' => null
-			];
+			$data['dashboard_host'] = null;
 		}
 
 		$response = new CControllerResponseData($data);
@@ -169,7 +166,14 @@ class CControllerDashboardView extends CController {
 	 * Get dashboard data from API.
 	 */
 	private function getDashboard(): array {
+		// The dashboard variable shall only contain data used by the JavaScript framework.
 		$dashboard = null;
+
+		$stats = [
+			'has_related_reports' => false,
+			'use_dashboard_host' => false,
+			'use_dashboard_time_period' => false
+		];
 		$error = null;
 
 		if ($this->hasInput('new')) {
@@ -191,11 +195,10 @@ class CControllerDashboardView extends CController {
 					'id' => CWebUser::$data['userid'],
 					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
 				],
-				'has_related_reports' => false
 			];
 		}
 		elseif ($this->hasInput('clone')) {
-			$dashboards = API::Dashboard()->get([
+			$db_dashboards = API::Dashboard()->get([
 				'output' => ['dashboardid', 'name', 'private', 'display_period', 'auto_start'],
 				'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 				'selectUsers' => ['userid', 'permission'],
@@ -203,27 +206,34 @@ class CControllerDashboardView extends CController {
 				'dashboardids' => $this->getInput('dashboardid')
 			]);
 
-			if ($dashboards) {
+			if ($db_dashboards) {
+				$dashboard = $db_dashboards[0];
+				$dashboard['pages'] = CDashboardHelper::unsetInaccessibleFields($dashboard['pages']);
+
+				$widgets_and_forms = CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null);
+
 				$dashboard = [
-					'dashboardid' => $dashboards[0]['dashboardid'],
-					'name' => $dashboards[0]['name'],
-					'display_period' => $dashboards[0]['display_period'],
-					'auto_start' => $dashboards[0]['auto_start'],
+					'dashboardid' => $db_dashboards[0]['dashboardid'],
+					'name' => $db_dashboards[0]['name'],
+					'display_period' => $db_dashboards[0]['display_period'],
+					'auto_start' => $db_dashboards[0]['auto_start'],
 					'editable' => true,
-					'pages' => CDashboardHelper::prepareDashboardPages(
-						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages']), null, true
-					),
+					'pages' => CDashboardHelper::preparePages($widgets_and_forms, $dashboard['pages'], true),
 					'owner' => [
 						'id' => CWebUser::$data['userid'],
 						'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
 					],
 					'sharing' => [
-						'private' => $dashboards[0]['private'],
-						'users' => $dashboards[0]['users'],
-						'userGroups' => $dashboards[0]['userGroups']
+						'private' => $db_dashboards[0]['private'],
+						'users' => $db_dashboards[0]['users'],
+						'userGroups' => $db_dashboards[0]['userGroups']
 					],
-					'has_related_reports' => false
 				];
+
+				$dashboard_requirements = CDashboardHelper::getDashboardRequirements($widgets_and_forms);
+
+				$stats['use_dashboard_host'] = $dashboard_requirements['use_dashboard_host'];
+				$stats['use_dashboard_time_period'] = $dashboard_requirements['use_dashboard_time_period'];
 			}
 			else {
 				$error = _('No permissions to referred object or it does not exist!');
@@ -237,39 +247,49 @@ class CControllerDashboardView extends CController {
 
 			if ($dashboardid === null && CProfile::get('web.dashboard.list_was_opened') != 1) {
 				// Get first available dashboard that user has read permissions.
-				$dashboards = API::Dashboard()->get([
+				$db_dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid'],
 					'sortfield' => 'name',
 					'limit' => 1
 				]);
 
-				if ($dashboards) {
-					$dashboardid = $dashboards[0]['dashboardid'];
+				if ($db_dashboards) {
+					$dashboardid = $db_dashboards[0]['dashboardid'];
 				}
 			}
 
 			if ($dashboardid !== null) {
-				$dashboards = API::Dashboard()->get([
+				$db_dashboards = API::Dashboard()->get([
 					'output' => ['dashboardid', 'name', 'userid', 'display_period', 'auto_start'],
 					'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
 					'dashboardids' => $dashboardid,
 					'preservekeys' => true
 				]);
 
-				if ($dashboards) {
-					CDashboardHelper::updateEditableFlag($dashboards);
+				if ($db_dashboards) {
+					CDashboardHelper::updateEditableFlag($db_dashboards);
 
-					$dashboard = array_shift($dashboards);
-					$dashboard['pages'] = CDashboardHelper::prepareDashboardPages($dashboard['pages'], null, true);
+					$dashboard = array_shift($db_dashboards);
+
+					$widgets_and_forms = CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null);
+
+					$dashboard['pages'] = CDashboardHelper::preparePages($widgets_and_forms, $dashboard['pages'], true);
+
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],
 						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
 					];
-					$dashboard['has_related_reports'] = (bool) API::Report()->get([
+
+					$stats['has_related_reports'] = (bool) API::Report()->get([
 						'output' => [],
 						'filter' => ['dashboardid' => $dashboard['dashboardid']],
 						'limit' => 1
 					]);
+
+					$dashboard_requirements = CDashboardHelper::getDashboardRequirements($widgets_and_forms);
+
+					$stats['use_dashboard_host'] = $dashboard_requirements['use_dashboard_host'];
+					$stats['use_dashboard_time_period'] = $dashboard_requirements['use_dashboard_time_period'];
 
 					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
@@ -282,21 +302,6 @@ class CControllerDashboardView extends CController {
 			}
 		}
 
-		return [$dashboard, $error];
-	}
-
-	/**
-	 * Checks, if any of widgets has checked dynamic field.
-	 */
-	private static function hasDynamicWidgets($grid_pages): bool {
-		foreach ($grid_pages as $page) {
-			foreach ($page['widgets'] as $widget) {
-				if (array_key_exists('dynamic', $widget['fields']) && $widget['fields']['dynamic'] == 1) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return [$dashboard, $stats, $error];
 	}
 }

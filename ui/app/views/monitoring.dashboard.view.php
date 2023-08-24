@@ -69,24 +69,24 @@ $web_layout_mode = $this->getLayoutMode();
 
 $main_filter_form = null;
 
-if ($data['dynamic']['has_dynamic_widgets']) {
+if ($data['use_dashboard_host']) {
 	$main_filter_form = (new CForm('get'))
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))
 		->addVar('action', 'dashboard.view')
 		->addItem([
-			(new CLabel(_('Host'), 'dynamic_hostid_ms'))->addStyle('margin-right: 5px;'),
+			(new CLabel(_('Host'), 'dashboard_hostid_ms'))->addStyle('margin-right: 5px;'),
 			(new CMultiSelect([
-				'name' => 'dynamic_hostid',
+				'name' => 'dashboard_hostid',
 				'object_name' => 'hosts',
-				'data' => $data['dynamic']['host'] ? [$data['dynamic']['host']] : [],
+				'data' => $data['dashboard_host'] ? [$data['dashboard_host']] : [],
 				'multiple' => false,
 				'popup' => [
 					'parameters' => [
 						'srctbl' => 'hosts',
 						'srcfld1' => 'hostid',
 						'dstfrm' => 'dashboard_filter',
-						'dstfld1' => 'dynamic_hostid',
+						'dstfld1' => 'dashboard_hostid',
 						'monitored_hosts' => true,
 						'with_items' => true
 					]
@@ -116,14 +116,12 @@ $html_page = (new CHtmlPage())
 							->addClass(ZBX_ICON_MENU)
 							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
-							->setEnabled($data['dashboard']['can_edit_dashboards']
-								|| $data['dashboard']['can_view_reports']
-							)
+							->setEnabled($data['dashboard']['can_edit_dashboards'] || $data['can_view_reports'])
 							->setAttribute('aria-haspopup', true)
 							->setMenuPopup(CMenuPopupHelper::getDashboard($data['dashboard']['dashboardid'],
-								$data['dashboard']['editable'], $data['dashboard']['has_related_reports'],
-								$data['dashboard']['can_edit_dashboards'], $data['dashboard']['can_view_reports'],
-								$data['dashboard']['can_create_reports']
+								$data['dashboard']['editable'], $data['has_related_reports'],
+								$data['dashboard']['can_edit_dashboards'], $data['can_view_reports'],
+								$data['can_create_reports']
 							))
 					)
 					->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
@@ -265,7 +263,8 @@ $html_page
 		'configuration_hash' => $data['configuration_hash'],
 		'has_time_selector' => $data['has_time_selector'],
 		'time_period' => $data['time_period'],
-		'dynamic' => $data['dynamic'],
+		'use_dashboard_host' => $data['use_dashboard_host'],
+		'dashboard_host' => $data['dashboard_host'],
 		'web_layout_mode' => $web_layout_mode,
 		'clone' => $data['clone']
 	]).');

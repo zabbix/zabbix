@@ -26,14 +26,15 @@ use CApiInputValidator,
 
 abstract class CWidgetField {
 
-	public const FOREIGN_REFERENCE = '_reference';
-
 	public const DEFAULT_VIEW = null;
 
 	public const FLAG_ACKNOWLEDGES = 0x01;
 	public const FLAG_NOT_EMPTY = 0x02;
 	public const FLAG_LABEL_ASTERISK = 0x04;
 	public const FLAG_DISABLED = 0x08;
+
+	public const FOREIGN_REFERENCE_KEY = '_reference';
+	public const REFERENCE_DASHBOARD = 'DASHBOARD';
 
 	protected string $name;
 	protected ?string $label;
@@ -390,5 +391,25 @@ abstract class CWidgetField {
 		else {
 			$validation_rule['flags'] = $flag;
 		}
+	}
+
+	/**
+	 * Parse typed reference (a reference to a foreign data source).
+	 *
+	 * @param string $typed_reference
+	 *
+	 * @return array
+	 */
+	public static function parseTypedReference(string $typed_reference): array {
+		$separator_index = strpos($typed_reference, '.');
+
+		if ($separator_index === false) {
+			return ['reference' => '', 'type' => ''];
+		}
+
+		return [
+			'reference' => substr($typed_reference, 0, $separator_index),
+			'type' => substr($typed_reference, $separator_index + 1)
+		];
 	}
 }

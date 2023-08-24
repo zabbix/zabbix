@@ -122,14 +122,14 @@
 					is_edit_mode: false,
 					can_edit_dashboards: false,
 					is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
+					hostid: this.#hostid,
 					time_period: time_period,
-					dynamic_hostid: this.#hostid,
 					csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 				});
 
 				for (const page of dashboard.pages) {
 					for (const widget of page.widgets) {
-						widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+						widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 					}
 
 					ZABBIX.Dashboard.addDashboardPage(page);

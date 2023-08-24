@@ -36,14 +36,15 @@
 			configuration_hash,
 			has_time_selector,
 			time_period,
-			dynamic,
+			use_dashboard_host,
+			dashboard_host,
 			web_layout_mode,
 			clone
 		}) {
 			this.dashboard = dashboard;
 			this.has_time_selector = has_time_selector;
 			this.time_period = time_period;
-			this.dynamic = dynamic;
+			this.use_dashboard_host = use_dashboard_host;
 			this.clone = clone;
 
 			timeControl.refreshPage = false;
@@ -88,14 +89,14 @@
 				is_edit_mode: dashboard.dashboardid === null || clone,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
+				hostid: dashboard_host !== null ? dashboard_host.id : null,
 				time_period,
-				dynamic_hostid: dynamic.host ? dynamic.host.id : null,
 				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
@@ -107,8 +108,8 @@
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
 
-				if (dynamic.has_dynamic_widgets) {
-					jQuery('#dynamic_hostid').on('change', this.events.dynamicHostChange);
+				if (use_dashboard_host) {
+					jQuery('#dashboard_hostid').on('change', this.events.dashboardHostChange);
 				}
 
 				if (dashboard.dashboardid === null || clone) {
@@ -127,7 +128,7 @@
 
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
-			if (dynamic.has_dynamic_widgets) {
+			if (use_dashboard_host) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', this.events.popState);
 			}
@@ -138,8 +139,8 @@
 		edit() {
 			timeControl.disableAllSBox();
 
-			if (this.dynamic.has_dynamic_widgets) {
-				jQuery('#dynamic_hostid').off('change', this.events.dynamicHostChange);
+			if (this.use_dashboard_host) {
+				jQuery('#dashboard_hostid').off('change', this.events.dashboardHostChange);
 			}
 
 			document
@@ -381,13 +382,13 @@
 			popState(e) {
 				const host = (e.state !== null && 'host' in e.state) ? e.state.host : null;
 
-				jQuery('#dynamic_hostid').multiSelect('addData', host ? [host] : [], false);
+				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
 				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
 			},
 
-			dynamicHostChange() {
-				const hosts = jQuery('#dynamic_hostid').multiSelect('getData');
+			dashboardHostChange() {
+				const hosts = jQuery('#dashboard_hostid').multiSelect('getData');
 				const host = hosts.length ? hosts[0] : null;
 				const curl = new Curl('zabbix.php');
 
@@ -406,11 +407,11 @@
 					curl.setArgument('hostid', host.id);
 				}
 
-				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
-
 				history.pushState({host: host}, '', curl.getUrl());
 
-				updateUserProfile('web.dashboard.hostid', host ? host.id : 1);
+				ZABBIX.Dashboard.setHostId(host !== null ? host.id : null);
+
+				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
 			},
 
 			applyProperties() {

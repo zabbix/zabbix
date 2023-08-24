@@ -40,6 +40,8 @@ class CDashboard {
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
+	#hostid = null;
+
 	#edit_widget_cache = null;
 
 	constructor(target, {
@@ -60,8 +62,8 @@ class CDashboard {
 		is_edit_mode,
 		can_edit_dashboards,
 		is_kiosk_mode,
+		hostid,
 		time_period,
-		dynamic_hostid,
 		csrf_token = null
 	}) {
 		this._target = target;
@@ -101,8 +103,8 @@ class CDashboard {
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._is_kiosk_mode = is_kiosk_mode;
+		this.#hostid = hostid;
 		this._time_period = time_period;
-		this._dynamic_hostid = dynamic_hostid;
 		this._csrf_token = csrf_token;
 
 		this.#initialize();
@@ -162,6 +164,8 @@ class CDashboard {
 
 		this._state = DASHBOARD_STATE_ACTIVE;
 
+		this.setHostId(this.getHostId() ?? null);
+
 		this.#activateEvents();
 
 		const dashboard_page = this._getInitialDashboardPage();
@@ -210,12 +214,44 @@ class CDashboard {
 		}
 	}
 
-	setDynamicHost(dynamic_hostid) {
-		this._dynamic_hostid = dynamic_hostid;
+	getHostId() {
+		return this.#hostid;
+	}
 
-		for (const dashboard_page of this._dashboard_pages.keys()) {
-			dashboard_page.setDynamicHost(this._dynamic_hostid);
+	setHostId(hostid) {
+		this.#hostid = hostid;
+
+		if (this._state === DASHBOARD_STATE_ACTIVE) {
+			this.#broadcastHost();
 		}
+	}
+
+	#broadcastHost() {
+		ZABBIX.EventHub.publish({
+			data: this.#hostid,
+			descriptor: {
+				context: 'dashboard',
+				sender_unique_id: 'dashboard',
+				sender_type: 'dashboard',
+				event_type: 'broadcast',
+				event_origin: 'dashboard',
+				reference: CDashboard.REFERENCE_DASHBOARD,
+				type: '_hostid'
+			}
+		});
+
+		ZABBIX.EventHub.publish({
+			data: this.#hostid !== null ? [this.#hostid] : null,
+			descriptor: {
+				context: 'dashboard',
+				sender_unique_id: 'dashboard',
+				sender_type: 'dashboard',
+				event_type: 'broadcast',
+				event_origin: 'dashboard',
+				reference: CDashboard.REFERENCE_DASHBOARD,
+				type: '_hostids'
+			}
+		});
 	}
 
 	_startSlideshow() {
@@ -495,7 +531,6 @@ class CDashboard {
 			is_edit_mode: this._is_edit_mode,
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
-			dynamic_hostid: this._dynamic_hostid,
 			csrf_token: this._csrf_token,
 			unique_id: this._createUniqueId()
 		});

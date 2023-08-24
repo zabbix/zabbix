@@ -21,7 +21,8 @@
 
 namespace Zabbix\Core;
 
-use CControllerDashboardWidgetEdit,
+use CWidgetsData,
+	CControllerDashboardWidgetEdit,
 	CControllerDashboardWidgetView;
 
 use Zabbix\Widgets\{
@@ -51,8 +52,6 @@ class CWidget extends CModule {
 	public const DEFAULT_JS_CLASS		= 'CWidget';
 	public const DEFAULT_SIZE			= ['width' => 12, 'height' => 5];
 	public const DEFAULT_REFRESH_RATE	= 60;
-
-	public const REFERENCE_DASHBOARD = 'DASHBOARD';
 
 	// Dashboard widget dynamic state.
 	public const SIMPLE_ITEM = 0;
@@ -88,13 +87,21 @@ class CWidget extends CModule {
 			$form->addFields();
 		}
 
+		$data_types_spec = CWidgetsData::getDataTypes();
+
 		/** @var CWidgetField $field */
 		foreach ($form->getFields() as $field) {
 			if (array_key_exists($field->getName(), $in_params)) {
-				$field->setInType($in_params[$field->getName()]['type']);
+				$data_type = $in_params[$field->getName()]['type'];
 
-				if (in_array($in_params[$field->getName()]['type'], ['_hostid', '_hostids'])) {
-					$field->acceptDashboard();
+				$field->setInType($data_type);
+
+				if (array_key_exists($data_type, $data_types_spec)) {
+					$data_type_spec = $data_types_spec[$data_type];
+
+					if ($data_type_spec['accepts_dashboard_host'] || $data_type_spec['accepts_dashboard_time_period']) {
+						$field->acceptDashboard();
+					}
 				}
 
 				$field->acceptWidget();
@@ -212,42 +219,18 @@ class CWidget extends CModule {
 	}
 
 	private function makeField($name, $param): ?CWidgetField {
-		switch ($param['type']) {
-			case '_hostgroupid':
-				return (new CWidgetFieldMultiSelectGroup($name, _('Host group')))->setMultiple(false);
+		$data_types_spec = CWidgetsData::getDataTypes();
 
-			case '_hostgroupids':
-				return new CWidgetFieldMultiSelectGroup($name, _('Host groups'));
-
-			case '_hostid':
-				return (new CWidgetFieldMultiSelectHost($name, _('Host')))->setMultiple(false);
-
-			case '_hostids':
-				return new CWidgetFieldMultiSelectHost($name, _('Hosts'));
-
-			case '_itemid':
-				return (new CWidgetFieldMultiSelectItem($name, _('Item')))->setMultiple(false);
-
-			case '_itemprototypeid':
-				return (new CWidgetFieldMultiSelectItemPrototype($name, _('Item prototype')))->setMultiple(false);
-
-			case '_graphid':
-				return (new CWidgetFieldMultiSelectGraph($name, _('Graph')))->setMultiple(false);
-
-			case '_graphprototypeid':
-				return (new CWidgetFieldMultiSelectGraphPrototype($name, _('Graph prototype')))->setMultiple(false);
-
-			case '_mapid':
-				return (new CWidgetFieldMultiSelectMap($name, _('Map')))->setMultiple(false);
-
-			case '_serviceid':
-				return (new CWidgetFieldMultiSelectService($name, _('Service')))->setMultiple(false);
-
-			case '_slaid':
-				return (new CWidgetFieldMultiSelectSla($name, _('SLA')))->setMultiple(false);
-
-			default:
-				return null;
+		if (!array_key_exists($param['type'], $data_types_spec)) {
+			return null;
 		}
+
+		[
+			'field_class' => $field_class,
+			'label' => $label,
+			'is_multiple' => $is_multiple
+		] = $data_types_spec[$param['type']];
+
+		return (new $field_class($name, $label))->setMultiple($is_multiple);
 	}
 }

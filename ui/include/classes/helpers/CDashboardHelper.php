@@ -24,6 +24,11 @@ use Zabbix\Core\{
 	CWidget
 };
 
+use Zabbix\Widgets\{
+	CWidgetField,
+	CWidgetForm
+};
+
 class CDashboardHelper {
 
 	/**
@@ -58,19 +63,45 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Prepare and validate widget data for displaying on the dashboard.
+	 * Get widget module and form instances for the raw data retrieved from the database.
 	 *
 	 * @param array       $pages         Dashboard pages with widgets as returned by the dashboard API.
 	 * @param string|null $templateid    Template ID, if used.
-	 * @param bool        $with_rf_rate  Supply refresh rates for widgets, for the current user.
 	 *
 	 * @return array
 	 */
-	public static function prepareDashboardPages(array $pages, ?string $templateid, bool $with_rf_rate): array {
-		if (!$pages) {
-			return [];
+	public static function prepareWidgetsAndForms(array $pages, ?string $templateid): array {
+		$widgets_and_forms = [];
+
+		foreach ($pages as $page) {
+			foreach ($page['widgets'] as $widget_data) {
+				/** @var CWidget $widget */
+				$widget = APP::ModuleManager()->getModule($widget_data['type']);
+
+				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
+					$form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
+
+					$widgets_and_forms[$widget_data['widgetid']] = [
+						'widget' => $widget,
+						'form' => $form
+					];
+				}
+			}
 		}
 
+		return $widgets_and_forms;
+	}
+
+	/**
+	 * Prepare dashboard pages and widgets for the presentation.
+	 *
+	 * @param array $widgets_and_forms  Widget module and form instances.
+	 * @param array $pages              Dashboard pages with widgets as returned by the dashboard API.
+	 * @param bool  $with_rf_rate       Supply refresh rates for widgets, for the current user.
+	 *
+	 * @return array
+	 */
+	public static function preparePages(array $widgets_and_forms, array $pages, bool $with_rf_rate): array {
 		$prepared_pages = [];
 
 		foreach ($pages as $page) {
@@ -79,6 +110,19 @@ class CDashboardHelper {
 			CArrayHelper::sort($page['widgets'], ['y', 'x']);
 
 			foreach ($page['widgets'] as $widget_data) {
+				if (!array_key_exists($widget_data['widgetid'], $widgets_and_forms)) {
+					continue;
+				}
+
+				/** @var CWidget $widget */
+				/** @var CWidgetForm $form */
+				[
+					'widget' => $widget,
+					'form' => $form
+				] = $widgets_and_forms[$widget_data['widgetid']];
+
+				$form->validate();
+
 				$prepared_widget = [
 					'widgetid' => $widget_data['widgetid'],
 					'type' => $widget_data['type'],
@@ -91,30 +135,19 @@ class CDashboardHelper {
 						'height' => (int) $widget_data['height']
 					],
 					'rf_rate' => 0,
-					'fields' => []
+					'fields' => $form->getFieldsValues()
 				];
 
-				/** @var CWidget $widget */
-				$widget = APP::ModuleManager()->getModule($widget_data['type']);
+				if ($with_rf_rate) {
+					$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
 
-				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
-					$form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
-
-					$form->validate();
-
-					$prepared_widget['fields'] = $form->getFieldsValues();
-
-					if ($with_rf_rate) {
-						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
-
-						if ($rf_rate == -1) {
-							$rf_rate = $prepared_widget['fields']['rf_rate'] == -1
-								? $widget->getDefaultRefreshRate()
-								: $prepared_widget['fields']['rf_rate'];
-						}
-
-						$prepared_widget['rf_rate'] = $rf_rate;
+					if ($rf_rate == -1) {
+						$rf_rate = $prepared_widget['fields']['rf_rate'] == -1
+							? $widget->getDefaultRefreshRate()
+							: $prepared_widget['fields']['rf_rate'];
 					}
+
+					$prepared_widget['rf_rate'] = $rf_rate;
 				}
 
 				$prepared_widgets[] = $prepared_widget;
@@ -129,6 +162,58 @@ class CDashboardHelper {
 		}
 
 		return $prepared_pages;
+	}
+
+	/**
+	 * Get dashboard data source requirements.
+	 *
+	 * @param array $widgets_and_forms  Widget module and form instances.
+	 *
+	 * @return array
+	 */
+	public static function getDashboardRequirements(array $widgets_and_forms): array {
+		$use_dashboard_host = false;
+		$use_dashboard_time_period = false;
+
+		$data_types = CWidgetsData::getDataTypes();
+
+		/** @var CWidgetForm $form */
+		foreach ($widgets_and_forms as ['form' => $form]) {
+			foreach ($form->getFields() as $field) {
+				if ($field->isDashboardAccepted()) {
+					$data_type = $data_types[$field->getInType()];
+
+					$value = $field->getValue();
+
+					if (!array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value)) {
+						continue;
+					}
+
+					[
+						'reference' => $reference
+					] = CWidgetField::parseTypedReference($value[CWidgetField::FOREIGN_REFERENCE_KEY]);
+
+					if ($reference === CWidgetField::REFERENCE_DASHBOARD) {
+						if ($data_type['accepts_dashboard_host']) {
+							$use_dashboard_host = true;
+						}
+
+						if ($data_type['accepts_dashboard_time_period']) {
+							$use_dashboard_time_period = true;
+						}
+					}
+
+					if ($use_dashboard_host && $use_dashboard_time_period) {
+						break 2;
+					}
+				}
+			}
+		}
+
+		return [
+			'use_dashboard_host' => $use_dashboard_host,
+			'use_dashboard_time_period' => $use_dashboard_time_period
+		];
 	}
 
 	/**
