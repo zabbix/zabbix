@@ -2530,22 +2530,21 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function deleteDiscoveredGroups(array $group_prototypeids): void {
 		$db_groups = DBfetchArrayAssoc(DBselect(
-			'SELECT gd.groupid,g.name,gd.groupdiscoveryid'.
+			'SELECT gd.groupid,g.name'.
 			' FROM group_discovery gd,hstgrp g'.
 			' WHERE gd.groupid=g.groupid'.
 				' AND '.dbConditionId('gd.parent_group_prototypeid', $group_prototypeids)
 		), 'groupid');
 
 		$multi_lld_rule_groups = DBfetchArrayAssoc(DBselect(
-			'SELECT groupid'.
+			'SELECT groupdiscoveryid,groupid'.
 			' FROM group_discovery'.
-			' WHERE '.dbConditionId('groupid', array_column($db_groups, 'groupid')).
+			' WHERE '.dbConditionId('groupid', array_keys($db_groups)).
+			' GROUP BY groupid'.
 			' HAVING count(groupid) > 1'
 		), 'groupid');
 
 		foreach (array_keys($multi_lld_rule_groups) as $group_id) {
-			$multi_lld_rule_groups[$group_id] = $db_groups[$group_id];
-
 			unset($db_groups[$group_id]);
 		}
 
