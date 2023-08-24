@@ -114,16 +114,21 @@ class CControllerUsergroupEdit extends CController {
 		if ($this->hasInput('tag_filters')) {
 			foreach ($this->getInput('tag_filters') as $tag_filter) {
 				$groupid = $tag_filter['groupid'];
-				$key = array_search($groupid, array_column($host_groups, 'groupid'));
-				$name = $key !== false ? $host_groups[$key]['name'] : '';
 
-				$data['tag_filters'][$groupid] = [
-					'groupid' => $groupid,
-					'name' => $name,
-					'tags' => $tag_filter['tags']
-				];
+				if (in_array($groupid, array_column($host_groups, 'groupid'))) {
+					$key = array_search($groupid, array_column($host_groups, 'groupid'));
+					$name = $key !== false ? $host_groups[$key]['name'] : '';
+
+					$data['tag_filters'][$groupid] = [
+						'groupid' => $groupid,
+						'name' => $name,
+						'tags' => $tag_filter['tags']
+					];
+				}
 			}
 		}
+
+		CArrayHelper::sort($data['tag_filters'], ['name']);
 
 		$tag_filters_badges = $data['tag_filters'];
 
@@ -222,7 +227,7 @@ class CControllerUsergroupEdit extends CController {
 			foreach ($group as $groupid) {
 				$permission = $permissions[$index] ?? PERM_DENY;
 
-				if ($groupid != 0) {
+				if ($groupid != 0 && in_array($groupid, array_column($groups, 'groupid'))) {
 					$key = array_search($groupid, array_column($groups, 'groupid'));
 					$name = $key !== false ? $groups[$key]['name'] : '';
 

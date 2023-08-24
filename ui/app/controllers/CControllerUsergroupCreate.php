@@ -74,11 +74,25 @@ class CControllerUsergroupCreate extends CController {
 
 		$this->getInputs($user_group, ['name', 'users_status', 'gui_access', 'debug_mode', 'userdirectoryid']);
 
+		$db_hostgroups = API::HostGroup()->get([
+			'output' => ['groupid', 'name']
+		]);
+		$db_templategroups = API::TemplateGroup()->get([
+			'output' => ['groupid', 'name']
+		]);
+
 		$hostgroup_rights = [];
 		$templategroup_rigts = [];
 
 		$this->getInputs($hostgroup_rights, ['ms_hostgroup_right', 'hostgroup_right']);
 		$this->getInputs($templategroup_rigts, ['ms_templategroup_right', 'templategroup_right']);
+
+		if (!checkGroupsExist($hostgroup_rights, $db_hostgroups, 'ms_hostgroup_right')
+			|| !checkGroupsExist($templategroup_rigts, $db_templategroups, 'ms_templategroup_right')) {
+			$this->getErrorResponse(true);
+
+			return;
+		}
 
 		$user_group['hostgroup_rights'] = processRights($hostgroup_rights, 'ms_hostgroup_right', 'hostgroup_right');
 		$user_group['templategroup_rights'] = processRights($templategroup_rigts,'ms_templategroup_right',
@@ -88,14 +102,21 @@ class CControllerUsergroupCreate extends CController {
 		$tag_filters = $this->getInput('tag_filters', []);
 
 		foreach ($tag_filters as $hostgroup) {
-			foreach ($hostgroup['tags'] as $tag_filter) {
-				if ($hostgroup['groupid'] != 0) {
-					$user_group['tag_filters'][] = [
-						'groupid' => $hostgroup['groupid'],
-						'tag' => $tag_filter['tag'],
-						'value' => $tag_filter['value']
-					];
+			if (in_array($hostgroup['groupid'], array_column($db_hostgroups, 'groupid'))) {
+				foreach ($hostgroup['tags'] as $tag_filter) {
+					if ($hostgroup['groupid'] != 0) {
+						$user_group['tag_filters'][] = [
+							'groupid' => $hostgroup['groupid'],
+							'tag' => $tag_filter['tag'],
+							'value' => $tag_filter['value']
+						];
+					}
 				}
+			}
+			else {
+				$this->getErrorResponse(true);
+
+				return;
 			}
 		}
 
@@ -108,14 +129,33 @@ class CControllerUsergroupCreate extends CController {
 			);
 			$response->setFormData(['uncheck' => '1']);
 			CMessageHelper::setSuccessTitle(_('User group added'));
+
+			$this->setResponse($response);
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'usergroup.edit')
-			);
-			CMessageHelper::setErrorTitle(_('Cannot add user group'));
-			$response->setFormData($this->getInputAll());
+			$this->getErrorResponse();
 		}
+	}
+
+	/**
+	 * Creates and sets an error response when creating a user group fails.
+	 * Redirects to the 'usergroup.edit' action and optionally adds a specific error message.
+	 *
+	 * @param bool	$add_message	Optional flag for adding a specific error message.
+	 *
+	 * @return void
+	 */
+	private function getErrorResponse(bool $add_message = false): void {
+		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
+			->setArgument('action', 'usergroup.edit')
+		);
+		CMessageHelper::setErrorTitle(_('Cannot update user group'));
+
+		if ($add_message) {
+			CMessageHelper::addError(_('No permissions to referred object or it does not exist!'));
+		}
+
+		$response->setFormData($this->getInputAll());
 
 		$this->setResponse($response);
 	}

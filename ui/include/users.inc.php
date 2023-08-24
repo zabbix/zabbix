@@ -440,3 +440,34 @@ function processRights(array $rights, string $groupid_key, string $permission_ke
 
 	return $processed_rights;
 }
+
+/**
+ * Checks if the groups specified in the $rights parameter exist in the provided $db_groups.
+ *
+ * @param array		$rights		Host or template groups submitted for permission update/creation.
+ * @param array		$db_groups	Array of host or template groups fetched from the database.
+ * @param string	$group_name	Key in the $rights array for the list of groupids
+ * 								('ms_hostgroup_right' or 'ms_templategroup_right').
+ *
+ * @return bool
+ */
+function checkGroupsExist(array $rights, array $db_groups, string $group_name): bool {
+	if (!array_key_exists($group_name, $rights)
+			|| !array_key_exists('groupids', $rights[$group_name])
+			|| !is_array($rights[$group_name]['groupids'])) {
+
+		return true;
+	}
+
+	$all_groupids = array_merge(...$rights[$group_name]['groupids']);
+	$existing_groupids = array_column($db_groups, 'groupid');
+
+	foreach ($all_groupids as $groupid) {
+		if (!in_array($groupid, $existing_groupids)) {
+
+			return false;
+		}
+	}
+
+	return true;
+}

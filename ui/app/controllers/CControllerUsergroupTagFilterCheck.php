@@ -21,6 +21,11 @@
 
 class CControllerUsergroupTagFilterCheck extends CController {
 
+	/**
+	 * @var array  Host group data from database.
+	 */
+	private $host_groups = [];
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
@@ -56,7 +61,23 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	 * @return bool
 	 */
 	protected function validateTagFilters(): bool {
-		if (!array_key_exists('groupids', $this->getInput('ms_new_tag_filter', []))) {
+		$new_host_groups = $this->getInput('ms_new_tag_filter', []);
+		$db_hostgroups = API::HostGroup()->get([
+			'output' => ['groupid', 'name']
+		]);
+
+		$this->host_groups = $db_hostgroups ?: $this->host_groups;
+
+		if (array_key_exists('groupids', $new_host_groups)) {
+			foreach($new_host_groups['groupids'] as $groupid) {
+				if (!in_array($groupid, array_column($this->host_groups, 'groupid'))) {
+					error(_('No permissions to referred object or it does not exist!'));
+
+					return false;
+				}
+			}
+		}
+		else {
 			error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
 
 			return false;
@@ -93,9 +114,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		$ms_groups = $this->getInput('ms_new_tag_filter', []);
 		$groupids = $ms_groups['groupids'];
 		$new_tag_filters = $this->filterDuplicates($this->getInput('new_tag_filter', []));
-		$host_groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name']
-		]);
 
 		if (!in_array($opened_groupid, $groupids)) {
 			unset($data['tag_filters'][$opened_groupid]);
@@ -153,8 +171,8 @@ class CControllerUsergroupTagFilterCheck extends CController {
 				}
 			}
 			else {
-				$key = array_search($groupid, array_column($host_groups, 'groupid'));
-				$name = $key !== false ? $host_groups[$key]['name'] : '';
+				$key = array_search($groupid, array_column($this->host_groups, 'groupid'));
+				$name = $key !== false ? $this->host_groups[$key]['name'] : '';
 
 				$data['tag_filters'][$groupid] = [
 					'groupid' => $groupid,
