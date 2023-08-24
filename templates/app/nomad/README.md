@@ -30,7 +30,7 @@ This template has been tested on:
 **Additional information**:
 
 * Synthetic Nomad host will be used just as an endpoint for servers and clients discovery (general cluster information), it will not be monitored as a Nomad server or client, so that to prevent duplicate entities.
-* If you're not using ACL - skip 3th setup step.
+* If you're not using ACL - skip 3rd setup step.
 * The Nomad servers/clients discovery is limited by region. If you're using multi-region cluster- create one synthetic host per region.
 * The Nomad server/client templates are ready for separate usage. Feel free to use if you prefer manual host creation.
 
@@ -115,18 +115,18 @@ This template has been tested on:
 
 1. Enable telemetry in HashiCorp Nomad agent configuration file. Set the Prometheus metrics format.
 >Refer to the [`vendor documentation`](https://developer.hashicorp.com/nomad/docs/configuration/telemetry).
-2. Prepare an ACL token with `node:read`, `namespace:read-job` permissions applied. Define the {$NOMAD.TOKEN} macro value.
+2. Prepare an ACL token with `node:read`, `namespace:read-job` permissions applied. Define the `{$NOMAD.TOKEN}` macro value.
 > Refer to the vendor documentation about [`Nomad native ACL`](https://developer.hashicorp.com/nomad/tutorials/access-control/access-control-policies) or [`Nomad Vault-generated tokens`](https://developer.hashicorp.com/nomad/tutorials/access-control/vault-nomad-secrets) if you're using integration with HashiCorp Vault.
 3. Set the values for the `{$NOMAD.CLIENT.API.SCHEME}` and `{$NOMAD.CLIENT.API.PORT}` macros to define the common Nomad API web schema and connection port.
 
 **Additional information**:
 
-*You have to prepare an additional ACL token only if you wish to monitor Nomad clients as a separate entities. If you're using clients discovery - token will be inherited from the master host linked to the HashiCorp Nomad by HTTP template.
+* You have to prepare an additional ACL token only if you wish to monitor Nomad clients as separate entities. If you're using clients discovery - token will be inherited from the master host linked to the HashiCorp Nomad by HTTP template.
 
 * If you're not using ACL - skip 2nd setup step.
 
-* The Nomad clients use the default web schema - `HTTP` and default API port - `4646`. If you're using clients discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:<IPADDR>}} or/and {{$NOMAD.CLIENT.API.PORT:<IPADDR>}} on master host or template level.
-* Some metrics may not be collected depending on your HashiCorp Nomad instance version and configuration.
+* The Nomad clients use the default web schema - `HTTP` and default API port - `4646`. If you're using clients discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:`NECESSARY.IP`}} or/and {{$NOMAD.CLIENT.API.PORT:`NECESSARY.IP`}} on master host or template level.
+* Some metrics may not be collected depending on your HashiCorp Nomad agent version and configuration.
 
 **Useful links**:
 
@@ -315,16 +315,12 @@ This template has been tested on:
 
 1. Enable telemetry in HashiCorp Nomad agent configuration file. Set the Prometheus metrics format.
 >Refer to the [`vendor documentation`](https://developer.hashicorp.com/nomad/docs/configuration/telemetry).
-2. Prepare an ACL token with `node:read`, `namespace:read-job`, `agent:read` an`management` permissions applied. Define the `{$NOMAD.TOKEN}`macro value.
-> Refer to the vendor documentation about [`Nomad native ACL`](https://developer.hashicorp.com/nomad/tutorials/access-control/access-control-policies) or [`Nomad Vault-generated tokens](https://developer.hashicorp.com/nomad/tutorials/access-control/vault-nomad-secrets) if you're using integration with HashiCorp Vault.
-3. Set the values for the `{$NOMAD.CLIENT.API.SCHEME}` and `{$NOMAD.CLIENT.API.PORT}` macros to define the common Nomad API web schema and connection port.
+2. Set the values for the `{$NOMAD.SERVER.API.SCHEME}` and `{$NOMAD.SERVER.API.PORT}` macros to define the common Nomad API web schema and connection port.
 
 **Additional information**:
 
-* You have to prepare an additional ACL token only if you wish to monitor Nomad servers as a separate entities. If you're using servers discovery - token will be inherited from the master host linked to the HashiCorp Nomad by HTTP template.
-* If you're not using ACL - skip 2nd setup step.
-* The Nomad servers use the default web schema - `HTTP` and default API port - `4646`. If you're using servers discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:<IPADDR>}} or/and {{$NOMAD.CLIENT.API.PORT:<IPADDR>}} on master host or template level.
-* Some metrics may not be collected depending on your HashiCorp Nomad instance version, configuration and cluster role.
+* The Nomad servers use the default web schema - `HTTP` and default API port - `4646`. If you're using servers discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:`NECESSARY.IP`}} or/and {{$NOMAD.CLIENT.API.PORT:`NECESSARY.IP`}} on master host or template level.
+* Some metrics may not be collected depending on your HashiCorp Nomad agent version, configuration and cluster role.
 * Don't forget to define the `{$NOMAD.REDUNDANCY.MIN}` macro value, based on your cluster nodes amount to configure the failure tolerance triggers correctly.
 
 **Useful links**:
