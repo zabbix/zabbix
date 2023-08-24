@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-07T05:35:58Z'
+  date: '2023-08-24T11:13:37Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -42,7 +42,7 @@ zabbix_export:
         
         Consult the PostgreSQL documentation about protection modes (https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) and client connection parameters (https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNECT-SSLMODE).
         
-        Also it is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the PostgreSQL documentation (https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
+        Also, it is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the PostgreSQL documentation (https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
         
         4. Edit the `pg_hba.conf` configuration file to allow connections for the user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
         
