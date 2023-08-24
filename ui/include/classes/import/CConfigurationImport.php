@@ -332,6 +332,10 @@ class CConfigurationImport {
 						$host_prototypes_refs['host'][$host][$discovery_rule['key_']][] = $host_prototype['host'];
 					}
 
+					foreach ($host_prototype['group_links'] as $group_link) {
+						$groups_refs += [$group_link['group']['name'] => []];
+					}
+
 					foreach ($host_prototype['group_prototypes'] as $group_prototype) {
 						if (array_key_exists('uuid', $host_prototype)) {
 							$group_prototypes_refs['uuid'][$host][$discovery_rule['key_']][$host_prototype['uuid']][] =
