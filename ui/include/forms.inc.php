@@ -733,7 +733,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
-		'type' => getRequest('type', 0),
+		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),

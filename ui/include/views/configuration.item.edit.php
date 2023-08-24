@@ -47,6 +47,7 @@ $form = (new CForm('post', $url))
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
 	->addVar('hostid', $data['hostid'])
+	->addVar('has_custom_timeout', $data['has_custom_timeout'])
 	->addVar('backurl', $data['backurl']);
 
 if (!empty($data['itemid'])) {
@@ -333,16 +334,6 @@ $item_tab
 			]))
 			->setReadonly($readonly)
 		))->setId('js-item-request-method-field')
-	])
-	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->setAsteriskMark()
-			->setId('js-item-timeout-label'),
-		(new CFormField((new CTextBox('timeout', $data['timeout'], $readonly))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		))->setId('js-item-timeout-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
 	->addItem([
@@ -827,6 +818,25 @@ $item_tab->addItem([
 	))->setId('js-item-flex-intervals-field')
 ]);
 
+/**
+ * Append timeout field to form list for item types:
+ * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ */
+$item_tab->addItem([
+	(new CLabel(_('Timeout'), 'timeout'))
+		->setAsteriskMark()
+		->setId('js-item-timeout-label'),
+	(new CFormField([
+		(new CTextBox('timeout', $data['timeout'], $readonly || !$data['has_custom_timeout']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
+		!$readonly
+			? (new CButtonLink($data['has_custom_timeout'] ? _('Remove') : _('Change')))->addClass('js-change-timeout')
+			: null
+	]))->setId('js-item-timeout-field')
+]);
+
 // Append history storage to form list.
 $keep_history_hint = null;
 
@@ -1106,7 +1116,8 @@ $html_page->show();
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface(),
-		'discovered_item' => $discovered_item
+		'discovered_item' => $discovered_item,
+		'inherited_timeouts' => $data['inherited_timeouts']
 	]).');
 '))->show();
 

@@ -146,9 +146,13 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'timeout' =>	 				[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO|P_ALLOW_LLD_MACRO,	null,
+	'has_custom_timeout' =>			[T_ZBX_INT, O_OPT, null,	IN([0, 1]),	null],
+	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
 										'(isset({add}) || isset({update})) && isset({type})'.
-											' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
+										' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
+											ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+											ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+										], 'type'),
 										_('Timeout')
 									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -258,7 +262,7 @@ unset($_REQUEST[$paramsFieldName]);
 // Permissions.
 $lld_rules = API::DiscoveryRule()->get([
 	'output' => ['itemid', 'hostid'],
-	'selectHosts' => ['status'],
+	'selectHosts' => ['proxyid', 'status'],
 	'itemids' => getRequest('parent_discoveryid'),
 	'editable' => true
 ]);
@@ -355,8 +359,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				? getRequest('http_password', DB::getDefault('items', 'password'))
 				: getRequest('password', DB::getDefault('items', 'password')),
 			'params' => getRequest('params', DB::getDefault('items', 'params')),
-			'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 			'delay' => getDelayWithCustomIntervals(getRequest('delay', DB::getDefault('items', 'delay')), $delay_flex),
+			'timeout' => getRequest('has_custom_timeout') == 1
+				? getRequest('timeout', DB::getDefault('items', 'timeout'))
+				: DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
 
 			// Dependent item type specific fields.
@@ -600,6 +606,19 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM_PROTOTYPE;
 	$data['preprocessing_types'] = CItemPrototype::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+
+	$default_timeout = DB::getDefault('items', 'timeout');
+	$inherited_timeouts = getInheritedTimeouts($lld_rules[0]['hosts'][0]['proxyid']);
+	$data['inherited_timeouts'] = $inherited_timeouts['timeouts'];
+	$data['inherited_timeouts_source'] = $inherited_timeouts['source'];
+	$data['inherited_timeout'] = array_key_exists($data['type'], $data['inherited_timeouts'])
+		? $data['inherited_timeouts'][$data['type']]
+		: $default_timeout;
+	$data['has_custom_timeout'] = getRequest('has_custom_timeout', (int) ($data['timeout'] !== $default_timeout));
+	$data['timeout'] = $data['has_custom_timeout'] ? $data['timeout'] : $data['inherited_timeout'];
+	$data['can_edit_source_timeouts'] = $data['inherited_timeouts_source'] === 'proxy'
+		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 
 	$data['display_interfaces'] = $data['hostid']
 		? (bool) API::Host()->get([

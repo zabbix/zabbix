@@ -162,7 +162,7 @@ abstract class CItemType {
 				}
 
 			case 'timeout':
-				return ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')];
+				return ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')];
 
 			case 'delay':
 				switch (static::TYPE) {
@@ -255,7 +255,7 @@ abstract class CItemType {
 				}
 
 			case 'timeout':
-				return ['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.SEC_PER_MIN, 'length' => DB::getFieldLength('items', 'timeout')];
+				return ['type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')];
 
 			case 'delay':
 				switch (static::TYPE) {

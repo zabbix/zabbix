@@ -44,7 +44,8 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
-	->addVar('parent_discoveryid', $data['parent_discoveryid']);
+	->addVar('parent_discoveryid', $data['parent_discoveryid'])
+	->addVar('has_custom_timeout', $data['has_custom_timeout']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -318,16 +319,6 @@ $item_tab
 			]))
 			->setReadonly($readonly)
 		))->setId('js-item-request-method-field')
-	])
-	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->setAsteriskMark()
-			->setId('js-item-timeout-label'),
-		(new CFormField((new CTextBox('timeout', $data['timeout'], $readonly))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		))->setId('js-item-timeout-field')
 	])
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
 	->addItem([
@@ -773,14 +764,34 @@ $delayFlexTable->addRow([(new CButton('interval_add', _('Add')))
 	->addClass('element-table-add')
 ]);
 
+$item_tab->addItem([
+	(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
+	(new CFormField((new CDiv($delayFlexTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	))->setId('js-item-flex-intervals-field')
+]);
+
+/**
+ * Append timeout field to form list for item types:
+ * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ */
+$item_tab->addItem([
+	(new CLabel(_('Timeout'), 'timeout'))
+		->setAsteriskMark()
+		->setId('js-item-timeout-label'),
+	(new CFormField([
+		(new CTextBox('timeout', $data['timeout'], $readonly || !$data['has_custom_timeout']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired(),
+		!$readonly
+			? (new CButtonLink($data['has_custom_timeout'] ? _('Remove') : _('Change')))->addClass('js-change-timeout')
+			: null
+	]))->setId('js-item-timeout-field')
+]);
+
 $item_tab
-	->addItem([
-		(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
-		(new CFormField((new CDiv($delayFlexTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		))->setId('js-item-flex-intervals-field')
-	])
 	->addItem([
 		(new CLabel(_('History storage period'), 'history'))->setAsteriskMark(),
 		new CFormField([
@@ -951,7 +962,8 @@ $html_page->show();
 		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'inherited_timeouts' => $data['inherited_timeouts']
 	]).');
 '))->show();
 

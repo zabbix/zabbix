@@ -28,7 +28,7 @@ class CItemTypeExternal extends CItemType {
 	/**
 	 * @inheritDoc
 	 */
-	const FIELD_NAMES = ['interfaceid', 'delay'];
+	const FIELD_NAMES = ['interfaceid', 'timeout', 'delay'];
 
 	/**
 	 * @inheritDoc
@@ -36,6 +36,7 @@ class CItemTypeExternal extends CItemType {
 	public static function getCreateValidationRules(array $item): array {
 		return [
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
+			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}
@@ -46,6 +47,7 @@ class CItemTypeExternal extends CItemType {
 	public static function getUpdateValidationRules(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRule('interfaceid', $db_item),
+			'timeout' =>		self::getUpdateFieldRule('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRule('delay', $db_item)
 		];
 	}
@@ -56,6 +58,7 @@ class CItemTypeExternal extends CItemType {
 	public static function getUpdateValidationRulesInherited(array $db_item): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleInherited('interfaceid', $db_item),
+			'timeout' =>		self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
@@ -66,6 +69,7 @@ class CItemTypeExternal extends CItemType {
 	public static function getUpdateValidationRulesDiscovered(): array {
 		return [
 			'interfaceid' =>	self::getUpdateFieldRuleDiscovered('interfaceid'),
+			'timeout' =>		self::getUpdateFieldRuleDiscovered('timeout'),
 			'delay' =>			self::getUpdateFieldRuleDiscovered('delay')
 		];
 	}

@@ -62,12 +62,15 @@
 
 	const item_form = {
 		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types,
-				discovered_item}) {
+				discovered_item, inherited_timeouts}) {
 			this.interfaces = interfaces;
 			this.testable_item_types = testable_item_types;
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
 			this.discovered_item = discovered_item === undefined ? false : discovered_item;
+			this.has_custom_timeout = document.getElementById('has_custom_timeout');
+			this.timeout = document.getElementById('timeout');
+			this.inherited_timeouts = inherited_timeouts;
 
 			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
 				item_type_lookup.init(value_type_by_keys, keys_by_item_type, this.discovered_item);
@@ -106,6 +109,21 @@
 			toggle_fields.forEach((element_id) =>
 				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
 			);
+		}
+
+		if (type in item_form.inherited_timeouts) {
+			item_form.timeout.disabled = false;
+
+			if (item_form.timeout.readOnly && item_form.has_custom_timeout.value == 0) {
+				item_form.timeout.value = item_form.inherited_timeouts[type];
+			}
+			else {
+				item_form.has_custom_timeout.value = 1;
+			}
+		}
+		else {
+			item_form.has_custom_timeout.value = 0;
+			item_form.timeout.disabled = true;
 		}
 
 		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !interface_optional);
@@ -189,6 +207,22 @@
 				}
 			})
 			.trigger('change');
+
+		const change_timeout_button = document.querySelector('.js-change-timeout');
+
+		if (change_timeout_button !== null) {
+			change_timeout_button.addEventListener('click', () => {
+				item_form.timeout.toggleAttribute('readonly', !item_form.timeout.readOnly);
+				change_timeout_button.innerText = item_form.timeout.readOnly
+					? <?= json_encode(_('Change')) ?>
+					: <?= json_encode(_('Remove')) ?>;
+				item_form.has_custom_timeout.value = item_form.timeout.readOnly ? 0 : 1;
+
+				if (item_form.timeout.readOnly) {
+					item_form.timeout.value = item_form.inherited_timeouts[document.getElementById('type').value] || '';
+				}
+			});
+		}
 
 		$('#test_item').on('click', function() {
 			var step_nums = [];

@@ -143,9 +143,13 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
+	'has_custom_timeout' =>			[T_ZBX_INT, O_OPT, null,	IN([0, 1]),	null],
 	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
 										'(isset({add}) || isset({update})) && isset({type})'.
-											' && '.IN(ITEM_TYPE_HTTPAGENT.','.ITEM_TYPE_SCRIPT, 'type'),
+											' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
+												ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH,
+												ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+											], 'type'),
 										_('Timeout')
 									],
 	'url' =>						[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
@@ -315,7 +319,7 @@ $itemid = getRequest('itemid');
 if ($itemid) {
 	$items = API::Item()->get([
 		'output' => ['itemid'],
-		'selectHosts' => ['hostid', 'status'],
+		'selectHosts' => ['hostid', 'proxyid', 'status'],
 		'itemids' => $itemid,
 		'editable' => true
 	]);
@@ -331,7 +335,7 @@ else {
 
 	if ($hostid) {
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'status'],
+			'output' => ['hostid', 'proxyid', 'status'],
 			'hostids' => $hostid,
 			'templated_hosts' => true,
 			'editable' => true
@@ -575,8 +579,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				? getRequest('http_password', DB::getDefault('items', 'password'))
 				: getRequest('password', DB::getDefault('items', 'password')),
 			'params' => getRequest('params', DB::getDefault('items', 'params')),
-			'timeout' => getRequest('timeout', DB::getDefault('items', 'timeout')),
 			'delay' => getDelayWithCustomIntervals(getRequest('delay', DB::getDefault('items', 'delay')), $delay_flex),
+			'timeout' => getRequest('has_custom_timeout') == 1
+				? getRequest('timeout', DB::getDefault('items', 'timeout'))
+				: DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
 
 			// Dependent item type specific fields.
@@ -757,7 +763,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 				'headers', 'retrieve_mode', 'request_method', 'output_format', 'ssl_cert_file', 'ssl_key_file',
 				'ssl_key_password', 'verify_peer', 'verify_host', 'allow_traps'
 			],
-			'selectHosts' => ['status', 'name', 'flags'],
+			'selectHosts' => ['proxyid', 'status', 'name', 'flags'],
 			'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
 			'selectItemDiscovery' => ['parent_itemid'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
@@ -800,7 +806,7 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 	}
 	else {
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status', 'flags'],
+			'output' => ['hostid', 'proxyid', 'name', 'status', 'flags'],
 			'hostids' => getRequest('hostid'),
 			'templated_hosts' => true
 		]);
@@ -836,6 +842,19 @@ if (getRequest('form') === 'create' || getRequest('form') === 'update'
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM;
 	$data['preprocessing_types'] = CItem::SUPPORTED_PREPROCESSING_TYPES;
 	$data['trends_default'] = DB::getDefault('items', 'trends');
+
+	$default_timeout = DB::getDefault('items', 'timeout');
+	$inherited_timeouts = getInheritedTimeouts($host['proxyid']);
+	$data['inherited_timeouts'] = $inherited_timeouts['timeouts'];
+	$data['inherited_timeouts_source'] = $inherited_timeouts['source'];
+	$data['inherited_timeout'] = array_key_exists($data['type'], $data['inherited_timeouts'])
+		? $data['inherited_timeouts'][$data['type']]
+		: $default_timeout;
+	$data['has_custom_timeout'] = getRequest('has_custom_timeout', (int) ($data['timeout'] !== $default_timeout));
+	$data['timeout'] = $data['has_custom_timeout'] ? $data['timeout'] : $data['inherited_timeout'];
+	$data['can_edit_source_timeouts'] = $data['inherited_timeouts_source'] === 'proxy'
+		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 
 	$history_in_seconds = timeUnitToSeconds($data['history']);
 	if (!getRequest('form_refresh') && $history_in_seconds !== null && $history_in_seconds == ITEM_NO_STORAGE_VALUE) {
