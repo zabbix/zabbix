@@ -520,6 +520,12 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		zbx_free(expanded_cmd);
 	}
+	else if (NULL == userinput) /* script does not take additional input yet we've received a value anyway */
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s(): script (scriptid:" ZBX_FS_UI64 ") "
+				"does not accept additional manual input, but request contains it anyway",
+				__func__, zbx_result_string(ret));
+	}
 
 	if (0 != hostid)	/* script on host */
 		macro_type = ZBX_MACRO_TYPE_SCRIPT;
