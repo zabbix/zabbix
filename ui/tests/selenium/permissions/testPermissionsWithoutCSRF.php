@@ -62,6 +62,27 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			'url' => 'http://test.url'
 		]);
 		$this->assertArrayHasKey('connectorids', $connectors);
+
+		// Create event correlation.
+		CDataHelper::call('correlation.create', [
+			[
+				'name' => 'Event correlation for element remove',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'element remove'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			]
+		]);
 	}
 
 	public static function getElementRemoveData() {
@@ -114,16 +135,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=create',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'create'
 				]
 			],
 			// #7 Template update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=update&templateid=10169',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'update'
 				]
 			],
 			// #8 Host create.

@@ -126,33 +126,37 @@ class CMenuPopupHelper {
 	/**
 	 * Prepare data for Ajax trigger menu popup.
 	 *
-	 * @param string $triggerid
-	 * @param string $eventid      (optional) Mandatory for "Update problem", "Convert as cause" and
-	 *                             "Mark selected as symptoms" context menus.
-	 * @param array  $options      (optional) Whether to show "Update problem" menu, "Convert as cause" or
-	 *                             "Mark selected as symptoms" context menus.
+	 * @param array  $data
+	 *        string $data['triggerid']                 Trigger ID.
+	 *        string $data['backurl']                   URL from where the menu popup was called.
+	 *        string $data['eventid']                   (optional) Mandatory for "Update problem", "Mark as cause"
+	 *                                                  and "Mark selected as symptoms" context menus.
+	 *        bool   $data['show_update_problem']       (optional) Whether to show "Update problem".
+	 *        bool   $data['show_rank_change_cause']    (optional) Whether to show "Mark as cause".
+	 *        bool   $data['show_rank_change_symptom']  (optional) Whether to show "Mark selected as symptoms".
 	 *
 	 * @return array
 	 */
-	public static function getTrigger(string $triggerid, string $eventid = '0', array $options = []): array {
-		$data = [
+	public static function getTrigger(array $data): array {
+		$menu = [
 			'type' => 'trigger',
 			'data' => [
-				'triggerid' => $triggerid
+				'triggerid' => $data['triggerid'],
+				'backurl' => $data['backurl']
 			]
 		];
 
-		if ($eventid != 0) {
-			$data['data']['eventid'] = $eventid;
+		if (array_key_exists('eventid', $data) && $data['eventid'] != 0) {
+			$menu['data']['eventid'] = $data['eventid'];
 
-			if ($options) {
-				foreach ($options as $key => $value) {
-					$data['data'][$key] = (int) $value;
+			foreach (['show_update_problem', 'show_rank_change_cause', 'show_rank_change_symptom'] as $option) {
+				if (array_key_exists($option, $data)) {
+					$menu['data'][$option] = (int) $data[$option];
 				}
 			}
 		}
 
-		return $data;
+		return $menu;
 	}
 
 	/**

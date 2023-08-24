@@ -3004,7 +3004,7 @@ retry_oracle:
 
 			str = zbx_db_format_values((zbx_db_field_t **)self->fields.values, values,
 					self->fields.values_num);
-			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), ZBX_NULL2EMPTY_STR(str));
 			zbx_free(str);
 		}
 	}

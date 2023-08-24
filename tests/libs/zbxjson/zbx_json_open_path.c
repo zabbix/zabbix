@@ -54,7 +54,12 @@ void	zbx_mock_test_entry(void **state)
 	path = zbx_mock_get_parameter_string("in.path");
 	result = zbx_mock_get_parameter_string("out.result");
 
-	ret = zbx_json_open(json, &jp);
+	if (FAIL == (ret = zbx_json_open(json, &jp)))
+	{
+		zbx_mock_assert_str_eq("Validating failed test", result, zbx_json_strerror());
+		return;
+	}
+
 	zbx_mock_assert_result_eq("Invalid zbx_json_open() return value", SUCCEED, ret);
 
 	if (FAIL == (ret = zbx_json_open_path(&jp, path, &jp_out)))

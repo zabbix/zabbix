@@ -46,7 +46,8 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
-	->addVar('hostid', $data['hostid']);
+	->addVar('hostid', $data['hostid'])
+	->addVar('backurl', $data['backurl']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -1112,7 +1113,8 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'trends_default' => $data['trends_default']
+		'trends_default' => $data['trends_default'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

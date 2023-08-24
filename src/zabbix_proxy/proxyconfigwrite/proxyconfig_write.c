@@ -1609,7 +1609,7 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 		}
 		zbx_db_free_result(result);
 
-		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "status", NULL);
+		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "status", (char *)NULL);
 
 		for (i = 0; i < templateids.values_num; i++)
 		{

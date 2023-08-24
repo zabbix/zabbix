@@ -60,7 +60,7 @@ int	zbx_proxy_get_delay(zbx_uint64_t lastid);
 int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
 		size_t values_num, zbx_proxy_suppress_t *nodata_win);
 
-void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, int lastaccess, int compress,
+void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version_int, time_t lastaccess,
 		zbx_uint64_t flags_add);
 
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
@@ -129,5 +129,11 @@ char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
 
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
+
+const char	*zbx_permission_string(int perm);
+int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
+int	zbx_get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids);
+int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
+int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 
 #endif /* ZABBIX_DBWRAP_H */

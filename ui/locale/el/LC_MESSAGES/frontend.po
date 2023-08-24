@@ -5829,6 +5829,10 @@ msgid_plural "Dashboards deleted"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr ""
@@ -8145,6 +8149,10 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr "Κατάλογος συμβάντων [προηγούμενα 20]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr ""
@@ -9603,6 +9611,10 @@ msgstr "Ο ξενιστής δεν μπορεί να έχει πλέον της 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Πλήθος ξενιστών"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14355,6 +14367,10 @@ msgstr ""
 msgid "New user group mapping"
 msgstr ""
 
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr ""
+
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
 msgid "Next page"
@@ -16442,6 +16458,10 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:451
 msgid "Preview"
 msgstr "Προεπισκόπηση"
+
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -19571,6 +19591,10 @@ msgstr ""
 #: include/views/general.login.php:94
 msgid "Support"
 msgstr "Υποστήριξη"
+
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
@@ -23146,6 +23170,10 @@ msgstr "Προσοχή"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
 msgstr ""
@@ -23984,6 +24012,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474

@@ -922,7 +922,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t size, zbx_j
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
 				return NULL;
 	}
 
@@ -956,7 +956,7 @@ const char	*zbx_json_decodevalue_dyn(const char *p, char **string, size_t *strin
 			/* only primitive values are decoded */
 			return NULL;
 		default:
-			if (0 == (len = json_parse_value(p, NULL, NULL)))
+			if (0 == (len = json_parse_value(p, NULL, 0, NULL)))
 				return NULL;
 	}
 
@@ -1221,7 +1221,7 @@ int	zbx_json_open_path(const struct zbx_json_parse *jp, const char *path, struct
 		object.start = p;
 
 		if (NULL == (object.end = __zbx_json_rbracket(p)))
-			object.end = p + json_parse_value(p, NULL, NULL) - 1;
+			object.end = p + json_parse_value(p, NULL, 0, NULL) - 1;
 	}
 
 	*out = object;

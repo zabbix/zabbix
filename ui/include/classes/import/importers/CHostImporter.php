@@ -306,14 +306,14 @@ class CHostImporter extends CImporter {
 				$proxyid = 0;
 			}
 			else {
-				$proxyid = $this->referencer->findProxyidByHost($host['proxy']['name']);
+				$proxyid = $this->referencer->findProxyidByName($host['proxy']['name']);
 
 				if ($proxyid === null) {
 					throw new Exception(_s('Proxy "%1$s" for host "%2$s" does not exist.', $host['proxy']['name'], $host['host']));
 				}
 			}
 
-			$host['proxy_hostid'] = $proxyid;
+			$host['proxyid'] = $proxyid;
 		}
 
 		$hostid = $this->referencer->findHostidByHost($host['host']);

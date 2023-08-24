@@ -65,7 +65,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 		];
 
 	$table->addRow([
-		$proxy['host'],
+		$proxy['name'],
 		($proxy_queue['delay5'] == 0) ? 0 : (new CCol($proxy_queue['delay5']))
 			->addClass(CSeverityHelper::getStyle(TRIGGER_SEVERITY_NOT_CLASSIFIED)),
 		($proxy_queue['delay10'] == 0) ? 0 : (new CCol($proxy_queue['delay10']))

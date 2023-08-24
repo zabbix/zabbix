@@ -201,12 +201,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'host' => [
 				'null' => false,
@@ -328,18 +328,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 512,
 				'default' => ''
-			],
-			'proxy_address' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'auto_compress' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
 			],
 			'discover' => [
 				'null' => false,
@@ -500,12 +488,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'name' => [
 				'null' => false,
@@ -5264,12 +5252,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'host' => [
 				'null' => false,
@@ -6884,12 +6872,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			]
 		]
 	],
@@ -9070,24 +9058,6 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
-			],
-			'lastaccess' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'version' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
-			'compatibility' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			]
 		]
 	],
@@ -9676,6 +9646,117 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
+			]
+		]
+	],
+	'proxy' => [
+		'key' => 'proxyid',
+		'fields' => [
+			'proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
+			],
+			'mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'description' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'default' => ''
+			],
+			'tls_connect' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'tls_accept' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
+			'tls_issuer' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
+			],
+			'tls_subject' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => ''
+			],
+			'tls_psk_identity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => ''
+			],
+			'tls_psk' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 512,
+				'default' => ''
+			],
+			'allowed_addresses' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'address' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '127.0.0.1'
+			],
+			'port' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '10051'
+			]
+		]
+	],
+	'proxy_rtdata' => [
+		'key' => 'proxyid',
+		'fields' => [
+			'proxyid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
+			],
+			'lastaccess' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'version' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'compatibility' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],
