@@ -1475,7 +1475,7 @@ define('API_BOOLEAN',				4);
 define('API_FLAG',					5);
 define('API_FLOAT',					6);
 define('API_UINT64',				7);
-define('API_FILTER_VALUE',			60);
+define('API_VALUE',					60);
 // arrays
 define('API_OBJECT',				8);
 define('API_IDS',					9);

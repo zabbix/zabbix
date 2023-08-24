@@ -214,7 +214,8 @@ class CControllerAuditLogList extends CController {
 			CAudit::ACTION_DELETE => _('Delete'),
 			CAudit::ACTION_EXECUTE => _('Execute'),
 			CAudit::ACTION_HISTORY_CLEAR => _('History clear'),
-			CAudit::ACTION_CONFIG_REFRESH => _('Configuration refresh')
+			CAudit::ACTION_CONFIG_REFRESH => _('Configuration refresh'),
+			CAudit::ACTION_PUSH => _('Push')
 		];
 	}
 
@@ -236,6 +237,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::RESOURCE_GRAPH => _('Graph'),
 			CAudit::RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
 			CAudit::RESOURCE_HA_NODE => _('High availability node'),
+			CAudit::RESOURCE_HISTORY => _('History'),
 			CAudit::RESOURCE_HOST => _('Host'),
 			CAudit::RESOURCE_HOST_GROUP => _('Host group'),
 			CAudit::RESOURCE_HOST_PROTOTYPE => _('Host prototype'),
@@ -312,7 +314,8 @@ class CControllerAuditLogList extends CController {
 				$auditlog['short_details'] .= _('Description').': '.$auditlog['resourcename'];
 			}
 
-			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE])) {
+			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE,
+					CAudit::ACTION_PUSH])) {
 				continue;
 			}
 
@@ -329,7 +332,7 @@ class CControllerAuditLogList extends CController {
 			}
 
 			$details = $this->formatDetails($details);
-			$short_details =  array_slice($details, 0, 2);
+			$short_details = array_slice($details, 0, 2);
 
 			// We cut string and show "Details" button if audit detail string more than 255 symbols.
 			foreach ($short_details as &$detail) {
