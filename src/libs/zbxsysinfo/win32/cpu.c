@@ -22,7 +22,7 @@
 #include "win32_cpu.h"
 
 #include "../common/stats.h"
-#include "perfstat.h"
+#include "perfstat/perfstat.h"
 
 /* shortcut to avoid extra verbosity */
 typedef PSYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX PSYS_LPI_EX;

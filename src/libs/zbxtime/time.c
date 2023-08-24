@@ -393,6 +393,9 @@ int	zbx_day_in_month(int year, int mon)
  *                                                                            *
  * Return value: duration in milliseconds since time stamp till current time  *
  *                                                                            *
+ * Comments:                                                                  *
+ *     Timestamp value 'ts' must be before or equal to current time.          *
+ *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 {
@@ -400,7 +403,7 @@ zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 
 	zbx_timespec(&now);
 
-	return (now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6;
+	return (zbx_uint64_t)((now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6);
 }
 
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);

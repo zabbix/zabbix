@@ -35,12 +35,9 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata_item, NULL)
-
-char	*CONFIG_HOST_INTERFACE		= NULL;
-char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
-
+static char	*zbx_config_host_interface = NULL;
+static char	*zbx_config_host_interface_item = NULL;
 ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
-
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 1)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
@@ -53,11 +50,11 @@ ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
 
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
-int	CONFIG_BUFFER_SIZE		= 100;
-int	CONFIG_BUFFER_SEND		= 5;
+int	zbx_config_buffer_size		= 100;
+int	zbx_config_buffer_send		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND		= 20;
-int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND	= 20;
+static int	zbx_config_eventlog_max_lines_per_second = 20;
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 
@@ -81,7 +78,7 @@ static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
+int	zbx_config_heartbeat_frequency	= 60;
 
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
@@ -89,13 +86,12 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #endif
 
 #ifdef _WINDOWS
-#	include "perfstat.h"
 #	include "zbxwin32.h"
 #else
 #	include "zbxnix.h"
 #endif
 #include "active_checks/active_checks.h"
-#include "listener.h"
+#include "listener/listener.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -597,7 +593,10 @@ static void	set_defaults(void)
 		zbx_free_agent_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
-		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", zbx_config_hostnames);
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]",
+				zbx_config_hostnames);
+	}
 
 	if (NULL != zbx_config_host_metadata && NULL != zbx_config_host_metadata_item)
 	{
@@ -605,10 +604,10 @@ static void	set_defaults(void)
 				zbx_config_host_metadata);
 	}
 
-	if (NULL != CONFIG_HOST_INTERFACE && NULL != CONFIG_HOST_INTERFACE_ITEM)
+	if (NULL != zbx_config_host_interface && NULL != zbx_config_host_interface_item)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "both HostInterface and HostInterfaceItem defined, using [%s]",
-				CONFIG_HOST_INTERFACE);
+				zbx_config_host_interface);
 	}
 
 #ifndef _WINDOWS
@@ -675,7 +674,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
+	if (NULL != zbx_config_host_interface && HOST_INTERFACE_LEN < zbx_strlen_utf8(zbx_config_host_interface))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
 				" than %d characters", HOST_INTERFACE_LEN);
@@ -733,7 +732,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 != err)
 		exit(EXIT_FAILURE);
 
-	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
+	zbx_config_eventlog_max_lines_per_second = CONFIG_MAX_LINES_PER_SECOND;
 }
 
 static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
@@ -763,6 +762,13 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 				0 < hostnames->values_num ? hostnames->values[i] : "");
 		config_active_args[forks].config_host_metadata = zbx_config_host_metadata;
 		config_active_args[forks].config_host_metadata_item = zbx_config_host_metadata_item;
+		config_active_args[forks].config_heartbeat_frequency = zbx_config_heartbeat_frequency;
+		config_active_args[forks].config_host_interface = zbx_config_host_interface;
+		config_active_args[forks].config_host_interface_item = zbx_config_host_interface_item;
+		config_active_args[forks].config_buffer_send = zbx_config_buffer_send;
+		config_active_args[forks].config_buffer_size = zbx_config_buffer_size;
+		config_active_args[forks].config_eventlog_max_lines_per_second =
+				zbx_config_eventlog_max_lines_per_second;
 	}
 
 	return SUCCEED;
@@ -856,17 +862,17 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostMetadata",		&zbx_config_host_metadata,			TYPE_STRING,
+		{"HostMetadata",		&zbx_config_host_metadata,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostMetadataItem",		&zbx_config_host_metadata_item,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostInterface",		&CONFIG_HOST_INTERFACE,			TYPE_STRING,
+		{"HostInterface",		&zbx_config_host_interface,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostInterfaceItem",		&CONFIG_HOST_INTERFACE_ITEM,		TYPE_STRING,
+		{"HostInterfaceItem",		&zbx_config_host_interface_item,	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
+		{"BufferSize",			&zbx_config_buffer_size,		TYPE_INT,
 			PARM_OPT,	2,			65535},
-		{"BufferSend",			&CONFIG_BUFFER_SEND,			TYPE_INT,
+		{"BufferSend",			&zbx_config_buffer_send,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 #ifndef _WINDOWS
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
@@ -888,7 +894,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			5},
-		{"StartAgents",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER],			TYPE_INT,
+		{"StartAgents",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER],TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
 			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
@@ -961,7 +967,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
-		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
+		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	TYPE_INT,
 			PARM_OPT,	0,			3600},
 		{NULL}
 	};
@@ -1128,7 +1134,8 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 
 			break;
 		case ZBX_RTC_USER_PARAMETERS_RELOAD:
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags, NULL);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags,
+					NULL);
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags, NULL);
 			break;
 		default:
@@ -1246,7 +1253,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #ifdef _WINDOWS
-	if (SUCCEED != init_perf_collector(ZBX_MULTI_THREADED, &error))
+	if (SUCCEED != zbx_init_perf_collector(ZBX_MULTI_THREADED, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize performance counter collector: %s", error);
 		zbx_free(error);
@@ -1391,7 +1398,7 @@ void	zbx_free_service_resources(int ret)
 	zbx_free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
-	free_perf_collector();
+	zbx_free_perf_collector();
 	zbx_co_uninitialize();
 #endif
 #ifndef _WINDOWS
@@ -1515,7 +1522,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
-			if (SUCCEED != init_perf_collector(ZBX_SINGLE_THREADED, &error))
+			if (SUCCEED != zbx_init_perf_collector(ZBX_SINGLE_THREADED, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot initialize performance counter collector: %s",
 						error);
@@ -1527,7 +1534,8 @@ int	main(int argc, char **argv)
 			zbx_set_common_signal_handlers(zbx_on_exit);
 #endif
 #ifndef _WINDOWS
-			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout, 0))
+			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout,
+					0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(EXIT_FAILURE);
@@ -1549,7 +1557,7 @@ int	main(int argc, char **argv)
 			else
 				zbx_test_parameters();
 #ifdef _WINDOWS
-			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
+			zbx_free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 
 			while (0 == WSACleanup())
 				;

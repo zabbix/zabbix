@@ -178,7 +178,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test update functionality in host form and interfaces',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20000,
+				'proxyid' => 20000,
 				'status' => HOST_STATUS_MONITORED
 			],
 			[
@@ -186,7 +186,7 @@ class testFormHost extends CWebTest {
 				'description' => 'Created host via API to test clone functionality in host form and interfaces 😀',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => 20000,
+				'proxyid' => 20000,
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -2094,8 +2094,8 @@ class testFormHost extends CWebTest {
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
-						['name' => 'Host groups', 'value' => ['Group created from host prototype 1', 'Group for discovered host test'],
-								'enabled' => false],
+						['name' => 'Host groups', 'value' => ['Group created from host prototype 1',
+								'Group for discovered host test'], 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',

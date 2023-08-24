@@ -36,12 +36,12 @@ typedef struct
 	char		*posts;
 	char		*status_codes;
 }
-zbx_dc_item_context_t;
+zbx_dc_httpitem_context_t;
 
 typedef struct
 {
 	zbx_http_context_t	http_context;
-	zbx_dc_item_context_t	item_context;
+	zbx_dc_httpitem_context_t	item_context;
 }
 zbx_httpagent_context;
 

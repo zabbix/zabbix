@@ -750,14 +750,13 @@ typedef struct
 	char				*version_str;
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
-	int				lastaccess;
-	int				last_version_error_time;
+	time_t				lastaccess;
+	time_t				last_version_error_time;
 	int				proxy_delay;
 	int				more_data;
 	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
@@ -765,7 +764,6 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
-		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
 	zbx_uint64_t			flags;
@@ -943,5 +941,8 @@ typedef struct
 	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
+
+#define PROXY_MODE_ACTIVE	0
+#define PROXY_MODE_PASSIVE	1
 
 #endif
