@@ -1480,7 +1480,6 @@ else {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => getRequest('filter_groupids'),
-				'editable' => true
 			]), ['groupid' => 'id'])
 			: [],
 		'hosts' => $host_template_filter,
