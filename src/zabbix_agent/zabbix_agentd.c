@@ -43,7 +43,7 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 1)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
-int	CONFIG_LISTEN_PORT			= ZBX_DEFAULT_AGENT_PORT;
+static int	zbx_config_listen_port			= ZBX_DEFAULT_AGENT_PORT;
 static char	*zbx_config_listen_ip			= NULL;
 static int	zbx_config_refresh_active_checks	= 5;
 
@@ -755,11 +755,12 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
-		config_active_args[forks].config_timeout = zbx_config_timeout;
-		config_active_args[forks].config_file = config_file;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].config_file = config_file;
+		config_active_args[forks].config_timeout = zbx_config_timeout;
 		config_active_args[forks].config_source_ip = zbx_config_source_ip;
 		config_active_args[forks].config_listen_ip = zbx_config_listen_ip;
+		config_active_args[forks].config_listen_port = zbx_config_listen_port;
 		config_active_args[forks].config_hostname = zbx_config_hostname = zbx_strdup(NULL,
 				0 < hostnames->values_num ? hostnames->values[i] : "");
 		config_active_args[forks].config_host_metadata = zbx_config_host_metadata;
@@ -890,7 +891,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1024},
 		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
+		{"ListenPort",			&zbx_config_listen_port,	       	TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
@@ -1231,7 +1232,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
-		if (FAIL == zbx_tcp_listen(&listen_sock, zbx_config_listen_ip, (unsigned short)CONFIG_LISTEN_PORT,
+		if (FAIL == zbx_tcp_listen(&listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
