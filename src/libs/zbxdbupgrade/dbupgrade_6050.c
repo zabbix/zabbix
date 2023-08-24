@@ -386,25 +386,25 @@ static int	DBpatch_6050034(void)
 {
 	int ret;
 
-	const zbx_db_field_t	takes_userinput = {"takes_userinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-	const zbx_db_field_t	userinput_prompt = {"userinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-	const zbx_db_field_t	userinput_validator = {"userinput_validator", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	takes_manualinput = {"takes_manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	manualinput_prompt = {"manualinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	manualinput_validator = {"manualinput_validator", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	/*
 	 * The below default value is an invalid one.
 	 * This should never happen in practice when describing new scripts.
 	 */
-	const zbx_db_field_t	userinput_validator_type = {"userinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
-	const zbx_db_field_t	userinput_default_value = {"userinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	manualinput_validator_type = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	manualinput_default_value = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED != (ret = DBadd_field("scripts", &takes_userinput)))
+	if (SUCCEED != (ret = DBadd_field("scripts", &takes_manualinput)))
 		return ret;
-	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_prompt)))
+	if (SUCCEED != (ret = DBadd_field("scripts", &manualinput_prompt)))
 		return ret;
-	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_validator)))
+	if (SUCCEED != (ret = DBadd_field("scripts", &manualinput_validator)))
 		return ret;
-	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_validator_type)))
+	if (SUCCEED != (ret = DBadd_field("scripts", &manualinput_validator_type)))
 		return ret;
-	if (SUCCEED != (ret = DBadd_field("scripts", &userinput_default_value)))
+	if (SUCCEED != (ret = DBadd_field("scripts", &manualinput_default_value)))
 		return ret;
 
 	return SUCCEED;

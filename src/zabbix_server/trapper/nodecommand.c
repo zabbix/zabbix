@@ -151,7 +151,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	db_result = zbx_db_select("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
 			",username,password,publickey,privatekey"
-			",takes_userinput,userinput_validator,userinput_validator_type"
+			",takes_manualinput,manualinput_validator,manualinput_validator_type"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
 
@@ -192,12 +192,12 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		script->password = zbx_strdup(script->password, row[11]);
 	}
 
-	ZBX_STR2UCHAR(script->takes_userinput, row[14]);
+	ZBX_STR2UCHAR(script->takes_manualinput, row[14]);
 
-	if (ZBX_SCRIPT_TAKES_USERINPUT_YES == script->takes_userinput)
+	if (ZBX_SCRIPT_TAKES_MANUALINPUT_YES == script->takes_manualinput)
 	{
-		script->userinput_validator = zbx_strdup(script->userinput_validator, row[15]);
-		ZBX_STR2UCHAR(script->userinput_validator_type, row[16]);
+		script->manualinput_validator = zbx_strdup(script->manualinput_validator, row[15]);
+		ZBX_STR2UCHAR(script->manualinput_validator_type, row[16]);
 	}
 
 	script->command = zbx_strdup(script->command, row[0]);
@@ -289,7 +289,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                            *
  * Purpose: validates a given user input with a validator of a given type     *
  *                                                                            *
- * Parameters:  userinput       - [IN] the user provided input string         *
+ * Parameters:  manualinput     - [IN] the user provided input string         *
  *              validator       - [IN] a string containing a validator        *
  *              validator_type  - [IN] indicator for how to interpret the     *
  *                                     validator string                       *
@@ -297,20 +297,20 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  * Return value:  SUCCEED or FAIL                                             *
  *                                                                            *
  ******************************************************************************/
-static int validate_userinput(const char *userinput, const char *validator, const unsigned char validator_type)
+static int validate_manualinput(const char *manualinput, const char *validator, const unsigned char validator_type)
 {
 	int ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userinput:%s, validator:%s, validator_type:" ZBX_FS_UI64,
-			__func__, userinput, validator, validator_type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() manualinput:%s, validator:%s, validator_type:" ZBX_FS_UI64,
+			__func__, manualinput, validator, validator_type);
 
 	switch (validator_type)
 	{
 		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX:
-			ret = (NULL != zbx_regexp_match(userinput, validator, NULL) ? SUCCEED : FAIL);
+			ret = (NULL != zbx_regexp_match(manualinput, validator, NULL) ? SUCCEED : FAIL);
 			break;
 		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST:
-			ret = is_value_in_csv_list(userinput, validator);
+			ret = is_value_in_csv_list(manualinput, validator);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -330,7 +330,7 @@ static int validate_userinput(const char *userinput, const char *validator, cons
  *              eventid          - [IN] the id of an event                      *
  *              user             - [IN] the user who executes the command       *
  *              clientip         - [IN] the IP of client                        *
- *              userinput        - [IN] user provided value to the script       *
+ *              manualinput      - [IN] user provided value to the script       *
  *              config_timeout   - [IN]                                         *
  *              config_source_ip - [IN]                                         *
  *              result           - [OUT] the result of a script execution       *
@@ -343,7 +343,7 @@ static int validate_userinput(const char *userinput, const char *validator, cons
  *                                                                              *
  ********************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
-		const char *clientip, const char *userinput, int config_timeout, const char *config_source_ip, char **result, char **debug)
+		const char *clientip, const char *manualinput, int config_timeout, const char *config_source_ip, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
 	zbx_dc_host_t		host;
@@ -357,8 +357,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
-			" userid:" ZBX_FS_UI64 " clientip:%s, userinput:%s",
-			__func__, scriptid, hostid, eventid, user->userid, clientip, userinput);
+			" userid:" ZBX_FS_UI64 " clientip:%s, manualinput:%s",
+			__func__, scriptid, hostid, eventid, user->userid, clientip, manualinput);
 
 	*error = '\0';
 	memset(&host, 0, sizeof(host));
@@ -496,31 +496,31 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	/* substitute macros in script body and webhook parameters */
 
-	if (ZBX_SCRIPT_TAKES_USERINPUT_YES == script.takes_userinput)
+	if (ZBX_SCRIPT_TAKES_MANUALINPUT_YES == script.takes_manualinput)
 	{
 		char *expanded_cmd;
 		size_t expanded_cmd_size;
 
-		if (NULL == userinput)
+		if (NULL == manualinput)
 		{
 			zbx_strlcpy(error, "Script takes user input, but none was provided.", sizeof(error));
 			goto fail;
 		}
 
-		if (FAIL == validate_userinput(userinput, script.userinput_validator, script.userinput_validator_type))
+		if (FAIL == validate_manualinput(manualinput, script.manualinput_validator, script.manualinput_validator_type))
 		{
 			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
 			goto fail;
 		}
 
-		substitute_macro(script.command, "{USERINPUT}", userinput, &expanded_cmd, &expanded_cmd_size);
+		substitute_macro(script.command, "{MANUALINPUT}", manualinput, &expanded_cmd, &expanded_cmd_size);
 
 		if (NULL == (script.command = zbx_strdup(script.command, expanded_cmd)))
 			goto fail;
 
 		zbx_free(expanded_cmd);
 	}
-	else if (NULL == userinput) /* script does not take additional input yet we've received a value anyway */
+	else if (NULL == manualinput) /* script does not take additional input yet we've received a value anyway */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): script (scriptid:" ZBX_FS_UI64 ") "
 				"does not accept additional manual input, but request contains it anyway",
@@ -691,8 +691,8 @@ static int	check_user_administration_actions_permissions(const zbx_user_t *user,
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout,
 		const char *config_source_ip)
 {
-	char			*result = NULL, *send = NULL, *debug = NULL, *userinput = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
-				clientip[MAX_STRING_LEN], tmp_userinput[MAX_STRING_LEN];
+	char			*result = NULL, *send = NULL, *debug = NULL, *manualinput = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
+				clientip[MAX_STRING_LEN], tmp_manualinput[MAX_STRING_LEN];
 	int			ret = FAIL, got_hostid = 0, got_eventid = 0;
 	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	struct zbx_json		j;
@@ -787,10 +787,10 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_USERINPUT, tmp_userinput, sizeof(tmp_userinput), NULL))
-		userinput = tmp_userinput;
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MANUALINPUT, tmp_manualinput, sizeof(tmp_manualinput), NULL))
+		manualinput = tmp_manualinput;
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, userinput, config_timeout,
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, manualinput, config_timeout,
 			config_source_ip, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
