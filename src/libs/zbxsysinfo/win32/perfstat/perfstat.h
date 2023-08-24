@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,28 +17,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_PERFSTAT_H
+#define ZABBIX_PERFSTAT_H
 
-/**
- * @var CView $this
- */
-?>
+#ifndef _WINDOWS
+#	error "This module is only available for Windows OS"
+#endif
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
-</script>
+#include "zbxwin32.h"
 
-<script type="text/javascript">
-	jQuery(function($) {
-		$('#filter-tags')
-			.dynamicRows({template: '#filter-tag-row-tmpl'})
-			.on('afteradd.dynamicRows', function() {
-				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length - 1]);
-			});
+void	collect_perfstat(void);
 
-		// Init existing fields once loaded.
-		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-			new CTagFilterItem(row);
-		});
-	});
-</script>
+int	get_perf_counter_value_by_name(const char *name, double *value, char **error);
+int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_perf_counter_lang_t lang,
+		double *value, char **error);
+int	get_perf_counter_value(zbx_perf_counter_data_t *counter, int interval, double *value, char **error);
+int	refresh_object_cache(void);
+wchar_t	*get_object_name_local(char *eng_name);
+
+#endif

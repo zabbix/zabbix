@@ -552,7 +552,9 @@ $html_page
 			'normal_only' => $data['normal_only'],
 			'parent_discoveryid' => $data['parent_discoveryid']
 		],
-		'items' => $data['items']
+		'items' => $data['items'],
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

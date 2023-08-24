@@ -19,37 +19,37 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/forms.inc.php';
+require_once __DIR__.'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstract {
+class CControllerTemplateMassupdate extends CControllerPopupMassupdateAbstract {
 
 	protected function checkInput() {
 		$fields = [
-			'ids' => 'required|array_id',
-			'update' => 'in 1',
-			'visible' => 'array',
-			'groups' => 'array',
-			'tags' => 'array',
-			'macros' => 'array',
-			'linked_templates' => 'array',
-			'valuemaps' => 'array',
-			'valuemap_remove' => 'array',
-			'valuemap_remove_except' => 'in 1',
-			'valuemap_remove_all' => 'in 1',
-			'valuemap_rename' => 'array',
-			'valuemap_update_existing' => 'in 1',
-			'valuemap_add_missing' => 'in 1',
-			'mass_action_tpls' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-			'mass_clear_tpls' => 'in 0,1',
-			'mass_update_groups' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-			'mass_update_tags' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
-			'mass_update_macros' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
-			'valuemap_massupdate' => 'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_RENAME, ZBX_ACTION_REMOVE_ALL]),
-			'description' => 'string',
-			'macros_add' => 'in 0,1',
-			'macros_update' => 'in 0,1',
-			'macros_remove' => 'in 0,1',
-			'macros_remove_all' => 'in 0,1'
+			'ids' =>						'required|array_id',
+			'update' =>						'in 1',
+			'visible' =>					'array',
+			'groups' =>						'array',
+			'tags' =>						'array',
+			'macros' =>						'array',
+			'linked_templates' =>			'array',
+			'valuemaps' =>					'array',
+			'valuemap_remove' =>			'array',
+			'valuemap_remove_except' =>		'in 1',
+			'valuemap_remove_all' =>		'in 1',
+			'valuemap_rename' =>			'array',
+			'valuemap_update_existing' =>	'in 1',
+			'valuemap_add_missing' =>		'in 1',
+			'mass_action_tpls' =>			'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+			'mass_clear_tpls' =>			'in 0,1',
+			'mass_update_groups' =>			'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+			'mass_update_tags' =>			'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE]),
+			'mass_update_macros' =>			'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_REMOVE_ALL]),
+			'valuemap_massupdate' =>		'in '.implode(',', [ZBX_ACTION_ADD, ZBX_ACTION_REPLACE, ZBX_ACTION_REMOVE, ZBX_ACTION_RENAME, ZBX_ACTION_REMOVE_ALL]),
+			'description' =>				'string',
+			'macros_add' =>					'in 0,1',
+			'macros_update' =>				'in 0,1',
+			'macros_remove' =>				'in 0,1',
+			'macros_remove_all' =>			'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -387,7 +387,11 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 					'debug_mode' => $this->getDebugMode()
 				],
 				'ids' => $this->getInput('ids'),
-				'location_url' => 'templates.php'
+				'location_url' =>  (new CUrl('zabbix.php'))
+					->setArgument('action', 'template.list')
+					->setArgument('page', CPagerHelper::loadPage('template.list'))
+					->setArgument('uncheck', 1)
+					->getUrl()
 			];
 
 			$this->setResponse(new CControllerResponseData($data));

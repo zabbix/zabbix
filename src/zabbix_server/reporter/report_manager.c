@@ -469,7 +469,8 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 		session = (zbx_rm_session_t *)zbx_hashset_insert(&manager->sessions, &session_local,
 				sizeof(session_local));
 
-		zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", NULL);
+		zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status",
+				(char *)NULL);
 		zbx_db_insert_add_values(&db_insert, session->sid, userid, now, ZBX_SESSION_ACTIVE);
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);

@@ -506,7 +506,7 @@ out:
  * Return value: SUCCEED/FAIL                                                 *
  *                                                                            *
  * Comments: This function should be normally called during agent             *
- *           initialization from init_perf_collector().                       *
+ *           initialization from zbx_init_perf_collector().                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_builtin_counter_indexes(void)
