@@ -30,7 +30,7 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 			->setPopupParameter('value_types', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 	)
 	->addField(
