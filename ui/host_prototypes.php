@@ -144,10 +144,10 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
 
 	if (hasRequest('group_prototypes')) {
-		foreach ($_REQUEST['group_prototypes'] as &$groupPrototype) {
-			unset($groupPrototype['group_prototypeid']);
+		foreach ($_REQUEST['group_prototypes'] as &$group_prototype) {
+			unset($group_prototype['group_prototypeid']);
 		}
-		unset($groupPrototype);
+		unset($group_prototype);
 	}
 
 	$warnings = [];

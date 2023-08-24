@@ -1345,15 +1345,16 @@ class CHostPrototype extends CHostBase {
 				}
 
 				if (array_key_exists('group_prototypeid', $group_prototype)) {
-					if (!array_key_exists($group_prototype['group_prototypeid'], $db_host['groupPrototypes'])) {
+					$group_prototypeid = $group_prototype['group_prototypeid'];
+
+					if (!array_key_exists($group_prototypeid, $db_host['groupPrototypes'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 							$path.'/'.($i2 + 1).'/group_prototypeid',
-							_('cannot be an group prototype ID from another host prototype.')
+							_('cannot be a group prototype ID from another host prototype')
 						));
 					}
 
-					$db_group_prototype = $db_host['groupPrototypes'][$group_prototype['group_prototypeid']];
-					$group_prototype += ['name' => $db_group_prototype['name']];
+					$group_prototype += ['name' => $db_host['groupPrototypes'][$group_prototypeid]['name']];
 				}
 			}
 			unset($group_prototype);

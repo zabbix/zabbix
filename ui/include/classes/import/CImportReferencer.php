@@ -1153,9 +1153,9 @@ class CImportReferencer {
 	}
 
 	/**
-	 * Add user macro names that need association with a database macro ID.
+	 * Add group prototype names that need association with a database group prototype ID.
 	 *
-	 * @param array $macros[<host name>]  An array of macros by host technical name.
+	 * @param array $group_prototypes
 	 */
 	public function addGroupPrototypes(array $group_prototypes): void {
 		$this->group_prototypes = $group_prototypes;
