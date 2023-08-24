@@ -57,11 +57,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'preservekeys' => true
 		];
 
-		$has_override_hostid = (bool) $this->fields_values['override_hostid'];
-
 		$tmp_items = [];
 
-		if ($has_override_hostid) {
+		if ($this->fields_values['override_hostid']) {
 			$tmp_items = API::Item()->get([
 				'output' => ['key_'],
 				'itemids' => $this->fields_values['itemid'],
@@ -90,7 +88,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
 		 */
 		if ($this->getInput('name', '') === '') {
-			if (!$this->isTemplateDashboard() || ($has_override_hostid && $tmp_items)) {
+			if (!$this->isTemplateDashboard() || ($this->fields_values['override_hostid'] && $tmp_items)) {
 				$options['output'] = array_merge($options['output'], ['name']);
 			}
 
@@ -100,7 +98,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		// Add other fields in case current widget is set in dynamic mode, template dashboard or has a specified host.
-		if (($has_override_hostid && $tmp_items) || !$has_override_hostid) {
+		if (($this->fields_values['override_hostid'] && $tmp_items) || !$this->fields_values['override_hostid']) {
 			// If description contains user macros, we need "itemid" and "hostid" to resolve them.
 			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
@@ -111,7 +109,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if ($has_override_hostid) {
+		if ($this->fields_values['override_hostid']) {
 			if ($tmp_items) {
 				$items = API::Item()->get($options);
 				$itemid = key($items);
@@ -222,7 +220,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($this->getInput('name', '') === '') {
-				if (!$this->isTemplateDashboard() || $has_override_hostid) {
+				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 					// Resolve original item name when user is in normal dashboards or template dashboards view mode.
 					$name = $items[$itemid]['name'];
 				}
@@ -241,7 +239,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$items[$itemid]['widget_description'] = $this->fields_values['description'];
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
-				if (!$this->isTemplateDashboard() || $has_override_hostid) {
+				if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 					$items = CMacrosResolverHelper::resolveItemWidgetDescriptions($items);
 				}
 
