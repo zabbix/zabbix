@@ -629,10 +629,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 		unset($formatted_total_value['is_numeric']);
 
-		$total_value = [
-			'value' => $raw_total_value,
-			'formatted_value' => $formatted_total_value
-		];
+		$total_value['value'] = $raw_total_value;
+
+		if ($raw_total_value !== null && $raw_total_value !== 0) {
+			$total_value['formatted_value'] = $formatted_total_value;
+		}
 	}
 
 	/**
