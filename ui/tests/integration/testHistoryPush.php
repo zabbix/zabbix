@@ -586,7 +586,7 @@ class testHistoryPush extends CIntegrationTest {
 			'value' => 0,
 			'clock' => $tm,
 			'ns' => 500
-			],
+			]
 		]);
 
 		$this->assertEquals(2, count($response['result']['data']));
