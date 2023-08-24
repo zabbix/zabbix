@@ -883,7 +883,6 @@ static int	DBpatch_6050082(void)
 	return SUCCEED;
 }
 
-
 static int	DBpatch_6050083(void)
 {
 	if (FAIL == zbx_db_index_exists("sysmap_usrgrp", "sysmap_usrgrp_2"))
