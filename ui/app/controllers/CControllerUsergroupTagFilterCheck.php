@@ -92,6 +92,18 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 					return false;
 				}
+
+				if (strlen($tag_filter['tag']) > DB::getFieldLength('tag_filter', 'tag')) {
+					error(_s('Invalid parameter "%1$s": %2$s.', _('Tag'), _('value is too long')));
+
+					return false;
+				}
+
+				if (strlen($tag_filter['value']) > DB::getFieldLength('tag_filter', 'value')) {
+					error(_s('Invalid parameter "%1$s": %2$s.', _('Value'), _('value is too long')));
+
+					return false;
+				}
 			}
 		}
 		elseif ($this->getInput('filter_type') == TAG_FILTER_LIST) {
