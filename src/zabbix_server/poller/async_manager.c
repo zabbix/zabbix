@@ -109,7 +109,7 @@ void	zbx_async_manager_free(zbx_async_manager_t *manager)
 	for (i = 0; i < manager->workers_num; i++)
 		async_worker_stop(&manager->workers[i]);
 
-	async_task_queue_notify_all(&manager->queue);
+	async_task_queue_notify(&manager->queue);
 	async_task_queue_unlock(&manager->queue);
 
 	for (i = 0; i < manager->workers_num; i++)

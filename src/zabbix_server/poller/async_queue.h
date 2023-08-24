@@ -56,6 +56,5 @@ void	async_task_queue_unlock(zbx_async_queue_t *queue);
 void	async_task_queue_register_worker(zbx_async_queue_t *queue);
 void	async_task_queue_deregister_worker(zbx_async_queue_t *queue);
 int	async_task_queue_wait(zbx_async_queue_t *queue, char **error);
-void	async_task_queue_notify_all(zbx_async_queue_t *queue);
 void	async_task_queue_notify(zbx_async_queue_t *queue);
 #endif

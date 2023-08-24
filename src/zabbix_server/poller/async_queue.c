@@ -23,16 +23,16 @@
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 
-#define PP_TASK_QUEUE_INIT_NONE		0x00
-#define PP_TASK_QUEUE_INIT_LOCK		0x01
-#define PP_TASK_QUEUE_INIT_EVENT	0x02
+#define ASYNC_TASK_QUEUE_INIT_NONE	0x00
+#define ASYNC_TASK_QUEUE_INIT_LOCK	0x01
+#define ASYNC_TASK_QUEUE_INIT_EVENT	0x02
 
 void	async_task_queue_destroy(zbx_async_queue_t *queue)
 {
-	if (0 != (queue->init_flags & PP_TASK_QUEUE_INIT_LOCK))
+	if (0 != (queue->init_flags & ASYNC_TASK_QUEUE_INIT_LOCK))
 		pthread_mutex_destroy(&queue->lock);
 
-	if (0 != (queue->init_flags & PP_TASK_QUEUE_INIT_EVENT))
+	if (0 != (queue->init_flags & ASYNC_TASK_QUEUE_INIT_EVENT))
 		pthread_cond_destroy(&queue->event);
 
 	zbx_vector_uint64_destroy(&queue->itemids);
@@ -44,7 +44,7 @@ void	async_task_queue_destroy(zbx_async_queue_t *queue)
 	zbx_vector_interface_status_clear_ext(&queue->interfaces, zbx_interface_status_free);
 	zbx_vector_interface_status_destroy(&queue->interfaces);
 
-	queue->init_flags = PP_TASK_QUEUE_INIT_NONE;
+	queue->init_flags = ASYNC_TASK_QUEUE_INIT_NONE;
 }
 
 int	async_task_queue_init(zbx_async_queue_t *queue, zbx_thread_poller_args *poller_args_in, char **error)
@@ -71,14 +71,14 @@ int	async_task_queue_init(zbx_async_queue_t *queue, zbx_thread_poller_args *poll
 		*error = zbx_dsprintf(NULL, "cannot initialize task queue mutex: %s", zbx_strerror(err));
 		goto out;
 	}
-	queue->init_flags |= PP_TASK_QUEUE_INIT_LOCK;
+	queue->init_flags |= ASYNC_TASK_QUEUE_INIT_LOCK;
 
 	if (0 != (err = pthread_cond_init(&queue->event, NULL)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot initialize task queue conditional variable: %s", zbx_strerror(err));
 		goto out;
 	}
-	queue->init_flags |= PP_TASK_QUEUE_INIT_EVENT;
+	queue->init_flags |= ASYNC_TASK_QUEUE_INIT_EVENT;
 
 	ret = SUCCEED;
 out:
@@ -141,22 +141,10 @@ int	async_task_queue_wait(zbx_async_queue_t *queue, char **error)
 	return SUCCEED;
 }
 
-void	async_task_queue_notify_all(zbx_async_queue_t *queue)
-{
-	int	err;
-
-	if (0 != (err = pthread_cond_broadcast(&queue->event)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot broadcast conditional variable: %s", zbx_strerror(err));
-	}
-}
-
 void	async_task_queue_notify(zbx_async_queue_t *queue)
 {
 	int	err;
 
 	if (0 != (err = pthread_cond_signal(&queue->event)))
-	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot signal conditional variable: %s", zbx_strerror(err));
-	}
 }
