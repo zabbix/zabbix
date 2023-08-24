@@ -19,10 +19,10 @@
 
 class CSVGPie {
 
-	static ZBX_STYLE_CLASS =				'svg-pie-chart';
+	static ZBX_STYLE_CLASS =					'svg-pie-chart';
 	static ZBX_STYLE_ARCS =					'svg-pie-chart-arcs';
-	static ZBX_STYLE_ARC_NO_DATA_OUTER =	'svg-pie-chart-arc-no-data-outer';
-	static ZBX_STYLE_ARC_NO_DATA_INNER =	'svg-pie-chart-arc-no-data-inner';
+	static ZBX_STYLE_ARC_NO_DATA_OUTER =		'svg-pie-chart-arc-no-data-outer';
+	static ZBX_STYLE_ARC_NO_DATA_INNER =		'svg-pie-chart-arc-no-data-inner';
 	static ZBX_STYLE_TOTAL_VALUE =			'svg-pie-chart-total-value';
 	static ZBX_STYLE_TOTAL_VALUE_NO_DATA =	'svg-pie-chart-total-value-no-data';
 
@@ -215,6 +215,27 @@ class CSVGPie {
 
 			if (this.#config.total_value?.show) {
 				this.#total_value_container
+					.text(() => {
+						let text = total_value.value;
+
+						if (this.#config.total_value.units_show && total_value.units !== '') {
+							text += ` ${total_value.units}`;
+						}
+
+						return text;
+					});
+
+				this.#total_value_container
+					.style('display', '');
+			}
+		}
+		else {
+			if (this.#config.total_value?.show) {
+				this.#total_value_container
+					.text('')
+					.style('display', 'none');
+
+				this.#no_data_container
 					.style('display', '');
 			}
 		}
@@ -317,34 +338,9 @@ class CSVGPie {
 
 					this.#no_data_container
 						.style('display', '');
-
-					if (this.#config.total_value?.show) {
-						this.#total_value_container
-							.style('display', 'none');
-					}
 				}
 			})
 			.catch(() => {});
-
-		if (this.#config.total_value?.show) {
-			this.#total_value_container
-				.text(() => {
-					let text = '';
-
-					if (total_value.value === null) {
-						text = total_value.value_text;
-					}
-					else {
-						text = total_value.value;
-
-						if (this.#config.total_value.units_show && total_value.units !== '') {
-							text += ` ${total_value.units}`;
-						}
-					}
-
-					return text;
-				});
-		}
 	}
 
 	/**
