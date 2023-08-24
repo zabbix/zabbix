@@ -41,7 +41,7 @@ zabbix_export:
         
         Consult the PostgreSQL documentation about protection modes (https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) and client connection parameters (https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNECT-SSLMODE).
         
-        Also it is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the PostgreSQL documentation (https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
+        Also, it is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the PostgreSQL documentation (https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
         
         4. Edit the `pg_hba.conf` configuration file to allow connections for the user `zbx_monitor`. You can check the PostgreSQL documentation for examples (https://www.postgresql.org/docs/current/auth-pg-hba-conf.html).
         
