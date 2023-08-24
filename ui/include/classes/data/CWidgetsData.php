@@ -50,7 +50,7 @@ class CWidgetsData {
 	 *
 	 * @return array[]
 	 */
-	public static function getDataTypes() {
+	public static function getDataTypes(): array {
 		static $data_types;
 
 		if ($data_types === null) {

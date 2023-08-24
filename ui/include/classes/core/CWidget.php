@@ -30,18 +30,7 @@ use Zabbix\Widgets\{
 	CWidgetForm
 };
 
-use Zabbix\Widgets\Fields\{
-	CWidgetFieldMultiSelectGraph,
-	CWidgetFieldMultiSelectGraphPrototype,
-	CWidgetFieldMultiSelectGroup,
-	CWidgetFieldMultiSelectHost,
-	CWidgetFieldMultiSelectItem,
-	CWidgetFieldMultiSelectItemPrototype,
-	CWidgetFieldMultiSelectMap,
-	CWidgetFieldMultiSelectService,
-	CWidgetFieldMultiSelectSla,
-	CWidgetFieldSelect
-};
+use Zabbix\Widgets\Fields\CWidgetFieldSelect;
 
 /**
  * Base class for user widgets. If Widget.php is not provided by user widget, this class will be instantiated instead.
@@ -87,7 +76,7 @@ class CWidget extends CModule {
 			$form->addFields();
 		}
 
-		$data_types_spec = CWidgetsData::getDataTypes();
+		$data_types = CWidgetsData::getDataTypes();
 
 		/** @var CWidgetField $field */
 		foreach ($form->getFields() as $field) {
@@ -96,8 +85,8 @@ class CWidget extends CModule {
 
 				$field->setInType($data_type);
 
-				if (array_key_exists($data_type, $data_types_spec)) {
-					$data_type_spec = $data_types_spec[$data_type];
+				if (array_key_exists($data_type, $data_types)) {
+					$data_type_spec = $data_types[$data_type];
 
 					if ($data_type_spec['accepts_dashboard_host'] || $data_type_spec['accepts_dashboard_time_period']) {
 						$field->acceptDashboard();
@@ -219,9 +208,9 @@ class CWidget extends CModule {
 	}
 
 	private function makeField($name, $param): ?CWidgetField {
-		$data_types_spec = CWidgetsData::getDataTypes();
+		$data_types = CWidgetsData::getDataTypes();
 
-		if (!array_key_exists($param['type'], $data_types_spec)) {
+		if (!array_key_exists($param['type'], $data_types)) {
 			return null;
 		}
 
@@ -229,7 +218,7 @@ class CWidget extends CModule {
 			'field_class' => $field_class,
 			'label' => $label,
 			'is_multiple' => $is_multiple
-		] = $data_types_spec[$param['type']];
+		] = $data_types[$param['type']];
 
 		return (new $field_class($name, $label))->setMultiple($is_multiple);
 	}

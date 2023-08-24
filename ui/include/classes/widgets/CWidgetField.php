@@ -134,6 +134,10 @@ abstract class CWidgetField {
 		return $this;
 	}
 
+	public function getDefault() {
+		return $this->default;
+	}
+
 	public function setDefault($value): self {
 		$this->default = $value;
 

@@ -181,7 +181,7 @@ class CDashboardHelper {
 		foreach ($widgets_and_forms as ['form' => $form]) {
 			foreach ($form->getFields() as $field) {
 				if ($field->isDashboardAccepted()) {
-					$data_type = $data_types[$field->getInType()];
+					$data_type_spec = $data_types[$field->getInType()];
 
 					$value = $field->getValue();
 
@@ -194,11 +194,11 @@ class CDashboardHelper {
 					] = CWidgetField::parseTypedReference($value[CWidgetField::FOREIGN_REFERENCE_KEY]);
 
 					if ($reference === CWidgetField::REFERENCE_DASHBOARD) {
-						if ($data_type['accepts_dashboard_host']) {
+						if ($data_type_spec['accepts_dashboard_host']) {
 							$use_dashboard_host = true;
 						}
 
-						if ($data_type['accepts_dashboard_time_period']) {
+						if ($data_type_spec['accepts_dashboard_time_period']) {
 							$use_dashboard_time_period = true;
 						}
 					}
