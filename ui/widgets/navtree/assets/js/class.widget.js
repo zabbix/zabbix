@@ -25,9 +25,9 @@ class CWidgetNavTree extends CWidget {
 
 	static WIDGET_MAP_EVENT_SUBMAP_SELECT = 'widget-map.submap-select';
 
-	static hasReferenceField() {
-		return true;
-	}
+	// static hasReferenceField() {
+	// 	return true;
+	// }
 
 	onInitialize() {
 		this._severity_levels = null;
@@ -61,22 +61,22 @@ class CWidgetNavTree extends CWidget {
 		this._deactivateContentsEvents();
 	}
 
-	announceWidgets(widgets) {
-		super.announceWidgets(widgets);
-		this._deactivateContentsEvents();
+	// announceWidgets(widgets) {
+	// 	super.announceWidgets(widgets);
+	// 	this._deactivateContentsEvents();
 
-		this._maps = [];
+	// 	this._maps = [];
 
-		for (const widget of widgets) {
-			if (this._fields.reference === widget._fields.filter_widget_reference) {
-				this._maps.push(widget);
-			}
-		}
+	// 	for (const widget of widgets) {
+	// 		if (this._fields.reference === widget._fields.filter_widget_reference) {
+	// 			this._maps.push(widget);
+	// 		}
+	// 	}
 
-		if (this._has_contents) {
-			this._activateContentsEvents();
-		}
-	}
+	// 	if (this._has_contents) {
+	// 		this._activateContentsEvents();
+	// 	}
+	// }
 
 	getDataCopy({is_single_copy}) {
 		this._deactivateContentsEvents();
@@ -225,10 +225,16 @@ class CWidgetNavTree extends CWidget {
 						[this._widgetid]
 					);
 
-					this.fire(CWidgetNavTree.EVENT_SELECT, {
-						sysmapid: this._navtree[this._navtree_item_selected].sysmapid,
-						itemid: this._navtree_item_selected
-					});
+// TODO AS: itemid is selected item from navigation
+
+// 					this.fire(CWidgetNavTree.EVENT_SELECT, {
+// 						sysmapid: this._navtree[this._navtree_item_selected].sysmapid,
+// 						itemid: this._navtree_item_selected
+// 					});
+
+					this.broadcast({_mapid: this._navtree[this._navtree_item_selected].sysmapid});
+
+					this.feedback({'sysmapid': this._navtree[this._navtree_item_selected].sysmapid});
 				}
 
 				e.preventDefault();
@@ -275,8 +281,10 @@ class CWidgetNavTree extends CWidget {
 			if (this._markTreeItemSelected(this._navtree_item_selected)) {
 				sysmapid = this._navtree[this._navtree_item_selected].sysmapid;
 			}
+// TODO AS: itemid is selected item from navigation
+			// this.fire(CWidgetNavTree.EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
 
-			this.fire(CWidgetNavTree.EVENT_SELECT, {sysmapid, itemid: this._navtree_item_selected});
+			this.broadcast({_mapid: sysmapid});
 		}
 	}
 

@@ -31,23 +31,16 @@ class CWidgetFieldTextArea extends CWidgetField {
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this
-			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
-	public function setFlags(int $flags): self {
-		parent::setFlags($flags);
+	protected function getValidationRules(bool $strict = false): array {
+		$validation_rules = parent::getValidationRules($strict);
 
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules();
+		if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
 		}
 
-		return $this;
+		return $validation_rules;
 	}
 }

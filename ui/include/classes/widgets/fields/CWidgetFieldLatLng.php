@@ -36,7 +36,6 @@ class CWidgetFieldLatLng extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_LAT_LNG_ZOOM])
 			->setMaxLength(255);
 	}

@@ -35,7 +35,6 @@ class CWidgetFieldColor extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_COLOR, 'flags' => API_ALLOW_NULL]);
 	}
 
@@ -51,6 +50,4 @@ class CWidgetFieldColor extends CWidgetField {
 
 		return $this;
 	}
-
-
 }

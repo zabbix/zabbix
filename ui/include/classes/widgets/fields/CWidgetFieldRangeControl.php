@@ -43,9 +43,7 @@ class CWidgetFieldRangeControl extends CWidgetField {
 		$this->max = $max;
 		$this->step = $step;
 
-		$this
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => $this->min.':'.$this->max]);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
 	public function setValue($value): self {
@@ -64,5 +62,10 @@ class CWidgetFieldRangeControl extends CWidgetField {
 
 	public function getStep(): int {
 		return $this->step;
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => $this->min.':'.$this->max];
 	}
 }

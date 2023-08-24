@@ -42,8 +42,7 @@ class CWidgetFieldSelect extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
 	public function setValue($value): self {
@@ -52,5 +51,10 @@ class CWidgetFieldSelect extends CWidgetField {
 
 	public function getValues(): array {
 		return $this->values;
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => implode(',', array_keys($this->values))];
 	}
 }

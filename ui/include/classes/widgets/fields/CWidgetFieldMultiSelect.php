@@ -25,32 +25,19 @@ use Zabbix\Widgets\CWidgetField;
 
 abstract class CWidgetFieldMultiSelect extends CWidgetField {
 
+	public const DEFAULT_VALUE = [];
+
 	// Is selecting multiple objects or a single one?
 	private bool $is_multiple = true;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
-		$this->setDefault([]);
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
 	public function setValue($value): self {
 		$this->value = (array) $value;
-
-		return $this;
-	}
-
-	public function setFlags(int $flags): self {
-		parent::setFlags($flags);
-
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$strict_validation_rules = $this->getValidationRules();
-			self::setValidationRuleFlag($strict_validation_rules, API_NOT_EMPTY);
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules();
-		}
 
 		return $this;
 	}
@@ -79,18 +66,6 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		return parent::preventDefault($default_prevented);
 	}
 
-	protected function getValidationRules(): array {
-		$value = $this->getValue();
-
-		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
-			return ['type' => API_OBJECT, 'fields' => [
-				self::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8]
-			]];
-		}
-
-		return parent::getValidationRules();
-	}
-
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
@@ -104,5 +79,28 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		else {
 			parent::toApi($widget_fields);
 		}
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		$value = $this->getValue();
+
+		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
+			$validation_rules = ['type' => API_OBJECT, 'fields' => [
+				self::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8]
+			]];
+
+			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+				self::setValidationRuleFlag($validation_rules[self::FOREIGN_REFERENCE_KEY], API_NOT_EMPTY);
+			}
+		}
+		else {
+			$validation_rules = parent::getValidationRules($strict);
+
+			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+				self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
+			}
+		}
+
+		return $validation_rules;
 	}
 }

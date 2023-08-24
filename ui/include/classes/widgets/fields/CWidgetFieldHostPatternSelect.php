@@ -37,16 +37,12 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 	}
 
 	public function toApi(array &$widget_fields = []): void {
-		$value = $this->getValue();
-
-		if ($value !== $this->default) {
-			foreach ($value as $num => $val) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.'.$num,
-					'value' => $val
-				];
-			}
+		foreach ($this->getValue() as $index => $value) {
+			$widget_fields[] = [
+				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+				'name' => $this->name.'.'.$index,
+				'value' => $value
+			];
 		}
 	}
 }

@@ -47,14 +47,20 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setMaxLength(255);
+			->setMaxLength(255)
+			->setValidationRules(['type' => API_OBJECT, 'fields' => [
+				'data_source' => ['type' => API_INT32, 'in' => implode(',', [self::DATA_SOURCE_DEFAULT, self::DATA_SOURCE_WIDGET, self::DATA_SOURCE_DASHBOARD])],
+				'from' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()],
+				'to' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()]
+			]]);
 	}
 
 	public function setValue($value): self {
-		unset($value['data_source']);
-		$this->value = (array) $value;
-
-		if (array_key_exists('reference', $this->value)) {
+		if (array_key_exists('data_source', $value)) {
+			$this->data_source = $value['data_source'];
+			unset($value['data_source']);
+		}
+		elseif (array_key_exists('reference', $value)) {
 			$this->data_source = $this->value['reference'] === 'DASHBOARD'
 				? self::DATA_SOURCE_DASHBOARD
 				: self::DATA_SOURCE_WIDGET;
@@ -63,28 +69,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			$this->data_source = self::DATA_SOURCE_DEFAULT;
 		}
 
-		return $this;
-	}
-
-	public function setFlags(int $flags): self {
-		parent::setFlags($flags);
-
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$strict_validation_rules = $this->getValidationRules();
-
-			if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
-				self::setValidationRuleFlag($strict_validation_rules['fields']['from'], API_NOT_EMPTY);
-				self::setValidationRuleFlag($strict_validation_rules['fields']['to'], API_NOT_EMPTY);
-			}
-			else {
-				self::setValidationRuleFlag($strict_validation_rules['fields']['reference'], API_NOT_EMPTY);
-			}
-
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules();
-		}
+		$this->value = (array) $value;
 
 		return $this;
 	}
@@ -154,19 +139,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		return [];
 	}
 
-	protected function getValidationRules(): array {
-		return ($this->data_source === self::DATA_SOURCE_DEFAULT)
-			? ['type' => API_OBJECT, 'fields' => [
-				'data_source' => ['type' => API_INT32, 'in' => implode(',', [self::DATA_SOURCE_DEFAULT, self::DATA_SOURCE_WIDGET, self::DATA_SOURCE_DASHBOARD])],
-				'from' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()],
-				'to' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()]
-			]]
-			: ['type' => API_OBJECT, 'fields' => [
-				'data_source' => ['type' => API_INT32, 'in' => implode(',', [self::DATA_SOURCE_DEFAULT, self::DATA_SOURCE_WIDGET, self::DATA_SOURCE_DASHBOARD])],
-				'reference' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
-			]];
-	}
-
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
@@ -195,8 +167,30 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		}
 	}
 
-
 	public function getDataSource(): int {
 		return $this->data_source;
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
+			$validation_rules = parent::getValidationRules($strict);
+
+			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+				self::setValidationRuleFlag($strict_validation_rules['fields']['from'], API_NOT_EMPTY);
+				self::setValidationRuleFlag($strict_validation_rules['fields']['to'], API_NOT_EMPTY);
+			}
+		}
+		else {
+			$validation_rules = ['type' => API_OBJECT, 'fields' => [
+				'data_source' => ['type' => API_INT32, 'in' => implode(',', [self::DATA_SOURCE_DEFAULT, self::DATA_SOURCE_WIDGET, self::DATA_SOURCE_DASHBOARD])],
+				'reference' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+			]];
+
+			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+				self::setValidationRuleFlag($strict_validation_rules['fields']['reference'], API_NOT_EMPTY);
+			}
+		}
+
+		return $validation_rules;
 	}
 }

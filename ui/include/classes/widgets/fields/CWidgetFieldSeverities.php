@@ -25,11 +25,8 @@ class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
 
 	public const DEFAULT_VIEW = \CWidgetFieldSeveritiesView::class;
 
-	public function __construct(string $name, string $label = null) {
-		parent::__construct($name, $label);
-
-		$this->setExValidationRules(
-			['in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))
-		]);
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))];
 	}
 }

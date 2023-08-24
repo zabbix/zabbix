@@ -39,14 +39,6 @@ class CWidgetFieldTimeZone extends CWidgetFieldSelect {
 			: null
 		);
 
-		$this
-			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
-	}
-
-	public function setValue($value): self {
-		$this->value = $value;
-
-		return $this;
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 }

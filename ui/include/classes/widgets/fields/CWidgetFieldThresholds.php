@@ -43,7 +43,6 @@ class CWidgetFieldThresholds extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' =>  API_OBJECTS, 'uniq' => [['threshold']], 'fields' => [
 				'color'		=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'threshold'	=> ['type' => API_NUMERIC, 'flags' => API_REQUIRED]
@@ -65,9 +64,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 	}
 
 	public function validate($strict = false): array {
-		$errors = parent::validate($strict);
-
-		if ($errors) {
+		if ($errors = parent::validate($strict)) {
 			return $errors;
 		}
 
@@ -80,7 +77,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 		$thresholds = [];
 
 		foreach ($this->getValue() as $threshold) {
-			if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
+			if ($number_parser->parse($threshold['threshold']) === CParser::PARSE_SUCCESS) {
 				$thresholds[] = $threshold + ['threshold_value' => $number_parser->calcValue()];
 			}
 		}
@@ -104,18 +101,16 @@ class CWidgetFieldThresholds extends CWidgetField {
 	}
 
 	public function toApi(array &$widget_fields = []): void {
-		$value = $this->getValue();
-
-		foreach ($value as $index => $val) {
+		foreach ($this->getValue() as $index => $value) {
 			$widget_fields[] = [
 				'type' => $this->save_type,
 				'name' => $this->name.'.color.'.$index,
-				'value' => $val['color']
+				'value' => $value['color']
 			];
 			$widget_fields[] = [
 				'type' => $this->save_type,
 				'name' => $this->name.'.threshold.'.$index,
-				'value' => $val['threshold']
+				'value' => $value['threshold']
 			];
 		}
 	}

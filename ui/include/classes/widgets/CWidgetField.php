@@ -54,9 +54,9 @@ abstract class CWidgetField {
 
 	protected int $flags = 0x00;
 
-	protected array $validation_rules = [];
-	protected ?array $strict_validation_rules = null;
-	protected array $ex_validation_rules = [];
+	private array $validation_rules = [];
+	private ?array $strict_validation_rules = null;
+	private array $ex_validation_rules = [];
 
 	private $templateid = null;
 
@@ -263,19 +263,9 @@ abstract class CWidgetField {
 	public function validate(bool $strict = false): array {
 		$errors = [];
 
-		$validation_rules = ($strict && $this->strict_validation_rules !== null)
-			? $this->strict_validation_rules
-			: $this->getValidationRules();
-		$validation_rules += $this->ex_validation_rules;
-
+		$validation_rules = $this->getValidationRules($strict);
+		$label = $this->full_name ?? $this->label ?? $this->name;
 		$value = $this->getValue();
-
-		if ($this->full_name !== null) {
-			$label = $this->full_name;
-		}
-		else {
-			$label = $this->label ?? $this->name;
-		}
 
 		if (CApiInputValidator::validate($validation_rules, $value, $label, $error)) {
 			$this->setValue($value);
@@ -356,8 +346,10 @@ abstract class CWidgetField {
 		return $this;
 	}
 
-	protected function getValidationRules(): array {
-		return $this->validation_rules;
+	protected function getValidationRules(bool $strict = false): array {
+		return $strict && $this->strict_validation_rules !== null
+			? $this->strict_validation_rules
+			: $this->validation_rules;
 	}
 
 	protected function setValidationRules(array $validation_rules): self {
@@ -371,12 +363,6 @@ abstract class CWidgetField {
 	 */
 	protected function setStrictValidationRules(array $strict_validation_rules = null): self {
 		$this->strict_validation_rules = $strict_validation_rules;
-
-		return $this;
-	}
-
-	protected function setExValidationRules(array $ex_validation_rules): self {
-		$this->ex_validation_rules = $ex_validation_rules;
 
 		return $this;
 	}

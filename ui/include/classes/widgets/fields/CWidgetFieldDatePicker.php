@@ -44,41 +44,20 @@ class CWidgetFieldDatePicker extends CWidgetField {
 			->setMaxLength(255);
 	}
 
-	public function setFlags(int $flags): self {
-		parent::setFlags($flags);
-
-		$validation_rules = $this->getValidationRules();
-		$validation_rules['flags'] = $validation_rules['flags'] ?? 0x00;
-
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$validation_rules['flags'] |= API_NOT_EMPTY;
-		}
-		else {
-			$validation_rules['flags'] &= 0xFF ^ API_NOT_EMPTY;
-		}
-
-		$this->setValidationRules($validation_rules);
-
-		return $this;
-	}
-
 	public function validate(bool $strict = false): array {
 		if ($errors = parent::validate($strict)) {
 			return $errors;
 		}
 
-		$label = $this->full_name ?? $this->label ?? $this->name;
-		$value = $this->value ?? $this->default;
+		$value = $this->getValue();
 
-		if ($value === '' && ($this->getFlags() & self::FLAG_NOT_EMPTY) === 0) {
-			$this->setValue('');
-
+		if ($value === self::DEFAULT_VALUE) {
 			return [];
 		}
 
 		$absolute_time_parser = new CAbsoluteTimeParser();
 
-		if ($absolute_time_parser->parse($value) == CParser::PARSE_SUCCESS) {
+		if ($absolute_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
 			$has_errors = false;
 
 			if ($this->is_date_only) {
@@ -86,15 +65,13 @@ class CWidgetFieldDatePicker extends CWidgetField {
 			}
 
 			if (!$has_errors) {
-				$this->setValue($value);
-
 				return [];
 			}
 		}
 
 		$relative_time_parser = new CRelativeTimeParser();
 
-		if ($relative_time_parser->parse($value) == CParser::PARSE_SUCCESS) {
+		if ($relative_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
 			$has_errors = false;
 
 			if ($this->is_date_only) {
@@ -107,18 +84,24 @@ class CWidgetFieldDatePicker extends CWidgetField {
 			}
 
 			if (!$has_errors) {
-				$this->setValue($value);
-
 				return [];
 			}
 		}
 
-		$this->setValue($this->default);
-
 		return [
-			_s('Invalid parameter "%1$s": %2$s.', $label,
+			_s('Invalid parameter "%1$s": %2$s.', $this->full_name ?? $this->label ?? $this->name,
 				$this->is_date_only ? _('a date is expected') : _('a time is expected')
 			)
 		];
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		$validation_rules = parent::getValidationRules($strict);
+
+		if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
+		}
+
+		return $validation_rules;
 	}
 }

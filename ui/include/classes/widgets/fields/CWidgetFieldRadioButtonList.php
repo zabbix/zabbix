@@ -39,9 +39,7 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 
 		$this->values = $values;
 
-		$this
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
 	public function getValues(): array {
@@ -50,5 +48,10 @@ class CWidgetFieldRadioButtonList extends CWidgetField {
 
 	public function setValue($value): self {
 		return parent::setValue((int) $value);
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => implode(',', array_keys($this->values))];
 	}
 }

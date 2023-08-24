@@ -26,6 +26,7 @@ use Zabbix\Widgets\CWidgetField;
 class CWidgetFieldColumnsList extends CWidgetField {
 
 	public const DEFAULT_VIEW = \CWidgetFieldColumnsListView::class;
+	public const DEFAULT_VALUE = [];
 
 	// Source of value to display in column.
 	public const DATA_ITEM_VALUE = 1;
@@ -54,7 +55,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		parent::__construct($name, $label);
 
 		$this
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
+			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'name'					=> ['type' => API_STRING_UTF8, 'default' => '', 'length' => 255],
 				'data'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::DATA_ITEM_VALUE, self::DATA_HOST_NAME, self::DATA_TEXT])],
@@ -124,20 +125,20 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			'text' => ZBX_WIDGET_FIELD_TYPE_STR
 		];
 
-		foreach ($this->getValue() as $column_index => $val) {
-			foreach (array_intersect_key($fields, $val) as $field => $field_type) {
+		foreach ($this->getValue() as $column_index => $value) {
+			foreach (array_intersect_key($fields, $value) as $field => $field_type) {
 				$widget_fields[] = [
 					'type' => $field_type,
 					'name' => implode('.', [$this->name, $field, $column_index]),
-					'value' => $val[$field]
+					'value' => $value[$field]
 				];
 			}
 
-			if (!array_key_exists('thresholds', $val) || !$val['thresholds']) {
+			if (!array_key_exists('thresholds', $value) || !$value['thresholds']) {
 				continue;
 			}
 
-			foreach ($val['thresholds'] as $threshold_index => $threshold) {
+			foreach ($value['thresholds'] as $threshold_index => $threshold) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 					'name' => implode('.', [$this->name.'thresholds.color', $column_index, $threshold_index]),
