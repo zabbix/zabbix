@@ -319,7 +319,7 @@ This template has been tested on:
 
 **Additional information**:
 
-* The Nomad servers use the default web schema - `HTTP` and default API port - `4646`. If you're using servers discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:`NECESSARY.IP`}} or/and {{$NOMAD.CLIENT.API.PORT:`NECESSARY.IP`}} on master host or template level.
+* The Nomad servers use the default web schema - `HTTP` and default API port - `4646`. If you're using servers discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.SERVER.API.SCHEME:`NECESSARY.IP`}} or/and {{$NOMAD.SERVER.API.PORT:`NECESSARY.IP`}} on master host or template level.
 * Some metrics may not be collected depending on your HashiCorp Nomad agent version, configuration and cluster role.
 * Don't forget to define the `{$NOMAD.REDUNDANCY.MIN}` macro value, based on your cluster nodes amount to configure the failure tolerance triggers correctly.
 
