@@ -542,8 +542,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		{
 			async_initiate_queued_checks(&poller_config);
 			zbx_async_manager_requeue_flush(poller_config.manager);
-			zbx_preprocessor_flush();
 		}
+
+		if (ZBX_IS_RUNNING())
+			zbx_preprocessor_flush();
 
 		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
