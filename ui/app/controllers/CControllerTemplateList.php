@@ -102,7 +102,7 @@ class CControllerTemplateList extends CController {
 			? CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groups'],
-				'editable' => true,
+//				'editable' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];
