@@ -22,6 +22,9 @@
 #include "trapper_auth.h"
 #include "zbxcommshigh.h"
 #include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxpreprocbase.h"
+#include "zbxtime.h"
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 

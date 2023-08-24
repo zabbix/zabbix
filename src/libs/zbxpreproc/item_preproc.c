@@ -21,11 +21,9 @@
 
 #include "zbxregexp.h"
 #include "zbxembed.h"
-#include "zbxprometheus.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
 #include "zbxdbhigh.h"
-#include "zbxjson.h"
 #include "zbxstr.h"
 
 #include "zbxxml.h"
@@ -1041,13 +1039,9 @@ out:
  *                                                                            *
  * Purpose: checks error for pattern matching regular expression              *
  *                                                                            *
- * Parameters: value                - [IN] value to process                   *
- *             params               - [IN] operation parameters               *
- *             error                - [IN/OUT]                                *
- *                                                                            *
- * Return value: FAIL - preprocessing step error                              *
- *               SUCCEED - preprocessing step succeeded, error may contain    *
- *                         extracted error message                            *
+ * Parameters: value  - [IN] value to process                                 *
+ *             params - [IN] operation parameters                             *
+ *             error  - [IN/OUT]                                              *
  *                                                                            *
  * Return value: FAIL - preprocessing step error                              *
  *               SUCCEED - preprocessing step succeeded, error may contain    *
@@ -1057,7 +1051,6 @@ out:
 int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *params, char **error)
 {
 #define ZBX_PP_MATCH_TYPE_MATCHES	0
-#define ZBX_PP_MATCH_TYPE_NOT_MATCH	1
 #define ZBX_PP_MATCH_TYPE_ANY		-1
 	zbx_variant_t	value_str;
 	int		ret = SUCCEED, match_type = ZBX_PP_MATCH_TYPE_ANY;
@@ -1080,7 +1073,7 @@ int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *param
 	{
 		if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &errptr))
 		{
-			*error = zbx_dsprintf(*error, "regular expression compilation failed: %s", errptr);
+			*error = zbx_dsprintf(*error, "invalid regular expression:: %s", errptr);
 			zbx_free(errptr);
 			goto out;
 		}
@@ -1103,7 +1096,7 @@ int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *param
 
 		if (FAIL == zbx_regexp_compile(pattern, &regex, &errptr))
 		{
-			*error = zbx_dsprintf(*error, "regular expression compilation failed: %s", errptr);
+			*error = zbx_dsprintf(*error, "invalid regular expression:: %s", errptr);
 			zbx_free(errptr);
 			ret = FAIL;
 			goto out;
@@ -1129,7 +1122,6 @@ out:
 
 	return ret;
 #undef ZBX_PP_MATCH_TYPE_MATCHES
-#undef ZBX_PP_MATCH_TYPE_NOT_MATCH
 #undef ZBX_PP_MATCH_TYPE_ANY
 }
 

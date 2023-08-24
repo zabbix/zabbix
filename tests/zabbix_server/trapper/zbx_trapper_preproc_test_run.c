@@ -82,7 +82,7 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 			&results_num);
 	for (i = 0; i < steps->values_num; i++)
 	{
-		zbx_pp_step_t *pstep = steps->values[i];
+		zbx_pp_step_t	*pstep = steps->values[i];
 
 		if (pstep->error_handler_params != preproc->steps[i].error_handler_params)
 			pstep->error_handler_params = preproc->steps[i].error_handler_params;

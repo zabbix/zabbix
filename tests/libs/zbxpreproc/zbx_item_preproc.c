@@ -123,7 +123,9 @@ static void	read_value(const char *path, unsigned char *value_type, zbx_variant_
 	handle = zbx_mock_get_parameter_handle(path);
 	if (NULL != value_type)
 		*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value_type"));
-	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts);
+	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts))
+		fail_msg("Invalid 'time' format");
+
 	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 }
 
@@ -132,7 +134,9 @@ static void	read_history_value(const char *path, zbx_variant_t *value, zbx_times
 	zbx_mock_handle_t	handle;
 
 	handle = zbx_mock_get_parameter_handle(path);
-	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts);
+	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts))
+		fail_msg("Invalid 'time' format");
+
 	zbx_variant_set_str(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 	zbx_variant_convert(value, zbx_mock_str_to_variant(zbx_mock_get_object_member_string(handle, "variant")));
 }
@@ -142,7 +146,9 @@ static void	read_error(const char *path, zbx_variant_t *value, zbx_timespec_t *t
 	zbx_mock_handle_t	handle;
 
 	handle = zbx_mock_get_parameter_handle(path);
-	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts);
+	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts))
+		fail_msg("Invalid 'time' format");
+
 	zbx_variant_set_error(value, zbx_strdup(NULL, zbx_mock_get_object_member_string(handle, "data")));
 }
 
