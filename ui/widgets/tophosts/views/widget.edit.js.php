@@ -77,7 +77,7 @@ window.widget_tophosts_form = new class {
 
 				column_popup = PopUp('widget.tophosts.column.edit', {templateid: this._templateid}).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
-				column_popup.addEventListener('overlay.close', this.removeColorpicker);
+				column_popup.addEventListener('dialogue.close', this.removeColorpicker);
 				break;
 
 			case 'edit':
@@ -88,7 +88,7 @@ window.widget_tophosts_form = new class {
 				column_popup = PopUp('widget.tophosts.column.edit',
 					{...form_fields.columns[this._column_index], edit: 1, templateid: this._templateid}).$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
-				column_popup.addEventListener('overlay.close', this.removeColorpicker);
+				column_popup.addEventListener('dialogue.close', this.removeColorpicker);
 				break;
 
 			case 'remove':

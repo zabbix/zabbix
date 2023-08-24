@@ -26,7 +26,8 @@ $change_container = new CDiv(new CPartial('configuration.valuemap', [
 	'context' => $data['context'],
 	'valuemaps' => [],
 	'readonly' => false,
-	'form' => 'massupdate'
+	'form' => 'massupdate',
+	'table_id' => 'valuemap-table'
 ]));
 
 $update_existing = (new CDiv(

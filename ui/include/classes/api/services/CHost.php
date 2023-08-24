@@ -26,7 +26,7 @@ class CHost extends CHostGeneral {
 
 	protected $sortColumns = ['hostid', 'host', 'name', 'status'];
 
-	public const OUTPUT_FIELDS = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
+	public const OUTPUT_FIELDS = ['hostid', 'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
 		'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
 		'maintenance_from', 'name', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
 		'inventory_mode', 'active_available'
@@ -48,7 +48,6 @@ class CHost extends CHostGeneral {
 	 * @param array         $options['httptestids']                        Select hosts by web scenario IDs.
 	 * @param bool          $options['monitored_hosts']                    Return only monitored hosts.
 	 * @param bool          $options['templated_hosts']                    Include templates in result.
-	 * @param bool          $options['proxy_hosts']                        Include proxies in result.
 	 * @param bool          $options['with_items']                         Select hosts only with items.
 	 * @param bool          $options['with_item_prototypes']               Select hosts only with item prototypes.
 	 * @param bool          $options['with_simple_graph_items']            Select hosts only with items suitable for graphs.
@@ -119,7 +118,6 @@ class CHost extends CHostGeneral {
 			'httptestids'						=> null,
 			'monitored_hosts'					=> null,
 			'templated_hosts'					=> null,
-			'proxy_hosts'						=> null,
 			'with_items'						=> null,
 			'with_item_prototypes'				=> null,
 			'with_simple_graph_items'			=> null,
@@ -220,7 +218,7 @@ class CHost extends CHostGeneral {
 		if (!is_null($options['proxyids'])) {
 			zbx_value2array($options['proxyids']);
 
-			$sqlParts['where'][] = dbConditionId('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionId('h.proxyid', $options['proxyids']);
 		}
 
 		// templateids
@@ -320,9 +318,6 @@ class CHost extends CHostGeneral {
 		}
 		elseif (!is_null($options['templated_hosts'])) {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')';
-		}
-		elseif (!is_null($options['proxy_hosts'])) {
-			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE.')';
 		}
 		else {
 			$sqlParts['where']['status'] = 'h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')';
@@ -660,7 +655,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['useip']        Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']          Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['details']      Interface additional fields (optional).
-	 * @param int    $hosts[]['proxy_hostid']               ID of the proxy that is used to monitor the host (optional).
+	 * @param int    $hosts[]['proxyid']                    ID of the proxy used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']              IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']             IPMI privilege (optional).
 	 * @param string $hosts[]['ipmi_username']              IPMI username (optional).
@@ -797,7 +792,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['useip']              Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']                Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['details']            Interface additional fields (optional).
-	 * @param int    $hosts[]['proxy_hostid']                     ID of the proxy that is used to monitor the host (optional).
+	 * @param int    $hosts[]['proxyid']                          ID of the proxy used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']                    IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']                   IPMI privilege (optional).
 	 * @param string $hosts[]['ipmi_username']                    IPMI username (optional).
@@ -932,7 +927,7 @@ class CHost extends CHostGeneral {
 	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
 	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
 	 * @param int    $hosts['fields']['details']		Details. OPTIONAL
-	 * @param int    $hosts['fields']['proxy_hostid']	Proxy Host ID. OPTIONAL
+	 * @param int    $hosts['fields']['proxyid']		Proxy ID. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL
@@ -952,7 +947,7 @@ class CHost extends CHostGeneral {
 		sort($hostids);
 
 		$db_hosts = $this->get([
-			'output' => ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+			'output' => ['hostid', 'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 				'ipmi_password', 'name', 'description', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
 				'tls_psk_identity', 'tls_psk', 'inventory_mode'
 			],

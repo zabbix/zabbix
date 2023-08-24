@@ -40,12 +40,6 @@
 #define ZBX_DBSYNC_UPDATE_MAINTENANCE_GROUPS	__UINT64_C(0x0040)
 #define ZBX_DBSYNC_UPDATE_MACROS		__UINT64_C(0x0080)
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-#	define ZBX_HOST_TLS_OFFSET	4
-#else
-#	define ZBX_HOST_TLS_OFFSET	0
-#endif
-
 #define ZBX_DBSYNC_TRIGGER_ERROR	0x80
 
 /******************************************************************************
@@ -164,5 +158,7 @@ void	zbx_dbsync_clear_user_macros(void);
 
 int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
+
+int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
 
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

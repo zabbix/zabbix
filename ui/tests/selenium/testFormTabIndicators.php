@@ -38,7 +38,7 @@ class testFormTabIndicators extends CWebTest {
 			// Template configuration form tab data.
 			[
 				[
-					'url' => 'templates.php?form=create',
+					'url' => 'zabbix.php?action=template.list',
 					'form' => 'name:templatesForm',
 					'tabs' => [
 						[
@@ -671,6 +671,10 @@ class testFormTabIndicators extends CWebTest {
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
 		}
+		elseif ($data['url'] === 'zabbix.php?action=template.list') {
+			$this->query('button:Create template')->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		}
 		elseif (CTestArrayHelper::get($data, 'create_button')) {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
@@ -975,15 +979,15 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'value_mapping':
 				if ($action === USER_ACTION_REMOVE) {
-					$form->query('xpath://table[@id="valuemap-table"]//button[text()="Remove"]')->all()->click();
+					$form->query('xpath://table[contains(@id,"valuemap-table")]//button[text()="Remove"]')->waitUntilClickable()->all()->click();
 				}
 				else {
 					foreach ($tab['entries'] as $field_value) {
 						$form->query('id:valuemap_add')->one()->click();
-						$valuemap_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$valuemap_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
 						$valuemap_form->submit();
-						COverlayDialogElement::ensureNotPresent();
+						$valuemap_form->waitUntilNotVisible();
 					}
 				}
 				break;

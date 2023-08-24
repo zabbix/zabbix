@@ -38,7 +38,7 @@ class CControllerHostList extends CController {
 			'filter_port'         => 'string',
 			'filter_status'       => 'in -1,'.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED,
 			'filter_monitored_by' => 'in '.ZBX_MONITORED_BY_ANY.','.ZBX_MONITORED_BY_SERVER.','.ZBX_MONITORED_BY_PROXY,
-			'filter_proxyids'     => 'array_db hosts.proxy_hostid',
+			'filter_proxyids'     => 'array_db hosts.proxyid',
 			'filter_evaltype'     => 'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags'         => 'array',
 			'sort'                => 'in name,status',
@@ -175,7 +175,7 @@ class CControllerHostList extends CController {
 				$proxyids = $filter['proxyids']
 					? $filter['proxyids']
 					: array_keys(API::Proxy()->get([
-						'output' => [],
+						'output' => ['proxyid'],
 						'preservekeys' => true
 					]));
 				break;
@@ -227,7 +227,7 @@ class CControllerHostList extends CController {
 		);
 
 		$hosts = API::Host()->get([
-			'output' => ['name', 'proxy_hostid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
+			'output' => ['name', 'proxyid', 'maintenance_status', 'maintenance_type', 'maintenanceid', 'flags',
 				'status', 'tls_connect', 'tls_accept', 'active_available'
 			],
 			'selectParentTemplates' => ['templateid', 'name'],
@@ -304,7 +304,7 @@ class CControllerHostList extends CController {
 		}
 
 		// Get proxy host IDs that are not 0 and maintenance IDs.
-		$proxy_hostids = [];
+		$proxyids = [];
 		$maintenanceids = [];
 
 		foreach ($hosts as &$host) {
@@ -324,8 +324,8 @@ class CControllerHostList extends CController {
 			}
 			unset($host['active_available']);
 
-			if ($host['proxy_hostid']) {
-				$proxy_hostids[$host['proxy_hostid']] = $host['proxy_hostid'];
+			if ($host['proxyid']) {
+				$proxyids[$host['proxyid']] = $host['proxyid'];
 			}
 
 			if ($host['status'] == HOST_STATUS_MONITORED &&
@@ -337,10 +337,10 @@ class CControllerHostList extends CController {
 
 		$proxies = [];
 
-		if ($proxy_hostids) {
+		if ($proxyids) {
 			$proxies = API::Proxy()->get([
-				'proxyids' => $proxy_hostids,
-				'output' => ['host'],
+				'output' => ['name'],
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
 		}
@@ -350,11 +350,11 @@ class CControllerHostList extends CController {
 
 		if ($filter['proxyids']) {
 			$filter_proxies = API::Proxy()->get([
-				'output' => ['proxyid', 'host'],
+				'output' => ['proxyid', 'name'],
 				'proxyids' => $filter['proxyids']
 			]);
 
-			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id', 'host' => 'name']);
+			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id']);
 		}
 
 		$db_maintenances = [];

@@ -432,7 +432,8 @@ $html_page
 		'is_templated' => (int) $data['templated'],
 		'variables' => $data['variables'],
 		'headers' => $data['headers'],
-		'steps' => $data['steps']
+		'steps' => $data['steps'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()
