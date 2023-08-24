@@ -398,4 +398,16 @@ abstract class CWidgetField {
 			'type' => substr($typed_reference, $separator_index + 1)
 		];
 	}
+
+	/**
+	 * Create a typed reference (a reference to a foreign data source).
+	 *
+	 * @param string $reference
+	 * @param string $type
+	 *
+	 * @return string
+	 */
+	public static function createTypedReference(string $reference, string $type = ''): string {
+		return $type !== '' ? $reference.'.'.$type : $reference;
+	}
 }

@@ -122,7 +122,7 @@
 					is_edit_mode: false,
 					can_edit_dashboards: false,
 					is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
-					hostid: this.#hostid,
+					hostid: host.hostid,
 					time_period: time_period,
 					csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 				});

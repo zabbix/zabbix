@@ -33,6 +33,18 @@ use Zabbix\Widgets\Fields\{
 
 class CWidgetsData {
 
+	public const DATA_TYPE_HOST_GROUP_ID =		'_hostgroupid';
+	public const DATA_TYPE_HOST_GROUP_IDS =		'_hostgroupids';
+	public const DATA_TYPE_HOST_ID =			'_hostid';
+	public const DATA_TYPE_HOST_IDS =			'_hostids';
+	public const DATA_TYPE_ITEM_ID =			'_itemid';
+	public const DATA_TYPE_ITEM_PROTOTYPE_ID =	'_itemprototypeid';
+	public const DATA_TYPE_GRAPH_ID =			'_graphid';
+	public const DATA_TYPE_GRAPH_PROTOTYPE_ID =	'_graphprototypeid';
+	public const DATA_TYPE_MAP_ID =				'_mapid';
+	public const DATA_TYPE_SERVICE_ID =			'_serviceid';
+	public const DATA_TYPE_SLA_ID =				'_slaid';
+
 	/**
 	 * Get data types supported by widget communication framework out of the box.
 	 *
@@ -43,77 +55,77 @@ class CWidgetsData {
 
 		if ($data_types === null) {
 			$data_types = [
-				'_hostgroupid' => [
+				self::DATA_TYPE_HOST_GROUP_ID => [
 					'field_class' => CWidgetFieldMultiSelectGroup::class,
 					'label' => _('Host group'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_hostgroupids' => [
+				self::DATA_TYPE_HOST_GROUP_IDS => [
 					'field_class' => CWidgetFieldMultiSelectGroup::class,
 					'label' => _('Host groups'),
 					'is_multiple' => true,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_hostid' => [
+				self::DATA_TYPE_HOST_ID => [
 					'field_class' => CWidgetFieldMultiSelectHost::class,
 					'label' => _('Host'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => true,
 					'accepts_dashboard_time_period' => false
 				],
-				'_hostids' => [
+				self::DATA_TYPE_HOST_IDS => [
 					'field_class' => CWidgetFieldMultiSelectHost::class,
 					'label' => _('Hosts'),
 					'is_multiple' => true,
 					'accepts_dashboard_host' => true,
 					'accepts_dashboard_time_period' => false
 				],
-				'_itemid' => [
+				self::DATA_TYPE_ITEM_ID => [
 					'field_class' => CWidgetFieldMultiSelectItem::class,
 					'label' => _('Item'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_itemprototypeid' => [
+				self::DATA_TYPE_ITEM_PROTOTYPE_ID => [
 					'field_class' => CWidgetFieldMultiSelectItemPrototype::class,
 					'label' => _('Item prototype'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_graphid' => [
+				self::DATA_TYPE_GRAPH_ID => [
 					'field_class' => CWidgetFieldMultiSelectGraph::class,
 					'label' => _('Graph'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_graphprototypeid' => [
+				self::DATA_TYPE_GRAPH_PROTOTYPE_ID => [
 					'field_class' => CWidgetFieldMultiSelectGraphPrototype::class,
 					'label' => _('Graph prototype'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_mapid' => [
+				self::DATA_TYPE_MAP_ID => [
 					'field_class' => CWidgetFieldMultiSelectMap::class,
 					'label' => _('Map'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_serviceid' => [
+				self::DATA_TYPE_SERVICE_ID => [
 					'field_class' => CWidgetFieldMultiSelectService::class,
 					'label' => _('Service'),
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
 				],
-				'_slaid' => [
+				self::DATA_TYPE_SLA_ID => [
 					'field_class' => CWidgetFieldMultiSelectSla::class,
 					'label' => _('SLA'),
 					'is_multiple' => false,
