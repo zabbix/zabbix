@@ -28,17 +28,6 @@ class CWidgetGauge extends CWidget {
 		this.gauge_link = document.createElement('a');
 	}
 
-	setDynamicHost(dynamic_hostid) {
-		if (this.gauge !== null) {
-			this.gauge.destroy();
-			this.gauge = null;
-		}
-
-		this._body.innerHTML = '';
-
-		super.setDynamicHost(dynamic_hostid);
-	}
-
 	onResize() {
 		if (this._state === WIDGET_STATE_ACTIVE && this.gauge !== null) {
 			this.gauge.setSize(super._getContentsSize());

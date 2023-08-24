@@ -38,7 +38,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid',
 			'with_config' => 'in 1'
 		]);
 	}
@@ -61,8 +60,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return;
 		}
 
-		if ($this->hasInput('dynamic_hostid')) {
-			$errors = $this->checkConfigForDynamicItem($item);
+		if ($this->fields_values['override_hostid']) {
+			$errors = $this->checkConfigForOverriddenItem($item);
 
 			if ($errors) {
 				foreach ($errors as $error) {
@@ -99,14 +98,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getItem(): ?array {
-		if (($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
-				&& $this->hasInput('dynamic_hostid')) {
-			$dynamic_hostid = $this->getInput('dynamic_hostid');
-		}
-		else {
-			$dynamic_hostid = null;
-		}
-
 		$item_options = [
 			'output' => ['itemid', 'hostid', 'name', 'value_type', 'units'],
 			'selectHosts' => !$this->isTemplateDashboard() ? ['name'] : null,
@@ -117,7 +108,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true
 		];
 
-		if ($dynamic_hostid !== null) {
+		if ($this->fields_values['override_hostid']) {
 			$src_items = API::Item()->get([
 				'output' => ['key_'],
 				'itemids' => $this->fields_values['itemid'],
@@ -128,7 +119,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				return null;
 			}
 
-			$item_options['hostids'] = $dynamic_hostid;
+			$item_options['hostids'] = $this->fields_values['override_hostid'];
 			$item_options['filter']['key_'] = $src_items[0]['key_'];
 		}
 		else {
@@ -144,7 +135,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $items[0];
 	}
 
-	private function checkConfigForDynamicItem(array $item): array {
+	private function checkConfigForOverriddenItem(array $item): array {
 		$form = $this->widget->getForm(['itemid' => $item['itemid']] + $this->getInput('fields', []),
 			$this->hasInput('templateid') ? $this->getInput('templateid') : null
 		);
@@ -204,7 +195,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$widget_description = $this->fields_values['description'];
 
-		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
+		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 			[[
 				'widget_description' => $widget_description
 			]] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item + [
@@ -302,7 +293,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'units_text' => ''
 		];
 
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			return $no_data;
 		}
 
