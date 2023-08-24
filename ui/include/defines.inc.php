@@ -1807,7 +1807,9 @@ define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_IPMI', 'ipmi');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
-define('TAB_INDICATOR_MACROS', 'macros');
+define('TAB_INDICATOR_HOST_MACROS', 'host-macros');
+define('TAB_INDICATOR_HOST_PROTOTYPE_MACROS', 'host-prototype-macros');
+define('TAB_INDICATOR_TEMPLATE_MACROS', 'template-macros');
 define('TAB_INDICATOR_MEDIATYPE_OPTIONS', 'mediatype-options');
 define('TAB_INDICATOR_MEDIA', 'media');
 define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
@@ -1823,6 +1825,7 @@ define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
+define('TAB_INDICATOR_TEMPLATE_VALUEMAPS', 'template-valuemaps');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');

@@ -1390,7 +1390,7 @@ class CDashboard {
 		if (!this._is_edit_widget_properties_cancel_subscribed) {
 			this._is_edit_widget_properties_cancel_subscribed = true;
 
-			overlay.$dialogue[0].addEventListener('overlay.close', this._events.editWidgetPropertiesCancel,
+			overlay.$dialogue[0].addEventListener('dialogue.close', this._events.editWidgetPropertiesCancel,
 				{once: true}
 			);
 		}

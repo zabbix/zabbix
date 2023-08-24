@@ -21,6 +21,16 @@
 
 class CControllerAuditLogList extends CController {
 
+	/**
+	 * @var string  Time from.
+	 */
+	private $from;
+
+	/**
+	 * @var string  Time till.
+	 */
+	private $to;
+
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
@@ -44,6 +54,19 @@ class CControllerAuditLogList extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
+		else {
+			if ($this->hasInput('from') || $this->hasInput('to')) {
+				validateTimeSelectorPeriod(
+					$this->hasInput('from') ? $this->getInput('from') : null,
+					$this->hasInput('to') ? $this->getInput('to') : null
+				);
+			}
+
+			$this->from = $this->getInput('from', CProfile::get('web.auditlog.filter.from',
+				'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
+			));
+			$this->to = $this->getInput('to', CProfile::get('web.auditlog.filter.to', 'now'));
+		}
 
 		return $ret;
 	}
@@ -60,15 +83,6 @@ class CControllerAuditLogList extends CController {
 			$this->deleteProfiles();
 		}
 
-		$timeselector_options = [
-			'profileIdx' => 'web.auditlog.filter',
-			'profileIdx2' => 0,
-			'from' => null,
-			'to' => null
-		];
-		$this->getInputs($timeselector_options, ['from', 'to']);
-		updateTimeSelectorPeriod($timeselector_options);
-
 		$data = [
 			'page' => $this->getInput('page', 1),
 			'userids' => CProfile::getArray('web.auditlog.filter.userids', []),
@@ -79,7 +93,12 @@ class CControllerAuditLogList extends CController {
 			'action' => $this->getAction(),
 			'actions' => self::getActionsList(),
 			'resources' => self::getResourcesList(),
-			'timeline' => getTimeSelectorPeriod($timeselector_options),
+			'timeline' => getTimeSelectorPeriod([
+				'profileIdx' => 'web.auditlog.filter',
+				'profileIdx2' => 0,
+				'from' => $this->from,
+				'to' => $this->to
+			]),
 			'auditlogs' => [],
 			'active_tab' => CProfile::get('web.auditlog.filter.active', 1)
 		];
@@ -262,6 +281,8 @@ class CControllerAuditLogList extends CController {
 		CProfile::update('web.auditlog.filter.recordsetid', $this->getInput('filter_recordsetid', ''),
 			PROFILE_TYPE_STR
 		);
+		CProfile::update('web.auditlog.filter.from', $this->from, PROFILE_TYPE_STR);
+		CProfile::update('web.auditlog.filter.to', $this->to, PROFILE_TYPE_STR);
 	}
 
 	private function deleteProfiles(): void {

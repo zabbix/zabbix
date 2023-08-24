@@ -4063,6 +4063,23 @@ z-select {
 	}
 }
 
+.overlay-dialogue #templates-form {
+	#tagsFormList,
+	#macrosFormList {
+		.form-field {
+			grid-column-start: 1;
+		}
+
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
+		}
+	}
+}
+
 .linked-templates {
 	> .table-forms {
 		margin-bottom: 5px;

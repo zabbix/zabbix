@@ -1043,7 +1043,8 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'counter' => $data['counter']
+		'counter' => $data['counter'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()
