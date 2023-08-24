@@ -65,8 +65,8 @@ $form
 				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
 			)
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')
