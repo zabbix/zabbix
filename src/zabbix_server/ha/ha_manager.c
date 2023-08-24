@@ -949,7 +949,7 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
  *                                                                            *
  ******************************************************************************/
 static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes, int *unavailable_index,
-		int *ha_status)
+		int *ha_status, int *ha_status_change_reason)
 {
 	int	i, ret = SUCCEED;
 
@@ -974,6 +974,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 	if (i == nodes->values_num || SUCCEED == zbx_cuid_compare(nodes->values[i]->ha_nodeid, info->ha_nodeid))
 	{
 		*ha_status = ZBX_NODE_STATUS_ACTIVE;
+		*ha_status_change_reason = ZBX_AUDIT_HA_ST_CH_REASON_NO_ACTIVE_NODES;
 	}
 	else
 	{
@@ -989,6 +990,7 @@ static int	ha_check_active_node(zbx_ha_info_t *info, zbx_vector_ha_node_t *nodes
 		{
 			*unavailable_index = i;
 			*ha_status = ZBX_NODE_STATUS_ACTIVE;
+			*ha_status_change_reason = ZBX_AUDIT_HA_ST_CH_REASON_DB_CONNECTION_LOSS;
 		}
 	}
 
@@ -1006,7 +1008,8 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 {
 	zbx_vector_ha_node_t	nodes;
 	zbx_ha_node_t		*node;
-	int			ha_status, db_time, unavailable_index = FAIL;
+	int			db_time, ha_status, ha_status_change_reason = ZBX_AUDIT_HA_ST_CH_REASON_UNKNOWN,
+				unavailable_index = FAIL;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 
@@ -1060,8 +1063,11 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 		}
 		else /* passive status */
 		{
-			if (SUCCEED != ha_check_active_node(info, &nodes, &unavailable_index, &ha_status))
+			if (SUCCEED != ha_check_active_node(info, &nodes, &unavailable_index, &ha_status,
+					&ha_status_change_reason))
+			{
 				goto out;
+			}
 		}
 	}
 
@@ -1076,6 +1082,12 @@ static void	ha_check_nodes(zbx_ha_info_t *info)
 		zbx_audit_ha_create_entry(AUDIT_ACTION_UPDATE, node->ha_nodeid.str, node->name);
 		zbx_audit_ha_update_field_int(node->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, node->status,
 				ha_status);
+
+		if (ZBX_NODE_STATUS_ACTIVE == ha_status)
+		{
+			zbx_audit_ha_add_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS_CHANGE_REASON_TO_ACTIVE,
+					ha_status_change_reason);
+		}
 	}
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where ha_nodeid='%s'", info->ha_nodeid.str);
