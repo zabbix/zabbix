@@ -27,7 +27,7 @@
  *                                                                            *
  * Purpose: loads aliases from configuration                                  *
  *                                                                            *
- * Parameters: lines - [IN] aliases from configuration file                   *
+ * Parameters: lines - [IN/OUT] aliases from configuration file               *
  *                                                                            *
  * Comments: calls zbx_add_alias() for each entry                             *
  *                                                                            *
@@ -65,19 +65,19 @@ void	load_aliases(char **lines)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: loads user parameters from configuration                          *
- *                                                                            *
- * Parameters: lines - [IN] user parameter entries from configuration file    *
- *             error - [IN] error message                                     *
- *                                                                            *
- * Return value: SUCCEED - successfully loaded user parameters                *
- *               FAIL    - failed to load user parameters                     *
- *                                                                            *
- * Comments: calls zbx_add_user_parameter() for each entry                    *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: loads user parameters from configuration                           *
+ *                                                                             *
+ * Parameters: lines - [IN/OUT] user parameter entries from configuration file *
+ *             error - [IN/OUT] error message                                  *
+ *                                                                             *
+ * Return value: SUCCEED - successfully loaded user parameters                 *
+ *               FAIL    - failed to load user parameters                      *
+ *                                                                             *
+ * Comments: calls zbx_add_user_parameter() for each entry                     *
+ *                                                                             *
+ *******************************************************************************/
 int	load_user_parameters(char **lines, char **err)
 {
 	char	*p, **pline, error[MAX_STRING_LEN];

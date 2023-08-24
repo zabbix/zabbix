@@ -31,7 +31,7 @@
 
 static char	*CONFIG_PID_FILE = NULL;
 
-char	*zbx_config_hosts_allowed	= NULL;
+static char	*zbx_config_hosts_allowed	= NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
@@ -44,8 +44,8 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
 int	CONFIG_LISTEN_PORT			= ZBX_DEFAULT_AGENT_PORT;
-char	*zbx_config_listen_ip			= NULL;
-int	zbx_config_refresh_active_checks	= 5;
+static char	*zbx_config_listen_ip			= NULL;
+static int	zbx_config_refresh_active_checks	= 5;
 
 ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
 
@@ -61,8 +61,6 @@ char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 
 char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_LOAD_MODULE		= NULL;
-//char	**CONFIG_USER_PARAMETERS	= NULL;
-//ZBX_GET_CONFIG_VAR(char **, zbx_config_user_parameters, NULL)
 char	**zbx_config_user_parameters	= NULL;
 char	*CONFIG_USER_PARAMETER_DIR	= NULL;
 #if defined(_WINDOWS)
@@ -1296,8 +1294,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_thread_args_t		*thread_args;
 		zbx_thread_info_t		*thread_info;
 		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
-								config_file, zbx_config_timeout, zbx_config_hosts_allowed,
-								zbx_config_user_parameters};
+								config_file, zbx_config_timeout,
+								zbx_config_hosts_allowed, zbx_config_user_parameters};
 
 		thread_args = (zbx_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_thread_args_t));
 		thread_info = &thread_args->info;
