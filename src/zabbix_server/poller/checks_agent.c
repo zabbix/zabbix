@@ -121,7 +121,7 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 	if (NULL != item->timeout)
 		zabbix_log(1, "DBG itemid, timeout str = %s", item->timeout);
 
-	if (NULL != item->timeout && '\0' != *(item->timeout) && SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
 		ret = FAIL;

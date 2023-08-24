@@ -3018,7 +3018,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 	SNMP_MT_EXECLOCK;
 
-	if (SUCCEED != zbx_is_time_suffix(items[j].timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_validate_item_timeout(items[j].timeout, &timeout_sec))
 	{
 		SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid timeout was specified."));
 		goto out;

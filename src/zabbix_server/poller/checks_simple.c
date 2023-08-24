@@ -218,8 +218,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 
-	if (NULL != item->timeout && '\0' != *(item->timeout) &&
-			SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
 		goto out;
