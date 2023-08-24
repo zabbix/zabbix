@@ -19,10 +19,10 @@
 
 class CSVGPie {
 
-	static ZBX_STYLE_CLASS =					'svg-pie-chart';
+	static ZBX_STYLE_CLASS =				'svg-pie-chart';
 	static ZBX_STYLE_ARCS =					'svg-pie-chart-arcs';
-	static ZBX_STYLE_ARC_NO_DATA_OUTER =		'svg-pie-chart-arc-no-data-outer';
-	static ZBX_STYLE_ARC_NO_DATA_INNER =		'svg-pie-chart-arc-no-data-inner';
+	static ZBX_STYLE_ARC_NO_DATA_OUTER =	'svg-pie-chart-arc-no-data-outer';
+	static ZBX_STYLE_ARC_NO_DATA_INNER =	'svg-pie-chart-arc-no-data-inner';
 	static ZBX_STYLE_TOTAL_VALUE =			'svg-pie-chart-total-value';
 	static ZBX_STYLE_TOTAL_VALUE_NO_DATA =	'svg-pie-chart-total-value-no-data';
 
