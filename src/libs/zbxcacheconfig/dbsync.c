@@ -4078,31 +4078,3 @@ out:
 	return ret;
 }
 
-int	zbx_dbsync_compare_item_type_timeouts(zbx_dbsync_t *sync)
-{
-	char	*sql = NULL;
-	size_t	sql_alloc = 0, sql_offset = 0;
-	int	ret = SUCCEED;
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,timeout_zabbix_agent,timeout_simple_check,timeout_snmp_agent,"
-			"timeout_external_check,timeout_db_monitor,timeout_http_agent,timeout_ssh_agent,"
-			"timeout_telnet_agent,timeout_script from proxy");
-
-	dbsync_prepare(sync, 10, NULL);
-
-	if (ZBX_DBSYNC_INIT == sync->mode)
-	{
-		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
-			ret = FAIL;
-
-		goto out;
-	}
-
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostid", "where", NULL,
-			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_TYPE_TIMEOUT)]);
-out:
-	zbx_free(sql);
-
-	return ret;
-}

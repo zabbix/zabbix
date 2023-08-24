@@ -9025,8 +9025,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	const ZBX_DC_HTTPITEM		*httpitem;
 	const ZBX_DC_SCRIPTITEM		*scriptitem;
-	char				*timeout_global = NULL;
-
+	const char			*timeout_global = NULL;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -9373,8 +9372,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 		default:
 			/* nothing to do */;
 	}
-
-	//zbx_free(timeout_global);
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
