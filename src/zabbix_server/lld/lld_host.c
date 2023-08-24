@@ -1541,7 +1541,7 @@ static void	lld_group_candidates_merge_by_name(zbx_vector_lld_group_ptr_t *group
 		{
 			zbx_lld_group_t	*right = groups_in->values[j];
 
-			if (0 == (strcmp(left->name, right->name)))
+			if (0 == strcmp(left->name, right->name))
 			{
 				/* unmerged group candidates have only one discovery link */
 				if (FAIL == lld_group_add_group_discovery(left, right->discovery.values[0]))
