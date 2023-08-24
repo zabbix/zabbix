@@ -71,18 +71,7 @@
 			const dialogue = overlay.$dialogue[0];
 
 			dialogue.addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
-
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
-				}
-
-				location.href = location.href;
-			});
-
-			dialogue.addEventListener('dialogue.delete', (e) => {
 				uncheckTableRows('connector');
-
 				postMessageOk(e.detail.title);
 
 				if ('messages' in e.detail) {

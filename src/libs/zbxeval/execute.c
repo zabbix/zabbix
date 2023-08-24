@@ -19,13 +19,14 @@
 
 #include "zbxeval.h"
 #include "eval.h"
+#include "count_pattern.h"
 
 #include "zbxalgo.h"
 #include "zbxvariant.h"
 #include "zbxnum.h"
 #include "zbxexpr.h"
 #include "zbxstr.h"
-#include "zbxexpression.h"
+#include "zbxtime.h"
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1

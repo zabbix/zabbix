@@ -1707,7 +1707,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
-				"status", "dcheckid", "dns", NULL);
+				"status", "dcheckid", "dns", (char *)NULL);
 
 		for (i = *processed_num; i < services->values_num; i++)
 		{

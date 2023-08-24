@@ -234,9 +234,10 @@ zbx_tcp_send_context_t;
 
 const char	*zbx_socket_strerror(void);
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
+int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len);
 #endif
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,

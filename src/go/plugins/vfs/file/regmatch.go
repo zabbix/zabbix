@@ -105,7 +105,12 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		if err != nil {
 			return nil, err
 		}
-		utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
+
+		utf8_buf, utf8_bufNumBytes, err := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
+		if err != nil {
+			return nil, fmt.Errorf("Failed to convert from encoding to utf8: %w", err)
+		}
+
 		utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
 
 		if curline >= startline {

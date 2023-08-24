@@ -156,6 +156,8 @@
 				this.#addHostDashboardTabs();
 				this.#addEventListeners();
 			}
+
+			this.#registerEvents();
 		}
 
 		#activateHostDashboardNavigation() {
@@ -270,6 +272,55 @@
 					window.location.href = host_dashboard.link;
 				}
 			}
+		}
+
+		editHost(hostid) {
+			const host_data = {hostid};
+
+			this.#openHostPopup(host_data);
+		}
+
+		#openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => history.replaceState({}, '', original_url));
+		}
+
+		#registerEvents() {
+			this.events = {
+				elementSuccess(e) {
+					let curl = null;
+					const data = e.detail;
+
+					if ('success' in data) {
+						postMessageOk(data.success.title);
+
+						if ('messages' in data.success) {
+							postMessageDetails('success', data.success.messages);
+						}
+
+						if ('action' in data.success && data.success.action === 'delete') {
+							curl = new Curl('zabbix.php');
+							curl.setArgument('action', 'host.view');
+						}
+					}
+					else {
+						postMessageError(data.error.title);
+
+						if ('messages' in data.error) {
+							postMessageDetails('error', data.error.messages);
+						}
+					}
+
+					location.href = curl === null ? location.href : curl.getUrl();
+				}
+			};
 		}
 	}
 </script>
