@@ -85,7 +85,7 @@ class NetworkDiscovery {
 						'ports' => 161,
 						'key_' => '.1.3.6.1.2.1.9.9.9',
 						'snmp_community'=> 'test SNMP community'
-						// TODO: Uncomment lines when ZBX-23088 is fixed.
+						// TODO: Uncomment lines when ZBX-23312 is fixed.
 						//'host_source' => 3,
 						//'name_source' => 2
 					],
@@ -96,14 +96,14 @@ class NetworkDiscovery {
 						'snmpv3_contextname name' => 'test_context_name',
 						'snmpv3_securityname' => 'test_security_name',
 						'snmpv3_securitylevel' => 0,
-						// TODO: Uncomment line when ZBX-23088 is fixed.
+						// TODO: Uncomment line when ZBX-23312 is fixed.
 						//'name_source' => 2
 						'uniq' => 1
 					],
 					[
 						'type' => SVC_TELNET,
 						'ports' => 23
-						// TODO: Uncomment line when ZBX-23088 is fixed.
+						// TODO: Uncomment line when ZBX-23312 is fixed.
 						//'name_source' => 2
 					]
 				]
