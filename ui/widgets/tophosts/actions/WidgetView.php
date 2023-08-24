@@ -415,64 +415,70 @@ class WidgetView extends CControllerDashboardWidgetView {
 				];
 		}
 
-		$value_type = $column['value_type'];
-		$aggregate_function = $column['aggregate_function'];
-		$time_from = $column['time_from'];
-		$time_to = $column['time_to'];
-
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($time_from);
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($time_to);
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-
-		$from = time() - $history_period;
-
-		self::addDataSource($items, $from, $time_now, $column['history']);
-
-		$function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
-
-		$result = [];
-
-		if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
-
-			$values = Manager::History()->getAggregationByInterval(
-				$items, $time_from, $time_to, $function, $time_to
-			);
-
-			if ($values) {
-				$values = $values[$column['itemid']]['data'][0];
-
-				$result += $aggregate_function !== AGGREGATE_COUNT
-					? [$column['itemid'] => $values['value']]
-					: [$column['itemid'] => $values['count']];
-			}
+		if (!array_key_exists('value_type', $column)) {
+			$result = [];
 		}
 		else {
-			switch ($function) {
-				case AGGREGATE_LAST:
-					$function = 'max';
-					break;
+			$value_type = $column['value_type'];
 
-				case AGGREGATE_FIRST:
-					$function = 'min';
-					break;
 
-				case AGGREGATE_COUNT:
-					$function = 'count';
-					break;
-			}
+			$aggregate_function = $column['aggregate_function'];
+			$time_from = $column['time_from'];
+			$time_to = $column['time_to'];
 
-			$non_numeric_history = Manager::History()->getAggregatedValue(
-				$column, $function, $time_from, $time_to
-			);
+			$range_time_parser = new CRangeTimeParser();
 
-			if ($non_numeric_history) {
-				$result = [
-					$column['itemid'] => $non_numeric_history
-				];
+			$range_time_parser->parse($time_from);
+			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+			$range_time_parser->parse($time_to);
+			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+
+			$from = time() - $history_period;
+
+			self::addDataSource($items, $from, $time_now, $column['history']);
+
+			$function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
+
+			$result = [];
+
+			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
+
+				$values = Manager::History()->getAggregationByInterval(
+					$items, $time_from, $time_to, $function, $time_to
+				);
+
+				if ($values) {
+					$values = $values[$column['itemid']]['data'][0];
+
+					$result += $aggregate_function !== AGGREGATE_COUNT
+						? [$column['itemid'] => $values['value']]
+						: [$column['itemid'] => $values['count']];
+				}
+			} else {
+				switch ($function) {
+					case AGGREGATE_LAST:
+						$function = 'max';
+						break;
+
+					case AGGREGATE_FIRST:
+						$function = 'min';
+						break;
+
+					case AGGREGATE_COUNT:
+						$function = 'count';
+						break;
+				}
+
+				$non_numeric_history = Manager::History()->getAggregatedValue(
+					$column, $function, $time_from, $time_to
+				);
+
+				if ($non_numeric_history) {
+					$result = [
+						$column['itemid'] => $non_numeric_history
+					];
+				}
 			}
 		}
 

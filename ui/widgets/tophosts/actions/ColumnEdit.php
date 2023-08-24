@@ -83,7 +83,8 @@ class ColumnEdit extends CController {
 		$column = $this->getInputAll();
 
 		if (isset($column['aggregate_function']) && $column['aggregate_function'] != AGGREGATE_NONE
-				&& isset($column['item_time'])) {
+				&& isset($column['item_time']) && $column['time_from'] != '' && $column['time_to'] != '') {
+
 			$ts = [];
 			$ts['now'] = time();
 			$range_time_parser = new CRangeTimeParser();
