@@ -166,20 +166,39 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				switch ($this->test_type) {
 					case self::ZBX_TEST_TYPE_ITEM:
 						$api_input_rules = CItem::getPreprocessingValidationRules();
+						$flags = ZBX_FLAG_DISCOVERY_NORMAL;
 						break;
 
 					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
 						$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+						$flags = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 						break;
 
 					case self::ZBX_TEST_TYPE_LLD:
 						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
+						$flags = ZBX_FLAG_DISCOVERY_RULE;
 						break;
 				}
 
 				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
 					error($error);
 					$ret = false;
+				}
+				else {
+					try {
+						$item = [
+							'type' => $this->item_type,
+							'flags' => $flags,
+							'preprocessing' => $steps
+						];
+
+						CItemGeneral::validatePreprocessingStepsByType($item, '/steps');
+
+						$steps = $item['preprocessing'];
+					} catch (Exception $e) {
+						error($e->getMessage());
+						$ret = false;
+					}
 				}
 			}
 
