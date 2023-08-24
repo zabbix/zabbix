@@ -23,10 +23,13 @@ import (
 	"context"
 	"crypto/tls"
 	"database/sql"
+	"fmt"
+	"strings"
 	"sync"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/omeid/go-yarn"
 
 	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
@@ -37,14 +40,17 @@ import (
 
 type MyClient interface {
 	Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error)
+	QueryByName(ctx context.Context, queryName string, args ...interface{}) (rows *sql.Rows, err error)
 	QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error)
 }
 
 type MyConn struct {
 	client         *sql.DB
 	lastTimeAccess time.Time
+	queryStorage   *yarn.Yarn
 }
 
+// Query wraps DB.QueryRowContext.
 func (conn *MyConn) Query(ctx context.Context, query string, args ...interface{}) (rows *sql.Rows, err error) {
 	rows, err = conn.client.QueryContext(ctx, query, args...)
 
@@ -55,7 +61,18 @@ func (conn *MyConn) Query(ctx context.Context, query string, args ...interface{}
 	return
 }
 
-// Query wraps DB.QueryRowContext.
+// QueryByName wraps DB.QueryRowContext.
+func (conn *MyConn) QueryByName(ctx context.Context, name string, args ...interface{}) (rows *sql.Rows, err error) {
+	if sql, ok := (*conn.queryStorage).Get(name + sqlExt); ok {
+		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
+
+		return conn.Query(ctx, normalizedSQL, args...)
+	}
+
+	return nil, fmt.Errorf("query %s not found", name)
+}
+
+// QueryRow wraps DB.QueryRowContext.
 func (conn *MyConn) QueryRow(ctx context.Context, query string, args ...interface{}) (row *sql.Row, err error) {
 	row = conn.client.QueryRowContext(ctx, query, args...)
 
@@ -80,11 +97,12 @@ type ConnManager struct {
 	connectTimeout time.Duration
 	callTimeout    time.Duration
 	Destroy        context.CancelFunc
+	queryStorage   yarn.Yarn
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
 func NewConnManager(keepAlive, connectTimeout, callTimeout,
-	hkInterval time.Duration) *ConnManager {
+	hkInterval time.Duration, queryStorage yarn.Yarn) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
@@ -93,6 +111,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 		connectTimeout: connectTimeout,
 		callTimeout:    callTimeout,
 		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
+		queryStorage:   queryStorage,
 	}
 
 	go connMgr.housekeeper(ctx, hkInterval)
@@ -175,6 +194,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*MyConn, e
 	c.connections[uri] = &MyConn{
 		client:         client,
 		lastTimeAccess: time.Now(),
+		queryStorage:   &c.queryStorage,
 	}
 
 	log.Debugf("[%s] Created new connection: %s", pluginName, uri.Addr())

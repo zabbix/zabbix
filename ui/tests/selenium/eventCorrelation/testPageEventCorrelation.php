@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @backup correlation
  *
  * @onBefore prepareEventData
+ *
+ * @dataSource HostGroups
  */
 class testPageEventCorrelation extends CWebTest {
 
@@ -53,6 +55,11 @@ class testPageEventCorrelation extends CWebTest {
 	const EVENT_NEW_VALUE = 'New event tag value';
 	const MULTIPLE_CONDITIONS = 'Conditions';
 	const EVENT_FOR_FILTER = '📌€√Σnt correlation for filter and deletion';
+
+	/**
+	 * Object created in dataSource HostGroups.
+	 */
+	const CORELLLATION_HOSTGROUP = 'Corellation for host group testing';
 
 	public function prepareEventData() {
 		CDataHelper::call('correlation.create', [
@@ -321,7 +328,7 @@ class testPageEventCorrelation extends CWebTest {
 	 * @dataProvider getEventData
 	 */
 	public function testPageEventCorrelation_Layout($data) {
-		$event_count = count($data);
+		$event_count = CDBHelper::getCount(self::CORRELATION_SQL);
 
 		$this->page->login()->open('zabbix.php?action=correlation.list');
 		$this->page->assertTitle('Event correlation rules');
@@ -408,6 +415,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Name' => 'host'
 					],
 					'expected' => [
+						self::CORELLLATION_HOSTGROUP,
 						self::EVENT_HOSTGROUP
 					]
 				]
@@ -420,6 +428,7 @@ class testPageEventCorrelation extends CWebTest {
 					],
 					'expected' => [
 						self::EVENT_BOTH_OPERATIONS,
+						self::CORELLLATION_HOSTGROUP,
 						self::EVENT_NEW_OPERATIONS,
 						self::EVENT_OLD_OPERATIONS,
 						self::EVENT_HOSTGROUP,
@@ -480,6 +489,7 @@ class testPageEventCorrelation extends CWebTest {
 					],
 					'expected' => [
 						self::MULTIPLE_CONDITIONS,
+						self::CORELLLATION_HOSTGROUP,
 						self::EVENT_NEW_OPERATIONS,
 						self::EVENT_HOSTGROUP,
 						self::EVENT_PAIR,
@@ -587,6 +597,7 @@ class testPageEventCorrelation extends CWebTest {
 						self::EVENT_HOSTGROUP,
 						self::EVENT_OLD_OPERATIONS,
 						self::EVENT_NEW_OPERATIONS,
+						self::CORELLLATION_HOSTGROUP,
 						self::MULTIPLE_CONDITIONS,
 						self::EVENT_BOTH_OPERATIONS
 					]
@@ -596,6 +607,7 @@ class testPageEventCorrelation extends CWebTest {
 				[
 					'sort_field' => 'Status',
 					'expected' => [
+						'Enabled',
 						'Enabled',
 						'Enabled',
 						'Enabled',
