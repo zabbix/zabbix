@@ -21,13 +21,14 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // Create form.
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('massupdate-form')
-	->addVar('action', 'popup.massupdate.template')
+	->addVar('action', 'template.massupdate')
 	->addVar('update', '1')
 	->addVar('ids', $data['ids'])
 	->addVar('location_url', $data['location_url'])
@@ -172,8 +173,7 @@ $output = [
 	]
 ];
 
-$output['script_inline'] = $this->readJsFile('popup.massupdate.js.php');
-$output['script_inline'] .= getPagePostJs();
+$output['script_inline'] = $this->readJsFile('popup.massupdate.js.php').getPagePostJs();
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();

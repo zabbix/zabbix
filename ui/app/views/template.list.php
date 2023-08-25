@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,47 +21,67 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-require_once dirname(__FILE__).'/js/configuration.template.list.js.php';
+$this->addJsFile('class.tagfilteritem.js');
+$this->includeJsFile('template.list.js.php');
 
-$filter_tags = $data['filter']['tags'];
-if (!$filter_tags) {
-	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+if ($data['uncheck']) {
+	uncheckTableRows('templates');
 }
+
+$html_page = (new CHtmlPage())
+	->setTitle(_('Templates'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_LIST))
+	->setControls((new CTag('nav', true,
+		(new CList())
+			->addItem(
+				(new CSimpleButton(_('Create template')))
+					->setAttribute('data-groupids', json_encode(array_keys($data['filter']['groups'])))
+					->setId('js-create'))
+			->addItem((new CSimpleButton(_('Import')))->setId('js-import'))
+	))->setAttribute('aria-label', _('Content controls')));
+
+$action_url = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
 $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'evaltype' => $data['filter']['evaltype'],
-	'tags' => $filter_tags
+	'tags' => $data['filter']['tags']
 ]);
 
 $filter = (new CFilter())
-	->setResetUrl(new CUrl('templates.php'))
+	->setResetUrl($action_url)
 	->setProfile($data['profileIdx'])
 	->setActiveTab($data['active_tab'])
+	->addVar('action', $data['action'], 'filter_action')
 	->addFilterTab(_('Filter'), [
-		(new CFormList())
-			->addRow(
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
 				(new CLabel(_('Template groups'), 'filter_groups__ms')),
-				(new CMultiSelect([
-					'name' => 'filter_groups[]',
-					'object_name' => 'templateGroup',
-					'data' => $data['filter']['groups'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'template_groups',
-							'srcfld1' => 'groupid',
-							'dstfrm' => 'zbx_filter',
-							'dstfld1' => 'filter_groups_',
-							'with_templates' => true,
-							'editable' => true,
-							'enrich_parent_groups' => true
+				new CFormField(
+					(new CMultiSelect([
+						'name' => 'filter_groups[]',
+						'object_name' => 'templateGroup',
+						'data' => $data['filter']['groups'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'template_groups',
+								'srcfld1' => 'groupid',
+								'dstfrm' => 'zbx_filter',
+								'dstfld1' => 'filter_groups_',
+								'with_templates' => true,
+								'editable' => true,
+								'enrich_parent_groups' => true
+							]
 						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(
-				(new CLabel(_('Linked templates'), 'filter_templates__ms')),
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			])
+		->addItem([
+			(new CLabel(_('Linked templates'), 'filter_templates__ms')),
+			new CFormField(
 				(new CMultiSelect([
 					'name' => 'filter_templates[]',
 					'object_name' => 'templates',
@@ -77,59 +97,45 @@ $filter = (new CFilter())
 					]
 				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-			->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-			->addRow(_('Vendor'),
+		])
+		->addItem([
+			new CLabel(_('Name'), 'filter_name'),
+			new CFormField((new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+		])
+		->addItem([
+			new CLabel(_('Vendor'), 'filter_vendor_name'),
+			new CFormField(
 				(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
 					DB::getFieldLength('hosts', 'vendor_name')
 				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			)
-			->addRow(_('Version'),
+		])
+		->addItem([
+			new CLabel(_('Version'), 'filter_vendor_version'),
+			new CFormField(
 				(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
 					DB::getFieldLength('hosts', 'vendor_version'))
 				)->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			),
-		(new CFormList())->addRow(_('Tags'), $filter_tags_table)
+			)
+		]),
+
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
 	]);
 
-$html_page = (new CHtmlPage())
-	->setTitle(_('Templates'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_LIST))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create template'),
-				(new CUrl('templates.php'))
-					->setArgument('groupids', array_keys($data['filter']['groups']))
-					->setArgument('form', 'create')
-				)
-			)
-			->addItem(
-				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {
-						rules_preset: "template", "'.
-						CCsrfTokenHelper::CSRF_TOKEN_NAME.'": "'.CCsrfTokenHelper::get('import').'"
-					}, {
-						dialogueid: "popup_import",
-						dialogue_class: "modal-popup-generic"
-					});')
-					->removeId()
-			)
-		))->setAttribute('aria-label', _('Content controls'))
-	)
-	->addItem($filter);
+$html_page->addItem($filter);
 
-$form = (new CForm())->setName('templates');
+$form = (new CForm())
+	->setName('templates');
 
-// create table
+// Create table.
 $table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder'],
-			(new CUrl('templates.php'))->getUrl()
-		),
+		make_sorting_header(_('Name'), 'name', $data['sort_field'], $data['sort_order'], $action_url->getUrl()),
 		_('Hosts'),
 		_('Items'),
 		_('Triggers'),
@@ -145,7 +151,9 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($data['templates'] as $template) {
-	$name = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
+	$name = (new CLink($template['name']))
+		->addClass('js-edit')
+		->setAttribute('data-templateid', $template['templateid']);
 
 	$linked_templates_output = [];
 	$linked_to_output = [];
@@ -164,14 +172,12 @@ foreach ($data['templates'] as $template) {
 			$linked_templates_output[] = ', ';
 		}
 
-		$url = (new CUrl('templates.php'))
-			->setArgument('form', 'update')
-			->setArgument('templateid', $parent_template['templateid']);
-
 		if (array_key_exists($parent_template['templateid'], $data['editable_templates'])) {
-			$linked_templates_output[] = (new CLink($parent_template['name'], $url))
+			$linked_templates_output[] = (new CLink($parent_template['name']))
+				->addClass('js-edit')
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
+				->addClass(ZBX_STYLE_GREY)
+				->setAttribute('data-templateid', $parent_template['templateid']);
 		}
 		else {
 			$linked_templates_output[] = (new CSpan($parent_template['name']))
@@ -194,12 +200,11 @@ foreach ($data['templates'] as $template) {
 		}
 
 		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
-			$url = (new CUrl('templates.php'))
-				->setArgument('form', 'update')
-				->setArgument('templateid', $child_template['templateid']);
-			$linked_to_output[] = (new CLink($child_template['name'], $url))
+			$linked_to_output[] = (new CLink($child_template['name']))
+				->addClass('js-edit')
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
+				->addClass(ZBX_STYLE_GREY)
+				->setAttribute('data-templateid', $child_template['templateid']);
 		}
 		else {
 			$linked_to_output[] = (new CSpan($child_template['name']))
@@ -286,45 +291,40 @@ foreach ($data['templates'] as $template) {
 $form->addItem([
 	$table,
 	$data['paging'],
-	new CActionButtonList('action', 'templates',
-		[
-			'template.export' => [
-				'content' => new CButtonExport('export.templates',
-					(new CUrl('templates.php'))
-						->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
-						->getUrl()
-				)
-			],
-			'popup.massupdate.template' => [
-				'content' => (new CSimpleButton(_('Mass update')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->onClick(
-						"openMassupdatePopup('popup.massupdate.template', ".
-							json_encode([CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('template')]).
-						", {
-							dialogue_class: 'modal-popup-static',
-							trigger_element: this
-						});"
-					)
-			],
-			'template.massdelete' => [
-				'name' => _('Delete'),
-				'confirm_singular' => _('Delete selected template?'),
-				'confirm_plural' => _('Delete selected templates?'),
-				'csrf_token' => CCsrfTokenHelper::get('templates.php')
-			],
-			'template.massdeleteclear' => [
-				'name' => _('Delete and clear'),
-				'confirm_singular' =>
-					_('Delete and clear selected template? (Warning: all linked hosts will be cleared!)'),
-				'confirm_plural' =>
-					_('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
-				'csrf_token' => CCsrfTokenHelper::get('templates.php')
-			]
+	new CActionButtonList('action', 'templates', [
+		'template.export' => [
+			'content' => new CButtonExport('export.templates',
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'templates.list')
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
+		],
+		'template.massupdate' => [
+			'content' => (new CSimpleButton(_('Mass update')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massupdate')
+				->addClass('js-no-chkbxrange')
+		],
+		'template.massdelete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete')
+				->addClass('js-no-chkbxrange')
+		],
+		'template.massdeleteclear' => [
+			'content' => (new CSimpleButton(_('Delete and clear')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-massdelete-clear')
+				->addClass('js-no-chkbxrange')
 		]
-	)
+	], 'templates')
 ]);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

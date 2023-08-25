@@ -5819,6 +5819,10 @@ msgid_plural "Dashboards deleted"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr ""
@@ -8133,6 +8137,10 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr ""
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr ""
@@ -9590,6 +9598,10 @@ msgstr ""
 #: app/views/administration.proxy.list.php:82 hostinventoriesoverview.php:89
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
 msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
@@ -14340,6 +14352,10 @@ msgstr ""
 msgid "New user group mapping"
 msgstr ""
 
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr ""
+
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
 msgid "Next page"
@@ -16426,6 +16442,10 @@ msgstr ""
 #: app/views/js/administration.iconmap.edit.js.php:47
 #: include/views/configuration.graph.edit.php:451
 msgid "Preview"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
 msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:86
@@ -23972,6 +23992,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474

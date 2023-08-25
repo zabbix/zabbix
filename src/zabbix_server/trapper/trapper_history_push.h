@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,28 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_TRAPPER_PREPROC_H
+#define ZABBIX_TRAPPER_PREPROC_H
 
-/**
- * @var CView $this
- */
-?>
+#include "zbxcomms.h"
+#include "zbxjson.h"
 
-<script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
-</script>
+int	trapper_process_history_push(zbx_socket_t *sock, const struct zbx_json_parse *jp, int timeout);
 
-<script type="text/javascript">
-	jQuery(function($) {
-		$('#filter-tags')
-			.dynamicRows({template: '#filter-tag-row-tmpl'})
-			.on('afteradd.dynamicRows', function() {
-				var rows = this.querySelectorAll('.form_row');
-				new CTagFilterItem(rows[rows.length - 1]);
-			});
-
-		// Init existing fields once loaded.
-		document.querySelectorAll('#filter-tags .form_row').forEach(row => {
-			new CTagFilterItem(row);
-		});
-	});
-</script>
+#endif

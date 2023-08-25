@@ -17,22 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxconf.h"
+#include "agent_conf.h"
 
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
-#include "zbxparam.h"
 #include "zbxexpr.h"
-
-#ifdef _WINDOWS
-#	include "perfstat.h"
-#endif
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load aliases from configuration                                   *
+ * Purpose: loads aliases from configuration                                  *
  *                                                                            *
- * Parameters: lines - aliases from configuration file                        *
+ * Parameters: lines - [IN/OUT] aliases from configuration file               *
  *                                                                            *
  * Comments: calls zbx_add_alias() for each entry                             *
  *                                                                            *
@@ -70,19 +65,19 @@ void	load_aliases(char **lines)
 	}
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: load user parameters from configuration                           *
- *                                                                            *
- * Parameters: lines - user parameter entries from configuration file         *
- *             error - error message                                          *
- *                                                                            *
- * Return value: SUCCEED - successfully loaded user parameters                *
- *               FAIL    - failed to load user parameters                     *
- *                                                                            *
- * Comments: calls zbx_add_user_parameter() for each entry                    *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: loads user parameters from configuration                           *
+ *                                                                             *
+ * Parameters: lines - [IN/OUT] user parameter entries from configuration file *
+ *             error - [IN/OUT] error message                                  *
+ *                                                                             *
+ * Return value: SUCCEED - successfully loaded user parameters                 *
+ *               FAIL    - failed to load user parameters                      *
+ *                                                                             *
+ * Comments: calls zbx_add_user_parameter() for each entry                     *
+ *                                                                             *
+ *******************************************************************************/
 int	load_user_parameters(char **lines, char **err)
 {
 	char	*p, **pline, error[MAX_STRING_LEN];
@@ -110,7 +105,7 @@ int	load_user_parameters(char **lines, char **err)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Adds key access rule from configuration                           *
+ * Purpose: adds key access rule from configuration                           *
  *                                                                            *
  * Parameters: value - [IN] key access rule parameter value                   *
  *             cfg   - [IN] configuration parameter information               *
@@ -136,7 +131,7 @@ int	load_key_access_rule(const char *value, const struct cfg_line *cfg)
 #ifdef _WINDOWS
 /******************************************************************************
  *                                                                            *
- * Purpose: load performance counters from configuration                      *
+ * Purpose: loads performance counters from configuration                     *
  *                                                                            *
  * Parameters: def_lines - array of PerfCounter configuration entries         *
  *             eng_lines - array of PerfCounterEn configuration entries       *
@@ -198,7 +193,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 				goto pc_fail;
 			}
 
-			if (NULL == add_perf_counter(name, counterpath, period, lang, &error))
+			if (NULL == zbx_add_perf_counter(name, counterpath, period, lang, &error))
 			{
 				if (NULL == error)
 					error = zbx_strdup(error, "Failed to add new performance counter.");
@@ -220,16 +215,16 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 #else
 /******************************************************************************
  *                                                                            *
- * Purpose: load user parameters from configuration file                      *
+ * Purpose: loads user parameters from configuration file                     *
  *                                                                            *
  ******************************************************************************/
-static int	load_config_user_params(const char *config_file)
+static int	load_config_user_params(const char *config_file, char **config_user_parameters)
 {
 	struct cfg_line	cfg[] =
 	{
 		/* PARAMETER,			VAR,					TYPE,
 			MANDATORY,	MIN,			MAX */
-		{"UserParameter",		&CONFIG_USER_PARAMETERS,		TYPE_MULTISTRING,
+		{"UserParameter",		&config_user_parameters,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
@@ -237,14 +232,15 @@ static int	load_config_user_params(const char *config_file)
 	return parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT, ZBX_CFG_NO_EXIT_FAILURE);
 }
 
-void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file)
+void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file,
+		char **config_user_parameters)
 {
 	char		*error = NULL;
 	zbx_metric_t	*metrics_fallback = NULL;
 
-	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_init(&config_user_parameters);
 
-	if (FAIL == load_config_user_params(config_file))
+	if (FAIL == load_config_user_params(config_file, config_user_parameters))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d]: error processing configuration file",
 				get_process_type_string(process_type), process_num);
@@ -254,7 +250,7 @@ void	reload_user_parameters(unsigned char process_type, int process_num, const c
 	zbx_get_metrics_copy(&metrics_fallback);
 	zbx_remove_user_parameters();
 
-	if (FAIL == load_user_parameters(CONFIG_USER_PARAMETERS, &error))
+	if (FAIL == load_user_parameters(config_user_parameters, &error))
 	{
 		zbx_set_metrics(metrics_fallback);
 		zabbix_log(LOG_LEVEL_ERR, "cannot reload user parameters [%s #%d], %s",
@@ -267,7 +263,7 @@ void	reload_user_parameters(unsigned char process_type, int process_num, const c
 	zabbix_log(LOG_LEVEL_INFORMATION, "user parameters reloaded [%s #%d]", get_process_type_string(process_type),
 			process_num);
 out:
-	zbx_strarr_free(&CONFIG_USER_PARAMETERS);
+	zbx_strarr_free(&config_user_parameters);
 }
 #endif	/* _WINDOWS */
 

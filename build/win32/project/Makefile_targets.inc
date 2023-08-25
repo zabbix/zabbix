@@ -108,6 +108,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxsysinfo\win32}.c{..\..\..\src\libs\zbxsysinfo\win32}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxsysinfo\win32\perfstat}.c{..\..\..\src\libs\zbxsysinfo\win32\perfstat}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxsysinfo\win32}.cpp{..\..\..\src\libs\zbxsysinfo\win32}.o:
 	$(CC) $? /Fo"$@" $(CPPFLAGS)
 
@@ -130,6 +133,12 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\zabbix_agent\eventlog}.c{..\..\..\src\zabbix_agent\eventlog}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\zabbix_agent\listener}.c{..\..\..\src\zabbix_agent\listener}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+{..\..\..\src\zabbix_agent\agent_conf}.c{..\..\..\src\zabbix_agent\agent_conf}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
 {..\..\..\src\zabbix_agent\logfiles}.c{..\..\..\src\zabbix_agent\logfiles}.o:

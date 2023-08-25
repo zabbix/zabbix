@@ -563,7 +563,7 @@ class testPageAdministrationProxies extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $data['title'], CTestArrayHelper::get($data, 'message', null));
 
 			// Check DB. Status 5 stands for Active proxy and status 6 - for Passive proxy.
-			$db_proxies = CDBHelper::getColumn('SELECT * FROM hosts WHERE status IN (5,6)', 'host');
+			$db_proxies = CDBHelper::getColumn('SELECT * FROM proxy', 'name');
 
 			foreach ($data['proxies'] as $proxy) {
 				$this->assertEquals(($data['action'] !== 'Delete'), in_array($proxy, array_values($db_proxies)));
@@ -577,7 +577,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 			// Check that hosts are actually enabled/disabled.
 			if ($data['action'] === 'Enable hosts' || $data['action'] === 'Disable hosts') {
-				$hosts = CDBHelper::getAll('SELECT host, status FROM hosts WHERE proxy_hostid IS NOT NULL');
+				$hosts = CDBHelper::getAll('SELECT host, status FROM hosts WHERE proxyid IS NOT NULL');
 
 				// DB check for hosts.
 				foreach ($hosts as $host) {
@@ -597,7 +597,7 @@ class testPageAdministrationProxies extends CWebTest {
 	 */
 	public function testPageAdministrationProxies_SortColumns() {
 		// Open Proxies page with proxies sorted descendingly by name.
-		$this->page->login()->open('zabbix.php?action=proxy.list&sort=host&sortorder=DESC')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=proxy.list&sort=name&sortorder=DESC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 
 		foreach (['Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)'] as $column) {

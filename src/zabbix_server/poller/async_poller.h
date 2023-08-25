@@ -22,10 +22,12 @@
 
 #include "zbxalgo.h"
 #include "zbxthreads.h"
-ZBX_VECTOR_DECL(int32, int)
+#include "zbxcacheconfig.h"
+#include "async_manager.h"
 
 typedef struct
 {
+	zbx_async_manager_t	*manager;
 	const zbx_thread_info_t	*info;
 	int			state;
 	int			clear_cache;
@@ -40,17 +42,15 @@ typedef struct
 	int			config_max_concurrent_checks_per_poller;
 	int			config_timeout;
 	const char		*config_source_ip;
-	struct event		*async_check_items_timer;
-	zbx_vector_uint64_t	itemids;
-	zbx_vector_int32_t	errcodes;
-	zbx_vector_int32_t	lastclocks;
+	struct event		*async_wake_timer;
+	struct event		*async_timer;
 	struct event_base	*base;
+	struct evdns_base	*dnsbase;
 	zbx_hashset_t		interfaces;
 #ifdef HAVE_LIBCURL
 	CURLM			*curl_handle;
 #endif
 }
 zbx_poller_config_t;
-
 
 #endif

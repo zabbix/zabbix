@@ -303,7 +303,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'status', 'proxy_hostid', 'tls_subject', 'maintenance_status',
+				'output' => ['hostid', 'host', 'name', 'status', 'proxyid', 'tls_subject', 'maintenance_status',
 					'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 					'tls_issuer', 'tls_connect'
 				],
@@ -336,14 +336,14 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function getHostProxies() {
 		$proxies = API::Proxy()->get([
-			'output' => ['host'],
+			'output' => ['name'],
 			'preservekeys' => true
 		]);
 
-		CArrayHelper::sort($proxies, [['field' => 'host', 'order' => ZBX_SORT_UP]]);
+		CArrayHelper::sort($proxies, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
 		foreach ($proxies as &$proxy) {
-			$proxy = $proxy['host'];
+			$proxy = $proxy['name'];
 		}
 		unset($proxy);
 
@@ -415,17 +415,17 @@ abstract class CControllerPopupItemTest extends CController {
 
 		// Set proxy.
 		if (in_array($this->item_type, $this->items_support_proxy)) {
-			if (array_key_exists('data', $input) && array_key_exists('proxy_hostid', $input['data'])) {
-				$data['proxy_hostid'] = $input['data']['proxy_hostid'];
+			if (array_key_exists('data', $input) && array_key_exists('proxyid', $input['data'])) {
+				$data['proxyid'] = $input['data']['proxyid'];
 			}
-			elseif (array_key_exists('proxy_hostid', $input)) {
-				$data['proxy_hostid'] = $input['proxy_hostid'];
+			elseif (array_key_exists('proxyid', $input)) {
+				$data['proxyid'] = $input['proxyid'];
 			}
-			elseif (array_key_exists('proxy_hostid', $this->host)) {
-				$data['proxy_hostid'] = $this->host['proxy_hostid'];
+			elseif (array_key_exists('proxyid', $this->host)) {
+				$data['proxyid'] = $this->host['proxyid'];
 			}
 			else {
-				$data['proxy_hostid'] = 0;
+				$data['proxyid'] = 0;
 			}
 		}
 
@@ -1119,6 +1119,11 @@ abstract class CControllerPopupItemTest extends CController {
 												$macros_posted
 											);
 											$expression[] = CFilterParser::quoteString($string);
+											break;
+
+										case CFilterParser::TOKEN_TYPE_KEYWORD:
+										case CFilterParser::TOKEN_TYPE_OPERATOR:
+											$expression[] = $filter_token['match'];
 											break;
 									}
 								}

@@ -17,22 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_LISTENER_H
-#define ZABBIX_LISTENER_H
-
-#include "zbxthreads.h"
-#include "zbxcomms.h"
+#ifndef ZABBIX_ASYNC_WORKER_H
+#define ZABBIX_ASYNC_WORKER_H
+#include "zbxalgo.h"
+#include "async_manager.h"
+#include "async_queue.h"
+#include "zbxtimekeeper.h"
 
 typedef struct
 {
-	zbx_socket_t		*listen_sock;
-	zbx_config_tls_t	*zbx_config_tls;
-	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	char			*config_file;
-	int			config_timeout;
+	zbx_uint32_t			init_flags;
+	int				stop;
+
+	zbx_async_queue_t		*queue;
+	pthread_t			thread;
+
+	zbx_async_notify_cb_t		finished_cb;
+
+	void				*finished_data;
 }
-zbx_thread_listener_args;
+zbx_async_worker_t;
 
-ZBX_THREAD_ENTRY(listener_thread, args);
-
+int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, char **error);
+void	async_worker_stop(zbx_async_worker_t *worker);
+void	async_worker_destroy(zbx_async_worker_t *worker);
+void	async_worker_set_finished_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t finished_cb, void *finished_data);
 #endif
