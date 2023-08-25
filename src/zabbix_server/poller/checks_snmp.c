@@ -566,7 +566,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const char *ip, unsigned short port,
 		char *snmp_community, char *snmpv3_securityname, char *snmpv3_contextname, unsigned char snmpv3_securitylevel,
 		unsigned char snmpv3_authprotocol, char *snmpv3_authpassphrase, unsigned char snmpv3_privprotocol, char *snmpv3_privpassphrase, char *error, size_t max_error_len,
-		int config_timeout, const char *config_source_ip)
+		int timeout, const char *config_source_ip)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
