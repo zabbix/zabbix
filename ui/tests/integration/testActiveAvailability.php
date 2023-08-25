@@ -67,7 +67,7 @@ class testActiveAvailability extends CIntegrationTest {
 				'LogFileSize' => 20
 			],
 			self::COMPONENT_PROXY => [
-				'ProxyMode' => PROXY_MODE_ACTIVE,
+				'ProxyMode' => PROXY_OPERATING_MODE_ACTIVE,
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
 				'Hostname' => 'active proxy',
@@ -94,7 +94,7 @@ class testActiveAvailability extends CIntegrationTest {
 				'ProxyDataFrequency' => 1
 			],
 			self::COMPONENT_PROXY => [
-				'ProxyMode' => PROXY_MODE_PASSIVE,
+				'ProxyMode' => PROXY_OPERATING_MODE_PASSIVE,
 				'DebugLevel' => 4,
 				'LogFileSize' => 20,
 				'Hostname' => 'passive proxy',
@@ -242,7 +242,7 @@ class testActiveAvailability extends CIntegrationTest {
 	public function testActiveAvailability_activeProxyActiveAvailCheck() {
 		$response = $this->call('proxy.create', [
 			'name' => 'active proxy',
-			'mode' => PROXY_MODE_ACTIVE,
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 			'hosts' => [
 				[
 					"hostid" => self::$hostid
@@ -289,7 +289,7 @@ class testActiveAvailability extends CIntegrationTest {
 	public function testActiveAvailability_passiveProxyActiveAvailCheck() {
 		$response = $this->call('proxy.create', [
 			'name' => 'passive proxy',
-			'mode' => PROXY_MODE_PASSIVE,
+			'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 			'hosts' => [
 				[
 					"hostid" => self::$hostid
