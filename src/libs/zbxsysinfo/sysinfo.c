@@ -33,6 +33,7 @@
 #include "zbxexpr.h"
 #include "zbxfile.h"
 #include "zbxthreads.h"
+#include "zbxtime.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -992,7 +993,7 @@ void	zbx_test_parameter(const char *key)
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result))
+	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, ZBX_CHECK_TIMEOUT_UNDEFINED))
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -1164,7 +1165,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
  *               result - contains item value or error message                    *
  *                                                                                *
  **********************************************************************************/
-int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result)
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout)
 {
 	int		ret = NOTSUPPORTED;
 	zbx_metric_t	*command = NULL;
@@ -1258,6 +1259,9 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 		}
 	}
 
+	if (timeout != ZBX_CHECK_TIMEOUT_UNDEFINED)
+		zbx_alarm_on(timeout);
+
 	if (SYSINFO_RET_OK != command->function(&request, result))
 	{
 		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
@@ -1267,6 +1271,14 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 		goto notsupported;
 	}
+
+	if (timeout != ZBX_CHECK_TIMEOUT_UNDEFINED && SUCCEED == zbx_alarm_timed_out())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timed out during check execution."));
+		goto notsupported;
+	}
+
+	zbx_alarm_off();
 
 	ret = SUCCEED;
 notsupported:
@@ -2130,4 +2142,24 @@ char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
 
 	return dst_string;
 }
+
+int	zbx_validate_item_timeout(const char *timeout_str, int *timeout_out)
+{
+#define ZBX_ITEM_TIMEOUT_MAX	600
+	if (NULL == timeout_str || '\0' == *timeout_str)
+	{
+		*timeout_out = ZBX_CHECK_TIMEOUT_UNDEFINED;
+		return SUCCEED;
+	}
+
+	if (SUCCEED != zbx_is_time_suffix(timeout_str, timeout_out, ZBX_LENGTH_UNLIMITED) ||
+			ZBX_ITEM_TIMEOUT_MAX < *timeout_out)
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+#undef ZBX_ITEM_TIMEOUT_MAX
+}
+
 #endif

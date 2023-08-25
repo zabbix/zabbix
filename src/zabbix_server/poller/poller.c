@@ -301,8 +301,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = get_value_agent(item, config_comms->config_timeout, config_comms->config_source_ip,
-					result);
+			res = get_value_agent(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -313,7 +312,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
-			res = get_value_db(item, config_comms->config_timeout, result);
+			res = get_value_db(item, result);
 #else
 			SET_MSG_RESULT(result,
 					zbx_strdup(NULL, "Support for Database monitor checks was not compiled in."));
@@ -322,19 +321,18 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_EXTERNAL:
 			/* external checks use their own timeouts */
-			res = get_value_external(item, config_comms->config_timeout, result);
+			res = get_value_external(item, result);
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			res = get_value_ssh(item, config_comms->config_timeout, config_comms->config_source_ip, result);
+			res = get_value_ssh(item, config_comms->config_source_ip, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			res = get_value_telnet(item, config_comms->config_timeout, config_comms->config_source_ip,
-					result);
+			res = get_value_telnet(item, config_comms->config_source_ip, result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
@@ -480,6 +478,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 							ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				}
 
+
 				if (FAIL == zbx_is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
@@ -492,6 +491,17 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 		switch (items[i].type)
 		{
+			case ITEM_TYPE_ZABBIX:
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				if (ZBX_MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+				break;
 			case ITEM_TYPE_SNMP:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
@@ -532,6 +542,12 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					errcodes[i] = CONFIG_ERROR;
 					continue;
 				}
+
+				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
 				break;
 			case ITEM_TYPE_SCRIPT:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -571,6 +587,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].params,
 						ZBX_MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+
+
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_SIMPLE:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -585,6 +603,12 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
 				break;
 			case ITEM_TYPE_JMX:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -723,8 +747,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout,
-				config_comms->config_source_ip);
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -788,11 +811,17 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 			case ITEM_TYPE_SIMPLE:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
+				zbx_free(items[i].timeout);
 				break;
 			case ITEM_TYPE_JMX:
 				zbx_free(items[i].username);
 				zbx_free(items[i].password);
 				zbx_free(items[i].jmx_endpoint);
+				break;
+			case ITEM_TYPE_ZABBIX:
+				ZBX_FALLTHROUGH;
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				zbx_free(items[i].timeout);
 				break;
 		}
 

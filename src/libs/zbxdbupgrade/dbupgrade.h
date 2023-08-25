@@ -92,5 +92,6 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 #endif /* !HAVE_SQLITE3 */
 
 unsigned char	DBget_program_type(void);
+int		DBget_config_timeout(void);
 
 #endif

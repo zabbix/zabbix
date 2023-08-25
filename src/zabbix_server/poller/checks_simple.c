@@ -204,7 +204,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 {
 	AGENT_REQUEST	request;
 	vmfunc_t	vmfunc;
-	int		ret = NOTSUPPORTED;
+	int		timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
@@ -218,14 +218,20 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
+		goto out;
+	}
+
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
-		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0))
+		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0, timeout_sec))
 			ret = SUCCEED;
 	}
 	else if (0 == strcmp(request.key, "net.tcp.service.perf") || 0 == strcmp(request.key, "net.udp.service.perf"))
 	{
-		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 1))
+		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 1, timeout_sec))
 			ret = SUCCEED;
 	}
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))
@@ -257,7 +263,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result, timeout_sec))
 			ret = SUCCEED;
 	}
 

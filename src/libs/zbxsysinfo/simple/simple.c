@@ -302,7 +302,7 @@ static int	validate_imap(const char *line)
 	return 0 == strncmp(line, "* OK", 4) ? ZBX_TCP_EXPECT_OK : ZBX_TCP_EXPECT_FAIL;
 }
 
-int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf)
+int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf, int timeout)
 {
 	unsigned short	port = 0;
 	char		*service, *ip_str, ip[ZBX_MAX_DNSNAME_LEN + 1], *port_str;
@@ -352,14 +352,14 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_SSH_PORT;
-			ret = check_ssh(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_ssh(ip, port, timeout, &value_int);
 		}
 		else if (0 == strcmp(service, "ldap"))
 		{
 #ifdef HAVE_LDAP
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_LDAP_PORT;
-			ret = check_ldap(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_ldap(ip, port, timeout, &value_int);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for LDAP check was not compiled in."));
 #endif
@@ -368,41 +368,41 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_SMTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_smtp, "QUIT\r\n",
+			ret = tcp_expect(ip, port, timeout, NULL, validate_smtp, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "ftp"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_FTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_ftp, "QUIT\r\n",
+			ret = tcp_expect(ip, port, timeout, NULL, validate_ftp, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "http"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_HTTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int);
+			ret = tcp_expect(ip, port, timeout, NULL, NULL, NULL, &value_int);
 		}
 		else if (0 == strcmp(service, "pop"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_POP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_pop, "QUIT\r\n",
+			ret = tcp_expect(ip, port, timeout, NULL, validate_pop, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "nntp"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_NNTP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_nntp, "QUIT\r\n",
+			ret = tcp_expect(ip, port, timeout, NULL, validate_nntp, "QUIT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "imap"))
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_IMAP_PORT;
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, validate_imap, "a1 LOGOUT\r\n",
+			ret = tcp_expect(ip, port, timeout, NULL, validate_imap, "a1 LOGOUT\r\n",
 					&value_int);
 		}
 		else if (0 == strcmp(service, "tcp"))
@@ -412,14 +412,14 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
 				return SYSINFO_RET_FAIL;
 			}
-			ret = tcp_expect(ip, port, sysinfo_get_config_timeout(), NULL, NULL, NULL, &value_int);
+			ret = tcp_expect(ip, port, timeout, NULL, NULL, NULL, &value_int);
 		}
 		else if (0 == strcmp(service, "https"))
 		{
 #ifdef HAVE_LIBCURL
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_HTTPS_PORT;
-			ret = check_https(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_https(ip, port, timeout, &value_int);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTPS check was not compiled in."));
 #endif
@@ -428,7 +428,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_TELNET_PORT;
-			ret = check_telnet(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_telnet(ip, port, timeout, &value_int);
 		}
 		else
 		{
@@ -442,7 +442,7 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 		{
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_NTP_PORT;
-			ret = check_ntp(ip, port, sysinfo_get_config_timeout(), &value_int);
+			ret = check_ntp(ip, port, timeout, &value_int);
 		}
 		else
 		{
@@ -497,12 +497,12 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 
 int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_check_service_default_addr(request, "127.0.0.1", result, 0);
+	return zbx_check_service_default_addr(request, "127.0.0.1", result, 0, sysinfo_get_config_timeout());
 }
 
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1);
+	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1, sysinfo_get_config_timeout());
 }
 
 static zbx_metric_t	parameters_simple[] =

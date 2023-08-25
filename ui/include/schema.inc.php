@@ -9777,65 +9777,65 @@ return [
 				'length' => 64,
 				'default' => '10051'
 			],
-			'custom_timeouts' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
-			],
 			'timeout_zabbix_agent' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_simple_check' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_snmp_agent' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_external_check' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_db_monitor' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_http_agent' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_ssh_agent' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_telnet_agent' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
 			],
 			'timeout_script' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '3s'
+			],
+			'custom_timeouts' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			]
 		]
 	],

@@ -548,7 +548,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 }
 
 static zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
-		int config_timeout, const char *config_source_ip)
+		int timeout, const char *config_source_ip)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
@@ -594,7 +594,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *er
 			break;
 	}
 
-	session.timeout = config_timeout * 1000 * 1000;	/* timeout of one attempt in microseconds */
+	session.timeout = timeout * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
 
 #ifdef HAVE_IPV6
@@ -2891,12 +2891,12 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_
 	return ret;
 }
 
-int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
+int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
 		const char *config_source_ip)
 {
 	int	errcode = SUCCEED;
 
-	get_values_snmp(item, result, &errcode, 1, poller_type, config_timeout, config_source_ip);
+	get_values_snmp(item, result, &errcode, 1, poller_type, config_source_ip);
 
 	return errcode;
 }
@@ -2995,12 +2995,12 @@ static void	process_snmp_result(void *data)
 }
 
 void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, int config_timeout, const char *config_source_ip)
+		unsigned char poller_type, const char *config_source_ip)
 {
 	zbx_snmp_sess_t		ssp;
 	char			error[MAX_STRING_LEN];
 	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = ZBX_MAX_SNMP_ITEMS + 1,
-				bulk = SNMP_BULK_ENABLED;
+				bulk = SNMP_BULK_ENABLED, timeout_sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__func__, items[0].host.host, items[0].interface.addr, num);
@@ -3018,11 +3018,17 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 	SNMP_MT_EXECLOCK;
 
+	if (FAIL == zbx_validate_item_timeout(items[j].timeout, &timeout_sec))
+	{
+		SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid timeout was specified."));
+		goto out;
+	}
+
 	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
 	{
 		int	max_vars;
 
-		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout,
+		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), timeout_sec,
 				config_source_ip)))
 		{
 			err = NETWORK_ERROR;
@@ -3044,7 +3050,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		zbx_set_snmp_bulkwalk_options();
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j],
-				process_snmp_result, &snmp_result, NULL, base, config_timeout, config_source_ip)))
+				process_snmp_result, &snmp_result, NULL, base, timeout_sec, config_source_ip)))
 		{
 			event_base_dispatch(base);
 			errcodes[j] = snmp_result.errcode;
@@ -3057,7 +3063,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{
-		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
+		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), timeout_sec, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -3072,7 +3078,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 	}
 	else
 	{
-		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), config_timeout, config_source_ip)))
+		if (NULL == (ssp = zbx_snmp_open_session(&items[j], error, sizeof(error), timeout_sec, config_source_ip)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;

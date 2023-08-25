@@ -167,7 +167,22 @@ func (t *exporterTask) perform(s Scheduler) {
 			var ret interface{}
 			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
-			if ret, err = exporter.Export(key, params, t); err == nil {
+			if t.item.timeout != 0 {
+				tc := make(chan bool)
+
+				go func() {
+					ret, err = exporter.Export(key, params, t)
+					tc <- true
+				}()
+
+				select {
+				case <-tc:
+				case <-time.After(time.Second * time.Duration(t.item.timeout)):
+					err = fmt.Errorf("Check has timed out")
+				}
+			}
+
+			if err == nil {
 				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)

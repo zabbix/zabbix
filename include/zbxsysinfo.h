@@ -108,7 +108,7 @@ int	zbx_check_key_access_rules(const char *metric);
 int	zbx_check_request_access_rules(AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
 
-int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result);
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout);
 
 void	zbx_set_user_parameter_dir(const char *path);
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
@@ -126,7 +126,7 @@ int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request);
 int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
 void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
 
-int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf);
+int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT *result, int perf, int timeout);
 
 /* the fields used by proc queries */
 #define ZBX_SYSINFO_PROC_NONE		0x0000
@@ -154,5 +154,8 @@ ZBX_THREAD_ENTRY(collector_thread, args);
 
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
+
+#define ZBX_CHECK_TIMEOUT_UNDEFINED	0
+int    zbx_validate_item_timeout(const char *timeout_str, int *timeout_out);
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

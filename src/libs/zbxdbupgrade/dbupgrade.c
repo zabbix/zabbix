@@ -874,6 +874,7 @@ static int	DBset_version(int version, unsigned char mandatory)
 #endif	/* not HAVE_SQLITE3 */
 
 zbx_get_program_type_f	DBget_program_type_cb;
+zbx_get_config_int_f	DBget_config_timeout_cb;
 
 DBPATCHES_ARRAY_DECL(2010);
 DBPATCHES_ARRAY_DECL(2020);
@@ -967,9 +968,16 @@ unsigned char	DBget_program_type(void)
 	return DBget_program_type_cb();
 }
 
-void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb)
+int	DBget_config_timeout(void)
+{
+	return DBget_config_timeout_cb();
+}
+
+void	zbx_init_library_dbupgrade(zbx_get_program_type_f get_program_type_cb,
+		zbx_get_config_int_f get_config_timeout_cb)
 {
 	DBget_program_type_cb = get_program_type_cb;
+	DBget_config_timeout_cb = get_config_timeout_cb;
 }
 #ifndef HAVE_SQLITE3
 static int	DBcheck_nodes(void)

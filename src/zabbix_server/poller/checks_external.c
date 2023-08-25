@@ -37,11 +37,11 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result)
+int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		i, ret = NOTSUPPORTED;
+	int		i, ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
@@ -63,6 +63,12 @@ int	get_value_external(const zbx_dc_item_t *item, int config_timeout, AGENT_RESU
 		goto out;
 	}
 
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
+		goto out;
+	}
+
 	for (i = 0; i < get_rparams_num(&request); i++)
 	{
 		const char	*param;
@@ -75,7 +81,7 @@ int	get_value_external(const zbx_dc_item_t *item, int config_timeout, AGENT_RESU
 		zbx_free(param_esc);
 	}
 
-	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), config_timeout,
+	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), timeout_sec,
 			ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);

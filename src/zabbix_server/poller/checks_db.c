@@ -37,7 +37,7 @@
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result)
+int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	AGENT_REQUEST		request;
 	const char		*dsn, *connection = NULL;
@@ -46,6 +46,7 @@ int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *re
 	char			*error = NULL;
 	int			(*query_result_to_text)(zbx_odbc_query_result_t *query_result, char **text, char **error),
 				ret = NOTSUPPORTED;
+	int			timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' query:'%s'", __func__, item->key_orig, item->params);
 
@@ -81,6 +82,13 @@ int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *re
 		goto out;
 	}
 
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
+		ret = FAIL;
+		goto out;
+	}
+
 	/* request.params[0] is ignored and is only needed to distinguish queries of same DSN */
 
 	dsn = request.params[1];
@@ -94,7 +102,7 @@ int	get_value_db(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *re
 		goto out;
 	}
 
-	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, config_timeout,
+	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, timeout_sec,
 			&error)))
 	{
 		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, &error)))
