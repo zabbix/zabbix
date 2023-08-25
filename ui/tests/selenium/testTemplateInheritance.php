@@ -103,11 +103,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 * @dataProvider dataCreate
 	 */
 	public function testTemplateInheritance_Create($result, $template, $itemName, $keyName, $errorMsgs) {
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$template.'&filter_set=1');
 		$this->zbxTestCheckHeader('Templates');
 
-		$this->zbxTestClickLinkTextWait($template);
-		$this->zbxTestClickLinkTextWait('Items');
+		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Items')->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create item');
 
 		$this->zbxTestInputTypeWait('name', $itemName);
@@ -195,11 +194,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateTrigger() {
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a trigger
-		$this->zbxTestClickLinkTextWait($this->templateName);
-		$this->zbxTestClickLinkTextWait('Triggers');
+		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Triggers')->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
 
 		$this->zbxTestInputTypeWait('description', 'Test LLD trigger1');
@@ -235,11 +233,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraph() {
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a graph
-		$this->zbxTestClickLinkTextWait($this->templateName);
-		$this->zbxTestClickLinkTextWait('Graphs');
+		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Graphs')->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create graph');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD graph1');
@@ -291,11 +288,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateDiscovery() {
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an LLD rule
-		$this->zbxTestClickLinkTextWait($this->templateName);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
 		$this->zbxTestContentControlButtonClickTextWait('Create discovery rule');
 
 		$this->zbxTestInputTypeWait('name', 'Test LLD');
@@ -337,11 +333,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateItemPrototype() {
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create an item prototype
-		$this->zbxTestClickLinkTextWait($this->templateName);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
 		$this->zbxTestClickLinkTextWait('Item prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
@@ -398,11 +393,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateTriggerPrototype() {
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
-		// create a trigger prototype
-		$this->zbxTestClickLinkTextWait($this->templateName);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		// create an trigger prototype
+		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
 		$this->zbxTestClickLinkTextWait('Trigger prototypes');
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
@@ -453,11 +447,10 @@ class testTemplateInheritance extends CLegacyWebTest {
 	 *
 	 */
 	public function testTemplateInheritance_CreateGraphPrototype() {
-		$this->zbxTestLogin('templates.php?page=2');
+		$this->zbxTestLogin('zabbix.php?action=template.list&filter_name='.$this->templateName.'&filter_set=1');
 
 		// create a graph
-		$this->zbxTestClickLinkTextWait($this->templateName);
-		$this->zbxTestClickLinkTextWait('Discovery rules');
+		$this->query('class:list-table')->asTable()->one()->getRow(0)->query('link:Discovery')->waitUntilVisible()->one()->click();
 		$this->zbxTestClickLinkTextWait('testInheritanceDiscoveryRule');
 		$this->zbxTestClickLinkTextWait('Graph prototypes');
 		$this->zbxTestCheckHeader('Graph prototypes');

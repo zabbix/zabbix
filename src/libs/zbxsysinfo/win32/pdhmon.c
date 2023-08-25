@@ -26,7 +26,7 @@
 #include "zbxalgo.h"
 #include "zbxlog.h"
 
-#include "perfstat.h"
+#include "perfstat/perfstat.h"
 
 int	user_perf_counter(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

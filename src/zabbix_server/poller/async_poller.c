@@ -41,6 +41,8 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 
+#include <event2/dns.h>
+
 ZBX_VECTOR_IMPL(int32, int)
 
 typedef struct
@@ -343,7 +345,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		else if (ITEM_TYPE_ZABBIX == items[i].type)
 		{
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
-					poller_config, poller_config, poller_config->base,
+					poller_config, poller_config, poller_config->base, poller_config->dnsbase,
 					poller_config->config_timeout, poller_config->config_source_ip);
 		}
 		else
@@ -352,7 +354,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 			zbx_set_snmp_bulkwalk_options();
 
 			errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
-					poller_config, poller_config, poller_config->base,
+					poller_config, poller_config, poller_config->base, poller_config->dnsbase,
 					poller_config->config_timeout, poller_config->config_source_ip);
 #else
 			errcodes[i] = NOTSUPPORTED;
@@ -470,6 +472,32 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in)
+{
+	char	*timeout;
+
+	if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
+		exit(EXIT_FAILURE);
+	}
+
+	timeout = zbx_dsprintf(NULL, "%d", poller_args_in->config_comms->config_timeout);
+
+	if (0 != evdns_base_set_option(poller_config->dnsbase, "timeout:", timeout))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot set timeout to asynchronous DNS library");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free(timeout);
+}
+
+static void	async_poller_dns_destroy(zbx_poller_config_t *poller_config)
+{
+	evdns_base_free(poller_config->dnsbase, 1);
+}
+
 static void	async_poller_stop(zbx_poller_config_t *poller_config)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -564,10 +592,13 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	}
 	else if (ZBX_POLLER_TYPE_AGENT == poller_type)
 	{
+		async_poller_dns_init(&poller_config, poller_args_in);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	}
+	else
+		async_poller_dns_init(&poller_config, poller_args_in);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -610,6 +641,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 #endif
 		}
 	}
+
+	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+		async_poller_dns_destroy(&poller_config);
 
 	event_del(rtc_event);
 	async_poller_stop(&poller_config);
