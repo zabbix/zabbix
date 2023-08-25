@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYCONFIG_READ_H
-#define ZABBIX_PROXYCONFIG_READ_H
+#ifndef ZABBIX_PROXYCONFIG_WRITE_H
+#define ZABBIX_PROXYCONFIG_WRITE_H
 
 #include "zbxcomms.h"
 #include "zbxjson.h"

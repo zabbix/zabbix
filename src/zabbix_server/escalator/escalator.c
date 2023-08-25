@@ -1531,8 +1531,8 @@ fail:
 						ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 				{
 					rc = zbx_script_execute(&script, &host, webhook_params_json, config_timeout,
-							config_trapper_timeout, config_source_ip, CONFIG_FORKS, NULL, error,
-							sizeof(error), NULL);
+							config_trapper_timeout, config_source_ip, CONFIG_FORKS, NULL,
+							error, sizeof(error), NULL);
 					status = ALERT_STATUS_SENT;
 				}
 				else
@@ -3582,7 +3582,8 @@ static int	process_escalations(int now, int *nextcheck, unsigned int escalation_
 		if (escalations.values_num >= ZBX_ESCALATIONS_PER_STEP)
 		{
 			ret += process_db_escalations(now, nextcheck, &escalations, &eventids, &problem_eventids,
-					&actionids, default_timezone, config_timeout, config_trapper_timeout, config_source_ip);
+					&actionids, default_timezone, config_timeout, config_trapper_timeout,
+					config_source_ip);
 			zbx_vector_ptr_clear_ext(&escalations, zbx_ptr_free);
 			zbx_vector_uint64_clear(&actionids);
 			zbx_vector_uint64_clear(&eventids);

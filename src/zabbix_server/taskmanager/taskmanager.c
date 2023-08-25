@@ -49,8 +49,6 @@
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
 #define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
 
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
 {

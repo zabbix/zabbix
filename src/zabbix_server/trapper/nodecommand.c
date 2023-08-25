@@ -222,16 +222,16 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                                    *
  * Purpose: executing command                                                         *
  *                                                                                    *
- * Parameters:  scriptid               - [IN] the id of a script to be executed       *
- *              hostid                 - [IN] the host the script will be executed on *
- *              eventid                - [IN] the id of an event                      *
- *              user                   - [IN] the user who executes the command       *
- *              clientip               - [IN] the IP of client                        *
+ * Parameters:  scriptid               - [IN] id of script to be executed             *
+ *              hostid                 - [IN] host the script will be executed on     *
+ *              eventid                - [IN]                                         *
+ *              user                   - [IN] user who executes command               *
+ *              clientip               - [IN] IP of client                            *
  *              config_timeout         - [IN]                                         *
  *              config_trapper_timeout - [IN]                                         *
  *              config_source_ip       - [IN]                                         *
- *              result                 - [OUT] the result of a script execution       *
- *              debug                  - [OUT] the debug data (optional)              *
+ *              result                 - [OUT] result of script execution             *
+ *              debug                  - [OUT] debug data (optional)                  *
  *                                                                                    *
  * Return value:  SUCCEED - processed successfully                                    *
  *                FAIL - an error occurred                                            *
