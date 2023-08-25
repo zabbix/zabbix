@@ -302,7 +302,12 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 	if ($is_template) {
 		$template = new CSpan(
-			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
+			(new CLink($db_host['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'template.edit')
+				->setArgument('templateid', $db_host['templateid'])
+			))
+				->setAttribute('data-templateid', $db_host['templateid'])
+				->onClick('view.editTemplate(event, this.dataset.templateid);')
 		);
 
 		if ($current_element === '') {
@@ -310,7 +315,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		}
 
 		$list->addItem(new CBreadcrumbs([
-			new CSpan(new CLink(_('All templates'), new CUrl('templates.php'))),
+			new CSpan(new CLink(_('All templates'), (new CUrl('zabbix.php'))->setArgument('action', 'template.list'))),
 			$template
 		]));
 

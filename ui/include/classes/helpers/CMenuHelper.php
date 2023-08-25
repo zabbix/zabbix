@@ -175,7 +175,7 @@ class CMenuHelper {
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 				? (new CMenuItem(_('Templates')))
-					->setUrl(new CUrl('templates.php'), 'templates.php')
+					->setAction('template.list')
 					->setAliases([
 						'template.dashboard.list', 'template.dashboard.edit', 'items.php?context=template',
 						'triggers.php?context=template', 'graphs.php?context=template',

@@ -2041,8 +2041,6 @@ function prepareLldMacroPaths(array $macro_paths): array {
  * @return array
  */
 function prepareLldFilter(array $filter): array {
-	ksort($filter['conditions']);
-
 	foreach ($filter['conditions'] as $i => &$condition) {
 		if ($condition['macro'] === '' && $condition['value'] === '') {
 			unset($filter['conditions'][$i]);
@@ -2422,6 +2420,53 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 }
 
 /**
+ * Apply sorting for discovery rule filter or override filter conditions, if appropriate.
+ * Prioritization by non/exist operator applied between matching macros.
+ *
+ * @param array $conditions
+ * @param int   $evaltype
+ *
+ * @return array
+ */
+function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
+	switch ($evaltype) {
+		case CONDITION_EVAL_TYPE_AND_OR:
+		case CONDITION_EVAL_TYPE_AND:
+		case CONDITION_EVAL_TYPE_OR:
+			usort($conditions, static function(array $condition_a, array $condition_b): int {
+				$comparison = strnatcasecmp($condition_a['macro'], $condition_b['macro']);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				$exist_operators = [CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_EXISTS];
+
+				$comparison = (int) in_array($condition_b['operator'], $exist_operators)
+					- (int) in_array($condition_a['operator'], $exist_operators);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				return strnatcasecmp($condition_a['value'], $condition_b['value']);
+			});
+
+			foreach ($conditions as $i => &$condition) {
+				$condition['formulaid'] = num2letter($i);
+			}
+			unset($condition);
+			break;
+
+		case CONDITION_EVAL_TYPE_EXPRESSION:
+			CArrayHelper::sort($conditions, ['formulaid']);
+			break;
+	}
+
+	return array_values($conditions);
+}
+
+/**
  * Get per-item-type timeouts from proxy or global settings.
  *
  * @param string $proxyid
@@ -2475,3 +2520,4 @@ function getInheritedTimeouts(string $proxyid): array {
 		]
 	];
 }
+

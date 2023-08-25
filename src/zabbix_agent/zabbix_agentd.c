@@ -86,13 +86,12 @@ int	zbx_config_heartbeat_frequency	= 60;
 #endif
 
 #ifdef _WINDOWS
-#	include "perfstat.h"
 #	include "zbxwin32.h"
 #else
 #	include "zbxnix.h"
 #endif
 #include "active_checks/active_checks.h"
-#include "listener.h"
+#include "listener/listener.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -1255,7 +1254,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 #ifdef _WINDOWS
-	if (SUCCEED != init_perf_collector(ZBX_MULTI_THREADED, &error))
+	if (SUCCEED != zbx_init_perf_collector(ZBX_MULTI_THREADED, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize performance counter collector: %s", error);
 		zbx_free(error);
@@ -1400,7 +1399,7 @@ void	zbx_free_service_resources(int ret)
 	zbx_free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
-	free_perf_collector();
+	zbx_free_perf_collector();
 	zbx_co_uninitialize();
 #endif
 #ifndef _WINDOWS
@@ -1524,7 +1523,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
 #ifdef _WINDOWS
-			if (SUCCEED != init_perf_collector(ZBX_SINGLE_THREADED, &error))
+			if (SUCCEED != zbx_init_perf_collector(ZBX_SINGLE_THREADED, &error))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot initialize performance counter collector: %s",
 						error);
@@ -1559,7 +1558,7 @@ int	main(int argc, char **argv)
 			else
 				zbx_test_parameters();
 #ifdef _WINDOWS
-			free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
+			zbx_free_perf_collector();	/* cpu_collector must be freed before perf_collector is freed */
 
 			while (0 == WSACleanup())
 				;

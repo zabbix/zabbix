@@ -454,7 +454,7 @@ static int	DBpatch_6050039(void)
 
 	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "mode", "description", "tls_connect",
 			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
-			"address", "port", NULL);
+			"address", "port", (char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -619,7 +619,7 @@ static int	DBpatch_6050054(void)
 		DEPRECATED_STATUS_PROXY_ACTIVE, DEPRECATED_STATUS_PROXY_PASSIVE);
 
 	zbx_db_insert_prepare(&db_insert_rtdata, "proxy_rtdata", "proxyid", "lastaccess", "version", "compatibility",
-			NULL);
+			(char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{

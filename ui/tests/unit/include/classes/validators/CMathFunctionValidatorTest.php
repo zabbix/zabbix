@@ -286,14 +286,34 @@ class CMathFunctionValidatorTest extends TestCase {
 			['sinh(1)', ['rc' => true, 'error' => null]],
 			['sinh(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "sinh"']],
 
+			['skewness()', ['rc' => false, 'error' => 'invalid number of parameters in function "skewness"']],
+			['skewness(1)', ['rc' => true, 'error' => null]],
+			['skewness(1, 1)', ['rc' => true, 'error' => null]],
+			['skewness(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "skewness"']],
+
 			['sqrt()', ['rc' => false, 'error' => 'invalid number of parameters in function "sqrt"']],
 			['sqrt(1)', ['rc' => true, 'error' => null]],
 			['sqrt(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "sqrt"']],
+
+			['stddevpop()', ['rc' => false, 'error' => 'invalid number of parameters in function "stddevpop"']],
+			['stddevpop(1)', ['rc' => true, 'error' => null]],
+			['stddevpop(1, 1)', ['rc' => true, 'error' => null]],
+			['stddevpop(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "stddevpop"']],
+
+			['stddevsamp()', ['rc' => false, 'error' => 'invalid number of parameters in function "stddevsamp"']],
+			['stddevsamp(1)', ['rc' => true, 'error' => null]],
+			['stddevsamp(1, 1)', ['rc' => true, 'error' => null]],
+			['stddevsamp(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "stddevsamp"']],
 
 			['sum()', ['rc' => false, 'error' => 'invalid number of parameters in function "sum"']],
 			['sum(1)', ['rc' => true, 'error' => null]],
 			['sum(1, 1)', ['rc' => true, 'error' => null]],
 			['sum(1, 1, 1)', ['rc' => true, 'error' => null]],
+
+			['sumofsquares()', ['rc' => false, 'error' => 'invalid number of parameters in function "sumofsquares"']],
+			['sumofsquares(1)', ['rc' => true, 'error' => null]],
+			['sumofsquares(1, 1)', ['rc' => true, 'error' => null]],
+			['sumofsquares(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "sumofsquares"']],
 
 			['tan()', ['rc' => false, 'error' => 'invalid number of parameters in function "tan"']],
 			['tan(1)', ['rc' => true, 'error' => null]],
@@ -310,7 +330,17 @@ class CMathFunctionValidatorTest extends TestCase {
 			['truncate()', ['rc' => false, 'error' => 'invalid number of parameters in function "truncate"']],
 			['truncate(1)', ['rc' => false, 'error' => 'invalid number of parameters in function "truncate"']],
 			['truncate(1, 1)', ['rc' => true, 'error' => null]],
-			['truncate(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "truncate"']]
+			['truncate(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "truncate"']],
+
+			['varpop()', ['rc' => false, 'error' => 'invalid number of parameters in function "varpop"']],
+			['varpop(1)', ['rc' => true, 'error' => null]],
+			['varpop(1, 1)', ['rc' => true, 'error' => null]],
+			['varpop(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "varpop"']],
+
+			['varsamp()', ['rc' => false, 'error' => 'invalid number of parameters in function "varsamp"']],
+			['varsamp(1)', ['rc' => true, 'error' => null]],
+			['varsamp(1, 1)', ['rc' => true, 'error' => null]],
+			['varsamp(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "varsamp"']]
 		];
 	}
 

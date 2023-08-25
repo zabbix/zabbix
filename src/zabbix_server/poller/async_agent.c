@@ -52,7 +52,7 @@ static zbx_async_task_state_t	get_task_state_for_event(short event)
 	return ZBX_ASYNC_TASK_STOP;
 }
 
-static int	agent_task_process(short event, void *data, int *fd)
+static int	agent_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
@@ -73,13 +73,19 @@ static int	agent_task_process(short event, void *data, int *fd)
 	if (0 == event)
 	{
 		/* initialization */
-		agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
-
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
 				get_agent_step_string(agent_context->step), event, agent_context->item.itemid);
 
-		zbx_tcp_send_context_init(agent_context->item.key, strlen(agent_context->item.key), 0,
-					ZBX_TCP_PROTOCOL, &agent_context->tcp_send_context);
+		if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM, agent_context->config_source_ip,
+				addr, agent_context->item.interface.port, agent_context->config_timeout))
+		{
+			agent_context->item.ret = NETWORK_ERROR;
+			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed"
+					" during %s", get_agent_step_string(agent_context->step)));
+			goto stop;
+		}
+
+		*fd = agent_context->s.socket;
 
 		return ZBX_ASYNC_TASK_WRITE;
 	}
@@ -94,7 +100,8 @@ static int	agent_task_process(short event, void *data, int *fd)
 	{
 		agent_context->item.ret = TIMEOUT_ERROR;
 		SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed during %s:"
-				" timed out", get_agent_step_string(agent_context->step)));
+				" %s", get_agent_step_string(agent_context->step), NULL != dnserr ? dnserr :
+				"timed out"));
 		goto stop;
 	}
 
@@ -134,7 +141,7 @@ static int	agent_task_process(short event, void *data, int *fd)
 					SET_MSG_RESULT(&agent_context->item.result,
 						zbx_dsprintf(NULL, "Get value from agent failed: TCP successful, cannot"
 						" establish TLS to [[%s]:%hu]: %s", agent_context->item.interface.addr,
-						agent_context->item.interface.port,error));
+						agent_context->item.interface.port, error));
 					zbx_free(error);
 					agent_context->item.ret = NETWORK_ERROR;
 					break;
@@ -205,7 +212,8 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 }
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
-		void *arg, void *arg_action, struct event_base *base, int config_timeout, const char *config_source_ip)
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase, int config_timeout,
+		const char *config_source_ip)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
 	int			ret = NOTSUPPORTED;
@@ -227,6 +235,9 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	item->key = NULL;
 	agent_context->tls_connect = item->host.tls_connect;
 	zbx_strlcpy(agent_context->item.host, item->host.host, sizeof(agent_context->item.host));
+
+	agent_context->config_source_ip = config_source_ip;
+	agent_context->config_timeout = config_timeout;
 
 	zbx_init_agent_result(&agent_context->item.result);
 
@@ -263,22 +274,19 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 			agent_context->tls_arg2 = NULL;
 			goto out;
 	}
-
-	if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM, config_source_ip,
-			agent_context->item.interface.addr, agent_context->item.interface.port, config_timeout))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
-		goto out;
-	}
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_is_ip(agent_context->item.interface.addr))
 		agent_context->server_name = agent_context->item.interface.addr;
 	else
 		agent_context->server_name = NULL;
 #endif
-	zbx_async_poller_add_task(base, agent_context->s.socket, agent_context, config_timeout, agent_task_process,
-			clear_cb);
+	zbx_socket_clean(&agent_context->s);
+	zbx_tcp_send_context_init(agent_context->item.key, strlen(agent_context->item.key), 0, ZBX_TCP_PROTOCOL,
+		&agent_context->tcp_send_context);
+	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
+
+	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, config_timeout,
+			agent_task_process, clear_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(SUCCEED));
 
