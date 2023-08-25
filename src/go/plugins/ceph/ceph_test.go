@@ -20,7 +20,6 @@
 package ceph
 
 import (
-	"io"
 	"log"
 	"os"
 	"strings"
@@ -37,14 +36,10 @@ func TestMain(m *testing.M) {
 	for _, cmd := range []command{
 		cmdDf, cmdPgDump, cmdOSDCrushRuleDump, cmdOSDCrushTree, cmdOSDDump, cmdHealth, cmdStatus,
 	} {
-		f, err := os.Open(
+		var err error
+		fixtures[cmd], err = os.ReadFile(
 			"testdata/" + strings.ReplaceAll(string(cmd), " ", "_") + ".json",
 		)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		fixtures[cmd], err = io.ReadAll(f)
 		if err != nil {
 			log.Fatal(err)
 		}
