@@ -609,13 +609,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$conditions = getRequest('conditions', []);
 		ksort($conditions);
 		$conditions = array_values($conditions);
-		foreach ($conditions as $condition) {
-			if (!zbx_empty($condition['macro'])) {
-				$condition['macro'] = mb_strtoupper($condition['macro']);
 
-				$lld_rule_filter['conditions'][] = $condition;
+		foreach ($conditions as $condition) {
+			if ($condition['macro'] === '' && $condition['value'] === '') {
+				continue;
 			}
+
+			$condition['macro'] = mb_strtoupper($condition['macro']);
+
+			$lld_rule_filter['conditions'][] = $condition;
 		}
+
 		if ($lld_rule_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			// if only one or no conditions are left, reset the evaltype to and/or and clear the formula
 			if (count($lld_rule_filter['conditions']) <= 1) {
@@ -845,7 +849,15 @@ if (hasRequest('form')) {
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
-	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
+	$data['conditions'] = getRequest('conditions', []);
+
+	foreach ($data['conditions'] as $i => $condition) {
+		if ($condition['macro'] === '' && $condition['value'] === '') {
+			unset($data['conditions'][$i]);
+		}
+	}
+
+	$data['conditions'] = sortLldRuleFilterConditions($data['conditions'], $data['evaltype']);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $host;
@@ -881,6 +893,16 @@ if (hasRequest('form')) {
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 
 		$data['overrides'] = $item['overrides'];
+
+		foreach ($data['overrides'] as &$override) {
+			if ($override['filter']['conditions']) {
+				$override['filter']['conditions'] = sortLldRuleFilterConditions($override['filter']['conditions'],
+					$override['filter']['evaltype']
+				);
+			}
+		}
+		unset($override);
+
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
 	}
