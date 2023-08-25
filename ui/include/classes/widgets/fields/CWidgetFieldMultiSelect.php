@@ -90,7 +90,7 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 			]];
 
 			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
-				self::setValidationRuleFlag($validation_rules[self::FOREIGN_REFERENCE_KEY], API_NOT_EMPTY);
+				self::setValidationRuleFlag($validation_rules['fields'][self::FOREIGN_REFERENCE_KEY], API_NOT_EMPTY);
 			}
 		}
 		else {

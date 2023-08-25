@@ -55,8 +55,6 @@ abstract class CWidgetField {
 	protected int $flags = 0x00;
 
 	private array $validation_rules = [];
-	private ?array $strict_validation_rules = null;
-	private array $ex_validation_rules = [];
 
 	private $templateid = null;
 
@@ -351,22 +349,11 @@ abstract class CWidgetField {
 	}
 
 	protected function getValidationRules(bool $strict = false): array {
-		return $strict && $this->strict_validation_rules !== null
-			? $this->strict_validation_rules
-			: $this->validation_rules;
+		return $this->validation_rules;
 	}
 
 	protected function setValidationRules(array $validation_rules): self {
 		$this->validation_rules = $validation_rules;
-
-		return $this;
-	}
-
-	/**
-	 * Set validation rules for "strict" mode.
-	 */
-	protected function setStrictValidationRules(array $strict_validation_rules = null): self {
-		$this->strict_validation_rules = $strict_validation_rules;
 
 		return $this;
 	}

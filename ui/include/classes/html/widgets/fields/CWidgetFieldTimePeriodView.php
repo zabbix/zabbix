@@ -25,9 +25,6 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 	private string $date_format = '';
 
-	private ?string $from_label = null;
-	private ?string $to_label = null;
-
 	private ?string $from_placeholder = null;
 	private ?string $to_placeholder = null;
 
@@ -116,14 +113,14 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 		array_push($view_collection,
 			[
-				'label' => (new CLabel($this->from_label ?? _('From')))
+				'label' => (new CLabel($this->field->getFromLabel()))
 					->addClass('js-'.$field_name.'-from')
 					->setAsteriskMark($this->isRequired()),
 				'view' => $date_selector_from,
 				'class' => $style_class.'js-'.$field_name.'-from'
 			],
 			[
-				'label' => (new CLabel($this->to_label ?? _('To')))
+				'label' => (new CLabel($this->field->getToLabel()))
 					->addClass('js-'.$field_name.'-to')
 					->setAsteriskMark($this->isRequired()),
 				'view' => $date_selector_to,

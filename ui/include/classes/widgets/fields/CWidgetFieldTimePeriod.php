@@ -22,6 +22,7 @@
 namespace Zabbix\Widgets\Fields;
 
 use CAbsoluteTimeParser,
+	CApiInputValidator,
 	CParser,
 	CRelativeTimeParser;
 
@@ -38,6 +39,9 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	private int $data_source = self::DATA_SOURCE_DEFAULT;
 
+	private ?string $from_label = null;
+	private ?string $to_label = null;
+
 	private bool $is_date_only;
 
 	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
@@ -49,7 +53,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			->setDefault(self::DEFAULT_VALUE)
 			->setMaxLength(255)
 			->setValidationRules(['type' => API_OBJECT, 'fields' => [
-				'data_source' => ['type' => API_INT32, 'in' => implode(',', [self::DATA_SOURCE_DEFAULT, self::DATA_SOURCE_WIDGET, self::DATA_SOURCE_DASHBOARD])],
 				'from' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()],
 				'to' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()]
 			]]);
@@ -57,11 +60,15 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	public function setValue($value): self {
 		if (array_key_exists('data_source', $value)) {
-			$this->data_source = $value['data_source'];
 			unset($value['data_source']);
 		}
-		elseif (array_key_exists('reference', $value)) {
-			$this->data_source = $this->value['reference'] === 'DASHBOARD'
+
+		if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
+			[
+				'reference' => $reference
+			] = self::parseTypedReference($value[self::FOREIGN_REFERENCE_KEY]);
+
+			$this->data_source = $reference === self::REFERENCE_DASHBOARD
 				? self::DATA_SOURCE_DASHBOARD
 				: self::DATA_SOURCE_WIDGET;
 		}
@@ -75,33 +82,42 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	}
 
 	public function validate(bool $strict = false): array {
-		if ($errors = parent::validate($strict)) {
-			return $errors;
-		}
+		$errors = [];
 
+		$validation_rules = $this->getValidationRules($strict);
+		$field_label = $this->full_name ?? $this->label ?? $this->name;
 		$field_value = $this->getValue();
 
 		if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
-			$period = ['from' => 0, 'to' => 0];
 			$absolute_time_parser = new CAbsoluteTimeParser();
 			$relative_time_parser = new CRelativeTimeParser();
-			$has_errors = false;
+			$period = ['from' => 0, 'to' => 0];
 
-			foreach ($field_value as $name => $value) {
-				if ($absolute_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
-					$datetime = $absolute_time_parser->getDateTime(true);
+			foreach ($field_value as $name => &$value) {
+				$label = $field_label.'/'.($name === 'from' ? $this->getFromLabel() : $this->getToLabel());
 
-					if ($this->is_date_only && $datetime->format('H:i:s') !== '00:00:00') {
-						$has_errors = true;
-						break;
-					}
-
-					$period[$name] = $datetime->getTimestamp();
+				if (!CApiInputValidator::validate($validation_rules['fields'][$name], $value, $label, $error)) {
+					$errors[] = $error;
 					continue;
 				}
 
+				if ($value === self::DEFAULT_VALUE[$name]) {
+					continue;
+				}
+
+				if ($absolute_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
+					$datetime = $absolute_time_parser->getDateTime($name === 'from');
+					$time_range = $name === 'from' ? '00:00:00' : '23:59:59';
+
+					if (!$this->is_date_only || $datetime->format('H:i:s') === $time_range) {
+						$period[$name] = $datetime->getTimestamp();
+						continue;
+					}
+				}
+
 				if ($relative_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
-					$datetime = $absolute_time_parser->getDateTime(true);
+					$datetime = $relative_time_parser->getDateTime($name === 'from');
+					$has_errors = false;
 
 					if ($this->is_date_only) {
 						foreach ($relative_time_parser->getTokens() as $token) {
@@ -112,29 +128,36 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 						}
 					}
 
-					$period[$name] = $datetime->getTimestamp();
-					continue;
+					if (!$has_errors) {
+						$period[$name] = $datetime->getTimestamp();
+						continue;
+					}
 				}
 
-				if ($has_errors) {
-					break;
-				}
-			}
-
-			if ($period['from'] !== 0 && $period['to'] !== 0 && $period['from'] >= $period['to']) {
-				$has_errors = true;
-			}
-
-			if ($has_errors) {
-				$this->setValue($this->default);
-
-				return [
-					_s('Invalid parameter "%1$s": %2$s.', $this->full_name ?? $this->label ?? $this->name,
+				$errors[] = [
+					_s('Invalid parameter "%1$s": %2$s.', $label,
 						$this->is_date_only ? _('a date is expected') : _('a time is expected')
 					)
 				];
 			}
+			unset($value);
+
+			if ($period['from'] !== 0 && $period['to'] !== 0 && $period['from'] >= $period['to']) {
+				$errors[] = [
+					_s('Invalid parameter "%1$s": %2$s.', $field_label,
+						$this->is_date_only ? _('a date is expected') : _('a time is expected')
+					)
+				];
+			}
+
+			if ($errors) {
+				$this->setValue($this->default);
+
+				return $errors;
+			}
 		}
+
+		$this->setValue($field_value);
 
 		return [];
 	}
@@ -171,23 +194,42 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		return $this->data_source;
 	}
 
+	public function getFromLabel(): string {
+		return $this->from_label ?? _('From');
+	}
+
+	public function setFromLabel(string $label): self {
+		$this->from_label = $label;
+
+		return $this;
+	}
+
+	public function getToLabel(): string {
+		return $this->to_label ?? _('To');
+	}
+
+	public function setToLabel(string $label): self {
+		$this->from_label = $label;
+
+		return $this;
+	}
+
 	protected function getValidationRules(bool $strict = false): array {
 		if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
 			$validation_rules = parent::getValidationRules($strict);
 
 			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
-				self::setValidationRuleFlag($strict_validation_rules['fields']['from'], API_NOT_EMPTY);
-				self::setValidationRuleFlag($strict_validation_rules['fields']['to'], API_NOT_EMPTY);
+				self::setValidationRuleFlag($validation_rules['fields']['from'], API_NOT_EMPTY);
+				self::setValidationRuleFlag($validation_rules['fields']['to'], API_NOT_EMPTY);
 			}
 		}
 		else {
 			$validation_rules = ['type' => API_OBJECT, 'fields' => [
-				'data_source' => ['type' => API_INT32, 'in' => implode(',', [self::DATA_SOURCE_DEFAULT, self::DATA_SOURCE_WIDGET, self::DATA_SOURCE_DASHBOARD])],
 				'reference' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]];
 
 			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
-				self::setValidationRuleFlag($strict_validation_rules['fields']['reference'], API_NOT_EMPTY);
+				self::setValidationRuleFlag($validation_rules['fields']['reference'], API_NOT_EMPTY);
 			}
 		}
 
