@@ -449,7 +449,7 @@ window.widget_pie_chart_form = new class {
 				multiselect: 1,
 				with_webitems: 1,
 				real_hosts: 1
-			});
+			}, {dialogue_class: 'modal-popup-generic'});
 		}
 		else {
 			PopUp('popup.generic', {
@@ -463,7 +463,7 @@ window.widget_pie_chart_form = new class {
 				with_webitems: 1,
 				hostid: this._templateid,
 				hide_host_filter: 1
-			});
+			}, {dialogue_class: 'modal-popup-generic'});
 		}
 	}
 
@@ -581,9 +581,8 @@ window.widget_pie_chart_form = new class {
 							writeonly: 1,
 							with_webitems: 1,
 							real_hosts: 1,
-							dialogue_class: 'modal-popup-generic',
 							excludeids: ids
-						});
+						}, {dialogue_class: 'modal-popup-generic'});
 					}
 					else {
 						PopUp('popup.generic', {
@@ -598,9 +597,8 @@ window.widget_pie_chart_form = new class {
 							with_webitems: 1,
 							hostid: this._templateid,
 							hide_host_filter: 1,
-							dialogue_class: 'modal-popup-generic',
 							excludeids: ids
-						});
+						}, {dialogue_class: 'modal-popup-generic'});
 					}
 				});
 			}
