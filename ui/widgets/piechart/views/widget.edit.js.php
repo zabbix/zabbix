@@ -223,7 +223,8 @@ window.widget_pie_chart_form = new class {
 		const custom_value_size_on = value_size_type == <?= WidgetForm::VALUE_SIZE_CUSTOM ?>;
 		const value_size_input = document.getElementById('value_size_custom_input');
 		const total_value_fields = this._form.querySelectorAll(
-			'#value_size_type, #value_size, #decimal_places, #units_show, #units, #value_bold, #value_color'
+			'#value_size_type_0, #value_size_type_1, #value_size_custom_input, #decimal_places, #units_show, #units,' +
+			' #value_bold, #value_color'
 		);
 
 		for (const element of doughnut_config_fields) {
@@ -252,7 +253,9 @@ window.widget_pie_chart_form = new class {
 			field.disabled = !document.getElementById('total_show').checked;
 		}
 
-		document.getElementById('units').disabled = !document.getElementById('units_show').checked;
+		document.getElementById('units').disabled = (!document.getElementById('units_show').checked
+			|| !document.getElementById('total_show').checked
+		);
 	}
 
 	updateDatasetsLabel() {
