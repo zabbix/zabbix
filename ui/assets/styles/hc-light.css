@@ -4442,7 +4442,7 @@ pre, pre a, pre td, pre span {
       margin-left: 5px; }
   .host-dashboard-header-navigation .filter-space {
     display: contents; }
-    .host-dashboard-header-navigation .filter-space form {
+    .host-dashboard-header-navigation .filter-space .filter-container {
       grid-column: 1 / -1; }
     .host-dashboard-header-navigation .filter-space li .ui-tabs-anchor {
       vertical-align: top; }

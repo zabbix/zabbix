@@ -1251,6 +1251,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_proxy);
+	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{

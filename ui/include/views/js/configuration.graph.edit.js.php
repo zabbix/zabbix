@@ -395,7 +395,7 @@
 
 						$(node).find('*[name]').each((_, input) => {
 							if (!$.isEmptyObject(input) && input.name != null) {
-								const regex = /items\[[\d+]\]\[([a-zA-Z0-9\-\_\.]+)\]/;
+								const regex = /items\[\d+\]\[([a-zA-Z0-9\-\_\.]+)\]/;
 								const name = input.name.match(regex);
 
 								short_fmt.push((name[1]).substr(0, 2) + ':' + input.value);
