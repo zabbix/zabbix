@@ -17,13 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "scripts.h"
+#include "zbxscripts.h"
 #include "zbxexpression.h"
 
-#include "../poller/checks_agent.h"
-#include "../ipmi/ipmi.h"
-#include "../poller/checks_ssh.h"
-#include "../poller/checks_telnet.h"
+#include "../../zabbix_server/poller/checks_agent.h"
+#include "../../zabbix_server/ipmi/ipmi.h"
+#include "../../zabbix_server/poller/checks_ssh.h"
+#include "../../zabbix_server/poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
@@ -39,9 +39,6 @@
 #define REMOTE_COMMAND_RESULT_OOM	1
 #define REMOTE_COMMAND_RESULT_WAIT	2
 #define REMOTE_COMMAND_COMPLETED	4
-
-extern int	CONFIG_TRAPPER_TIMEOUT;
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
 
@@ -222,8 +219,8 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 	int			values_num = 0, parsed_num = 0, results_num = 0;
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_commands, jp_command;
-	char 			*str = NULL, *value = NULL, *error = NULL;
-	size_t 			str_alloc = 0;
+	char			*str = NULL, *value = NULL, *error = NULL;
+	size_t			str_alloc = 0;
 	zbx_uint64_t		id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -327,7 +324,7 @@ out:
 }
 
 static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, char *error, size_t max_error_len)
+		int config_timeout, int config_forks[], char *error, size_t max_error_len)
 {
 	int			ret = FAIL, completed = 0;
 	zbx_rc_command_t	cmd, *pcmd;
@@ -335,7 +332,7 @@ static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 > CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
+	if (2 > config_forks[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
 	{
 		zbx_snprintf(error, max_error_len, "cannot execute remote command on active agent, at least two"
 				" trappers are required");
@@ -488,7 +485,7 @@ fail:
 }
 
 static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, int config_forks[], char *error, size_t max_error_len)
 {
 	zbx_dc_interface_t	interface;
 
@@ -498,8 +495,8 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
 			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
 	{
-		return active_command_send_and_result_fetch(host, command, result, config_timeout, error,
-				max_error_len);
+		return active_command_send_and_result_fetch(host, command, result, config_timeout, config_forks,
+				error, max_error_len);
 	}
 
 	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip, error,
@@ -509,7 +506,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
 		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
-	int		ret = FAIL, i;
+	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
 	int             (*function)(zbx_dc_item_t *, int timeout, const char*, AGENT_RESULT *);
@@ -526,7 +523,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 	memset(&item, 0, sizeof(item));
 	memcpy(&item.host, host, sizeof(item.host));
 
-	for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
+	for (int i = 0; INTERFACE_TYPE_COUNT > i; i++)
 	{
 		if (SUCCEED == (ret = zbx_dc_config_get_interface_by_type(&item.interface, host->hostid,
 				INTERFACE_TYPE_PRIORITY[i])))
@@ -714,12 +711,12 @@ void	zbx_webhook_params_pack_json(const zbx_vector_ptr_pair_t *params, char **pa
  *                                                                                 *
  * Purpose: prepares user script                                                   *
  *                                                                                 *
- * Parameters: script        - [IN] the script to prepare                          *
- *             host          - [IN] the host the script will be executed on        *
- *             error         - [OUT] the error message buffer                      *
- *             max_error_len - [IN] the size of error message output buffer        *
+ * Parameters: script        - [IN] script to prepare                              *
+ *             hostid        - [IN] host the script will be executed on            *
+ *             error         - [OUT] error message buffer                          *
+ *             max_error_len - [IN] size of error message output buffer            *
  *                                                                                 *
- * Return value:  SUCCEED - the script has been prepared successfully              *
+ * Return value:  SUCCEED - script has been prepared successfully                  *
  *                FAIL    - otherwise, error contains error message                *
  *                                                                                 *
  * Comments: This function prepares script for execution by loading global         *
@@ -783,16 +780,16 @@ out:
  *                                                                            *
  * Purpose: fetch webhook parameters                                          *
  *                                                                            *
- * Parameters:  scriptid  - [IN] the id of script to be executed              *
- *              params    - [OUT] parameters name-value pairs                 *
- *              error     - [IN/OUT] the error message                        *
- *              error_len - [IN] the maximum error length                     *
+ * Parameters:  scriptid  - [IN] id of script to be executed                  *
+ *              params    - [OUT] parameters, name-value pairs                *
+ *              error     - [IN/OUT] error message                            *
+ *              error_len - [IN] maximum error length                         *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
-int	DBfetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
+int	zbx_db_fetch_webhook_params(zbx_uint64_t scriptid, zbx_vector_ptr_pair_t *params, char *error, size_t error_len)
 {
 	int		ret = SUCCEED;
 	zbx_db_result_t	result;
@@ -824,28 +821,30 @@ out:
 	return ret;
 }
 
-/****************************************************************************
- *                                                                          *
- * Purpose: executing user scripts or remote commands                       *
- *                                                                          *
- * Parameters:  script           - [IN] script to be executed               *
- *              host             - [IN] host the script will be executed on *
- *              params           - [IN] parameters for the script           *
- *              config_timeout   - [IN]                                     *
- *              config_source_ip - [IN]                                     *
- *              result           - [OUT] result of a script execution       *
- *              error            - [OUT] error reported by the script       *
- *              max_error_len    - [IN] maximum error length                *
- *              debug            - [OUT] debug data (optional)              *
- *                                                                          *
- * Return value:  SUCCEED - processed successfully                          *
- *                FAIL - an error occurred                                  *
- *                TIMEOUT_ERROR - a timeout occurred                        *
- *                                                                          *
- ****************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: executing user scripts or remote commands                             *
+ *                                                                                *
+ * Parameters:  script                 - [IN] script to be executed               *
+ *              host                   - [IN] host the script will be executed on *
+ *              params                 - [IN] parameters for the script           *
+ *              config_timeout         - [IN]                                     *
+ *              config_trapper_timeout - [IN]                                     *
+ *              config_source_ip       - [IN]                                     *
+ *              config_forks           - [IN]                                     *
+ *              result                 - [OUT] result of a script execution       *
+ *              error                  - [OUT] error reported by the script       *
+ *              max_error_len          - [IN] maximum error length                *
+ *              debug                  - [OUT] debug data (optional)              *
+ *                                                                                *
+ * Return value:  SUCCEED - processed successfully                                *
+ *                FAIL - error occurred                                           *
+ *                TIMEOUT_ERROR - timeout occurred                                *
+ *                                                                                *
+ **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
-		int config_timeout, const char *config_source_ip, char **result, char *error, size_t max_error_len,
-		char **debug)
+		int config_timeout, int config_trapper_timeout, const char *config_source_ip, int config_forks[],
+		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -864,12 +863,12 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
-							config_source_ip, error, max_error_len);
+							config_source_ip, config_forks, error, max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
 					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
-							CONFIG_TRAPPER_TIMEOUT, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
+							config_trapper_timeout, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
 					{
 						ret = FAIL;
 					}
@@ -881,7 +880,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			break;
 		case ZBX_SCRIPT_TYPE_IPMI:
 #ifdef HAVE_OPENIPMI
-			if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
+			if (0 == config_forks[ZBX_PROCESS_TYPE_IPMIPOLLER])
 			{
 				zbx_strlcpy(error, "Cannot perform IPMI request: configuration parameter"
 						" \"StartIPMIPollers\" is 0.", max_error_len);
@@ -920,10 +919,9 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates remote command task from a script                         *
+ * Purpose: creates remote command task from script                           *
  *                                                                            *
- * Return value:  the identifier of the created task or 0 in the case of      *
- *                error                                                       *
+ * Return value:  identifier of created task or 0 in case of error            *
  *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_host_t *host, zbx_uint64_t alertid,
