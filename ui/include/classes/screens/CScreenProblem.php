@@ -261,10 +261,8 @@ class CScreenProblem extends CScreenBase {
 				unset($options['symptom']);
 			}
 
-			$filter_options = [];
-
 			if (array_key_exists('cause_eventid', $filter) && $filter['cause_eventid']) {
-				$filter_options['cause_eventid'] = $filter['cause_eventid'];
+				$options['filter']['cause_eventid'] = $filter['cause_eventid'];
 			}
 
 			if (array_key_exists('acknowledgement_status', $filter)) {
@@ -284,10 +282,6 @@ class CScreenProblem extends CScreenBase {
 						}
 						break;
 				}
-			}
-
-			if ($filter_options) {
-				$options['filter'] = $filter_options;
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)

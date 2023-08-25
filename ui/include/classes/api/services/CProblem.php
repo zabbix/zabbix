@@ -280,9 +280,7 @@ class CProblem extends CApiService {
 		}
 
 		// Acknowledge action and users that have performed the action.
-		$acknowledge_actions = [
-			'ack.eventid=p.eventid'
-		];
+		$acknowledge_actions = [];
 
 		if ($options['action'] !== null) {
 			$acknowledge_actions[] = 'ack.action & '.$options['action'].'='.$options['action'];
@@ -292,11 +290,12 @@ class CProblem extends CApiService {
 			$acknowledge_actions[] = dbConditionId('ack.userid', $options['action_userids']);
 		}
 
-		if (count($acknowledge_actions) > 1) {
+		if ($acknowledge_actions) {
 			$sql_parts['where'][] = 'EXISTS ('.
 				'SELECT NULL'.
 				' FROM acknowledges ack'.
-				' WHERE '.implode(' AND ', $acknowledge_actions).
+				' WHERE p.eventid=ack.eventid'.
+					' AND '.implode(' AND ', $acknowledge_actions).
 			')';
 		}
 
