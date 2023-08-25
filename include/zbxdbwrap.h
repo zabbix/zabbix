@@ -39,11 +39,15 @@ zbx_host_template_link_type;
 
 typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *, const char *,
 		const zbx_timespec_t *, char **);
-
 typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
 		zbx_timespec_t *ts, char *error);
+typedef void (*zbx_preprocess_item_value_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigned char item_value_type,
+		unsigned char item_flags, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, char *error);
+typedef void (*zbx_preprocessor_flush_func_t)(void);
 
-void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func);
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
+		zbx_preprocess_item_value_func_t preprocess_item_value_func,
+		zbx_preprocessor_flush_func_t preprocessor_flush_func);
 
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *server);
