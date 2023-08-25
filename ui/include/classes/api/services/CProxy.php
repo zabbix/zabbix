@@ -658,7 +658,7 @@ class CProxy extends CApiService {
 			'allowed_addresses' =>	['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
 			'address' => 			['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'address')],
-										['if' => ['field' => 'operating_mode', 'in' => PROXY_operating_mode_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')]
+										['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_PASSIVE], 'type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')]
 			]],
 			'port' =>				['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'operating_mode', 'in' => PROXY_OPERATING_MODE_ACTIVE], 'type' => API_STRING_UTF8, 'in' => DB::getDefault('proxy', 'port')],
