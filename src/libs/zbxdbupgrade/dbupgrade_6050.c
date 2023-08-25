@@ -698,7 +698,7 @@ static int	DBpatch_6050062(void)
 			"update profiles"
 			" set value_str='name'"
 			" where value_str like 'host'"
-				" and idx like 'web.proxies.php.sort'"))
+				" and idx='web.proxies.php.sort'"))
 	{
 		return FAIL;
 	}
