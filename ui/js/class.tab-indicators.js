@@ -1441,7 +1441,7 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 
 		const legend_aggregation = document.getElementById('legend_aggregation');
 
-		if (legend_aggregation !== null && legend_aggregation.checked) {
+		if (legend_aggregation !== null && legend_aggregation.checked && !legend_aggregation.disabled) {
 			return true;
 		}
 

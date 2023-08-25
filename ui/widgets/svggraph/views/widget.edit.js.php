@@ -31,8 +31,8 @@ window.widget_svggraph_form = new class {
 		this._$overlay_body = jQuery('.overlay-dialogue-body');
 		this._form = document.getElementById('widget-dialogue-form');
 		this._templateid = templateid;
-
 		this._dataset_wrapper = document.getElementById('data_sets');
+		this._any_ds_aggregation_function_enabled = false;
 
 		this._$overlay_body.on('scroll', () => {
 			const $preview = jQuery('.<?= ZBX_STYLE_SVG_GRAPH_PREVIEW ?>', this._$overlay_body);
@@ -242,7 +242,9 @@ window.widget_svggraph_form = new class {
 					jQuery('#legend_columns').rangeControl('enable');
 				}
 				document.getElementById('legend_statistic').disabled = !e.target.checked;
-				document.getElementById('legend_aggregation').disabled = !e.target.checked;
+				document.getElementById('legend_aggregation').disabled = (!e.target.checked
+					|| !this._any_ds_aggregation_function_enabled
+				);
 			});
 
 		document.getElementById('legend_statistic')
@@ -762,6 +764,22 @@ window.widget_svggraph_form = new class {
 				approximation_select.value = <?= APPROXIMATION_AVG ?>;
 			}
 		}
+
+		const all_datasets = this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
+
+		this._any_ds_aggregation_function_enabled = false;
+
+		for (const ds of all_datasets) {
+			const ds_index = ds.getAttribute('data-set');
+			const aggregate_function_select = ds.querySelector(`[name="ds[${ds_index}][aggregate_function]"]`);
+
+			if (aggregate_function_select.value != <?= AGGREGATE_NONE ?>) {
+				this._any_ds_aggregation_function_enabled = true;
+				break;
+			}
+		}
+
+		document.getElementById('legend_aggregation').disabled = !this._any_ds_aggregation_function_enabled;
 
 		// Displaying options tab.
 		const percentile_left_checkbox = document.getElementById('percentile_left');
