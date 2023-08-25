@@ -281,8 +281,8 @@ static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
 static int	config_histsyncer_frequency	= 1;
 
-int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
-char	*CONFIG_LISTEN_IP		= NULL;
+static int	zbx_config_listen_port		= ZBX_DEFAULT_SERVER_PORT;
+static char	*zbx_config_listen_ip		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 static char	*config_server		= NULL;		/* not used in zabbix_server, required for linking */
 
@@ -869,9 +869,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnavailableDelay",		&config_unavailable_delay,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
+		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
+		{"ListenPort",			&zbx_config_listen_port,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1498,7 +1498,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
-		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT,
+		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
@@ -1836,8 +1836,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #endif
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_STANDBY;
 
 	if (SUCCEED != zbx_ha_start(rtc, ha_config, &error))
@@ -1883,8 +1883,8 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_STANDBY;
 
 	if (SUCCEED != zbx_ha_start(rtc, ha_config, &error))
@@ -2104,8 +2104,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_UNKNOWN;
 
 	if (SUCCEED != zbx_ha_start(&rtc, ha_config, &error))
