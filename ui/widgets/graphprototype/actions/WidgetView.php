@@ -37,8 +37,7 @@ class WidgetView extends CControllerWidgetIterator {
 		parent::init();
 
 		$this->addValidationRules([
-			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
-			'dynamic_hostid' => 'db hosts.hostid'
+			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])
 		]);
 	}
 
@@ -72,11 +71,7 @@ class WidgetView extends CControllerWidgetIterator {
 			'selectDiscoveryRule' => ['hostid']
 		];
 
-		$is_dynamic_item = ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
-
-		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
-
-		if ($is_dynamic_item && $dynamic_hostid != 0) {
+		if ($this->fields_values['override_hostid']) {
 			// The key of the actual graph prototype selected on widget's edit form.
 			$graph_prototype = API::GraphPrototype()->get([
 				'output' => ['name'],
@@ -89,8 +84,8 @@ class WidgetView extends CControllerWidgetIterator {
 				return $this->inaccessibleError();
 			}
 
-			// Analog graph prototype for the selected dynamic host.
-			$options['hostids'] = [$dynamic_hostid];
+			// Analog graph prototype for the overridden host.
+			$options['hostids'] = $this->fields_values['override_hostid'];
 			$options['filter'] = ['name' => $graph_prototype['name']];
 		}
 		else {
@@ -110,7 +105,7 @@ class WidgetView extends CControllerWidgetIterator {
 		$graphs_collected = [];
 
 		// Do not collect graphs while editing a template dashboard.
-		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
+		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 			$graphs_created_all = API::Graph()->get([
 				'output' => ['graphid', 'name'],
 				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
@@ -125,7 +120,7 @@ class WidgetView extends CControllerWidgetIterator {
 				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
 					$prepend_host_name = $this->isTemplateDashboard()
 						? false
-						: count($graph['hosts']) == 1 || ($is_dynamic_item && $dynamic_hostid != 0);
+						: count($graph['hosts']) == 1 || $this->fields_values['override_hostid'];
 
 					$graphs_collected[$graph['graphid']] = $prepend_host_name
 						? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
@@ -154,11 +149,13 @@ class WidgetView extends CControllerWidgetIterator {
 					'show_legend' => $this->fields_values['show_legend']
 				];
 
+				$child_form = $widget->getForm($child_fields, null);
+
 				$children[] = [
 					'widgetid' => (string) $graphid,
 					'type' => self::GRAPH_WIDGET_ID,
 					'name' => $name,
-					'fields' => $child_fields,
+					'fields' => $child_form->getFieldsValues(),
 					'defaults' => $widget->getDefaults()
 				];
 			}
@@ -194,11 +191,7 @@ class WidgetView extends CControllerWidgetIterator {
 			'selectDiscoveryRule' => ['hostid']
 		];
 
-		$is_dynamic_item = ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
-
-		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
-
-		if ($is_dynamic_item && $dynamic_hostid != 0) {
+		if ($this->fields_values['override_hostid']) {
 			// The key of the actual item prototype selected on widget's edit form.
 			$item_prototype = API::ItemPrototype()->get([
 				'output' => ['key_'],
@@ -211,8 +204,8 @@ class WidgetView extends CControllerWidgetIterator {
 				return $this->inaccessibleError();
 			}
 
-			// Analog item prototype for the selected dynamic host.
-			$options['hostids'] = [$dynamic_hostid];
+			// Analog item prototype for the overridden host.
+			$options['hostids'] = $this->fields_values['override_hostid'];
 			$options['filter'] = ['key_' => $item_prototype['key_']];
 		}
 		else {
@@ -232,7 +225,7 @@ class WidgetView extends CControllerWidgetIterator {
 		$items_collected = [];
 
 		// Do not collect items while editing a template dashboard.
-		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
+		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 			$items_created_all = API::Item()->get([
 				'output' => ['itemid', 'name'],
 				'hostids' => [$item_prototype['discoveryRule']['hostid']],
@@ -274,11 +267,13 @@ class WidgetView extends CControllerWidgetIterator {
 					'show_legend' => $this->fields_values['show_legend']
 				];
 
+				$child_form = $widget->getForm($child_fields, null);
+
 				$children[] = [
 					'widgetid' => (string) $itemid,
 					'type' => self::GRAPH_WIDGET_ID,
 					'name' => $name,
-					'fields' => $child_fields,
+					'fields' => $child_form->getFieldsValues(),
 					'defaults' => $widget->getDefaults()
 				];
 			}

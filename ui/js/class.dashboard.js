@@ -647,6 +647,10 @@ class CDashboard {
 			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(widget.fields).values()) {
 				const {reference, type} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
+				if (reference === CDashboard.REFERENCE_DASHBOARD) {
+					continue;
+				}
+
 				accessor.setTypedReference(
 					CWidgetBase.createTypedReference(references_substitution.has(reference)
 						? {
@@ -763,6 +767,10 @@ class CDashboard {
 
 		for (const accessor of CWidgetBase.getFieldsReferencesAccessors(new_widget_data.fields).values()) {
 			const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+			if (reference === CDashboard.REFERENCE_DASHBOARD) {
+				continue;
+			}
 
 			if (!references.has(reference)) {
 				accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));
@@ -1963,6 +1971,10 @@ class CDashboard {
 
 			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
 				const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
+
+				if (reference === CDashboard.REFERENCE_DASHBOARD) {
+					continue;
+				}
 
 				if (!references.has(reference)) {
 					accessor.setTypedReference(CWidgetBase.createTypedReference({reference: ''}));

@@ -40,7 +40,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->addValidationRules([
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
-			'dynamic_hostid' => 'db hosts.hostid',
 			'contents_width' => 'int32',
 			'contents_height' => 'int32'
 		]);
@@ -52,7 +51,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$width = (int) $this->getInput('contents_width', 100);
 		$height = (int) $this->getInput('contents_height', 100);
 
-		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 		$resourceid = null;
 		$profileIdx = 'web.dashboard.filter';
 		$profileIdx2 = $this->getInput('dashboardid', 0);
@@ -99,11 +97,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'profileIdx2' => $profileIdx2
 		];
 
-		$is_dynamic_item = $this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM;
-
-		// Replace graph item by particular host item if dynamic items are used.
-		if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
-			// Find same simple-graph item in selected $dynamic_hostid host.
+		// Replace graph item by particular host item if the host has been overridden.
+		if ($this->fields_values['override_hostid'] && $resourceid) {
+			// Find same simple-graph item in the overridden host.
 			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$src_items = API::Item()->get([
 					'output' => ['key_'],
@@ -114,7 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$items = API::Item()->get([
 					'output' => ['itemid', 'name'],
 					'selectHosts' => ['name'],
-					'hostids' => $dynamic_hostid,
+					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
 						'key_' => $src_items[0]['key_'],
 						'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
@@ -134,7 +130,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				// get host
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'host', 'name'],
-					'hostids' => $dynamic_hostid
+					'hostids' => $this->fields_values['override_hostid']
 				]);
 				$host = reset($hosts);
 
@@ -152,7 +148,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
 						$new_dynamic = getSameGraphItemsForHost(
 							[['itemid' => $graph['ymax_itemid']]],
-							$dynamic_hostid,
+							$this->fields_values['override_hostid'][0],
 							false
 						);
 						$new_dynamic = reset($new_dynamic);
@@ -168,7 +164,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
 						$new_dynamic = getSameGraphItemsForHost(
 							[['itemid' => $graph['ymin_itemid']]],
-							$dynamic_hostid,
+							$this->fields_values['override_hostid'][0],
 							false
 						);
 						$new_dynamic = reset($new_dynamic);
@@ -185,8 +181,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				if ($graph) {
 					$graph['hosts'] = $hosts;
 
-					// Search if there are any items available for this dynamic host.
-					$new_dynamic = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+					// Search if there are any items available for the overridden host.
+					$new_dynamic = getSameGraphItemsForHost($graph['gitems'],
+						$this->fields_values['override_hostid'][0], false
+					);
 
 					if ($new_dynamic) {
 						// Add destination host data required by CMacrosResolver::resolveGraphNames().
@@ -271,13 +269,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				$prepend_host_name = $this->isTemplateDashboard()
 					? false
-					: count($graph['hosts']) == 1 || ($is_dynamic_item && $dynamic_hostid != 0);
+					: count($graph['hosts']) == 1 || $this->fields_values['override_hostid'];
 
 				$header_name = $prepend_host_name
 					? $graph['hosts'][0]['name'].NAME_DELIMITER.$graph['name']
 					: $graph['name'];
 
-				if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
+				if ($this->fields_values['override_hostid'] && $resourceid) {
 					if ($graph['graphtype'] == GRAPH_TYPE_PIE || $graph['graphtype'] == GRAPH_TYPE_EXPLODED) {
 						$graph_src = (new CUrl('chart7.php'))
 							->setArgument('name', $host['name'].NAME_DELIMITER.$graph['name'])
@@ -300,7 +298,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 							->setArgument('percent_right', $graph['percent_right']);
 					}
 
-					$new_graph_items = getSameGraphItemsForHost($graph['gitems'], $dynamic_hostid, false);
+					$new_graph_items = getSameGraphItemsForHost($graph['gitems'],
+						$this->fields_values['override_hostid'][0], false
+					);
 
 					foreach ($new_graph_items as &$new_graph_item) {
 						unset($new_graph_item['gitemid'], $new_graph_item['graphid']);
@@ -311,14 +311,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				if ($graph_dims['graphtype'] == GRAPH_TYPE_PIE || $graph_dims['graphtype'] == GRAPH_TYPE_EXPLODED) {
-					if (!$is_dynamic_item || $graph_src === '') {
+					if (!$this->fields_values['override_hostid'] || $graph_src === '') {
 						$graph_src = (new CUrl('chart6.php'))
 							->setArgument('graphid', $resourceid)
 							->setArgument('graph3d', $graph['show_3d']);
 					}
 				}
 				else {
-					if (!$is_dynamic_item || $graph_src === '') {
+					if (!$this->fields_values['override_hostid'] || $graph_src === '') {
 						$graph_src = (new CUrl('chart2.php'))->setArgument('graphid', $resourceid);
 					}
 
@@ -346,15 +346,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($edit_mode || ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid'))) {
+			if ($edit_mode || ($this->isTemplateDashboard() && !$this->fields_values['override_hostid'])) {
 				$graph_url = null;
 			}
 			else {
 				if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-					$has_host_graph = $is_dynamic_item && $dynamic_hostid != 0
+					$has_host_graph = !$this->fields_values['override_hostid']
 						? (bool) API::Graph()->get([
 							'output' => [],
-							'hostids' => [$dynamic_hostid],
+							'hostids' => $this->fields_values['override_hostid'],
 							'filter' => [
 								'name' => $graph['name']
 							]

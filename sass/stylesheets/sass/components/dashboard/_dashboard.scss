@@ -577,6 +577,19 @@
 	}
 }
 
+.dashboard-grid-iterator-actions {
+	opacity: 0;
+
+	@if $ui-transitions {
+		transition: opacity $ui-controls-transition-duration ease-out;
+	}
+
+	li {
+		margin-top: 2px;
+		margin-right: 2px;
+	}
+}
+
 .dashboard-grid-iterator-contents {
 	// To catch vertical resize events correctly.
 	position: absolute;
@@ -659,6 +672,10 @@
 			// Not inheriting opacity transition here.
 			transition: margin-top $ui-transition-duration ease-out, height $ui-transition-duration ease-out,
 				box-shadow $ui-transition-duration ease-out;
+		}
+
+		.dashboard-grid-iterator-actions {
+			opacity: 1;
 		}
 
 		&.dashboard-grid-iterator-hidden-header.iterator-double-header {
@@ -1039,8 +1056,8 @@
 	}
 }
 
-.dashboard-grid-widget-contents,
-.dashboard-grid-iterator-contents {
+.dashboard-grid-widget-body,
+.dashboard-grid-iterator-body {
 	&.is-loading::before {
 		margin: calc(.25rem + 1px);
 	}

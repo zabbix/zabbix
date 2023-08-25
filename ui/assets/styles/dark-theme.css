@@ -1892,6 +1892,13 @@ button {
   .dashboard-grid-iterator-header.pager-visible .dashboard-grid-iterator-pager {
     display: flex; }
 
+.dashboard-grid-iterator-actions {
+  opacity: 0;
+  transition: opacity 0.2s ease-out; }
+  .dashboard-grid-iterator-actions li {
+    margin-top: 2px;
+    margin-right: 2px; }
+
 .dashboard-grid-iterator-contents {
   position: absolute;
   top: 0;
@@ -1951,6 +1958,8 @@ button {
       box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, 0.15);
       opacity: 1;
       transition: margin-top 0.3s ease-out, height 0.3s ease-out, box-shadow 0.3s ease-out; }
+    .dashboard-grid-iterator.dashboard-grid-iterator-focus .dashboard-grid-iterator-actions {
+      opacity: 1; }
     .dashboard-grid-iterator.dashboard-grid-iterator-focus.dashboard-grid-iterator-hidden-header.iterator-double-header .dashboard-grid-iterator-header {
       margin-top: calc(-4rem - 8px);
       height: calc(4rem + 8px); }
@@ -2137,8 +2146,8 @@ button {
   .dashboard-widget-graph-link:link {
     border: 0; }
 
-.dashboard-grid-widget-contents.is-loading::before,
-.dashboard-grid-iterator-contents.is-loading::before {
+.dashboard-grid-widget-body.is-loading::before,
+.dashboard-grid-iterator-body.is-loading::before {
   margin: calc(.25rem + 1px); }
 
 .dashboard-list .dashboard-list-item {

@@ -31,6 +31,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGraphPrototype,
 	CWidgetFieldMultiSelectItemPrototype,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList
 };
 
@@ -64,10 +65,6 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
-			)
 			->addField(
 				(new CWidgetFieldIntegerBox('columns', _('Columns'), 1, DASHBOARD_MAX_COLUMNS))
 					->setDefault(self::DEFAULT_COLUMNS_COUNT)
@@ -79,6 +76,9 @@ class WidgetForm extends CWidgetForm {
 				))
 					->setDefault(self::DEFAULT_ROWS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

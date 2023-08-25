@@ -70,7 +70,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$options = [
 					'output' => ['value_type'],
 					'selectValueMap' => ['mappings'],
-					'hostids' => $this->fields_values['override_hostid'][0],
+					'hostids' => $this->fields_values['override_hostid'],
 					'webitems' => true,
 					'filter' => [
 						'key_' => $tmp_items[0]['key_']

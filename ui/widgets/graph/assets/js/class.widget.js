@@ -20,8 +20,16 @@
 
 class CWidgetGraph extends CWidget {
 
+	#override_hostid = null;
+
 	onInitialize() {
 		this._is_graph_mode = false;
+	}
+
+	onStart() {
+		if (this.getFieldsReferredData().has('override_hostid')) {
+			this.#override_hostid = this.getFieldsReferredData().get('override_hostid').value;
+		}
 	}
 
 	onActivate() {
@@ -81,21 +89,21 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
-	setDynamicHost(dynamic_hostid) {
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._stopUpdating();
-		}
-
-		if (this._is_graph_mode) {
-			this._is_graph_mode = false;
-			this._deactivateGraph();
-		}
-
-		super.setDynamicHost(dynamic_hostid);
-	}
-
 	promiseUpdate() {
 		if (this._is_graph_mode) {
+			if (this.getFieldsReferredData().has('override_hostid')) {
+				const override_hostid = this.getFieldsReferredData().get('override_hostid').value;
+
+				if (this.#override_hostid !== override_hostid) {
+					this.#override_hostid = override_hostid;
+
+					this._is_graph_mode = false;
+					this._deactivateGraph();
+
+					return super.promiseUpdate();
+				}
+			}
+
 			timeControl.refreshObject('graph_' + this._unique_id);
 
 			return Promise.resolve();

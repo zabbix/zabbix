@@ -384,7 +384,6 @@ class CWidgetIterator extends CWidget {
 			is_edit_mode: false,
 			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
-			dynamic_hostid: this._dynamic_hostid,
 			unique_id: this._createUniqueId()
 		});
 	}

@@ -30,6 +30,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldMultiSelectGraph,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList
 };
 
@@ -60,9 +61,8 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }
