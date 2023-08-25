@@ -174,11 +174,14 @@ window.check_popup = new class {
 		];
 
 		return results.some(result => {
-			if (!result.type) {
+			if (!result.type || result.dcheckid === dcheck.dcheckid) {
 				return false;
 			}
-			if (result.dcheckid === dcheck.dcheckid) {
-				return false;
+
+			if ([<?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>].includes(parseInt(result.type))
+					&& "key_" in result) {
+				result.snmp_oid = result.key_;
+				delete result.key_;
 			}
 
 			const check = lookup.find(entry => entry.types.includes(parseInt(result.type)));
