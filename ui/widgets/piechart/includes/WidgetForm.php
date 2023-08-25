@@ -70,6 +70,8 @@ class WidgetForm extends CWidgetForm {
 	private const VALUE_DECIMALS_MAX = 6;
 	private const VALUE_DECIMALS_MIN = 1;
 
+	public const VALUE_SIZE_CUSTOM = 1;
+	private const VALUE_SIZE_AUTO = 0;
 	private const VALUE_SIZE_DEFAULT = 10;
 	private const VALUE_SIZE_MAX = 100;
 	private const VALUE_SIZE_MIN = 1;
@@ -168,7 +170,13 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('total_show', _('Show total value')))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('value_size', _('Size'),
+				(new CWidgetFieldRadioButtonList('value_size_type', _('Size'), [
+					self::VALUE_SIZE_AUTO => _('Auto'),
+					self::VALUE_SIZE_CUSTOM => _('Custom')
+				]))->setDefault(self::VALUE_SIZE_AUTO)
+			)
+			->addField(
+				(new CWidgetFieldIntegerBox('value_size', null,
 					self::VALUE_SIZE_MIN, self::VALUE_SIZE_MAX
 				))
 					->setDefault(self::VALUE_SIZE_DEFAULT)

@@ -681,11 +681,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($this->fields_values['total_show'] == self::SHOW_TOTAL_ON) {
 				$config['total_value'] = [
 					'show' => true,
-					'size' => $this->fields_values['value_size'],
+					'is_custom_size' => $this->fields_values['value_size_type'] == WidgetForm::VALUE_SIZE_CUSTOM,
 					'is_bold' =>  $this->fields_values['value_bold'] == self::VALUE_BOLD_ON,
 					'color' => '#'.$this->fields_values['value_color'],
 					'units_show' => $this->fields_values['units_show'] == self::SHOW_UNITS_ON
 				];
+
+				if ($this->fields_values['value_size_type'] == WidgetForm::VALUE_SIZE_CUSTOM) {
+					$config['total_value']['size'] = $this->fields_values['value_size'];
+				}
 			}
 			else {
 				$config['total_value'] = [

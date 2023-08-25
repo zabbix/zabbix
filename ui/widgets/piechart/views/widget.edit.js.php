@@ -219,8 +219,11 @@ window.widget_pie_chart_form = new class {
 		const doughnut_config_fields = this._form.querySelectorAll('#width_label, #width_range, #show_total_fields');
 		const is_doughnut = draw_type == <?= WidgetForm::DRAW_TYPE_DOUGHNUT ?>;
 		const merge = document.getElementById('merge');
+		const value_size_type = this._form.querySelector('[name="value_size_type"]:checked').value;
+		const custom_value_size_on = value_size_type == <?= WidgetForm::VALUE_SIZE_CUSTOM ?>;
+		const value_size_input = document.getElementById('value_size_custom_input');
 		const total_value_fields = this._form.querySelectorAll(
-			'#value_size, #decimal_places, #units_show, #units, #value_bold, #value_color'
+			'#value_size_type, #value_size, #decimal_places, #units_show, #units, #value_bold, #value_color'
 		);
 
 		for (const element of doughnut_config_fields) {
@@ -228,6 +231,14 @@ window.widget_pie_chart_form = new class {
 			for (const input of element.querySelectorAll('input')) {
 				input.disabled = !is_doughnut;
 			}
+		}
+
+		value_size_input.style.display = custom_value_size_on ? '' : 'none';
+		value_size_input.disabled = !custom_value_size_on;
+		value_size_input.nextSibling.nodeValue = custom_value_size_on ? ' %' : '';
+
+		if (custom_value_size_on) {
+			value_size_input.focus();
 		}
 
 		jQuery('#width').rangeControl(
