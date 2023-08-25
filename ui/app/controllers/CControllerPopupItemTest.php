@@ -1139,6 +1139,11 @@ abstract class CControllerPopupItemTest extends CController {
 											);
 											$expression[] = CFilterParser::quoteString($string);
 											break;
+
+										case CFilterParser::TOKEN_TYPE_KEYWORD:
+										case CFilterParser::TOKEN_TYPE_OPERATOR:
+											$expression[] = $filter_token['match'];
+											break;
 									}
 								}
 								break;
