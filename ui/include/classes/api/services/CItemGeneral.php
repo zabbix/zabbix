@@ -2823,7 +2823,10 @@ abstract class CItemGeneral extends CApiService {
 				if ($params[1] == ZBX_PREPROC_MATCH_ERROR_ANY) {
 					if ($match_any_exists) {
 						$error = _s('Invalid parameter "%1$s": %2$s.', $path.($j + 1),
-							_s('value %1$s already exists', '('.implode(', ', $params).')=('.implode(', ', $params).')')
+							_s('only one object can exist within the combinations of %1$s',
+								'('.implode(', ', ['type', 'params']).')=('.
+								implode(', ', [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, $step['params']]).')'
+							)
 						);
 						self::exception(ZBX_API_ERROR_PARAMETERS, str_replace("\n", '\n', $error));
 					}
