@@ -287,7 +287,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	.filter-space {
 		display: contents;
 
-		form {
+		.filter-container {
 			grid-column: 1 / -1;
 		}
 
@@ -4040,6 +4040,23 @@ z-select,
 	#tagsFormList,
 	#macrosFormList,
 	#valuemap-formlist {
+		.form-field {
+			grid-column-start: 1;
+		}
+
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
+		}
+	}
+}
+
+.overlay-dialogue #templates-form {
+	#tagsFormList,
+	#macrosFormList {
 		.form-field {
 			grid-column-start: 1;
 		}

@@ -57,9 +57,6 @@ class CUrlFactory {
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']
 		],
-		'templates.php' => [
-			'remove' => ['templateid']
-		],
 		'trigger_prototypes.php' => [
 			'remove' =>  ['triggerid'],
 			'add' => ['parent_discoveryid', 'hostid']

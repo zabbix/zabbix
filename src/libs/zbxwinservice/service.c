@@ -22,7 +22,6 @@
 #include "zbxstr.h"
 #include "cfg.h"
 #include "zbxlog.h"
-#include "zbxconf.h"
 
 #include <strsafe.h> /* StringCchPrintf */
 
