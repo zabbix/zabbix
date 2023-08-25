@@ -1201,7 +1201,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCMAN, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+	/* subscribe for worker log level rtc messages */
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
 			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_create(&tasks);

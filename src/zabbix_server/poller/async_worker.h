@@ -17,40 +17,29 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ASYNC_POLLER_H
-#define ZABBIX_ASYNC_POLLER_H
-
+#ifndef ZABBIX_ASYNC_WORKER_H
+#define ZABBIX_ASYNC_WORKER_H
 #include "zbxalgo.h"
-#include "zbxthreads.h"
-#include "zbxcacheconfig.h"
 #include "async_manager.h"
+#include "async_queue.h"
+#include "zbxtimekeeper.h"
 
 typedef struct
 {
-	zbx_async_manager_t	*manager;
-	const zbx_thread_info_t	*info;
-	int			state;
-	int			clear_cache;
-	int			process_num;
-	unsigned char		poller_type;
-	int			processed;
-	int			queued;
-	int			processing;
-	int			config_unavailable_delay;
-	int			config_unreachable_delay;
-	int			config_unreachable_period;
-	int			config_max_concurrent_checks_per_poller;
-	int			config_timeout;
-	const char		*config_source_ip;
-	struct event		*async_wake_timer;
-	struct event		*async_timer;
-	struct event_base	*base;
-	struct evdns_base	*dnsbase;
-	zbx_hashset_t		interfaces;
-#ifdef HAVE_LIBCURL
-	CURLM			*curl_handle;
-#endif
-}
-zbx_poller_config_t;
+	zbx_uint32_t			init_flags;
+	int				stop;
 
+	zbx_async_queue_t		*queue;
+	pthread_t			thread;
+
+	zbx_async_notify_cb_t		finished_cb;
+
+	void				*finished_data;
+}
+zbx_async_worker_t;
+
+int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, char **error);
+void	async_worker_stop(zbx_async_worker_t *worker);
+void	async_worker_destroy(zbx_async_worker_t *worker);
+void	async_worker_set_finished_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t finished_cb, void *finished_data);
 #endif
