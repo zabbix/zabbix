@@ -2581,7 +2581,7 @@ static const char	*dc_get_global_item_type_timeout(const ZBX_DC_ITEM *item)
 			global_timeout = config->config->item_timeouts.http;
 			break;
 		default:
-			THIS_SHOULD_NEVER_HAPPEN;
+			global_timeout = NULL;
 			break;
 	}
 
@@ -9067,7 +9067,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	DCget_interface(&dst_item->interface, dc_interface);
 
 	if (src_item->timeout == NULL || '\0' == *src_item->timeout)
+	{
+		zabbix_log(1, "DBG get global for itemid %llu", src_item->itemid);
 		timeout_global = dc_get_global_item_type_timeout(src_item);
+	}
 
 	switch (src_item->type)
 	{
@@ -14870,21 +14873,24 @@ int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, int *lastaccess, char 
 
 void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts)
 {
-	ZBX_DC_PROXY	*proxy;
+	ZBX_DC_PROXY			*proxy;
+	zbx_config_item_type_timeouts_t	*timeouts_src;
 
 	RDLOCK_CACHE;
 
 	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
 	{
-		zbx_strscpy(timeouts->agent, proxy->item_timeouts.agent);
-		zbx_strscpy(timeouts->simple, proxy->item_timeouts.simple);
-		zbx_strscpy(timeouts->snmp, proxy->item_timeouts.snmp);
-		zbx_strscpy(timeouts->external, proxy->item_timeouts.external);
-		zbx_strscpy(timeouts->odbc, proxy->item_timeouts.odbc);
-		zbx_strscpy(timeouts->http, proxy->item_timeouts.http);
-		zbx_strscpy(timeouts->ssh, proxy->item_timeouts.ssh);
-		zbx_strscpy(timeouts->telnet, proxy->item_timeouts.telnet);
-		zbx_strscpy(timeouts->script, proxy->item_timeouts.script);
+		timeouts_src = (0 == proxy->custom_timeouts ? &config->config->item_timeouts : &proxy->item_timeouts);
+
+		zbx_strscpy(timeouts->agent, timeouts_src->agent);
+		zbx_strscpy(timeouts->simple, timeouts_src->simple);
+		zbx_strscpy(timeouts->snmp, timeouts_src->snmp);
+		zbx_strscpy(timeouts->external, timeouts_src->external);
+		zbx_strscpy(timeouts->odbc, timeouts_src->odbc);
+		zbx_strscpy(timeouts->http, timeouts_src->http);
+		zbx_strscpy(timeouts->ssh, timeouts_src->ssh);
+		zbx_strscpy(timeouts->telnet, timeouts_src->telnet);
+		zbx_strscpy(timeouts->script, timeouts_src->script);
 	}
 
 	UNLOCK_CACHE;

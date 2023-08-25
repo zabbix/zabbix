@@ -1274,7 +1274,7 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 	if (timeout != ZBX_CHECK_TIMEOUT_UNDEFINED && SUCCEED == zbx_alarm_timed_out())
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "timed out"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timed out during check execution."));
 		goto notsupported;
 	}
 
