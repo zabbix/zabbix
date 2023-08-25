@@ -234,14 +234,6 @@ window.widget_pie_chart_form = new class {
 			}
 		}
 
-		value_size_input.style.display = custom_value_size_on ? '' : 'none';
-		value_size_input.disabled = !custom_value_size_on;
-		value_size_input.nextSibling.nodeValue = custom_value_size_on ? ' %' : '';
-
-		if (custom_value_size_on) {
-			value_size_input.focus();
-		}
-
 		jQuery('#width').rangeControl(
 			is_doughnut ? 'enable' : 'disable'
 		);
@@ -251,6 +243,14 @@ window.widget_pie_chart_form = new class {
 
 		for (const field of total_value_fields) {
 			field.disabled = !document.getElementById('total_show').checked;
+		}
+
+		value_size_input.disabled = !custom_value_size_on;
+		value_size_input.style.display = custom_value_size_on ? '' : 'none';
+		value_size_input.nextSibling.nodeValue = custom_value_size_on ? ' %' : '';
+
+		if (custom_value_size_on) {
+			value_size_input.focus();
 		}
 
 		document.getElementById('units').disabled = (!document.getElementById('units_show').checked
