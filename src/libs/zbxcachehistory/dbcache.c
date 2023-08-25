@@ -376,7 +376,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
-			"value_max", NULL);
+			"value_max", (char *)NULL);
 
 	for (i = 0; i < trends_num; i++)
 	{

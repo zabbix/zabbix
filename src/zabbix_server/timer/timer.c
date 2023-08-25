@@ -385,7 +385,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num)
 			zbx_dc_get_event_maintenances(&event_queries, &maintenanceids);
 
 		zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid", "maintenanceid",
-				"suppress_until", NULL);
+				"suppress_until", (char *)NULL);
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		for (i = 0; i < event_queries.values_num; i++)

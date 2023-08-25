@@ -124,87 +124,6 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
 		int err_type, const char *tz);
 
-static int	get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone)
-{
-	int		user_type = -1;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	*user_timezone = NULL;
-
-	result = zbx_db_select("select r.type,u.roleid,u.timezone from users u,role r where u.roleid=r.roleid and"
-			" userid=" ZBX_FS_UI64, userid);
-
-	if (NULL != (row = zbx_db_fetch(result)) && FAIL == zbx_db_is_null(row[0]))
-	{
-		user_type = atoi(row[0]);
-		ZBX_STR2UINT64(*roleid, row[1]);
-		*user_timezone = zbx_strdup(NULL, row[2]);
-	}
-
-	zbx_db_free_result(result);
-
-	return user_type;
-}
-
-static const char	*permission_string(int perm)
-{
-	switch (perm)
-	{
-		case PERM_DENY:
-			return "dn";
-		case PERM_READ:
-			return "r";
-		case PERM_READ_WRITE:
-			return "rw";
-		default:
-			return "unknown";
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Return user permissions for access to the host                    *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: PERM_DENY - if host or user not found,                       *
- *                   or permission otherwise                                  *
- *                                                                            *
- ******************************************************************************/
-static int	get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids)
-{
-	int		perm = PERM_DENY;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 == hostgroupids->values_num)
-		goto out;
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select min(r.permission)"
-			" from rights r"
-			" join users_groups ug on ug.usrgrpid=r.groupid"
-				" where ug.userid=" ZBX_FS_UI64 " and", userid);
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "r.id",
-			hostgroupids->values, hostgroupids->values_num);
-	result = zbx_db_select("%s", sql);
-
-	if (NULL != (row = zbx_db_fetch(result)) && FAIL == zbx_db_is_null(row[0]))
-		perm = atoi(row[0]);
-
-	zbx_db_free_result(result);
-	zbx_free(sql);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
-
-	return perm;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Check user access to event by tags                                *
@@ -315,7 +234,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (USER_TYPE_SUPER_ADMIN == get_user_info(userid, &roleid, user_timezone))
+	if (USER_TYPE_SUPER_ADMIN == zbx_get_user_info(userid, &roleid, user_timezone))
 	{
 		perm = PERM_READ_WRITE;
 		goto out;
@@ -339,7 +258,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char
 
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (PERM_DENY < (perm = get_hostgroups_permission(userid, &hostgroupids)) &&
+	if (PERM_DENY < (perm = zbx_get_hostgroups_permission(userid, &hostgroupids)) &&
 			FAIL == check_tag_based_permission(userid, &hostgroupids, event))
 	{
 		perm = PERM_DENY;
@@ -347,56 +266,7 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char
 
 	zbx_vector_uint64_destroy(&hostgroupids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
-
-	return perm;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Return user permissions for access to item                        *
- *                                                                            *
- * Return value: PERM_DENY - if host or user not found,                       *
- *                   or permission otherwise                                  *
- *                                                                            *
- ******************************************************************************/
-static int	get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone)
-{
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	int			perm = PERM_DENY;
-	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		hostgroupid, roleid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&hostgroupids);
-	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-	if (USER_TYPE_SUPER_ADMIN == get_user_info(userid, &roleid, user_timezone))
-	{
-		perm = PERM_READ_WRITE;
-		goto out;
-	}
-
-	result = zbx_db_select(
-			"select hg.groupid from items i"
-			" join hosts_groups hg on hg.hostid=i.hostid"
-			" where i.itemid=" ZBX_FS_UI64,
-			itemid);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		ZBX_STR2UINT64(hostgroupid, row[0]);
-		zbx_vector_uint64_append(&hostgroupids, hostgroupid);
-	}
-	zbx_db_free_result(result);
-
-	perm = get_hostgroups_permission(userid, &hostgroupids);
-out:
-	zbx_vector_uint64_destroy(&hostgroupids);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, permission_string(perm));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
 
 	return perm;
 }
@@ -594,7 +464,7 @@ static int	get_service_permission(zbx_uint64_t userid, char **user_timezone, con
 	zbx_vector_uint64_t	parent_ids;
 	zbx_service_role_t	role_local, *role;
 
-	user.type = get_user_info(userid, &user.roleid, user_timezone);
+	user.type = zbx_get_user_info(userid, &user.roleid, user_timezone);
 
 	role_local.roleid = user.roleid;
 
@@ -867,7 +737,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 				break;
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
-				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
+				if (PERM_READ > zbx_get_item_permission(userid, event->objectid, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
@@ -967,7 +837,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 				break;
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
-				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
+				if (PERM_READ > zbx_get_item_permission(userid, event->objectid, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
@@ -1059,7 +929,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 				break;
 			case EVENT_OBJECT_ITEM:
 			case EVENT_OBJECT_LLDRULE:
-				if (PERM_READ > get_item_permission(userid, event->objectid, &user_timezone))
+				if (PERM_READ > zbx_get_item_permission(userid, event->objectid, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_SERVICE:
@@ -1179,7 +1049,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	{
 		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
 				"status", "error", "esc_step", "alerttype", (NULL != r_event ? "p_eventid" : NULL),
-				NULL);
+				(char *)NULL);
 	}
 
 	now = (int)time(NULL);
@@ -1793,7 +1663,7 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 			zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid",
 					"clock", "mediatypeid", "sendto", "subject", "message", "status", "error",
 					"esc_step", "alerttype", "acknowledgeid", "parameters",
-					(NULL != r_event ? "p_eventid" : NULL), NULL);
+					(NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
 		}
 
 		if (MEDIA_TYPE_EXEC == type)
@@ -1835,7 +1705,7 @@ err_alert:
 
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
-				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), NULL);
+				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
 
 		if (NULL != r_event)
 		{

@@ -1112,7 +1112,7 @@ static void	tm_process_temp_suppression(const char *data)
 			zbx_db_insert_t	db_insert;
 
 			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
-					"suppress_until", "userid", NULL);
+					"suppress_until", "userid", (char *)NULL);
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, ts, userid);
 
 			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");

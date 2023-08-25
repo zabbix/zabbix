@@ -100,19 +100,6 @@ $filter_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), (new CColHeader(_('Action')))->setWidth('100%')]);
 
-$overrides_filters = $options['overrides_filters'];
-if (!$overrides_filters) {
-	$overrides_filters = [[
-		'macro' => '',
-		'operator' => CONDITION_OPERATOR_REGEXP,
-		'value' => '',
-		'formulaid' => num2letter(0)
-	]];
-}
-else {
-	$overrides_filters = CConditionHelper::sortConditionsByFormulaId($overrides_filters);
-}
-
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
@@ -120,7 +107,7 @@ $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
 ]);
 
-foreach ($overrides_filters as $i => $overrides_filter) {
+foreach ($options['overrides_filters'] as $i => $overrides_filter) {
 	$formulaid = [
 		new CSpan($overrides_filter['formulaid']),
 		new CVar('overrides_filters['.$i.'][formulaid]', $overrides_filter['formulaid'])

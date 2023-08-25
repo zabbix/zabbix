@@ -1258,6 +1258,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_server);
+	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{

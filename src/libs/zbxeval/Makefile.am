@@ -6,6 +6,8 @@ libzbxeval_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
 libzbxeval_a_SOURCES = \
+	count_pattern.c \
+	count_pattern.h \
 	parse.c \
 	execute.c \
 	misc.c \
