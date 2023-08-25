@@ -4278,6 +4278,8 @@ Changes for 5.0.38rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-17279] fixed graph widget loading (apoga)
+A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.37
