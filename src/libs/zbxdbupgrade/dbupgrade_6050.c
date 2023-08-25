@@ -697,8 +697,8 @@ static int	DBpatch_6050062(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update profiles"
 			" set value_str='name'"
-			" where value_str='host'"
-				" and idx='web.proxies.php.sort'"))
+			" where value_str like 'host'"
+				" and idx like 'web.proxies.php.sort'"))
 	{
 		return FAIL;
 	}
