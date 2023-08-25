@@ -36,6 +36,7 @@ class CSVGPie {
 	static DRAW_TYPE_DOUGHNUT = 1;
 
 	static TOTAL_VALUE_SIZE_DEFAULT = 10;
+	static TOTAL_VALUE_PADDING = 4;
 
 	/**
 	 * Widget configuration.
@@ -232,22 +233,13 @@ class CSVGPie {
 						.style('font-size', `${this.#config.total_value.size * 10}px`);
 				}
 				else {
-					const y = 3.5;
-
-					// Set initial size
-					this.#total_value_container
-						.attr('y', y)
-						.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT}px`);
-
-					const font_family = this.#svg.style('font-family');
-					const padding = 5;
 					const text_width = this.#getMeasuredTextWidth(
 						this.#total_value_container.text(),
 						CSVGPie.TOTAL_VALUE_SIZE_DEFAULT,
-						font_family) + padding;
+						this.#svg.style('font-family')) + CSVGPie.TOTAL_VALUE_PADDING;
+
 					const scale = this.#radius_inner * 2 / text_width;
 
-					// Scale to actual size
 					this.#total_value_container
 						.attr('transform', `scale(${scale})`);
 				}
@@ -262,8 +254,30 @@ class CSVGPie {
 					.text('')
 					.style('display', 'none');
 
+				if (this.#config.total_value.is_custom_size) {
+					this.#no_data_container
+						.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT - this.#config.total_value.size)
+						.style('font-size', `${this.#config.total_value.size * 10}px`);
+				}
+				else {
+					const text_width = this.#getMeasuredTextWidth(
+						this.#no_data_container.text(),
+						CSVGPie.TOTAL_VALUE_SIZE_DEFAULT,
+						this.#svg.style('font-family')) + CSVGPie.TOTAL_VALUE_PADDING;
+
+					const scale = this.#radius_inner * 2 / text_width;
+
+					this.#no_data_container
+						.attr('transform', `scale(${scale})`);
+				}
+
 				this.#no_data_container
 					.style('display', '');
+			}
+			else {
+				this.#no_data_container
+					.attr('y', CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10 / 2 / CSVGPie.LINE_HEIGHT - CSVGPie.TOTAL_VALUE_SIZE_DEFAULT)
+					.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10}px`)
 			}
 		}
 
@@ -390,6 +404,8 @@ class CSVGPie {
 	 * Create containers for elements (arcs, total value, no data text).
 	 */
 	#createContainers() {
+		const y = 3.5;
+
 		this.#arcs_container = this.#g_scalable
 			.append('svg:g')
 			.attr('class', CSVGPie.ZBX_STYLE_ARCS);
@@ -409,21 +425,20 @@ class CSVGPie {
 				this.#total_value_container = this.#g_scalable
 					.append('svg:text')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
+					.attr('y', y)
+					.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT}px`)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
 					.style('fill', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
 					.style('display', 'none');
 			}
 		}
 
-		const total_value_size = CSVGPie.TOTAL_VALUE_SIZE_DEFAULT;
-		const total_value_font_weight = this.#config.total_value?.is_bold ? 'bold' : '';
-
 		this.#no_data_container = this.#g_scalable
 			.append('svg:text')
 			.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE_NO_DATA)
-			.attr('y', total_value_size * 10 / 2 / CSVGPie.LINE_HEIGHT)
-			.style('font-size', `${total_value_size * 10}px`)
-			.style('font-weight', total_value_font_weight)
+			.attr('y', y)
+			.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT}px`)
+			.style('font-weight', this.#config.total_value?.is_bold ? 'bold' : '')
 			.text(t('No data'));
 	}
 
