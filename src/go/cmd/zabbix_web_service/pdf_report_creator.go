@@ -158,9 +158,15 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		u.String(), req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
 	var buf []byte
+	cookieName := "zbx_session"
+	cookieValue := strings.Replace(req.Header["Cookie"], "zbx_session=", "", 1)
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
-		network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
+		network.SetCookie(cookieName, cookieValue).
+			WithURL(req.URL).
+			WithDomain(u.Hostname()).
+			WithSameSite(network.CookieSameSiteStrict).
+			WithHTTPOnly(true),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
 		navigateAndWaitFor(u.String(), "networkIdle"),
 		chromedp.ActionFunc(func(ctx context.Context) error {
@@ -209,10 +215,11 @@ func navigateAndWaitFor(url string, eventName string) chromedp.ActionFunc {
 //
 // waitFor blocks until eventName is received.
 // Examples of events you can wait for:
-//     init, DOMContentLoaded, firstPaint,
-//     firstContentfulPaint, firstImagePaint,
-//     firstMeaningfulPaintCandidate,
-//     load, networkAlmostIdle, firstMeaningfulPaint, networkIdle
+//
+//	init, DOMContentLoaded, firstPaint,
+//	firstContentfulPaint, firstImagePaint,
+//	firstMeaningfulPaintCandidate,
+//	load, networkAlmostIdle, firstMeaningfulPaint, networkIdle
 //
 // This is not super reliable, I've already found incidental cases where
 // networkIdle was sent before load. It's probably smart to see how
