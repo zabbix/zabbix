@@ -29,7 +29,8 @@ class CSVGPie {
 	static LINE_HEIGHT = 1.14;
 
 	static ANIMATE_DURATION_WHOLE = 1000;
-	static ANIMATE_DURATION_SECTORS = 300;
+	static ANIMATE_DURATION_POP_OUT = 300;
+	static ANIMATE_DURATION_POP_IN = 100;
 
 	static DRAW_TYPE_PIE = 0;
 	static DRAW_TYPE_DOUGHNUT = 1;
@@ -309,10 +310,10 @@ class CSVGPie {
 								const x = arc.centroid(datum)[0] / 10;
 								const y = arc.centroid(datum)[1] / 10;
 
-								_this.transition().duration(CSVGPie.ANIMATE_DURATION_SECTORS).attr('transform', `translate(${x}, ${y})`);
+								_this.transition().duration(CSVGPie.ANIMATE_DURATION_POP_OUT).attr('transform', `translate(${x}, ${y})`);
 							})
 							.on('mouseleave', () => {
-								_this.transition().duration(CSVGPie.ANIMATE_DURATION_SECTORS).attr('transform', 'translate(0, 0)');
+								_this.transition().duration(CSVGPie.ANIMATE_DURATION_POP_IN).attr('transform', 'translate(0, 0)');
 							});
 					}
 				}
