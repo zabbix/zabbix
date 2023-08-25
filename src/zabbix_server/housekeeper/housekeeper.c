@@ -1112,6 +1112,73 @@ static int	housekeeping_audit(int now)
 	return 0;
 }
 
+static int	housekeeping_autoreg_host()
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	int			deleted = 0;
+	zbx_vector_uint64_t	autoreg_hostids;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	result = DBselect(
+			"select ah.autoreg_hostid"
+			" from autoreg_host ah"
+			" where not exists ("
+					"select null"
+					" from hosts h"
+					" where ah.host=h.host"
+			")"
+				" and not exists ("
+						"select null"
+						" from events e"
+						" where ah.autoreg_hostid=e.objectid"
+							" and e.source=%d"
+							" and e.object=%d"
+				")",
+			EVENT_SOURCE_AUTOREGISTRATION,
+			EVENT_OBJECT_ZABBIX_ACTIVE
+	);
+
+	zbx_vector_uint64_create(&autoreg_hostids);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		zbx_uint64_t	autoreg_hostid;
+
+		ZBX_STR2UINT64(autoreg_hostid, row[0]);
+
+		zbx_vector_uint64_append(&autoreg_hostids, autoreg_hostid);
+
+	}
+	DBfree_result(result);
+
+	if (autoreg_hostids.values_num != 0)
+	{
+		char	*sql = NULL;
+		size_t	sql_alloc = 0, sql_offset;
+		int	ret;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from autoreg_host where");
+
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid", autoreg_hostids.values,
+				autoreg_hostids.values_num);
+
+		ret = DBexecute("%s", sql);
+
+		if (ZBX_DB_OK <= ret)
+			deleted = ret;
+
+		zbx_free(sql);
+	}
+
+	zbx_vector_uint64_destroy(&autoreg_hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
+
+	return deleted;
+}
+
 static int	housekeeping_events(int now)
 {
 #define ZBX_HK_EVENT_RULE	" and not exists (select null from problem where events.eventid=problem.eventid)" \
@@ -1222,7 +1289,7 @@ static void	hk_tsdb_check_config(void)
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int			now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions, d_services,
-				d_audit, sleeptime, records;
+				d_audit, d_autoreg_host, sleeptime, records;
 	double			sec, time_slept, time_now;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
@@ -1344,6 +1411,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
 
+		zbx_setproctitle("%s [removing old autoreg_hosts]", get_process_type_string(process_type));
+		d_autoreg_host = housekeeping_autoreg_host();
+
 		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
 		records = housekeeping_proxy_dhistory(now);
 
@@ -1352,9 +1422,10 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit, %d records in " ZBX_FS_DBL " sec, %s]",
+				" %d sessions, %d alarms, %d audit, %d autoreg_host, %d records in " ZBX_FS_DBL
+				" sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_problems, d_sessions, d_services, d_audit, records, sec, sleeptext);
+				d_problems, d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
 
 		zbx_config_clean(&cfg);
 
