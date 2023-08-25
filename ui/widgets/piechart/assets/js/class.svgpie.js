@@ -226,6 +226,32 @@ class CSVGPie {
 						return text;
 					});
 
+				if (this.#config.total_value.is_custom_size) {
+					this.#total_value_container
+						.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT - this.#config.total_value.size)
+						.style('font-size', `${this.#config.total_value.size * 10}px`);
+				}
+				else {
+					const y = 3.5;
+
+					// Set initial size
+					this.#total_value_container
+						.attr('y', y)
+						.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT}px`);
+
+					const font_family = this.#svg.style('font-family');
+					const padding = 5;
+					const text_width = this.#getMeasuredTextWidth(
+						this.#total_value_container.text(),
+						CSVGPie.TOTAL_VALUE_SIZE_DEFAULT,
+						font_family) + padding;
+					const scale = this.#radius_inner * 2 / text_width;
+
+					// Scale to actual size
+					this.#total_value_container
+						.attr('transform', `scale(${scale})`);
+				}
+
 				this.#total_value_container
 					.style('display', '');
 			}
@@ -361,7 +387,7 @@ class CSVGPie {
 	}
 
 	/**
-	 * Create containers for elements (arcs, total value).
+	 * Create containers for elements (arcs, total value, no data text).
 	 */
 	#createContainers() {
 		this.#arcs_container = this.#g_scalable
@@ -383,15 +409,13 @@ class CSVGPie {
 				this.#total_value_container = this.#g_scalable
 					.append('svg:text')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
-					.attr('y', this.#config.total_value.size * 10 / 2 / CSVGPie.LINE_HEIGHT)
-					.style('font-size', `${this.#config.total_value.size * 10}px`)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
 					.style('fill', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
 					.style('display', 'none');
 			}
 		}
 
-		const total_value_size = this.#config.total_value?.size || CSVGPie.TOTAL_VALUE_SIZE_DEFAULT;
+		const total_value_size = CSVGPie.TOTAL_VALUE_SIZE_DEFAULT;
 		const total_value_font_weight = this.#config.total_value?.is_bold ? 'bold' : '';
 
 		this.#no_data_container = this.#g_scalable
@@ -473,5 +497,23 @@ class CSVGPie {
 
 			return aIndex - bIndex;
 		});
+	}
+
+	/**
+	 * Get text width using canvas measuring.
+	 *
+	 * @param {String}	text
+	 * @param {number}	size
+	 * @param {String}	font_family
+	 *
+	 * @returns {number}
+	 */
+	#getMeasuredTextWidth(text, size, font_family) {
+		const canvas = document.createElement('canvas');
+		const context = canvas.getContext('2d');
+
+		context.font = `${size}px ${font_family}`;
+
+		return context.measureText(text).width;
 	}
 }
