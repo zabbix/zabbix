@@ -73,7 +73,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		// Assert table column names.
 		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'],
-				$this->query('class:list-table')->asTable()->one()->getHeadersText());
+				$this->query('class:list-table')->asTable()->one()->getHeadersText()
+		);
 
 		// Check filter layout and values.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -91,28 +92,101 @@ class testPageMonitoringWebDetails extends CWebTest {
 		foreach ($buttons as $selector => $enabled) {
 			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
 		}
+
+		// Check that filter is expanded by default.
+		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
+		$filter_tab->isExpanded();
+
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter_tab->expand($status);
+			$this->assertTrue($filter_tab->isExpanded($status));
+		}
+	}
+
+	public function getCheckFiltersData() {
+		return [
+			[
+				[
+					'fields' => ['id:from' => 'now-2h', 'id:to' => 'now-1h'],
+					'expected' => 'from=now-2h&to=now-1h',
+					'zoom_buttons' => [
+						'js-btn-time-left' => true,
+						'btn-time-zoomout' => true,
+						'js-btn-time-right' => true
+					]
+				]
+			],
+			[
+				[
+					'fields' => ['id:from' => 'now-2y', 'id:to' => 'now-1y'],
+					'expected' => 'from=now-2y&to=now-1y',
+					'zoom_buttons' => [
+						'js-btn-time-left' => true,
+						'btn-time-zoomout' => true,
+						'js-btn-time-right' => true
+					]
+				]
+			],
+			[
+				[
+					'link' => 'Last 30 days',
+					'expected' => 'from=now-30d&to=now',
+					'zoom_buttons' => [
+						'js-btn-time-left' => true,
+						'btn-time-zoomout' => true,
+						'js-btn-time-right' => false
+					]
+				]
+			],
+			[
+				[
+					'link' => 'Last 2 years',
+					'expected' => 'from=now-2y&to=now',
+					'zoom_buttons' => [
+						'js-btn-time-left' => true,
+						'btn-time-zoomout' => false,
+						'js-btn-time-right' => false
+					]
+				]
+			]
+		];
 	}
 
 	/**
 	 * Change values in the filter section and check the resulting changes in graphs.
+	 *
+	 * @dataProvider getCheckFiltersData
 	 */
-	public function testPageMonitoringWebDetails_CheckFilters() {
+	public function testPageMonitoringWebDetails_CheckFilters($data) {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 
 		// Set custom time filter.
-		$form->fill(['id:from' => 'now-2h', 'id:to' => 'now-1h']);
+		if (CTestArrayHelper::get($data, 'fields')) {
+			$form->fill($data['fields']);
+		}
+		else {
+			$form->query('link', $data['link'])->waitUntilClickable()->one()->click();
+		}
+
+		$graph = $this->query('id:graph_in')->one();
+		$form->fill(CTestArrayHelper::get($data, 'fields', 'link'));
 		$form->query('id:apply')->one()->click();
-		$this->assertGraphImageSrcContains('from=now-2h&to=now-1h');
-		$this->assertTrue($this->query('xpath://button[contains(@class, "js-btn-time-right")]')->one()->isEnabled());
+		$graph->waitUntilReloaded();
 
-		// Use time filter preset button.
-		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
-		$this->assertGraphImageSrcContains('from=now-30d&to=now');
+		foreach (['graph_in', 'graph_time'] as $graph_id) {
+			$this->assertStringContainsString($data['expected'], $this->query('id', $graph_id)
+					->one()->getAttribute('src')
+			);
+		}
 
-		// Minimize filter section.
-		$this->query('id:ui-id-1')->one()->click();
-		$this->assertTrue($this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]')->exists());
+		// Check Zoom buttons.
+		foreach ($data['zoom_buttons'] as $button => $state) {
+			$this->assertTrue($this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($button).
+					')]')->one()->isEnabled($state)
+			);
+		}
 	}
 
 	/**
@@ -259,9 +333,9 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 * Test the display of data in the table.
 	 * Additional complexity comes from the Status column, as the displayed values there are calculated on the fly.
 	 *
-	 * @dataProvider getDataDisplayData
+	 * @dataProvider getDisplayTableData
 	 */
-	public function testPageMonitoringWebDetails_DataDisplay($data) {
+	public function testPageMonitoringWebDetails_DisplayTable($data) {
 		// Fill in step data so that a web scenario can be created with API.
 		$api_steps = [];
 		foreach ($data['steps'] as $i => $step){
@@ -325,23 +399,5 @@ class testPageMonitoringWebDetails extends CWebTest {
 		// The table contains an additional TOTAL row.
 		$expected_rows[] = array_merge(['Step' => 'TOTAL'], $data['expected_totals'] ?? []);
 		$this->assertTableData($expected_rows);
-	}
-
-	/**
-	 * Waits for both graphs to reload after a filter change and asserts that their image src attribute contains some value.
-	 *
-	 * @param string $expected_src    the value that should be contained within the graph's image src attribute
-	 */
-	protected function assertGraphImageSrcContains($expected_src) {
-		foreach (['graph_in', 'graph_time'] as $i => $graph_id) {
-			$graph = $this->query('id', $graph_id)->one();
-
-			// Only wait for reload once.
-			if ($i == 0) {
-				$graph->waitUntilReloaded();
-			}
-
-			$this->assertStringContainsString($expected_src, $graph->getAttribute('src'));
-		}
 	}
 }
