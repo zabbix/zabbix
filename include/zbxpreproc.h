@@ -101,6 +101,7 @@ zbx_pp_sequence_stats_t;
 
 ZBX_PTR_VECTOR_DECL(pp_sequence_stats_ptr, zbx_pp_sequence_stats_t *)
 
+int	zbx_diag_add_preproc_info(const struct zbx_json_parse *jp, struct zbx_json *json, char **error);
 void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg);
 zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
 void	zbx_preprocessor_get_worker_info(zbx_process_info_t *info);
