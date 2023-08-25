@@ -835,34 +835,33 @@ class testFormNetworkDiscovery extends CWebTest {
 				]
 			],
 			// #40.
-			// Uncomment after ZBX-22640 is merged.
-//			[
-//				[
-//					'fields' => [
-//						'Name' => 'All checks SNMPv3'
-//					],
-//					'Checks' => [
-//						[
-//							'Check type' => 'SNMPv3 agent',
-//							'SNMP OID' => 1,
-//							'Security level' => 'authNoPriv',
-//							'Authentication protocol' => 'MD5'
-//						],
-//						[
-//							'Check type' => 'SNMPv3 agent',
-//							'SNMP OID' => 1,
-//							'Security level' => 'authNoPriv',
-//							'Authentication protocol' => 'SHA1'
-//						],
-//						[
-//							'Check type' => 'SNMPv3 agent',
-//							'SNMP OID' => 1,
-//							'Security level' => 'authNoPriv',
-//							'Authentication protocol' => 'SHA512'
-//						]
-//					]
-//				]
-//			],
+			[
+				[
+					'fields' => [
+						'Name' => 'All checks SNMPv3'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv3 agent',
+							'SNMP OID' => 1,
+							'Security level' => 'authNoPriv',
+							'Authentication protocol' => 'MD5'
+						],
+						[
+							'Check type' => 'SNMPv3 agent',
+							'SNMP OID' => 1,
+							'Security level' => 'authNoPriv',
+							'Authentication protocol' => 'SHA1'
+						],
+						[
+							'Check type' => 'SNMPv3 agent',
+							'SNMP OID' => 1,
+							'Security level' => 'authNoPriv',
+							'Authentication protocol' => 'SHA512'
+						]
+					]
+				]
+			],
 			// #41.
 			[
 				[
@@ -1814,71 +1813,69 @@ class testFormNetworkDiscovery extends CWebTest {
 	 * Function for testing Discovery rule's checks validation when similar, but not the same
 	 * checks are removed and added again, but in opposite order. Issue was first discovered in ZBX-22640.
 	 */
-	// Uncomment after ZBX-22640 is merged.
-//	public function testFormNetworkDiscovery_DuplicateChecksValidation() {
-//		$discovery_name = 'Double checks validation';
+	public function testFormNetworkDiscovery_DuplicateChecksValidation() {
+		$discovery_name = 'Double checks validation';
 
-//		$this->page->login()->open('zabbix.php?action=discovery.list');
-//		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
-//		$form = $this->query('id:discoveryForm')->waitUntilPresent()->one()->asForm();
-//		$form->fill(['Name' => $discovery_name]);
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
+		$form = $this->query('id:discoveryForm')->waitUntilPresent()->one()->asForm();
+		$form->fill(['Name' => $discovery_name]);
 
-//		// Add SNMPv3 checks.
-//		$this->changeDiscoveryChecks(
-//			[
-//				[
-//					'action' => USER_ACTION_ADD,
-//					'Check type' => 'SNMPv3 agent',
-//					'SNMP OID' => 1
-//				],
-//				[
-//					'action' => USER_ACTION_ADD,
-//					'Check type' => 'SNMPv3 agent',
-//					'SNMP OID' => 1,
-//					'Context name' => 1
-//				]
-//			], $form
-//		);
+		// Add SNMPv3 checks.
+		$this->changeDiscoveryChecks(
+			[
+				[
+					'action' => USER_ACTION_ADD,
+					'Check type' => 'SNMPv3 agent',
+					'SNMP OID' => 1
+				],
+				[
+					'action' => USER_ACTION_ADD,
+					'Check type' => 'SNMPv3 agent',
+					'SNMP OID' => 1,
+					'Context name' => 1
+				]
+			], $form
+		);
 
-//		// Remove just added checks.
-//		$this->changeDiscoveryChecks(
-//			[
-//				[
-//					'action' => USER_ACTION_REMOVE,
-//					'index' => 1
-//				],
-//				[
-//					'action' => USER_ACTION_REMOVE,
-//					'index' => 0
-//				]
-//			], $form
-//		);
+		// Remove just added checks.
+		$this->changeDiscoveryChecks(
+			[
+				[
+					'action' => USER_ACTION_REMOVE,
+					'index' => 1
+				],
+				[
+					'action' => USER_ACTION_REMOVE,
+					'index' => 0
+				]
+			], $form
+		);
 
-//		// Add SNMP checks again in the opposite order.
-//		$this->changeDiscoveryChecks(
-//			[
-//				[
-//					'action' => USER_ACTION_ADD,
-//					'Check type' => 'SNMPv3 agent',
-//					'SNMP OID' => 1,
-//					'Context name' => 1
-//				],
-//				[
-//					'action' => USER_ACTION_ADD,
-//					'Check type' => 'SNMPv3 agent',
-//					'SNMP OID' => 1
-//				]
-//			], $form
-//		);
+		// Add SNMP checks again in the opposite order.
+		$this->changeDiscoveryChecks(
+			[
+				[
+					'action' => USER_ACTION_ADD,
+					'Check type' => 'SNMPv3 agent',
+					'SNMP OID' => 1,
+					'Context name' => 1
+				],
+				[
+					'action' => USER_ACTION_ADD,
+					'Check type' => 'SNMPv3 agent',
+					'SNMP OID' => 1
+				]
+			], $form
+		);
 
-//		$form->submit();
-//		$this->assertMessage(TEST_GOOD, 'Discovery rule created');
-//		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr($discovery_name)));
-//		$this->query('link', $discovery_name)->waitUntilClickable()->one()->click();
-//		COverlayDialogElement::find()->one()->waitUntilReady();
-//		$form->invalidate();
-//		$this->assertTableDataColumn(['SNMPv3 agent "1"', 'SNMPv3 agent "1"'], 'Type', 'id:dcheckList');
-//	}
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Discovery rule created');
+		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr($discovery_name)));
+		$this->query('link', $discovery_name)->waitUntilClickable()->one()->click();
+		$form->invalidate();
+		$this->compareChecksTable(['SNMPv3 agent "1"', 'SNMPv3 agent "1"']);
+	}
 
 	public static function getNoChangesData() {
 		return [
