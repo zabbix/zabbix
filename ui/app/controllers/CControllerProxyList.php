@@ -33,7 +33,7 @@ class CControllerProxyList extends CController {
 			'filter_name' =>	                 'string',
 			'sort' =>			                 'in '.implode(',', ['name', 'operating_mode', 'tls_accept', 'version', 'lastaccess']),
 			'sortorder' =>		                 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'filter_operating_operating_mode' => 'in -1,'.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
+			'filter_operating_mode' => 'in -1,'.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
 			'filter_version' =>	                 'in -1,'.implode(',', [ZBX_PROXY_VERSION_ANY_OUTDATED, ZBX_PROXY_VERSION_CURRENT])
 		];
 
@@ -61,7 +61,7 @@ class CControllerProxyList extends CController {
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.proxies.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 			CProfile::update('web.proxies.filter_operating_mode',
-				$this->getInput('filter_mode', -1), PROFILE_TYPE_INT
+				$this->getInput('filter_operating_mode', -1), PROFILE_TYPE_INT
 			);
 			CProfile::update('web.proxies.filter_version', $this->getInput('filter_version', -1), PROFILE_TYPE_INT);
 		}
