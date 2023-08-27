@@ -38,8 +38,11 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 
 	if ($data['discoveryRules']) {
 		$ldd_rule_count = count($data['discoveryRules']);
+		$count = 0;
 
-		foreach ($data['discoveryRules'] as $key => $ldd_rule) {
+		foreach ($data['discoveryRules'] as $ldd_rule) {
+			$count++;
+
 			if ($data['allowed_ui_conf_hosts'] && $data['is_discovery_rule_editable']
 				&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
 				$discovery_rules[] = (new CLink($ldd_rule['name'],
@@ -54,12 +57,12 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 				$discovery_rules[] = new CSpan($ldd_rule['name']);
 			}
 
-			if ($ldd_rule_count > 5 && $key === 5) {
+			if ($ldd_rule_count > 5 && $count === 5) {
 				$discovery_rules[] = (new CSpan(',...'));
 
 				break;
 			}
-			elseif ($key + 1 !== $ldd_rule_count) {
+			elseif ($count < $ldd_rule_count) {
 				$discovery_rules[] = (new CSpan(', '));
 			}
 		}
