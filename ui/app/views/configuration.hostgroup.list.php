@@ -178,7 +178,7 @@ foreach ($data['groups'] as $group) {
 				break;
 			}
 
-			$max = max($result, (int) $group_discovery['ts_delete']);
+			$max = max($max, (int) $group_discovery['ts_delete']);
 		}
 
 		if ($max > 0) {
