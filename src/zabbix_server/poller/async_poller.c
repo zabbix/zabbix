@@ -346,7 +346,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		{
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
 					poller_config, poller_config, poller_config->base, poller_config->dnsbase,
-					poller_config->config_timeout, poller_config->config_source_ip);
+					poller_config->config_source_ip);
 		}
 		else
 		{

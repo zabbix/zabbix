@@ -51,7 +51,7 @@ typedef struct
 zbx_agent_context;
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase, int config_timeout,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip);
 void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 

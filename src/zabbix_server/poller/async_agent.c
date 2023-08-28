@@ -22,6 +22,7 @@
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"
+#include "zbxsysinfo.h"
 #include "async_poller.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
@@ -212,11 +213,11 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 }
 
 int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase, int config_timeout,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
-	int			ret = NOTSUPPORTED;
+	int			ret = NOTSUPPORTED, timeout_sec = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'  conn:'%s'", __func__, item->key,
 			item->host.host, item->interface.addr, zbx_tcp_connection_type_name(item->host.tls_connect));
@@ -237,9 +238,16 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	zbx_strlcpy(agent_context->item.host, item->host.host, sizeof(agent_context->item.host));
 
 	agent_context->config_source_ip = config_source_ip;
-	agent_context->config_timeout = config_timeout;
 
 	zbx_init_agent_result(&agent_context->item.result);
+
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
+		goto out;
+	}
+
+	agent_context->config_timeout = timeout_sec;
 
 	switch (agent_context->tls_connect)
 	{
@@ -281,11 +289,11 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 		agent_context->server_name = NULL;
 #endif
 	zbx_socket_clean(&agent_context->s);
-	zbx_tcp_send_context_init(agent_context->item.key, strlen(agent_context->item.key), 0, ZBX_TCP_PROTOCOL,
+	zbx_tcp_send_context_init(agent_context->item.key, strlen(agent_context->item.key), timeout_sec + 1, ZBX_TCP_PROTOCOL,
 		&agent_context->tcp_send_context);
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
 
-	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, config_timeout,
+	zbx_async_poller_add_task(base, dnsbase, agent_context->item.interface.addr, agent_context, timeout_sec + 1,
 			agent_task_process, clear_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(SUCCEED));
