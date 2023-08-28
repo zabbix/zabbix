@@ -94,7 +94,13 @@ else {
 				case CWidgetFieldColumnsList::DATA_HOST_NAME:
 					$row[] = (new CCol(
 						(new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']))
-					))->addStyle($color !== '' ? 'background-color: #' . $color : null);
+					))
+						->addStyle($color !== '' ? 'background-color: #' . $color : null)
+						->addItem($column['maintenance'] != 0
+							? (new CIcon('zi-wrench-alt-small'))
+								->addClass('color-warning no-indent')
+							: null
+						);
 
 					break;
 
