@@ -2435,7 +2435,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/data_overview'
 				]
 			],
-			// #233 Start creating Gauge  widget.
+			// #233 Start creating Gauge widget.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
@@ -2453,14 +2453,32 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/gauge'
 				]
 			],
-			// #234 Connectors list view.
+			// #234 Start creating Top triggers widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Top triggers',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/top_triggers'
+				]
+			],
+			// #235 Connectors list view.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#connectors'
 				]
 			],
-			// #235 Create connectors popup.
+			// #236 Create connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
@@ -2473,7 +2491,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #236 Edit connectors popup.
+			// #237 Edit connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
