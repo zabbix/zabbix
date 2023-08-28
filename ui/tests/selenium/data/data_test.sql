@@ -54,8 +54,8 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) 
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (9,'Autoregistration action 1',2,0,0,'1h');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (15,'Autoregistration action 2',2,0,1,'1h');
 
-INSERT INTO proxy (proxyid, name, mode, description) VALUES (20000, 'Proxy for Discovery rule', 0, '');
-INSERT INTO proxy (proxyid, name, mode, description) VALUES (20001, 'Proxy for Actions', 0, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20000, 'Proxy for Discovery rule', 0, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20001, 'Proxy for Actions', 0, '');
 
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (500, 9, 22, 3, 'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 2, 'MySQL');

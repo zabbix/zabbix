@@ -389,7 +389,7 @@ static int	DBpatch_6050034(void)
 			{
 				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"operating_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -450,7 +450,7 @@ static int	DBpatch_6050039(void)
 			" where h.status in (%i,%i)",
 			DEPRECATED_STATUS_PROXY_PASSIVE, DEPRECATED_STATUS_PROXY_ACTIVE);
 
-	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "mode", "description", "tls_connect",
+	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "operating_mode", "description", "tls_connect",
 			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
 			"address", "port", (char *)NULL);
 
@@ -466,7 +466,7 @@ static int	DBpatch_6050039(void)
 
 		if (DEPRECATED_STATUS_PROXY_ACTIVE == status)
 		{
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_ACTIVE, row[3],
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_ACTIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
 					"127.0.0.1", "10051");
 		}
@@ -487,7 +487,7 @@ static int	DBpatch_6050039(void)
 				zabbix_log(LOG_LEVEL_WARNING, "cannot select interface for proxy '%s'",  row[1]);
 			}
 
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_PASSIVE, row[3],
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_PASSIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address, port);
 		}
 	}
@@ -697,7 +697,7 @@ static int	DBpatch_6050062(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update profiles"
 			" set value_str='name'"
-			" where value_str='host'"
+			" where value_str like 'host'"
 				" and idx='web.proxies.php.sort'"))
 	{
 		return FAIL;
