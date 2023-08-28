@@ -191,12 +191,21 @@ class CControllerProxyUpdate extends CController {
 
 		$result = API::Proxy()->update($proxy);
 
-		$output = $result
-			? ['success' => ['title' => _('Proxy updated')]]
-			: ['error' => [
+		$output = [];
+
+		if ($result) {
+			$output['success']['title'] = _('Proxy updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
+		}
+		else {
+			$output['error'] = [
 				'title' => _('Cannot update proxy'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
-			]];
+			];
+		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
