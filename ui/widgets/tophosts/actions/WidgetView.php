@@ -85,7 +85,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			: null;
 
 		$hosts = API::Host()->get([
-			'output' => ['name'],
+			'output' => ['name', 'maintenance_status'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
 			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
@@ -96,6 +96,38 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$hostids = array_keys($hosts);
+
+		$has_data_text = false;
+		$item_names = [];
+		$items = [];
+
+		foreach ($configuration as $column_index => $column) {
+			switch ($column['data']) {
+				case CWidgetFieldColumnsList::DATA_TEXT:
+					$has_data_text = true;
+					break 2;
+
+				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+					$item_names[$column_index] = $column['item'];
+					break;
+			}
+		}
+
+		if (!$has_data_text) {
+			$hosts_with_items = [];
+
+			foreach ($item_names as $column_index => $item_name) {
+				$numeric_only = self::isNumericOnlyColumn($configuration[$column_index]);
+				$items[$column_index] = self::getItems($item_name, $numeric_only, $groupids, $hostids);
+
+				foreach ($items[$column_index] as $item) {
+					$hosts_with_items[$item['hostid']] = true;
+				}
+			}
+
+			$hostids = array_keys($hosts_with_items);
+			$hosts = array_intersect_key($hosts, $hosts_with_items);
+		}
 
 		if (!$hostids) {
 			return [
@@ -115,9 +147,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		switch ($master_column['data']) {
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 				$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
-				$master_entities = self::getItems($master_column['item'], $master_items_only_numeric_allowed,
-					$groupids, $hostids
-				);
+				$master_entities = $items[$master_column_index]
+					?: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
 				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
 				break;
 
@@ -127,8 +158,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			case CWidgetFieldColumnsList::DATA_TEXT:
 				$master_entity_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
-					[$master_column_index => $this->fields_values['columns'][$master_column_index]['text']],
-					$hostids
+					[$master_column_index => $master_column['text']], $hostids
 				)[$master_column_index];
 
 				foreach ($master_entity_values as $key => $value) {
@@ -228,7 +258,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$numeric_only = self::isNumericOnlyColumn($column);
 				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
 					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
-					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
+					: ($items[$column_index] ?: self::getItems($column['item'], $numeric_only, $groupids, $hostids));
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 			}
@@ -317,7 +347,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:
 						$row[] = [
 							'value' => $hosts[$hostid]['name'],
-							'hostid' => $hostid
+							'hostid' => $hostid,
+							'maintenance' => $hosts[$hostid]['maintenance_status']
 						];
 
 						break;
