@@ -39,22 +39,6 @@
 			this.openHostPopup(host_data);
 		},
 
-		openHostPopup(host_data) {
-			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', original_url);
-			}, {once: true});
-		},
-
 		editTrigger(trigger_data) {
 			clearMessages();
 
@@ -64,11 +48,35 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
+		openHostPopup(host_data) {
+			const original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

@@ -1,0 +1,1 @@
+.......PS. [ZBXNEXT-8621] improved asynchronous pollers to read configuration in separate thread to avoid blocking (vso)

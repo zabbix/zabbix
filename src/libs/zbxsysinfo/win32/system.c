@@ -34,7 +34,7 @@
  ******************************************************************************/
 static wchar_t	*read_registry_value(HKEY hKey, LPCTSTR name)
 {
-	DWORD	szData;
+	DWORD	szData = 0;
 	wchar_t	*value = NULL;
 
 	if (ERROR_SUCCESS == RegQueryValueEx(hKey, name, NULL, NULL, NULL, &szData))

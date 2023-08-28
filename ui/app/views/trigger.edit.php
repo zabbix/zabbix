@@ -357,7 +357,8 @@ $triggers_tab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.ta
 		'show_inherited_tags' => array_key_exists('show_inherited_tags', $data) ? $data['show_inherited_tags'] : false,
 		'readonly' => $discovered_trigger,
 		'tabs_id' => 'tabs',
-		'tags_tab_id' => 'tags-tab'
+		'tags_tab_id' => 'tags-tab',
+		'with_label' => true
 	]),
 	TAB_INDICATOR_TAGS
 );
@@ -486,7 +487,8 @@ $trigger_form
 			'recovery_popup_parameters' => $recovery_popup_parameters,
 			'readonly' => $readonly,
 			'db_dependencies' => $data['db_dependencies'],
-			'action' => 'trigger.edit'
+			'action' => 'trigger.edit',
+			'context' => $data['context']
 		]).');'))->setOnDocumentReady()
 	);
 

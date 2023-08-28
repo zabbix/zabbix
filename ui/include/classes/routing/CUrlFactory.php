@@ -57,9 +57,6 @@ class CUrlFactory {
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']
 		],
-		'templates.php' => [
-			'remove' => ['templateid']
-		],
 		'__default' => [
 			'remove' => ['cancel', 'form', 'delete']
 		]

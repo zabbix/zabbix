@@ -260,34 +260,32 @@
 				prevent_navigation: true
 			});
 
-			['dialogue.create', 'dialogue.update', 'dialogue.delete'].forEach((event_type) => {
-				overlay.$dialogue[0].addEventListener(event_type, (e) => {
-					const data = e.detail;
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.elementSuccess.bind(this, this.context), {once: true}
+			);
 
-					if ('success' in data) {
-						postMessageOk(data.success.title);
-
-						if ('messages' in data.success) {
-							postMessageDetails('success', data.success.messages);
-						}
-					}
-
-					if (event_type === 'dialogue.delete') {
-						const curl = new Curl('zabbix.php');
-						curl.setArgument('action', 'host.list');
-
-						location.href = curl.getUrl();
-					}
-					else {
-						location.href = location.href;
-					}
-
-				}, {once: true});
-			});
-
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		}
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		}
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.elementSuccess.bind(this, this.context), {once: true}
+			);
 		}
 
 		openCopyPopup() {
@@ -306,6 +304,29 @@
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});
+		}
+
+		elementSuccess(context, e) {
+			const data = e.detail;
+			let curl = null;
+
+			if ('success' in data) {
+				postMessageOk(data.success.title);
+
+				if ('messages' in data.success) {
+					postMessageDetails('success', data.success.messages);
+				}
+
+				if ('action' in data.success && data.success.action === 'delete') {
+					curl = new Curl('zabbix.php');
+					curl.setArgument('action', 'trigger.list');
+					curl.setArgument('context', context);
+				}
+			}
+
+			uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
+
+			location.href = curl === null ? location.href : curl.getUrl();
 		}
 	};
 </script>

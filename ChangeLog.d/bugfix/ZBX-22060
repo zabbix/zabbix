@@ -1,0 +1,1 @@
+.........T [ZBX-22060] added notes about encryption in PostgreSQL templates, renamed database instance URI macro to connection string in PostgreSQL by Zabbix agent 2 template, updated PostgreSQL by ODBC template to use connection string (drasikhov)

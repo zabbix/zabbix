@@ -22,13 +22,16 @@
 
 	window.trigger_edit_popup = new class {
 
-		init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies, action}) {
+		init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies, action,
+				context
+		}) {
 			this.triggerid = triggerid;
 			this.expression_popup_parameters = expression_popup_parameters;
 			this.recovery_popup_parameters = recovery_popup_parameters;
 			this.readonly = readonly;
 			this.db_dependencies = db_dependencies;
 			this.action = action;
+			this.context = context;
 			this.overlay = overlays_stack.getById('trigger-edit');
 			this.dialogue = this.overlay.$dialogue[0];
 			this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -142,6 +145,9 @@
 				}
 				else if (e.target.classList.contains('js-related-trigger-edit')) {
 					this.#openRelatedTrigger(e.target.dataset);
+				}
+				else if (e.target.classList.contains('js-edit-template')) {
+					this.editTemplate(e, e.target.dataset.templateid);
 				}
 				else if (e.target.name === 'show_inherited_tags') {
 					this.#toggleInheritedTags();
@@ -538,13 +544,8 @@
 		}
 
 		#openRelatedTrigger(data) {
-			const form_fields = getFormFields(this.form);
-			const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
-
-			if (!diff) {
-				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-					return;
-				}
+			if (!this.#isFormModified()) {
+				return;
 			}
 
 			const dialogueid = this.dialogue.dataset.dialogueid;
@@ -563,6 +564,18 @@
 			this.form.append(form_refresh);
 
 			reloadPopup(this.form, this.action);
+		}
+
+		#isFormModified() {
+			const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form));
+
+			if (!diff) {
+				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		#post(url, data) {
@@ -697,5 +710,55 @@
 
 				dependency_table.insertAdjacentHTML('beforeend', template.evaluate(element));
 			})
+		}
+
+		editTemplate(e, templateid) {
+			if (!this.#isFormModified()) {
+				return;
+			}
+
+			e.preventDefault();
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		}
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.elementSuccess.bind(this, this.context, this.action !== 'trigger.edit'), {once: true}
+			);
+		}
+
+		elementSuccess(context, discovery, e) {
+			const data = e.detail;
+			let curl = null;
+
+			if ('success' in data) {
+				postMessageOk(data.success.title);
+
+				if ('messages' in data.success) {
+					postMessageDetails('success', data.success.messages);
+				}
+
+				if ('action' in data.success && data.success.action === 'delete') {
+					curl = discovery ? new Curl('host_discovery.php') : new Curl('zabbix.php?action=trigger.list')
+					curl.setArgument('context', context);
+				}
+			}
+
+			if (curl == null) {
+				location.href = location.href;
+			}
+			else {
+				location.href = curl.getUrl();
+			}
 		}
 	}

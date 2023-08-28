@@ -211,7 +211,6 @@ class CRouter {
 		'popup.massupdate.item'						=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],
 		'popup.massupdate.itemprototype'			=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],
 		'popup.massupdate.service'					=> ['CControllerPopupMassupdateService',				'layout.json',			'popup.massupdate.service'],
-		'popup.massupdate.template'					=> ['CControllerPopupMassupdateTemplate',				'layout.json',			'popup.massupdate.template'],
 		'popup.media'								=> ['CControllerPopupMedia',							'layout.json',			'popup.media'],
 		'popup.mediatypemapping.check'				=> ['CControllerPopupMediaTypeMappingCheck',			'layout.json',			null],
 		'popup.mediatypemapping.edit'				=> ['CControllerPopupMediaTypeMappingEdit',				'layout.json',			'popup.mediatypemapping.edit'],
@@ -291,10 +290,16 @@ class CRouter {
 		'slareport.list'							=> ['CControllerSlaReportList',							'layout.htmlpage',		'slareport.list'],
 		'system.warning'							=> ['CControllerSystemWarning',							'layout.warning',		'system.warning'],
 		'tabfilter.profile.update'					=> ['CControllerTabFilterProfileUpdate',				'layout.json',			null],
+		'template.create'							=> ['CControllerTemplateCreate',						'layout.json',			null],
 		'template.dashboard.delete'					=> ['CControllerTemplateDashboardDelete',				null,					null],
 		'template.dashboard.edit'					=> ['CControllerTemplateDashboardEdit',					'layout.htmlpage',		'configuration.dashboard.edit'],
 		'template.dashboard.list'					=> ['CControllerTemplateDashboardList',					'layout.htmlpage',		'configuration.dashboard.list'],
 		'template.dashboard.update'					=> ['CControllerTemplateDashboardUpdate',				'layout.json',			null],
+		'template.delete'							=> ['CControllerTemplateDelete',						'layout.json',			null],
+		'template.edit'								=> ['CControllerTemplateEdit',							'layout.json',			'template.edit'],
+		'template.list'								=> ['CControllerTemplateList',							'layout.htmlpage',		'template.list'],
+		'template.massupdate'						=> ['CControllerTemplateMassupdate',					'layout.json',			'template.massupdate'],
+		'template.update'							=> ['CControllerTemplateUpdate',						'layout.json',			null],
 		'templategroup.create'						=> ['CControllerTemplateGroupCreate',					'layout.json',			null],
 		'templategroup.delete'						=> ['CControllerTemplateGroupDelete',					'layout.json',			null],
 		'templategroup.edit'						=> ['CControllerTemplateGroupEdit',						'layout.htmlpage',		'configuration.templategroup.edit'],
@@ -385,7 +390,6 @@ class CRouter {
 		'report4.php'					=> ['CLegacyAction', null, null],
 		'sysmap.php'					=> ['CLegacyAction', null, null],
 		'sysmaps.php'					=> ['CLegacyAction', null, null],
-		'templates.php' 				=> ['CLegacyAction', null, null],
 		'tr_events.php'					=> ['CLegacyAction', null, null]
 	];
 

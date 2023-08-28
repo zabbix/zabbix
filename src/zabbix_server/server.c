@@ -144,7 +144,7 @@ const char	*help_message[] = {
 	"                                  escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, preprocessing manager, proxy poller,",
+	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
 	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
@@ -157,7 +157,7 @@ const char	*help_message[] = {
 	"                                  escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
 	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
-	"                                  http agent poller, preprocessing manager, proxy poller,",
+	"                                  http agent poller, snmp poller, preprocessing manager, proxy poller,",
 	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
@@ -259,6 +259,7 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -272,13 +273,7 @@ static int	get_config_forks(unsigned char process_type)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_source_ip, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_tmpdir, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
-char	*zbx_config_fping6_location = NULL;
-#ifdef HAVE_IPV6
-static const char	*get_zbx_config_fping6_location(void)
-{
-	return zbx_config_fping6_location;
-}
-#endif
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_alert_scripts_path, NULL)
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
@@ -286,8 +281,8 @@ static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
 static int	config_histsyncer_frequency	= 1;
 
-int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
-char	*CONFIG_LISTEN_IP		= NULL;
+static int	zbx_config_listen_port		= ZBX_DEFAULT_SERVER_PORT;
+static char	*zbx_config_listen_ip		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 static char	*config_server		= NULL;		/* not used in zabbix_server, required for linking */
 
@@ -573,6 +568,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_AGENT_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
 	}
 	else
 		return FAIL;
@@ -869,9 +869,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnavailableDelay",		&config_unavailable_delay,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
+		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
+		{"ListenPort",			&zbx_config_listen_port,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1029,6 +1029,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartAgentPollers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"StartSNMPPollers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{NULL}
@@ -1157,9 +1159,7 @@ int	main(int argc, char **argv)
 	static zbx_config_icmpping_t	config_icmpping = {
 		get_zbx_config_source_ip,
 		get_zbx_config_fping_location,
-#ifdef HAVE_IPV6
 		get_zbx_config_fping6_location,
-#endif
 		get_zbx_config_tmpdir};
 
 	ZBX_TASK_EX			t = {ZBX_TASK_START};
@@ -1258,6 +1258,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_server);
+	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1497,7 +1498,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
-		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT,
+		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
@@ -1732,6 +1733,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;
+			case ZBX_PROCESS_TYPE_SNMP_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
+				thread_args.args = &poller_args;
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
+				break;
 		}
 	}
 
@@ -1830,8 +1836,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #endif
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_STANDBY;
 
 	if (SUCCEED != zbx_ha_start(rtc, ha_config, &error))
@@ -1877,8 +1883,8 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_STANDBY;
 
 	if (SUCCEED != zbx_ha_start(rtc, ha_config, &error))
@@ -2098,8 +2104,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_UNKNOWN;
 
 	if (SUCCEED != zbx_ha_start(&rtc, ha_config, &error))

@@ -114,11 +114,13 @@ foreach ($data['tags'] as $i => $tag) {
 
 			foreach ($tag['parent_templates'] as $templateid => $template) {
 				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
-					$template_list[] = (new CLink($template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $templateid)
-					))->setTarget('_blank');
+					$template_link = (new CLink($template['name']))->setAttribute('data-templateid', $templateid);
+
+					($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype')
+						? $template_link->addClass('js-edit-template')
+						: $template_link->onClick('view.editTemplate(event, this.dataset.templateid);');
+
+					$template_list[] = $template_link;
 				}
 				else {
 					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -144,15 +146,12 @@ $table->setFooter(new CCol(
 		->setEnabled(!$data['readonly'])
 ));
 
-$label = '';
-
 if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest'])) {
 	switch ($data['source']) {
 		case 'trigger':
 		case 'trigger_prototype':
 			$btn_labels = [_('Trigger tags'), _('Inherited and trigger tags')];
 			$on_change = '';
-			$label = new CLabel(_('Tags'));
 			break;
 
 		case 'httptest':
@@ -176,8 +175,10 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 	);
 }
 
-$form_grid->addItem([$label,
-	new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
-]);
+if (array_key_exists('with_label', $data)) {
+	$form_grid->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+}
 
-$form_grid->show();
+$form_grid
+	->addItem(new CFormField($table))
+	->show();

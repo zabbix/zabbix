@@ -62,7 +62,7 @@ class CLegacyAction extends CAction {
 		if (in_array(getRequest('context', ''), ['host', 'template']) && in_array($action, ['items.php',
 				'graphs.php', 'host_discovery.php', 'httpconf.php', 'disc_prototypes.php',
 				'host_prototypes.php'])) {
-			$action = (getRequest('context') === 'host') ? 'host.list' : 'templates.php';
+			$action = (getRequest('context') === 'host') ? 'host.list' : 'template.list';
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_USER) {
@@ -75,7 +75,7 @@ class CLegacyAction extends CAction {
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = array_merge($denied, ['actionconf.php', 'disc_prototypes.php', 'graphs.php', 'host_discovery.php',
 				'host_prototypes.php', 'host.list', 'httpconf.php', 'items.php', 'report4.php',
-				'templates.php'
+				'template.list'
 			]);
 		}
 
@@ -100,7 +100,7 @@ class CLegacyAction extends CAction {
 		if ($user_type == USER_TYPE_ZABBIX_ADMIN || $user_type == USER_TYPE_SUPER_ADMIN) {
 			$rule_actions += [
 				CRoleHelper::UI_CONFIGURATION_HOSTS => ['host.list'],
-				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['templates.php'],
+				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['template.list'],
 				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php']
 			];
 

@@ -489,7 +489,7 @@ function overlayDialogueDestroy(dialogueid) {
 
 		removeFromOverlaysStack(dialogueid);
 
-		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.close', {detail: {dialogueid}}));
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: {dialogueid}}));
 	}
 }
 

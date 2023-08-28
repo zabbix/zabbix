@@ -71,7 +71,7 @@ window.token_edit_popup = {
 				else {
 					overlayDialogueDestroy(this.overlay.dialogueid);
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 						detail: {
 							success: response.success
 						}
@@ -136,7 +136,7 @@ window.token_edit_popup = {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
 					detail: {
 						success: response.success
 					}
@@ -233,7 +233,7 @@ window.token_edit_popup = {
 					throw {error: response.error};
 				}
 
-				this.overlay.$dialogue[0].addEventListener('overlay.close', this.events.overlayCloseAfterUpdate,
+				this.overlay.$dialogue[0].addEventListener('dialogue.close', this.events.overlayCloseAfterUpdate,
 					{once: true}
 				);
 
@@ -247,7 +247,7 @@ window.token_edit_popup = {
 
 	events: {
 		overlayCloseAfterUpdate() {
-			token_edit_popup.dialogue.dispatchEvent(new CustomEvent('dialogue.update', {detail: {}}));
+			token_edit_popup.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {}}));
 		}
 	}
 };

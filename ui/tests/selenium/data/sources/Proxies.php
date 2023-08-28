@@ -131,7 +131,7 @@ class Proxies {
 			$disabled_hosts_data[] = [
 				'host' => $host,
 				'groups' => [['groupid' => $hostgroupid]],
-				'status' => 1
+				'status' => HOST_STATUS_NOT_MONITORED
 			];
 		}
 		$disabled_hosts = CDataHelper::call('host.create', $disabled_hosts_data);
@@ -139,33 +139,31 @@ class Proxies {
 
 		// Create active proxies.
 		$active_proxy_data = [];
+
 		foreach (self::$active_proxies as $proxy) {
 			$active_proxy_data[] = [
-				'host' => $proxy,
-				'status' => 5
+				'name' => $proxy,
+				'mode' => PROXY_MODE_ACTIVE
 			];
 		}
 
 		$active_proxies = CDataHelper::call('proxy.create', $active_proxy_data);
-		$active_proxyids = CDataHelper::getIds('host');
+		$active_proxyids = CDataHelper::getIds('name');
 
 		// Create passive proxies.
 		$passive_proxy_data = [];
+
 		foreach (self::$passive_proxies as $proxy) {
 			$passive_proxy_data[] = [
-				'host' => $proxy,
-				'status' => 6,
-				'interface' => [
-					'ip'=> '127.0.0.1',
-					'dns' => '',
-					'useip' => '1',
-					'port' => '10051'
-				]
+				'name' => $proxy,
+				'mode' => PROXY_MODE_PASSIVE,
+				'address' => '127.0.0.1',
+				'port' => '10051'
 			];
 		}
 
 		$passive_proxies = CDataHelper::call('proxy.create', $passive_proxy_data);
-		$passive_proxyids = CDataHelper::getIds('host');
+		$passive_proxyids = CDataHelper::getIds('name');
 
 		// Add hosts to proxies.
 		CDataHelper::call('proxy.update', [
@@ -250,10 +248,10 @@ class Proxies {
 		 * Supported version "60400" is hardcoded one time, so that no need to change it,
 		 * even if newer versions of Zabbix are released.
 		 */
-		DBexecute('UPDATE host_rtdata SET version=60400, compatibility=1 WHERE hostid='.zbx_dbstr($active_proxyids['active_current']));
-		DBexecute('UPDATE host_rtdata SET version=60200, compatibility=2 WHERE hostid='.zbx_dbstr($passive_proxyids['passive_outdated']));
-		DBexecute('UPDATE host_rtdata SET version=0, compatibility=0 WHERE hostid='.zbx_dbstr($active_proxyids['active_unknown']));
-		DBexecute('UPDATE host_rtdata SET version=50401, compatibility=3 WHERE hostid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
+		DBexecute('UPDATE proxy_rtdata SET version=60400, compatibility=1 WHERE proxyid='.zbx_dbstr($active_proxyids['active_current']));
+		DBexecute('UPDATE proxy_rtdata SET version=60200, compatibility=2 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_outdated']));
+		DBexecute('UPDATE proxy_rtdata SET version=0, compatibility=0 WHERE proxyid='.zbx_dbstr($active_proxyids['active_unknown']));
+		DBexecute('UPDATE proxy_rtdata SET version=50401, compatibility=3 WHERE proxyid='.zbx_dbstr($passive_proxyids['passive_unsupported']));
 		DBexecute('UPDATE config SET server_status='.zbx_dbstr('{"version": "6.4.0alpha1"}'));
 	}
 }
