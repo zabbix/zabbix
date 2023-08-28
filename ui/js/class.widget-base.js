@@ -1724,9 +1724,7 @@ class CWidgetBase {
 
 			leave: () => {
 				this.fire(WIDGET_EVENT_LEAVE);
-			},
-
-			...this._events
+			}
 		};
 	}
 

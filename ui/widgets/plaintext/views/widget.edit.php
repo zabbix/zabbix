@@ -46,8 +46,8 @@
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_as_html'])
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->show();
