@@ -62,6 +62,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+						'title' => _('Cannot update trigger prototype'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])]))->disableView()

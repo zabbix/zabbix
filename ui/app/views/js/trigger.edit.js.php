@@ -677,7 +677,7 @@
 			this.#post(curl.getUrl(), {triggerids: [this.triggerid]}, (response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 			});
 		}
 
