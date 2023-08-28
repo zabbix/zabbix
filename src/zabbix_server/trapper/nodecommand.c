@@ -149,7 +149,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 	zbx_db_row_t	row;
 	zbx_uint64_t	usrgrpid_l, groupid_l;
 
-	db_result = zbx_db_select("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
+	db_result = zbx_db_select("select name,command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
 			",username,password,publickey,privatekey"
 			",takes_manualinput,manualinput_validator,manualinput_validator_type"
 			" from scripts"
@@ -167,53 +167,54 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		goto fail;
 	}
 
-	ZBX_DBROW2UINT64(usrgrpid_l, row[2]);
+	ZBX_DBROW2UINT64(usrgrpid_l, row[3]);
 	*usrgrpid = usrgrpid_l;
 
-	ZBX_DBROW2UINT64(groupid_l, row[3]);
+	ZBX_DBROW2UINT64(groupid_l, row[4]);
 	*groupid = groupid_l;
 
-	ZBX_STR2UCHAR(script->type, row[4]);
+	ZBX_STR2UCHAR(script->type, row[5]);
 
 	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type)
-		ZBX_STR2UCHAR(script->execute_on, row[5]);
+		ZBX_STR2UCHAR(script->execute_on, row[6]);
 
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
-		ZBX_STR2UCHAR(script->authtype, row[9]);
-		script->publickey = zbx_strdup(script->publickey, row[12]);
-		script->privatekey = zbx_strdup(script->privatekey, row[13]);
+		ZBX_STR2UCHAR(script->authtype, row[10]);
+		script->publickey = zbx_strdup(script->publickey, row[13]);
+		script->privatekey = zbx_strdup(script->privatekey, row[14]);
 	}
 
 	if (ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type)
 	{
-		script->port = zbx_strdup(script->port, row[8]);
-		script->username = zbx_strdup(script->username, row[10]);
-		script->password = zbx_strdup(script->password, row[11]);
+		script->port = zbx_strdup(script->port, row[9]);
+		script->username = zbx_strdup(script->username, row[11]);
+		script->password = zbx_strdup(script->password, row[12]);
 	}
 
-	ZBX_STR2UCHAR(script->takes_manualinput, row[14]);
+	ZBX_STR2UCHAR(script->takes_manualinput, row[15]);
 
 	if (ZBX_SCRIPT_TAKES_MANUALINPUT_YES == script->takes_manualinput)
 	{
-		script->manualinput_validator = zbx_strdup(script->manualinput_validator, row[15]);
-		ZBX_STR2UCHAR(script->manualinput_validator_type, row[16]);
+		script->manualinput_validator = zbx_strdup(script->manualinput_validator, row[16]);
+		ZBX_STR2UCHAR(script->manualinput_validator_type, row[17]);
 	}
 
-	script->command = zbx_strdup(script->command, row[0]);
-	script->command_orig = zbx_strdup(script->command_orig, row[0]);
+	script->name = zbx_strdup(script->name, row[0]);
+	script->command = zbx_strdup(script->command, row[1]);
+	script->command_orig = zbx_strdup(script->command_orig, row[1]);
 
 	script->scriptid = scriptid;
 
-	ZBX_STR2UCHAR(script->host_access, row[1]);
+	ZBX_STR2UCHAR(script->host_access, row[2]);
 
-	if (SUCCEED != zbx_is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(row[7], &script->timeout, ZBX_LENGTH_UNLIMITED))
 	{
 		zbx_strlcpy(error, "Invalid timeout value in script configuration.", error_len);
 		goto fail;
 	}
 
-	*scope = atoi(row[7]);
+	*scope = atoi(row[8]);
 
 	ret = SUCCEED;
 fail:

@@ -358,6 +358,7 @@ typedef struct
 	char		*password;
 	char		*publickey;
 	char		*privatekey;
+	char		*name;
 	char		*command;
 	char		*command_orig;
 	zbx_uint64_t	scriptid;
