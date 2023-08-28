@@ -235,7 +235,7 @@ $formgrid = (new CFormGrid())
 				->addValue(_('JSON data'), ZBX_POSTTYPE_JSON)
 				->addValue(_('XML data'), ZBX_POSTTYPE_XML)
 				->setEnabled(!$data['readonly'])
-				->setModern(true)
+				->setModern()
 		))->setId('js-item-post-type-field')
 	])
 	->addItem([
@@ -305,7 +305,7 @@ $formgrid = (new CFormGrid())
 				->addValue(_('Headers'), HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
 				->addValue(_('Body and headers'), HTTPTEST_STEP_RETRIEVE_MODE_BOTH)
 				->setEnabled(!($data['readonly'] || $data['form']['request_method'] == HTTPCHECK_REQUEST_HEAD))
-				->setModern(true)
+				->setModern()
 		))->setId('js-item-retrieve-mode-field')
 	])
 	->addItem([
@@ -626,7 +626,7 @@ $formgrid
 							->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
 							->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
 							->setReadonly($data['discovered'])
-							->setModern(true),
+							->setModern(),
 						[
 							(new CTextBox('delay_flex[#{rowNum}][delay]', '#{delay}', $data['discovered']))
 								->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
@@ -670,7 +670,7 @@ $formgrid->addItem([
 			->addValue(_('Do not keep history'), ITEM_STORAGE_OFF)
 			->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
 			->setReadonly($data['discovered'])
-			->setModern(true),
+			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('history', $data['form']['history'], $data['discovered']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -705,7 +705,7 @@ $formgrid
 				->addValue(_('Do not keep trends'), ITEM_STORAGE_OFF)
 				->addValue(_('Storage period'), ITEM_STORAGE_CUSTOM)
 				->setReadonly($data['discovered'])
-				->setModern(true),
+				->setModern(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CTextBox('trends', $data['form']['trends'], $data['discovered']))
 				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
