@@ -29,9 +29,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 		$fields = [
 			'context'				=> 'required|in host,template',
 			'parent_discoveryid'	=> 'required|id',
-			'sort'					=> 'in '.implode(',', [
-				'delay', 'history', 'key_', 'name', 'status', 'trends', 'type', 'discover'
-			]),
+			'sort'					=> 'in '.implode(',', ['delay', 'history', 'key_', 'name', 'status', 'trends', 'type', 'discover']),
 			'sortorder'				=> 'in '.implode(',', [ZBX_SORT_DOWN.','.ZBX_SORT_UP]),
 			'page'					=> 'ge 1'
 		];
