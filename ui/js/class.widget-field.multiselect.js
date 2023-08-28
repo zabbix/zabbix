@@ -68,7 +68,7 @@ class CWidgetFieldMultiselect {
 	/**
 	 * @type {string|null}
 	 */
-	#selected_reference = null;
+	#selected_typed_reference = null;
 
 	/**
 	 * @type {int}
@@ -93,8 +93,8 @@ class CWidgetFieldMultiselect {
 
 		this.#initField(element, multiselect_params);
 
-		if ('_reference' in field_value) {
-			this.#selectReference(field_value._reference);
+		if (CWidgetBase.FOREIGN_REFERENCE_KEY in field_value) {
+			this.#selectTypedReference(field_value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
 		}
 	}
 
@@ -138,8 +138,11 @@ class CWidgetFieldMultiselect {
 
 			if (this.#dashboard_accepted) {
 				this.#multiselect.multiSelect('addOptionalSelect', t('Dashboard'), () => {
-					this.#selectReference(
-						CWidgetBase.createTypedReference({reference: 'DASHBOARD', type: this.#in_type})
+					this.#selectTypedReference(
+						CWidgetBase.createTypedReference({
+							reference: CDashboard.REFERENCE_DASHBOARD,
+							type: this.#in_type
+						})
 					);
 				});
 			}
@@ -152,9 +155,9 @@ class CWidgetFieldMultiselect {
 			selectedLimit: this.#selected_limit
 		});
 
-		if (this.#selected_reference !== null) {
-			this.#multiselect.multiSelect('removeSelected', this.#selected_reference);
-			this.#selected_reference = null;
+		if (this.#selected_typed_reference !== null) {
+			this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
+			this.#selected_typed_reference = null;
 		}
 
 		this.#multiselect.multiSelect('openSelectPopup', e.target);
@@ -164,19 +167,24 @@ class CWidgetFieldMultiselect {
 		const popup = new ClassWidgetSelectPopup(this.#getWidgets());
 
 		popup.on('dialogue.submit', (e) => {
-			this.#selectReference(e.detail.reference);
+			this.#selectTypedReference(e.detail.reference);
 		});
 	}
 
-	#selectReference(reference) {
+	#selectTypedReference(typed_reference) {
 		let caption = null;
 
-		if (reference === CWidgetBase.createTypedReference({reference: 'DASHBOARD', type: this.#in_type})) {
-			caption = {id: reference, name: t('Dashboard')}
+		const typed_reference_dashboard = CWidgetBase.createTypedReference({
+			reference: CDashboard.REFERENCE_DASHBOARD,
+			type: this.#in_type
+		});
+
+		if (typed_reference === typed_reference_dashboard) {
+			caption = {id: typed_reference_dashboard, name: t('Dashboard')}
 		}
 		else {
 			for (const widget of this.#getWidgets()) {
-				if (widget.id === reference) {
+				if (widget.id === typed_reference) {
 					caption = widget;
 					break;
 				}
@@ -185,11 +193,11 @@ class CWidgetFieldMultiselect {
 
 		if (caption !== null) {
 			this.#multiselect.multiSelect('modify', {
-				name: `${this.#field_name}[_reference]`,
+				name: `${this.#field_name}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
 				selectedLimit: 1
 			});
 
-			this.#selected_reference = reference;
+			this.#selected_typed_reference = typed_reference;
 
 			this.#multiselect.multiSelect('addData', [caption]);
 		}
@@ -197,7 +205,7 @@ class CWidgetFieldMultiselect {
 
 	#selectSuggested(entity) {
 		if (entity.source !== undefined) {
-			this.#selectReference(entity.id);
+			this.#selectTypedReference(entity.id);
 		}
 		else {
 			this.#multiselect.multiSelect('modify', {
@@ -205,9 +213,9 @@ class CWidgetFieldMultiselect {
 				selectedLimit: this.#selected_limit
 			});
 
-			if (this.#selected_reference !== null) {
-				this.#multiselect.multiSelect('removeSelected', this.#selected_reference);
-				this.#selected_reference = null;
+			if (this.#selected_typed_reference !== null) {
+				this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
+				this.#selected_typed_reference = null;
 			}
 
 			this.#multiselect.multiSelect('addData', [entity]);
@@ -221,7 +229,7 @@ class CWidgetFieldMultiselect {
 
 		if (this.#dashboard_accepted && t('Dashboard').toLowerCase().includes(search)) {
 			result_entities.set('DASHBOARD', {
-				id: CWidgetBase.createTypedReference({reference: 'DASHBOARD', type: this.#in_type}),
+				id: CWidgetBase.createTypedReference({reference: CDashboard.REFERENCE_DASHBOARD, type: this.#in_type}),
 				name: t('Dashboard'),
 				source: 'dashboard'
 			})
