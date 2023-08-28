@@ -114,7 +114,7 @@ function openImportComparePopup(overlay) {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		const message_box = makeMessageBox('bad', messages, title);
+		const message_box = makeMessageBox('bad', messages, title, true, true);
 
 		message_box.insertBefore(form);
 	})
@@ -169,7 +169,7 @@ function submitImportPopup(overlay) {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		const message_box = makeMessageBox('bad', messages, title);
+		const message_box = makeMessageBox('bad', messages, title, true, true);
 
 		message_box.insertBefore(form);
 	})
