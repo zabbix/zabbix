@@ -49,11 +49,11 @@ class CSvgGraphHelper {
 		$errors = [];
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
-		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['dynamic_hostid']);
-		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['dynamic_hostid']);
+		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
+		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
 		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
-		self::applyOverrides($metrics, $options['templateid'], $options['dynamic_hostid'], $options['overrides']);
+		self::applyOverrides($metrics, $options['templateid'], $options['override_hostid'], $options['overrides']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
@@ -80,7 +80,7 @@ class CSvgGraphHelper {
 			->addMetrics($metrics)
 			->addSimpleTriggers(self::getSimpleTriggers($metrics, $options['displaying']))
 			->addProblems(self::getProblems($metrics, $options['problems'], $options['time_period'],
-				$options['templateid'], $options['dynamic_hostid'])
+				$options['templateid'], $options['override_hostid'])
 			)
 			->draw();
 
@@ -110,7 +110,7 @@ class CSvgGraphHelper {
 	}
 
 	private static function getMetricsPattern(array &$metrics, array $data_sets, string $templateid,
-			string $dynamic_hostid): void {
+			string $override_hostid): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
@@ -167,7 +167,7 @@ class CSvgGraphHelper {
 				}
 			}
 			else {
-				$options['hostids'] = $dynamic_hostid !== '' ? $dynamic_hostid : $templateid;
+				$options['hostids'] = $override_hostid !== '' ? $override_hostid : $templateid;
 			}
 
 			$items = null;
@@ -200,7 +200,7 @@ class CSvgGraphHelper {
 	}
 
 	private static function getMetricsItems(array &$metrics, array $data_sets, string $templateid,
-			string $dynamic_hostid): void {
+			string $override_hostid): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
@@ -216,7 +216,7 @@ class CSvgGraphHelper {
 				break;
 			}
 
-			if ($templateid !== '' && $dynamic_hostid !== '') {
+			if ($templateid !== '' && $override_hostid !== '') {
 				$tmp_items = API::Item()->get([
 					'output' => ['key_'],
 					'itemids' => $data_set['itemids'],
@@ -226,7 +226,7 @@ class CSvgGraphHelper {
 				if ($tmp_items) {
 					$items = API::Item()->get([
 						'output' => ['itemid'],
-						'hostids' => [$dynamic_hostid],
+						'hostids' => [$override_hostid],
 						'webitems' => true,
 						'filter' => [
 							'key_' => array_column($tmp_items, 'key_')
@@ -288,17 +288,17 @@ class CSvgGraphHelper {
 	/**
 	 * Apply overrides for each pattern matching metric.
 	 */
-	private static function applyOverrides(array &$metrics, string $templateid, string $dynamic_hostid,
+	private static function applyOverrides(array &$metrics, string $templateid, string $override_hostid,
 			array $overrides = []): void {
-		if ($templateid !== '' && $dynamic_hostid !== '') {
+		if ($templateid !== '' && $override_hostid !== '') {
 			$dynamic_host = API::Host()->get([
 				'output' => ['name'],
-				'hostids' => [$dynamic_hostid]
+				'hostids' => [$override_hostid]
 			]);
 		}
 
 		foreach ($overrides as $override) {
-			if ($templateid === '' || $templateid !== '' && $dynamic_hostid === '') {
+			if ($templateid === '' || $templateid !== '' && $override_hostid === '') {
 				if ($override['hosts'] === '' || $override['items'] === '') {
 					continue;
 				}
@@ -309,7 +309,7 @@ class CSvgGraphHelper {
 				}
 			}
 
-			if ($templateid !== '' && $dynamic_hostid !== '') {
+			if ($templateid !== '' && $override_hostid !== '') {
 				$override['hosts'] = [$dynamic_host[0]['name']];
 			}
 
@@ -817,15 +817,15 @@ class CSvgGraphHelper {
 	 * Find problems at given time period that matches specified problem options.
 	 */
 	private static function getProblems(array $metrics, array $problem_options, array $time_period, string $templateid,
-			string $dynamic_hostid): array {
+			string $override_hostid): array {
 		if ($problem_options['show_problems'] == SVG_GRAPH_PROBLEMS_OFF) {
 			return [];
 		}
 
-		if ($templateid !== '' && $dynamic_hostid !== '') {
+		if ($templateid !== '' && $override_hostid !== '') {
 			$dynamic_host = API::Host()->get([
 				'output' => ['name'],
-				'hostids' => [$dynamic_hostid]
+				'hostids' => [$override_hostid]
 			]);
 			$problem_options['problemhosts'] = [$dynamic_host[0]['name']];
 		}

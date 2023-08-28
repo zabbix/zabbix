@@ -27,6 +27,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldLatLng,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldTags
 };
@@ -59,6 +60,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldLatLng('default_view', _('Initial view'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

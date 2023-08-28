@@ -27,13 +27,6 @@ use API,
 	CItemGeneral;
 
 class WidgetView extends CControllerDashboardWidgetView {
-	protected function init(): void {
-		parent::init();
-
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
 
 	protected function doAction(): void {
 		$interface_types = CItemGeneral::INTERFACE_TYPES_BY_PRIORITY;
@@ -52,7 +45,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			INTERFACE_AVAILABLE_FALSE => 0
 		]);
 
-		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid') || !$this->isTemplateDashboard()) {
+		if ($this->isTemplateDashboard() && $this->fields_values['override_hostid'] || !$this->isTemplateDashboard()) {
 			$options = [
 				'output' => [],
 				'selectInterfaces' => ['type', 'available'],
@@ -61,8 +54,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: ['status' => HOST_STATUS_MONITORED]
 			];
 
-			if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid')) {
-				$options['hostids'] = [$this->getInput('dynamic_hostid')];
+			if ($this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
+				$options['hostids'] = $this->fields_values['override_hostid'];
 			}
 			else {
 				$options['groupids'] = !$this->isTemplateDashboard() && $this->fields_values['groupids']

@@ -46,8 +46,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'contents_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'from' => 'string',
-			'to' => 'string',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'to' => 'string'
 		]);
 	}
 
@@ -150,7 +149,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			],
 			'overrides' => array_values($this->fields_values['or']),
 			'templateid' => $this->getInput('templateid', ''),
-			'dynamic_hostid' => $this->getInput('dynamic_hostid', '')
+			'override_hostid' => $this->fields_values['override_hostid']
+				? $this->fields_values['override_hostid'][0]
+				: ''
 		];
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);

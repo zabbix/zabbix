@@ -37,6 +37,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldGraphDataSet,
 	CWidgetFieldGraphOverride,
 	CWidgetFieldHostPatternSelect,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldNumericBox,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldRangeControl,
@@ -245,7 +246,10 @@ class WidgetForm extends CWidgetForm {
 			->initAxesFields()
 			->initLegendFields()
 			->initProblemsFields()
-			->initOverridesFields();
+			->initOverridesFields()
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
+			);
 	}
 
 	private function initDataSetFields(): self {

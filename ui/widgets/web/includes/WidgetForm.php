@@ -27,6 +27,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldTags
 };
@@ -64,6 +65,9 @@ class WidgetForm extends CWidgetForm {
 					'maintenance',
 					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
 				))->setDefault(1)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

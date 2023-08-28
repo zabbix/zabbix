@@ -30,6 +30,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSeverities,
 	CWidgetFieldTags,
@@ -74,6 +75,9 @@ class WidgetForm extends CWidgetForm {
 				))
 					->setDefault(self::DEFAULT_TRIGGER_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

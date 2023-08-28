@@ -30,6 +30,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSeverities,
 	CWidgetFieldTags,
@@ -85,6 +86,9 @@ class WidgetForm extends CWidgetForm {
 				]))
 					->setDefault(EXTACK_OPTION_ALL)
 					->setFlags(CWidgetField::FLAG_ACKNOWLEDGES)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

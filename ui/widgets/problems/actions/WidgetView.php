@@ -34,14 +34,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'initial_load' => 'in 0,1'
 		]);
 	}
 
 	protected function doAction(): void {
 		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$this->setResponse(new CControllerResponseData([
 				'name' => $this->getInput('name', $this->widget->getDefaultName()),
 				'error' => _('No data.'),
@@ -58,7 +57,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'exclude_groupids' => !$this->isTemplateDashboard() ? $this->fields_values['exclude_groupids'] : null,
 				'hostids' => !$this->isTemplateDashboard()
 					? $this->fields_values['hostids']
-					: [$this->getInput('dynamic_hostid')],
+					: $this->fields_values['override_hostid'],
 				'name' => $this->fields_values['problem'],
 				'severities' => $this->fields_values['severities'],
 				'evaltype' => $this->fields_values['evaltype'],

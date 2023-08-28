@@ -34,8 +34,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->addValidationRules([
 			'from' => 'string',
-			'to' => 'string',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'to' => 'string'
 		]);
 	}
 
@@ -48,7 +47,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$data['error'] = _('No data.');
 		}
 		else {
@@ -65,7 +64,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			: null;
 
 		if ($this->isTemplateDashboard()) {
-			$hostids = [$this->getInput('dynamic_hostid')];
+			$hostids = $this->fields_values['override_hostid'];
 		}
 		else {
 			$hostids = $this->fields_values['hostids'] ?: null;

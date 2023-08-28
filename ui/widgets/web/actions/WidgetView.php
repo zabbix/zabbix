@@ -31,14 +31,6 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	protected function init(): void {
-		parent::init();
-
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
-
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
@@ -49,7 +41,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$data['error'] = _('No data.');
 		}
 		else {
@@ -58,7 +50,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				: null;
 
 			if ($this->isTemplateDashboard()) {
-				$filter_hostids = [$this->getInput('dynamic_hostid')];
+				$filter_hostids = $this->fields_values['override_hostid'];
 			}
 			else {
 				$filter_hostids = $this->fields_values['hostids'] ?: null;

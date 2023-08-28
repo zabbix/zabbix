@@ -49,8 +49,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->addValidationRules([
 			'initial_load' => 'in 0,1',
 			'widgetid' => 'db widget.widgetid',
-			'unique_id' => 'required|string',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'unique_id' => 'required|string'
 		]);
 	}
 
@@ -83,11 +82,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	private function getHosts(): array {
 		if ($this->isTemplateDashboard()) {
-			if ($this->hasInput('dynamic_hostid')) {
+			if ($this->fields_values['override_hostid']) {
 				$hosts = API::Host()->get([
 					'output' => ['hostid', 'name'],
 					'selectInventory' => ['location_lat', 'location_lon'],
-					'hostids' => [$this->getInput('dynamic_hostid')],
+					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
 						'inventory_mode' => [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC]
 					],
