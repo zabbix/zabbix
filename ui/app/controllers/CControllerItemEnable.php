@@ -67,7 +67,7 @@ class CControllerItemEnable extends CControllerItem {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot disable item', 'Cannot disable items', $count),
+				'title' => _n('Cannot enable item', 'Cannot enable items', $count),
 				'messages' => $messages
 			];
 		}
