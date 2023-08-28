@@ -173,7 +173,6 @@ abstract class CControllerItemPrototype extends CController {
 			'delay' => ZBX_ITEM_DELAY_DEFAULT,
 			'description' => DB::getDefault('items', 'description'),
 			'discover' => DB::getDefault('items', 'discover'),
-			'discover' => DB::getDefault('items', 'discover'),
 			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
 			'headers' => [],
 			'history_mode' => ITEM_STORAGE_CUSTOM,
