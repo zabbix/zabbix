@@ -50,7 +50,7 @@ abstract class CControllerItemPrototype extends CController {
 			'follow_redirects'		=> 'db items.follow_redirects',
 			'retrieve_mode'			=> 'db items.retrieve_mode',
 			'output_format'			=> 'db items.output_format',
-			'http_proxy'			=> 'string',
+			'http_proxy'			=> 'db items.http_proxy',
 			'http_authtype'			=> 'db items.authtype',
 			'http_username'			=> 'db items.username',
 			'http_password'			=> 'db items.password',
