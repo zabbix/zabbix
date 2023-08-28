@@ -823,6 +823,18 @@ $item_tab->addItem([
  * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
  * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
  */
+$edit_source_timeouts_link = null;
+
+if ($data['can_edit_source_timeouts'] && (($readonly && !$data['has_custom_timeout']) || !$readonly)) {
+	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
+		? (new CLink(_('Timeouts')))
+			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
+			->onClick('view.editProxy(event, this.dataset.proxyid);')
+		: (new CLink(_('Timeouts'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+		))->setTarget('_blank');
+}
+
 $item_tab->addItem([
 	(new CLabel(_('Timeout'), 'timeout'))
 		->setAsteriskMark()
@@ -833,7 +845,8 @@ $item_tab->addItem([
 			->setAriaRequired(),
 		!$readonly
 			? (new CButtonLink($data['has_custom_timeout'] ? _('Remove') : _('Change')))->addClass('js-change-timeout')
-			: null
+			: null,
+		$edit_source_timeouts_link
 	]))->setId('js-item-timeout-field')
 ]);
 
@@ -1117,7 +1130,7 @@ $html_page->show();
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
 		'interface_types' => itemTypeInterface(),
 		'discovered_item' => $discovered_item,
-		'inherited_timeouts' => $data['inherited_timeouts']
+		'inherited_timeouts' => $data['inherited_timeouts']['timeouts']
 	]).');
 '))->show();
 

@@ -84,6 +84,8 @@ class TabIndicators {
 				return HOST_DISCOVERY;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
+			case !!PROXY:
+				return PROXY;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
@@ -92,8 +94,6 @@ class TabIndicators {
 				return MAP;
 			case !!MEDIA_TYPE:
 				return MEDIA_TYPE;
-			case !!PROXY:
-				return PROXY;
 			case !!SERVICE:
 				return SERVICE;
 			case !!SLA:

@@ -608,15 +608,13 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	$default_timeout = DB::getDefault('items', 'timeout');
-	$inherited_timeouts = getInheritedTimeouts($lld_rules[0]['hosts'][0]['proxyid']);
-	$data['inherited_timeouts'] = $inherited_timeouts['timeouts'];
-	$data['inherited_timeouts_source'] = $inherited_timeouts['source'];
-	$data['inherited_timeout'] = array_key_exists($data['type'], $data['inherited_timeouts'])
-		? $data['inherited_timeouts'][$data['type']]
+	$data['inherited_timeouts'] = getInheritedTimeouts($lld_rules[0]['hosts'][0]['proxyid']);
+	$data['inherited_timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
+		? $data['inherited_timeouts']['timeouts'][$data['type']]
 		: $default_timeout;
 	$data['has_custom_timeout'] = getRequest('has_custom_timeout', (int) ($data['timeout'] !== $default_timeout));
 	$data['timeout'] = $data['has_custom_timeout'] ? $data['timeout'] : $data['inherited_timeout'];
-	$data['can_edit_source_timeouts'] = $data['inherited_timeouts_source'] === 'proxy'
+	$data['can_edit_source_timeouts'] = $data['inherited_timeouts']['source'] === 'proxy'
 		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 

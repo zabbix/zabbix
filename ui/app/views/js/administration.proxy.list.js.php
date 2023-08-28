@@ -75,7 +75,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
 		}
 
 		_editHost(hostid) {

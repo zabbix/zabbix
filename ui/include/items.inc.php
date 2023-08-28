@@ -2488,6 +2488,7 @@ function getInheritedTimeouts(string $proxyid): array {
 		if ($db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			return [
 				'source' => 'proxy',
+				'proxyid' => $proxyid,
 				'timeouts' => [
 					ITEM_TYPE_ZABBIX => $db_proxy['timeout_zabbix_agent'],
 					ITEM_TYPE_SIMPLE => $db_proxy['timeout_simple_check'],
@@ -2506,6 +2507,7 @@ function getInheritedTimeouts(string $proxyid): array {
 
 	return [
 		'source' => 'global',
+		'proxyid' => $proxyid,
 		'timeouts' => [
 			ITEM_TYPE_ZABBIX => CSettingsHelper::get(CSettingsHelper::TIMEOUT_ZABBIX_AGENT),
 			ITEM_TYPE_SIMPLE => CSettingsHelper::get(CSettingsHelper::TIMEOUT_SIMPLE_CHECK),

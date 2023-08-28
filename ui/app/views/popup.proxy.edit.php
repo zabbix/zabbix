@@ -302,7 +302,7 @@ $timeouts_tab = (new CFormGrid())
 		)
 	]);
 
-$tabs = (new CTabView())
+$tabs = (new CTabView(['id' => 'proxy-tabs']))
 	->setSelected(0)
 	->addTab('proxy-tab', _('Proxy'), $proxy_tab)
 	->addTab('proxy-encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_PROXY_ENCRYPTION)
