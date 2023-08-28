@@ -2294,7 +2294,6 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	struct timeval			timeout = {.tv_sec = snmp_context->config_timeout};
 	fd_set				fdset;
 
-
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char	buffer[MAX_OID_LEN];
