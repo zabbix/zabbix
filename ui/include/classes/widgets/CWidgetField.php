@@ -99,7 +99,7 @@ abstract class CWidgetField {
 	 * @return mixed
 	 */
 	public function getValue() {
-		return $this->value ?? $this->default;
+		return $this->value ?? $this->getDefault();
 	}
 
 	public function setValue($value): self {
@@ -273,7 +273,7 @@ abstract class CWidgetField {
 			$this->setValue($value);
 		}
 		else {
-			$this->setValue($this->default);
+			$this->setValue($this->getDefault());
 			$errors[] = $error;
 		}
 
@@ -290,7 +290,7 @@ abstract class CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
-		if ($value !== null && $value !== $this->default) {
+		if ($value !== null && $value !== $this->getDefault()) {
 			$widget_field = [
 				'type' => $this->save_type,
 				'name' => $this->name

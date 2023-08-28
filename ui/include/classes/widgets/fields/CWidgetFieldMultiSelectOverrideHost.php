@@ -36,6 +36,22 @@ class CWidgetFieldMultiSelectOverrideHost extends CWidgetFieldMultiSelectHost {
 			->acceptDashboard();
 	}
 
+	public function getDefault(): array {
+		if ($this->isTemplateDashboard()) {
+			return [
+				CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+					CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_HOST_ID
+				)
+			];
+		}
+
+		return parent::getDefault();
+	}
+
+	public function isWidgetAccepted(): bool {
+		return !$this->isTemplateDashboard();
+	}
+
 	public function validate(bool $strict = false): array {
 		if ($strict && $this->isTemplateDashboard()) {
 			$this->setValue([
@@ -46,9 +62,5 @@ class CWidgetFieldMultiSelectOverrideHost extends CWidgetFieldMultiSelectHost {
 		}
 
 		return parent::validate($strict);
-	}
-
-	public function isWidgetAccepted(): bool {
-		return !$this->isTemplateDashboard();
 	}
 }

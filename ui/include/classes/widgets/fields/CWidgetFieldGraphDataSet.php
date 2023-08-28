@@ -181,7 +181,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			$this->setValue($value);
 		}
 		else {
-			$this->setValue($this->default);
+			$this->setValue($this->getDefault());
 		}
 
 		return $errors;

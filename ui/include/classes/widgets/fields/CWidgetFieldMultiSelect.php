@@ -69,6 +69,10 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
+		if ($value === $this->getDefault()) {
+			return;
+		}
+
 		if (is_array($value) && array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
