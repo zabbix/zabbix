@@ -87,7 +87,7 @@ class testPageMaintenance extends CWebTest {
 				'active_till' => '1577923200',
 				'hosts' => [
 					[
-						'hostid' => '10084',
+						'hostid' => '10084'
 					]
 				],
 				'timeperiods' => [[]]
@@ -100,7 +100,7 @@ class testPageMaintenance extends CWebTest {
 				'groups' => [
 					[
 						'groupid' => '4'
-					],
+					]
 				],
 				'timeperiods' => [[]]
 			],
@@ -112,7 +112,7 @@ class testPageMaintenance extends CWebTest {
 				'groups' => [
 					[
 						'groupid' => '4'
-					],
+					]
 				],
 				'timeperiods' => [[]]
 			],
@@ -125,7 +125,7 @@ class testPageMaintenance extends CWebTest {
 				'groups' => [
 					[
 						'groupid' => '4'
-					],
+					]
 				],
 				'timeperiods' => [[]]
 			]
@@ -159,46 +159,6 @@ class testPageMaintenance extends CWebTest {
 						'Active till' => '2022-01-01 03:00',
 						'State' => 'Expired',
 						'Description' => 'Test description of the maintenance'
-					],
-					[
-						'Name' => 'Maintenance for Host availability widget',
-						'Type' => 'With data collection',
-						'Active since' => '2018-08-23 00:00',
-						'Active till' => '2038-01-18 00:00',
-						'State' => 'Active',
-						'Description' => 'Maintenance for checking Show hosts in maintenance option in Host availability widget'
-					],
-					[
-						'Name' => 'Maintenance for suppression test',
-						'Type' => 'With data collection',
-						'Active since' => '2018-08-23 00:00',
-						'Active till' => '2038-01-18 00:00',
-						'State' => 'Active',
-						'Description' => ''
-					],
-					[
-						'Name' => 'Maintenance for update (data collection)',
-						'Type' => 'With data collection',
-						'Active since' => '2018-08-22 00:00',
-						'Active till' => '2018-08-23 00:00',
-						'State' => 'Expired',
-						'Description' => 'Test description'
-					],
-					[
-						'Name' => 'Maintenance period 1 (data collection)',
-						'Type' => 'With data collection',
-						'Active since' => '2011-01-11 17:38',
-						'Active till' => '2011-01-12 17:38',
-						'State' => 'Expired',
-						'Description' => 'Test description 1'
-					],
-					[
-						'Name' => 'Maintenance period 2 (no data collection)',
-						'Type' => 'No data collection',
-						'Active since' => '2011-01-11 17:38',
-						'Active till' => '2011-01-12 17:38',
-						'State' => 'Expired',
-						'Description' => 'Test description 1'
 					],
 					[
 						'Name' => 'Maintenance with 2 host groups',
@@ -261,28 +221,15 @@ class testPageMaintenance extends CWebTest {
 			$this->assertTrue($filter->isExpanded($state));
 		}
 
-		// Check filter fields.
-		$this->assertEquals(['Host groups', 'Name', 'State'],
-				$form->getLabels()->asText()
-		);
-
-		// Host groups - placeholder check.
+		$this->assertEquals(['Host groups', 'Name', 'State'], $form->getLabels()->asText());
 		$this->assertEquals('type here to search', $form->getField('id:filter_groups__ms')
 				->getAttribute('placeholder')
 		);
-
-		// Name field's validation.
 		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
-
-		// State check
 		$this->assertEquals(['Any', 'Active', 'Approaching', 'Expired'], $form->getField('State')->getLabels()
 				->asText()
 		);
-
-		// Check default values of the fields.
-		$this->assertEquals(['Host groups' => '', 'Name' => '', 'State' => 'Any'],
-				$form->getValues(CElementFilter::VISIBLE)
-		);
+		$form->checkValue(['Host groups' => '', 'Name' => '', 'State' => 'Any']);
 
 		// Check table headers and sortable headers.
 		$table = $this->getTable();
@@ -323,10 +270,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Host groups' => [
-							'Discovered hosts',
-							'Zabbix servers'
-						]
+						'Host groups' => ['Discovered hosts', 'Zabbix servers']
 					],
 					'expected' => [
 						self::ACTIVE_MAINTENANCE,
@@ -344,7 +288,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'id:filter_name' => '  '
+						'Name' => '  '
 					]
 				]
 			],
@@ -352,7 +296,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'id:filter_name' => 'ʍąɨɲţ€ɲąɲȼ€🙂'
+						'Name' => 'ʍąɨɲţ€ɲąɲȼ€🙂'
 					],
 					'expected' => [
 						self::FILTER_NAME_MAINTENANCE
@@ -363,7 +307,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'id:filter_name' => 'Test description of the maintenance'
+						'Name' => 'Test description of the maintenance'
 					]
 				]
 			],
@@ -433,7 +377,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'id:filter_name' => 'Host',
+						'Name' => 'Host',
 						'State' => 'Expired',
 						'Host groups' => 'Zabbix servers'
 					],
@@ -451,8 +395,7 @@ class testPageMaintenance extends CWebTest {
 	 */
 	public function testPageMaintenance_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=maintenance.list&sort=name&sortorder=ASC');
-		$filter = CFilterElement::find()->one();
-		$form = $filter->getForm();
+		$form = CFilterElement::find()->one()->getForm();
 
 		// Fill filter fields if such present in data provider.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
@@ -463,8 +406,7 @@ class testPageMaintenance extends CWebTest {
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected', []));
 
 		// Check the displaying amount.
-		$maintenance_count = count((CTestArrayHelper::get($data, 'expected', [])));
-		$this-> assertTableStats($maintenance_count);
+		$this-> assertTableStats(count((CTestArrayHelper::get($data, 'expected', []))));
 
 		// Reset filter to not influence further tests.
 		$this->query('button:Reset')->one()->click();
@@ -479,12 +421,13 @@ class testPageMaintenance extends CWebTest {
 			natcasesort($values);
 
 			if ($column === 'Type') {
-			$values = array_reverse($values);
+				$values = array_reverse($values);
 			}
+
 			foreach ([$values, array_reverse($values)] as $sorted_values) {
-			$table->query('link', $column)->waitUntilClickable()->one()->click();
-			$table->waitUntilReloaded();
-			$this->assertTableDataColumn($sorted_values, $column);
+				$table->query('link', $column)->waitUntilClickable()->one()->click();
+				$table->waitUntilReloaded();
+				$this->assertTableDataColumn($sorted_values, $column);
 			}
 		}
 	}
@@ -521,17 +464,7 @@ class testPageMaintenance extends CWebTest {
 			// Delete all maintenances.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'name' => [
-						self::ACTIVE_MAINTENANCE,
-						self::DESCRIPTION_MAINTENANCE,
-						'Maintenance for Host availability widget',
-						'Maintenance for suppression test',
-						'Maintenance for update (data collection)',
-						'Maintenance period 1 (data collection)',
-						'Maintenance period 2 (no data collection)',
-						self::FILTER_NAME_MAINTENANCE
-					]
+					'expected' => TEST_GOOD
 				]
 			]
 		];
@@ -550,9 +483,13 @@ class testPageMaintenance extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Maintenance period'.(($count_names === 1) ? '' : 's').' deleted');
 		$this->assertSelectedCount(0);
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name IN ('.
+
+		if($count_names > 0){
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name IN ('.
 					CDBHelper::escape($data['name']).')')
-		);
+			);
+		}
+
 		$this->assertTableStats(CDBHelper::getCount(self::MAINTENANCE_SQL));
 	}
 
