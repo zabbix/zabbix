@@ -489,6 +489,94 @@ final class CItemData {
 	}
 
 	/**
+	 * Returns sets of elements (DOM IDs) to set visible, disabled, when a 'parent' field value is changed.
+	 *
+	 * @return array
+	 */
+	public static function filterSwitchingConfiguration(): array {
+		return [
+			'for_type' => [
+				ITEM_TYPE_CALCULATED => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_DB_MONITOR => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_DEPENDENT => [],
+				ITEM_TYPE_EXTERNAL => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_HTTPAGENT => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_INTERNAL => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_IPMI => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_JMX => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SCRIPT => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SIMPLE => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SNMP => [
+					'js-filter-snmp-oid-label',
+					'js-filter-snmp-oid-field',
+					'filter_snmp_oid',
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_SNMPTRAP => [],
+				ITEM_TYPE_SSH => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_TELNET => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_TRAPPER => [],
+				ITEM_TYPE_ZABBIX => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				],
+				ITEM_TYPE_ZABBIX_ACTIVE => [
+					'js-filter-delay-label',
+					'js-filter-delay-field',
+					'filter_delay'
+				]
+			]
+		];
+	}
+
+	/**
 	 * Returns sets of elements (DOM IDs, default field values, dependent option values) to set visible,
 	 * disabled, or set value of, when a 'parent' field value is changed.
 	 *

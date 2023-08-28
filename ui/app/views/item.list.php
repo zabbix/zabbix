@@ -312,9 +312,7 @@ $confirm_messages = [
 	view.init('.json_encode([
 		'context' => $data['context'],
 		'confirm_messages' => $confirm_messages,
-		'field_switches' => [
-			'for_type' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false])['for_type']
-		],
+		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
 		'hostids' => $data['filter_data']['filter_hostids'],
 		'token' => [

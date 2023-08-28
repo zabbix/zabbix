@@ -145,11 +145,11 @@ $filter_columns[1]
 		new CFormField($info_type_select),
 	])
 	->addItem([
-		(new CLabel(_('SNMP OID'), 'filter_snmp_oid'))->setId('js-item-snmp-oid-label'),
+		(new CLabel(_('SNMP OID'), 'filter_snmp_oid'))->setId('js-filter-snmp-oid-label'),
 		(new CFormField(
 			(new CTextBox('filter_snmp_oid', $data['filter_data']['filter_snmp_oid'], '', 255))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-		))->setId('js-item-snmp-oid-field')
+		))->setId('js-filter-snmp-oid-field')
 	])
 	->addItem([
 		new CLabel(_('History')),
@@ -166,11 +166,11 @@ $filter_columns[1]
 		)
 	])
 	->addItem([
-		(new CLabel(_('Update interval'), 'filter_delay'))->setId('js-item-delay-label'),
+		(new CLabel(_('Update interval'), 'filter_delay'))->setId('js-filter-delay-label'),
 		(new CFormField(
 			(new CTextBox('filter_delay', $data['filter_data']['filter_delay']))
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-		))->setId('js-item-delay-field')
+		))->setId('js-filter-delay-field')
 	]);
 
 // Third column.
