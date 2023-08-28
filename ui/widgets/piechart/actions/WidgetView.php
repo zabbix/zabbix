@@ -168,7 +168,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $info;
 	}
 
-	private static function getItems(array &$metrics, array $data_sets, string $templateid, string $dynamic_hostid): void {
+	private static function getItems(array &$metrics, array $data_sets, string $templateid,
+			string $dynamic_hostid): void {
 		$metrics = [];
 		$max_metrics = 50;
 
@@ -268,7 +269,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $metrics;
 	}
 
-	private static function getMetricsPatternItemDS(array $data_set, int $max_metrics, string $templateid, string $dynamic_hostid): array {
+	private static function getMetricsPatternItemDS(array $data_set, int $max_metrics, string $templateid,
+			string $dynamic_hostid): array {
 		$metrics = [];
 
 		if (($templateid === '' && (!$data_set['hosts'] || !$data_set['items']))
@@ -328,7 +330,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $metrics;
 	}
 
-	private static function getChartDataSource(array &$metrics, array &$errors, int $data_source, array $time_period): void {
+	private static function getChartDataSource(array &$metrics, array &$errors, int $data_source,
+			array $time_period): void {
 		/**
 		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
 		 * $metric.
@@ -523,6 +526,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$raw_total_value = null;
 		$others_value = 0;
 		$below_threshold_count = 0;
+		$below_threshold_sectors = [];
 		$sectors = [];
 
 		if ($templateid !== '' && $dynamic_hostid === '') {
@@ -573,7 +577,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			unset($metric);
 
-			foreach ($metrics as $key => &$metric) {
+			foreach ($metrics as $key => $metric) {
 				if ($metric['value'] <= 0 || $raw_total_value <= 0) {
 					$percentage = 0;
 				}
@@ -586,12 +590,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$below_threshold_count++;
 					$others_value += max($metric['value'], 0);
 
-					unset($metrics[$key]);
+					$below_threshold_sectors[] = $key;
 				}
 			}
-			unset($metric);
 
 			if ($below_threshold_count >= 2) {
+				foreach ($below_threshold_sectors as $sector_key) {
+					unset($sectors[$sector_key]);
+				}
+
 				$sectors[] = [
 					'name' => _('Other'),
 					'color' => $merge_sectors['color'],
