@@ -31,9 +31,10 @@ $this->includeJsFile('item.list.js.php', $data);
 
 $filter = new CPartial('item.list.filter', [
 	'action' => $data['action'],
+	'context' => $data['context'],
 	'filter_data' => $data['filter_data'],
 	'subfilter' => $data['subfilter'],
-	'context' => $data['context']
+	'types' => $data['types']
 ]);
 
 $form = (new CForm())
@@ -309,14 +310,17 @@ $confirm_messages = [
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'context' => $data['context'],
+		'confirm_messages' => $confirm_messages,
+		'field_switches' => [
+			'for_type' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false])['for_type']
+		],
+		'form_name' => $form->getName(),
+		'hostids' => $data['filter_data']['filter_hostids'],
 		'token' => [
 			'token' => CCsrfTokenHelper::CSRF_TOKEN_NAME,
 			'value' => CCsrfTokenHelper::get('item')
-		],
-		'context' => $data['context'],
-		'confirm_messages' => $confirm_messages,
-		'hostids' => $data['filter_data']['filter_hostids'],
-		'form_name' => $form->getName()
+		]
 	]).');
 '))
 	->setOnDocumentReady()

@@ -31,7 +31,7 @@
 <script>
 	const view = new class {
 
-		init({form_name, confirm_messages, token, hostids, context}) {
+		init({context, confirm_messages, field_switches, form_name, hostids, token}) {
 			this.confirm_messages = confirm_messages;
 			this.token = token;
 			this.context = context;
@@ -40,11 +40,13 @@
 			this.form = document.forms[form_name];
 			this.filter_form = document.querySelector('form[name="zbx_filter"]');
 
-			this.initForm();
+			this.initForm(field_switches);
 			this.initEvents();
 		}
 
-		initForm() {
+		initForm(field_switches) {
+			new CViewSwitcher('filter_type', 'change', field_switches.for_type);
+
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {

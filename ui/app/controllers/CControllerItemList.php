@@ -104,6 +104,7 @@ class CControllerItemList extends CControllerItem {
 			'context' => $this->getInput('context'),
 			'filter_data' => $filter,
 			'items' => [],
+			'types' => item_type2str(),
 			'triggers' => [],
 			'trigger_parent_templates' => [],
 			'tags' => [],
@@ -113,6 +114,7 @@ class CControllerItemList extends CControllerItem {
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder']
 		];
+		unset($data['types'][ITEM_TYPE_HTTPTEST]);
 
 		$items = $this->getItems($data['context'], $filter);
 		[$items, $subfilter_fields] = $this->getItemsAndSubfilter($items, $this->getSubfilter($items, $filter));
@@ -561,7 +563,7 @@ class CControllerItemList extends CControllerItem {
 			$options['filter']['value_type'] = $input['filter_value_type'];
 		}
 
-		if ($input['filter_snmp_oid'] !== '') {
+		if ($input['filter_type'] == ITEM_TYPE_SNMP && $input['filter_snmp_oid'] !== '') {
 			$options['filter']['snmp_oid'] = $input['filter_snmp_oid'];
 		}
 
