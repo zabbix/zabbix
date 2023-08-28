@@ -57,6 +57,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		$this->page->assertTitle('Configuration of discovery rules');
 		$this->page->assertHeader('Discovery rules');
 		$this->assertEquals(['', 'Name', 'IP range', 'Proxy', 'Interval', 'Checks', 'Status'], $table->getHeadersText());
+		$this->assertEquals(['Name'], $table->getSortableHeaders()->asText());
 		$this->assertEquals(['Name', 'Status'], $form->getLabels()->asText());
 
 		$this->assertEquals(['Any', 'Enabled', 'Disabled'], $form->getField('Status')->asSegmentedRadio()
@@ -82,11 +83,13 @@ class testPageNetworkDiscovery extends CWebTest {
 		);
 
 		// Check if filter collapses/ expands.
-		foreach (['true', 'false'] as $status) {
-			$this->assertTrue($this->query('xpath://li[@aria-expanded='.CXPathHelper::escapeQuotes($status).']')
-					->one()->isPresent()
-			);
-			$this->query('id:ui-id-1')->one()->click();
+		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
+		$filter_tab->isExpanded();
+
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter_tab->expand($status);
+			$this->assertTrue($filter_tab->isExpanded($status));
 		}
 
 		// Check if fields "Name" length is as expected.
@@ -119,6 +122,7 @@ class testPageNetworkDiscovery extends CWebTest {
 			$this->assertEquals($expected, $this->getTableColumnData('Name'));
 		}
 	}
+
 	public function getFilterData() {
 		return [
 			[
@@ -224,19 +228,17 @@ class testPageNetworkDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => '/, >, ;....'
+						'Name' => '    '
 					],
-					'expected' => [
-					]
+					'expected' => []
 				]
 			],
 			[
 				[
 					'filter' => [
-						'Name' => '    '
+						'Name' => '/, >, ;....'
 					],
-					'expected' => [
-					]
+					'expected' => []
 				]
 			]
 		];
@@ -249,14 +251,45 @@ class testPageNetworkDiscovery extends CWebTest {
 	 */
 	public function testPageNetworkDiscovery_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
-		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected'));
-		$this->assertTableStats(12);
+		$this->assertTableStats(count($data['expected']));
+		$this->query('button:Reset')->one()->click();
 	}
+
+	public function testPageNetworkDiscovery_ResetButton() {
+		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Check table contents before filtering.
+		$start_rows_count = $table->getRows()->count();
+		$this->assertTableStats($start_rows_count);
+		$start_contents = $this->getTableColumnData('Name');
+
+		// Filling fields with needed discovery rules information.
+		$form->fill(['id:filter_name' => 'External network']);
+		$form->submit();
+
+		// Check that filtered count matches expected.
+		$this->assertEquals(1, $table->getRows()->count());
+		$this->assertTableStats(1);
+
+		// Checking that filtered discovery rule matches expected.
+		$this->assertTableDataColumn(['External network']);
+
+		// After pressing reset button, check that previous discovery rules are displayed again.
+		$form->query('button:Reset')->one()->click();
+
+		$reset_count =  $table->getRows()->count();
+		$this->assertEquals($start_rows_count, $reset_count);
+		$this->assertTableStats($reset_count);
+		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
+	}
+
 
 	public static function getNetworkDiscoveryActionData () {
 		return [
@@ -421,33 +454,25 @@ class testPageNetworkDiscovery extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$count = CDBHelper::getCount(self::SQL);
 
-		if(array_key_exists('link', $data)) {
+		if (array_key_exists('link', $data)) {
 			$row = $table->findRow('Name', $data['name']);
 			$row->getColumn('Status')->query('xpath:.//a')->one()->click();
-			if ($data['default'] === DRULE_STATUS_DISABLED) {
-				$this->assertMessage(TEST_GOOD, 'Discovery rule enabled');
-				$this->assertEquals('Enabled', $row->getColumnData('Status', DRULE_STATUS_ACTIVE));
-			}
-			else {
-				$this->assertMessage(TEST_GOOD, 'Discovery rule disabled');
-				$this->assertEquals('Disabled', $row->getColumnData('Status', DRULE_STATUS_DISABLED));
-			}
+
+			$this->assertMessage(TEST_GOOD, 'Discovery rule '.($data['default'] ? 'enabled' : 'disabled'));
+			$this->assertEquals($data['default'] ? 'Enabled' : 'Disabled',
+					$row->getColumnData('Status', $data['default'] ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED)
+			);
 		}
 		else {
-			if(array_key_exists('single', $data)) {
-				$plural = '';
-				$this->selectTableRows($data['name']);
-				$this->assertSelectedCount(1);
-			}
-			else {
-				$plural = 's';
-				$table->findRows('Name', $data['name'])->select();
-				$this->assertSelectedCount(count($data['name']));
-			}
+			$this->selectTableRows($data['name']);
+			$this->assertSelectedCount(CTestArrayHelper::get($data, 'single', false) ? 1 : count($data['name']));
 			$this->query('button:'.$data['action'])->one()->waitUntilClickable()->click();
-			$this->assertEquals($data['action'].' selected discovery rule'.$plural.'?', $this->page->getAlertText());
+			$this->assertEquals($data['action'].' selected discovery '.
+					(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').'?',
+					$this->page->getAlertText()
+			);
 
-			if(array_key_exists('cancel', $data)) {
+			if (array_key_exists('cancel', $data)) {
 				$this->page->dismissAlert();
 				$this->page->waitUntilReady();
 
@@ -462,12 +487,15 @@ class testPageNetworkDiscovery extends CWebTest {
 			else {
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();
-				$this->assertMessage(TEST_GOOD, 'Discovery rule'.$plural.' '.lcfirst($data['action']).'d');
+				$this->assertMessage(TEST_GOOD, 'Discovery '.
+						(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
+						' '.lcfirst($data['action']).'d');
 				CMessageElement::find()->one()->close();
+
 				if ($data['action'] === 'Delete') {
 					$this->assertSelectedCount(0);
-					$this->assertTableStats($data['single'] === true ? $count - 1 : 0);
-					$this->assertEquals(0, ($data['single'] === true)
+					$this->assertTableStats(CTestArrayHelper::get($data, 'single', false) === true ? $count - 1 : 0);
+					$this->assertEquals(0, (CTestArrayHelper::get($data, 'single', false) === true)
 						? CDBHelper::getCount('SELECT NULL FROM drules WHERE name IN ('.CDBHelper::escape($data['name']).')')
 						: CDBHelper::getCount('SELECT NULL FROM drules')
 					);
