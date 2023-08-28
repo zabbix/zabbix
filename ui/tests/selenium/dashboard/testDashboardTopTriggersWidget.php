@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../traits/TagTrait.php';
 
 /**
- * @backup dashboard
+ * @backup dashboard, problem, events
  *
  * @onBefore prepareData
  */
@@ -67,7 +67,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 	public static function prepareData() {
 		// Create hostgroups for hosts.
-		$hostgroups = CDataHelper::call('hostgroup.create', [
+		CDataHelper::call('hostgroup.create', [
 			['name' => 'First Group for TOP triggers check'],
 			['name' => 'Second Group for TOP triggers check']
 		]);
@@ -154,49 +154,49 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				'description' => 'Problem Disaster',
 				'expression' => 'last(/Host with top triggers trapper/toptrap)=5',
 				'type' => 1,
-				'priority' => 5
+				'priority' => TRIGGER_SEVERITY_DISASTER
 			],
 			[
 				'description' => 'Problem High',
 				'expression' => 'last(/Host with top triggers trapper/toptrap)=4',
 				'type' => 1,
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => 'Severity status: High',
 				'expression' => 'last(/Host with top triggers trapper2/toptrap)=4',
 				'type' => 1,
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => 'Problem Average',
 				'expression' => 'last(/Host with top triggers trapper/toptrap)=3',
 				'type' => 1,
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => 'Problem Warning',
 				'expression' => 'last(/Host with top triggers trapper/toptrap)=2',
 				'type' => 1,
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Severity status: Warning⚠️',
 				'expression' => 'last(/Host with top triggers trapper2/toptrap)=2',
 				'type' => 1,
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Issue: Warning',
 				'expression' => 'last(/TOP triggers/toptrap)=2',
 				'type' => 1,
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => 'Problem with tag',
 				'expression' => 'last(/TOP triggers/toptrap)=2',
 				'type' => 1,
-				'priority' => 2,
+				'priority' => TRIGGER_SEVERITY_WARNING,
 				'tags' => [
 					[
 						'tag' => 'test1',
@@ -208,19 +208,19 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				'description' => 'Problem Information',
 				'expression' => 'last(/Host with top triggers trapper/toptrap)=1',
 				'type' => 1,
-				'priority' => 1
+				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
 				'description' => 'Trigger from {HOST.HOST}',
 				'expression' => 'last(/Host with top triggers trapper2/toptrap)=1',
 				'type' => 1,
-				'priority' => 1
+				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
 				'description' => 'Problem Not classified',
 				'expression' => 'last(/Host with top triggers trapper/toptrap)=0',
 				'type' => 1,
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			]
 		]);
 
@@ -320,16 +320,16 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			'id:tags_0_tag' => '',
 			'id:tags_0_operator' => 'Contains',
 			'id:tags_0_value' => '',
-			'Trigger count' => '10'
+			'Trigger count' => 10
 		];
 
 		$form->checkValue($default_state);
-		$this->assertTrue($form->isRequired('Trigger count'));
+		$this->assertEquals(['Trigger count'], $form->getRequiredLabels());
 
 		// Check attributes of input elements.
 		$inputs = [
 			'Name' => [
-				'maxlength' => '255',
+				'maxlength' => 255,
 				'placeholder' => 'default'
 			],
 			'id:groupids__ms' => [
@@ -339,22 +339,24 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				'placeholder' => 'type here to search'
 			],
 			'Problem' => [
-				'maxlength' => '2048'
+				'maxlength' => 2048
 			],
 			'id:tags_0_tag' => [
-				'maxlength' => '255',
+				'maxlength' => 255,
 				'placeholder' => 'tag'
 			],
 			'id:tags_0_value' => [
-				'maxlength' => '255',
+				'maxlength' => 255,
 				'placeholder' => 'value'
 			],
 			'Trigger count' => [
-				'maxlength' => '3'
+				'maxlength' => 3
 			]
 		];
 		foreach ($inputs as $field => $attributes) {
-			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
+			foreach ($attributes as $attribute => $value) {
+				$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
+			}
 		}
 
 		$this->assertEquals(['Default (No refresh)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
@@ -382,8 +384,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
-		$dialog->close();
-		$dashboard->save();
 	}
 
 	public static function getWidgetData() {
@@ -424,6 +424,21 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'error' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
 				]
 			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Trigger count' => 'x'
+					],
+					'error' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => []
+				]
+			],
 			// Widget name "Top triggers", if no name is given.
 			[
 				[
@@ -447,7 +462,10 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Hosts' => 'ЗАББИКС Сервер',
+						'Host groups' => [
+							'Zabbix servers',
+							'First Group for TOP triggers check'
+						],
 						'Refresh interval' => '30 seconds'
 					]
 				]
@@ -456,8 +474,29 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Problem' => 'Top trigger_1',
+						'Hosts' => 'ЗАББИКС Сервер',
 						'Refresh interval' => '1 minute'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Hosts' => [
+							'ЗАББИКС Сервер',
+							'Host with top triggers trapper'
+						],
+						'Refresh interval' => '2 minutes'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Problem' => 'Top trigger_1 💡',
+						'Refresh interval' => '10 minutes'
 					]
 				]
 			],
@@ -467,7 +506,19 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'fields' => [
 						'Name' => 'Not classified severity check',
 						'id:severities_0' => true,
-						'Refresh interval' => '2 minutes'
+						'Refresh interval' => '15 minutes'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Random severities checked',
+						'id:severities_0' => true,
+						'id:severities_3' => true,
+						'id:severities_5' => true,
+						'Refresh interval' => 'Default (No refresh)'
 					]
 				]
 			],
@@ -481,8 +532,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						'id:severities_2' => true,
 						'id:severities_3' => true,
 						'id:severities_4' => true,
-						'id:severities_5' => true,
-						'Refresh interval' => '10 minutes'
+						'id:severities_5' => true
 					]
 				]
 			],
@@ -491,8 +541,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Problem tags' => 'Or',
-						'Trigger count' => '1',
-						'Refresh interval' => '15 minutes'
+						'Trigger count' => '1'
 					]
 				]
 			],
@@ -501,8 +550,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Problem tags' => 'And/Or',
-						'Trigger count' => '100',
-						'Refresh interval' => 'Default (No refresh)'
+						'Trigger count' => '100'
 					]
 				]
 			],
@@ -512,8 +560,14 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'fields' => [
 						'Name' => STRING_255,
 						'Show header' => false,
-						'Host groups' => 'Zabbix servers',
-						'Hosts' => 'ЗАББИКС Сервер',
+						'Host groups' => [
+							'Zabbix servers',
+							'First Group for TOP triggers check'
+						],
+						'Hosts' => [
+							'ЗАББИКС Сервер',
+							'Host with top triggers trapper'
+						],
 						'Problem' => STRING_2048,
 						'id:severities_3' => true,
 						'Problem tags' => 'Or',
@@ -543,12 +597,35 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => 'Empty tag/value'
+					],
+					'tags' => [
+						['name' => '', 'operator' => 'Contains', 'value' => '']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Different types of macro in input fields {$A}',
+						'Problem' => '{HOST.HOST} {#ID}'
+					],
+					'tags' => [
+						['name' => '{HOST.NAME}', 'operator' => 'Does not contain', 'value' => '{ITEM.VALUE}']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Check tags table'
 					],
 					'tags' => [
-						['name' => 'Check tag with operator - Equals', 'operator' => 'Equals', 'value' => 'Warning'],
+						['name' => 'Check tag with operator - Equals ⚠️', 'operator' => 'Equals', 'value' => 'Warning ⚠️'],
 						['name' => 'Check tag with operator - Exists', 'operator' => 'Exists'],
-						['name' => 'Check tag with operator - Contains', 'operator' => 'Contains', 'value' => 'tag value'],
+						['name' => 'Check tag with operator - Contains ❌', 'operator' => 'Contains', 'value' => 'tag value ❌'],
 						['name' => 'Check tag with operator - Does not exist', 'operator' => 'Does not exist'],
 						['name' => 'Check tag with operator - Does not equal', 'operator' => 'Does not equal', 'value' => 'Average'],
 						['name' => 'Check tag with operator - Does not contain', 'operator' => 'Does not contain', 'value' => 'Disaster']
@@ -591,11 +668,18 @@ class testDashboardTopTriggersWidget extends CWebTest {
 	 * @param boolean $update	updating is performed
 	 */
 	protected function checkWidgetForm($data, $update = false) {
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		if ($expected === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
-		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Top triggers ' . microtime());
+		if ($data['fields'] === []) {
+			$data['fields']['Name'] = '';
+		}
+		else {
+			$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Top triggers ' . microtime());
+		}
+
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -612,7 +696,10 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			$this->setTags($data['tags']);
 		}
 
-		$values = $form->getValues();
+		if ($expected === TEST_GOOD) {
+			$values = $form->getValues();
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
@@ -623,13 +710,9 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			}
 		}
 
-		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		if ($expected === TEST_BAD) {
 			$this->assertMessage($data['expected'], null, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
-			COverlayDialogElement::find()->one()->close();
-			$dashboard->save();
-			$this->page->waitUntilReady();
-			$this->assertFalse($dashboard->getWidget($data['fields']['Name'], false)->isValid());
 		}
 		else {
 			// If name is empty string it is replaced by default name "Top triggers".
@@ -778,24 +861,61 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 		// Check that widget is not present on dashboard.
 		$this->assertFalse($dashboard->getWidget(self::DELETE_WIDGET, false)->isValid());
-		$widget_sql = 'SELECT NULL FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
-				' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET);
-		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM widget_field wf'.
+				' LEFT JOIN widget w'.
+					' ON w.widgetid=wf.widgetid'.
+					' WHERE w.name='.zbx_dbstr(self::DELETE_WIDGET)
+		));
 	}
 
 	public static function getWidgetTableData() {
-
 		return [
 			// Check widget data with all possible severity types and different problems count.
 			[
 				[
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem Not classified', 'time' => strtotime('now'), 'problem_count' => '6', 'severity' => '0'],
-						['id' => '100560', 'name' => 'Problem Information', 'time' => strtotime('-5 minutes'), 'problem_count' => '5', 'severity' => '1'],
-						['id' => '100570', 'name' => 'Severity status: Warning⚠️', 'time' => strtotime('-10 minutes'), 'problem_count' => '4', 'severity' => '2'],
-						['id' => '100580', 'name' => 'Problem Average', 'time' => strtotime('-20 minutes'), 'problem_count' => '3', 'severity' => '3'],
-						['id' => '100590', 'name' => 'Problem High', 'time' => strtotime('-30 minutes'), 'problem_count' => '2', 'severity' => '4'],
-						['id' => '100595', 'name' => 'Problem Disaster', 'time' => strtotime('-50 minutes'), 'problem_count' => '1', 'severity' => '5']
+						[
+							'id' => '1007700',
+							'name' => 'Problem Not classified',
+							'time' => strtotime('now'),
+							'problem_count' => '6',
+							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Problem Information',
+							'time' => strtotime('-5 minutes'),
+							'problem_count' => '5',
+							'severity' => TRIGGER_SEVERITY_INFORMATION
+						],
+						[
+							'id' => '1007720',
+							'name' => 'Severity status: Warning⚠️',
+							'time' => strtotime('-10 minutes'),
+							'problem_count' => '4',
+							'severity' => TRIGGER_SEVERITY_WARNING
+						],
+						[
+							'id' => '1007730',
+							'name' => 'Problem Average',
+							'time' => strtotime('-20 minutes'),
+							'problem_count' => '3',
+							'severity' => TRIGGER_SEVERITY_AVERAGE
+						],
+						[
+							'id' => '1007740',
+							'name' => 'Problem High',
+							'time' => strtotime('-30 minutes'),
+							'problem_count' => '2',
+							'severity' => TRIGGER_SEVERITY_HIGH
+						],
+						[
+							'id' => '1007745',
+							'name' => 'Problem Disaster',
+							'time' => strtotime('-42 minutes'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_DISASTER
+						]
 					],
 					'expected' => [
 						[
@@ -845,12 +965,24 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					]
 				]
 			],
-			// Check problems that are shown with standart time selector (From -> now-1h, To -> now).
+			// Check problems that are shown with standard time selector (From -> now-1h, To -> now).
 			[
 				[
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem Information', 'time' => strtotime('now'), 'problem_count' => '11', 'severity' => '1'],
-						['id' => '100570', 'name' => 'Problem Disaster', 'time' => strtotime('-2 hours'), 'problem_count' => '2', 'severity' => '5']
+						[
+							'id' => '1007700',
+							'name' => 'Problem Information',
+							'time' => strtotime('now'),
+							'problem_count' => '11',
+							'severity' => TRIGGER_SEVERITY_INFORMATION
+						],
+						[
+							'id' => '1007720',
+							'name' => 'Problem Disaster',
+							'time' => strtotime('-2 hours'),
+							'problem_count' => '2',
+							'severity' => TRIGGER_SEVERITY_DISASTER
+						]
 					],
 					'expected' => [
 						[
@@ -872,8 +1004,20 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						'Host groups' => 'Second Group for TOP triggers check'
 					],
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem Not classified', 'time' => strtotime('now'), 'problem_count' => '3', 'severity' => '0'],
-						['id' => '100560', 'name' => 'Severity status: Warning⚠️', 'time' => strtotime('-5 minutes'), 'problem_count' => '1', 'severity' => '2']
+						[
+							'id' => '1007700',
+							'name' => 'Problem Not classified',
+							'time' => strtotime('now'),
+							'problem_count' => '3',
+							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Severity status: Warning⚠️',
+							'time' => strtotime('-5 minutes'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING
+						]
 					],
 					'expected' => [
 						[
@@ -892,12 +1036,31 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Host groups' => '',
 						'Hosts' => 'Host with top triggers trapper'
 					],
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem Not classified', 'time' => strtotime('now'), 'problem_count' => '3', 'severity' => '0'],
-						['id' => '100560', 'name' => 'Problem Average', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '3'],
-						['id' => '100570', 'name' => 'Severity status: High', 'time' => strtotime('-5 minutes'), 'problem_count' => '5', 'severity' => '2']
+						[
+							'id' => '1007700',
+							'name' => 'Problem Not classified',
+							'time' => strtotime('now'),
+							'problem_count' => '3',
+							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Problem Average',
+							'time' => strtotime('-2 minutes'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_AVERAGE
+						],
+						[
+							'id' => '1007720',
+							'name' => 'Severity status: High',
+							'time' => strtotime('-5 minutes'),
+							'problem_count' => '5',
+							'severity' => TRIGGER_SEVERITY_HIGH
+						]
 					],
 					'expected' => [
 						[
@@ -923,11 +1086,24 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Hosts' => '',
 						'Problem' => 'Trigger from '
 					],
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem Not classified', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '0'],
-						['id' => '100560', 'name' => 'Trigger from {HOST.HOST}', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1']
+						[
+							'id' => '1007700',
+							'name' => 'Problem Not classified',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Trigger from {HOST.HOST}',
+							'time' => strtotime('-2 minutes'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_INFORMATION
+						]
 					],
 					'expected' => [
 						[
@@ -946,12 +1122,31 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			[
 				[
 					'fields' => [
+						'Problem' => '',
 						'High' => true
 					],
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
-						['id' => '100560', 'name' => 'Severity status: High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
-						['id' => '100570', 'name' => 'Problem Information', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1']
+						[
+							'id' => '1007700',
+							'name' => 'Problem High',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_HIGH
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Severity status: High',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_HIGH
+						],
+						[
+							'id' => '1007720',
+							'name' => 'Problem Information',
+							'time' => strtotime('-2 minutes'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_INFORMATION
+						]
 					],
 					'expected' => [
 						[
@@ -977,15 +1172,38 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'High' => true,
 						'Average' => true,
 						'Disaster' => true
 					],
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem Disaster', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '5'],
-						['id' => '100560', 'name' => 'Problem Average', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '3'],
-						['id' => '100570', 'name' => 'Severity status: High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
-						['id' => '100580', 'name' => 'Problem Information', 'time' => strtotime('-2 minutes'), 'problem_count' => '1', 'severity' => '1']
+						[
+							'id' => '1007700',
+							'name' => 'Problem Disaster',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_DISASTER
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Problem Average',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_AVERAGE
+						],
+						[
+							'id' => '1007720',
+							'name' => 'Severity status: High',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_HIGH
+						],
+						[
+							'id' => '1007730',
+							'name' => 'Problem Information',
+							'time' => strtotime('-2 minutes'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_INFORMATION
+						]
 					],
 					'expected' => [
 						[
@@ -1018,15 +1236,54 @@ class testDashboardTopTriggersWidget extends CWebTest {
 //			[
 //				[
 //					'fields' => [
+//						'High' => false,
+//						'Average' => false,
+//						'Disaster' => false,
 //						'Trigger count' => '2'
 //					],
 //					'trigger_data' => [
-//						['id' => '100550', 'name' => 'Problem Disaster', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '5'],
-//						['id' => '100560', 'name' => 'Severity status: High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
-//						['id' => '100570', 'name' => 'Problem Average', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '3'],
-//						['id' => '100580', 'name' => 'Severity status: Warning⚠️', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '2'],
-//						['id' => '100590', 'name' => 'Problem Not classified', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '0'],
-//						['id' => '100595', 'name' => 'Problem Information', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '1']
+//						[
+//							'id' => '1007700',
+//							'name' => 'Problem Disaster',
+//							'time' => strtotime('now'),
+//							'problem_count' => '1',
+//							'severity' => TRIGGER_SEVERITY_DISASTER
+//						],
+//						[
+//							'id' => '1007710',
+//							'name' => 'Severity status: High',
+//							'time' => strtotime('now'),
+//							'problem_count' => '1',
+//							'severity' => TRIGGER_SEVERITY_HIGH
+//						],
+//						[
+//							'id' => '1007720',
+//							'name' => 'Problem Average',
+//							'time' => strtotime('now'),
+//							'problem_count' => '1',
+//							'severity' => TRIGGER_SEVERITY_AVERAGE
+//						],
+//						[
+//							'id' => '1007730',
+//							'name' => 'Severity status: Warning⚠️',
+//							'time' => strtotime('now'),
+//							'problem_count' => '1',
+//							'severity' => TRIGGER_SEVERITY_WARNING
+//						],
+//						[
+//							'id' => '1007740',
+//							'name' => 'Problem Not classified',
+//							'time' => strtotime('now'),
+//							'problem_count' => '1',
+//							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+//						],
+//						[
+//							'id' => '1007745',
+//							'name' => 'Problem Information',
+//							'time' => strtotime('now'),
+//							'problem_count' => '1',
+//							'severity' => TRIGGER_SEVERITY_INFORMATION
+//						]
 //					],
 //					'expected' => [
 //						[
@@ -1053,16 +1310,39 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'tags' => true,
 					'fields' => [
+						'Warning' => true,
+						'Trigger count' => '10',
 						'id:tags_0_tag' => 'test1',
 						'id:tags_0_value' => 'tag1'
 					],
 					'trigger_data' => [
-						['id' => '100570', 'name' => 'Problem with tag', 'time' => strtotime('-2 minutes'),
-							'problem_count' => '1', 'severity' => '2', 'tag' => 'test1', 'value' => 'tag1'],
-						['id' => '100550', 'name' => 'Problem Warning', 'time' => strtotime('now'),
-							'problem_count' => '1', 'severity' => '2','tag' => 'test2', 'value' => 'tag2'],
-						['id' => '100560', 'name' => 'Issue: Warning', 'time' => strtotime('-1 minute'),
-							'problem_count' => '1', 'severity' => '2','tag' => 'test2', 'value' => 'tag2']
+						[
+							'id' => '1007720',
+							'name' => 'Problem with tag',
+							'time' => strtotime('-2 minutes'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING,
+							'tag' => 'test1',
+							'value' => 'tag1'
+						],
+						[
+							'id' => '1007700',
+							'name' => 'Problem Warning',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING,
+							'tag' => 'test2',
+							'value' => 'tag2'
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Issue: Warning',
+							'time' => strtotime('-1 minute'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING,
+							'tag' => 'test2',
+							'value' => 'tag2'
+						]
 					],
 					'expected' => [
 						[
@@ -1081,16 +1361,47 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			[
 				[
 					'fields' => [
+						'id:tags_0_tag' => '',
+						'id:tags_0_value' => '',
 						'Host groups' => 'First Group for TOP triggers check',
-						'Problem' => 'Issue',
-						'Warning' => true
+						'Problem' => 'Issue'
 					],
 					'trigger_data' => [
-						['id' => '100550', 'name' => 'Problem Warning', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '2'],
-						['id' => '100560', 'name' => 'Severity status: High', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '4'],
-						['id' => '100570', 'name' => 'Severity status: Warning⚠️', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '2'],
-						['id' => '100580', 'name' => 'Issue: Warning', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '02'],
-						['id' => '100590', 'name' => 'Problem Information', 'time' => strtotime('now'), 'problem_count' => '1', 'severity' => '1']
+						[
+							'id' => '1007700',
+							'name' => 'Problem Warning',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING
+						],
+						[
+							'id' => '1007710',
+							'name' => 'Severity status: High',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_HIGH
+						],
+						[
+							'id' => '1007720',
+							'name' => 'Severity status: Warning⚠️',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING
+						],
+						[
+							'id' => '1007730',
+							'name' => 'Issue: Warning',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING
+						],
+						[
+							'id' => '1007740',
+							'name' => 'Problem Information',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_INFORMATION
+						]
 					],
 					'expected' => [
 						[
@@ -1110,20 +1421,27 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 	/**
 	 * @dataProvider getWidgetTableData
-	 *
-	 * @backup problem, events
 	 */
 	public function  testDashboardTopTriggersWidget_WidgetTableData($data) {
+		// Delete entries from database if known ids are already in use.
+		$eventids = ('SELECT eventid FROM events WHERE eventid between 1007701 and 1007750');
+		if ($eventids !== null) {
+			DBexecute('DELETE FROM problem WHERE eventid between 1007701 and 1007750');
+			DBexecute('DELETE FROM events WHERE eventid between 1007701 and 1007750');
+		}
+
 		foreach ($data['trigger_data'] as $params) {
 			$objectid = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description ='.zbx_dbstr($params['name']));
 			$i = 1;
 			do {
-				DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES ('.($params['id'] + $i).', 0, 0, '.
-						zbx_dbstr($objectid).', '.$params['time'].', 0, 1,'.zbx_dbstr($params['name']).', '.zbx_dbstr($params['severity']).')'
+				DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity)
+						VALUES ('.($params['id'] + $i).', 0, 0, '.zbx_dbstr($objectid).', '.$params['time'].', 0, 1,'.
+						zbx_dbstr($params['name']).', '.zbx_dbstr($params['severity']).')'
 				);
 
 				if (array_key_exists('tags', $data)) {
-					DBexecute('INSERT INTO event_tag (eventtagid, eventid, tag, value) VALUES ('.($params['id'] + $i).', '.($params['id'] + $i).', '.
+					DBexecute('INSERT INTO event_tag (eventtagid, eventid, tag, value)
+							VALUES ('.($params['id'] + $i).', '.($params['id'] + $i).', '.
 							zbx_dbstr($params['tag']).', '.zbx_dbstr($params['value']).')'
 					);
 				}
@@ -1133,12 +1451,14 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 			$j = 1;
 			do {
-				DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES ('.($params['id'] + $j).', 0, 0, '.
-						zbx_dbstr($objectid).', '.$params['time'].', 0, '.zbx_dbstr($params['name']).', '.zbx_dbstr($params['severity']).')'
+				DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity)
+						VALUES ('.($params['id'] + $j).', 0, 0, '.zbx_dbstr($objectid).', '.$params['time'].', 0, '.
+						zbx_dbstr($params['name']).', '.zbx_dbstr($params['severity']).')'
 				);
 
 				if (array_key_exists('tags', $data)) {
-					DBexecute('INSERT INTO problem_tag (problemtagid, eventid, tag, value) VALUES ('.($params['id'] + $j).', '.($params['id'] + $j).', '.
+					DBexecute('INSERT INTO problem_tag (problemtagid, eventid, tag, value)
+							VALUES ('.($params['id'] + $j).', '.($params['id'] + $j).', '.
 							zbx_dbstr($params['tag']).', '.zbx_dbstr($params['value']).')'
 					);
 				}
@@ -1148,7 +1468,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->waitUntilReady();
 
 		if (array_key_exists('fields', $data)) {
 			$form = $dashboard->getWidget(self::DATA_WIDGET)->edit()->asForm();
@@ -1157,7 +1478,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			$form->submit();
 			COverlayDialogElement::ensureNotPresent();
 			$dashboard->save();
-			$this->page->waitUntilReady();
+			$dashboard->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		}
 
