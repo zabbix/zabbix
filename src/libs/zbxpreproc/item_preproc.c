@@ -1073,7 +1073,7 @@ int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *param
 	{
 		if (FAIL == zbx_regexp_compile_ext(pattern, &regex, 0, &errptr))
 		{
-			*error = zbx_dsprintf(*error, "invalid regular expression:: %s", errptr);
+			*error = zbx_dsprintf(*error, "invalid regular expression: %s", errptr);
 			zbx_free(errptr);
 			goto out;
 		}
@@ -1096,7 +1096,7 @@ int	item_preproc_check_error_regex(const zbx_variant_t *value, const char *param
 
 		if (FAIL == zbx_regexp_compile(pattern, &regex, &errptr))
 		{
-			*error = zbx_dsprintf(*error, "invalid regular expression:: %s", errptr);
+			*error = zbx_dsprintf(*error, "invalid regular expression: %s", errptr);
 			zbx_free(errptr);
 			ret = FAIL;
 			goto out;

@@ -452,6 +452,9 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		$hostid = $response['result']['hostids'][0];
 
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+
 		$response = $this->call('host.get', [
 			'output' => ['host'],
 			'selectInterfaces' => ['interfaceid'],
@@ -507,7 +510,6 @@ class testDataCollection extends CIntegrationTest {
 			'itemids' => [$itemid]
 		], 60, 1);
 
-		$this->assertArrayHasKey('result', $response);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);

@@ -179,13 +179,14 @@ static void	read_step(const char *path, zbx_pp_step_t *step)
 static void	duplicate_step(zbx_pp_step_t *step_src, zbx_pp_step_t *step_dst)
 {
 	step_dst->type = step_src->type;
-	step_dst->params = step_src->params;
+	step_dst->params = zbx_strdup(NULL, step_src->params);
 	step_dst->error_handler = step_src->error_handler;
 	step_dst->error_handler_params = zbx_strdup(NULL, step_src->error_handler_params);
 }
 
 static void	release_step(zbx_pp_step_t *step)
 {
+	zbx_free(step->params);
 	zbx_free(step->error_handler_params);
 }
 
