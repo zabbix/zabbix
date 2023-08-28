@@ -2458,7 +2458,7 @@ class testDashboardGraphWidget extends CWebTest {
 				'Data set #3'
 			],
 			'Legend labels' => [
-				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: Linux: CPU guest nice time)', 'max(ЗАББИКС Сервер: Linux: CPU guest time)',
+				'祝你今天過得愉快', 'ЗАББИКС Сервер: Linux: CPU guest nice time', 'ЗАББИКС Сервер: Linux: CPU guest time',
 				'Data set #3'
 			]
 		];
