@@ -1292,7 +1292,7 @@ static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_
 			"select gd.groupid,gp.group_prototypeid,gd.name,gd.lastcheck,gd.ts_delete,g.name,"
 				"gd.groupdiscoveryid"
 			" from group_prototype gp,group_discovery gd"
-				" left join hstgrp g"
+				" join hstgrp g"
 					" on gd.groupid=g.groupid"
 			" where gp.group_prototypeid=gd.parent_group_prototypeid"
 				" and gp.hostid=" ZBX_FS_UI64
