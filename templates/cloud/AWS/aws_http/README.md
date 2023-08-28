@@ -57,7 +57,7 @@ If you are using role-based authorization, add the appropriate permissions:
         {
             "Effect": "Allow",
             "Action": "iam:PassRole",
-            "Resource": "arn:aws:iam::233150958290:role/<<--Role_name-->>"
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
         },
         {
             "Sid": "VisualEditor1",
