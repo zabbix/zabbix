@@ -260,6 +260,9 @@ class testPageNetworkDiscovery extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 	}
 
+	/**
+	 * Check Network Discovery pages reset buttons functionality.
+	 */
 	public function testPageNetworkDiscovery_ResetButton() {
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
@@ -316,7 +319,6 @@ class testPageNetworkDiscovery extends CWebTest {
 				[
 					'name' => 'External network',
 					'single' => true,
-					'cancel' => false,
 					'action' => 'Enable'
 				]
 			],
@@ -325,7 +327,6 @@ class testPageNetworkDiscovery extends CWebTest {
 				[
 					'name' => 'External network',
 					'single' => true,
-					'cancel' => false,
 					'action' => 'Disable'
 				]
 			],
@@ -424,7 +425,6 @@ class testPageNetworkDiscovery extends CWebTest {
 				[
 					'name' => 'External network',
 					'single' => true,
-					'cancel' => false,
 					'action' => 'Delete'
 				]
 			],
@@ -438,8 +438,29 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Disabled discovery rule for update',
 						"<img src=\"x\" onerror=\"alert('UWAGA');\"/>"
 					],
-					'cancel' => false,
 					'action' => 'Delete'
+				]
+			],
+			// Delete action for discovery rule which is used in action.
+			[
+				[
+					'name' => [
+						'Discovery rule for deleting, used in Action'
+					],
+					'single' => true,
+					'action' => 'Delete',
+					'error' => 'Discovery rule "Discovery rule for deleting, used in Action" is used in "Action with discovery rule" action.'
+				]
+			],
+			// Delete action for discovery rule check which is used in action.
+			[
+				[
+					'name' => [
+						'Discovery rule for deleting, check used in Action'
+					],
+					'single' => true,
+					'action' => 'Delete',
+					'error' => 'Discovery rule "Discovery rule for deleting, check used in Action" is used in "Action with discovery check" action.'
 				]
 			]
 		];
@@ -487,18 +508,30 @@ class testPageNetworkDiscovery extends CWebTest {
 			else {
 				$this->page->acceptAlert();
 				$this->page->waitUntilReady();
-				$this->assertMessage(TEST_GOOD, 'Discovery '.
+
+				if (array_key_exists('error', $data)) {
+					$this->assertMessage(TEST_BAD, 'Cannot delete discovery rule', $data['error']);
+				}
+				else {
+					$this->assertMessage(TEST_GOOD, 'Discovery '.
 						(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
 						' '.lcfirst($data['action']).'d');
+				}
+
 				CMessageElement::find()->one()->close();
 
-				if ($data['action'] === 'Delete') {
+				if ($data['action'] === 'Delete' && !array_key_exists('error', $data)) {
 					$this->assertSelectedCount(0);
-					$this->assertTableStats(CTestArrayHelper::get($data, 'single', false) === true ? $count - 1 : 0);
-					$this->assertEquals(0, (CTestArrayHelper::get($data, 'single', false) === true)
-						? CDBHelper::getCount('SELECT NULL FROM drules WHERE name IN ('.CDBHelper::escape($data['name']).')')
-						: CDBHelper::getCount('SELECT NULL FROM drules')
+					$this->assertTableStats(CTestArrayHelper::get($data, 'single', false) === true
+						? $count - 1
+						: $count - count($data['name'])
 					);
+					if (CTestArrayHelper::get($data, 'single', false) === true) {
+						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.CDBHelper::escape($data['name']).')'));
+					}
+					else {
+						$this->assertEquals($count - count($data['name']), CDBHelper::getCount('SELECT *FROM drules'));
+					}
 				}
 			}
 		}
