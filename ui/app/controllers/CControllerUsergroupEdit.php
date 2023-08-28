@@ -222,21 +222,31 @@ class CControllerUsergroupEdit extends CController {
 		$permissions = $new_rights[$permission_key]['permission'] ?? [];
 
 		$group_rights = [];
+		$unique_rights = [];
 
 		foreach ($groupids as $index => $group) {
 			foreach ($group as $groupid) {
 				$permission = $permissions[$index] ?? PERM_DENY;
 
 				if ($groupid != 0 && in_array($groupid, array_column($groups, 'groupid'))) {
-					$key = array_search($groupid, array_column($groups, 'groupid'));
-					$name = $key !== false ? $groups[$key]['name'] : '';
-
-					$group_rights[$groupid] = [
-						'permission' => $permission,
-						'name' => $name
-					];
+					if (!array_key_exists($groupid, $unique_rights)) {
+						$unique_rights[$groupid] = $permission;
+					}
+					else {
+						$unique_rights[$groupid] = min($unique_rights[$groupid], $permission);
+					}
 				}
 			}
+		}
+
+		foreach($unique_rights as $groupid => $permission) {
+			$key = array_search($groupid, array_column($groups, 'groupid'));
+			$name = $key !== false ? $groups[$key]['name'] : '';
+
+			$group_rights[$groupid] = [
+				'permission' => $permission,
+				'name' => $name
+			];
 		}
 
 		return $group_rights;
