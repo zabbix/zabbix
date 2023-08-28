@@ -58,6 +58,9 @@ window.tag_filter_edit = new class {
 				this.#addTagFilterRow(tag);
 			}
 		}
+		else {
+			this.#addTagFilterRow();
+		}
 
 		this.#toggleTagList();
 

@@ -84,30 +84,56 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		}
 
 		if ($this->hasInput('new_tag_filter')) {
+			$empty_tags = 0;
+			$unique_tag_filters = [];
+
 			foreach ($this->getInput('new_tag_filter') as $tag_filter) {
-				if (($tag_filter['tag'] === '' && $tag_filter['value'] !== '')
-						|| ($this->getInput('filter_type') == TAG_FILTER_LIST && $tag_filter['tag'] === ''
-							&& $tag_filter['value'] === '')) {
+				$tag = $tag_filter['tag'];
+				$value = $tag_filter['value'];
+
+				if ($tag === '' && $value !== '') {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 
 					return false;
 				}
 
-				if (strlen($tag_filter['tag']) > DB::getFieldLength('tag_filter', 'tag')) {
-					error(_s('Invalid parameter "%1$s": %2$s.', _('Tag'), _('value is too long')));
+				if (strlen($tag) > DB::getFieldLength('tag_filter', 'tag')) {
+					error(_s('Invalid parameter "%1$s": %2$s.', $tag, _('value is too long')));
 
 					return false;
 				}
 
-				if (strlen($tag_filter['value']) > DB::getFieldLength('tag_filter', 'value')) {
-					error(_s('Invalid parameter "%1$s": %2$s.', _('Value'), _('value is too long')));
+				if (strlen($value) > DB::getFieldLength('tag_filter', 'value')) {
+					error(_s('Invalid parameter "%1$s": %2$s.', $value, _('value is too long')));
 
 					return false;
 				}
+
+				if ($tag === '' && $value === '') {
+					$empty_tags++;
+					continue;
+				}
+
+				if (array_key_exists($tag, $unique_tag_filters) && $unique_tag_filters[$tag] === $value) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'),
+							_s('value "%1$s" already exists', '(tag, value)=('.$tag.', '.$value.')'))
+					);
+
+					return false;
+				}
+				else {
+					$unique_tag_filters[$tag] = $value;
+				}
+			}
+
+			if (count($this->getInput('new_tag_filter')) == $empty_tags) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'), _('cannot be empty')));
+
+				return false;
 			}
 		}
 		elseif ($this->getInput('filter_type') == TAG_FILTER_LIST) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
+			error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'), _('cannot be empty')));
 
 			return false;
 		}
@@ -125,10 +151,16 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		$opened_groupid = $this->getInput('groupid');
 		$ms_groups = $this->getInput('ms_new_tag_filter', []);
 		$groupids = $ms_groups['groupids'];
-		$new_tag_filters = $this->filterDuplicates($this->getInput('new_tag_filter', []));
+		$new_tag_filters = $this->getInput('new_tag_filter', []);
 
 		if (!in_array($opened_groupid, $groupids)) {
 			unset($data['tag_filters'][$opened_groupid]);
+		}
+
+		foreach ($new_tag_filters as $key => $new_tag_filter) {
+			if ($new_tag_filter['tag'] === '' && $new_tag_filter['value'] === '') {
+				unset($new_tag_filters[$key]);
+			}
 		}
 
 		foreach ($groupids as $groupid) {
@@ -195,30 +227,5 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
-	}
-
-	/**
-	 * Filters out duplicate tag filters from the given array of tag filters.
-	 *
-	 * @param array $tag_filters	Array of tag filters to be filtered for duplicates.
-	 *
-	 * @return array
-	 */
-	private function filterDuplicates(array $tag_filters): array {
-		$unique_tag_filters = [];
-
-		foreach ($tag_filters as $tag_filter) {
-			$unique_tag_filters[$tag_filter['tag']][$tag_filter['value']] = $tag_filter;
-		}
-
-		$tag_filters = [];
-
-		foreach ($unique_tag_filters as $tag) {
-			foreach ($tag as $value) {
-				$tag_filters[] = $value;
-			}
-		}
-
-		return $tag_filters;
 	}
 }
