@@ -1360,6 +1360,10 @@ msgstr "매년"
 msgid "Any"
 msgstr "전부"
 
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
+
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
 msgid "Any character string included"
@@ -5745,6 +5749,10 @@ msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] "대시보드를 삭제하셨습니다."
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "대시보드 페이지 속성"
@@ -8055,6 +8063,10 @@ msgstr "이벤트가 인정되지 않음"
 msgid "Event list [previous 20]"
 msgstr "이벤트리스트 [최근20]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "이벤트 로그의 감시. 로그 값을 리턴."
@@ -9509,6 +9521,10 @@ msgstr "호스트에 같은 타입의 기본 인터페이스는 2개 이상 설�
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "호스트 수"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14217,6 +14233,10 @@ msgstr ""
 msgid "New tag name"
 msgstr ""
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14228,6 +14248,10 @@ msgstr "신규 트리거"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
@@ -16317,6 +16341,10 @@ msgstr ""
 msgid "Preview"
 msgstr "미리보기"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -16694,6 +16722,10 @@ msgstr "공개키"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "공개키 파일"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -23843,6 +23875,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474

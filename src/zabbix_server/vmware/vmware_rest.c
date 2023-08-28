@@ -649,7 +649,7 @@ static int	vmware_rest_post(const char *fn_parent, CURL *easyhandle, const char 
 	if (SUCCEED != vmware_http_request(fn_parent, easyhandle, url_suffix, jp, error))
 		return FAIL;
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, NULL)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, (char *)NULL)))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", CURLOPT_POSTFIELDS,
 				curl_easy_strerror(err));
