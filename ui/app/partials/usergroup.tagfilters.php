@@ -46,7 +46,13 @@ foreach ($data['tag_filters'] as $key => $tag_filter) {
 		$badges = $data['tag_filters_badges'][$tag_filter['groupid']];
 	}
 
-	$tag_filter_table->addRow([$tag_filter['name'], $badges, $action]);
+	$tag_filter_table->addRow([
+		(new CCol($tag_filter['name']))
+			->addClass(ZBX_STYLE_WORDWRAP)
+			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+		$badges,
+		(new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
+	]);
 }
 
 $tag_filter_table->addItem(
