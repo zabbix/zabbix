@@ -552,7 +552,7 @@ class CMacrosResolverHelper {
 	 * Resolve text-type column macros for top-hosts widget.
 	 *
 	 * @param array $columns
-	 * @param array $items
+	 * @param array $hostids
 	 *
 	 * @return array
 	 */
