@@ -132,17 +132,70 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var AwsECS = {
+            var AWS = {
                 params: {},
             
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
+                        }
+            
+                        data = data[step];
+                    }
+            
+                    return data;
+                },
+            
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'cluster_name'].forEach(function (field) {
+                    switch (AWS.getField(params, 'auth_type')) {
+                        case 'role_base':
+                            AWS.params['auth_type'] = 'role_base';
+                            var request = new HttpRequest(),
+                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            
+                            if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+                                throw 'Error getting security credentials from instance metadata. Role not found.';
+                            }
+            
+                            credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+                            if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+                                throw 'Error getting security credentials from instance metadata.';
+                            }
+            
+                            try {
+                                credentials = JSON.parse(credentials);
+                            }
+                            catch (error) {
+                                throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+                            }
+            
+                            ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+                                if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                                    throw 'Required credentials is not set: "' + field + '".';
+                                };
+                                AWS.params[field] = credentials[field];
+                            });
+                            break;
+                        case 'access_key':
+                        default:
+                            AWS.params['auth_type'] = 'access_key';
+                            ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+                                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                                    throw 'Required param is not set: "' + field + '".';
+                                }
+                                AWS.params[field] = params[field];
+                            });
+                    }
+                    ['region', 'cluster_name'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
+                        AWS.params[field] = params[field];
                     });
-            
-                    AwsECS.params = params;
                 },
             
                 sign: function (key, message) {
@@ -189,23 +242,25 @@ zabbix_export:
                         canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
                         credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                         request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                        key = AwsECS.sign('AWS4' + AwsECS.params.secret_key, date);
+                        key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
             
-                    key = AwsECS.sign(key, region);
-                    key = AwsECS.sign(key, service);
-                    key = AwsECS.sign(key, 'aws4_request');
+                    key = AWS.sign(key, region);
+                    key = AWS.sign(key, service);
+                    key = AWS.sign(key, 'aws4_request');
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
             
-                    if (typeof AwsECS.params.proxy !== 'undefined' && AwsECS.params.proxy !== '') {
-                        request.setProxy(AwsECS.params.proxy);
+                    if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                        request.setProxy(AWS.params.proxy);
                     }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Content-Encoding: amz-1.0');
-                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsECS.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+                    if (AWS.params.auth_type === 'role_base')
+                        request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
                     Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
             
@@ -247,7 +302,7 @@ zabbix_export:
                     payload['Version'] = '2010-08-01';
             
                     while (payload.NextToken !== '') {
-                        var alarms = AwsECS.request('GET', AwsECS.params.region, 'monitoring', AwsECS.prepareParams(payload));
+                        var alarms = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
             
                         if (typeof alarms !== 'object'
                             || typeof alarms.DescribeAlarmsResponse !== 'object'
@@ -274,7 +329,7 @@ zabbix_export:
                                 });
                             }
                             for (var i in dimensions) {
-                                if (dimensions[i].Name === 'ClusterName' && dimensions[i].Value === AwsECS.params.cluster_name) {
+                                if (dimensions[i].Name === 'ClusterName' && dimensions[i].Value === AWS.params.cluster_name) {
                                     result.push(alarm);
                                     break;
                                 }
@@ -287,9 +342,9 @@ zabbix_export:
             }
             
             try {
-                AwsECS.setParams(JSON.parse(value));
+                AWS.setParams(JSON.parse(value));
             
-                return JSON.stringify(AwsECS.getAlarms());
+                return JSON.stringify(AWS.getAlarms());
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
@@ -306,10 +361,12 @@ zabbix_export:
                 - ''
           timeout: 15s
           parameters:
-            - name: access_key
+            - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
+            - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: auth_type
+              value: '{$AWS.AUTH_TYPE}'
             - name: region
               value: '{$AWS.REGION}'
             - name: cluster_name
@@ -328,17 +385,56 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var AwsECS = {
+            var AWS = {
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key' , 'cluster_name'].forEach(function (field) {
+                    switch (AWS.getField(params, 'auth_type')) {
+                        case 'role_base':
+                            AWS.params['auth_type'] = 'role_base';
+                            var request = new HttpRequest(),
+                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            
+                            if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+                                throw 'Error getting security credentials from instance metadata. Role not found.';
+                            }
+            
+                            credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+                            if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+                                throw 'Error getting security credentials from instance metadata.';
+                            }
+            
+                            try {
+                                credentials = JSON.parse(credentials);
+                            }
+                            catch (error) {
+                                throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+                            }
+            
+                            ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+                                if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                                    throw 'Required credentials is not set: "' + field + '".';
+                                };
+                                AWS.params[field] = credentials[field];
+                            });
+                            break;
+                        case 'access_key':
+                        default:
+                            AWS.params['auth_type'] = 'access_key';
+                            ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+                                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                                    throw 'Required param is not set: "' + field + '".';
+                                }
+                                AWS.params[field] = params[field];
+                            });
+                    }
+                    ['region', 'cluster_name'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
+                        AWS.params[field] = params[field];
                     });
-            
-                    AwsECS.params = params;
                 },
             
                 getField: function (data, path) {
@@ -399,25 +495,27 @@ zabbix_export:
                         canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
                         credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                         request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                        key = AwsECS.sign('AWS4' + AwsECS.params.secret_key, date);
+                        key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
             
-                    key = AwsECS.sign(key, region);
-                    key = AwsECS.sign(key, service);
-                    key = AwsECS.sign(key, 'aws4_request');
+                    key = AWS.sign(key, region);
+                    key = AWS.sign(key, service);
+                    key = AWS.sign(key, 'aws4_request');
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
             
-                    if (typeof AwsECS.params.proxy !== 'undefined' && AwsECS.params.proxy !== '') {
-                        request.setProxy(AwsECS.params.proxy);
+                    if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                        request.setProxy(AWS.params.proxy);
                     }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('x-amz-content-sha256:' + sha256(data));
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/x-www-form-urlencoded');
                     request.addHeader('Content-Encoding: amz-1.0');
-                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsECS.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            
+                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+                    if (AWS.params.auth_type === 'role_base')
+                        request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+                    
                     Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
             
                     response = request.post(url, data);
@@ -446,16 +544,16 @@ zabbix_export:
             
                     payload['Action'] = 'ListServices';
                     payload['Version'] = '2014-11-13';
-                    payload['cluster'] = AwsECS.params.cluster_name;
+                    payload['cluster'] = AWS.params.cluster_name;
             
-                    result = AwsECS.request('POST', AwsECS.params.region, 'ecs', 'ecs.' + AwsECS.params.region + '.amazonaws.com', AwsECS.prepareParams(payload), '', '');
-                    ECSClusters_Services = AwsECS.getField(result, 'ListServicesResponse.ListServicesResult.serviceArns')
+                    result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
+                    ECSClusters_Services = AWS.getField(result, 'ListServicesResponse.ListServicesResult.serviceArns')
             
                     for (k in ECSClusters_Services) {
                         id = ECSClusters_Services[k];
             
                         json = {};
-                        input = id.split(AwsECS.params.cluster_name + '/');
+                        input = id.split(AWS.params.cluster_name + '/');
                         for (var i = 1; i < input.length; i += 2) {
                             json[input[i]] = input[i + 1];
                         }
@@ -480,15 +578,15 @@ zabbix_export:
             
                     payload['Action'] = 'ListTasks';
                     payload['Version'] = '2014-11-13';
-                    payload['cluster'] = AwsECS.params.cluster_name;
-                    payload['status'] = AwsECS.params.status;
+                    payload['cluster'] = AWS.params.cluster_name;
+                    payload['status'] = AWS.params.status;
             
-                    result = AwsECS.request('POST', AwsECS.params.region, 'ecs', 'ecs.' + AwsECS.params.region + '.amazonaws.com', AwsECS.prepareParams(payload), '', '');
-                    ECSClusters_Services_Tasks = AwsECS.getField(result, 'ListTasksResponse.ListTasksResult.taskArns')
+                    result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
+                    ECSClusters_Services_Tasks = AWS.getField(result, 'ListTasksResponse.ListTasksResult.taskArns')
                     for (k in ECSClusters_Services_Tasks) {
                         id = ECSClusters_Services_Tasks[k];
                         json = {};
-                        input = id.split(AwsECS.params.cluster_name + '/');
+                        input = id.split(AWS.params.cluster_name + '/');
                         for (var i = 1; i < input.length; i += 2) {
                             json[input[i]] = input[i + 1];
                         }
@@ -505,10 +603,10 @@ zabbix_export:
             };
             
             try {
-                AwsECS.setParams(JSON.parse(value));
+                AWS.setParams(JSON.parse(value));
                 var 
-                services = AwsECS.listServices(),
-                    tasks = AwsECS.ListTasks();
+                services = AWS.listServices(),
+                    tasks = AWS.ListTasks();
                 return JSON.stringify(({ services, tasks }));
             }
             catch (error) {
@@ -525,10 +623,12 @@ zabbix_export:
                 - ''
           timeout: 15s
           parameters:
-            - name: access_key
+            - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
+            - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: auth_type
+              value: '{$AWS.AUTH_TYPE}'
             - name: region
               value: '{$AWS.REGION}'
             - name: cluster_name
@@ -547,18 +647,57 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var AwsECS = {
+            var AWS = {
                 params: {},
                 request_period: 600,
             
                 setParams: function (params) {
-                    ['access_key', 'secret_key', 'region', 'cluster_name'].forEach(function (field) {
+                    switch (AWS.getField(params, 'auth_type')) {
+                        case 'role_base':
+                            AWS.params['auth_type'] = 'role_base';
+                            var request = new HttpRequest(),
+                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            
+                            if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+                                throw 'Error getting security credentials from instance metadata. Role not found.';
+                            }
+            
+                            credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            
+                            if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+                                throw 'Error getting security credentials from instance metadata.';
+                            }
+            
+                            try {
+                                credentials = JSON.parse(credentials);
+                            }
+                            catch (error) {
+                                throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+                            }
+            
+                            ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+                                if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                                    throw 'Required credentials is not set: "' + field + '".';
+                                };
+                                AWS.params[field] = credentials[field];
+                            });
+                            break;
+                        case 'access_key':
+                        default:
+                            AWS.params['auth_type'] = 'access_key';
+                            ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+                                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                                    throw 'Required param is not set: "' + field + '".';
+                                }
+                                AWS.params[field] = params[field];
+                            });
+                    }
+                    ['region', 'cluster_name'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
+                        AWS.params[field] = params[field];
                     });
-            
-                    AwsECS.params = params;
                 },
             
                 getField: function (data, path) {
@@ -596,7 +735,7 @@ zabbix_export:
                     if (typeof param === 'object') {
                         if (Array.isArray(param)) {
                             param.forEach(function (value, index) {
-                                var nested = AwsECS.prepareRecursive(prefix + '.member.' + (index + 1), value);
+                                var nested = AWS.prepareRecursive(prefix + '.member.' + (index + 1), value);
                                 Object.keys(nested).forEach(function (key) {
                                     result[key] = nested[key];
                                 });
@@ -604,7 +743,7 @@ zabbix_export:
                         }
                         else {
                             Object.keys(param).forEach(function (k) {
-                                var nested = AwsECS.prepareRecursive(prefix + '.' + k, param[k]);
+                                var nested = AWS.prepareRecursive(prefix + '.' + k, param[k]);
                                 Object.keys(nested).forEach(function (key) {
                                     result[key] = nested[key];
                                 });
@@ -689,24 +828,26 @@ zabbix_export:
                         canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
                         credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                         request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                        key = AwsECS.sign('AWS4' + AwsECS.params.secret_key, date);
+                        key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
             
-                    key = AwsECS.sign(key, region);
-                    key = AwsECS.sign(key, service);
-                    key = AwsECS.sign(key, 'aws4_request');
+                    key = AWS.sign(key, region);
+                    key = AWS.sign(key, service);
+                    key = AWS.sign(key, 'aws4_request');
             
                     var request = new HttpRequest(),
                         url = 'https://' + host + canonical_uri + '?' + params;
             
-                    if (typeof AwsECS.params.proxy !== 'undefined' && AwsECS.params.proxy !== '') {
-                        request.setProxy(AwsECS.params.proxy);
+                    if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                        request.setProxy(AWS.params.proxy);
                     }
                     request.addHeader('x-amz-date: ' + amzdate);
                     request.addHeader('Accept: application/json');
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Content-Encoding: amz-1.0');
-                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsECS.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-            
+                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+                    if (AWS.params.auth_type === 'role_base')
+                        request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+                    
                     Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
             
                     response = request.get(url);
@@ -738,8 +879,8 @@ zabbix_export:
                         obj = {},
                         metrics = ['CpuReserved', 'CpuUtilized', 'MemoryReserved', 'MemoryUtilized'],
                         end_time = new Date(timestamp).toISOString().replace(/\.\d+Z/, 'Z'),
-                        start_time = new Date(timestamp - AwsECS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
-                        payload = AwsECS.prepareRecursive('MetricDataQueries', AwsECS.renderPayload(AwsECS.request_period, AwsECS.params.cluster_name));
+                        start_time = new Date(timestamp - AWS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
+                        payload = AWS.prepareRecursive('MetricDataQueries', AWS.renderPayload(AWS.request_period, AWS.params.cluster_name));
             
                     payload['Action'] = 'GetMetricData';
                     payload['Version'] = '2010-08-01';
@@ -747,13 +888,13 @@ zabbix_export:
                     payload['EndTime'] = end_time;
                     payload['ScanBy'] = 'TimestampDescending';
             
-                    result = AwsECS.request('GET', AwsECS.params.region, 'monitoring', AwsECS.prepareParams(payload));
-                    MetricData = AwsECS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
+                    result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
+                    MetricData = AWS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
             
                     MetricData.forEach(function (id) {
                         for (i in metrics) {
-                            if (AwsECS.getField(id, 'Label') === metrics[i]) {
-                                obj[metrics[i]] = AwsECS.getField(id, 'Values');
+                            if (AWS.getField(id, 'Label') === metrics[i]) {
+                                obj[metrics[i]] = AWS.getField(id, 'Values');
                             }
                         }
                     });
@@ -764,9 +905,9 @@ zabbix_export:
             };
             
             try {
-                AwsECS.setParams(JSON.parse(value));
+                AWS.setParams(JSON.parse(value));
             
-                return JSON.stringify(AwsECS.getMetricsData());
+                return JSON.stringify(AWS.getMetricsData());
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
@@ -783,10 +924,12 @@ zabbix_export:
                 - ''
           timeout: 15s
           parameters:
-            - name: access_key
+            - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
+            - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
+            - name: auth_type
+              value: '{$AWS.AUTH_TYPE}'
             - name: region
               value: '{$AWS.REGION}'
             - name: cluster_name
@@ -1195,18 +1338,57 @@ zabbix_export:
               trends: '0'
               value_type: TEXT
               params: |
-                var AwsECS = {
+                var AWS = {
                     params: {},
                     request_period: 600,
                 
                     setParams: function (params) {
-                        ['access_key', 'secret_key', 'region', 'cluster_name', 'service_name'].forEach(function (field) {
+                        switch (AWS.getField(params, 'auth_type')) {
+                            case 'role_base':
+                                AWS.params['auth_type'] = 'role_base';
+                                var request = new HttpRequest(),
+                                    IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                
+                                if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+                                    throw 'Error getting security credentials from instance metadata. Role not found.';
+                                }
+                
+                                credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+                
+                                if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+                                    throw 'Error getting security credentials from instance metadata.';
+                                }
+                
+                                try {
+                                    credentials = JSON.parse(credentials);
+                                }
+                                catch (error) {
+                                    throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+                                }
+                
+                                ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+                                    if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                                        throw 'Required credentials is not set: "' + field + '".';
+                                    };
+                                    AWS.params[field] = credentials[field];
+                                });
+                                break;
+                            case 'access_key':
+                            default:
+                                AWS.params['auth_type'] = 'access_key';
+                                ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+                                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                                        throw 'Required param is not set: "' + field + '".';
+                                    }
+                                    AWS.params[field] = params[field];
+                                });
+                        }
+                        ['region', 'cluster_name', 'service_name'].forEach(function (field) {
                             if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                                 throw 'Required param is not set: "' + field + '".';
                             }
+                            AWS.params[field] = params[field];
                         });
-                
-                        AwsECS.params = params;
                     },
                 
                     getField: function (data, path) {
@@ -1244,7 +1426,7 @@ zabbix_export:
                         if (typeof param === 'object') {
                             if (Array.isArray(param)) {
                                 param.forEach(function (value, index) {
-                                    var nested = AwsECS.prepareRecursive(prefix + '.member.' + (index + 1), value);
+                                    var nested = AWS.prepareRecursive(prefix + '.member.' + (index + 1), value);
                                     Object.keys(nested).forEach(function (key) {
                                         result[key] = nested[key];
                                     });
@@ -1252,7 +1434,7 @@ zabbix_export:
                             }
                             else {
                                 Object.keys(param).forEach(function (k) {
-                                    var nested = AwsECS.prepareRecursive(prefix + '.' + k, param[k]);
+                                    var nested = AWS.prepareRecursive(prefix + '.' + k, param[k]);
                                     Object.keys(nested).forEach(function (key) {
                                         result[key] = nested[key];
                                     });
@@ -1348,24 +1530,26 @@ zabbix_export:
                             canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
                             credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                             request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                            key = AwsECS.sign('AWS4' + AwsECS.params.secret_key, date);
+                            key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
                 
-                        key = AwsECS.sign(key, region);
-                        key = AwsECS.sign(key, service);
-                        key = AwsECS.sign(key, 'aws4_request');
+                        key = AWS.sign(key, region);
+                        key = AWS.sign(key, service);
+                        key = AWS.sign(key, 'aws4_request');
                 
                         var request = new HttpRequest(),
                             url = 'https://' + host + canonical_uri + '?' + params;
                 
-                        if (typeof AwsECS.params.proxy !== 'undefined' && AwsECS.params.proxy !== '') {
-                            request.setProxy(AwsECS.params.proxy);
+                        if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                            request.setProxy(AWS.params.proxy);
                         }
                         request.addHeader('x-amz-date: ' + amzdate);
                         request.addHeader('Accept: application/json');
                         request.addHeader('Content-Type: application/json');
                         request.addHeader('Content-Encoding: amz-1.0');
-                        request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AwsECS.params.access_key + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-                
+                        request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+                        if (AWS.params.auth_type === 'role_base')
+                            request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+                        
                         Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
                 
                         response = request.get(url);
@@ -1391,8 +1575,8 @@ zabbix_export:
                     getMetricsData: function () {
                         var timestamp = new Date().getTime(),
                             end_time = new Date(timestamp).toISOString().replace(/\.\d+Z/, 'Z'),
-                            start_time = new Date(timestamp - AwsECS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
-                            payload = AwsECS.prepareRecursive('MetricDataQueries', AwsECS.renderPayload(AwsECS.request_period, AwsECS.params.cluster_name, AwsECS.params.service_name));
+                            start_time = new Date(timestamp - AWS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
+                            payload = AWS.prepareRecursive('MetricDataQueries', AWS.renderPayload(AWS.request_period, AWS.params.cluster_name, AWS.params.service_name));
                 
                         payload['Action'] = 'GetMetricData';
                         payload['Version'] = '2010-08-01';
@@ -1400,17 +1584,17 @@ zabbix_export:
                         payload['EndTime'] = end_time;
                         payload['ScanBy'] = 'TimestampDescending';
                 
-                        result = AwsECS.request('GET', AwsECS.params.region, 'monitoring', AwsECS.prepareParams(payload));
-                        MetricData = AwsECS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
+                        result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
+                        MetricData = AWS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
                 
                         return MetricData;
                     }
                 };
                 
                 try {
-                    AwsECS.setParams(JSON.parse(value));
+                    AWS.setParams(JSON.parse(value));
                 
-                    return JSON.stringify(AwsECS.getMetricsData());
+                    return JSON.stringify(AWS.getMetricsData());
                 }
                 catch (error) {
                     error += (String(error).endsWith('.')) ? '' : '.';
@@ -1427,10 +1611,12 @@ zabbix_export:
                     - ''
               timeout: 15s
               parameters:
-                - name: access_key
+                - name: AccessKeyId
                   value: '{$AWS.ACCESS.KEY.ID}'
-                - name: secret_key
+                - name: SecretAccessKey
                   value: '{$AWS.SECRET.ACCESS.KEY}'
+                - name: auth_type
+                  value: '{$AWS.AUTH_TYPE}'
                 - name: region
                   value: '{$AWS.REGION}'
                 - name: cluster_name
@@ -1712,6 +1898,9 @@ zabbix_export:
       macros:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
+        - macro: '{$AWS.AUTH_TYPE}'
+          value: role_base
+          description: 'Authorization method. Possible values: role_base, access_key.'
         - macro: '{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}'
           value: '70'
           description: 'The warning threshold of the cluster CPU utilization expressed in %.'
