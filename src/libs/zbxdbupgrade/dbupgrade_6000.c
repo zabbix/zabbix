@@ -394,6 +394,14 @@ static int	DBpatch_6000020(void)
 {
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
+
+static int	DBpatch_6000021(void)
+{
+	const ZBX_FIELD	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_remote_command_result", &field, &old_field);
+}
 #endif
 
 DBPATCH_START(6000)
@@ -421,5 +429,6 @@ DBPATCH_ADD(6000017, 0, 0)
 DBPATCH_ADD(6000018, 0, 0)
 DBPATCH_ADD(6000019, 0, 0)
 DBPATCH_ADD(6000020, 0, 0)
+DBPATCH_ADD(6000021, 0, 0)
 
 DBPATCH_END()
