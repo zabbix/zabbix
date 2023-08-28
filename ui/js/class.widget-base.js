@@ -125,7 +125,6 @@ class CWidgetBase {
 	 * @param {number}      min_rows            Minimum number of dashboard cell rows per single widget.
 	 * @param {boolean}     is_editable         Whether to display the "Edit" button.
 	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the editing mode.
-	 * @param {boolean}     can_edit_dashboards Whether the user has access to creating and editing dashboards.
 	 *
 	 * @param {Object|null} time_period         Selected time period (if widget.use_time_selector in manifest.json is
 	 *                                          set to true in any of the loaded widgets), or null.
@@ -134,9 +133,6 @@ class CWidgetBase {
 	 *        {string}      time_period.to      Relative time of period end (like "now").
 	 *        {number}      time_period.to_ts   Timestamp of period end.
 	 *
-	 * @param {string|null}	dynamic_hostid      ID of the dynamically selected host on a dashboard (if any of the
-	 *                                          widgets has the "dynamic" checkbox field configured and checked in the
-	 *                                          widget configuration), or null.
 	 * @param {string|null} csrf_token          CSRF token for AJAX requests.
 	 * @param {string}      unique_id           Run-time, unique ID of the widget.
 	 */
@@ -157,9 +153,7 @@ class CWidgetBase {
 		min_rows,
 		is_editable,
 		is_edit_mode,
-		can_edit_dashboards,
 		time_period,
-		dynamic_hostid,
 		csrf_token = null,
 		unique_id
 	}) {
@@ -197,9 +191,7 @@ class CWidgetBase {
 		this._min_rows = min_rows;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
-		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
-		this._dynamic_hostid = dynamic_hostid;
 		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
@@ -652,39 +644,6 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	onEdit() {
-	}
-
-	/**
-	 * Check whether the widget supports dynamic hosts (overriding the host selected in the configuration).
-	 *
-	 * The host selection control will be displayed on the dashboard, if any of the loaded widgets has such support.
-	 *
-	 * @returns {boolean}
-	 */
-	supportsDynamicHosts() {
-		return this._fields.dynamic === 1;
-	}
-
-	/**
-	 * Get the dynamic host currently in use. Invoked if the widget supports dynamic hosts.
-	 *
-	 * @returns {string|null}
-	 */
-	getDynamicHost() {
-		return this._dynamic_hostid;
-	}
-
-	/**
-	 * Set the dynamic host. Invoked if the widget supports dynamic hosts.
-	 *
-	 * @param {string|null} dynamic_hostid
-	 */
-	setDynamicHost(dynamic_hostid) {
-		this._dynamic_hostid = dynamic_hostid;
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
 	}
 
 	/**
@@ -1158,15 +1117,16 @@ class CWidgetBase {
 	/**
 	 * Get context menu to display when actions button is clicked.
 	 *
+	 * @param {boolean} can_copy_widget   Whether a widget is allowed to be copied?
 	 * @param {boolean} can_paste_widget  Whether a copied widget is ready to be pasted over the current one.
 	 *
 	 * @returns {Object[]}
 	 */
-	getActionsContextMenu({can_paste_widget}) {
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
 		let menu = [];
 		let menu_actions = [];
 
-		if (this._can_edit_dashboards && (this._dashboard.templateid === null || this._dynamic_hostid === null)) {
+		if (can_copy_widget) {
 			menu_actions.push({
 				label: t('Copy'),
 				clickCallback: () => this.fire(WIDGET_EVENT_COPY)

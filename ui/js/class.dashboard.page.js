@@ -51,9 +51,7 @@ class CDashboardPage {
 		widget_defaults,
 		is_editable,
 		is_edit_mode,
-		can_edit_dashboards,
 		time_period,
-		dynamic_hostid,
 		csrf_token = null,
 		unique_id
 	}) {
@@ -81,9 +79,7 @@ class CDashboardPage {
 		this._widget_defaults = widget_defaults;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
-		this._can_edit_dashboards = can_edit_dashboards;
 		this._time_period = time_period;
-		this._dynamic_hostid = dynamic_hostid;
 		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
@@ -236,18 +232,6 @@ class CDashboardPage {
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
 			this.resetWidgetPlaceholder();
-		}
-	}
-
-	setDynamicHost(dynamic_hostid) {
-		if (this._dynamic_hostid !== dynamic_hostid) {
-			this._dynamic_hostid = dynamic_hostid;
-
-			for (const widget of this._widgets.keys()) {
-				if (widget.supportsDynamicHosts() && this._dynamic_hostid !== widget.getDynamicHost()) {
-					widget.setDynamicHost(this._dynamic_hostid);
-				}
-			}
 		}
 	}
 
@@ -430,9 +414,7 @@ class CDashboardPage {
 			min_rows: this._widget_min_rows,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
-			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
-			dynamic_hostid: this._dynamic_hostid,
 			csrf_token: this._csrf_token,
 			unique_id
 		});

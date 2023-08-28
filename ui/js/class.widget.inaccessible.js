@@ -44,8 +44,8 @@ class CWidgetInaccessible extends CWidget {
 		return Promise.resolve();
 	}
 
-	getActionsContextMenu({can_paste_widget}) {
-		const menu = super.getActionsContextMenu({can_paste_widget});
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_copy_widget, can_paste_widget});
 
 		for (const section of menu) {
 			switch (section.label) {

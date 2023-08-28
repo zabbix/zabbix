@@ -184,9 +184,6 @@ class CWidget extends CWidgetBase {
 			fields: Object.keys(fields_data).length > 0 ? fields_data : undefined,
 			view_mode: this._view_mode,
 			edit_mode: this._is_edit_mode ? 1 : 0,
-			dynamic_hostid: this._dashboard.templateid !== null || this.supportsDynamicHosts()
-				? (this._dynamic_hostid ?? undefined)
-				: undefined,
 			contents_width: this._contents_size.width,
 			contents_height: this._contents_size.height
 		};

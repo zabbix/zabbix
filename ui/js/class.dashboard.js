@@ -529,7 +529,6 @@ class CDashboard {
 			widget_defaults: this._widget_defaults,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
-			can_edit_dashboards: this._can_edit_dashboards,
 			time_period: this._time_period,
 			csrf_token: this._csrf_token,
 			unique_id: this._createUniqueId()
@@ -2123,7 +2122,9 @@ class CDashboard {
 
 			dashboardPageWidgetActions: (e) => {
 				const menu = e.detail.widget.getActionsContextMenu({
-					can_paste_widget: this.getStoredWidgetDataCopy() !== null
+					can_copy_widget: this._can_edit_dashboards
+						&& (this._data.templateid === null || this.#hostid === null),
+					can_paste_widget: this._can_edit_dashboards && this.getStoredWidgetDataCopy() !== null
 				});
 
 				jQuery(e.detail.mouse_event.target).menuPopup(menu, new jQuery.Event(e.detail.mouse_event));

@@ -60,8 +60,7 @@
 				is_edit_mode: false,
 				can_edit_dashboards: false,
 				is_kiosk_mode: true,
-				time_period: time_period,
-				dynamic_hostid: null
+				time_period: time_period
 			});
 
 			for (const page of dashboard.pages) {

@@ -384,7 +384,7 @@
 
 				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
-				ZABBIX.Dashboard.setDynamicHost(host ? host.id : null);
+				ZABBIX.Dashboard.setHostId(host !== null ? host.id : null);
 			},
 
 			dashboardHostChange() {
