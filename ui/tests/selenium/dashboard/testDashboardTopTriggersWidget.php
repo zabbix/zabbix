@@ -884,35 +884,35 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						[
 							'id' => '1007710',
 							'name' => 'Problem Information',
-							'time' => strtotime('-5 minutes'),
+							'time' => strtotime('-2 minutes'),
 							'problem_count' => '5',
 							'severity' => TRIGGER_SEVERITY_INFORMATION
 						],
 						[
 							'id' => '1007720',
 							'name' => 'Severity status: Warning⚠️',
-							'time' => strtotime('-10 minutes'),
+							'time' => strtotime('-3 minutes'),
 							'problem_count' => '4',
 							'severity' => TRIGGER_SEVERITY_WARNING
 						],
 						[
 							'id' => '1007730',
 							'name' => 'Problem Average',
-							'time' => strtotime('-20 minutes'),
+							'time' => strtotime('-4 minutes'),
 							'problem_count' => '3',
 							'severity' => TRIGGER_SEVERITY_AVERAGE
 						],
 						[
 							'id' => '1007740',
 							'name' => 'Problem High',
-							'time' => strtotime('-30 minutes'),
+							'time' => strtotime('-5 minutes'),
 							'problem_count' => '2',
 							'severity' => TRIGGER_SEVERITY_HIGH
 						],
 						[
 							'id' => '1007745',
 							'name' => 'Problem Disaster',
-							'time' => strtotime('-42 minutes'),
+							'time' => strtotime('now'),
 							'problem_count' => '1',
 							'severity' => TRIGGER_SEVERITY_DISASTER
 						]
