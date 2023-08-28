@@ -30,7 +30,7 @@ This template has been tested on:
 **Additional information**:
 
 * Synthetic Nomad host will be used just as an endpoint for servers and clients discovery (general cluster information), it will not be monitored as a Nomad server or client, so that to prevent duplicate entities.
-* If you're not using ACL - skip 3th setup step.
+* If you're not using ACL - skip 3rd setup step.
 * The Nomad servers/clients discovery is limited by region. If you're using multi-region cluster- create one synthetic host per region.
 * The Nomad server/client templates are ready for separate usage. Feel free to use if you prefer manual host creation.
 
@@ -76,8 +76,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HashiCorp Nomad: Client nodes API connection has failed|<p>Client nodes API connection has failed.<br>Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad by HTTP/nomad.client.nodes.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
-|HashiCorp Nomad: Server-related API connection has failed|<p>Server-related API connection has failed.<br>Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad by HTTP/nomad.server.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
+|HashiCorp Nomad: Client nodes API connection has failed|<p>Client nodes API connection has failed.<br>Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad by HTTP/nomad.client.nodes.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
+|HashiCorp Nomad: Server-related API connection has failed|<p>Server-related API connection has failed.<br>Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad by HTTP/nomad.server.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
 
 ### LLD rule Clients discovery
 
@@ -115,18 +115,18 @@ This template has been tested on:
 
 1. Enable telemetry in HashiCorp Nomad agent configuration file. Set the Prometheus metrics format.
 >Refer to the [`vendor documentation`](https://developer.hashicorp.com/nomad/docs/configuration/telemetry).
-2. Prepare an ACL token with `node:read`, `namespace:read-job` permissions applied. Define the {$NOMAD.TOKEN} macro value.
+2. Prepare an ACL token with `node:read`, `namespace:read-job` permissions applied. Define the `{$NOMAD.TOKEN}` macro value.
 > Refer to the vendor documentation about [`Nomad native ACL`](https://developer.hashicorp.com/nomad/tutorials/access-control/access-control-policies) or [`Nomad Vault-generated tokens`](https://developer.hashicorp.com/nomad/tutorials/access-control/vault-nomad-secrets) if you're using integration with HashiCorp Vault.
 3. Set the values for the `{$NOMAD.CLIENT.API.SCHEME}` and `{$NOMAD.CLIENT.API.PORT}` macros to define the common Nomad API web schema and connection port.
 
 **Additional information**:
 
-*You have to prepare an additional ACL token only if you wish to monitor Nomad clients as a separate entities. If you're using clients discovery - token will be inherited from the master host linked to the HashiCorp Nomad by HTTP template.
+* You have to prepare an additional ACL token only if you wish to monitor Nomad clients as separate entities. If you're using clients discovery - token will be inherited from the master host linked to the HashiCorp Nomad by HTTP template.
 
 * If you're not using ACL - skip 2nd setup step.
 
-* The Nomad clients use the default web schema - `HTTP` and default API port - `4646`. If you're using clients discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:<IPADDR>}} or/and {{$NOMAD.CLIENT.API.PORT:<IPADDR>}} on master host or template level.
-* Some metrics may not be collected depending on your HashiCorp Nomad instance version and configuration.
+* The Nomad clients use the default web schema - `HTTP` and default API port - `4646`. If you're using clients discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:`NECESSARY.IP`}} or/and {{$NOMAD.CLIENT.API.PORT:`NECESSARY.IP`}} on master host or template level.
+* Some metrics may not be collected depending on your HashiCorp Nomad agent version and configuration.
 
 **Useful links**:
 
@@ -213,7 +213,7 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HashiCorp Nomad Client: Monitoring API connection has failed|<p>Monitoring API connection has failed.<br>Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Client by HTTP/nomad.client.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
+|HashiCorp Nomad Client: Monitoring API connection has failed|<p>Monitoring API connection has failed.<br>Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Client by HTTP/nomad.client.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
 |HashiCorp Nomad Client: Service [rpc] is down|<p>Cannot establish the connection to [rpc] service port {$NOMAD.CLIENT.RPC.PORT}.<br>Check the Nomad state and network connectivity between Nomad and Zabbix.</p>|`last(/HashiCorp Nomad Client by HTTP/net.tcp.service[tcp,,{$NOMAD.CLIENT.RPC.PORT}]) = 0`|Average|**Manual close**: Yes|
 |HashiCorp Nomad Client: Service [serf] is down|<p>Cannot establish the connection to [serf] service port {$NOMAD.CLIENT.SERF.PORT}.<br>Check the Nomad state and network connectivity between Nomad and Zabbix.</p>|`last(/HashiCorp Nomad Client by HTTP/net.tcp.service[tcp,,{$NOMAD.CLIENT.SERF.PORT}]) = 0`|Average|**Manual close**: Yes|
 |HashiCorp Nomad Client: OOM killed allocations found|<p>OOM killed allocations found.</p>|`last(/HashiCorp Nomad Client by HTTP/nomad.client.allocations.oom_killed) > 0`|Warning|**Manual close**: Yes|
@@ -221,8 +221,8 @@ This template has been tested on:
 |HashiCorp Nomad Client: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`(min(/HashiCorp Nomad Client by HTTP/nomad.client.memory.available, 10m) / last(/HashiCorp Nomad Client by HTTP/nomad.client.memory.total))*100 <= {$NOMAD.RAM.AVAIL.MIN}`|Average||
 |HashiCorp Nomad Client: The host has been restarted|<p>The host uptime is less than 10 minutes.</p>|`last(/HashiCorp Nomad Client by HTTP/nomad.client.uptime) < 10m`|Warning|**Manual close**: Yes|
 |HashiCorp Nomad Client: Nomad client version has changed|<p>Nomad client version has changed.</p>|`change(/HashiCorp Nomad Client by HTTP/nomad.client.version)<>0`|Info|**Manual close**: Yes|
-|HashiCorp Nomad Client: Nodes API connection has failed|<p>Nodes API connection has failed.<br>Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Client by HTTP/nomad.client.node.info.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HashiCorp Nomad Client: Monitoring API connection has failed</li></ul>|
-|HashiCorp Nomad Client: Allocations API connection has failed|<p>Allocations API connection has failed.<br>Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Client by HTTP/nomad.client.job.allocs.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HashiCorp Nomad Client: Monitoring API connection has failed</li></ul>|
+|HashiCorp Nomad Client: Nodes API connection has failed|<p>Nodes API connection has failed.<br>Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Client by HTTP/nomad.client.node.info.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HashiCorp Nomad Client: Monitoring API connection has failed</li></ul>|
+|HashiCorp Nomad Client: Allocations API connection has failed|<p>Allocations API connection has failed.<br>Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Client by HTTP/nomad.client.job.allocs.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HashiCorp Nomad Client: Monitoring API connection has failed</li></ul>|
 
 ### LLD rule Drivers discovery
 
@@ -315,16 +315,12 @@ This template has been tested on:
 
 1. Enable telemetry in HashiCorp Nomad agent configuration file. Set the Prometheus metrics format.
 >Refer to the [`vendor documentation`](https://developer.hashicorp.com/nomad/docs/configuration/telemetry).
-2. Prepare an ACL token with `node:read`, `namespace:read-job`, `agent:read` an`management` permissions applied. Define the `{$NOMAD.TOKEN}`macro value.
-> Refer to the vendor documentation about [`Nomad native ACL`](https://developer.hashicorp.com/nomad/tutorials/access-control/access-control-policies) or [`Nomad Vault-generated tokens](https://developer.hashicorp.com/nomad/tutorials/access-control/vault-nomad-secrets) if you're using integration with HashiCorp Vault.
-3. Set the values for the `{$NOMAD.CLIENT.API.SCHEME}` and `{$NOMAD.CLIENT.API.PORT}` macros to define the common Nomad API web schema and connection port.
+2. Set the values for the `{$NOMAD.SERVER.API.SCHEME}` and `{$NOMAD.SERVER.API.PORT}` macros to define the common Nomad API web schema and connection port.
 
 **Additional information**:
 
-* You have to prepare an additional ACL token only if you wish to monitor Nomad servers as a separate entities. If you're using servers discovery - token will be inherited from the master host linked to the HashiCorp Nomad by HTTP template.
-* If you're not using ACL - skip 2nd setup step.
-* The Nomad servers use the default web schema - `HTTP` and default API port - `4646`. If you're using servers discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.CLIENT.API.SCHEME:<IPADDR>}} or/and {{$NOMAD.CLIENT.API.PORT:<IPADDR>}} on master host or template level.
-* Some metrics may not be collected depending on your HashiCorp Nomad instance version, configuration and cluster role.
+* The Nomad servers use the default web schema - `HTTP` and default API port - `4646`. If you're using servers discovery and you need to re-define macros for the particular host created from prototype, use the context macros like {{$NOMAD.SERVER.API.SCHEME:`NECESSARY.IP`}} or/and {{$NOMAD.SERVER.API.PORT:`NECESSARY.IP`}} on master host or template level.
+* Some metrics may not be collected depending on your HashiCorp Nomad agent version, configuration and cluster role.
 * Don't forget to define the `{$NOMAD.REDUNDANCY.MIN}` macro value, based on your cluster nodes amount to configure the failure tolerance triggers correctly.
 
 **Useful links**:
@@ -489,8 +485,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|HashiCorp Nomad Server: Monitoring API connection has failed|<p>Monitoring API connection has failed.<br>Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Server by HTTP/nomad.server.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
-|HashiCorp Nomad Server: Internal stats API connection has failed|<p>Internal stats API connection has failed.<br>Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Server by HTTP/nomad.server.stats.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HashiCorp Nomad Server: Monitoring API connection has failed</li></ul>|
+|HashiCorp Nomad Server: Monitoring API connection has failed|<p>Monitoring API connection has failed.<br>Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Server by HTTP/nomad.server.data.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes|
+|HashiCorp Nomad Server: Internal stats API connection has failed|<p>Internal stats API connection has failed.<br>Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.</p>|`find(/HashiCorp Nomad Server by HTTP/nomad.server.stats.api.response,,"like","{$NOMAD.API.RESPONSE.SUCCESS}")=0`|Average|**Manual close**: Yes<br>**Depends on**:<br><ul><li>HashiCorp Nomad Server: Monitoring API connection has failed</li></ul>|
 |HashiCorp Nomad Server: Nomad server version has changed|<p>Nomad server version has changed.</p>|`change(/HashiCorp Nomad Server by HTTP/nomad.server.version)<>0`|Info|**Manual close**: Yes|
 |HashiCorp Nomad Server: Cluster role has changed|<p>Cluster role has changed.</p>|`change(/HashiCorp Nomad Server by HTTP/nomad.server.raft.cluster_role) <> 0`|Info|**Manual close**: Yes|
 |HashiCorp Nomad Server: Current number of open files is too high|<p>Heavy file descriptor usage (i.e., near the process file descriptor limit) indicates a potential file descriptor exhaustion issue.</p>|`min(/HashiCorp Nomad Server by HTTP/nomad.server.process_open_fds,5m)/last(/HashiCorp Nomad Server by HTTP/nomad.server.process_max_fds)*100>{$NOMAD.OPEN.FDS.MAX}`|Warning||

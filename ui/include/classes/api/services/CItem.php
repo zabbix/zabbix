@@ -1315,7 +1315,7 @@ class CItem extends CItemGeneral {
 
 		$result = DBselect(
 			'SELECT ii.itemid,ii.name,ii.type,ii.key_,ii.value_type,ii.templateid,ii.uuid,ii.valuemapid,ii.hostid,'.
-				'h.status AS host_status'.
+				'ii.flags,h.status AS host_status'.
 			' FROM items i,items ii,hosts h'.
 			' WHERE i.itemid=ii.templateid'.
 				' AND ii.hostid=h.hostid'.
@@ -1329,6 +1329,7 @@ class CItem extends CItemGeneral {
 		$db_items = [];
 		$i = 0;
 		$tpl_itemids = [];
+		$internal_fields = array_flip(['type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
 
 		while ($row = DBfetch($result)) {
 			$item = [
@@ -1345,9 +1346,7 @@ class CItem extends CItemGeneral {
 
 				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 					$tpl_itemids[$i] = $row['itemid'];
-					$item += array_intersect_key($row,
-						array_flip(['type', 'key_', 'hostid', 'host_status', 'value_type'])
-					);
+					$item += array_intersect_key($row, $internal_fields);
 				}
 			}
 

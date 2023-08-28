@@ -409,6 +409,8 @@ typedef struct
 }
 zbx_host_key_t;
 
+ZBX_VECTOR_DECL(host_key, zbx_host_key_t)
+
 /* housekeeping related configuration data */
 typedef struct
 {
