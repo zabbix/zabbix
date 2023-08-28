@@ -27,52 +27,50 @@ class CControllerItemList extends CControllerItem {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'filter_set'			=> 'in 1',
-			'filter_rst'			=> 'in 1',
-			'context'				=> 'required|in host,template',
-			'filter_groupids'		=> 'array_db hstgrp.groupid',
-			'filter_hostids'		=> 'array_db hosts.hostid',
-			'filter_name'			=> 'string',
-			'filter_key'			=> 'string',
-			'filter_valuemapids'	=> 'array_db valuemap.valuemapid',
-			'filter_type'			=> 'in '.implode(',', [
+			'filter_set'				=> 'in 1',
+			'filter_rst'				=> 'in 1',
+			'context'					=> 'required|in host,template',
+			'filter_groupids'			=> 'array_db hstgrp.groupid',
+			'filter_hostids'			=> 'array_db hosts.hostid',
+			'filter_name'				=> 'string',
+			'filter_key'				=> 'string',
+			'filter_valuemapids'		=> 'array_db valuemap.valuemapid',
+			'filter_type'				=> 'in '.implode(',', [
 				-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP,
 				ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT,
 				ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED,
 				ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT
 			]),
-			'filter_value_type'		=> 'in '.implode(',', [
+			'filter_value_type'			=> 'in '.implode(',', [
 				-1, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
 				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
 			]),
-			'filter_snmp_oid'		=> 'string',
-			'filter_history'		=> 'string',
-			'filter_trends'			=> 'string',
-			'filter_delay'			=> 'string',
-			'filter_evaltype'		=> 'in '.implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
-			'filter_tags'			=> 'array',
-			'filter_state'			=> 'in '.implode(',', [-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
-			'filter_status'			=> 'in '.implode(',', [-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
-			'filter_with_triggers'	=> 'in -1,0,1',
-			'filter_inherited'		=> 'in -1,0,1',
-			'filter_discovered'		=> 'in '.implode(',', [-1, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_NORMAL]),
-			'subfilter_types'		=> 'array',
-			'subfilter_value_types'	=> 'array',
-			'subfilter_status'		=> 'array',
-			'subfilter_state'		=> 'array',
-			'subfilter_inherited'	=> 'array',
+			'filter_snmp_oid'			=> 'string',
+			'filter_history'			=> 'string',
+			'filter_trends'				=> 'string',
+			'filter_delay'				=> 'string',
+			'filter_evaltype'			=> 'in '.implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
+			'filter_tags'				=> 'array',
+			'filter_state'				=> 'in '.implode(',', [-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
+			'filter_status'				=> 'in '.implode(',', [-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+			'filter_with_triggers'		=> 'in -1,0,1',
+			'filter_inherited'			=> 'in -1,0,1',
+			'filter_discovered'			=> 'in '.implode(',', [-1, ZBX_FLAG_DISCOVERY_CREATED, ZBX_FLAG_DISCOVERY_NORMAL]),
+			'subfilter_types'			=> 'array',
+			'subfilter_value_types'		=> 'array',
+			'subfilter_status'			=> 'array',
+			'subfilter_state'			=> 'array',
+			'subfilter_inherited'		=> 'array',
 			'subfilter_with_triggers'	=> 'array',
-			'subfilter_discovered'	=> 'array',
-			'subfilter_hosts'		=> 'array',
-			'subfilter_interval'	=> 'array',
-			'subfilter_history'		=> 'array',
-			'subfilter_trends'		=> 'array',
-			'subfilter_tags'		=> 'array',
-			'sort'					=> 'in '.implode(',', [
-				'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'
-			]),
-			'sortorder'				=> 'in '.implode(',', [ZBX_SORT_DOWN.','.ZBX_SORT_UP]),
-			'page'					=> 'ge 1'
+			'subfilter_discovered'		=> 'array',
+			'subfilter_hosts'			=> 'array',
+			'subfilter_interval'		=> 'array',
+			'subfilter_history'			=> 'array',
+			'subfilter_trends'			=> 'array',
+			'subfilter_tags'			=> 'array',
+			'sort'						=> 'in name,key_,delay,history,trends,type,status',
+			'sortorder'					=> 'in '.implode(',', [ZBX_SORT_DOWN.','.ZBX_SORT_UP]),
+			'page'						=> 'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -592,7 +590,8 @@ class CControllerItemList extends CControllerItem {
 			}
 			elseif ($input['filter_type'] == ITEM_TYPE_TRAPPER || $input['filter_type'] == ITEM_TYPE_SNMPTRAP
 					|| $input['filter_type'] == ITEM_TYPE_DEPENDENT
-					|| ($input['filter_type'] == ITEM_TYPE_ZABBIX_ACTIVE && strpos($input['filter_type'], 'mqtt.get') === 0)) {
+					|| ($input['filter_type'] == ITEM_TYPE_ZABBIX_ACTIVE
+						&& strpos($input['filter_type'], 'mqtt.get') === 0)) {
 				$options['filter']['delay'] = -1;
 			}
 		}
@@ -801,7 +800,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	protected function getProfiles(): array {
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.' : 'web.template.items.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
 		$filter = [
 			'filter_evaltype'		=> CProfile::get($prefix.'filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 			'filter_groupids'		=> CProfile::getArray($prefix.'filter_groupids', []),
@@ -856,7 +855,7 @@ class CControllerItemList extends CControllerItem {
 			$filter_tags['operators'][] = $tag['operator'];
 		}
 
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.' : 'web.template.items.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
 		CProfile::updateArray($prefix.'filter_groupids', $this->getInput('filter_groupids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_valuemapids', $this->getInput('filter_valuemapids', []), PROFILE_TYPE_ID);
@@ -881,7 +880,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	protected function updateProfileSort() {
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.' : 'web.template.items.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
 
 		if ($this->hasInput('sort')) {
 			CProfile::update($prefix.'sort', $this->getInput('sort'), PROFILE_TYPE_STR);
@@ -893,7 +892,7 @@ class CControllerItemList extends CControllerItem {
 	}
 
 	protected function deleteProfiles() {
-		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.' : 'web.template.items.';
+		$prefix = $this->getInput('context') === 'host' ? 'web.host.items.list.' : 'web.template.items.list.';
 
 		if (count(CProfile::getArray($prefix.'filter_hostids', [])) != 1) {
 			CProfile::deleteIdx($prefix.'filter_hostids');
