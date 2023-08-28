@@ -75,6 +75,8 @@ class CWidgetBase {
 	// Require data source event: informs the dashboard page to load the referred foreign data source.
 	static EVENT_REQUIRE_DATA_SOURCE = 'widget-require-data-source';
 
+	static FOREIGN_REFERENCE_KEY = '_reference';
+
 	#fields_references_accessors = null;
 
 	#fields_referred_data = new Map();
