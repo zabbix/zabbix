@@ -577,10 +577,11 @@ class CControllerItemList extends CControllerItem {
 			$options['filter']['delay'] = $input['filter_delay'];
 
 			/*
-			* Trapper and SNMP trap items contain zeros in "delay" field and, if no specific type is set, look in item types
-			* other than trapper and SNMP trap that allow zeros. For example, when a flexible interval is used. Since trapper
-			* and SNMP trap items contain zeros, but those zeros should not be displayed, they cannot be filtered by entering
-			* either zero or any other number in filter field.
+			* Trapper and SNMP trap items contain zeros in "delay" field and, if no specific type is set, look in
+			* item types other than trapper and SNMP trap that allow zeros.
+			* For example, when a flexible interval is used. Since trapper and SNMP trap items contain zeros, but
+			* those zeros should not be displayed, they cannot be filtered by entering either zero or any other
+			* number in filter field.
 			*/
 			if ($input['filter_type'] == -1 && $input['filter_delay'] == 0) {
 				$options['filter']['type'] = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE,  ITEM_TYPE_INTERNAL,
