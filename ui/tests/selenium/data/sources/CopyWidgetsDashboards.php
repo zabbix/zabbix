@@ -1665,6 +1665,81 @@ class CopyWidgetsDashboards {
 										'value' => 1
 									]
 								]
+							],
+							[
+								'type' => 'toptriggers',
+								'name' => 'Top triggers for copying',
+								'x' => 16,
+								'y' => 12,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 10
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids',
+										'value' => 4
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids',
+										'value' => 10084
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'problem',
+										'value' => 'test top triggers'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 25
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.0',
+										'value' => 'top trigger tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.0',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.0',
+										'value' => 'top trigger tag value1'
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.1',
+										'value' => 'top trigger tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.1',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.1',
+										'value' => 'top trigger tag value2'
+									]
+								]
 							]
 						]
 					],
@@ -1968,6 +2043,71 @@ class CopyWidgetsDashboards {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'dynamic',
 										'value' => 1
+									]
+								]
+							],
+							[
+								'type' => 'toptriggers',
+								'name' => 'Top triggers widget',
+								'x' => 0,
+								'y' => 10,
+								'width' => 7,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 10
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'problem',
+										'value' => 'test top triggers'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 25
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.0',
+										'value' => 'top trigger tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.0',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.0',
+										'value' => 'top trigger tag value1'
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.1',
+										'value' => 'top trigger tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.1',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.1',
+										'value' => 'top trigger tag value2'
 									]
 								]
 							]
