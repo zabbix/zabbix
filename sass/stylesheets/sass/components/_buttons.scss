@@ -226,6 +226,10 @@ button {
 	&.btn-small {
 		line-height: 16px;
 	}
+
+	&.display-none {
+		display: none;
+	}
 }
 
 .btn-link {

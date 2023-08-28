@@ -1026,7 +1026,11 @@ $item_tabs = (new CTabView())
 		(new CFormGrid())
 			->setId('item_preproc_list')
 			->addItem([
-				new CLabel(_('Preprocessing steps')),
+				new CLabel([_('Preprocessing steps'),
+					makeWarningIcon(_('The "Check for not supported value" steps will be re-arranged.'))
+						->addClass(ZBX_STYLE_DISPLAY_NONE)
+						->addClass('js-steps-warning')
+				]),
 				new CFormField(
 					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'], $data['type'])
 				)

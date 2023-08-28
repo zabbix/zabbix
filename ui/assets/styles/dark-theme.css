@@ -1301,6 +1301,8 @@ button {
     pointer-events: none; }
   .btn-icon.btn-small {
     line-height: 16px; }
+  .btn-icon.display-none, .table-forms > li.btn-icon.display-none {
+    display: none; }
 
 .btn-link {
   box-sizing: content-box;

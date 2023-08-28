@@ -291,10 +291,11 @@ $form_grid->addItem([
 		? null
 		: (new CFormField([
 			(new CCheckBox('not_supported'))->setLabel(_('Not supported')),
-			(new CFormFieldset(null, [
-				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
+			(new CDiv([
+				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error')
+					->addStyle('width: auto; padding:0 8px;'),
 				(new CMultilineInput('runtime_error', '', ['readonly' => false]))
-					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setWidth(250)
 					->addStyle('display: inline-flex;')
 			]))
 		]))
