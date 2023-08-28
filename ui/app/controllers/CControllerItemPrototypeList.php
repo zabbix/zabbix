@@ -147,7 +147,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 
 	protected function getProfiles(): array {
 		$prefix = $this->getInput('context') === 'host'
-			? 'web.host.items.prototypes.' : 'web.template.items.prototypes.';
+			? 'web.host.items.prototypes.list.' : 'web.template.items.prototypes.list.';
 		$profile = [
 			'sort'				=> CProfile::get($prefix.'sort', 'name'),
 			'sortorder' 		=> CProfile::get($prefix.'sortorder', ZBX_SORT_UP)
@@ -158,7 +158,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 
 	protected function updateProfileSort() {
 		$prefix = $this->getInput('context') === 'host'
-			? 'web.host.items.prototypes.' : 'web.template.items.prototypes.';
+			? 'web.host.items.prototypes.list.' : 'web.template.items.prototypes.list.';
 
 		if ($this->hasInput('sort')) {
 			CProfile::update($prefix.'sort', $this->getInput('sort'), PROFILE_TYPE_STR);
