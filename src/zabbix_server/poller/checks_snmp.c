@@ -2294,6 +2294,7 @@ static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *er
 	struct timeval			timeout = {.tv_sec = snmp_context->config_timeout};
 	fd_set				fdset;
 
+
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
 		char	buffer[MAX_OID_LEN];
@@ -2467,7 +2468,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			{
 				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
 						"cannot retrieve OID: '%s' from [[%s]:%hu]:"
-						" timed out", buffer, snmp_context->item.interface.addr,
+						" timed DBG out", buffer, snmp_context->item.interface.addr,
 						snmp_context->item.interface.port));
 				snmp_context->item.ret = TIMEOUT_ERROR;
 			}
@@ -2602,10 +2603,10 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 }
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase, int config_timeout,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip)
 {
-	int			i, ret = SUCCEED, pdu_type;
+	int			i, ret = SUCCEED, pdu_type, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	AGENT_REQUEST		request;
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
@@ -2626,7 +2627,16 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	snmp_context->item.key = item->key;
 	item->key = NULL;
 	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
+
 	zbx_init_agent_result(&snmp_context->item.result);
+
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
+		goto out;
+	}
+
+	snmp_context->config_timeout = timeout_sec;
 
 	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
 	snmp_context->arg = arg;
@@ -2635,7 +2645,6 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	snmp_context->results_alloc = 0;
 	snmp_context->results_offset = 0;
 	snmp_context->i = 0;
-	snmp_context->config_timeout = config_timeout;
 
 	snmp_context->snmp_version = item->snmp_version;
 	snmp_context->snmp_community = item->snmp_community;
@@ -2701,7 +2710,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		zbx_vector_bulkwalk_context_append(&snmp_context->bulkwalk_contexts, bulkwalk_context);
 	}
 
-	zbx_async_poller_add_task(base, dnsbase, snmp_context->item.interface.addr, snmp_context, config_timeout,
+	zbx_async_poller_add_task(base, dnsbase, snmp_context->item.interface.addr, snmp_context, timeout_sec,
 			snmp_task_process, clear_cb);
 
 	ret = SUCCEED;
@@ -3133,7 +3142,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		zbx_set_snmp_bulkwalk_options();
 
 		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
-				&snmp_result, NULL, snmp_result.base, dnsbase, timeout_sec, config_source_ip)))
+				&snmp_result, NULL, snmp_result.base, dnsbase, config_source_ip)))
 		{
 			if (1 == snmp_result.finished || -1 != event_base_dispatch(snmp_result.base))
 			{
