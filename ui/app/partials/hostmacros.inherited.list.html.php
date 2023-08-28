@@ -67,21 +67,20 @@ else {
 				->addClass('macro')
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->setAttribute('placeholder', '{$MACRO}')
+				->disableSpellcheck()
 		];
 
-		if (!$data['readonly']) {
-			if (array_key_exists('hostmacroid', $macro)) {
-				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
-			}
+		if (array_key_exists('hostmacroid', $macro)) {
+			$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
+		}
 
-			$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
+		$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
 
-			if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
-				$inherited_macro = $macro[$macro['inherited_level']];
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
-			}
+		if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
+			$inherited_macro = $macro[$macro['inherited_level']];
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
 		}
 
 		if (array_key_exists('allow_revert', $macro)) {

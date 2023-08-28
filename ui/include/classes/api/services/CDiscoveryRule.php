@@ -732,8 +732,8 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyTriggerPrototypes(array $src_discovery, array $src_host, array $dst_host): array {
 		$src_triggers = API::TriggerPrototype()->get([
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type',
-				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'opdata', 'discover',
-				'event_name'
+				'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata',
+				'discover', 'event_name'
 			],
 			'selectItems' => ['itemid', 'type'],
 			'selectTags' => ['tag', 'value'],
@@ -751,7 +751,7 @@ class CDiscoveryRule extends CItemGeneral {
 			else {
 				$dst_triggers[] = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url',
 					'status', 'priority', 'comments','type', 'recovery_mode', 'recovery_expression', 'correlation_mode',
-					'correlation_tag', 'opdata', 'discover', 'event_name', 'tags'
+					'correlation_tag', 'manual_close', 'opdata', 'discover', 'event_name', 'tags'
 				]));
 			}
 		}

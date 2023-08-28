@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-06-28 07:18+0000\n"
+"PO-Revision-Date: 2023-08-09 03:14+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -14299,11 +14299,11 @@ msgstr "Процент времени, когда виртуальная маш�
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:151
 msgid "Percentile line (left)"
-msgstr "Процентная линия (слева)"
+msgstr "Линия процентиля (слева)"
 
 #: graphs.php:56 include/views/configuration.graph.edit.php:169
 msgid "Percentile line (right)"
-msgstr "Процентная линия (справа)"
+msgstr "Линия процентиля (справа)"
 
 #: include/classes/data/CItemData.php:917
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -15390,14 +15390,14 @@ msgstr "Отчеты"
 #: include/views/configuration.item.edit.php:363
 #: include/views/configuration.item.prototype.edit.php:349
 msgid "Request body"
-msgstr "Запрос тела"
+msgstr "Тело запроса"
 
 #: app/views/popup.massupdate.item.php:90
 #: include/views/configuration.host.discovery.edit.php:296
 #: include/views/configuration.item.edit.php:352
 #: include/views/configuration.item.prototype.edit.php:338
 msgid "Request body type"
-msgstr "Типа запроса тела"
+msgstr "Тип тела запроса"
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
@@ -16498,7 +16498,7 @@ msgstr "Значение тега услуги"
 
 #: app/views/popup.sla.edit.php:122 app/views/sla.list.php:60
 msgid "Service tags"
-msgstr "Теги сервисов"
+msgstr "Теги услуг"
 
 #: app/views/popup.condition.common.php:564 include/actions.inc.php:56
 msgid "Service type"
@@ -20763,7 +20763,7 @@ msgstr "МИН значение оси Y"
 
 #: include/views/configuration.graph.edit.php:352
 msgid "Y axis side"
-msgstr "Расположение оси"
+msgstr "Расположение оси Y"
 
 #: include/classes/widgets/CWidgetHelper.php:936
 #: include/classes/widgets/CWidgetHelper.php:1012
