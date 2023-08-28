@@ -727,8 +727,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$row = $dashboard->getWidget(self::$update_widget)->getContent()->asTable()->findRow('Hosts', self::$icon_host);
 
 		foreach ($popup_content as $trigger => $dependency) {
-			// Locate hint and check table headers in hint.
-			$hint_table = $row->getColumn($trigger)->query('class:hint-box')->one()->asTable();
+			// Hover hint and check table headers in hint.
+			$row->getColumn($trigger)->query('tag:button')->one()->hoverMouse();
+			$hint_table = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one()
+					->query('class:list-table')->one()->asTable();
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 
 			// Gather data from rows and compare result with reference.
