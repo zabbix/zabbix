@@ -89,6 +89,7 @@ ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
 ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
+ZBX_VECTOR_IMPL(host_key, zbx_host_key_t)
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
@@ -10698,7 +10699,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, co
  *             nextcheck - [IN] the scheduled time                            *
  *                                                                            *
  ******************************************************************************/
-static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int nextcheck)
+static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, time_t nextcheck)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
@@ -11914,7 +11915,8 @@ int	zbx_dc_config_get_last_sync_time(void)
  ******************************************************************************/
 int	zbx_dc_config_get_proxypoller_hosts(zbx_dc_proxy_t *proxies, int max_hosts)
 {
-	int			now, num = 0;
+	time_t			now;
+	int			num = 0;
 	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -12009,24 +12011,24 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
 		if (SUCCEED == proxy_conn_err)
 			dc_proxy->last_cfg_error_time = 0;
 		else if (CONFIG_ERROR == proxy_conn_err)
-			dc_proxy->last_cfg_error_time = (int)now;
+			dc_proxy->last_cfg_error_time = now;
 
 		if (PROXY_MODE_PASSIVE == dc_proxy->mode)
 		{
 			if (0 != (update_nextcheck & ZBX_PROXY_CONFIG_NEXTCHECK))
 			{
-				dc_proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
+				dc_proxy->proxy_config_nextcheck = calculate_proxy_nextcheck(
 						proxyid, proxyconfig_frequency, now);
 			}
 
 			if (0 != (update_nextcheck & ZBX_PROXY_DATA_NEXTCHECK))
 			{
-				dc_proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
+				dc_proxy->proxy_data_nextcheck = calculate_proxy_nextcheck(
 						proxyid, proxydata_frequency, now);
 			}
 			if (0 != (update_nextcheck & ZBX_PROXY_TASKS_NEXTCHECK))
 			{
-				dc_proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
+				dc_proxy->proxy_tasks_nextcheck = calculate_proxy_nextcheck(
 						proxyid, ZBX_TASK_UPDATE_FREQUENCY, now);
 			}
 
@@ -13740,7 +13742,7 @@ int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid)
 	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
 		ret = FAIL;
 	else
-		dc_proxy->proxy_config_nextcheck = (int)time(NULL);
+		dc_proxy->proxy_config_nextcheck = time(NULL);
 
 	UNLOCK_CACHE;
 
@@ -14106,7 +14108,7 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
  *           all items can be safely rescheduled.                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxyids)
+void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids)
 {
 	int		i;
 	ZBX_DC_ITEM	*dc_item;
@@ -14292,7 +14294,7 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 void	zbx_dc_get_proxy_lastaccess(zbx_vector_uint64_pair_t *lastaccess)
 {
 	ZBX_DC_PROXY	*proxy;
-	int		now;
+	time_t		now;
 
 	if (ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY < (now = time(NULL)) - config->proxy_lastaccess_ts)
 	{
@@ -14680,7 +14682,7 @@ int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error)
  *               FAIL    - proxy lastaccess cannot be retrieved               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error)
+int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, time_t *lastaccess, char **error)
 {
 	const ZBX_DC_PROXY	*dc_proxy;
 	int			ret;
