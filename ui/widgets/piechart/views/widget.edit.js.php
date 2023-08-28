@@ -245,7 +245,7 @@ window.widget_pie_chart_form = new class {
 			field.disabled = !document.getElementById('total_show').checked;
 		}
 
-		value_size_input.disabled = !custom_value_size_on;
+		value_size_input.disabled = (!custom_value_size_on || !document.getElementById('total_show').checked);
 		value_size_input.style.display = custom_value_size_on ? '' : 'none';
 		value_size_input.nextSibling.nodeValue = custom_value_size_on ? ' %' : '';
 
