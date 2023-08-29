@@ -2173,7 +2173,14 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					buf[BUF_SIZE] = '\0';
 
 					if ('\0' != *encoding)
-						value = zbx_convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
+					{
+						if (NULL == (value = zbx_convert_to_utf8(buf, (size_t)BUF_SIZE,
+								encoding, err_msg)))
+						{
+							ret = FAIL;
+							goto out;
+						}
+					}
 					else
 						value = buf;
 
@@ -2309,8 +2316,12 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 
 					if ('\0' != *encoding)
 					{
-						value = zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start),
-								encoding);
+						if (NULL == (value = zbx_convert_to_utf8(p_start,
+								(size_t)(p_nl - p_start), encoding, err_msg)))
+						{
+							ret = FAIL;
+							goto out;
+						}
 					}
 					else
 						value = p_start;

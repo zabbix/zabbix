@@ -750,8 +750,8 @@ typedef struct
 	char				*version_str;
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
-	int				lastaccess;
-	int				last_version_error_time;
+	time_t				lastaccess;
+	time_t				last_version_error_time;
 	int				proxy_delay;
 	int				more_data;
 	zbx_proxy_suppress_t		nodata_win;
@@ -942,7 +942,7 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#define PROXY_MODE_ACTIVE	0
-#define PROXY_MODE_PASSIVE	1
+#define PROXY_OPERATING_MODE_ACTIVE	0
+#define PROXY_OPERATING_MODE_PASSIVE	1
 
 #endif

@@ -4466,7 +4466,7 @@ pre, pre a, pre td, pre span {
       margin-left: 5px; }
   .host-dashboard-header-navigation .filter-space {
     display: contents; }
-    .host-dashboard-header-navigation .filter-space form {
+    .host-dashboard-header-navigation .filter-space .filter-container {
       grid-column: 1 / -1; }
     .host-dashboard-header-navigation .filter-space li .ui-tabs-anchor {
       vertical-align: top; }
@@ -6853,6 +6853,16 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .overlay-dialogue #host-form #tagsFormList .table-forms-td-right,
 .overlay-dialogue #host-form #macrosFormList .table-forms-td-right,
 .overlay-dialogue #host-form #valuemap-formlist .table-forms-td-right {
+  width: 100%; }
+
+.overlay-dialogue #templates-form #tagsFormList .form-field,
+.overlay-dialogue #templates-form #macrosFormList .form-field {
+  grid-column-start: 1; }
+.overlay-dialogue #templates-form #tagsFormList .table-forms-td-left,
+.overlay-dialogue #templates-form #macrosFormList .table-forms-td-left {
+  display: none; }
+.overlay-dialogue #templates-form #tagsFormList .table-forms-td-right,
+.overlay-dialogue #templates-form #macrosFormList .table-forms-td-right {
   width: 100%; }
 
 .linked-templates > .table-forms {

@@ -893,10 +893,10 @@ static int	get_proc_net_count_ipv6(const char *filename, unsigned char state, ne
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
 				(NULL != exp_l->ai &&
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l,
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, &sockaddr_l,
 				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
 				(NULL != exp_r->ai &&
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r,
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, &sockaddr_r,
 				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;
@@ -953,10 +953,10 @@ static int	get_proc_net_count_ipv4(const char *filename, unsigned char state, ne
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
 				(NULL != exp_l->ai &&
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, sockaddr_l,
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, &sockaddr_l,
 				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
 				(NULL != exp_r->ai &&
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, sockaddr_r,
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, &sockaddr_r,
 				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;

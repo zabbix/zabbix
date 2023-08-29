@@ -895,7 +895,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				continue;
 			}
 
-			if (PROXY_MODE_ACTIVE == type)
+			if (PROXY_OPERATING_MODE_ACTIVE == type)
 			{
 				zbx_tm_task_t	*task;
 
@@ -903,7 +903,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				zbx_vector_tm_task_append(&tasks_active, task);
 				zbx_vector_str_append(&proxynames_log, name);
 			}
-			else if (PROXY_MODE_PASSIVE == type)
+			else if (PROXY_OPERATING_MODE_PASSIVE == type)
 			{
 				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
 				{
@@ -1112,7 +1112,7 @@ static void	tm_process_temp_suppression(const char *data)
 			zbx_db_insert_t	db_insert;
 
 			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
-					"suppress_until", "userid", NULL);
+					"suppress_until", "userid", (char *)NULL);
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, ts, userid);
 
 			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
@@ -1274,7 +1274,7 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxyid
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1317,10 +1317,12 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				{
 					zbx_tm_task_t	*task;
 					const char	*error = "Remote commands are disabled on unsupported proxies.";
+					double		t;
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					t = zbx_time();
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
-							ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
+							ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
 					task->data = zbx_tm_remote_command_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1364,10 +1366,12 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_tm_task_t	*task;
 					const char	*error = "The requested task is disabled. Proxy major"
 							" version does not match server major version.";
+					double		t;
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					t = zbx_time();
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-							zbx_time(), 0, 0);
+							(time_t)t, 0, 0);
 					task->data = zbx_tm_data_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1420,11 +1424,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
  * Purpose: remove old done/expired tasks                                     *
  *                                                                            *
  ******************************************************************************/
-static void	tm_remove_old_tasks(int now)
+static void	tm_remove_old_tasks(time_t now)
 {
 	zbx_db_begin();
-	zbx_db_execute("delete from task where status in (%d,%d) and clock<=%d",
-			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
+	zbx_db_execute("delete from task where status in (%d,%d) and clock<=" ZBX_FS_TIME_T,
+			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, (zbx_fs_time_t)(now - ZBX_TM_CLEANUP_TASK_AGE));
 	zbx_db_commit();
 }
 
@@ -1451,12 +1455,12 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 		proxy = proxies.values[i];
 
-		if (PROXY_MODE_ACTIVE == proxy->mode)
+		if (PROXY_OPERATING_MODE_ACTIVE == proxy->mode)
 		{
 			task = tm_create_active_proxy_reload_task(proxy->proxyid);
 			zbx_vector_tm_task_append(&tasks_active, task);
 		}
-		else if (PROXY_MODE_PASSIVE == proxy->mode)
+		else if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
 		{
 			if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxy->proxyid))
 			{
@@ -1539,7 +1543,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 				continue;
 			}
 
-			if (PROXY_MODE_ACTIVE == type)
+			if (PROXY_OPERATING_MODE_ACTIVE == type)
 			{
 				zbx_tm_task_t	*task;
 
@@ -1547,7 +1551,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 				zbx_vector_tm_task_append(&tasks_active, task);
 				zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 			}
-			else if (PROXY_MODE_PASSIVE == type)
+			else if (PROXY_OPERATING_MODE_PASSIVE == type)
 			{
 				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
 				{
@@ -1608,9 +1612,8 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
-	static int		cleanup_time = 0;
-	double			sec1, sec2;
-	int			tasks_num, sleeptime, nextcheck;
+	static time_t		cleanup_time = 0;
+	int			tasks_num, sleeptime;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -1632,9 +1635,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
 
-	sec1 = zbx_time();
+	double sec1 = zbx_time();
 
-	sleeptime = ZBX_TM_PROCESS_PERIOD - (int)sec1 % ZBX_TM_PROCESS_PERIOD;
+	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
@@ -1662,18 +1665,18 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks(&rtc, (int)sec1);
+		tasks_num = tm_process_tasks(&rtc, (time_t)sec1);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
-			tm_remove_old_tasks((int)sec1);
-			cleanup_time = sec1;
+			tm_remove_old_tasks((time_t)sec1);
+			cleanup_time = (time_t)sec1;
 		}
 
-		sec2 = zbx_time();
+		double sec2 = zbx_time();
 
-		nextcheck = (int)sec1 - (int)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
+		time_t nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
 
-		if (0 > (sleeptime = nextcheck - (int)sec2))
+		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
