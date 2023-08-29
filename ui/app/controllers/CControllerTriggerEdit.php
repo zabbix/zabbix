@@ -165,6 +165,17 @@ class CControllerTriggerEdit extends CController {
 
 			$data['tags'] = $tags;
 		}
+		elseif ($data['tags']) {
+			$tags = $data['tags'];
+
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
+			}
+
+			$data['tags'] = $tags;
+		}
 
 		if ($this->trigger) {
 			$trigger = $this->getAdditionalTriggerData($data, $data['tags']);

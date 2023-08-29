@@ -176,6 +176,17 @@ class CControllerTriggerPrototypeEdit extends CController {
 
 			$data['tags'] = $tags;
 		}
+		elseif ($data['tags']) {
+			$tags = $data['tags'];
+
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
+			}
+
+			$data['tags'] = $tags;
+		}
 
 		if ($this->trigger_prototype) {
 			$trigger = $this->getAdditionalTriggerPrototypeData($data, $data['tags']);
