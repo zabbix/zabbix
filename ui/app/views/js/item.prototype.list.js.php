@@ -161,6 +161,10 @@
 			return overlay;
 		}
 
+		editItemPrototype(target, data) {
+			this.#edit(target, {...data, action: 'item.prototype.edit'});
+		}
+
 		editHost(e, hostid) {
 			e.preventDefault();
 			this.openHostPopup({hostid});

@@ -1053,7 +1053,7 @@ function getMenuPopupItem(options) {
 				label: t('Item'),
 				clickCallback: () => {
 					view.editItem(null, {
-						context: 'host',
+						context: options.context,
 						itemid: options.itemid
 					});
 				}
@@ -1108,8 +1108,8 @@ function getMenuPopupItem(options) {
 					view.editItem(null, {
 						context: options.context,
 						hostid: options.hostid,
-						type: 18, // ITEM_TYPE_DEPENDENT
-						master_itemid: options.itemid
+						master_itemid: options.itemid,
+						type: 18 // ITEM_TYPE_DEPENDENT
 					});
 				}
 			});
@@ -1188,15 +1188,15 @@ function getMenuPopupItemPrototype(options) {
 
 	let url;
 
-	url = new Curl('disc_prototypes.php');
-	url.setArgument('form', 'update');
-	url.setArgument('parent_discoveryid', options.parent_discoveryid);
-	url.setArgument('itemid', options.itemid);
-	url.setArgument('context', options.context);
-
 	config_urls.push({
 		label: t('Item prototype'),
-		url: url.getUrl()
+		clickCallback: () => {
+			view.editItemPrototype(null, {
+				context: options.context,
+				itemid: options.itemid,
+				parent_discoveryid: options.parent_discoveryid
+			});
+		}
 	});
 
 	if (options.trigger_prototypes.length) {
@@ -1236,16 +1236,16 @@ function getMenuPopupItemPrototype(options) {
 		url: url.getUrl()
 	});
 
-	url = new Curl('disc_prototypes.php');
-	url.setArgument('form', 'create');
-	url.setArgument('parent_discoveryid', options.parent_discoveryid);
-	url.setArgument('type', 18);	// ITEM_TYPE_DEPENDENT
-	url.setArgument('master_itemid', options.itemid);
-	url.setArgument('context', options.context);
-
 	config_urls.push({
 		label: t('Create dependent item'),
-		url: url.getUrl()
+		clickCallback: () => {
+			view.editItemPrototype(null, {
+				context: options.context,
+				master_itemid: options.itemid,
+				parent_discoveryid: options.parent_discoveryid,
+				type: 18 // ITEM_TYPE_DEPENDENT
+			});
+		}
 	});
 
 	sections.push({
