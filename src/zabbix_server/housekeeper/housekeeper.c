@@ -499,7 +499,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, int now)
-{	
+{
 	unsigned char	items_update = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
