@@ -45,8 +45,8 @@ const ZBX_STYLE_FORM_INPUT_MARGIN = <?= json_encode(ZBX_STYLE_FORM_INPUT_MARGIN)
 window.item_edit_form = new class {
 
 	init({
-		actions, field_switches, form_data, host, interface_types, readonly, testable_item_types, type_with_key_select,
-		value_type_keys, source
+		actions, field_switches, form_data, host, interface_types, readonly, testable_item_types, token,
+		type_with_key_select, value_type_keys, source
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -59,6 +59,7 @@ window.item_edit_form = new class {
 		this.type_interfaceids = {};
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
+		this.token = token;
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -168,10 +169,10 @@ window.item_edit_form = new class {
 
 	initEvents() {
 		// Item tab events.
-		this.field.key.addEventListener('help_items.paste', e => this.#keyChangeHandler(e));
-		this.field.key.addEventListener('keyup', e => this.#keyChangeHandler(e));
-		this.field.key_button?.addEventListener('click', e => this.#keySelectClickHandler(e));
-		this.field.type.addEventListener('click', e => this.#typeChangeHandler(e));
+		this.field.key.addEventListener('help_items.paste', () => this.#keyChangeHandler());
+		this.field.key.addEventListener('keyup', () => this.#keyChangeHandler());
+		this.field.key_button?.addEventListener('click', () => this.#keySelectClickHandler());
+		this.field.type.addEventListener('click', () => this.updateFieldsVisibility());
 		this.field.value_type.addEventListener('change', e => this.#valueTypeChangeHandler(e));
 		this.form.addEventListener('click', e => {
 			const target = e.target;
@@ -219,7 +220,7 @@ window.item_edit_form = new class {
 
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
-			.forEach(o => o.addEventListener('click', e => this.#inheritedTagsChangeHandler(e)));
+			.forEach(o => o.addEventListener('change', e => reloadPopup(this.form, this.actions.form)));
 
 		// Preprocessing tab events.
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
@@ -277,7 +278,7 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.delete);
-		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]});
+		this.#post(curl.getUrl(), {context: fields.context, itemids: [fields.itemid]});
 	}
 
 	clear() {
@@ -285,7 +286,7 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.clear');
-		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]}, true);
+		this.#post(curl.getUrl(), {context: fields.context, itemids: [fields.itemid]}, true);
 	}
 
 	execute() {
@@ -293,7 +294,7 @@ window.item_edit_form = new class {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.execute');
-		this.#post(curl.getUrl(), {...fields, itemids: [fields.itemid]}, true);
+		this.#post(curl.getUrl(), {discovery_rule: fields.discovery_rule, itemids: [fields.itemid]}, true);
 	}
 
 	updateFieldsVisibility() {
@@ -353,7 +354,7 @@ window.item_edit_form = new class {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(data)
+			body: JSON.stringify({...this.token, ...data})
 		})
 			.then((response) => response.json())
 			.then((response) => {
@@ -466,10 +467,6 @@ window.item_edit_form = new class {
 			? matches[0][1] : null;
 	}
 
-	#typeChangeHandler(e) {
-		this.updateFieldsVisibility();
-	}
-
 	#intervalTypeChangeHandler(e) {
 		const target = e.target;
 
@@ -491,7 +488,7 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 	}
 
-	#keyChangeHandler(e) {
+	#keyChangeHandler() {
 		const inferred_type = this.#getInferredValueType(this.field.key.value);
 
 		if (inferred_type !== null) {
@@ -501,7 +498,7 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 	}
 
-	#keySelectClickHandler(e) {
+	#keySelectClickHandler() {
 		PopUp('popup.generic', {
 			srctbl: 'help_items',
 			srcfld1: 'key',
@@ -509,10 +506,6 @@ window.item_edit_form = new class {
 			dstfld1: 'key',
 			itemtype: this.field.type.value
 		}, {dialogue_class: 'modal-popup-generic'});
-	}
-
-	#inheritedTagsChangeHandler(e) {
-		reloadPopup(this.form, this.actions.form);
 	}
 
 	#updateHistoryModeVisibility() {

@@ -216,6 +216,7 @@ $form
 			'readonly' => $data['readonly'],
 			'source' => 'item',
 			'testable_item_types' => $data['testable_item_types'],
+			'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys']
 		]).');'))->setOnDocumentReady()

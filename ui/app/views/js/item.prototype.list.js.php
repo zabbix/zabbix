@@ -123,12 +123,10 @@
 		}
 
 		#post(curl, parameters) {
-			parameters[this.token.token] = this.token.value;
-
 			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(parameters)
+				body: JSON.stringify({...this.token, ...parameters})
 			})
 				.then((response) => response.json())
 				.then((response) => {

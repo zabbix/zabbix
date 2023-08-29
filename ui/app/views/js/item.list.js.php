@@ -186,9 +186,7 @@
 		}
 
 		#massupdate(target, parameters) {
-			parameters[this.token.token] = this.token.value;
-
-			this.#popup('item.massupdate', parameters, {
+			this.#popup('item.massupdate', {...this.token, ...parameters}, {
 				dialogue_class: 'modal-popup-preprocessing',
 				trigger_element: target
 			});
@@ -218,12 +216,10 @@
 		}
 
 		#post(curl, data) {
-			data[this.token.token] = this.token.value;
-
 			return fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(data)
+				body: JSON.stringify({...this.token, ...data})
 			})
 				.then((response) => response.json())
 				.then((response) => {
