@@ -99,7 +99,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$hostids = array_keys($hosts);
 		$maintenance_ids = array_unique(array_column($hosts, 'maintenanceid'));
 
-		$maintenance_data = ($maintenance_ids && $maintenance === null)
+		$db_maintenance = ($maintenance_ids && $maintenance === null)
 			? API::Maintenance()->get([
 				'output' => ['name', 'maintenance_type', 'description'],
 				'maintenanceids' => $maintenance_ids,
@@ -107,7 +107,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			])
 			: [];
 
-		$maintenance_data = CArrayHelper::renameObjectsKeys($maintenance_data,
+		$db_maintenance = CArrayHelper::renameObjectsKeys($db_maintenance,
 			['name' => 'maintenance_name', 'description' => 'maintenance_description']
 		);
 
@@ -370,7 +370,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						];
 
 						if ($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-							$data = array_merge($data, $maintenance_data[$hosts[$hostid]['maintenanceid']]);
+							$data = array_merge($data, $db_maintenance[$hosts[$hostid]['maintenanceid']]);
 						}
 
 						$row[] = $data;
