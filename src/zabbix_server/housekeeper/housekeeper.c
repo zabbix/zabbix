@@ -29,6 +29,13 @@
 #include "history_compress.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS		4

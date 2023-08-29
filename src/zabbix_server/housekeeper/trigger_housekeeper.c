@@ -27,6 +27,10 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxipcservice.h"
 
 static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 {
