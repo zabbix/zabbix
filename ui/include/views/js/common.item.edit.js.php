@@ -110,6 +110,19 @@
 				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
 			);
 		}
+		// timeout field
+		else if (type == <?= ITEM_TYPE_SIMPLE ?>) {
+			const toggle_fields = [
+				'js-item-timeout-label',
+				'js-item-timeout-field'
+			];
+			const set_hidden = key.substr(0, 8) === 'icmpping' || key.substr(0, 6) === 'vmware';
+			const object_switcher = globalAllObjForViewSwitcher['type'];
+
+			toggle_fields.forEach((element_id) =>
+				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
+			);
+		}
 
 		if (type in item_form.inherited_timeouts) {
 			item_form.timeout.disabled = false;

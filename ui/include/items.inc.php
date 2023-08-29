@@ -2404,6 +2404,10 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 					[ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST]
 				);
 
+			case 'timeout':
+				return $input['type'] != ITEM_TYPE_SIMPLE
+					|| (strncmp($input['key_'], 'icmpping', 8) !== 0 && strncmp($input['key_'], 'vmware', 6) !== 0);
+
 			case 'delay':
 				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;
 
