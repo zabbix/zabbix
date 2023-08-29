@@ -430,8 +430,8 @@ class CWidgetBase {
 		const accessors = this.#getFieldsReferencesAccessors();
 
 		for (const [path, value] of Object.entries(data)) {
-			if (!accessors.has(path)) {
-				throw new Error('Cannot send feedback: reference path does not exist.');
+			if (accessors.has(path)) {
+				continue;
 			}
 
 			const {reference, type} = CWidgetBase.parseTypedReference(accessors.get(path).getTypedReference());
