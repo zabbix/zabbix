@@ -355,7 +355,7 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-char	*zbx_config_webservice_url	= NULL;
+static char	*zbx_config_webservice_url	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 

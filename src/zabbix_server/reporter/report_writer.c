@@ -285,7 +285,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 		const char *config_source_ip, const char *config_webservice_url, char **error)
 {
 	zbx_vector_ptr_pair_t	params;
-	int			i, ret, width, height;
+	int			ret, width, height;
 	const char		*subject = "", *message = "";
 	char			*url, *cookie, *report = NULL, *name;
 	size_t			report_size = 0;
@@ -296,7 +296,7 @@ static int	rw_begin_report(zbx_ipc_message_t *msg, zbx_alerter_dispatch_t *dispa
 
 	report_deserialize_begin_report(msg->data, &name, &url, &cookie, &width, &height, &params);
 
-	for (i = 0; i < params.values_num; i++)
+	for (int i = 0; i < params.values_num; i++)
 	{
 		if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
 		{

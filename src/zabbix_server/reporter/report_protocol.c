@@ -198,7 +198,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 
 	if (SUCCEED == *status && NULL != results)
 	{
-		int				i, results_num;
+		int				results_num;
 		zbx_alerter_dispatch_result_t	*result;
 
 		data += zbx_deserialize_value(data, &results_num);
@@ -207,7 +207,7 @@ void	report_deserialize_response(const unsigned char *data, int *status, char **
 		{
 			zbx_vector_alerter_dispatch_result_reserve(results, (size_t)results_num);
 
-			for (i = 0; i < results_num; i++)
+			for (int i = 0; i < results_num; i++)
 			{
 				result = zbx_malloc(NULL, sizeof(zbx_alerter_dispatch_result_t));
 				data += zbx_deserialize_value(data, &result->status);
@@ -230,7 +230,6 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 {
 	zbx_uint32_t	data_len = 0, *params_len, url_len, cookie_len, name_len;
 	unsigned char	*ptr;
-	int		i;
 
 	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_str(data_len, url);
@@ -240,7 +239,7 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 	zbx_serialize_prepare_value(data_len, params->values_num);
 
 	params_len = (zbx_uint32_t *)zbx_malloc(NULL, params->values_num * 2 * sizeof(zbx_uint32_t));
-	for (i = 0; i < params->values_num; i++)
+	for (int i = 0; i < params->values_num; i++)
 	{
 		zbx_serialize_prepare_str_len(data_len, params->values[i].first, params_len[i * 2]);
 		zbx_serialize_prepare_str_len(data_len, params->values[i].second, params_len[i * 2 + 1]);
@@ -257,7 +256,7 @@ zbx_uint32_t	report_serialize_begin_report(unsigned char **data, const char *nam
 
 	ptr += zbx_serialize_value(ptr, params->values_num);
 
-	for (i = 0; i < params->values_num; i++)
+	for (int i = 0; i < params->values_num; i++)
 	{
 		ptr += zbx_serialize_str(ptr, params->values[i].first, params_len[i * 2]);
 		ptr += zbx_serialize_str(ptr, params->values[i].second, params_len[i * 2 + 1]);

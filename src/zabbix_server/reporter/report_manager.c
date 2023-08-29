@@ -386,7 +386,7 @@ static char	*rm_time_to_urlfield(const struct tm *tm)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: createS zbx_session cookie for frontend authentication            *
+ * Purpose: creates zbx_session cookie for frontend authentication            *
  *                                                                            *
  * Parameters: manager   - [IN]                                               *
  *             sessionid - [IN]                                               *
@@ -425,7 +425,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: getS specified user session, creating one if necessary            *
+ * Purpose: gets specified user session, creating one if necessary            *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
  *             userid  - [IN]                                                 *
@@ -630,7 +630,8 @@ static int	rm_get_report_range(int report_time, unsigned char period, struct tm 
 {
 	struct tm	*tm;
 	time_t		from_time = report_time;
-	zbx_time_unit_t	period2unit[] = {ZBX_TIME_UNIT_DAY, ZBX_TIME_UNIT_WEEK, ZBX_TIME_UNIT_MONTH, ZBX_TIME_UNIT_YEAR};
+	zbx_time_unit_t	period2unit[] = {ZBX_TIME_UNIT_DAY, ZBX_TIME_UNIT_WEEK, ZBX_TIME_UNIT_MONTH,
+						ZBX_TIME_UNIT_YEAR};
 
 	if (ARRSIZE(period2unit) <= period || NULL == (tm = localtime(&from_time)))
 		return FAIL;
@@ -711,8 +712,8 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 		zbx_uint64_t access_userid, int report_time, unsigned char period, zbx_uint64_t *userids,
 		int userids_num, int report_width, int report_height, const zbx_vector_ptr_pair_t *params, char **error)
 {
-	size_t			url_alloc = 0, url_offset = 0;
-	struct tm		from, to;
+	size_t		url_alloc = 0, url_offset = 0;
+	struct tm	from, to;
 
 	if ('\0' == *manager->zabbix_url)
 	{
@@ -2257,7 +2258,7 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 	else
 	{
 		zbx_vector_alerter_dispatch_result_t	results;
-		int					status, i, total_num = 0, sent_num = 0;
+		int					status, total_num = 0, sent_num = 0;
 		zbx_alerter_dispatch_result_t		*result;
 		char					*error;
 
@@ -2265,7 +2266,7 @@ static void	rm_process_result(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_i
 
 		report_deserialize_response(message->data, &status, &error, &results);
 
-		for (i = 0; i < results.values_num; i++)
+		for (int i = 0; i < results.values_num; i++)
 		{
 			result = results.values[i];
 
