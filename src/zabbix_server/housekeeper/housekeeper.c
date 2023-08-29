@@ -1440,7 +1440,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_vc_housekeeping_value_cache();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
-				" %d audit items, %d d_autoreg_host, %d records in " ZBX_FS_DBL " sec, %s]",
+				" %d audit items, %d autoreg_host, %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
 				d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
 	}
