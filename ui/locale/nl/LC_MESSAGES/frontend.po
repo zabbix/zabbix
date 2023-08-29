@@ -5,7 +5,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-20 06:43+0000\n"
+"PO-Revision-Date: 2023-08-23 19:02+0000\n"
 "Last-Translator: Michiel C. <michiel.cornille@gmail.com>\n"
 "Language-Team: NL\n"
 "Language: nl\n"
@@ -1383,6 +1383,10 @@ msgstr "Jaarlijks"
 msgid "Any"
 msgstr "Iedere"
 
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
+
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
 msgid "Any character string included"
@@ -1798,15 +1802,15 @@ msgstr "Gemiddeld aantal uitstaande leesverzoeken naar de virtuele schijf tijden
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Gemiddeld aantal uitstaande leesverzoeken naar de virtuele schijf gedurende het verzamelingsinterval, <url> - VMware service-URL, <uuid> - Hostnaam van de VMware virtuele machine, <instance> - Instantie van het schijfapparaat."
 
 #: include/classes/data/CItemData.php:1735
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Gemiddeld aantal uitstaande schrijfverzoeken naar de virtuele schijf gedurende het verzamelingsinterval, \"url\" - VMware service-URL, \"uuid\" - Unieke wereldwijde identifier van de VMware virtuele machine, \"instance\" - Instantie van het schijfapparaat."
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Gemiddeld aantal uitstaande schrijfverzoeken naar de virtuele schijf gedurende het verzamelingsinterval, `<url>` - VMware service-URL, `<uuid>` - Hostnaam van de VMware virtuele machine, `<instance>` - Instantie van het schijfapparaat."
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
@@ -1859,11 +1863,11 @@ msgstr "Basis"
 
 #: app/views/connector.edit.php:136
 msgid "Bearer"
-msgstr ""
+msgstr "Toonder"
 
 #: app/views/connector.edit.php:156
 msgid "Bearer token"
-msgstr ""
+msgstr "Toegangstoken"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
@@ -2025,15 +2029,15 @@ msgstr "CPU-belasting. retourneert float"
 
 #: include/classes/data/CItemData.php:1603
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "CPU-tijd besteed aan wachten op inwisselen van swap, \"url\" - VMware-service-URL, \"uuid\" - unieke wereldwijde identificator van virtuele machine van VMware, \"instance\" - CPU-instantie."
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "CPU-tijd besteed aan wachten op inwisselen van swap, <url> - VMware-service-URL, <uuid> - VMware virtuele machine hostnaam, <instance> - CPU-instantie."
 
 #: include/classes/data/CItemData.php:1407
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "CPU-gebruik als percentage tijdens het interval is afhankelijk van energiebeheer of Hyper-Threading (HT). \"url\" - VMware-service-URL, \"uuid\" - unieke identificatie van de VMware-hypervisor."
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -14349,6 +14353,10 @@ msgstr ""
 msgid "New tag name"
 msgstr ""
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -16835,6 +16843,10 @@ msgstr ""
 #: include/views/configuration.item.edit.php:687
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
 msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61

@@ -341,8 +341,8 @@ define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
 define('HOST_STATUS_TEMPLATE',		3);
 
-define('PROXY_MODE_ACTIVE',		0);
-define('PROXY_MODE_PASSIVE',	1);
+define('PROXY_OPERATING_MODE_ACTIVE',	0);
+define('PROXY_OPERATING_MODE_PASSIVE',	1);
 
 define('HOST_DISCOVER',		0);
 define('HOST_NO_DISCOVER',	1);
@@ -1479,7 +1479,7 @@ define('API_BOOLEAN',				4);
 define('API_FLAG',					5);
 define('API_FLOAT',					6);
 define('API_UINT64',				7);
-define('API_FILTER_VALUE',			60);
+define('API_VALUE',					60);
 // arrays
 define('API_OBJECT',				8);
 define('API_IDS',					9);

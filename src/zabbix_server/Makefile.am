@@ -18,7 +18,6 @@ SUBDIRS = \
 	vmware \
 	taskmanager \
 	ipmi \
-	scripts \
 	stats \
 	preproc \
 	connector \
@@ -76,9 +75,9 @@ zabbix_server_LDADD = \
 	proxyconfigread/libzbxproxyconfigread.a \
 	vmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager.a \
-	scripts/libzbxscripts.a \
 	connector/libconnector.a \
 	service/libservice.a \
+	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \

@@ -873,10 +873,13 @@ class testFormValueMappings extends CWebTest {
 
 			// Check the value mapping screenshots after form submit.
 			if (CTestArrayHelper::get($data, 'screenshot_id')) {
+				// Viewport update needed because of an unexpected viewport shift.
+				$this->page->removeFocus();
+				$this->page->updateViewport();
+
 				// Take a screenshot to test draggable object position in overlay dialog.
 				if ($action === 'create') {
-					$this->page->removeFocus();
-					$dialog = COverlayDialogElement::find()->waitUntilVisible()->all()->last();
+					$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 					$this->assertScreenshot($dialog->query('id:mappings_table')->asMultifieldTable()->one(),
 							'Value mappings popup'.$data['screenshot_id']);
 				}
@@ -884,7 +887,7 @@ class testFormValueMappings extends CWebTest {
 				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
 				$this->assertScreenshot($this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->one(),
-						$action.$data['screenshot_id']);
+						$action.$source.$data['screenshot_id']);
 				COverlayDialogElement::find()->one()->close();
 			}
 		}

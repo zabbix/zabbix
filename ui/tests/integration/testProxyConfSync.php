@@ -1099,7 +1099,7 @@ class testProxyConfSync extends CIntegrationTest
 	{
 		$response = $this->call('proxy.create', [
 			'name' => 'Proxy',
-			'mode' => PROXY_MODE_PASSIVE,
+			'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 			'hosts' => [],
 			'address' => '127.0.0.1',
 			'port' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
@@ -1122,7 +1122,7 @@ class testProxyConfSync extends CIntegrationTest
 				'VaultURL' => 'https://127.0.0.1:1858'
 			],
 			self::COMPONENT_PROXY => [
-				'ProxyMode' => PROXY_MODE_PASSIVE,
+				'ProxyMode' => PROXY_OPERATING_MODE_PASSIVE,
 				'DebugLevel' => 5,
 				'LogFileSize' => 0,
 				'Hostname' => 'Proxy',

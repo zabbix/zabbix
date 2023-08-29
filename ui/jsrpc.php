@@ -737,6 +737,7 @@ switch ($data['method']) {
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'preservekeys' => true,
+					'sortfield' => 'name',
 					'limit' => $limit
 				];
 
@@ -778,6 +779,7 @@ switch ($data['method']) {
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'hostids' => $hostids,
 					'webitems' => true,
+					'sortfield' => 'name',
 					'limit' => $limit
 				];
 
@@ -791,6 +793,7 @@ switch ($data['method']) {
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'searchWildcardsEnabled' => $wildcard_enabled,
+					'sortfield' => 'name',
 					'limit' => $limit
 				];
 
