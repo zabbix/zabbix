@@ -161,8 +161,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		switch ($master_column['data']) {
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 				$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
-				$master_entities = $items[$master_column_index]
-					?: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
+				$master_entities = array_key_exists($master_column_index, $items)
+					? $items[$master_column_index]
+					: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
 				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
 				break;
 
@@ -272,7 +273,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$numeric_only = self::isNumericOnlyColumn($column);
 				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
 					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
-					: ($items[$column_index] ?: self::getItems($column['item'], $numeric_only, $groupids, $hostids));
+					: (array_key_exists($column_index, $items)
+						? $items[$column_index]
+						: self::getItems($column['item'], $numeric_only, $groupids, $hostids)
+					);
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 			}
