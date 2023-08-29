@@ -710,11 +710,6 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 
 int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
 
-#define ZBX_VPXD_STATS_MAXQUERYMETRICS				64
-#define ZBX_MAXQUERYMETRICS_UNLIMITED				1000
-#define ZBX_VCENTER_LESS_THAN_6_5_0_STATS_MAXQUERYMETRICS	64
-#define ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS	256
-
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);

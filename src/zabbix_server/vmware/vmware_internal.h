@@ -64,6 +64,12 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 
 #define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)		\
 						xmlFreeDoc(xdoc)
+
+#define ZBX_VPXD_STATS_MAXQUERYMETRICS				64
+#define ZBX_MAXQUERYMETRICS_UNLIMITED				1000
+#define ZBX_VCENTER_LESS_THAN_6_5_0_STATS_MAXQUERYMETRICS	64
+#define ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS	256
+
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 #endif	/* ZABBIX_VMWARE_INTERNAL_H */
