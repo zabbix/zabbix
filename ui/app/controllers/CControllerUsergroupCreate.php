@@ -149,7 +149,7 @@ class CControllerUsergroupCreate extends CController {
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
 			->setArgument('action', 'usergroup.edit')
 		);
-		CMessageHelper::setErrorTitle(_('Cannot update user group'));
+		CMessageHelper::setErrorTitle(_('Cannot add user group'));
 
 		if ($add_message) {
 			CMessageHelper::addError(_('No permissions to referred object or it does not exist!'));
