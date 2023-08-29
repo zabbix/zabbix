@@ -23,6 +23,7 @@
 
 zbx_shmem_info_t	*vmware_shmem_get_vmware_mem(void);
 void	vmware_shmem_set_vmware_mem_NULL(void);
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define VMWARE_SHMEM_VECTOR_CREATE_DECL(ref,type) void	vmware_shmem_vector_##type##_create_ext(ref);
 
@@ -68,11 +69,11 @@ zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src);
 zbx_vmware_service_t	*vmware_shmem_vmware_service_malloc(void);
 void	vmware_shmem_hashset_create_perf_entities_counter_queries(zbx_vmware_service_t *service);
 zbx_vector_custquery_param_t *vmware_shmem_custquery_malloc(void);
-int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
 zbx_vmware_job_t	*vmware_shmem_vmware_job_malloc(void);
 void	vmware_shmem_vmware_job_free(zbx_vmware_job_t *job);
 zbx_vmware_entity_tags_t	*vmware_shmem_entity_tags_malloc(void);
 zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void);
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t *vmware, zbx_hashset_t *evt_msg_strpool,
 		char **error);
 

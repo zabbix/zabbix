@@ -20,6 +20,7 @@
 #include "vmware_shmem.h"
 #include "vmware.h"
 #include "vmware_perfcntr.h"
+#include "zbxshmem.h"
 
 #include "zbxmutexs.h"
 
@@ -37,8 +38,9 @@ void	vmware_shmem_set_vmware_mem_NULL(void)
 {
 	vmware_mem = NULL;
 }
-
 ZBX_SHMEM_FUNC_IMPL(__vm, vmware_mem)
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #define VMWARE_SHMEM_VECTOR_CREATE_IMPL(ref, type) void	vmware_shmem_vector_##type##_create_ext(ref x)	\
 {													\
@@ -1114,6 +1116,29 @@ static zbx_hash_t	vmware_strpool_hash_func(const void *data)
 }
 #undef REFCOUNT_FIELD_SIZE
 
+zbx_vmware_job_t	*vmware_shmem_vmware_job_malloc(void)
+{
+	return (zbx_vmware_job_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_job_t));
+
+}
+
+void	vmware_shmem_vmware_job_free(zbx_vmware_job_t *job)
+{
+	__vm_shmem_free_func(job);
+}
+
+zbx_vmware_entity_tags_t	*vmware_shmem_entity_tags_malloc(void)
+{
+	return (zbx_vmware_entity_tags_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_entity_tags_t));
+}
+
+zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
+{
+	return (zbx_vmware_tag_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_tag_t));
+}
+
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
+
 /******************************************************************************
  *                                                                            *
  * Purpose: initializes vmware collector service                              *
@@ -1151,6 +1176,8 @@ int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t *vmwa
 		__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 	zbx_binary_heap_create_ext(&vmware->jobs_queue, vmware_job_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY,
 			__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
+#else
+	ZBX_UNUSED(evt_msg_strpool);
 #endif
 	ret = SUCCEED;
 out:
@@ -1158,25 +1185,3 @@ out:
 
 	return ret;
 }
-
-zbx_vmware_job_t	*vmware_shmem_vmware_job_malloc(void)
-{
-	return (zbx_vmware_job_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_job_t));
-
-}
-
-void	vmware_shmem_vmware_job_free(zbx_vmware_job_t *job)
-{
-	__vm_shmem_free_func(job);
-}
-
-zbx_vmware_entity_tags_t	*vmware_shmem_entity_tags_malloc(void)
-{
-	return (zbx_vmware_entity_tags_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_entity_tags_t));
-}
-
-zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
-{
-	return (zbx_vmware_tag_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_tag_t));
-}
-

@@ -72,6 +72,7 @@
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 zbx_vmware_t	*vmware = NULL;
+static zbx_hashset_t	evt_msg_strpool;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
@@ -160,8 +161,6 @@ zbx_vmware_alarms_data_t;
 ZBX_VECTOR_DECL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_PTR_VECTOR_IMPL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
-
-static zbx_hashset_t	evt_msg_strpool;
 
 static zbx_uint64_t	evt_req_chunk_size;
 
@@ -7590,6 +7589,7 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 
 	zbx_vmware_unlock();
 }
+#endif
 
 int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error)
 {
@@ -7598,9 +7598,10 @@ int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error)
 
 	if (SUCCEED == vmware_shmem_init(config_vmware_cache_size, vmware, &evt_msg_strpool, error))
 	{
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 		evt_req_chunk_size = zbx_shmem_required_chunk_size(sizeof(zbx_vmware_event_t));
+#endif
 	}
 
 	return SUCCEED;
 }
-#endif
