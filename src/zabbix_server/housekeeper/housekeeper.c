@@ -138,32 +138,35 @@ typedef struct
 }
 zbx_hk_delete_queue_t;
 
+ZBX_PTR_VECTOR_DECL(hk_delete_queue_ptr, zbx_hk_delete_queue_t *)
+ZBX_PTR_VECTOR_IMPL(hk_delete_queue_ptr, zbx_hk_delete_queue_t *)
+
 /* this structure is used to remove old records from history (trends) tables */
 typedef struct
 {
 	/* the target table name */
-	const char		*table;
+	const char				*table;
 
 	/* history setting field name in items table (history|trends) */
-	const char		*history;
+	const char				*history;
 
 	/* a reference to the housekeeping configuration mode (enable) option for this table */
-	unsigned char		*poption_mode;
+	unsigned char				*poption_mode;
 
 	/* a reference to the housekeeping configuration overwrite option for this table */
-	unsigned char		*poption_global;
+	unsigned char				*poption_global;
 
 	/* a reference to the housekeeping configuration history value for this table */
-	int			*poption;
+	int					*poption;
 
 	/* type for checking which values are sent to the history storage */
-	unsigned char		type;
+	unsigned char				type;
 
 	/* the oldest item record timestamp cache for target table */
-	zbx_hashset_t		item_cache;
+	zbx_hashset_t				item_cache;
 
 	/* the item delete queue */
-	zbx_vector_ptr_t	delete_queue;
+	zbx_vector_hk_delete_queue_ptr_t	delete_queue;
 }
 zbx_hk_history_rule_t;
 
@@ -256,7 +259,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
 		update_record = (zbx_hk_delete_queue_t *)zbx_malloc(NULL, sizeof(zbx_hk_delete_queue_t));
 		update_record->itemid = item_record->itemid;
 		update_record->min_clock = item_record->min_clock;
-		zbx_vector_ptr_append(&rule->delete_queue, update_record);
+		zbx_vector_hk_delete_queue_ptr_append(&rule->delete_queue, update_record);
 	}
 }
 
@@ -279,8 +282,8 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 
 	zbx_hashset_create(&rule->item_cache, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_ptr_create(&rule->delete_queue);
-	zbx_vector_ptr_reserve(&rule->delete_queue, HK_INITIAL_DELETE_QUEUE_SIZE);
+	zbx_vector_hk_delete_queue_ptr_create(&rule->delete_queue);
+	zbx_vector_hk_delete_queue_ptr_reserve(&rule->delete_queue, HK_INITIAL_DELETE_QUEUE_SIZE);
 
 	result = zbx_db_select("select itemid,min(clock) from %s group by itemid", rule->table);
 
@@ -319,7 +322,7 @@ static void	hk_history_release(zbx_hk_history_rule_t *rule)
 		return;
 
 	zbx_hashset_destroy(&rule->item_cache);
-	zbx_vector_ptr_destroy(&rule->delete_queue);
+	zbx_vector_hk_delete_queue_ptr_destroy(&rule->delete_queue);
 }
 
 /******************************************************************************
@@ -533,7 +536,8 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
  ******************************************************************************/
 static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 {
-	zbx_vector_ptr_clear_ext(&rule->delete_queue, zbx_ptr_free);
+	zbx_vector_hk_delete_queue_ptr_clear_ext(&rule->delete_queue,
+			(zbx_hk_delete_queue_ptr_free_func_t)zbx_ptr_free);
 }
 
 /******************************************************************************
@@ -710,7 +714,7 @@ static int	housekeeping_history_and_trends(int now)
 #endif
 		/* process delete queue for the housekeeping rule */
 
-		zbx_vector_ptr_sort(&rule->delete_queue, hk_item_update_cache_compare);
+		zbx_vector_hk_delete_queue_ptr_sort(&rule->delete_queue, hk_item_update_cache_compare);
 
 		for (i = 0; i < rule->delete_queue.values_num; i++)
 		{
