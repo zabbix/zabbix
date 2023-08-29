@@ -364,7 +364,7 @@ typedef struct
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
 	int		timeout;
-	unsigned char	takes_manualinput;
+	unsigned char	manualinput;
 	char		*manualinput_validator;
 	unsigned char	manualinput_validator_type;
 }
@@ -384,8 +384,8 @@ zbx_script_t;
 #define ZBX_SCRIPT_EXECUTE_ON_SERVER	1
 #define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
-#define	ZBX_SCRIPT_TAKES_MANUALINPUT_NO		0
-#define	ZBX_SCRIPT_TAKES_MANUALINPUT_YES	1
+#define	ZBX_SCRIPT_MANUALINPUT_NO	0
+#define	ZBX_SCRIPT_MANUALINPUT_YES	1
 
 #define POLLER_DELAY		5
 #define DISCOVERER_DELAY	5

@@ -386,7 +386,7 @@ static int	DBpatch_6050034(void)
 {
 	int ret;
 
-	const zbx_db_field_t	takes_manualinput = {"takes_manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	manualinput = {"manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	manualinput_prompt = {"manualinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	manualinput_validator = {"manualinput_validator", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 	/*
@@ -396,7 +396,7 @@ static int	DBpatch_6050034(void)
 	const zbx_db_field_t	manualinput_validator_type = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 	const zbx_db_field_t	manualinput_default_value = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-	if (SUCCEED != (ret = DBadd_field("scripts", &takes_manualinput)))
+	if (SUCCEED != (ret = DBadd_field("scripts", &manualinput)))
 		return ret;
 	if (SUCCEED != (ret = DBadd_field("scripts", &manualinput_prompt)))
 		return ret;

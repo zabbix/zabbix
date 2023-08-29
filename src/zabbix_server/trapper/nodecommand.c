@@ -151,7 +151,7 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 
 	db_result = zbx_db_select("select name,command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
 			",username,password,publickey,privatekey"
-			",takes_manualinput,manualinput_validator,manualinput_validator_type"
+			",manualinput,manualinput_validator,manualinput_validator_type"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
 
@@ -192,9 +192,9 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		script->password = zbx_strdup(script->password, row[12]);
 	}
 
-	ZBX_STR2UCHAR(script->takes_manualinput, row[15]);
+	ZBX_STR2UCHAR(script->manualinput, row[15]);
 
-	if (ZBX_SCRIPT_TAKES_MANUALINPUT_YES == script->takes_manualinput)
+	if (ZBX_SCRIPT_MANUALINPUT_YES == script->manualinput)
 	{
 		script->manualinput_validator = zbx_strdup(script->manualinput_validator, row[16]);
 		ZBX_STR2UCHAR(script->manualinput_validator_type, row[17]);
@@ -497,7 +497,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	/* substitute macros in script body and webhook parameters */
 
-	if (ZBX_SCRIPT_TAKES_MANUALINPUT_YES == script.takes_manualinput)
+	if (ZBX_SCRIPT_MANUALINPUT_YES == script.manualinput)
 	{
 		char *expanded_cmd;
 		size_t expanded_cmd_size;
