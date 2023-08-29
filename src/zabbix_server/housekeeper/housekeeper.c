@@ -30,24 +30,16 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 
-static struct zbx_db_version_info_t	*db_version_info;
-
-#if defined(HAVE_POSTGRESQL)
-static int				tsdb_version = 0;
-#endif
-
-static int	hk_period;
-
-#define HK_INITIAL_DELETE_QUEUE_SIZE	4096
-
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS		4
 
 #define HK_MIN_CLOCK_UNDEFINED		0
 #define HK_MIN_CLOCK_ALWAYS_RECHECK	-1
 
-/* global configuration data containing housekeeping configuration */
-static zbx_config_t	cfg;
+/* trends table offsets in the hk_cleanup_tables[] mapping  */
+#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	(ITEM_VALUE_TYPE_BIN + 1)
+#define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
+#define HK_UPDATE_CACHE_TREND_COUNT		2
 
 /* Housekeeping rule definition.                                */
 /* A housekeeping rule describes table from which records older */
@@ -93,31 +85,6 @@ typedef struct
 	unsigned char	*poption_global;
 }
 zbx_hk_cleanup_table_t;
-
-static unsigned char poption_mode_regular	= ZBX_HK_MODE_REGULAR;
-static unsigned char poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
-
-/* Housekeeper table mapping to housekeeping configuration values.    */
-/* This mapping is used to exclude disabled tables from housekeeping  */
-/* cleanup procedure.                                                 */
-static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
-	{"history",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_log",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_str",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_text",	&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_bin",		&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"history_uint",	&cfg.hk.history_mode,	&cfg.hk.history_global},
-	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
-	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
-	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
-	{"events",		&poption_mode_regular,	&poption_global_disabled},
-	{NULL}
-};
-
-/* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	(ITEM_VALUE_TYPE_BIN + 1)
-#define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
-#define HK_UPDATE_CACHE_TREND_COUNT		2
 
 /* the oldest record timestamp cache for items in history tables */
 typedef struct
@@ -169,6 +136,37 @@ typedef struct
 	zbx_vector_hk_delete_queue_ptr_t	delete_queue;
 }
 zbx_hk_history_rule_t;
+
+static struct zbx_db_version_info_t	*db_version_info;
+
+#if defined(HAVE_POSTGRESQL)
+static int				tsdb_version = 0;
+#endif
+
+static int	hk_period;
+
+static unsigned char poption_mode_regular	= ZBX_HK_MODE_REGULAR;
+static unsigned char poption_global_disabled	= ZBX_HK_OPTION_DISABLED;
+
+/* global configuration data containing housekeeping configuration */
+static zbx_config_t	cfg;
+
+/* Housekeeper table mapping to housekeeping configuration values.    */
+/* This mapping is used to exclude disabled tables from housekeeping  */
+/* cleanup procedure.                                                 */
+static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
+	{"history",		&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_log",		&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_str",		&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_text",	&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_bin",		&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_uint",	&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
+	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
+	/* force events housekeeping mode on to perform problem cleanup when events housekeeping is disabled */
+	{"events",		&poption_mode_regular,	&poption_global_disabled},
+	{NULL}
+};
 
 /* The history item rules, used for housekeeping history and trends tables */
 /* The order of the rules must match the order of value types in zbx_item_value_type_t. */
@@ -274,6 +272,7 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
  ******************************************************************************/
 static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 {
+#define HK_INITIAL_DELETE_QUEUE_SIZE	4096
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
@@ -300,6 +299,7 @@ static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 	}
 
 	zbx_db_free_result(result);
+#undef HK_INITIAL_DELETE_QUEUE_SIZE
 }
 
 /******************************************************************************
