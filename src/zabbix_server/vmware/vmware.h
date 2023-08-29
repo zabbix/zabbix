@@ -564,6 +564,8 @@ zbx_thread_vmware_args;
 
 ZBX_THREAD_ENTRY(vmware_thread, args);
 
+zbx_hash_t	vmware_hv_hash(const void *data);
+int	vmware_hv_compare(const void *d1, const void *d2);
 int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
 void	zbx_vmware_destroy(void);
 
@@ -573,8 +575,6 @@ void	zbx_vmware_unlock(void);
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
 void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
-
-ZBX_SHMEM_FUNC_DECL(, __vm)
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
@@ -711,6 +711,7 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *config_source_ip, int config_vmware_timeout, char **error);
 
 int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
+int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
 
 #define ZBX_VPXD_STATS_MAXQUERYMETRICS				64
 #define ZBX_MAXQUERYMETRICS_UNLIMITED				1000
@@ -719,6 +720,4 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
-#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
-		__vm_shmem_realloc_func, __vm_shmem_free_func)
 #endif	/* ZABBIX_VMWARE_H */

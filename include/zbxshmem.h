@@ -92,43 +92,44 @@ void	zbx_shmem_dump_stats(int level, zbx_shmem_info_t *info);
 size_t		zbx_shmem_required_size(int chunks_num, const char *descr, const char *param);
 zbx_uint64_t	zbx_shmem_required_chunk_size(zbx_uint64_t size);
 
-#define ZBX_SHMEM_FUNC1_DECL_MALLOC(is_static, __prefix)		\
-is_static void	*__prefix ## _shmem_malloc_func(void *old, size_t size)
-#define ZBX_SHMEM_FUNC1_DECL_REALLOC(is_static, __prefix)		\
-is_static void	*__prefix ## _shmem_realloc_func(void *old, size_t size)
-#define ZBX_SHMEM_FUNC1_DECL_FREE(is_static, __prefix)			\
-is_static void	__prefix ## _shmem_free_func(void *ptr)
+#define ZBX_SHMEM_FUNC1_DECL_MALLOC(__prefix)				\
+static void	*__prefix ## _shmem_malloc_func(void *old, size_t size)
+#define ZBX_SHMEM_FUNC1_DECL_REALLOC(__prefix)				\
+static void	*__prefix ## _shmem_realloc_func(void *old, size_t size)
+#define ZBX_SHMEM_FUNC1_DECL_FREE(__prefix)				\
+static void	__prefix ## _shmem_free_func(void *ptr)
 
-#define ZBX_SHMEM_FUNC1_IMPL_MALLOC(is_static, __prefix, __info)	\
+#define ZBX_SHMEM_FUNC1_IMPL_MALLOC(__prefix, __info)			\
 									\
-is_static void	*__prefix ## _shmem_malloc_func(void *old, size_t size)	\
+static void	*__prefix ## _shmem_malloc_func(void *old, size_t size)	\
 {									\
 	return zbx_shmem_malloc(__info, old, size);			\
 }
 
-#define ZBX_SHMEM_FUNC1_IMPL_REALLOC(is_static, __prefix, __info)	\
+#define ZBX_SHMEM_FUNC1_IMPL_REALLOC(__prefix, __info)			\
 									\
-is_static void	*__prefix ## _shmem_realloc_func(void *old, size_t size)\
+static void	*__prefix ## _shmem_realloc_func(void *old, size_t size)\
 {									\
 	return zbx_shmem_realloc(__info, old, size);			\
 }
 
-#define ZBX_SHMEM_FUNC1_IMPL_FREE(is_static, __prefix, __info)		\
+#define ZBX_SHMEM_FUNC1_IMPL_FREE(__prefix, __info)			\
 									\
-is_static void	__prefix ## _shmem_free_func(void *ptr)			\
+static void	__prefix ## _shmem_free_func(void *ptr)			\
 {									\
 	zbx_shmem_free(__info, ptr);					\
 }
 
-#define ZBX_SHMEM_FUNC_DECL(is_static, __prefix)			\
+#define ZBX_SHMEM_FUNC_DECL(__prefix)					\
 									\
-ZBX_SHMEM_FUNC1_DECL_MALLOC(is_static, __prefix);			\
-ZBX_SHMEM_FUNC1_DECL_REALLOC(is_static, __prefix);			\
-ZBX_SHMEM_FUNC1_DECL_FREE(is_static, __prefix);
+ZBX_SHMEM_FUNC1_DECL_MALLOC(__prefix);					\
+ZBX_SHMEM_FUNC1_DECL_REALLOC(__prefix);					\
+ZBX_SHMEM_FUNC1_DECL_FREE(__prefix);
 
-#define ZBX_SHMEM_FUNC_IMPL(is_static, __prefix, __info)		\
+#define ZBX_SHMEM_FUNC_IMPL(__prefix, __info)				\
 									\
-ZBX_SHMEM_FUNC1_IMPL_MALLOC(is_static, __prefix, __info)		\
-ZBX_SHMEM_FUNC1_IMPL_REALLOC(is_static, __prefix, __info)		\
-ZBX_SHMEM_FUNC1_IMPL_FREE(is_static, __prefix, __info)
+ZBX_SHMEM_FUNC1_IMPL_MALLOC(__prefix, __info)				\
+ZBX_SHMEM_FUNC1_IMPL_REALLOC(__prefix, __info)				\
+ZBX_SHMEM_FUNC1_IMPL_FREE(__prefix, __info)
+
 #endif /* ZABBIX_SHMEM_H */

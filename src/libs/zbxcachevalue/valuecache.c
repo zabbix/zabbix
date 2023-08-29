@@ -68,7 +68,7 @@ zbx_rwlock_t	vc_lock = ZBX_RWLOCK_NULL;
 /* value cache state, after initialization value cache is always disabled */
 static int	vc_state = ZBX_VC_DISABLED;
 
-ZBX_SHMEM_FUNC_IMPL(static, __vc, vc_mem)
+ZBX_SHMEM_FUNC_IMPL(__vc, vc_mem)
 
 #define VC_STRPOOL_INIT_SIZE	(1000)
 #define VC_ITEMS_INIT_SIZE	(1000)

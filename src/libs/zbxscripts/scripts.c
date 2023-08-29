@@ -44,7 +44,7 @@ static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
 
 static zbx_mutex_t	remote_commands_lock = ZBX_MUTEX_NULL;
 static zbx_shmem_info_t	*remote_commands_mem = NULL;
-ZBX_SHMEM_FUNC_IMPL(static, __remote_commands, remote_commands_mem)
+ZBX_SHMEM_FUNC_IMPL(__remote_commands, remote_commands_mem)
 typedef struct
 {
 	zbx_uint64_t		maxid;

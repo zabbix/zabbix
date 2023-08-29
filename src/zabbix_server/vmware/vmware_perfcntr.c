@@ -22,6 +22,7 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "vmware_perfcntr.h"
+#include "vmware_shmem.h"
 #include "vmware.h"
 #include "vmware_internal.h"
 
@@ -212,22 +213,6 @@ void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pair_t *pa
 	}
 
 	pairs->values_num = 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees shared resources allocated to store performance counter     *
- *          data                                                              *
- *                                                                            *
- * Parameters: counter - [IN] the performance counter data                    *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_perf_counter_shared_free(zbx_vmware_perf_counter_t *counter)
-{
-	vmware_vector_str_uint64_pair_shared_clean(&counter->values);
-	zbx_vector_str_uint64_pair_destroy(&counter->values);
-	vmware_shared_strfree(counter->query_instance);
-	__vm_shmem_free_func(counter);
 }
 
 /******************************************************************************
@@ -554,33 +539,6 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates a new performance counter object in shared memory and     *
- *          adds to the specified vector                                      *
- *                                                                            *
- * Parameters: counters  - [IN/OUT] the vector the created performance        *
- *                                  counter object should be added to         *
- *             counterid - [IN] the performance counter id                    *
- *             state     - [IN] the performance counter first state           *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t counterid, unsigned char state)
-{
-	zbx_vmware_perf_counter_t	*counter;
-
-	counter = (zbx_vmware_perf_counter_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
-	counter->counterid = counterid;
-	counter->state = state;
-	counter->last_used = 0;
-	counter->query_instance = NULL;
-
-	zbx_vector_str_uint64_pair_create_ext(&counter->values, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
-			__vm_shmem_free_func);
-
-	zbx_vector_ptr_append(counters, counter);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: adds entity to vmware service performance entity list             *
  *                                                                            *
  * Parameters: service  - [IN] the vmware service                             *
@@ -612,13 +570,12 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
 
-		zbx_vector_ptr_create_ext(&pentity->counters, __vm_shmem_malloc_func, __vm_shmem_realloc_func,
-				__vm_shmem_free_func);
+		vmware_perf_counters_vector_ptr_create_ext(pentity);
 
 		for (i = 0; NULL != counters[i]; i++)
 		{
 			if (SUCCEED == zbx_vmware_service_get_counterid(service, counters[i], &counterid, NULL))
-				vmware_counters_add_new(&pentity->counters, counterid, ZBX_VMWARE_COUNTER_NEW);
+				vmware_perf_counters_add_new(&pentity->counters, counterid, ZBX_VMWARE_COUNTER_NEW);
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
 		}
@@ -1593,7 +1550,7 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 		entity.type = vmware_shared_strdup(type);
 		entity.id = vmware_shared_strdup(id);
 		entity.error = NULL;
-		VMWARE_VECTOR_CREATE(&entity.counters, ptr);
+		vmware_shmem_vector_ptr_create_ext(&entity.counters);
 
 		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity,
 				sizeof(zbx_vmware_perf_entity_t));
@@ -1601,7 +1558,7 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 
 	if (FAIL == (i = zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
-		vmware_counters_add_new(&pentity->counters, counterid,
+		vmware_perf_counters_add_new(&pentity->counters, counterid,
 				ZBX_VMWARE_COUNTER_NEW | ZBX_VMWARE_COUNTER_CUSTOM);
 		counter = (zbx_vmware_perf_counter_t *)pentity->counters.values[pentity->counters.values_num - 1];
 		zbx_vector_ptr_sort(&pentity->counters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);

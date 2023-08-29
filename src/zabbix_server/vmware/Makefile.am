@@ -9,6 +9,8 @@ endif
 endif
 
 libzbxvmware_a_SOURCES = \
+	vmware_shmem.c \
+	vmware_shmem.h \
 	vmware_stats.c \
 	$(VMWARE_FILES_WITH_LIBXML2) \
 	vmware_perfcntr.h \
