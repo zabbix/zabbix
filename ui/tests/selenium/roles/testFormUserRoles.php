@@ -1433,7 +1433,7 @@ class testFormUserRoles extends CWebTest {
 									->query('class:zi-more')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
-								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
+								$this->assertTrue($popup->query("xpath:.//span[text()=".CXPathHelper::escapeQuotes($tag)."]")
 										->one(false)->isValid()
 								);
 							}
