@@ -29,6 +29,7 @@ typedef struct
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
 	const char		*config_source_ip;
+	int			config_escalator_forks;
 }
 zbx_thread_escalator_args;
 
