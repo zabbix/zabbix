@@ -28,8 +28,6 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-extern int		CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY;
-
 static void	housekeep_service_problems(const zbx_vector_uint64_t *eventids)
 {
 	unsigned char	*data = NULL;
@@ -137,7 +135,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_setproctitle("%s [startup idle for %d second(s)]", get_process_type_string(process_type),
-			CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
+			trigger_housekeeper_args_in->config_problemhousekeeping_frequency);
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
 			trigger_housekeeper_args_in->config_timeout, &rtc);
@@ -147,8 +145,8 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY) &&
-				0 != rtc_cmd)
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data,
+				trigger_housekeeper_args_in->config_problemhousekeeping_frequency) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
@@ -171,7 +169,7 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 
 		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, idle for %d second(s)]",
 				get_process_type_string(process_type), deleted, zbx_time() - sec,
-				CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY);
+				trigger_housekeeper_args_in->config_problemhousekeeping_frequency);
 	}
 
 	zbx_db_close();

@@ -89,7 +89,6 @@ void	set_config_forks(unsigned char process_type, int forks)
 }
 
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
-int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 

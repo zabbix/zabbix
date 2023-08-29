@@ -25,6 +25,7 @@
 typedef struct
 {
 	int	config_timeout;
+	int	config_problemhousekeeping_frequency;
 }
 zbx_thread_server_trigger_housekeeper_args;
 

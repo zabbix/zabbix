@@ -290,7 +290,7 @@ static int	config_housekeeping_frequency	= 1;
 static int	config_max_housekeeper_delete	= 5000;		/* applies for every separate field value */
 int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
 
-int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
+static int	config_problemhousekeeping_frequency = 60;
 
 static int	config_vmware_frequency		= 60;
 static int	config_vmware_perf_frequency	= 60;
@@ -1011,7 +1011,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			100},
 		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ProblemHousekeepingFrequency",	&CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY,	TYPE_INT,
+		{"ProblemHousekeepingFrequency",	&config_problemhousekeeping_frequency,	TYPE_INT,
 			PARM_OPT,	1,			3600},
 		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
 			PARM_OPT,	1,			3600},
@@ -1424,7 +1424,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout,
 							config_housekeeping_frequency, config_max_housekeeper_delete};
-	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout};
+	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout,
+							config_problemhousekeeping_frequency};
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout,
 							config_proxyconfig_frequency, config_proxydata_frequency,
