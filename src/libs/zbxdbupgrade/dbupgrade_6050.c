@@ -810,10 +810,10 @@ static int	DBpatch_6050073(void)
 
 	ts = zbx_age2str((time_t)DBget_config_timeout());
 
-	if (ZBX_DB_OK > zbx_db_execute("update config set timeout_zabbix_agent='%s', timeout_simple_check='%s', "
-				"timeout_snmp_agent='%s', timeout_external_check='%s', timeout_db_monitor='%s', "
-				"timeout_http_agent='%s', timeout_ssh_agent='%s', timeout_telnet_agent='%s', "
-				"timeout_script='%s'", ts, ts, ts, ts, ts, ts, ts, ts, ts))
+	if (ZBX_DB_OK > zbx_db_execute("update config set timeout_zabbix_agent='%s',timeout_simple_check='%s',"
+		"timeout_snmp_agent='%s',timeout_external_check='%s',timeout_db_monitor='%s',timeout_http_agent='%s',"
+		"timeout_ssh_agent='%s',timeout_telnet_agent='%s',timeout_script='%s'", ts, ts, ts, ts, ts, ts, ts, ts,
+		ts))
 	{
 		return FAIL;
 	}
