@@ -376,7 +376,7 @@ $filter = [
 	'hosts' => []
 ];
 
-$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {

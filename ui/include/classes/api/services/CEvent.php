@@ -69,6 +69,8 @@ class CEvent extends CApiService {
 			'problem_time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'problem_time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'acknowledged' =>			['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'action' =>					['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => ZBX_PROBLEM_UPDATE_CLOSE.':'.(ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_ACKNOWLEDGE | ZBX_PROBLEM_UPDATE_MESSAGE | ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE | ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS | ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM), 'default' => null],
+			'action_userids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'suppressed' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'symptom' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'evaltype' =>				['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
@@ -77,7 +79,7 @@ class CEvent extends CApiService {
 				'operator' =>				['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
 				'value' =>					['type' => API_STRING_UTF8]
 			]],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'value', 'acknowledged', 'name', 'severity', 'action', 'action_userid', 'cause_eventid']],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'value', 'acknowledged', 'name', 'severity', 'cause_eventid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -418,6 +420,26 @@ class CEvent extends CApiService {
 			$sql_parts['where'][] = 'e.acknowledged='.$acknowledged;
 		}
 
+		// Acknowledge action and users that have performed the action.
+		$acknowledge_actions = [];
+
+		if ($options['action'] !== null) {
+			$acknowledge_actions[] = 'ack.action & '.$options['action'].'='.$options['action'];
+		}
+
+		if ($options['action_userids'] !== null) {
+			$acknowledge_actions[] = dbConditionId('ack.userid', $options['action_userids']);
+		}
+
+		if ($acknowledge_actions) {
+			$sql_parts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM acknowledges ack'.
+				' WHERE e.eventid=ack.eventid'.
+					' AND '.implode(' AND ', $acknowledge_actions).
+			')';
+		}
+
 		// suppressed
 		if ($options['suppressed'] !== null) {
 			$sql_parts['where'][] = (!$options['suppressed'] ? 'NOT ' : '').
@@ -600,48 +622,16 @@ class CEvent extends CApiService {
 	 * Apply filter conditions to SQL built query.
 	 *
 	 * @param array $options
+	 *        array $options['filter']['cause_eventids']  Cause event IDs to filter by.
 	 * @param array $sql_parts
-	 *
-	 * $options = [
-	 *     'filter' => [
-	 *         'action' =>          (int)       Acknowledge action(s) that must be performed on filtered events.
-	 *         'action_userid' =>   (int)       User which has performed acknowledge action.
-	 *         'cause_eventid' =>   (array)     Cause event IDs to filter by.
-	 *     ]
-	 * ]
 	 */
 	private function applyFilters(array $options, array &$sql_parts): void {
 		if ($options['countOutput'] || $options['groupBy']) {
 			return;
 		}
 
-		// Acknowledge action filter properties.
-		$acknowledge_actions = [
-			'ack.eventid=e.eventid'
-		];
-
-		if (array_key_exists('action', $options['filter']) && ctype_xdigit((string) $options['filter']['action'])
-				&& $options['filter']['action'] != ZBX_PROBLEM_UPDATE_NONE) {
-			$acknowledge_actions[] = 'ack.action & '.$options['filter']['action'].'='.$options['filter']['action'];
-		}
-
-		if (array_key_exists('action_userid', $options['filter'])
-				&& zbx_ctype_digit($options['filter']['action_userid'])) {
-			$acknowledge_actions[] = dbConditionId('ack.userid', [$options['filter']['action_userid']]);
-		}
-
-		if (count($acknowledge_actions) > 1) {
-			$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM acknowledges ack'.
-				' WHERE '.implode(' AND ', $acknowledge_actions).
-			')';
-		}
-
 		// Filter symptom events for given cause.
 		if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
-			zbx_value2array($options['filter']['cause_eventid']);
-
 			$sql_parts['from']['event_symptom'] = 'event_symptom es';
 			$sql_parts['where']['ese'] = 'es.eventid=e.eventid';
 			$sql_parts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);

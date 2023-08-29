@@ -19,7 +19,7 @@
 
 #include "taskmanager.h"
 
-#include "../../zabbix_server/scripts/scripts.h"
+#include "zbxscripts.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"
 #include "../../zabbix_server/poller/checks_snmp.h"
 
@@ -35,6 +35,8 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
+extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
+
 /**************************************************************************************
  *                                                                                    *
  * Purpose: execute remote command task                                               *
@@ -44,6 +46,7 @@
  *             ttl                           - [IN] task expiration period in seconds *
  *             now                           - [IN]                                   *
  *             config_timeout                - [IN]                                   *
+ *             config_trapper_timeout        - [IN]                                   *
  *             config_source_ip              - [IN]                                   *
  *             config_enable_remote_commands - [IN]                                   *
  *             config_log_remote_commands    - [IN]                                   *
@@ -53,7 +56,8 @@
  *                                                                                    *
  **************************************************************************************/
 static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, time_t now, int config_timeout,
-		const char *config_source_ip, int config_enable_remote_commands, int config_log_remote_commands)
+		int config_trapper_timeout, const char *config_source_ip, int config_enable_remote_commands,
+		int config_log_remote_commands)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -132,8 +136,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 		ZBX_DBROW2UINT64(alertid, row[11]);
 	}
 
-	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_source_ip, 0 == alertid ?
-			&info : NULL, error, sizeof(error), NULL)))
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_trapper_timeout,
+			config_source_ip, CONFIG_FORKS, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}
@@ -360,8 +364,9 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now,
-						config_comms->config_timeout, config_comms->config_source_ip,
-						config_enable_remote_commands, config_log_remote_commands))
+						config_comms->config_timeout, config_comms->config_trapper_timeout,
+						config_comms->config_source_ip, config_enable_remote_commands,
+						config_log_remote_commands))
 				{
 					processed_num++;
 				}

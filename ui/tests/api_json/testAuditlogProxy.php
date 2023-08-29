@@ -40,7 +40,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 		$create = $this->call('proxy.create', [
 			[
 				'name' => 'Audit proxy',
-				'mode' => PROXY_MODE_ACTIVE,
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Proxy audit description',
 				'tls_accept' => 2,
 				'allowed_addresses' => 'localhost',
@@ -78,7 +78,7 @@ class testAuditlogProxy extends testAuditlogCommon {
 			[
 				'proxyid' => self::PROXYID,
 				'name' => 'Updated Audit proxy',
-				'mode' => PROXY_MODE_ACTIVE,
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Update proxy audit description',
 				'tls_accept' => 2,
 				'allowed_addresses' => 'updated_address',
