@@ -28,10 +28,15 @@ class CControllerItemCreate extends CControllerItem {
 	protected function checkInput(): bool {
 		$ret = $this->validateFormInput(['hostid']);
 
+		if ($ret && $this->hasInput('type') && $this->hasInput('key')) {
+			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
+		}
+
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
+						'title' => _('Cannot add item'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				])])
