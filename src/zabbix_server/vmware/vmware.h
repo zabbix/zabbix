@@ -22,7 +22,6 @@
 #include "zbxthreads.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
-#include "zbxshmem.h"
 
 /* the vmware service state */
 #define ZBX_VMWARE_STATE_NEW		0x001
@@ -566,7 +565,6 @@ ZBX_THREAD_ENTRY(vmware_thread, args);
 
 zbx_hash_t	vmware_hv_hash(const void *data);
 int	vmware_hv_compare(const void *d1, const void *d2);
-int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
 void	zbx_vmware_destroy(void);
 
 void	zbx_vmware_lock(void);
