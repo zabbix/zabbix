@@ -20,20 +20,17 @@
 
 
 /**
- * Get data for item edit page.
+ * Get data for LLD rule edit page.
  *
- * @param array  $item                          Item, item prototype, LLD rule or LLD item to take the data from.
- * @param array  $options
- * @param bool   $options['form']               (mandatory)
- * @param bool   $options['is_discovery_rule']  (optional)
+ * @param array $item  LLD rule to take the data from.
  *
  * @return array
  */
-function getItemFormData(array $item = [], array $options = []) {
+function getItemFormData(array $item = []) {
 	$data = [
-		'form' => $options['form'],
+		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
-		'is_discovery_rule' => !empty($options['is_discovery_rule']),
+		'is_discovery_rule' => true,
 		'parent_discoveryid' => getRequest('parent_discoveryid', 0),
 		'itemid' => getRequest('itemid'),
 		'limited' => false,
@@ -200,10 +197,7 @@ function getItemFormData(array $item = [], array $options = []) {
 	// types, http items only for internal processes
 	$data['types'] = item_type2str();
 	unset($data['types'][ITEM_TYPE_HTTPTEST]);
-
-	if ($data['is_discovery_rule']) {
-		unset($data['types'][ITEM_TYPE_CALCULATED], $data['types'][ITEM_TYPE_SNMPTRAP]);
-	}
+	unset($data['types'][ITEM_TYPE_CALCULATED], $data['types'][ITEM_TYPE_SNMPTRAP]);
 
 	// item
 	if (array_key_exists('itemid', $item)) {
@@ -213,42 +207,14 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['interfaceid'] = $item['interfaceid'];
 
 		// discovery rule
-		if ($data['is_discovery_rule']) {
-			$flag = ZBX_FLAG_DISCOVERY_RULE;
-		}
-		// item prototype
-		elseif ($data['parent_discoveryid'] != 0) {
-			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-
+		$flag = ZBX_FLAG_DISCOVERY_RULE;
 		$data['templates'] = makeItemTemplatesHtml($item['itemid'], getItemParentTemplates([$item], $flag), $flag,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 	}
 
 	// caption
-	if ($data['is_discovery_rule']) {
-		$data['caption'] = _('Discovery rule');
-	}
-	else {
-		$data['caption'] = _('Item prototype');
-	}
-
-	// hostname
-	if (empty($data['is_discovery_rule']) && empty($data['hostname'])) {
-		if (!empty($data['hostid'])) {
-			$hostInfo = API::Host()->get([
-				'hostids' => $data['hostid'],
-				'output' => ['name'],
-				'templated_hosts' => true
-			]);
-			$hostInfo = reset($hostInfo);
-			$data['hostname'] = $hostInfo['name'];
-		}
-		else {
-			$data['hostname'] = _('not selected');
-		}
-	}
+	$data['caption'] = _('Discovery rule');
 
 	// fill data from item
 	if (!hasRequest('form_refresh') && ($item || $data['limited'])) {
@@ -295,10 +261,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
 
-		if (!$data['is_discovery_rule']) {
-			$data['tags'] = $data['item']['tags'];
-		}
-
 		if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
 			// Convert hash to array where every item is hash for single key value pair as it is used by view.
 			$headers = [];
@@ -314,10 +276,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		}
 
 		$data['preprocessing'] = $data['item']['preprocessing'];
-
-		if (!$data['is_discovery_rule']) {
-			$data['output_format'] = $data['item']['output_format'];
-		}
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['delay'] = $data['item']['delay'];
@@ -381,56 +339,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		['field' => 'interfaceid','order' => ZBX_SORT_UP]
 	]);
 
-	if (!$data['is_discovery_rule'] && $data['form'] === 'clone') {
-		if ($data['valuemapid'] != 0) {
-			$entity = ($data['parent_discoveryid'] == 0) ? API::Item() : API::ItemPrototype();
-			$cloned_item = $entity->get([
-				'output' => ['templateid'],
-				'selectValueMap' => ['name'],
-				'itemids' => $data['itemid']
-			]);
-			$cloned_item = reset($cloned_item);
-
-			if ($cloned_item['templateid'] != 0) {
-				$host_valuemaps = API::ValueMap()->get([
-					'output' => ['valuemapid'],
-					'hostids' => $data['hostid'],
-					'filter' => ['name' => $cloned_item['valuemap']['name']]
-				]);
-
-				$data['valuemapid'] = $host_valuemaps ? $host_valuemaps[0]['valuemapid'] : 0;
-			}
-		}
-
-		$data['itemid'] = 0;
-		$data['form'] = 'create';
-	}
-
-	if ($data['is_discovery_rule']) {
-		unset($data['valuemapid']);
-	}
-	else if ($data['valuemapid'] != 0) {
-		$data['valuemap'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => $data['valuemapid']
-		]), ['valuemapid' => 'id']);
-	}
-	else {
-		$data['valuemap'] = [];
-	}
-
-	// possible host inventories
-	if ($data['parent_discoveryid'] == 0) {
-		$data['possibleHostInventories'] = getHostInventories();
-
-		// get already populated fields by other items
-		$data['alreadyPopulated'] = API::item()->get([
-			'output' => ['inventory_link'],
-			'filter' => ['hostid' => $data['hostid']],
-			'nopermissions' => true
-		]);
-		$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
-	}
+	unset($data['valuemapid']);
 
 	// unset ssh auth fields
 	if ($data['type'] != ITEM_TYPE_SSH) {
@@ -441,96 +350,6 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if ($data['type'] != ITEM_TYPE_DEPENDENT) {
 		$data['master_itemid'] = 0;
-	}
-
-	if (!$data['is_discovery_rule']) {
-		// Select inherited tags.
-		if ($data['show_inherited_tags'] && array_key_exists('item', $data)) {
-			if ($data['item']['discoveryRule']) {
-				$items = [$data['item']['discoveryRule']];
-				$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_RULE)['templates'];
-			}
-			else {
-				$items = [[
-					'templateid' => $data['item']['templateid'],
-					'itemid' => $data['itemid']
-				]];
-				$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
-			}
-			unset($parent_templates[0]);
-
-			$db_templates = $parent_templates
-				? API::Template()->get([
-					'output' => ['templateid'],
-					'selectTags' => ['tag', 'value'],
-					'templateids' => array_keys($parent_templates),
-					'preservekeys' => true
-				])
-				: [];
-
-			$inherited_tags = [];
-
-			// Make list of template tags.
-			foreach ($parent_templates as $templateid => $template) {
-				if (array_key_exists($templateid, $db_templates)) {
-					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						if (array_key_exists($tag['tag'], $inherited_tags)
-								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
-								$templateid => $template
-							];
-						}
-						else {
-							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-								'parent_templates' => [$templateid => $template],
-								'type' => ZBX_PROPERTY_INHERITED
-							];
-						}
-					}
-				}
-			}
-
-			$db_hosts = API::Host()->get([
-				'output' => ['hostid', 'name'],
-				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid'],
-				'templated_hosts' => true
-			]);
-
-			// Overwrite and attach host level tags.
-			if ($db_hosts) {
-				foreach ($db_hosts[0]['tags'] as $tag) {
-					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
-					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
-				}
-			}
-
-			// Overwrite and attach item's own tags.
-			foreach ($data['tags'] as $tag) {
-				if (array_key_exists($tag['tag'], $inherited_tags)
-						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-				}
-				else {
-					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-				}
-			}
-
-			$data['tags'] = [];
-
-			foreach ($inherited_tags as $tag) {
-				foreach ($tag as $value) {
-					$data['tags'][] = $value;
-				}
-			}
-		}
-
-		if (!$data['tags']) {
-			$data['tags'] = [['tag' => '', 'value' => '']];
-		}
-		else {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
-		}
 	}
 
 	return $data;
