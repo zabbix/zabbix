@@ -72,7 +72,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 	}
 
 	/**
-	 * Convert form submited data to be ready to send to API for update or create operation.
+	 * Convert form submitted data to be ready to send to API for update or create operation.
 	 *
 	 * @param array $input  Array of form input fields.
 	 */
@@ -81,6 +81,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 
 		if ($input['delay_flex']) {
 			$custom_intervals = $input['delay_flex'];
+			// isValidCustomIntervals is used to filter out custom intervals with empty value, not for validation.
 			isValidCustomIntervals($custom_intervals, true);
 			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
 		}

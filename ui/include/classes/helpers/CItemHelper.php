@@ -103,11 +103,15 @@ class CItemHelper extends CItemGeneralHelper {
 			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 		}
 
+		if ($item['tags']) {
+			CArrayHelper::sort($item['tags'], ['tag', 'value']);
+		}
+
 		return $item;
 	}
 
 	/**
-	 * Convert form submited data to be ready to send to API for update or create operation.
+	 * Convert form submitted data to be ready to send to API for update or create operation.
 	 *
 	 * @param array $input  Array of form input fields.
 	 */
@@ -116,6 +120,7 @@ class CItemHelper extends CItemGeneralHelper {
 
 		if ($input['delay_flex']) {
 			$custom_intervals = $input['delay_flex'];
+			// isValidCustomIntervals is used to filter out custom intervals with empty value, not for validation.
 			isValidCustomIntervals($custom_intervals);
 			$input['delay'] = getDelayWithCustomIntervals($input['delay'], $custom_intervals);
 		}

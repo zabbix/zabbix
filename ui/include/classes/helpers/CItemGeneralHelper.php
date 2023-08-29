@@ -197,7 +197,7 @@ class CItemGeneralHelper {
 	}
 
 	/**
-	 * Convert form submited data to be ready to send to API for update or create operation.
+	 * Convert form submitted data to be ready to send to API for update or create operation.
 	 *
 	 * @param array $input  Array of form input fields.
 	 */
