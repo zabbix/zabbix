@@ -932,7 +932,7 @@ static int	DBpatch_6050088(void)
 			"update widget_field wf"
 			" set wf.value_str=' '"
 			" where wf.name like 'columns.name.%%'"
-			" and wf.value_str=''"
+			" and wf.value_str like ''"
 			" and wf.widgetid in ("
 				"select w.widgetid"
 				" from widget w"
