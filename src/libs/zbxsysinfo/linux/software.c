@@ -151,6 +151,7 @@ static void	print_packages(char **buffer, size_t *alloc_len, size_t *offset, zbx
 	if (NULL != manager)
 		zbx_snprintf_alloc(buffer, alloc_len, offset, "[%s]", manager);
 
+
 	if (0 < packages->values_num)
 	{
 		if (NULL != manager)
@@ -276,7 +277,7 @@ next:
 	zbx_vector_str_destroy(&packages);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, output));
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(output)));
 	else
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
 
