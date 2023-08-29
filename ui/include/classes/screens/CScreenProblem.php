@@ -261,10 +261,8 @@ class CScreenProblem extends CScreenBase {
 				unset($options['symptom']);
 			}
 
-			$filter_options = [];
-
 			if (array_key_exists('cause_eventid', $filter) && $filter['cause_eventid']) {
-				$filter_options['cause_eventid'] = $filter['cause_eventid'];
+				$options['filter']['cause_eventid'] = $filter['cause_eventid'];
 			}
 
 			if (array_key_exists('acknowledgement_status', $filter)) {
@@ -277,17 +275,13 @@ class CScreenProblem extends CScreenBase {
 						$options['acknowledged'] = true;
 
 						if (array_key_exists('acknowledged_by_me', $filter) && $filter['acknowledged_by_me'] == 1) {
-							$filter_options += [
+							$options += [
 								'action' => ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
-								'action_userid' => CUser::$userData['userid']
+								'action_userids' => CUser::$userData['userid']
 							];
 						}
 						break;
 				}
-			}
-
-			if ($filter_options) {
-				$options['filter'] = $filter_options;
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
@@ -1455,10 +1449,16 @@ class CScreenProblem extends CScreenBase {
 				? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
 				: [];
 			$description[] = (new CLinkAction($problem['name']))
-				->setMenuPopup(CMenuPopupHelper::getTrigger($trigger['triggerid'], $problem['eventid'],
-					['show_rank_change_cause' => true, 'show_rank_change_symptom' => true]
-				))
-				->addClass(ZBX_STYLE_WORDBREAK);
+				->addClass(ZBX_STYLE_WORDBREAK)
+				->setMenuPopup(CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'problem.view')
+						->getUrl(),
+					'eventid' => $problem['eventid'],
+					'show_rank_change_cause' => true,
+					'show_rank_change_symptom' => true
+				]));
 
 			$opdata = null;
 

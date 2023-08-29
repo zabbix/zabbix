@@ -285,8 +285,10 @@ $graphForm->addItem([
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $data['hostid'],
-		'checkbox_object' => 'group_graphid'
+		'checkbox_hash' => $data['parent_discoveryid'] ?? $data['hostid'],
+		'checkbox_object' => 'group_graphid',
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

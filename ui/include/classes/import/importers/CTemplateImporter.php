@@ -397,6 +397,10 @@ class CTemplateImporter extends CImporter {
 			}
 		}
 
+		if (!$this->options['templates']['createMissing'] && !$this->options['templates']['updateExisting']) {
+			return $template;
+		}
+
 		foreach ($template['groups'] as $index => $group) {
 			$groupid = $this->referencer->findTemplateGroupidByName($group['name']);
 
