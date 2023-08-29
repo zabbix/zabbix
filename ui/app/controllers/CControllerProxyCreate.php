@@ -32,13 +32,13 @@ class CControllerProxyCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'name' =>					'required|not_empty|db proxy.name',
-			'mode' =>					'required|db proxy.mode|in '.implode(',', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE]),
-			'address' =>				'db proxy.address',
-			'port' =>					'db proxy.port',
-			'allowed_addresses' =>		'db proxy.allowed_addresses',
-			'description' =>			'db proxy.description',
-			'tls_connect' =>			'db proxy.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
+			'name' =>					'required|string|not_empty',
+			'operating_mode' =>			'required|in '.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
+			'address' =>				'string',
+			'port' =>					'string',
+			'allowed_addresses' =>		'string',
+			'description' =>			'string',
+			'tls_connect' =>			'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
 			'tls_accept_none' =>		'in 1',
 			'tls_accept_psk' =>			'in 1',
 			'tls_accept_certificate' =>	'in 1',
@@ -63,8 +63,8 @@ class CControllerProxyCreate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			switch ($this->getInput('mode')) {
-				case PROXY_MODE_ACTIVE:
+			switch ($this->getInput('operating_mode')) {
+				case PROXY_OPERATING_MODE_ACTIVE:
 					if (!$this->hasInput('tls_accept_none') && !$this->hasInput('tls_accept_psk')
 							&& !$this->hasInput('tls_accept_certificate')) {
 						info(_s('Incorrect value for field "%1$s": %2$s.', _('Connections from proxy'),
@@ -76,7 +76,7 @@ class CControllerProxyCreate extends CController {
 
 					break;
 
-				case PROXY_MODE_PASSIVE:
+				case PROXY_OPERATING_MODE_PASSIVE:
 					if ($this->getInput('address', '')	== '') {
 						info(
 							_s('Incorrect value for field "%1$s": %2$s.', _('Address'), _('cannot be empty'))
@@ -95,8 +95,8 @@ class CControllerProxyCreate extends CController {
 			}
 
 			if (!$this->getInput('clone_psk')) {
-				if (($this->getInput('mode') == PROXY_MODE_ACTIVE && $this->hasInput('tls_accept_psk'))
-						|| ($this->getInput('mode') == PROXY_MODE_PASSIVE
+				if (($this->getInput('operating_mode') == PROXY_OPERATING_MODE_ACTIVE && $this->hasInput('tls_accept_psk'))
+						|| ($this->getInput('operating_mode') == PROXY_OPERATING_MODE_PASSIVE
 							&& $this->getInput('tls_connect', 0) == HOST_ENCRYPTION_PSK)) {
 					if ($this->getInput('tls_psk_identity', '') === '') {
 						info(_s('Incorrect value for field "%1$s": %2$s.', _('PSK identity'), _('cannot be empty')));
@@ -179,12 +179,12 @@ class CControllerProxyCreate extends CController {
 	protected function doAction() {
 		$proxy = [];
 
-		$this->getInputs($proxy, ['name', 'mode', 'description', 'tls_connect', 'tls_psk_identity', 'tls_psk',
-			'tls_issuer', 'tls_subject'
+		$this->getInputs($proxy, ['name', 'operating_mode', 'description', 'tls_connect', 'tls_psk_identity',
+			'tls_psk', 'tls_issuer', 'tls_subject'
 		]);
 
-		switch ($this->getInput('mode')) {
-			case PROXY_MODE_ACTIVE:
+		switch ($this->getInput('operating_mode')) {
+			case PROXY_OPERATING_MODE_ACTIVE:
 				$proxy['allowed_addresses'] = $this->getInput('allowed_addresses', '');
 
 				$proxy['tls_accept'] = ($this->hasInput('tls_accept_none') ? HOST_ENCRYPTION_NONE : 0)
@@ -198,7 +198,7 @@ class CControllerProxyCreate extends CController {
 
 				break;
 
-			case PROXY_MODE_PASSIVE:
+			case PROXY_OPERATING_MODE_PASSIVE:
 				$proxy['address'] = $this->getInput('address','');
 				$proxy['port'] = $this->getInput('port','');
 

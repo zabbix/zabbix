@@ -60,7 +60,7 @@ class CControllerPopupProxyEdit extends CController {
 
 		if ($this->hasInput('proxyid')) {
 			$db_proxies = API::Proxy()->get([
-				'output' => ['name', 'mode', 'allowed_addresses', 'description', 'tls_connect', 'tls_accept',
+				'output' => ['name', 'operating_mode', 'allowed_addresses', 'description', 'tls_connect', 'tls_accept',
 					'tls_issuer', 'tls_subject', 'address', 'port', 'custom_timeouts', 'timeout_zabbix_agent',
 					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
 					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script', 'compatibility'
@@ -87,11 +87,11 @@ class CControllerPopupProxyEdit extends CController {
 					|| $this->proxy['compatibility'] == ZBX_PROXY_VERSION_UNSUPPORTED,
 				'form' => [
 					'name' => $this->proxy['name'],
-					'mode' => (int) $this->proxy['mode'],
-					'address' => $this->proxy['mode'] == PROXY_MODE_PASSIVE
+					'operating_mode' => (int) $this->proxy['operating_mode'],
+					'address' => $this->proxy['operating_mode'] == PROXY_OPERATING_MODE_PASSIVE
 						? $this->proxy['address']
 						: DB::getDefault('proxy', 'address'),
-					'port' => $this->proxy['mode'] == PROXY_MODE_PASSIVE
+					'port' => $this->proxy['operating_mode'] == PROXY_OPERATING_MODE_PASSIVE
 						? $this->proxy['port']
 						: DB::getDefault('proxy', 'port'),
 					'allowed_addresses' => $this->proxy['allowed_addresses'],
@@ -136,7 +136,7 @@ class CControllerPopupProxyEdit extends CController {
 				'version_mismatch' => false,
 				'form' => [
 					'name' => DB::getDefault('proxy', 'name'),
-					'mode' => (int) DB::getDefault('proxy', 'mode'),
+					'operating_mode' => (int) DB::getDefault('proxy', 'operating_mode'),
 					'allowed_addresses' => DB::getDefault('proxy', 'allowed_addresses'),
 					'address' => DB::getDefault('proxy', 'address'),
 					'port' => DB::getDefault('proxy', 'port'),

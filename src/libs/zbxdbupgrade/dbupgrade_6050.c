@@ -29,7 +29,6 @@
 
 #ifndef HAVE_SQLITE3
 
-
 static int	DBpatch_6050000(void)
 {
 	const zbx_db_field_t	field = {"url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
@@ -390,7 +389,7 @@ static int	DBpatch_6050034(void)
 			{
 				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"operating_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -451,7 +450,7 @@ static int	DBpatch_6050039(void)
 			" where h.status in (%i,%i)",
 			DEPRECATED_STATUS_PROXY_PASSIVE, DEPRECATED_STATUS_PROXY_ACTIVE);
 
-	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "mode", "description", "tls_connect",
+	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "operating_mode", "description", "tls_connect",
 			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
 			"address", "port", (char *)NULL);
 
@@ -467,7 +466,7 @@ static int	DBpatch_6050039(void)
 
 		if (DEPRECATED_STATUS_PROXY_ACTIVE == status)
 		{
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_ACTIVE, row[3],
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_ACTIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
 					"127.0.0.1", "10051");
 		}
@@ -488,7 +487,7 @@ static int	DBpatch_6050039(void)
 				zabbix_log(LOG_LEVEL_WARNING, "cannot select interface for proxy '%s'",  row[1]);
 			}
 
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_PASSIVE, row[3],
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_PASSIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address, port);
 		}
 	}
@@ -698,7 +697,7 @@ static int	DBpatch_6050062(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update profiles"
 			" set value_str='name'"
-			" where value_str='host'"
+			" where value_str like 'host'"
 				" and idx='web.proxies.php.sort'"))
 	{
 		return FAIL;
@@ -734,13 +733,205 @@ static int	DBpatch_6050063(void)
 
 static int	DBpatch_6050064(void)
 {
+	if (FAIL == zbx_db_index_exists("dashboard_user", "dashboard_user_2"))
+		return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050065(void)
+{
+	if (FAIL == zbx_db_index_exists("dashboard_usrgrp", "dashboard_usrgrp_2"))
+		return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050066(void)
+{
+	if (FAIL == zbx_db_index_exists("event_suppress", "event_suppress_4"))
+		return DBcreate_index("event_suppress", "event_suppress_4", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050067(void)
+{
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_1"))
+		return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050068(void)
+{
+	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_2"))
+		return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050069(void)
+{
+	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_3"))
+		return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050070(void)
+{
+	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_1"))
+		return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050071(void)
+{
+	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_2"))
+		return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050072(void)
+{
+	if (FAIL == zbx_db_index_exists("hosts", "hosts_7"))
+		return DBcreate_index("hosts", "hosts_7", "templateid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050073(void)
+{
+	if (FAIL == zbx_db_index_exists("interface_discovery", "interface_discovery_1"))
+		return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050074(void)
+{
+	if (FAIL == zbx_db_index_exists("report", "report_2"))
+		return DBcreate_index("report", "report_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050075(void)
+{
+	if (FAIL == zbx_db_index_exists("report", "report_3"))
+		return DBcreate_index("report", "report_3", "dashboardid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050076(void)
+{
+	if (FAIL == zbx_db_index_exists("report_user", "report_user_2"))
+		return DBcreate_index("report_user", "report_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050077(void)
+{
+	if (FAIL == zbx_db_index_exists("report_user", "report_user_3"))
+		return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050078(void)
+{
+	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_2"))
+		return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050079(void)
+{
+	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_3"))
+		return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050080(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmaps", "sysmaps_4"))
+		return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050081(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_element_trigger", "sysmap_element_trigger_2"))
+		return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050082(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_user", "sysmap_user_2"))
+		return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050083(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_usrgrp", "sysmap_usrgrp_2"))
+		return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050084(void)
+{
+	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_1"))
+		return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050085(void)
+{
+	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_2"))
+		return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050086(void)
+{
+	if (FAIL == zbx_db_index_exists("task", "task_2"))
+		return DBcreate_index("task", "task_2", "proxyid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050087(void)
+{
+	if (FAIL == zbx_db_index_exists("users", "users_3"))
+		return DBcreate_index("users", "users_3", "roleid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050088(void)
+{
 	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050065(void)
+static int	DBpatch_6050089(void)
 {
 	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -748,7 +939,7 @@ static int	DBpatch_6050065(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050066(void)
+static int	DBpatch_6050090(void)
 {
 	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -756,7 +947,7 @@ static int	DBpatch_6050066(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050067(void)
+static int	DBpatch_6050091(void)
 {
 	const zbx_db_field_t	field = {"timeout_external_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -764,7 +955,7 @@ static int	DBpatch_6050067(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050068(void)
+static int	DBpatch_6050092(void)
 {
 	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -772,7 +963,7 @@ static int	DBpatch_6050068(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050069(void)
+static int	DBpatch_6050093(void)
 {
 	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -780,7 +971,7 @@ static int	DBpatch_6050069(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050070(void)
+static int	DBpatch_6050094(void)
 {
 	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -788,7 +979,7 @@ static int	DBpatch_6050070(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050071(void)
+static int	DBpatch_6050095(void)
 {
 	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -796,7 +987,7 @@ static int	DBpatch_6050071(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050072(void)
+static int	DBpatch_6050096(void)
 {
 	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -804,7 +995,7 @@ static int	DBpatch_6050072(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050073(void)
+static int	DBpatch_6050097(void)
 {
 	char	*ts;
 
@@ -821,7 +1012,7 @@ static int	DBpatch_6050073(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050074(void)
+static int	DBpatch_6050098(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update items set timeout='' where type not in (%d,%d)", ITEM_TYPE_HTTPAGENT,
 			ITEM_TYPE_SCRIPT))
@@ -832,83 +1023,82 @@ static int	DBpatch_6050074(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050075(void)
+static int	DBpatch_6050099(void)
 {
 	const zbx_db_field_t	field = {"timeout", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBset_default("items", &field);
 }
 
-static int	DBpatch_6050076(void)
+static int	DBpatch_6050100(void)
 {
 	const zbx_db_field_t	field = {"custom_timeouts", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050077(void)
+static int	DBpatch_6050101(void)
 {
 	const zbx_db_field_t	field = {"timeout_zabbix_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050078(void)
+static int	DBpatch_6050102(void)
 {
 	const zbx_db_field_t	field = {"timeout_simple_check", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050079(void)
+static int	DBpatch_6050103(void)
 {
 	const zbx_db_field_t	field = {"timeout_snmp_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050080(void)
+static int	DBpatch_6050104(void)
 {
 	const zbx_db_field_t	field = {"timeout_external_check", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050081(void)
+static int	DBpatch_6050105(void)
 {
 	const zbx_db_field_t	field = {"timeout_db_monitor", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050082(void)
+static int	DBpatch_6050106(void)
 {
 	const zbx_db_field_t	field = {"timeout_http_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050083(void)
+static int	DBpatch_6050107(void)
 {
 	const zbx_db_field_t	field = {"timeout_ssh_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050084(void)
+static int	DBpatch_6050108(void)
 {
 	const zbx_db_field_t	field = {"timeout_telnet_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050085(void)
+static int	DBpatch_6050109(void)
 {
 	const zbx_db_field_t	field = {"timeout_script", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
-
 
 #endif
 
@@ -1002,5 +1192,29 @@ DBPATCH_ADD(6050082, 0, 1)
 DBPATCH_ADD(6050083, 0, 1)
 DBPATCH_ADD(6050084, 0, 1)
 DBPATCH_ADD(6050085, 0, 1)
+DBPATCH_ADD(6050086, 0, 1)
+DBPATCH_ADD(6050087, 0, 1)
+DBPATCH_ADD(6050088, 0, 1)
+DBPATCH_ADD(6050089, 0, 1)
+DBPATCH_ADD(6050090, 0, 1)
+DBPATCH_ADD(6050091, 0, 1)
+DBPATCH_ADD(6050092, 0, 1)
+DBPATCH_ADD(6050093, 0, 1)
+DBPATCH_ADD(6050094, 0, 1)
+DBPATCH_ADD(6050095, 0, 1)
+DBPATCH_ADD(6050096, 0, 1)
+DBPATCH_ADD(6050097, 0, 1)
+DBPATCH_ADD(6050098, 0, 1)
+DBPATCH_ADD(6050099, 0, 1)
+DBPATCH_ADD(6050100, 0, 1)
+DBPATCH_ADD(6050101, 0, 1)
+DBPATCH_ADD(6050102, 0, 1)
+DBPATCH_ADD(6050103, 0, 1)
+DBPATCH_ADD(6050104, 0, 1)
+DBPATCH_ADD(6050105, 0, 1)
+DBPATCH_ADD(6050106, 0, 1)
+DBPATCH_ADD(6050107, 0, 1)
+DBPATCH_ADD(6050108, 0, 1)
+DBPATCH_ADD(6050109, 0, 1)
 
 DBPATCH_END()

@@ -38,6 +38,12 @@ libzbxpoller_a_SOURCES = \
 	async_agent.c \
 	async_httpagent.h \
 	async_httpagent.c \
+	async_manager.h \
+	async_manager.c \
+	async_worker.h \
+	async_worker.c \
+	async_queue.h \
+	async_queue.c \
 	poller.c \
 	poller.h
 
