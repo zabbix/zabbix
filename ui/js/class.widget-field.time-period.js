@@ -104,15 +104,17 @@ class CWidgetFieldTimePeriod {
 	set value(value) {
 		this.#field_value = value;
 
-		if ('reference' in value) {
-			if (value.reference === 'DASHBOARD') {
+		if (CWidgetBase.FOREIGN_REFERENCE_KEY in value) {
+			const {reference} = CWidgetBase.parseTypedReference(value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
+
+			if (reference === CDashboard.REFERENCE_DASHBOARD) {
 				this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DASHBOARD;
 			}
 			else {
 				this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET;
 			}
 
-			this.#selectReference(value.reference);
+			this.#selectTypedReference(value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
 		}
 		else {
 			this.#data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
@@ -136,18 +138,18 @@ class CWidgetFieldTimePeriod {
 	#initField() {
 		if (this.#widget_accepted) {
 			this.#reference_multiselect = jQuery(`#${this.#field_name}_reference`).multiSelect({
-				name: `${this.#field_name}[reference]`,
+				name: `${this.#field_name}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
 				selectedLimit: 1,
 				custom_select: true,
 				custom_suggest_list: (entities) => this.#getSuggestedList(entities),
-				custom_suggest_select_handler: (entity) => this.#selectReference(entity.id)
+				custom_suggest_select_handler: (entity) => this.#selectTypedReference(entity.id)
 			});
 
 			this.#reference_multiselect.multiSelect('getSelectButton').addEventListener('click', () => {
 				const popup = new ClassWidgetSelectPopup(this.#getWidgets());
 
 				popup.on('dialogue.submit', (e) => {
-					this.#selectReference(e.detail.reference);
+					this.#selectTypedReference(e.detail.reference);
 				});
 			});
 		}
@@ -179,9 +181,7 @@ class CWidgetFieldTimePeriod {
 		}
 
 		for (const reference_form_rows of document.querySelectorAll(`.js-${this.#field_name}-reference`)) {
-			reference_form_rows.style.display = this.#data_source == CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET
-				? ''
-				: 'none';
+			reference_form_rows.hidden = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET;
 		}
 
 		if (!this.#is_disabled && this.#data_source == CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET) {
@@ -209,7 +209,7 @@ class CWidgetFieldTimePeriod {
 		const date_picker_form_rows = `.js-${this.#field_name}-from, .js-${this.#field_name}-to`;
 
 		for (const element of document.querySelectorAll(date_picker_form_rows)) {
-			element.style.display = this.#data_source == CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT ? '' : 'none';
+			element.hidden = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
 		}
 	}
 
@@ -226,9 +226,9 @@ class CWidgetFieldTimePeriod {
 		return result_entities;
 	}
 
-	#selectReference(reference) {
+	#selectTypedReference(typed_reference) {
 		for (const widget of this.#getWidgets()) {
-			if (widget.id === reference) {
+			if (widget.id === typed_reference) {
 				this.#reference_multiselect.multiSelect('addData', [widget]);
 				break;
 			}
@@ -245,7 +245,7 @@ class CWidgetFieldTimePeriod {
 
 		for (const widget of widgets) {
 			result.push({
-				id: widget.getFields().reference,
+				id: CWidgetBase.createTypedReference({reference: widget.getFields().reference, type: this.#in_type}),
 				name: widget.getHeaderName()
 			});
 		}

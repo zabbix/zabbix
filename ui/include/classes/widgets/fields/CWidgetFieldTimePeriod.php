@@ -59,6 +59,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	}
 
 	public function setValue($value): self {
+		$value = (array) $value;
+
 		if (array_key_exists('data_source', $value)) {
 			unset($value['data_source']);
 		}
@@ -76,7 +78,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			$this->data_source = self::DATA_SOURCE_DEFAULT;
 		}
 
-		$this->value = (array) $value;
+		$this->value = $value;
 
 		return $this;
 	}
@@ -151,7 +153,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			}
 
 			if ($errors) {
-				$this->setValue($this->default);
+				$this->setValue($this->getDefault());
 
 				return $errors;
 			}
@@ -165,8 +167,12 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
-		if ($value !== $this->default && is_array($value)) {
-			if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
+		if ($value === $this->getDefault()) {
+			return;
+		}
+
+		switch ($this->data_source) {
+			case self::DATA_SOURCE_DEFAULT:
 				array_push($widget_fields,
 					[
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -179,14 +185,16 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 						'value' => $value['to']
 					]
 				);
-			}
-			elseif (array_key_exists('reference', $value)) {
+				break;
+
+			case self::DATA_SOURCE_WIDGET:
+			case self::DATA_SOURCE_DASHBOARD:
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'[reference]',
-					'value' => $value['reference']
+					'name' => $this->name.'['.self::FOREIGN_REFERENCE_KEY.']',
+					'value' => $value[self::FOREIGN_REFERENCE_KEY]
 				];
-			}
+				break;
 		}
 	}
 
@@ -209,7 +217,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	}
 
 	public function setToLabel(string $label): self {
-		$this->from_label = $label;
+		$this->to_label = $label;
 
 		return $this;
 	}

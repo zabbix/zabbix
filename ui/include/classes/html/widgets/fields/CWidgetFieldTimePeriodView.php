@@ -19,6 +19,8 @@
 **/
 
 
+use Zabbix\Widgets\CWidgetField;
+
 use Zabbix\Widgets\Fields\CWidgetFieldTimePeriod;
 
 class CWidgetFieldTimePeriodView extends CWidgetFieldView {
@@ -74,7 +76,9 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 		if ($this->field->isDashboardAccepted()) {
 			$view_collection[] = [
 				'label' => null,
-				'view' => (new CInput('hidden', $field_name.'[reference]', 'DASHBOARD'))
+				'view' => (new CInput('hidden', $field_name.'['.CWidgetField::FOREIGN_REFERENCE_KEY.']',
+					CWidgetField::createTypedReference(CWidgetField::REFERENCE_DASHBOARD, $this->field->getInType())
+				))
 					->setId($field_name.'_reference_dashboard')
 					->setEnabled(!$this->isDisabled()),
 				'class' => ZBX_STYLE_DISPLAY_NONE
@@ -87,9 +91,10 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 					->addClass('js-'.$field_name.'-reference')
 					->setAsteriskMark($this->isRequired()),
 				'view' =>  (new CMultiSelect([
-					'name' => $field_name.'[reference]',
+					'name' => $field_name.'['.CWidgetField::FOREIGN_REFERENCE_KEY.']',
 					'add_post_js' => false
 				]))
+					->setId($field_name.'_reference')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setAriaRequired($this->isRequired()),
 				'class' => $style_class.'js-'.$field_name.'-reference'

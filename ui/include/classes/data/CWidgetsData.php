@@ -28,7 +28,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectItemPrototype,
 	CWidgetFieldMultiSelectMap,
 	CWidgetFieldMultiSelectService,
-	CWidgetFieldMultiSelectSla
+	CWidgetFieldMultiSelectSla,
+	CWidgetFieldTimePeriod
 };
 
 class CWidgetsData {
@@ -44,6 +45,7 @@ class CWidgetsData {
 	public const DATA_TYPE_MAP_ID =				'_mapid';
 	public const DATA_TYPE_SERVICE_ID =			'_serviceid';
 	public const DATA_TYPE_SLA_ID =				'_slaid';
+	public const DATA_TYPE_TIME_PERIOD =		'_timeperiod';
 
 	/**
 	 * Get data types supported by widget communication framework out of the box.
@@ -131,6 +133,13 @@ class CWidgetsData {
 					'is_multiple' => false,
 					'accepts_dashboard_host' => false,
 					'accepts_dashboard_time_period' => false
+				],
+				self::DATA_TYPE_TIME_PERIOD => [
+					'field_class' => CWidgetFieldTimePeriod::class,
+					'label' => _('Time period'),
+					'is_multiple' => false,
+					'accepts_dashboard_host' => false,
+					'accepts_dashboard_time_period' => true
 				]
 			];
 		}
