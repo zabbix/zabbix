@@ -171,11 +171,15 @@ class CControllerUsergroupEdit extends CController {
 			$new_hostgroup_rights = $this->processNewRights($host_groups, 'ms_hostgroup_right', 'hostgroup_right');
 
 			if ($new_hostgroup_rights) {
+				CArrayHelper::sort($new_hostgroup_rights, ['name']);
+
 				return $this->sortGroupRights($new_hostgroup_rights);
 			}
 		}
 
 		$group_rights = getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : []);
+
+		CArrayHelper::sort($group_rights, ['name']);
 
 		return $this->sortGroupRights($group_rights);
 	}
@@ -196,11 +200,15 @@ class CControllerUsergroupEdit extends CController {
 			);
 
 			if ($new_templategroup_rights) {
+				CArrayHelper::sort($new_templategroup_rights, ['name']);
+
 				return $this->sortGroupRights($new_templategroup_rights);
 			}
 		}
 
 		$group_rights = getTemplateGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : []);
+
+		CArrayHelper::sort($group_rights, ['name']);
 
 		return $this->sortGroupRights($group_rights);
 	}
