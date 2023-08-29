@@ -430,7 +430,7 @@ class CWidgetBase {
 		const accessors = this.#getFieldsReferencesAccessors();
 
 		for (const [path, value] of Object.entries(data)) {
-			if (accessors.has(path)) {
+			if (!accessors.has(path)) {
 				continue;
 			}
 
