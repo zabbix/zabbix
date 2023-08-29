@@ -56,8 +56,8 @@ class testPageMaintenance extends CWebTest {
 			[
 				'name' => self::APPROACHING_MAINTENANCE,
 				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
-				'active_since' => '2017008000',
-				'active_till' => '2019600000',
+				'active_since' => 2017008000,
+				'active_till' => 2019600000,
 				'groups' => [
 					[
 						'groupid' => '20'
@@ -68,8 +68,8 @@ class testPageMaintenance extends CWebTest {
 			[
 				'name' => self::MULTIPLE_GROUPS_MAINTENANCE,
 				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
-				'active_since' => '1388534400',
-				'active_till' => '1420070400',
+				'active_since' => 1388534400,
+				'active_till' => 1420070400,
 				'groups' => [
 					[
 						'groupid' => '4'
@@ -83,8 +83,8 @@ class testPageMaintenance extends CWebTest {
 			[
 				'name' => self::HOST_MAINTENANCE,
 				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'active_since' => '1577836800',
-				'active_till' => '1577923200',
+				'active_since' => 1577836800,
+				'active_till' => 1577923200,
 				'hosts' => [
 					[
 						'hostid' => '10084'
@@ -95,8 +95,8 @@ class testPageMaintenance extends CWebTest {
 			[
 				'name' => self::FILTER_NAME_MAINTENANCE,
 				'maintenance_type' =>  MAINTENANCE_TYPE_NORMAL,
-				'active_since' => '1686009600',
-				'active_till' => '1688601600',
+				'active_since' => 1686009600,
+				'active_till' => 1688601600,
 				'groups' => [
 					[
 						'groupid' => '4'
@@ -107,8 +107,8 @@ class testPageMaintenance extends CWebTest {
 			[
 				'name' => self::ACTIVE_MAINTENANCE,
 				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'active_since' => '1688601600',
-				'active_till' => '2019600000',
+				'active_since' => 1688601600,
+				'active_till' => 2019600000,
 				'groups' => [
 					[
 						'groupid' => '4'
@@ -119,8 +119,8 @@ class testPageMaintenance extends CWebTest {
 			[
 				'name' => self::DESCRIPTION_MAINTENANCE,
 				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'active_since' => '1640995200',
-				'active_till' => '1640998800',
+				'active_since' => 1640995200,
+				'active_till' => 1640998800,
 				'description' => 'Test description of the maintenance',
 				'groups' => [
 					[
@@ -484,7 +484,7 @@ class testPageMaintenance extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Maintenance period'.(($count_names === 1) ? '' : 's').' deleted');
 		$this->assertSelectedCount(0);
 
-		if($count_names > 0){
+		if ($count_names > 0) {
 			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name IN ('.
 					CDBHelper::escape($data['name']).')')
 			);
