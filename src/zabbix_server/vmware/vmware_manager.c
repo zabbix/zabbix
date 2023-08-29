@@ -32,8 +32,6 @@
 
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 
-extern zbx_vmware_t			*vmware;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: return string value of vmware job types                           *
@@ -236,7 +234,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 			services_removed = 0;
 		}
 
-		while (NULL != (job = vmware_job_get(vmware, (int)time_now)))
+		while (NULL != (job = vmware_job_get(zbx_vmware_get_vmware(), (int)time_now)))
 		{
 			if (SUCCEED == job->expired)
 			{
@@ -246,7 +244,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 			services_updated += vmware_job_exec(job, vmware_args_in->config_source_ip,
 					vmware_args_in->config_vmware_timeout, vmware_args_in->config_vmware_frequency);
-			vmware_job_schedule(vmware, job, (time_t)time_now, vmware_args_in->config_vmware_frequency,
+			vmware_job_schedule(zbx_vmware_get_vmware(), job, (time_t)time_now, vmware_args_in->config_vmware_frequency,
 					vmware_args_in->config_vmware_perf_frequency);
 		}
 

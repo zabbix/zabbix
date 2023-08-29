@@ -75,7 +75,8 @@ void	vmware_shmem_vmware_job_free(zbx_vmware_job_t *job);
 zbx_vmware_entity_tags_t	*vmware_shmem_entity_tags_malloc(void);
 zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
-int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t *vmware, zbx_hashset_t *evt_msg_strpool,
+zbx_vmware_t			*zbx_vmware_get_vmware(void);
+int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmware, zbx_hashset_t *evt_msg_strpool,
 		char **error);
 
 #endif	/* ZABBIX_VMWARE_SHMEM_H */

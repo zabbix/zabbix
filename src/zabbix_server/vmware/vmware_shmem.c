@@ -1144,7 +1144,7 @@ zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
  * Comments: This function must be called before worker threads are forked.   *
  *                                                                            *
  ******************************************************************************/
-int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t *vmware, zbx_hashset_t *evt_msg_strpool,
+int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmware, zbx_hashset_t *evt_msg_strpool,
 		char **error)
 {
 	int		ret = FAIL;
@@ -1161,18 +1161,19 @@ int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t *vmwa
 	{
 		goto out;
 	}
-	vmware = (zbx_vmware_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_t));
 
-	memset(vmware, 0, sizeof(zbx_vmware_t));
+	*vmware = (zbx_vmware_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_t));
 
-	VMWARE_VECTOR_CREATE(&vmware->services, ptr);
+	memset(*vmware, 0, sizeof(zbx_vmware_t));
+
+	VMWARE_VECTOR_CREATE(&(*vmware)->services, ptr);
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	vmware->strpool_sz = 0;
+	(*vmware)->strpool_sz = 0;
 
 	zbx_hashset_create(evt_msg_strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func);
-	zbx_hashset_create_ext(&vmware->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
+	zbx_hashset_create_ext(&(*vmware)->strpool, 100, vmware_strpool_hash_func, vmware_strpool_compare_func, NULL,
 		__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
-	zbx_binary_heap_create_ext(&vmware->jobs_queue, vmware_job_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY,
+	zbx_binary_heap_create_ext(&(*vmware)->jobs_queue, vmware_job_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_EMPTY,
 			__vm_shmem_malloc_func, __vm_shmem_realloc_func, __vm_shmem_free_func);
 #else
 	ZBX_UNUSED(evt_msg_strpool);

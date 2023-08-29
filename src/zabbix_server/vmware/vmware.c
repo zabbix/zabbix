@@ -71,7 +71,7 @@
 
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
-zbx_vmware_t	*vmware = NULL;
+static zbx_vmware_t	*vmware = NULL;
 static zbx_hashset_t	evt_msg_strpool;
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
@@ -7591,12 +7591,17 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 }
 #endif
 
+zbx_vmware_t	*zbx_vmware_get_vmware(void)
+{
+	return vmware;
+}
+
 int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error)
 {
 	if (SUCCEED != zbx_mutex_create(&vmware_lock, ZBX_MUTEX_VMWARE, error))
 		return FAIL;
 
-	if (SUCCEED == vmware_shmem_init(config_vmware_cache_size, vmware, &evt_msg_strpool, error))
+	if (SUCCEED == vmware_shmem_init(config_vmware_cache_size, &vmware, &evt_msg_strpool, error))
 	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 		evt_req_chunk_size = zbx_shmem_required_chunk_size(sizeof(zbx_vmware_event_t));

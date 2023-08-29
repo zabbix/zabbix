@@ -712,6 +712,7 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
+zbx_vmware_t			*zbx_vmware_get_vmware(void);
 int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
 
 #endif	/* ZABBIX_VMWARE_H */
