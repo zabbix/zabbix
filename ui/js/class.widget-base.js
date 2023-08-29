@@ -81,6 +81,8 @@ class CWidgetBase {
 
 	#fields_referred_data = new Map();
 
+	#fields_referred_data_updated = new Set();
+
 	#fields_referred_data_subscriptions = [];
 
 	#feedback_cache = new Map();
@@ -481,6 +483,7 @@ class CWidgetBase {
 
 			if (reference === '') {
 				this.#fields_referred_data.set(path, {value: null, descriptor: null});
+				this.#fields_referred_data_updated.add(path);
 
 				continue;
 			}
@@ -500,6 +503,7 @@ class CWidgetBase {
 					}
 
 					this.#fields_referred_data.set(path, {value: data, descriptor});
+					this.#fields_referred_data_updated.add(path);
 
 					if (this._state === WIDGET_STATE_ACTIVE) {
 						this._startUpdating();
@@ -568,6 +572,7 @@ class CWidgetBase {
 		}
 
 		this.#fields_referred_data.clear();
+		this.#fields_referred_data_updated.clear();
 		this.#fields_referred_data_subscriptions = [];
 
 		this.#resetFieldsReferencesAccessors();
@@ -589,6 +594,15 @@ class CWidgetBase {
 	 */
 	getFieldsReferredData() {
 		return this.#fields_referred_data;
+	}
+
+	/**
+	 * Check whether the referred fields data has been updated since the last update cycle.
+	 *
+	 * @returns {boolean}
+	 */
+	isFieldsReferredDataUpdated(path) {
+		return this.#fields_referred_data_updated.has(path);
 	}
 
 	/**
@@ -1308,6 +1322,8 @@ class CWidgetBase {
 			.then(() => {
 				this._hidePreloader();
 				this._show_preloader_asap = false;
+
+				this.#fields_referred_data_updated.clear();
 
 				this.#broadcastDefaults();
 			})
