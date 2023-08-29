@@ -870,6 +870,64 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 	public static function getWidgetTableData() {
 		return [
+			// Check trigger urls.
+			[
+				[
+					'trigger_name' => 'First test trigger with tag priority',
+					'trigger_data' => [
+						[
+							'id' => '1007700',
+							'name' => 'First test trigger with tag priority',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING
+						]
+					],
+					'links' => [
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
+						'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253'],
+						'Trigger' => 'triggers.php?form=update&triggerid=99252&context=host'.
+								'&backurl=zabbix.php%3Faction%3Ddashboard.view',
+						'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
+								'&backurl=zabbix.php%3Faction%3Ddashboard.view'
+						]
+					],
+					'titles' => ['VIEW', 'CONFIGURATION']
+				]
+			],
+			// Check host urls.
+			[
+				[
+					'host_name' => 'ЗАББИКС Сервер',
+					'trigger_data' => [
+						[
+							'id' => '1007700',
+							'name' => 'First test trigger with tag priority',
+							'time' => strtotime('now'),
+							'problem_count' => '1',
+							'severity' => TRIGGER_SEVERITY_WARNING
+						]
+					],
+					'links' => [
+						'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
+						'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D=10084&filter_set=1',
+						'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D=10084&filter_set=1',
+						'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=10084&filter_set=1',
+						'Web' => '',
+						'Inventory' => 'hostinventories.php?hostid=10084',
+						'Host' => 'zabbix.php?action=host.edit&hostid=10084',
+						'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+						'Triggers' => 'triggers.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+						'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+						'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+						'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+						'Detect operating system' => '',
+						'Ping' => '',
+						'Traceroute' => ''
+					],
+					'titles' => ['VIEW', 'CONFIGURATION', 'SCRIPTS']
+				]
+			],
 			// Check widget data with all possible severity types and different problems count.
 			[
 				[
@@ -1488,13 +1546,40 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		}
 
-		$this->assertTableData($data['expected']);
+		if (array_key_exists('expected', $data)) {
+			$this->assertTableData($data['expected']);
 
-		foreach ($data['background_color'] as $trigger => $colors) {
-			$table = $dashboard->getWidget(self::DATA_WIDGET)->getContent()->asTable();
-			$this->assertEquals($data['background_color'][$trigger], $table->findRow('Trigger', $trigger)
-					->getColumn('Severity')->getAttribute('class')
-			);
+			foreach ($data['background_color'] as $trigger => $colors) {
+				$table = $dashboard->getWidget(self::DATA_WIDGET)->getContent()->asTable();
+				$this->assertEquals($data['background_color'][$trigger], $table->findRow('Trigger', $trigger)
+						->getColumn('Severity')->getAttribute('class')
+				);
+			}
+		}
+
+		if (array_key_exists('trigger_name', $data) || array_key_exists('host_name', $data)) {
+			$this->query('link', ((array_key_exists('host_name', $data))
+				? $data['host_name']
+				: $data['trigger_name']))->one()->waitUntilClickable()->click();
+
+			// Check trigger popup menu.
+			$trigger_popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+			$this->assertTrue($trigger_popup->hasTitles($data['titles']));
+
+			foreach ($data['links'] as $menu => $links) {
+				// Check 2-level menu links.
+				if (is_array($links)) {
+					$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
+					$this->assertEquals(array_keys($links), [$item_link->getText()]);
+					$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
+				}
+				else {
+					// Check 1-level menu links.
+					if ($links !== '') {
+						$this->assertStringContainsString($links, $trigger_popup->getItem($menu)->getAttribute('href'));
+					}
+				}
+			}
 		}
 	}
 }
