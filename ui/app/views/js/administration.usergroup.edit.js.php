@@ -101,19 +101,28 @@
 
 			$(ms).multiSelect();
 
-			for (const id in groups) {
-				if (groups.hasOwnProperty(id)) {
-					const group = {
-						'id': groups[id]['groupid'],
-						'name': groups[id]['name']
-					};
+			if (!groups.length) {
+				if (group_type === 'templategroup') {
+					this.#setMultiselectDisabling('ms_templategroup');
+				} else if (group_type === 'hostgroup') {
+					this.#setMultiselectDisabling('ms_hostgroup');
+				}
+			}
+			else {
+				for (const id in groups) {
+					if (groups.hasOwnProperty(id)) {
+						const group = {
+							'id': groups[id]['groupid'],
+							'name': groups[id]['name']
+						};
 					$(ms).multiSelect('addData', [group]);
 
 					disable_groupids.push(group['id']);
+					}
 				}
-			}
 
-			$(ms).multiSelect('setDisabledEntries', disable_groupids);
+				$(ms).multiSelect('setDisabledEntries', disable_groupids);
+			}
 
 			const permission_radio = document
 				.querySelector(`input[name="${group_type}_right[permission][${rowid}]"][value="${permission}"]`);
@@ -146,8 +155,7 @@
 					let input_name = is_single
 						? `input[name^="${group_type}"]`
 						: `input[name^="${group_type}_right[groupids]"]`;
-					const groupids = [...event.target.querySelectorAll(input_name)]
-						.map(input => input.value);
+					const groupids = [...event.target.querySelectorAll(input_name)].map(input => input.value);
 
 					$(ms).multiSelect('setDisabledEntries', groupids);
 				});
