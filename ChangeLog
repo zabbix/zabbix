@@ -26,6 +26,7 @@ A.F.I..PS. [ZBXNEXT-8500,ZBXNEXT-8506] moved proxies to separate database tables
 .........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
 .......PS. [ZBXNEXT-8567] added asynchronous SNMP pollers (vso)
 .......PS. [ZBXNEXT-8620] added asynchronous DNS resolving for async SNMP and Zabbix agent pollers (vso)
+..F....... [ZBXNEXT-8444] moved template configuration form to modal window (esekace)
 
 Bug fixes:
 A.F....... [ZBX-23240] fixed filtering by "action" and "action_userid" in event.get and problem.get not working (agriscenko)
