@@ -28,6 +28,7 @@ import (
 )
 
 const (
+	keyCustomQuery            = "mysql.custom.query"
 	keyDatabasesDiscovery     = "mysql.db.discovery"
 	keyDatabaseSize           = "mysql.db.size"
 	keyPing                   = "mysql.ping"
@@ -44,6 +45,8 @@ type handlerFunc func(ctx context.Context, conn MyClient,
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {
 	switch key {
+	case keyCustomQuery:
+		return customQueryHandler
 	case keyDatabasesDiscovery:
 		return databasesDiscoveryHandler
 	case keyDatabaseSize:
@@ -58,7 +61,6 @@ func getHandlerFunc(key string) handlerFunc {
 		return statusVarsHandler
 	case keyVersion:
 		return versionHandler
-
 	default:
 		return nil
 	}
@@ -80,13 +82,20 @@ var (
 )
 
 var metrics = metric.MetricSet{
+	keyCustomQuery: metric.New("Returns result of a custom query.",
+		[]*metric.Param{paramURI, paramUsername, paramPassword,
+			metric.NewParam("QueryName", "Name of a custom query "+
+				"(must be equal to a name of an SQL file without an extension).").SetRequired(),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, true),
+
 	keyDatabasesDiscovery: metric.New("Returns list of databases in LLD format.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
 			paramTLSKeyFile}, false),
 
 	keyDatabaseSize: metric.New("Returns size of given database in bytes.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam("Database", "Database name.").SetRequired(),
-			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword,
+			metric.NewParam("Database", "Database name.").SetRequired(), paramTLSConnect, paramTLSCaFile,
+			paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyPing: metric.New("Tests if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
@@ -97,8 +106,8 @@ var metrics = metric.MetricSet{
 			paramTLSKeyFile}, false),
 
 	keyReplicationSlaveStatus: metric.New("Returns replication status.",
-		[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam("Master", "Master host."), paramTLSConnect, paramTLSCaFile, paramTLSCertFile,
-			paramTLSKeyFile}, false),
+		[]*metric.Param{paramURI, paramUsername, paramPassword, metric.NewParam("Master", "Master host."),
+			paramTLSConnect, paramTLSCaFile, paramTLSCertFile, paramTLSKeyFile}, false),
 
 	keyStatusVars: metric.New("Returns values of global status variables.",
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramTLSConnect, paramTLSCaFile, paramTLSCertFile,

@@ -733,7 +733,8 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'form_name' => $triggersForm->getName()
+		'form_name' => $triggersForm->getName(),
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

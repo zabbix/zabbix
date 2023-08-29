@@ -325,10 +325,19 @@ int	zbx_wis_uint(const wchar_t *wide_string)
  ******************************************************************************/
 const char	*zbx_print_double(char *buffer, size_t size, double val)
 {
-	zbx_snprintf(buffer, size, "%.15G", val);
+	double	ipart;
 
-	if (atof(buffer) != val)
+	if (0.0 == modf(val, &ipart))
+	{
 		zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
+	}
+	else
+	{
+		zbx_snprintf(buffer, size, "%.15G", val);
+
+		if (atof(buffer) != val)
+			zbx_snprintf(buffer, size, ZBX_FS_DBL64, val);
+	}
 
 	return buffer;
 }
