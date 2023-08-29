@@ -1,1 +1,0 @@
-A.F....... [ZBX-23240] fixed filtering by "action" and "action_userid" in event.get and problem.get not working (agriscenko)

@@ -19,6 +19,7 @@ A.F.I..PS. [ZBXNEXT-8500,ZBXNEXT-8506] moved proxies to separate database tables
 .........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
 
 Bug fixes:
+A.F....... [ZBX-23240] fixed filtering by "action" and "action_userid" in event.get and problem.get not working (agriscenko)
 .D........ [ZBX-21952] fixed and improved documentation for Oracle by ODBC template (knaglis)
 ..F....... [ZBX-22980] fixed host prototype displaying inherited macros in a non-inherited macro tab (Ivo)
 ..F....... [ZBX-17279] fixed graph widget loading (apoga)
