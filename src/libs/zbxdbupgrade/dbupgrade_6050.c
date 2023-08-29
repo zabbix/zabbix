@@ -735,7 +735,8 @@ static int	DBpatch_6050063(void)
 
 static int	DBpatch_6050064(void)
 {
-	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -751,7 +752,8 @@ static int	DBpatch_6050065(void)
 }
 static int	DBpatch_6050066(void)
 {
-	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -765,7 +767,8 @@ static int	DBpatch_6050067(void)
 }
 static int	DBpatch_6050068(void)
 {
-	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -779,7 +782,8 @@ static int	DBpatch_6050069(void)
 }
 static int	DBpatch_6050070(void)
 {
-	const zbx_db_field_t	field = {"timeout_external_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_external_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -793,7 +797,8 @@ static int	DBpatch_6050071(void)
 }
 static int	DBpatch_6050072(void)
 {
-	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -807,7 +812,8 @@ static int	DBpatch_6050073(void)
 }
 static int	DBpatch_6050074(void)
 {
-	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -822,7 +828,8 @@ static int	DBpatch_6050075(void)
 
 static int	DBpatch_6050076(void)
 {
-	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -836,7 +843,8 @@ static int	DBpatch_6050077(void)
 }
 static int	DBpatch_6050078(void)
 {
-	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
@@ -850,7 +858,8 @@ static int	DBpatch_6050079(void)
 }
 static int	DBpatch_6050080(void)
 {
-	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBadd_field("config", &field);
 }
