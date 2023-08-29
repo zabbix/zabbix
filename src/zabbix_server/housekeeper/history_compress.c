@@ -54,7 +54,7 @@ static int		compress_older_cache = 0;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check that hypertables are segmented by                           *
+ * Purpose: check that hypertables are segmented                              *
  *                                                                            *
  * Parameters: table_name - [IN] hypertable name                              *
  *             segmentby  - [IN] field to segment by                          *
@@ -69,7 +69,7 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
-	/* get hypertable segmentby attribute name */
+	/* get hypertable's 'segmentby' attribute name */
 
 	if (1 == ZBX_DB_TSDB_V1)
 	{
@@ -177,7 +177,7 @@ static void	hk_check_table_compression_age(const char *table_name, int age)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: turns table compression on for items older than specified age     *
+ * Purpose: turns on table compression for items older than specified age     *
  *                                                                            *
  * Parameters: age - [IN] compression age                                     *
  *                                                                            *
@@ -210,7 +210,7 @@ static void	hk_history_enable_compression(int age)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: turns table compression off                                       *
+ * Purpose: turns off table compression                                       *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_disable_compression(void)
@@ -233,7 +233,7 @@ static void	hk_history_disable_compression(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initializing compression for history/trends tables                *
+ * Purpose: initialize compression for history/trends tables                  *
  *                                                                            *
  ******************************************************************************/
 void	hk_history_compression_init(void)
@@ -242,8 +242,6 @@ void	hk_history_compression_init(void)
 	int		disable_compression = 0;
 	char		*db_log_level = NULL;
 	zbx_config_t	cfg;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -255,7 +253,8 @@ void	hk_history_compression_init(void)
 	if (0 == zbx_strcmp_null(cfg.db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 	{
 		/* suppress notice logs during DB initialization */
-		result = zbx_db_select("show client_min_messages");
+		zbx_db_result_t	result = zbx_db_select("show client_min_messages");
+		zbx_db_row_t	row;
 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -306,7 +305,7 @@ void	hk_history_compression_init(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: history compression settings periodic update                      *
+ * Purpose: updates history compression period settings                       *
  *                                                                            *
  * Parameters: cfg - [IN] database extension history compression settings     *
  *                                                                            *

@@ -31,7 +31,6 @@ typedef struct
 }
 zbx_thread_housekeeper_args;
 
-
 ZBX_THREAD_ENTRY(housekeeper_thread, args);
 
 #endif
