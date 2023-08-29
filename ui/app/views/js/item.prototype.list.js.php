@@ -41,7 +41,7 @@
 			));
 			this.form.addEventListener('click', e => {
 				const target = e.target;
-				const selectedids = Object.keys(chkbxRange.getSelectedIds());
+				const itemids = Object.keys(chkbxRange.getSelectedIds());
 
 				if (target.matches('.js-update-item')) {
 					this.#edit(target, {...target.dataset, action: 'item.edit'});
@@ -56,13 +56,18 @@
 					this.#disable(null, {...target.dataset, itemids: [target.dataset.itemid]});
 				}
 				else if (target.matches('.js-massenable-itemprototype')) {
-					this.#enable(target, {itemids: selectedids, context: this.context, field: 'status'});
+					this.#enable(target, {itemids: itemids, context: this.context, field: 'status'});
 				}
 				else if (target.matches('.js-massdisable-itemprototype')) {
-					this.#disable(target, {itemids: selectedids, context: this.context, field: 'status'});
+					this.#disable(target, {itemids: itemids, context: this.context, field: 'status'});
+				}
+				else if (target.classList.contains('js-massupdate-itemprototype')) {
+					this.#massupdate(target, {ids: itemids, context: this.context,
+						parent_discoveryid: this.form.querySelector('#form_parent_discoveryid').value
+					});
 				}
 				else if (target.matches('.js-massdelete-itemprototype')) {
-					this.#delete(target, {itemids: selectedids, context: this.context});
+					this.#delete(target, {itemids: itemids, context: this.context});
 				}
 			});
 		}
@@ -146,6 +151,13 @@
 			this.#popup(action, parameters, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+		}
+
+		#massupdate(target, parameters) {
+			this.#popup('item.prototype.massupdate', {...this.token, ...parameters, prototype: 1}, {
+				dialogue_class: 'modal-popup-preprocessing',
 				trigger_element: target
 			});
 		}

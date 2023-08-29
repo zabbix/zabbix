@@ -116,7 +116,7 @@
 					this.#copy(target, itemids);
 				}
 				else if (target.classList.contains('js-massupdate-item')) {
-					this.#massupdate(target, {ids: itemids, prototype: 0, context: this.context});
+					this.#massupdate(target, {ids: itemids, context: this.context});
 				}
 				else if (target.classList.contains('js-massdelete-item')) {
 					this.#delete(target, {itemids: itemids, context: this.context});
@@ -186,7 +186,7 @@
 		}
 
 		#massupdate(target, parameters) {
-			this.#popup('item.massupdate', {...this.token, ...parameters}, {
+			this.#popup('item.massupdate', {...this.token, ...parameters, prototype: 0}, {
 				dialogue_class: 'modal-popup-preprocessing',
 				trigger_element: target
 			});
