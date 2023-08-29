@@ -233,6 +233,10 @@ require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 
+// Maintenance
+require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
+require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
+
 require_once dirname(__FILE__).'/testExecuteNow.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
@@ -245,7 +249,6 @@ require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
-require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
@@ -273,7 +276,6 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
