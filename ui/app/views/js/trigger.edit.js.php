@@ -643,26 +643,16 @@
 			this.#post(curl.getUrl(), fields);
 		}
 
-		clone({buttons}) {
-			this.triggerid = null;
+		clone() {
+			const form_refresh = document.createElement('input');
 
-			const title = this.action === 'trigger.edit'
-				? <?= json_encode(_('New trigger')) ?>
-				: <?= json_encode(_('New trigger prototype')) ?>;
+			form_refresh.setAttribute('type', 'hidden');
+			form_refresh.setAttribute('name', 'form_refresh');
+			form_refresh.setAttribute('value', 1);
+			this.form.append(form_refresh);
 
-			const fields = this.form.querySelectorAll(
-				"input[readonly], input[disabled], textarea[readonly], button[disabled]"
-			);
-
-			fields.forEach((field) => {
-				field.removeAttribute("readonly");
-				field.removeAttribute("disabled");
-			})
-
-			this.overlay.setProperties({title, buttons});
-			this.overlay.unsetLoading();
-			this.overlay.recoverFocus();
-			this.overlay.containFocus();
+			this.form.querySelector('[name="triggerid"]').remove();
+			reloadPopup(this.form, this.action);
 		}
 
 		delete() {

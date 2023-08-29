@@ -429,22 +429,7 @@ else {
 			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'trigger_edit_popup.clone('.json_encode([
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'trigger_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => ZBX_STYLE_BTN_ALT,
-							'cancel' => true,
-							'action' => ''
-						]
-					]
-				]).');'
+			'action' => 'trigger_edit_popup.clone();'
 		],
 		[
 			'title' => _('Delete'),

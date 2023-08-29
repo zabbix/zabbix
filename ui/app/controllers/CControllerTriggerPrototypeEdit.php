@@ -159,7 +159,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 		$data['comments'] = $this->getInput('description', '');
 		$data['dependencies'] =  zbx_toObject($this->getInput('dependencies', []), 'triggerid');
 
-		if ($data['tags'] && $data['show_inherited_tags'] == 0) {
+		if ($data['tags'] && ($data['show_inherited_tags'] == 0 || !$this->trigger_prototype)) {
 			// Unset inherited tags.
 			$tags = [];
 
