@@ -545,28 +545,41 @@ class testDocumentationLinks extends CWebTest {
 			// #49 Template list view.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates'
 				]
 			],
 			// #50 Create template view.
 			[
 				[
-					'url' => 'templates.php?form=create',
+					'url' => 'zabbix.php?action=template.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create template'
+						]
+					],
+					'open_button' => 'button:Create template',
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
 			// #51 Update template view.
 			[
 				[
-					'url' => 'templates.php?form=update&templateid=10047',
+					'url' => 'zabbix.php?action=template.list',
+					'actions' => [
+								[
+									'callback' => 'openFormWithLink',
+									'element' => 'xpath://a[text()="AIX by Zabbix agent"]'
+								]
+							],
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
 			// #52 Template import popup.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -579,7 +592,7 @@ class testDocumentationLinks extends CWebTest {
 			// #53 Template mass update popup.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'

@@ -28,8 +28,9 @@ typedef struct
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	int			config_timeout;
+	int			config_trapper_timeout;
 	const char		*config_source_ip;
-	int			config_escalator_forks;
+	int			*config_forks;
 }
 zbx_thread_escalator_args;
 

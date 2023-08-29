@@ -3263,7 +3263,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		int		j;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+					"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
 		for (j = 0; j < new_escalations.values_num; j++)
 		{
@@ -3454,7 +3454,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-						"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+						"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
 		zbx_vector_ptr_sort(&ack_escalations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 

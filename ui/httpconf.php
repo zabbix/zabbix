@@ -690,7 +690,7 @@ else {
 	}
 
 	// Get host groups.
-	$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], $data['context']);
+	$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], $data['context']);
 
 	if ($data['context'] === 'host') {
 		$filter['hosts'] = $filter_hostids
