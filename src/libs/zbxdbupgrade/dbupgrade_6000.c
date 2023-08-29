@@ -397,186 +397,117 @@ static int	DBpatch_6000020(void)
 
 static int	DBpatch_6000021(void)
 {
-	if (FAIL == DBindex_exists("dashboard_user", "dashboard_user_2"))
-		return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
 }
 
 static int	DBpatch_6000022(void)
 {
-	if (FAIL == DBindex_exists("dashboard_usrgrp", "dashboard_usrgrp_2"))
-		return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
 }
 
 static int	DBpatch_6000023(void)
 {
-	if (FAIL == DBindex_exists("group_discovery", "group_discovery_1"))
-		return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
 }
 
 static int	DBpatch_6000024(void)
 {
-	if (FAIL == DBindex_exists("group_prototype", "group_prototype_2"))
-		return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
 }
 
 static int	DBpatch_6000025(void)
 {
-	if (FAIL == DBindex_exists("group_prototype", "group_prototype_3"))
-		return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
 }
 
 static int	DBpatch_6000026(void)
 {
-	if (FAIL == DBindex_exists("host_discovery", "host_discovery_1"))
-		return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
 }
 
 static int	DBpatch_6000027(void)
 {
-	if (FAIL == DBindex_exists("host_discovery", "host_discovery_2"))
-		return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
 }
 
 static int	DBpatch_6000028(void)
 {
-	if (FAIL == DBindex_exists("hosts", "hosts_7"))
-		return DBcreate_index("hosts", "hosts_7", "templateid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("hosts", "hosts_7", "templateid", 0);
 }
 
 static int	DBpatch_6000029(void)
 {
-	if (FAIL == DBindex_exists("interface_discovery", "interface_discovery_1"))
-		return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
 }
 
 static int	DBpatch_6000030(void)
 {
-	if (FAIL == DBindex_exists("report", "report_2"))
-		return DBcreate_index("report", "report_2", "userid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("report", "report_2", "userid", 0);
 }
 
 static int	DBpatch_6000031(void)
 {
-	if (FAIL == DBindex_exists("report", "report_3"))
-		return DBcreate_index("report", "report_3", "dashboardid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("report", "report_3", "dashboardid", 0);
 }
 
 static int	DBpatch_6000032(void)
 {
-	if (FAIL == DBindex_exists("report_user", "report_user_2"))
-		return DBcreate_index("report_user", "report_user_2", "userid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("report_user", "report_user_2", "userid", 0);
 }
 
 static int	DBpatch_6000033(void)
 {
-	if (FAIL == DBindex_exists("report_user", "report_user_3"))
-		return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
 }
 
 static int	DBpatch_6000034(void)
 {
-	if (FAIL == DBindex_exists("report_usrgrp", "report_usrgrp_2"))
-		return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
 }
 
 static int	DBpatch_6000035(void)
 {
-	if (FAIL == DBindex_exists("report_usrgrp", "report_usrgrp_3"))
-		return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
 }
 
 static int	DBpatch_6000036(void)
 {
-	if (FAIL == DBindex_exists("sysmaps", "sysmaps_4"))
-		return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
 }
 
 static int	DBpatch_6000037(void)
 {
-	if (FAIL == DBindex_exists("sysmap_element_trigger", "sysmap_element_trigger_2"))
-		return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
 }
 
 static int	DBpatch_6000038(void)
 {
-	if (FAIL == DBindex_exists("sysmap_user", "sysmap_user_2"))
-		return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
 }
 
 static int	DBpatch_6000039(void)
 {
-	if (FAIL == DBindex_exists("sysmap_usrgrp", "sysmap_usrgrp_2"))
-		return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
 }
 
 static int	DBpatch_6000040(void)
 {
-	if (FAIL == DBindex_exists("tag_filter", "tag_filter_1"))
-		return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
 }
 
 static int	DBpatch_6000041(void)
 {
-	if (FAIL == DBindex_exists("tag_filter", "tag_filter_2"))
-		return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
 }
 
 static int	DBpatch_6000042(void)
 {
-	if (FAIL == DBindex_exists("task", "task_2"))
-		return DBcreate_index("task", "task_2", "proxy_hostid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("task", "task_2", "proxy_hostid", 0);
 }
 
 static int	DBpatch_6000043(void)
 {
-	if (FAIL == DBindex_exists("users", "users_3"))
-		return DBcreate_index("users", "users_3", "roleid", 0);
-
-	return SUCCEED;
+	return DBcreate_index("users", "users_3", "roleid", 0);
 }
 
 #endif
