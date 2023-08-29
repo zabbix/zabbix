@@ -929,14 +929,14 @@ static int	DBpatch_6050088(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > zbx_db_execute(
-			"update widget_field wf"
-			" set wf.value_str=' '"
-			" where wf.name like 'columns.name.%%'"
-			" and wf.value_str like ''"
-			" and wf.widgetid in ("
-				"select w.widgetid"
-				" from widget w"
-				" where w.type='tophosts'"
+			"update widget_field"
+			" set value_str=' '"
+			" where name like 'columns.name.%%'"
+			" and value_str like ''"
+			" and widgetid in ("
+				"select widgetid"
+				" from widget"
+				" where type='tophosts'"
 			")"))
 	{
 		return FAIL;
