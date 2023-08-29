@@ -96,9 +96,10 @@ else {
 						(new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']))
 					))
 						->addStyle($color !== '' ? 'background-color: #' . $color : null)
-						->addItem($column['maintenance'] != 0
-							? (new CIcon('zi-wrench-alt-small'))
-								->addClass('color-warning no-indent')
+						->addItem($column['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
+							? makeMaintenanceIcon($column['maintenance_type'], $column['maintenance_name'],
+								$column['maintenance_description']
+							)
 							: null
 						);
 

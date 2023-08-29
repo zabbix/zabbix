@@ -31,6 +31,7 @@ use API,
 	CSettingsHelper,
 	Manager;
 
+use CArrayHelper;
 use Widgets\TopHosts\Widget;
 
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
@@ -85,7 +86,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			: null;
 
 		$hosts = API::Host()->get([
-			'output' => ['name', 'maintenance_status'],
+			'output' => ['name', 'maintenance_status', 'maintenanceid'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
 			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
@@ -96,6 +97,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$hostids = array_keys($hosts);
+		$maintenance_ids = array_unique(array_column($hosts, 'maintenanceid'));
+
+		$maintenance_data = ($maintenance_ids && $maintenance === null)
+			? API::Maintenance()->get([
+				'output' => ['name', 'maintenance_type', 'description'],
+				'maintenanceids' => $maintenance_ids,
+				'preservekeys' => true
+			])
+			: [];
+
+		$maintenance_data = CArrayHelper::renameObjectsKeys($maintenance_data,
+			['name' => 'maintenance_name', 'description' => 'maintenance_description']
+		);
 
 		$has_data_text = false;
 		$item_names = [];
@@ -345,11 +359,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 			foreach ($configuration as $column_index => $column) {
 				switch ($column['data']) {
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:
-						$row[] = [
+						$data = [
 							'value' => $hosts[$hostid]['name'],
 							'hostid' => $hostid,
-							'maintenance' => $hosts[$hostid]['maintenance_status']
+							'maintenance_status' => $hosts[$hostid]['maintenance_status'],
 						];
+
+						if ($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+							$data = array_merge($data, $maintenance_data[$hosts[$hostid]['maintenanceid']]);
+						}
+
+						$row[] = $data;
 
 						break;
 
