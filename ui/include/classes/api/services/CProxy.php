@@ -703,7 +703,7 @@ class CProxy extends CApiService {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 			'proxyid' =>				['type' => API_ANY],
 			'name' =>					['type' => API_H_NAME, 'length' => DB::getFieldLength('proxy', 'name')],
-			'operating_mode' =>					['type' => API_ANY],
+			'operating_mode' =>			['type' => API_ANY],
 			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
 			'allowed_addresses' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
 			'address' => 				['type' => API_MULTIPLE, 'rules' => [

@@ -48,7 +48,8 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate']) {
+		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
+				'custom_timeouts']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this._update());

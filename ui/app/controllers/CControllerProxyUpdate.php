@@ -27,14 +27,14 @@ class CControllerProxyUpdate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'proxyid' =>				'required|id',
-			'name' =>					'required|string|not_empty',
-			'operating_mode' =>			'required|in '.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
-			'address' =>				'string',
-			'port' =>					'string',
-			'allowed_addresses' =>		'string',
-			'description' =>			'string',
-			'tls_connect' =>			'in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
+			'proxyid' =>				'required|db proxy.proxyid',
+			'name' =>					'required|not_empty|db proxy.name',
+			'operating_mode' =>			'required|db proxy.operating_mode|in '.implode(',', [PROXY_OPERATING_MODE_ACTIVE, PROXY_OPERATING_MODE_PASSIVE]),
+			'address' =>				'db proxy.address',
+			'port' =>					'db proxy.port',
+			'allowed_addresses' =>		'db proxy.allowed_addresses',
+			'description' =>			'db proxy.description',
+			'tls_connect' =>			'db proxy.tls_connect|in '.implode(',', [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]),
 			'tls_accept_none' =>		'in 1',
 			'tls_accept_psk' =>			'in 1',
 			'tls_accept_certificate' =>	'in 1',
