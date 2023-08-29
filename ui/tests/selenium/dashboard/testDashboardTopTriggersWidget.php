@@ -965,7 +965,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					]
 				]
 			],
-			// Check problems that are shown with standard time selector (From -> now-1h, To -> now).
+			// Check filter results using time selector (From -> now-24h, To -> now).
 			[
 				[
 					'trigger_data' => [
@@ -979,7 +979,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						[
 							'id' => '1007720',
 							'name' => 'Problem Disaster',
-							'time' => strtotime('-2 hours'),
+							'time' => strtotime('-2 days'),
 							'problem_count' => '2',
 							'severity' => TRIGGER_SEVERITY_DISASTER
 						]
@@ -1470,6 +1470,12 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
+
+		// Set specific time selector in zoom filter.
+		$filter_element = CFilterElement::find()->one()->query('link', 'Last 1 day')->waitUntilPresent();
+		if ($filter_element->one()->isSelected(false)) {
+			$filter_element->one()->click();
+		}
 
 		if (array_key_exists('fields', $data)) {
 			$form = $dashboard->getWidget(self::DATA_WIDGET)->edit()->asForm();
