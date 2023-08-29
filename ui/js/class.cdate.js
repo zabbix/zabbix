@@ -43,8 +43,8 @@ CDate.prototype = {
 
 	/**
 	* Formats date according given format. Uses server timezone.
-	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d', 'H:i:s', 'H:i',
-	*						'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i' and 'd m Y H i'
+	* Supported formats:	'd M Y H:i', 'j. M Y G:i', 'Y/m/d H:i', 'Y-m-d H:i', 'Y-m-d H:i:s', 'Y-m-d h:i:s A',
+	*						'Y-m-d','H:i:s', 'H:i', 'M jS, Y h:i A', 'Y M d H:i', 'd.m.Y H:i' and 'd m Y H i'
 	*						Format 'd m Y H i' is also accepted but used internally for date input fields.
 	*
 	* @param format PHP style date format limited to supported formats
@@ -60,6 +60,8 @@ CDate.prototype = {
 			hrs = this.getHours(),
 			mnts = this.getMinutes(),
 			sec = this.getSeconds();
+
+		var ampm = (hrs < 12) ? 'AM' : 'PM';
 
 		/**
 		 * Append date suffix according to English rules e.g., 3 becomes 3rd.
@@ -99,7 +101,6 @@ CDate.prototype = {
 			case 'H:i':
 				return  appendZero(hrs) + ':' + appendZero(mnts);
 			case 'M jS, Y h:i A':
-				var ampm = (hrs < 12) ? 'AM' : 'PM';
 				hrs = appendZero((hrs + 11) % 12 + 1);
 				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + hrs + ':' + appendZero(mnts) + ' ' + ampm;
 			case 'Y M d H:i':
@@ -114,6 +115,10 @@ CDate.prototype = {
 			case 'd m Y H i':
 				return appendZero(dt) + ' ' + appendZero(mnth + 1) + ' ' + yr + ' ' + appendZero(hrs) + ' ' +
 					appendZero(mnts);
+			case 'Y-m-d h:i:s A':
+				hrs = appendZero((hrs + 11) % 12 + 1);
+				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + hrs + ':' + appendZero(mnts) +
+					':' + appendZero(sec) + ' ' + ampm;
 			default:
 				// defaults to Y-m-d H:i:s
 				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + appendZero(hrs) + ':' +
