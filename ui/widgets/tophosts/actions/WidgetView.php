@@ -237,6 +237,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
+		$master_hostids = array_keys($master_hostids);
+
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
 			'with_time_suffix' => true,
@@ -271,12 +273,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
-				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
-					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
-					: (array_key_exists($column_index, $items)
+
+				if (!$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')) {
+					$column_items = self::getItems($column['item'], $numeric_only, $groupids, $master_hostids);
+				}
+				else {
+					$column_items = array_key_exists($column_index, $items)
 						? $items[$column_index]
-						: self::getItems($column['item'], $numeric_only, $groupids, $hostids)
-					);
+						: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
+				}
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 			}
@@ -340,7 +345,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item_values[$column_index] = [];
 
 			foreach ($column_item_values as $itemid => $column_item_value) {
-				if (array_key_exists($column_items[$itemid]['hostid'], $master_hostids)) {
+				if (in_array($column_items[$itemid]['hostid'], $master_hostids)) {
 					$item_values[$column_index][$column_items[$itemid]['hostid']] = [
 						'value' => $column_item_value,
 						'item' => $column_items[$itemid],
@@ -351,13 +356,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		unset($column);
 
-		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns,
-			array_keys($master_hostids)
-		);
+		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_hostids);
 
 		$rows = [];
 
-		foreach (array_keys($master_hostids) as $hostid) {
+		foreach ($master_hostids as $hostid) {
 			$row = [];
 
 			foreach ($configuration as $column_index => $column) {
