@@ -301,8 +301,8 @@ $trigger_form_grid
 			->setEnabled(!$readonly)
 	])
 	->addItem([
-		(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),
-		(new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
+		(new CLabel(_('Tag for matching'), 'correlation-tag'))->setAsteriskMark(),
+		(new CTextBox('correlation-tag', $data['correlation_tag'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setId('correlation-tag')
