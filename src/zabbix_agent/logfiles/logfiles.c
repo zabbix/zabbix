@@ -47,8 +47,6 @@
 #define ZBX_FILE_PLACE_OTHER	0	/* both files have different device or inode numbers */
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
-extern int	CONFIG_MAX_LINES_PER_SECOND;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: separates given string to two parts by given delimiter in string  *
@@ -3767,12 +3765,12 @@ static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *
 
 /******************************************************************************
  *                                                                            *
- * Comments: thread-safe if CONFIG_MAX_LINES_PER_SECOND is updated when log   *
+ * Comments: thread-safe if config_max_lines_per_second is updated when log   *
  *           checks are not running                                           *
  *                                                                            *
  ******************************************************************************/
 static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *request, int *max_lines_per_sec,
-		char **error)
+		int config_max_lines_per_second, char **error)
 {
 	const char	*p;
 	int		rate;
@@ -3780,9 +3778,9 @@ static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *reques
 	if (NULL == (p = get_rparam(request, 3)) || '\0' == *p)
 	{
 		if (0 == is_count_item)				/* log[], logrt[] */
-			*max_lines_per_sec = CONFIG_MAX_LINES_PER_SECOND;
+			*max_lines_per_sec = config_max_lines_per_second;
 		else						/* log.count[], logrt.count[] */
-			*max_lines_per_sec = MAX_VALUE_LINES_MULTIPLIER * CONFIG_MAX_LINES_PER_SECOND;
+			*max_lines_per_sec = MAX_VALUE_LINES_MULTIPLIER * config_max_lines_per_second;
 
 		return SUCCEED;
 	}
@@ -3942,7 +3940,8 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		const char *config_hostname, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size)
+		const char *config_hostname, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size,
+		int config_max_lines_per_second)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -4010,8 +4009,11 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	}
 
 	/* parameter 'maxlines' or 'maxproclines' */
-	if (SUCCEED !=  init_max_lines_per_sec(is_count_item, &request, &max_lines_per_sec, error))
+	if (SUCCEED !=  init_max_lines_per_sec(is_count_item, &request, &max_lines_per_sec,
+			config_max_lines_per_second, error))
+	{
 		goto out;
+	}
 
 	/* parameter 'mode' */
 
