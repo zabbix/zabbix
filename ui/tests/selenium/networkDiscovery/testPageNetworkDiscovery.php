@@ -49,7 +49,7 @@ class testPageNetworkDiscovery extends CWebTest {
 	/**
 	 * Function which checks layout of Network Discovery page.
 	 */
-	public function testPageNetworkDiscovery_CheckLayout() {
+	public function testPageNetworkDiscovery_Layout() {
 		$this->page->login()->open('zabbix.php?action=discovery.list&sort=name&sortorder=DESC');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -103,6 +103,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		$this->assertSelectedCount(0);
 		$this->query('id:all_drules')->asCheckbox()->one()->check();
 		$this->assertSelectedCount(12);
+
 		foreach (['Enable', 'Disable', 'Delete'] as $buttons) {
 			$this->assertTrue($this->query('button:'.$buttons)->one()->isEnabled());
 		}
@@ -292,7 +293,6 @@ class testPageNetworkDiscovery extends CWebTest {
 		$this->assertTableStats($reset_count);
 		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
 	}
-
 
 	public static function getNetworkDiscoveryActionData () {
 		return [
@@ -496,13 +496,7 @@ class testPageNetworkDiscovery extends CWebTest {
 			if (array_key_exists('cancel', $data)) {
 				$this->page->dismissAlert();
 				$this->page->waitUntilReady();
-
-				if(array_key_exists('single', $data)) {
-					$this->assertSelectedCount(1);
-				}
-				else {
-					$this->assertSelectedCount(count($data['name']));
-				}
+				$this->assertSelectedCount((array_key_exists('single', $data) ? 1 : count($data['name'])));
 				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 			}
 			else {
