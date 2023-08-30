@@ -196,10 +196,13 @@ class CControllerTriggerPrototypeEdit extends CController {
 					$data['tags'] = $trigger['tags'];
 				}
 
-				$data['templateid'] = $trigger['templateid'];
-				$data['limited'] = $trigger['limited'];
-				$data['flags'] = $trigger['flags'];
-				$data['hostid'] = $trigger['hostid'];
+				$data = array_merge($data, [
+					'templateid' => $trigger['templateid'],
+					'limited' => $trigger['limited'],
+					'flags' => $trigger['flags'],
+					'templates' => $trigger['templates'],
+					'hostid' => $trigger['hostid']
+				]);
 			}
 			else {
 				$data = $trigger;

@@ -185,9 +185,14 @@ class CControllerTriggerEdit extends CController {
 					$data['tags'] = $trigger['tags'];
 				}
 
-				$data['templateid'] = $trigger['templateid'];
-				$data['limited'] = $trigger['limited'];
-				$data['flags'] = $trigger['flags'];
+				$data = array_merge($data, [
+					'templateid' => $trigger['templateid'],
+					'limited' => $trigger['limited'],
+					'flags' => $trigger['flags'],
+					'templates' => $trigger['templates'],
+					'discoveryRule' => $trigger['discoveryRule'],
+					'triggerDiscovery' => $trigger['triggerDiscovery']
+				]);
 			}
 			else {
 				$data = $trigger;
