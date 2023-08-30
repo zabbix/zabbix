@@ -1289,7 +1289,8 @@ typedef struct
 }
 zbx_config_item_type_timeouts_t;
 
-#define ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX	255
+#define ZBX_ITEM_TYPE_TIMEOUT_LEN	255
+#define ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX	(ZBX_ITEM_TYPE_TIMEOUT_LEN + 1)
 
 typedef struct
 {
