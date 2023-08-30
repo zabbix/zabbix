@@ -161,7 +161,7 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_MODE_ACTIVE, events_cbs,
+		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE, events_cbs,
 				proxydata_frequency, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",

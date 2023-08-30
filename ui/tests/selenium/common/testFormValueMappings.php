@@ -887,7 +887,7 @@ class testFormValueMappings extends CWebTest {
 				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
 				$this->assertScreenshot($this->query('id', ($source === 'template' ? 'template-' : '').'valuemap-table')->one(),
-					$action.$data['screenshot_id']);
+						$action.$source.$data['screenshot_id']);
 				COverlayDialogElement::find()->one()->close();
 			}
 		}

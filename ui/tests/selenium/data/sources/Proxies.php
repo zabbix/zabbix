@@ -143,7 +143,7 @@ class Proxies {
 		foreach (self::$active_proxies as $proxy) {
 			$active_proxy_data[] = [
 				'name' => $proxy,
-				'mode' => PROXY_MODE_ACTIVE
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			];
 		}
 
@@ -156,7 +156,7 @@ class Proxies {
 		foreach (self::$passive_proxies as $proxy) {
 			$passive_proxy_data[] = [
 				'name' => $proxy,
-				'mode' => PROXY_MODE_PASSIVE,
+				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 				'address' => '127.0.0.1',
 				'port' => '10051'
 			];

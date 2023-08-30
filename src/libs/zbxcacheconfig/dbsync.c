@@ -1714,8 +1714,9 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 			" from items i"
 			" inner join hosts h on i.hostid=h.hostid"
 			" join item_rtdata ir on i.itemid=ir.itemid"
-			" where h.status in (%d,%d) and i.flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			" where (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d or i.flags=%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
+			ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_CREATED);
 
 	dbsync_prepare(sync, 50, dbsync_item_preproc_row);
 
@@ -4049,7 +4050,7 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select p.proxyid,p.name,p.mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
+			"select p.proxyid,p.name,p.operating_mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
 				"p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,pr.lastaccess"
 			" from proxy p"
 			" join proxy_rtdata pr"
