@@ -47,6 +47,16 @@
 #define ZBX_FILE_PLACE_OTHER	0	/* both files have different device or inode numbers */
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
+
+typedef enum
+{
+	ZBX_LOG_ROTATION_LOGRT = 0,	/* pure rotation model */
+	ZBX_LOG_ROTATION_LOGCPT,	/* copy-truncate rotation model */
+	ZBX_LOG_ROTATION_REREAD,	/* reread if modification time changes but size does not */
+	ZBX_LOG_ROTATION_NO_REREAD	/* don't reread if modification time changes but size does not */
+}
+zbx_log_rotation_options_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: separates given string to two parts by given delimiter in string  *
@@ -1555,7 +1565,7 @@ out:
  *     logfiles_num   - [IN/OUT] valid pointer to number of inserted logfiles *
  *                                                                            *
  ******************************************************************************/
-void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
 	int	i;
 

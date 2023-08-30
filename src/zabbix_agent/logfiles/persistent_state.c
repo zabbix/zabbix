@@ -592,6 +592,9 @@ void	zbx_remove_from_persistent_inactive_list(zbx_vector_persistent_inactive_t *
 
 void	zbx_remove_inactive_persistent_files(zbx_vector_persistent_inactive_t *inactive_vec)
 {
+#define ZBX_PERSIST_INACTIVITY_PERIOD	SEC_PER_DAY	/* the time period after which persistent files used by log */
+							/* items which are not received in active check list can be */
+							/* removed */
 	int	i;
 	time_t	now;
 
@@ -620,6 +623,7 @@ void	zbx_remove_inactive_persistent_files(zbx_vector_persistent_inactive_t *inac
 			zbx_vector_persistent_inactive_remove(inactive_vec, i);
 		}
 	}
+#undef ZBX_PERSIST_INACTIVITY_PERIOD
 }
 
 static int	zbx_pre_persistent_compare_func(const void *d1, const void *d2)
