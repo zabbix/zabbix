@@ -415,38 +415,6 @@
 
 		let step_index = $preprocessing.find('li.sortable').length;
 
-		function stepsInOrder(container) {
-			const steps = [];
-
-			$(container).find('.preprocessing-step').each(function (i) {
-				const step = {
-					index: i,
-					type: $(this).find('.step-name z-select').val(),
-					match: $(this).find('.step-parameters z-select').val()
-				};
-
-				if (step.type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>) {
-					steps.push(step);
-				}
-			});
-
-			if (!steps) {
-				return true;
-			}
-
-			for (let i = 0; i <= steps.length - 1; i++) {
-				if (steps[i].index != i) {
-					return false;
-				}
-
-				if (steps[i].match == <?= ZBX_PREPROC_MATCH_ERROR_ANY?> && i != steps.length - 1) {
-					return false;
-				}
-			}
-
-			return true;
-		}
-
 		$preprocessing.sortable({
 			disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
 			items: 'li.sortable',
@@ -459,9 +427,7 @@
 			update: function() {
 				let i = 0;
 
-				$(this)
-					.closest('#preprocessing').trigger('update-ordered-warning').end()
-					.find('li.sortable').each(function() {
+				$(this).closest('#preprocessing').find('li.sortable').each(function() {
 						$(this).find('[name*="sortorder"]').val(i++);
 					});
 			}
@@ -545,7 +511,6 @@
 				}
 
 				$preprocessing[0].dispatchEvent(change_event);
-				$preprocessing.trigger('update-ordered-warning')
 			})
 			.on('change', 'z-select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
@@ -585,8 +550,6 @@
 						$row.find('[name*="[test]"]').prop('disabled', false);
 						break;
 				}
-
-				$(this).closest('#preprocessing').trigger('update-ordered-warning');
 			})
 			.on('change', 'input[type="text"][name*="params"]', function() {
 				$(this).attr('title', $(this).val());
@@ -664,10 +627,6 @@
 					.querySelector('tbody')
 					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb}));
 			})
-			.on('update-ordered-warning', function(e) {
-				$(this).closest('#preprocessing-form-list, #preprocTab').eq(0)
-					.find('.js-steps-warning').css('background-color', stepsInOrder(this) ? '' : 'orange');
-			})
 			.on('item-type-change', function (e) {
 				const $preproc_steps = $('z-select[name^="preprocessing["][name$="[type]"]'),
 					no_parameters = $('#type').val() != <?= ITEM_TYPE_SSH ?>;
@@ -681,8 +640,6 @@
 						}
 					}
 				}
-
-				$(this).trigger('update-ordered-warning')
 			});
 	});
 </script>

@@ -205,10 +205,10 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
 			->setLabel([
 				_('Preprocessing steps'),
-				makeHelpIcon(_(
-					'The "Check for not supported value" steps are always executed first, with an "any error" check as last of them.'."\n".
-					'If present, they will be arranged at the starting positions upon saving.'
-				))->addClass('js-steps-warning')
+				makeHelpIcon([_s(
+					'The "%1$s" steps are always executed as the first preprocessing steps (with "%2$s" as the last of them).',
+					_('Check for not supported value'), _('any error')
+				), BR(), 'If such steps are configured, they will be placed above all others.'])
 			]),
 		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'], -1)))
 			->setId('preprocessing_div')
