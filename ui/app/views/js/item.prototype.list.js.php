@@ -196,14 +196,15 @@
 				prevent_navigation: true
 			});
 			const host_list = new Curl('zabbix.php');
+			const list_href = location.href;
 
 			host_list.setArgument('action', 'host.list');
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#navigate(e.detail, location.href));
-			overlay.$dialogue[0].addEventListener('dialogue.create', e => this.#navigate(e.detail, location.href));
-			overlay.$dialogue[0].addEventListener('dialogue.update', e => this.#navigate(e.detail, location.href));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#navigate(e.detail, list_href));
+			overlay.$dialogue[0].addEventListener('dialogue.create', e => this.#navigate(e.detail, list_href));
+			overlay.$dialogue[0].addEventListener('dialogue.update', e => this.#navigate(e.detail, list_href));
 			overlay.$dialogue[0].addEventListener('dialogue.delete', e => this.#navigate(e.detail, host_list.getUrl()));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', location.href);
+				history.replaceState({}, '', list_href);
 			});
 		}
 
