@@ -66,6 +66,8 @@ typedef struct
 }
 zbx_am_source_stats_t;
 
+ZBX_PTR_VECTOR_DECL(am_source_stats_ptr, zbx_am_source_stats_t *)
+
 typedef struct
 {
 	char	*recipient;
@@ -111,7 +113,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args);
 
 int	zbx_alerter_get_diag_stats(zbx_uint64_t *alerts_num, char **error);
 int	zbx_alerter_get_top_mediatypes(int limit, zbx_vector_uint64_pair_t *mediatypes, char **error);
-int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error);
+int	zbx_alerter_get_top_sources(int limit, zbx_vector_am_source_stats_ptr_t *sources, char **error);
 
 zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t mediatypeid, unsigned char type,
 		const char *smtp_server, const char *smtp_helo, const char *smtp_email, const char *exec_path,

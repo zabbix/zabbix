@@ -24,6 +24,12 @@
 #include "zbxserialize.h"
 #include "zbxstr.h"
 
+ZBX_PTR_VECTOR_IMPL(am_mediatype_ptr, zbx_am_mediatype_t *)
+ZBX_PTR_VECTOR_IMPL(am_media_ptr, zbx_am_media_t *)
+ZBX_PTR_VECTOR_IMPL(am_db_mediatype_ptr, zbx_am_db_mediatype_t *)
+ZBX_PTR_VECTOR_IMPL(am_db_alert_ptr, zbx_am_db_alert_t *)
+ZBX_PTR_VECTOR_IMPL(am_result_ptr, zbx_am_result_t *)
+
 void	zbx_am_db_mediatype_clear(zbx_am_db_mediatype_t *mediatype)
 {
 	zbx_free(mediatype->smtp_server);
@@ -877,7 +883,8 @@ zbx_uint32_t	zbx_alerter_serialize_top_sources_result(unsigned char **data, zbx_
 	return data_len;
 }
 
-static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data, zbx_vector_ptr_t *sources)
+static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data,
+		zbx_vector_am_source_stats_ptr_t *sources)
 {
 	int	i, sources_num;
 
@@ -885,7 +892,7 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 
 	if (0 != sources_num)
 	{
-		zbx_vector_ptr_reserve(sources, (size_t)sources_num);
+		zbx_vector_am_source_stats_ptr_reserve(sources, (size_t)sources_num);
 
 		for (i = 0; i < sources_num; i++)
 		{
@@ -896,7 +903,7 @@ static void	zbx_alerter_deserialize_top_sources_result(const unsigned char *data
 			data += zbx_deserialize_value(data, &source->object);
 			data += zbx_deserialize_value(data, &source->objectid);
 			data += zbx_deserialize_value(data, &source->alerts_num);
-			zbx_vector_ptr_append(sources, source);
+			zbx_vector_am_source_stats_ptr_append(sources, source);
 		}
 	}
 }
@@ -975,7 +982,7 @@ out:
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_alerter_get_top_sources(int limit, zbx_vector_ptr_t *sources, char **error)
+int	zbx_alerter_get_top_sources(int limit, zbx_vector_am_source_stats_ptr_t *sources, char **error)
 {
 	int		ret;
 	unsigned char	*data, *result;

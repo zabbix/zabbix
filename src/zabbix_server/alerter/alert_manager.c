@@ -168,42 +168,45 @@ typedef struct
 }
 zbx_am_alerter_t;
 
+ZBX_PTR_VECTOR_DECL(am_alerter_ptr, zbx_am_alerter_t *)
+ZBX_PTR_VECTOR_IMPL(am_alerter_ptr, zbx_am_alerter_t *)
+
 /* alert manager data */
 typedef struct
 {
 	/* number of queued alerts */
-	zbx_uint64_t		alerts_num;
+	zbx_uint64_t			alerts_num;
 
 	/* alerter vector, created during manager initialization */
-	zbx_vector_ptr_t	alerters;
-	zbx_queue_ptr_t		free_alerters;
+	zbx_vector_am_alerter_ptr_t	alerters;
+	zbx_queue_ptr_t			free_alerters;
 
 	/* alerters indexed by IPC service clients */
-	zbx_hashset_t		alerters_client;
+	zbx_hashset_t			alerters_client;
 
 	/* the next alerter index to be assigned to new IPC service clients */
-	int			next_alerter_index;
+	int				next_alerter_index;
 
-	zbx_hashset_t		mediatypes;
-	zbx_hashset_t		alertpools;
+	zbx_hashset_t			mediatypes;
+	zbx_hashset_t			alertpools;
 
 	/* the alert status update cache */
-	zbx_hashset_t		results;
+	zbx_hashset_t			results;
 
 	/* the watchdog alert recipients */
-	zbx_hashset_t		watchdog;
+	zbx_hashset_t			watchdog;
 
 	/* mediatype queue */
-	zbx_binary_heap_t	queue;
+	zbx_binary_heap_t		queue;
 
 	/* the database status */
-	int			dbstatus;
+	int				dbstatus;
 
 	/* the scripting engine */
-	zbx_es_t		es;
+	zbx_es_t			es;
 
 	/* the IPC service */
-	zbx_ipc_service_t	ipc;
+	zbx_ipc_service_t		ipc;
 }
 zbx_am_t;
 
@@ -1148,7 +1151,7 @@ static int	am_init(zbx_am_t *manager, zbx_get_config_forks_f get_forks_cb, char 
 		goto out;
 
 	manager->alerts_num = 0;
-	zbx_vector_ptr_create(&manager->alerters);
+	zbx_vector_am_alerter_ptr_create(&manager->alerters);
 	zbx_queue_ptr_create(&manager->free_alerters);
 	zbx_hashset_create(&manager->alerters_client, 0, alerter_hash_func, alerter_compare_func);
 
@@ -1160,7 +1163,7 @@ static int	am_init(zbx_am_t *manager, zbx_get_config_forks_f get_forks_cb, char 
 
 		alerter->client = NULL;
 
-		zbx_vector_ptr_append(&manager->alerters, alerter);
+		zbx_vector_am_alerter_ptr_append(&manager->alerters, alerter);
 	}
 
 	zbx_hashset_create(&manager->mediatypes, 5, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -1193,8 +1196,8 @@ static void	am_destroy(zbx_am_t *manager)
 
 	zbx_hashset_destroy(&manager->alerters_client);
 	zbx_queue_ptr_destroy(&manager->free_alerters);
-	zbx_vector_ptr_clear_ext(&manager->alerters, (zbx_mem_free_func_t)am_alerter_free);
-	zbx_vector_ptr_destroy(&manager->alerters);
+	zbx_vector_am_alerter_ptr_clear_ext(&manager->alerters, am_alerter_free);
+	zbx_vector_am_alerter_ptr_destroy(&manager->alerters);
 
 	while (NULL != (alert = am_pop_alert(manager)))
 		am_remove_alert(manager, alert);
@@ -1301,17 +1304,17 @@ static void	am_external_alert_send_response(const zbx_ipc_service_t *alerter_ser
  ******************************************************************************/
 static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int medias_num)
 {
-	int			i;
-	zbx_hashset_t		mediaids;
-	zbx_am_media_t		*media, media_local;
-	zbx_hashset_iter_t	iter;
-	zbx_vector_ptr_t	media_new;
-	static int		old_count = -1;
+	int				i;
+	zbx_hashset_t			mediaids;
+	zbx_am_media_t			*media, media_local;
+	zbx_hashset_iter_t		iter;
+	zbx_vector_am_media_ptr_t	media_new;
+	static int			old_count = -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() recipients:%d", __func__, medias_num);
 
 	zbx_hashset_create(&mediaids, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_ptr_create(&media_new);
+	zbx_vector_am_media_ptr_create(&media_new);
 
 	for (i = 0; i < medias_num; i++)
 	{
@@ -1323,7 +1326,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 			media = (zbx_am_media_t *)zbx_hashset_insert(&manager->watchdog, &media_local,
 					sizeof(media_local));
 			media->sendto = NULL;
-			zbx_vector_ptr_append(&media_new, media);
+			zbx_vector_am_media_ptr_append(&media_new, media);
 		}
 		media->mediatypeid = medias[i]->mediatypeid;
 		ZBX_UPDATE_STR(media->sendto,  medias[i]->sendto);
@@ -1341,7 +1344,7 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 		zbx_hashset_iter_remove(&iter);
 	}
 
-	zbx_vector_ptr_destroy(&media_new);
+	zbx_vector_am_media_ptr_destroy(&media_new);
 	zbx_hashset_destroy(&mediaids);
 
 	if (0 < old_count && 0 == manager->watchdog.num_data)
@@ -1853,11 +1856,11 @@ static void	am_drop_mediatypes(zbx_am_t *manager, zbx_ipc_message_t *message)
  ******************************************************************************/
 static void	am_flush_results(zbx_am_t *manager, zbx_ipc_client_t *client)
 {
-	zbx_vector_ptr_t	results;
-	zbx_hashset_iter_t	iter;
-	zbx_am_result_t		*result;
-	zbx_uint32_t		data_len;
-	unsigned char		*data;
+	zbx_vector_am_result_ptr_t	results;
+	zbx_hashset_iter_t		iter;
+	zbx_am_result_t			*result;
+	zbx_uint32_t			data_len;
+	unsigned char			*data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() results:%d", __func__, manager->results.num_data);
 
@@ -1871,13 +1874,13 @@ static void	am_flush_results(zbx_am_t *manager, zbx_ipc_client_t *client)
 		goto out;
 	}
 
-	zbx_vector_ptr_create(&results);
+	zbx_vector_am_result_ptr_create(&results);
 
 	zbx_hashset_iter_reset(&manager->results, &iter);
 	while (NULL != (result = (zbx_am_result_t *)zbx_hashset_iter_next(&iter)))
-		zbx_vector_ptr_append(&results, result);
+		zbx_vector_am_result_ptr_append(&results, result);
 
-	zbx_vector_ptr_sort(&results, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_am_result_ptr_sort(&results, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	data_len = zbx_alerter_serialize_results(&data, (zbx_am_result_t **)results.values, results.values_num);
 	zbx_ipc_client_send(client, ZBX_IPC_ALERTER_RESULTS, data, data_len);
@@ -1891,7 +1894,7 @@ static void	am_flush_results(zbx_am_t *manager, zbx_ipc_client_t *client)
 	}
 
 	zbx_hashset_clear(&manager->results);
-	zbx_vector_ptr_destroy(&results);
+	zbx_vector_am_result_ptr_destroy(&results);
 
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -2174,32 +2177,32 @@ static void	am_process_diag_top_mediatypes(zbx_am_t *manager, zbx_ipc_client_t *
 	unsigned char		*data;
 	zbx_uint32_t		data_len;
 
-	zbx_vector_ptr_t	view;
-	zbx_hashset_iter_t	iter;
-	zbx_am_mediatype_t	*mediatype;
-	int			mediatypes_num;
+	zbx_vector_am_mediatype_ptr_t	view;
+	zbx_hashset_iter_t		iter;
+	zbx_am_mediatype_t		*mediatype;
+	int				mediatypes_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_alerter_deserialize_top_request(message->data, &limit);
 
-	zbx_vector_ptr_create(&view);
+	zbx_vector_am_mediatype_ptr_create(&view);
 
 	zbx_hashset_iter_reset(&manager->mediatypes, &iter);
 	while (NULL != (mediatype = (zbx_am_mediatype_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (0 != mediatype->refcount)
-			zbx_vector_ptr_append(&view, mediatype);
+			zbx_vector_am_mediatype_ptr_append(&view, mediatype);
 	}
 
-	zbx_vector_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
+	zbx_vector_am_mediatype_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
 	mediatypes_num = MIN(limit, view.values_num);
 
 	data_len = zbx_alerter_serialize_top_mediatypes_result(&data, (zbx_am_mediatype_t **)view.values, mediatypes_num);
 	zbx_ipc_client_send(client, ZBX_IPC_ALERTER_DIAG_TOP_MEDIATYPES_RESULT, data, data_len);
 	zbx_free(data);
 
-	zbx_vector_ptr_destroy(&view);
+	zbx_vector_am_mediatype_ptr_destroy(&view);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2248,19 +2251,19 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 	unsigned char		*data;
 	zbx_uint32_t		data_len;
 
-	zbx_vector_ptr_t	view;
-	zbx_am_alertpool_t	*alertpool;
-	const zbx_am_alert_t	*alert;
-	int			i, sources_num;
-	zbx_hashset_t		sources;
-	zbx_hashset_iter_t	iter;
+	zbx_vector_am_source_stats_ptr_t	view;
+	zbx_am_alertpool_t		*alertpool;
+	const zbx_am_alert_t		*alert;
+	int				i, sources_num;
+	zbx_hashset_t			sources;
+	zbx_hashset_iter_t		iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_alerter_deserialize_top_request(message->data, &limit);
 
 	zbx_hashset_create(&sources, 1024, am_source_hash_func, am_source_compare_func);
-	zbx_vector_ptr_create(&view);
+	zbx_vector_am_source_stats_ptr_create(&view);
 
 	zbx_hashset_iter_reset(&manager->alertpools, &iter);
 	while (NULL != (alertpool = (zbx_am_alertpool_t *)zbx_hashset_iter_next(&iter)))
@@ -2278,20 +2281,20 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 			{
 				source_local.alerts_num = 0;
 				source = zbx_hashset_insert(&sources, &source_local, sizeof(source_local));
-				zbx_vector_ptr_append(&view, source);
+				zbx_vector_am_source_stats_ptr_append(&view, source);
 			}
 			source->alerts_num++;
 		}
 	}
 
-	zbx_vector_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
+	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
 	sources_num = MIN(limit, view.values_num);
 
 	data_len = zbx_alerter_serialize_top_sources_result(&data, (zbx_am_source_stats_t **)view.values, sources_num);
 	zbx_ipc_client_send(client, ZBX_IPC_ALERTER_DIAG_TOP_SOURCES_RESULT, data, data_len);
 	zbx_free(data);
 
-	zbx_vector_ptr_destroy(&view);
+	zbx_vector_am_source_stats_ptr_destroy(&view);
 	zbx_hashset_destroy(&sources);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

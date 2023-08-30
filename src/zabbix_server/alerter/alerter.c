@@ -35,6 +35,8 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
+ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
+
 static zbx_es_t	es_engine;
 
 /******************************************************************************

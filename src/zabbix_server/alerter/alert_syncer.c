@@ -118,7 +118,7 @@ static void	am_db_clear(zbx_am_db_t *amdb)
  *               FAIL    - database connection error                          *
  *                                                                            *
  ******************************************************************************/
-static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
+static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 {
 	static int		status_limit = 2;
 	zbx_uint64_t		status_filter[] = {ALERT_STATUS_NEW, ALERT_STATUS_NOT_SENT};
@@ -179,7 +179,7 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 		alert = am_db_create_alert(alertid, mediatypeid, source, object, objectid, eventid, p_eventid, row[2],
 				row[3], row[4], row[10], status, attempts);
 
-		zbx_vector_ptr_append(alerts, alert);
+		zbx_vector_am_db_alert_ptr_append(alerts, alert);
 
 		if (ALERT_STATUS_NEW == alert->status)
 			zbx_vector_uint64_append(&alertids, alert->alertid);
@@ -212,7 +212,7 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 	zbx_free(sql);
 
 	if (SUCCEED != ret)
-		zbx_vector_ptr_clear_ext(alerts, (zbx_clean_func_t)zbx_am_db_alert_free);
+		zbx_vector_am_db_alert_ptr_clear_ext(alerts, zbx_am_db_alert_free);
 	else
 		status_limit = 1;
 
@@ -315,7 +315,7 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *mediatypeids, int mediatypeids_num,
-		zbx_vector_ptr_t *mediatypes)
+		zbx_vector_am_db_mediatype_ptr_t *mediatypes)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -367,7 +367,7 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 				atoi(row[20]));
 
 		if (NULL != mediatype)
-			zbx_vector_ptr_append(mediatypes, mediatype);
+			zbx_vector_am_db_mediatype_ptr_append(mediatypes, mediatype);
 	}
 	zbx_db_free_result(result);
 
@@ -386,14 +386,15 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
  ******************************************************************************/
 static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 {
-	zbx_vector_ptr_t	alerts, mediatypes;
-	int			i, alerts_num;
-	zbx_am_db_alert_t	*alert;
-	zbx_vector_uint64_t	mediatypeids;
+	zbx_vector_am_db_mediatype_ptr_t	mediatypes;
+	zbx_vector_am_db_alert_ptr_t	alerts;
+	int				i, alerts_num;
+	zbx_am_db_alert_t		*alert;
+	zbx_vector_uint64_t		mediatypeids;
 
-	zbx_vector_ptr_create(&alerts);
+	zbx_vector_am_db_alert_ptr_create(&alerts);
 	zbx_vector_uint64_create(&mediatypeids);
-	zbx_vector_ptr_create(&mediatypes);
+	zbx_vector_am_db_mediatype_ptr_create(&mediatypes);
 
 	if (FAIL == am_db_get_alerts(&alerts) || 0 == alerts.values_num)
 		goto out;
@@ -434,11 +435,11 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 	}
 
 out:
-	zbx_vector_ptr_destroy(&mediatypes);
+	zbx_vector_am_db_mediatype_ptr_destroy(&mediatypes);
 	zbx_vector_uint64_destroy(&mediatypeids);
 	alerts_num = alerts.values_num;
-	zbx_vector_ptr_clear_ext(&alerts, (zbx_clean_func_t)zbx_am_db_alert_free);
-	zbx_vector_ptr_destroy(&alerts);
+	zbx_vector_am_db_alert_ptr_clear_ext(&alerts, zbx_am_db_alert_free);
+	zbx_vector_am_db_alert_ptr_destroy(&alerts);
 
 	return alerts_num;
 }
@@ -836,14 +837,15 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
  ******************************************************************************/
 static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	int			medias_num = 0;
-	zbx_am_media_t		*media;
-	zbx_vector_uint64_t	mediatypeids;
-	zbx_vector_ptr_t	medias, mediatypes;
-	unsigned char		*data;
-	zbx_uint32_t		data_len;
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
+	int					medias_num = 0;
+	zbx_am_media_t				*media;
+	zbx_vector_uint64_t			mediatypeids;
+	zbx_vector_am_db_mediatype_ptr_t	mediatypes;
+	zbx_vector_am_media_ptr_t		medias;
+	unsigned char				*data;
+	zbx_uint32_t				data_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -861,8 +863,8 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 				MEDIA_TYPE_WEBHOOK);
 
 	zbx_vector_uint64_create(&mediatypeids);
-	zbx_vector_ptr_create(&medias);
-	zbx_vector_ptr_create(&mediatypes);
+	zbx_vector_am_media_ptr_create(&medias);
+	zbx_vector_am_db_mediatype_ptr_create(&mediatypes);
 
 	/* read watchdog alert recipients */
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -871,7 +873,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 		ZBX_STR2UINT64(media->mediaid, row[0]);
 		ZBX_STR2UINT64(media->mediatypeid, row[1]);
 		media->sendto = zbx_strdup(NULL, row[2]);
-		zbx_vector_ptr_append(&medias, media);
+		zbx_vector_am_media_ptr_append(&medias, media);
 		zbx_vector_uint64_append(&mediatypeids, media->mediatypeid);
 	}
 	zbx_db_free_result(result);
@@ -899,10 +901,10 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 	medias_num = medias.values_num;
 
-	zbx_vector_ptr_clear_ext(&medias, (zbx_clean_func_t)zbx_am_media_free);
-	zbx_vector_ptr_destroy(&mediatypes);
+	zbx_vector_am_media_ptr_clear_ext(&medias, zbx_am_media_free);
+	zbx_vector_am_db_mediatype_ptr_destroy(&mediatypes);
 	zbx_vector_uint64_destroy(&mediatypeids);
-	zbx_vector_ptr_destroy(&medias);
+	zbx_vector_am_media_ptr_destroy(&medias);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, medias_num);
 }
