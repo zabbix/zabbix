@@ -1259,7 +1259,7 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	if (timeout != ZBX_CHECK_TIMEOUT_UNDEFINED)
+	if (ZBX_CHECK_TIMEOUT_UNDEFINED != timeout)
 		zbx_alarm_on(timeout);
 
 	if (SYSINFO_RET_OK != command->function(&request, result))
@@ -1278,7 +1278,8 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 		goto notsupported;
 	}
 
-	zbx_alarm_off();
+	if (ZBX_CHECK_TIMEOUT_UNDEFINED != timeout)
+		zbx_alarm_off();
 
 	ret = SUCCEED;
 notsupported:
