@@ -377,8 +377,8 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rules, int count, cons
  * Purpose: updates history housekeeping rule with the latest item history    *
  *          settings and prepares delete queue                                *
  *                                                                            *
- * Parameters: rule  - [IN/OUT] history housekeeping rule                     *
- *             now   - [IN] current timestamp                                 *
+ * Parameters: rule - [IN/OUT] history housekeeping rule                      *
+ *             now  - [IN] current timestamp                                  *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
@@ -491,8 +491,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
  * Purpose: prepares history housekeeping delete queues for all defined       *
  *          history rules.                                                    *
  *                                                                            *
- * Parameters: rules  - [IN/OUT] history housekeeping rules                   *
- *             now    - [IN] current timestamp                                *
+ * Parameters: rules - [IN/OUT] history housekeeping rules                    *
+ *             now   - [IN] current timestamp                                 *
  *                                                                            *
  * Comments: This function also handles history rule initializing/releasing   *
  *           when the rule just became enabled/disabled.                      *
@@ -531,8 +531,8 @@ static void	hk_history_delete_queue_prepare_all(zbx_hk_history_rule_t *rules, in
  *                                                                            *
  * Purpose: clears the history housekeeping delete queue                      *
  *                                                                            *
- * Parameters: rule   - [IN/OUT] history housekeeping rule                    *
- *             now    - [IN] current timestamp                                *
+ * Parameters: rule - [IN/OUT] history housekeeping rule                      *
+ *             now  - [IN] current timestamp                                  *
  *                                                                            *
  ******************************************************************************/
 static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
