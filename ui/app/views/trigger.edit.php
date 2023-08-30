@@ -350,7 +350,7 @@ $triggers_tab->addTab('tags-tab', _('Tags'),
 	new CPartial('configuration.tags.tab', [
 		'source' => 'trigger',
 		'tags' => $data['tags'],
-		'show_inherited_tags' => array_key_exists('show_inherited_tags', $data) ? $data['show_inherited_tags'] : false,
+		'show_inherited_tags' => $data['show_inherited_tags'],
 		'readonly' => $discovered_trigger,
 		'tabs_id' => 'tabs',
 		'tags_tab_id' => 'tags-tab',
