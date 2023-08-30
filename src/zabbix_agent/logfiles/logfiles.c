@@ -47,7 +47,6 @@
 #define ZBX_FILE_PLACE_OTHER	0	/* both files have different device or inode numbers */
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
-
 typedef enum
 {
 	ZBX_LOG_ROTATION_LOGRT = 0,	/* pure rotation model */
@@ -62,10 +61,10 @@ zbx_log_rotation_options_t;
  * Purpose: separates given string to two parts by given delimiter in string  *
  *                                                                            *
  * Parameters:                                                                *
- *     str -   [IN] a not-empty string to split                               *
- *     del -   [IN] pointer to a character in the string                      *
- *     part1 - [OUT] pointer to buffer for the first part with delimiter      *
- *     part2 - [OUT] pointer to buffer for the second part                    *
+ *     str   - [IN] not-empty string to split                                 *
+ *     del   - [IN] pointer to character in string                            *
+ *     part1 - [OUT] pointer to buffer for first part with delimiter          *
+ *     part2 - [OUT] pointer to buffer for second part                        *
  *                                                                            *
  * Return value: SUCCEED - on splitting without errors                        *
  *               FAIL - on splitting with errors                              *
@@ -115,9 +114,9 @@ out:
  * Parameters:                                                                *
  *     filename        - [IN] first parameter of logrt[] or logrt.count[]     *
  *                       item                                                 *
- *     directory       - [IN/OUT] directory part of the 'filename'            *
+ *     directory       - [IN/OUT] directory part of 'filename'                *
  *     filename_regexp - [IN/OUT] file name regular expression part           *
- *     err_msg         - [IN/OUT] error message why an item became            *
+ *     err_msg         - [IN/OUT] error message why item became               *
  *                       NOTSUPPORTED                                         *
  *                                                                            *
  * Return value: SUCCEED - on successful splitting                            *
@@ -240,16 +239,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate the MD5 sum of the specified part of the file           *
+ * Purpose: calculates MD5 sum of specified part of file                      *
  *                                                                            *
  * Parameters:                                                                *
  *     f        - [IN] file descriptor                                        *
- *     offset   - [IN] start position of the part                             *
- *     length   - [IN] length of the part in bytes. Maximum is 512 bytes.     *
- *     md5buf   - [OUT] output buffer, ZBX_MD5_DIGEST_SIZE-bytes long, where  *
- *                the calculated MD5 sum is placed                            *
- *     filename - [IN] file name, used in error logging                       *
- *     err_msg  - [IN/OUT] error message why FAIL-ed                          *
+ *     offset   - [IN] start position of part                                 *
+ *     length   - [IN] Length of the part in bytes. Maximum is 512 bytes.     *
+ *     md5buf   - [OUT] Output buffer, ZBX_MD5_DIGEST_SIZE-bytes long, where  *
+ *                the calculated MD5 sum is placed.                           *
+ *     filename - [IN] used in error logging                                  *
+ *     err_msg  - [IN/OUT]                                                    *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -311,8 +310,8 @@ typedef struct {
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get Microsoft Windows file device ID, 64-bit FileIndex or         *
- *          128-bit FileId                                                    *
+ * Purpose: Gets Microsoft Windows file device ID, 64-bit FileIndex or        *
+ *          128-bit FileId.                                                   *
  *                                                                            *
  * Parameters:                                                                *
  *     f        - [IN] file descriptor                                        *
@@ -320,7 +319,7 @@ typedef struct {
  *     dev      - [OUT] device ID                                             *
  *     ino_lo   - [OUT] 64-bit nFileIndex or lower 64-bits of FileId          *
  *     ino_hi   - [OUT] higher 64-bits of FileId                              *
- *     filename - [IN] file name, used in error logging                       *
+ *     filename - [IN] used in error logging                                  *
  *     err_msg  - [IN/OUT] error message why an item became NOTSUPPORTED      *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -390,12 +389,12 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find file system type and set 'use_ino' parameter                 *
+ * Purpose: finds file system type and sets 'use_ino' parameter               *
  *                                                                            *
  * Parameters:                                                                *
  *     path     - [IN] directory or file name                                 *
  *     use_ino  - [IN] how to use file IDs                                    *
- *     err_msg  - [IN/OUT] error message why an item became NOTSUPPORTED      *
+ *     err_msg  - [IN/OUT] error message why item became NOTSUPPORTED         *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -448,11 +447,11 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 
 /******************************************************************************
  *                                                                            *
- * Purpose: write logfile list into log for debugging                         *
+ * Purpose: writes logfile list into log for debugging                        *
  *                                                                            *
  * Parameters:                                                                *
  *     logfiles     - [IN] array of logfiles                                  *
- *     logfiles_num - [IN] number of elements in the array                    *
+ *     logfiles_num - [IN] number of elements in array                        *
  *                                                                            *
  ******************************************************************************/
 static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_num)
@@ -482,15 +481,15 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare device numbers and inode numbers of 2 files               *
+ * Purpose: compares device numbers and inode numbers of 2 files              *
  *                                                                            *
- * Parameters: old_file - [IN] details of the 1st log file                    *
- *             new_file - [IN] details of the 2nd log file                    *
+ * Parameters: old_file - [IN] details of 1st log file                        *
+ *             new_file - [IN] details of 2nd log file                        *
  *             use_ino  - [IN] 0 - do not use inodes in comparison,           *
  *                             1 - use up to 64-bit inodes in comparison,     *
  *                             2 - use 128-bit inodes in comparison.          *
  *                                                                            *
- * Return value: ZBX_FILE_PLACE_SAME - both files have the same place         *
+ * Return value: ZBX_FILE_PLACE_SAME - both files have same place             *
  *               ZBX_FILE_PLACE_OTHER - files reside in different places      *
  *               ZBX_FILE_PLACE_UNKNOWN - cannot compare places (no inodes)   *
  *                                                                            *
@@ -513,7 +512,7 @@ static int	compare_file_places(const struct st_logfile *old_file, const struct s
 
 /******************************************************************************
  *                                                                            *
- * Purpose: open specified file for reading                                   *
+ * Purpose: opens specified file for reading                                  *
  *                                                                            *
  * Parameters: pathname - [IN] full pathname of file                          *
  *             err_msg  - [IN/OUT] error message why file could not be opened *
@@ -533,13 +532,13 @@ static int	open_file_helper(const char *pathname, char **err_msg)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: close specified file                                              *
+ * Purpose: closes specified file                                             *
  *                                                                            *
  * Parameters: fd       - [IN] file descriptor to close                       *
- *             pathname - [IN] pathname of file, used for error reporting     *
- *             err_msg  - [IN/OUT] error message why file could not be closed *
+ *             pathname - [IN] Pathname of file, used for error reporting.    *
+ *             err_msg  - [IN/OUT] Error message why file could not be closed *
  *                             unless an earlier error has been already       *
- *                             reported                                       *
+ *                             reported.                                      *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -557,20 +556,20 @@ static int	close_file_helper(int fd, const char *pathname, char **err_msg)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: from MD5 sums of blocks and places of 2 files make a conclusion   *
- *          is it the same file, a pair 'original/copy' or 2 different files  *
+ * Purpose: Makes a conclusion from MD5 sums of blocks and places of 2 files: *
+ *          is it the same file, a pair 'original/copy' or 2 different files. *
  *                                                                            *
- * Parameters:  buf1          - [IN] MD5 sum of block in the 1st file         *
- *              buf2          - [IN] MD5 sum of block in the 2nd file         *
+ * Parameters:  buf1          - [IN] MD5 sum of block in 1st file             *
+ *              buf2          - [IN] MD5 sum of block in 2nd file             *
  *              size          - [IN] size of MD5 sum                          *
  *              is_same_place - [IN] equality of file places                  *
  *                                                                            *
  * Return value: ZBX_SAME_FILE_NO - they are 2 different files                *
- *               ZBX_SAME_FILE_YES - 2 files are (assumed) to be the same     *
- *               ZBX_SAME_FILE_COPY - one file is copy of the other           *
+ *               ZBX_SAME_FILE_YES - 2 files are (assumed) to be same         *
+ *               ZBX_SAME_FILE_COPY - one file is copy of other               *
  *                                                                            *
- * Comments: in case files places are unknown but MD5 sums of block pairs     *
- *           match it is assumed to be the same file                          *
+ * Comments: In case files places are unknown but MD5 sums of block pairs     *
+ *           match it is assumed to be the same file.                         *
  *                                                                            *
  ******************************************************************************/
 static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2, size_t size, int is_same_place)
@@ -592,23 +591,24 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find out if a file from the old list and a file from the new list *
- *          could be the same file or copy in case of copy/truncate rotation  *
+ * Purpose: Finds out if a file from the old list and a file from the new     *
+ *          list could be the same file or copy in case of copy/truncate      *
+ *          rotation.                                                         *
  *                                                                            *
  * Parameters:                                                                *
- *          old_file - [IN] file from the old list                            *
- *          new_file - [IN] file from the new list                            *
+ *          old_file - [IN] file from old list                                *
+ *          new_file - [IN] file from new list                                *
  *          use_ino  - [IN] 0 - do not use inodes in comparison,              *
  *                          1 - use up to 64-bit inodes in comparison,        *
  *                          2 - use 128-bit inodes in comparison.             *
  *         new_files - [IN] new file list                                     *
- *          num_new  - [IN] number of elements in the new file list           *
- *          err_msg  - [IN/OUT] error message why an item became              *
+ *          num_new  - [IN] number of elements in new file list               *
+ *          err_msg  - [IN/OUT] error message why item became                 *
  *                     NOTSUPPORTED                                           *
  *                                                                            *
- * Return value: ZBX_SAME_FILE_NO - it is not the same file                   *
- *               ZBX_SAME_FILE_YES - it could be the same file                *
- *               ZBX_SAME_FILE_COPY - it is a copy                            *
+ * Return value: ZBX_SAME_FILE_NO - it is not same file                       *
+ *               ZBX_SAME_FILE_YES - it could be same file                    *
+ *               ZBX_SAME_FILE_COPY - it is copy                              *
  *               ZBX_SAME_FILE_ERROR - error                                  *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
@@ -807,8 +807,8 @@ clean3:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find out if a file from the old list and a file from the new list *
- *          could be the same file in case of simple rotation                 *
+ * Purpose: Finds out if a file from the old list and a file from the new     *
+ *          list could be the same file in case of simple rotation.           *
  *                                                                            *
  * Parameters:                                                                *
  *          old_file - [IN] file from the old list                            *
@@ -818,14 +818,13 @@ clean3:
  *                          2 - use 128-bit inodes in comparison.             *
  *          options  - [IN] log rotation options                              *
  *         new_files - [IN] new file list                                     *
- *          num_new  - [IN] number of elements in the new file list           *
- *          err_msg  - [IN/OUT] error message why an item became              *
- *                     NOTSUPPORTED                                           *
+ *          num_new  - [IN] number of elements in new file list               *
+ *          err_msg  - [IN/OUT] error message why item became NOTSUPPORTED    *
  *                                                                            *
- * Return value: ZBX_SAME_FILE_NO - it is not the same file,                  *
- *               ZBX_SAME_FILE_YES - it could be the same file,               *
- *               ZBX_SAME_FILE_ERROR - error,                                 *
- *               ZBX_SAME_FILE_RETRY - retry on the next check.               *
+ * Return value: ZBX_SAME_FILE_NO - it is not same file                       *
+ *               ZBX_SAME_FILE_YES - it could be same file                    *
+ *               ZBX_SAME_FILE_ERROR - error                                  *
+ *               ZBX_SAME_FILE_RETRY - retry on the next check                *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           We can never say that it IS the same file and it has not been    *
@@ -1020,13 +1019,13 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: fill the given row and column with '0' except the element at the  *
- *          cross point and protected columns and protected rows              *
+ * Purpose: Fills the given row and column with '0' except the element at the *
+ *          cross point and protected columns and protected rows.             *
  *                                                                            *
  * Parameters:                                                                *
  *          arr    - [IN/OUT] two dimensional array                           *
- *          n_rows - [IN] number of rows in the array                         *
- *          n_cols - [IN] number of columns in the array                      *
+ *          n_rows - [IN] number of rows in array                             *
+ *          n_cols - [IN] number of columns in array                          *
  *          row    - [IN] number of cross point row                           *
  *          col    - [IN] number of cross point column                        *
  *          p_rows - [IN] vector with 'n_rows' elements.                      *
@@ -1073,16 +1072,16 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if there is only one element '1' or '2' in the given row    *
+ * Purpose: checks if there is only one element '1' or '2' in given row       *
  *                                                                            *
  * Parameters:                                                                *
  *          arr    - [IN] two dimensional array                               *
  *          n_cols - [IN] number of columns in the array                      *
  *          row    - [IN] number of row to search                             *
  *                                                                            *
- * Return value: number of column where the element '1' or '2' was found or   *
+ * Return value: Number of column where the element '1' or '2' was found or   *
  *               -1 if there are zero or multiple elements '1' or '2' in the  *
- *               row                                                          *
+ *               row.                                                         *
  *                                                                            *
  ******************************************************************************/
 static int	is_uniq_row(const char * const arr, int n_cols, int row)
@@ -1113,7 +1112,7 @@ static int	is_uniq_row(const char * const arr, int n_cols, int row)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if there is only one element '1' or '2' in the given column *
+ * Purpose: checks if there is only one element '1' or '2' in given column    *
  *                                                                            *
  * Parameters:                                                                *
  *          arr    - [IN] two dimensional array                               *
@@ -1121,9 +1120,9 @@ static int	is_uniq_row(const char * const arr, int n_cols, int row)
  *          n_cols - [IN] number of columns in the array                      *
  *          col    - [IN] number of column to search                          *
  *                                                                            *
- * Return value: number of row where the element '1' or '2 ' was found or     *
+ * Return value: Number of row where the element '1' or '2 ' was found or     *
  *               -1 if there are zero or multiple elements '1' or '2' in the  *
- *               column                                                       *
+ *               column.                                                      *
  *                                                                            *
  ******************************************************************************/
 static int	is_uniq_col(const char * const arr, int n_rows, int n_cols, int col)
@@ -1154,14 +1153,14 @@ static int	is_uniq_col(const char * const arr, int n_rows, int n_cols, int col)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if 'old2new' array has only unique mappings                 *
+ * Purpose: checks if 'old2new' array has only unique mappings                *
  *                                                                            *
  * Parameters:                                                                *
  *          old2new - [IN] two dimensional array of possible mappings         *
- *          num_old - [IN] number of elements in the old file list            *
- *          num_new - [IN] number of elements in the new file list            *
+ *          num_old - [IN] number of elements in old file list                *
+ *          num_new - [IN] number of elements in new file list                *
  *                                                                            *
- * Return value: SUCCEED - all mappings are unique,                           *
+ * Return value: SUCCEED - all mappings are unique                            *
  *               FAIL - there are non-unique mappings                         *
  *                                                                            *
  ******************************************************************************/
@@ -1191,12 +1190,12 @@ static int	is_old2new_unique_mapping(const char * const old2new, int num_old, in
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolve non-unique mappings                                       *
+ * Purpose: resolves non-unique mappings                                      *
  *                                                                            *
  * Parameters:                                                                *
  *     old2new - [IN] two dimensional array of possible mappings              *
- *     num_old - [IN] number of elements in the old file list                 *
- *     num_new - [IN] number of elements in the new file list                 *
+ *     num_old - [IN] number of elements in old file list                     *
+ *     num_new - [IN] number of elements in new file list                     *
  *                                                                            *
  ******************************************************************************/
 static void	resolve_old2new(char *old2new, int num_old, int num_new)
@@ -1344,17 +1343,17 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: allocate and fill an array of possible mappings from the old log  *
- *          files to the new log files                                        *
+ * Purpose: Allocates and fill an array of possible mappings from the old log *
+ *          files to the new log files.                                       *
  *                                                                            *
  * Parameters:                                                                *
  *     rotation_type - [IN] file rotation type                                *
  *     old_files     - [IN] old file list                                     *
- *     num_old       - [IN] number of elements in the old file list           *
+ *     num_old       - [IN] number of elements in old file list               *
  *     new_files     - [IN] new file list                                     *
- *     num_new       - [IN] number of elements in the new file list           *
+ *     num_new       - [IN] number of elements in new file list               *
  *     use_ino       - [IN] how to use inodes in is_same_file()               *
- *     err_msg       - [IN/OUT] error message why an item became NOTSUPPORTED *
+ *     err_msg       - [IN/OUT] error message why item became NOTSUPPORTED    *
  *                                                                            *
  * Return value: pointer to allocated array or NULL                           *
  *                                                                            *
@@ -1427,14 +1426,14 @@ static char	*create_old2new_and_copy_of(zbx_log_rotation_options_t rotation_type
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find a mapping from old to new file                               *
+ * Purpose: finds mapping from old to new file                                *
  *                                                                            *
  * Parameters:                                                                *
  *          old2new - [IN] two dimensional array of possible mappings         *
- *          num_new - [IN] number of elements in the new file list            *
- *          i_old   - [IN] index of the old file                              *
+ *          num_new - [IN] number of elements in new file list                *
+ *          i_old   - [IN] index of old file                                  *
  *                                                                            *
- * Return value: index of the new file or                                     *
+ * Return value: index of new file or                                         *
  *               -1 if no mapping was found                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1456,12 +1455,12 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds information of a logfile to the list of logfiles             *
+ * Purpose: adds information of logfile to list of logfiles                   *
  *                                                                            *
  * Parameters: logfiles - pointer to the list of logfiles                     *
  *             logfiles_alloc - number of logfiles memory was allocated for   *
  *             logfiles_num - number of already inserted logfiles             *
- *             filename - name of a logfile (with full path)                  *
+ *             filename - name of logfile (with full path)                    *
  *             st - structure returned by stat()                              *
  *                                                                            *
  ******************************************************************************/
@@ -1556,11 +1555,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: release resources allocated to a logfile list                     *
+ * Purpose: releases resources allocated to logfile list                      *
  *                                                                            *
  * Parameters:                                                                *
- *     logfiles       - [IN/OUT] pointer to the list of logfiles, can be NULL *
- *     logfiles_alloc - [IN/OUT] pointer to number of logfiles memory was     *
+ *     logfiles       - [IN/OUT] pointer to list of logfiles, can be NULL     *
+ *     logfiles_alloc - [IN/OUT] Pointer to number of logfiles memory was     *
  *                               allocated for, can be NULL.                  *
  *     logfiles_num   - [IN/OUT] valid pointer to number of inserted logfiles *
  *                                                                            *
@@ -1582,25 +1581,25 @@ static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_all
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the specified file meets requirements and adds it to    *
- *          the logfile list                                                  *
+ * Purpose: Checks if the specified file meets requirements and adds it to    *
+ *          the logfile list.                                                 *
  *                                                                            *
  * Parameters:                                                                *
- *     directory      - [IN] directory where the logfiles reside              *
- *     filename       - [IN] name of the logfile (without path)               *
- *     mtime          - [IN] selection criterion "logfile modification time"  *
+ *     directory      - [IN] directory where logfiles reside                  *
+ *     filename       - [IN] name of logfile (without path)                   *
+ *     mtime          - [IN] Selection criterion "logfile modification time". *
  *                      The logfile will be selected if modified not before   *
  *                      'mtime'.                                              *
  *     re             - [IN] selection criterion "regexp describing filename  *
  *                      pattern"                                              *
- *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
+ *     logfiles       - [IN/OUT] pointer to list of logfiles                  *
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *     err_msg        - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
- * Comments: This is a helper function for pick_logfiles()                    *
+ * Comments: This is a helper function for pick_logfiles().                   *
  *                                                                            *
  ******************************************************************************/
 static int	pick_logfile(const char *directory, const char *filename, int mtime, const zbx_regexp_t *re,
@@ -1642,25 +1641,24 @@ static int	pick_logfile(const char *directory, const char *filename, int mtime, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find logfiles in a directory and put them into a list             *
+ * Purpose: Finds logfiles in a directory and puts them into a list.          *
  *                                                                            *
  * Parameters:                                                                *
- *     directory      - [IN] directory where the logfiles reside              *
- *     mtime          - [IN] selection criterion "logfile modification time"  *
+ *     directory      - [IN] directory where logfiles reside                  *
+ *     mtime          - [IN] Selection criterion "logfile modification time". *
  *                      The logfile will be selected if modified not before   *
  *                      'mtime'.                                              *
- *     re             - [IN] selection criterion "regexp describing filename  *
- *                      pattern"                                              *
+ *     re             - [IN] Selection criterion "regexp describing filename  *
+ *                      pattern".                                             *
  *     use_ino        - [OUT] how to use inodes in is_same_file()             *
- *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
+ *     logfiles       - [IN/OUT] pointer to list of logfiles                  *
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
- *     err_msg        - [IN/OUT] error message why an item became             *
- *                      NOTSUPPORTED                                          *
+ *     err_msg        - [IN/OUT] error message why item became NOTSUPPORTED   *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
- * Comments: This is a helper function for make_logfile_list()                *
+ * Comments: This is a helper function for make_logfile_list().               *
  *                                                                            *
  * Comments: Thread-safety - readdir() is a gray area, supposed to work on    *
  *           modern implementations when the directory stream is not shared   *
@@ -1757,7 +1755,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compile regular expression                                        *
+ * Purpose: compiles regular expression                                       *
  *                                                                            *
  * Parameters:                                                                *
  *     filename_regexp - [IN] regexp to be compiled                           *
@@ -1785,7 +1783,7 @@ static int	compile_filename_regexp(const char *filename_regexp, zbx_regexp_t **r
 
 /******************************************************************************
  *                                                                            *
- * Purpose: fill-in MD5 sums, device and inode numbers for files in the list  *
+ * Purpose: fills-in MD5 sums, device and inode numbers for files in list     *
  *                                                                            *
  * Parameters:                                                                *
  *     logfiles     - [IN/OUT] list of log files                              *
@@ -1851,23 +1849,23 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: select log files to be analyzed and make a list, set 'use_ino'    *
- *          parameter                                                         *
+ * Purpose: Selects log files to be analyzed and make a list, set 'use_ino'   *
+ *          parameter.                                                        *
  *                                                                            *
  * Parameters:                                                                *
  *     flags          - [IN] bit flags with item type: log, logrt, log.count  *
  *                      or logrt.count                                        *
- *     filename       - [IN] logfile name (regular expression with a path)    *
- *     mtime          - [IN] last modification time of the file               *
- *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
+ *     filename       - [IN] logfile name (regular expression with path)      *
+ *     mtime          - [IN] last modification time of file                   *
+ *     logfiles       - [IN/OUT] pointer to list of logfiles                  *
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *     use_ino        - [IN/OUT] how to use inode numbers                     *
  *     err_msg        - [IN/OUT] error message (if FAIL or ZBX_NO_FILE_ERROR  *
  *                      is returned)                                          *
  *                                                                            *
- * Return value: SUCCEED - file list successfully built,                      *
- *               ZBX_NO_FILE_ERROR - file(s) do not exist,                    *
+ * Return value: SUCCEED - file list successfully built                       *
+ *               ZBX_NO_FILE_ERROR - file(s) do not exist                     *
  *               FAIL - other errors                                          *
  *                                                                            *
  * Comments: Supposed to be thread-safe, see pick_logfiles() comments.        *
@@ -2466,21 +2464,20 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Match new records in logfile with regexp, transmit matching       *
- *          records to Zabbix server                                          *
+ * Purpose: Matches new records in logfile with regexp, transmit matching     *
+ *          records to Zabbix server.                                         *
  *                                                                            *
  * Parameters:                                                                *
  *     flags           - [IN] bit flags with item type: log, logrt, log.count *
  *                       or logrt.count                                       *
  *     logfile         - [IN/OUT] logfile attributes                          *
- *     lastlogsize     - [IN/OUT] offset from the beginning of the file       *
+ *     lastlogsize     - [IN/OUT] offset from beginning of file               *
  *     mtime           - [IN/OUT] file modification time for reporting to     *
  *                       server                                               *
  *     lastlogsize_sent - [OUT] lastlogsize value that was last sent          *
  *     mtime_sent      - [OUT] mtime value that was last sent                 *
- *     skip_old_data   - [IN/OUT] start from the beginning of the file or     *
- *                       jump to the end                                      *
- *     big_rec         - [IN/OUT] state variable to remember whether a long   *
+ *     skip_old_data   - [IN/OUT] start from beginning of file or jump to end *
+ *     big_rec         - [IN/OUT] state variable to remember whether long     *
  *                       record is being processed                            *
  *     encoding        - [IN] text string describing encoding.                *
  *                       See function zbx_find_cr_lf_szbyte() for supported   *
@@ -2497,8 +2494,8 @@ out:
  *                            send data                                       *
  *     agent2_result   - [IN] address of buffer where to store matching log   *
  *                            records (used only in Agent2)                   *
- *     hostname        - [IN] hostname the data comes from                    *
- *     key             - [IN] item key the data belongs to                    *
+ *     hostname        - [IN] hostname data comes from                        *
+ *     key             - [IN] item key data belongs to                        *
  *     processed_bytes - [OUT] number of processed bytes in logfile           *
  *     seek_offset     - [IN] position to seek in file                        *
  *     persistent_file_name - [IN] name of file for saving persistent data    *
@@ -2509,10 +2506,9 @@ out:
  *     config_source_ip - [IN]                                                *
  *     itemid          - [IN] item id for logging when called from Agent 2.   *
  *                            It is 0 when called from Agent 1.               *
- *     err_msg         - [IN/OUT] error message why an item became            *
- *                       NOTSUPPORTED                                         *
+ *     err_msg         - [IN/OUT] error message why item became NOTSUPPORTED  *
  *                                                                            *
- * Return value: returns SUCCEED on successful reading,                       *
+ * Return value: returns SUCCEED on successful reading                        *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Comments:                                                                  *
@@ -2669,10 +2665,10 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare MD5 sums of first and last blocks between 2 files. If MD5 *
- *          sums have been calculated for blocks of different sizes or        *
- *          offsets then open the log file with larger size of blocks and get *
- *          MD5 for the smaller size                                          *
+ * Purpose: Compares MD5 sums of first and last blocks between 2 files. If    *
+ *          MD5 sums have been calculated for blocks of different sizes or    *
+ *          offsets then opens the log file with larger size of blocks and    *
+ *          gets MD5 for the smaller size.                                    *
  *                                                                            *
  * Parameters:                                                                *
  *     log1 - [IN] log file 1 attributes                                      *
@@ -2682,7 +2678,7 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
  *                                                                            *
  * Comments: Use this function to compare log files from the 'new' file list. *
  *           DO NOT use it with a file which belongs to the 'old' list (the   *
- *           old file name now could point to different file)                 *
+ *           old file name now could point to different file).                *
  *                                                                            *
  ******************************************************************************/
 static int	files_have_same_blocks_md5(const struct st_logfile *log1, const struct st_logfile *log2)
@@ -2872,8 +2868,8 @@ static zbx_uint64_t	max_processed_size_in_copies(const struct st_logfile *logfil
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate delay based on number of processed and remaining bytes, *
- *          and processing time                                               *
+ * Purpose: Calculates delay based on number of processed and remaining bytes *
+ *          , and processing time.                                            *
  *                                                                            *
  * Parameters:                                                                *
  *     processed_bytes - [IN] number of processed bytes in logfile            *
@@ -2955,13 +2951,13 @@ static void	jump_remaining_bytes_logrt(struct st_logfile *logfiles, int logfiles
 /******************************************************************************
  *                                                                            *
  * Purpose:                                                                   *
- *    After jumping over a number of bytes we "land" most likely somewhere in *
- *    the middle of log file line. This function tries to adjust position to  *
- *    the beginning of the log line.                                          *
+ *    Tries to adjust position to the beginning of the log line, after        *
+ *    jumping over a number of bytes we "land" most likely somewhere in       *
+ *    the middle of log file line.                                            *
  *                                                                            *
  * Parameters:                                                                *
  *     logfile     - [IN/OUT] log file data                                   *
- *     lastlogsize - [IN/OUT] offset from the beginning of the file           *
+ *     lastlogsize - [IN/OUT] offset from beginning of file                   *
  *     min_size    - [IN] minimum offset to search from                       *
  *     encoding    - [IN] text string describing encoding                     *
  *     err_msg     - [IN/OUT] error message                                   *
@@ -3123,7 +3119,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: move forward to a new position in the log file list               *
+ * Purpose: moves forward to new position in log file list                    *
  *                                                                            *
  * Parameters:                                                                *
  *     key           - [IN] item key for logging                              *
@@ -3132,8 +3128,8 @@ out:
  *     jump_from_to  - [IN/OUT] on input - number of element where to start   *
  *                     jump, on output - number of element we jumped into     *
  *     seq           - [IN/OUT] sequence number of last processed file        *
- *     lastlogsize   - [IN/OUT] offset from the beginning of the file         *
- *     mtime         - [IN/OUT] last modification time of the file            *
+ *     lastlogsize   - [IN/OUT] offset from beginning of file                 *
+ *     mtime         - [IN/OUT] last modification time of file                *
  *     encoding      - [IN] text string describing encoding                   *
  *     bytes_to_jump - [IN] number of bytes to jump ahead                     *
  *     err_msg       - [IN/OUT] error message                                 *
@@ -3334,28 +3330,27 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Find new records in logfiles                                      *
+ * Purpose: finds new records in logfiles                                     *
  *                                                                            *
  * Parameters:                                                                *
  *     flags            - [IN] bit flags with item type: log, logrt,          *
  *                        log.count or logrt.count                            *
- *     filename         - [IN] logfile name (regular expression with a path)  *
- *     lastlogsize      - [IN/OUT] offset from the beginning of the file      *
- *     mtime            - [IN/OUT] last modification time of the file         *
+ *     filename         - [IN] logfile name (regular expression with path)    *
+ *     lastlogsize      - [IN/OUT] offset from beginning of file              *
+ *     mtime            - [IN/OUT] last modification time of file             *
  *     lastlogsize_sent - [OUT] lastlogsize value that was last sent          *
  *     mtime_sent       - [OUT] mtime value that was last sent                *
- *     skip_old_data    - [IN/OUT] start from the beginning of the file or    *
- *                        jump to the end                                     *
- *     big_rec          - [IN/OUT] state variable to remember whether a long  *
+ *     skip_old_data    - [IN/OUT] start from beginning of file or jump to    *
+ *                                 end                                        *
+ *     big_rec          - [IN/OUT] state variable to remember whether long    *
  *                        record is being processed                           *
  *     use_ino          - [IN/OUT] how to use inode numbers                   *
- *     err_msg          - [IN/OUT] error message why an item became           *
- *                        NOTSUPPORTED                                        *
- *     logfiles_old     - [IN/OUT] array of logfiles from the last check      *
+ *     err_msg          - [IN/OUT] error message why item became NOTSUPPORTED *
+ *     logfiles_old     - [IN/OUT] array of logfiles from last check          *
  *     logfiles_num_old - [IN] number of elements in "logfiles_old"           *
  *     logfiles_new     - [OUT] new array of logfiles                         *
  *     logfiles_num_new - [OUT] number of elements in "logfiles_new"          *
- *     encoding         - [IN] text string describing encoding.               *
+ *     encoding         - [IN] Text string describing encoding.               *
  *                        See function zbx_find_cr_lf_szbyte() for supported  *
  *                        encodings.                                          *
  *                        "" (empty string) means a single-byte character set *
@@ -3370,9 +3365,9 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *                             to send data                                   *
  *     agent2_result    - [IN] address of buffer where to store matching log  *
  *                             records (used only in Agent2)                  *
- *     hostname         - [IN] hostname the data comes from                   *
- *     key              - [IN] item key the data belongs to                   *
- *     jumped           - [OUT] flag to indicate that a jump took place       *
+ *     hostname         - [IN] hostname data comes from                       *
+ *     key              - [IN] item key data belongs to                       *
+ *     jumped           - [OUT] flag to indicate that jump took place         *
  *     max_delay        - [IN] maximum allowed delay, s                       *
  *     start_time       - [IN/OUT] start time of check                        *
  *     processed_bytes  - [IN/OUT] number of bytes processed                  *
@@ -3383,10 +3378,12 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     config_tls       - [IN]                                                *
  *     config_timeout   - [IN]                                                *
  *     config_source_ip - [IN]                                                *
- *     itemid           - [IN] item id for logging when called from Agent 2.  *
+ *     itemid           - [IN] Item id for logging when called from Agent 2.  *
  *                             It is 0 when called from Agent 1.              *
+ *     config_buffer_send - [IN]                                              *
+ *     config_buffer_size - [IN]                                              *
  *                                                                            *
- * Return value: returns SUCCEED on successful reading,                       *
+ * Return value: returns SUCCEED on successful reading                        *
  *               FAIL on other cases                                          *
  *                                                                            *
  * Comments: Supposed to be thread-safe, see pick_logfiles() comments.        *
@@ -3775,8 +3772,8 @@ static int	check_number_of_parameters(unsigned char flags, const AGENT_REQUEST *
 
 /******************************************************************************
  *                                                                            *
- * Comments: thread-safe if config_max_lines_per_second is updated when log   *
- *           checks are not running                                           *
+ * Comments: Thread-safe if config_max_lines_per_second is updated when log   *
+ *           checks are not running.                                          *
  *                                                                            *
  ******************************************************************************/
 static int	init_max_lines_per_sec(int is_count_item, const AGENT_REQUEST *request, int *max_lines_per_sec,
