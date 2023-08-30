@@ -8,6 +8,17 @@
 	"author": "Zabbix",
 	"description": "Allows to build a hierarchy of existing maps and display problem statistics for each included map and map group.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/map_tree",
+	"widget": {
+		"out": [
+			{"type": "_mapid"}
+		],
+		"size": {
+			"width": 6,
+			"height": 5
+		},
+		"js_class": "CWidgetNavTree",
+		"refresh_rate": 900
+	},
 	"actions": {
 		"widget.navtree.view": {
 			"class": "WidgetView"
@@ -21,14 +32,6 @@
 			"class": "NavTreeItemUpdate",
 			"layout": "layout.json"
 		}
-	},
-	"widget": {
-		"size": {
-			"width": 6,
-			"height": 5
-		},
-		"js_class": "CWidgetNavTree",
-		"refresh_rate": 900
 	},
 	"assets": {
 		"js": ["class.widget.js"]
