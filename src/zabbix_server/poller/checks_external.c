@@ -63,12 +63,6 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
-		goto out;
-	}
-
 	for (i = 0; i < get_rparams_num(&request); i++)
 	{
 		const char	*param;

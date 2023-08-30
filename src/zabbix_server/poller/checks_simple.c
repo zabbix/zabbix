@@ -218,12 +218,6 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
-		goto out;
-	}
-
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
 		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0, timeout_sec))

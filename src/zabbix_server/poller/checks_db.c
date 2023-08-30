@@ -82,13 +82,6 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
-		ret = FAIL;
-		goto out;
-	}
-
 	/* request.params[0] is ignored and is only needed to distinguish queries of same DSN */
 
 	dsn = request.params[1];

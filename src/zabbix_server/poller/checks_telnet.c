@@ -74,12 +74,6 @@ int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RE
 	else
 		item->interface.port = ZBX_DEFAULT_TELNET_PORT;
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
-		goto out;
-	}
-
 	encoding = get_rparam(&request, 3);
 
 	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding), timeout_sec, config_source_ip);

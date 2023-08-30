@@ -218,6 +218,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
 	int			ret = NOTSUPPORTED, timeout_sec = 0;
+	char            	error[ZBX_ITEM_ERROR_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'  conn:'%s'", __func__, item->key,
 			item->host.host, item->interface.addr, zbx_tcp_connection_type_name(item->host.tls_connect));
@@ -241,9 +242,9 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 
 	zbx_init_agent_result(&agent_context->item.result);
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
+	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec, error, sizeof(error)))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 		goto out;
 	}
 

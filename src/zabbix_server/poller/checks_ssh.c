@@ -76,12 +76,6 @@ int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESUL
 	else
 		item->interface.port = ZBX_DEFAULT_SSH_PORT;
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
-		goto out;
-	}
-
 	encoding = get_rparam(&request, 3);
 	ssh_options = get_rparam(&request, 4);
 

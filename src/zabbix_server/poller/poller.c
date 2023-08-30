@@ -48,6 +48,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxsysinfo.h"
 
 /******************************************************************************
  *                                                                            *
@@ -451,6 +452,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 	for (i = 0; i < num; i++)
 	{
+		int	timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
+
 		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
@@ -502,6 +505,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
+
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
+						sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
 				break;
 			case ITEM_TYPE_SNMP:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -549,6 +561,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
+
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
+						sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
 				break;
 			case ITEM_TYPE_SCRIPT:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -559,6 +580,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON,
 						NULL, 0);
+
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
+						sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].script_params,
 						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
@@ -610,6 +640,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
+
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
+						sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+
 				break;
 			case ITEM_TYPE_JMX:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -646,6 +685,15 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].timeout,
 							ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+					if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
+							sizeof(error)))
+					{
+						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+						errcodes[i] = CONFIG_ERROR;
+						continue;
+					}
+
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
 							&items[i].host, &items[i], NULL, NULL, NULL, NULL, NULL,
 							&items[i].url, ZBX_MACRO_TYPE_HTTP_RAW, NULL, 0);
