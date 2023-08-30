@@ -277,11 +277,17 @@ next:
 	zbx_vector_str_destroy(&packages);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(output)));
-	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+	{
+		if (NULL == output)
+			output = zbx_strdup(NULL, "");
 
-	zbx_free(output);
+		SET_TEXT_RESULT(result, output);
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+		zbx_free(output);
+	}
 
 	return ret;
 }
