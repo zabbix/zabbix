@@ -25,7 +25,7 @@ case $# in
 esac
 
 aclocal -I m4
-autoconf
+autoconf -W no-obsolete
 autoheader
 automake -a
 automake
