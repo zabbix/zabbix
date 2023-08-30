@@ -92,10 +92,13 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item->itemid, item->hostid,
-					item->value_type, item->flags, NULL, &timespec,
-					ITEM_STATE_NOTSUPPORTED, item->result.msg);
+			if (NOTSUPPORTED == item->ret || AGENT_ERROR == item->ret || CONFIG_ERROR == item->ret)
+			{
+				zbx_preprocess_item_value(item->itemid, item->hostid, item->value_type,
+					item->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, item->result.msg);
+			}
 		}
+
 		interface_status->error = item->result.msg;
 		SET_MSG_RESULT(&item->result, NULL);
 	}
