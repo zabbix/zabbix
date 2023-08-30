@@ -14871,46 +14871,41 @@ void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeo
 	UNLOCK_CACHE;
 }
 
-static void	proxy_discovery_add_item_type_timeout(const char *key, struct zbx_json *j, zbx_dc_um_handle_t *um_handle,
-		const char *proxy_timeout, zbx_uint64_t proxyid)
+static void	proxy_discovery_add_item_type_timeout(const char *key, struct zbx_json *j, const char *raw_timeout,
+		zbx_uint64_t proxyid)
 {
-	char	*tmp;
-	int	value = 0;
+	char	*expanded_value;
+	int	tm_seconds = 0;
 
-	tmp = zbx_strdup(NULL, proxy_timeout);
+	expanded_value = dc_expand_user_macros_dyn(raw_timeout, &proxyid, 1, ZBX_MACRO_ENV_NONSECURE);
 
-	(void)zbx_dc_expand_user_macros(um_handle, &tmp, &proxyid, 1, NULL);
-
-	if (SUCCEED == zbx_is_time_suffix(tmp, &value, ZBX_LENGTH_UNLIMITED))
-		zbx_json_adduint64(j, key, value);
+	if (SUCCEED == zbx_is_time_suffix(expanded_value, &tm_seconds, ZBX_LENGTH_UNLIMITED))
+	{
+		zbx_json_adduint64(j, key, tm_seconds);
+	}
 	else
-		zbx_json_addstring(j, key, tmp, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, key, expanded_value, ZBX_JSON_TYPE_STRING);
 
-	zbx_free(tmp);
+	zbx_free(expanded_value);
 }
 
 static void	proxy_discovery_get_timeouts(const ZBX_DC_PROXY *proxy, struct zbx_json *json)
 {
-	zbx_dc_um_handle_t			*um_handle;
 	const zbx_config_item_type_timeouts_t	*timeouts;
-
-	um_handle = zbx_dc_open_user_macros();
 
 	timeouts = (0 == proxy->custom_timeouts ? &config->config->item_timeouts : &proxy->item_timeouts);
 
 	zbx_json_addobject(json, "timeouts");
 
-	proxy_discovery_add_item_type_timeout("zabbix_agent", json, um_handle, timeouts->agent, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("simple_check", json, um_handle, timeouts->simple, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("snmp_check", json, um_handle, timeouts->snmp, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("external_check", json, um_handle, timeouts->external, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("db_monitor", json, um_handle, timeouts->odbc, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("http_agent", json, um_handle, timeouts->http, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("ssh_agent", json, um_handle, timeouts->ssh, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("telnet_agent", json, um_handle, timeouts->telnet, proxy->proxyid);
-	proxy_discovery_add_item_type_timeout("script", json, um_handle, timeouts->script, proxy->proxyid);
-
-	zbx_dc_close_user_macros(um_handle);
+	proxy_discovery_add_item_type_timeout("zabbix_agent", json, timeouts->agent, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("simple_check", json, timeouts->simple, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("snmp_check", json, timeouts->snmp, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("external_check", json, timeouts->external, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("db_monitor", json, timeouts->odbc, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("http_agent", json, timeouts->http, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("ssh_agent", json, timeouts->ssh, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("telnet_agent", json, timeouts->telnet, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("script", json, timeouts->script, proxy->proxyid);
 
 	zbx_json_close(json);
 }
