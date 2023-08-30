@@ -31,7 +31,14 @@
 			this.form = document.forms[form_name];
 			this.confirm_messages = confirm_messages;
 
+			this.initFilterForm();
 			this.initEvents();
+		}
+
+		initFilterForm() {
+			this.field = {
+				parent_discoveryid: this.form.querySelector('#form_parent_discoveryid').value
+			}
 		}
 
 		initEvents() {
@@ -63,7 +70,7 @@
 				}
 				else if (target.classList.contains('js-massupdate-itemprototype')) {
 					this.#massupdate(target, {ids: itemids, context: this.context,
-						parent_discoveryid: this.form.querySelector('#form_parent_discoveryid').value
+						parent_discoveryid: this.field.parent_discoveryid
 					});
 				}
 				else if (target.matches('.js-massdelete-itemprototype')) {
@@ -135,7 +142,7 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					uncheckTableRows('itemprototype');
+					uncheckTableRows(this.field.parent_discoveryid);
 					this.#navigate(response, location.href);
 				})
 				.catch(() => {
@@ -166,7 +173,7 @@
 			const overlay = PopUp(action, parameters, overlay_options);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('itemprototype');
+				uncheckTableRows(this.field.parent_discoveryid);
 				this.#navigate(e.detail, location.href);
 			});
 

@@ -459,6 +459,11 @@ function submitPopup(overlay) {
 
 			message_box.insertBefore(form);
 		}
+		else if (action === 'item.prototype.massupdate' || action === 'item.massupdate') {
+			// Item and item prototype lists javascript handles successfull update.
+			overlayDialogueDestroy(overlay.dialogueid);
+			overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+		}
 		else {
 			postMessageOk(response.title);
 
