@@ -508,8 +508,9 @@ class testPageNetworkDiscovery extends CWebTest {
 				}
 				else {
 					$this->assertMessage(TEST_GOOD, 'Discovery '.
-						(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
-						' '.lcfirst($data['action']).'d');
+							(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
+							' '.lcfirst($data['action']).'d'
+					);
 				}
 
 				CMessageElement::find()->one()->close();
