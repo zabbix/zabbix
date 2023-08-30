@@ -315,6 +315,10 @@ abstract class CControllerItemPrototype extends CController {
 			$input['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
 		}
 
+		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
 		return $input;
 	}
 

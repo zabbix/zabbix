@@ -37,6 +37,7 @@ const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
+const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
 const ZBX_STYLE_BTN_GREY = <?= json_encode(ZBX_STYLE_BTN_GREY) ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
@@ -114,7 +115,9 @@ window.item_edit_form = new class {
 			username: this.form.querySelector('[name=username]'),
 			value_type: this.form.querySelector('[name="value_type"]'),
 			value_type_steps: this.form.querySelector('[name="value_type_steps"]'),
-			ipmi_sensor: this.form.querySelector('[name="ipmi_sensor"]')
+			ipmi_sensor: this.form.querySelector('[name="ipmi_sensor"]'),
+			request_method: this.form.querySelector('[name="request_method"'),
+			retrieve_mode: this.form.querySelectorAll('[name="retrieve_mode"]')
 		};
 		this.label = {
 			interfaceid: this.form.querySelector('[for="interfaceid"]'),
@@ -173,7 +176,8 @@ window.item_edit_form = new class {
 		this.field.key.addEventListener('keyup', () => this.#keyChangeHandler());
 		this.field.key_button?.addEventListener('click', () => this.#keySelectClickHandler());
 		this.field.type.addEventListener('click', () => this.updateFieldsVisibility());
-		this.field.value_type.addEventListener('change', e => this.#valueTypeChangeHandler(e));
+		this.field.value_type.addEventListener('change', (e) => this.#valueTypeChangeHandler(e));
+		this.field.request_method.addEventListener('change', () => this.updateFieldsVisibility());
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
@@ -311,6 +315,7 @@ window.item_edit_form = new class {
 		this.#updateTrendsModeVisibility();
 		this.#updateValueTypeHintVisibility();
 		this.#updateValueTypeOptionVisibility();
+		this.#updateRetrieveModeVisibility();
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
@@ -437,6 +442,16 @@ window.item_edit_form = new class {
 		const switcher = globalAllObjForViewSwitcher['type'];
 
 		fields.forEach(id => switcher[action]({id}));
+	}
+
+	#updateRetrieveModeVisibility() {
+		const disable = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
+
+		if (disable) {
+			this.field.retrieve_mode.item(0).checked = true;
+		}
+
+		this.field.retrieve_mode.forEach(radio => radio.disabled = disable);
 	}
 
 	#updateValueTypeHintVisibility() {
