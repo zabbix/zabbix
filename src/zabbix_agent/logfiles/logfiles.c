@@ -18,6 +18,7 @@
 **/
 
 #include "logfiles.h"
+#include "persistent_state.h"
 
 #include "zbxsysinfo.h"
 #include "cfg.h"

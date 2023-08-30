@@ -20,9 +20,6 @@
 #ifndef ZABBIX_PERSISTENT_STATE_H
 #define ZABBIX_PERSISTENT_STATE_H
 
-#include "zbxhash.h"
-#include "zbxalgo.h"
-
 #include "logfiles.h"
 
 char	*zbx_create_persistent_server_directory(const char *base_path, const char *host, unsigned short port,

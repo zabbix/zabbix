@@ -18,8 +18,11 @@
 **/
 
 #include "persistent_state.h"
-
 #include "logfiles.h"
+
+#include "zbxalgo.h"
+#include "zbxhash.h"
+#include "zbxnum.h"
 #include "zbxjson.h"
 #include "zbxcrypto.h"
 

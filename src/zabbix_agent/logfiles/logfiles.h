@@ -21,7 +21,8 @@
 #define ZABBIX_LOGFILES_H
 
 #include "../metrics.h"
-#include "persistent_state.h"
+#include "zbxalgo.h"
+#include "zbxhash.h"
 #include "zbxcomms.h"
 #include "zbxregexp.h"
 #include "cfg.h"

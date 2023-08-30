@@ -21,7 +21,6 @@
 
 #include "../agent_conf/agent_conf.h"
 #include "../logfiles/logfiles.h"
-#include "../logfiles/persistent_state.h"
 
 #include "cfg.h"
 #include "zbxlog.h"
