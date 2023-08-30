@@ -2719,6 +2719,11 @@ class testCalculatedFormula extends CWebTest {
 			// foreach() aggregated functions.
 			[
 				[
+					'formula' => 'mad(last_foreach(/*/trap))'
+				]
+			],
+			[
+				[
 					'formula' => 'sum(last_foreach(/*/trap))'
 				]
 			],
@@ -2919,7 +2924,7 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'mad()',
-					'error' => 'Invalid parameter "/1/params": incorrect usage of function "mad".'
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "mad".'
 				]
 			],
 			[
