@@ -1145,7 +1145,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 	{
 		group = groups->values[i];
 
-		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED) || 0 == group->groupid)
+		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
 		for (j = 0; j < group->hosts.values_num; j++)
@@ -2050,7 +2050,8 @@ out:
  *                                     sorted by group_prototypeid            *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes)
+static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
+		char **error)
 {
 	int				i, j, groups_insert_num = 0, groups_update_num = 0, gd_insert_num = 0,
 					gd_update_num = 0;
@@ -2193,7 +2194,7 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 		}
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select groupid,name from hstgrp"
+				"select groupid,name,flags from hstgrp"
 					" where type=%d"
 						" and",
 				HOSTGROUP_TYPE_HOST);
@@ -2210,7 +2211,18 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 				zbx_lld_group_t	*group = groups->values[i];
 
 				if (0 == group->groupid && 0 == strcmp(group->name, row[1]))
-					ZBX_STR2UINT64(group->groupid, row[0]);
+				{
+					if (0 == (atoi(row[2]) & ZBX_FLAG_DISCOVERY_CREATED))
+					{
+						group->flags &= (~ZBX_FLAG_LLD_GROUP_DISCOVERED);
+
+						*error = zbx_strdcatf(*error, "Cannot discover group:"
+								" group with the same name \"%s\" already exists.\n",
+								group->name);
+					}
+					else
+						ZBX_STR2UINT64(group->groupid, row[0]);
+				}
 			}
 		}
 		zbx_db_free_result(result);
@@ -2250,14 +2262,6 @@ static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector
 					(int)ZBX_FLAG_DISCOVERY_CREATED);
 
 			zbx_vector_lld_group_ptr_append(&new_groups, group);
-
-			for (j = 0; j < group->hosts.values_num; j++)
-			{
-				zbx_lld_host_t	*host = (zbx_lld_host_t *)group->hosts.values[j];
-
-				/* hosts will be linked to a new host groups */
-				zbx_vector_uint64_append(&host->new_groupids, group->groupid);
-			}
 		}
 		else if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
 		{
@@ -5125,12 +5129,14 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 
 		lld_interfaces_validate(&hosts, error);
 
+		/* save groups before making hosts_groups links because groupids could be updated during save */
+		lld_groups_save(&groups_out, &group_prototypes, error);
+
 		lld_hostgroups_make(&groupids, &hosts, &groups_out, &del_hostgroupids);
 		lld_templates_make(parent_hostid, &hosts);
 
 		lld_hostmacros_make(&hostmacros, &hosts, lld_macro_paths);
 
-		lld_groups_save(&groups_out, &group_prototypes);
 		lld_hosts_save(parent_hostid, &hosts, host_proto, proxyid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, tls_connect, tls_accept,
 				tls_issuer, tls_subject, tls_psk_identity, tls_psk, &del_hostgroupids);
