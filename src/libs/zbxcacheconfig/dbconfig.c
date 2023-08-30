@@ -2582,7 +2582,7 @@ static const char	*dc_get_global_item_type_timeout(const ZBX_DC_ITEM *item)
 			global_timeout = config->config->item_timeouts.http;
 			break;
 		default:
-			global_timeout = NULL;
+			global_timeout = "";
 			break;
 	}
 
@@ -9025,7 +9025,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	const ZBX_DC_HTTPITEM		*httpitem;
 	const ZBX_DC_SCRIPTITEM		*scriptitem;
-	const char			*timeout_global = NULL;
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -9067,7 +9066,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	DCget_interface(&dst_item->interface, dc_interface);
 
 	if ('\0' == *src_item->timeout)
-		timeout_global = dc_get_global_item_type_timeout(src_item);
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item));
 
 	switch (src_item->type)
 	{
@@ -9089,8 +9088,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
 				dst_item->snmp_max_repetitions = snmp->max_repetitions;
-
-				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
@@ -9144,8 +9141,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->params = zbx_strdup(NULL, dbitem->params);
 				zbx_strscpy(dst_item->username_orig, dbitem->username);
 				zbx_strscpy(dst_item->password_orig, dbitem->password);
-
-				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
@@ -9168,8 +9163,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				zbx_strscpy(dst_item->privatekey_orig, sshitem->privatekey);
 				zbx_strscpy(dst_item->password_orig, sshitem->password);
 				dst_item->params = zbx_strdup(NULL, sshitem->params);
-
-				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
@@ -9190,14 +9183,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
 					&src_item->itemid)))
 			{
-				if (NULL == httpitem->timeout || '\0' == *httpitem->timeout)
-				{
-					timeout_global = dc_get_global_item_type_timeout(src_item);
-					zbx_strscpy(dst_item->timeout_orig, timeout_global);
-				}
-				else
-					zbx_strscpy(dst_item->timeout_orig, httpitem->timeout);
-
+				zbx_strscpy(dst_item->timeout_orig, httpitem->timeout);
 				zbx_strscpy(dst_item->url_orig, httpitem->url);
 				zbx_strscpy(dst_item->query_fields_orig, httpitem->query_fields);
 				zbx_strscpy(dst_item->status_codes_orig, httpitem->status_codes);
@@ -9265,13 +9251,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-				if (NULL == scriptitem->timeout || '\0' == *scriptitem->timeout)
-				{
-					timeout_global = dc_get_global_item_type_timeout(src_item);
-					zbx_strscpy(dst_item->timeout_orig, timeout_global);
-				}
-				else
-					zbx_strscpy(dst_item->timeout_orig, scriptitem->timeout);
+				zbx_strscpy(dst_item->timeout_orig, scriptitem->timeout);
 
 				dst_item->params = zbx_strdup(NULL, scriptitem->script);
 
@@ -9302,7 +9282,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				zbx_strscpy(dst_item->username_orig, telnetitem->username);
 				zbx_strscpy(dst_item->password_orig, telnetitem->password);
 				dst_item->params = zbx_strdup(NULL, telnetitem->params);
-				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
@@ -9320,7 +9299,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			{
 				zbx_strscpy(dst_item->username_orig, simpleitem->username);
 				zbx_strscpy(dst_item->password_orig, simpleitem->password);
-				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
@@ -9365,7 +9343,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			break;
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_ZABBIX_ACTIVE:
-			zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			dst_item->timeout = NULL;
 
 			break;
