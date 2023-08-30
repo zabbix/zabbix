@@ -1563,21 +1563,21 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				? $data['host_name']
 				: $data['trigger_name']))->one()->waitUntilClickable()->click();
 
-			// Check trigger popup menu.
-			$trigger_popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($trigger_popup->hasTitles($data['titles']));
+			// Check popup menu.
+			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+			$this->assertTrue($popup->hasTitles($data['titles']));
 
 			foreach ($data['links'] as $menu => $links) {
 				// Check 2-level menu links.
 				if (is_array($links)) {
-					$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
+					$item_link = $popup->getItem($menu)->query('xpath:./../ul//a')->one();
 					$this->assertEquals(array_keys($links), [$item_link->getText()]);
 					$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
 				}
 				else {
 					// Check 1-level menu links.
 					if ($links !== '') {
-						$this->assertStringContainsString($links, $trigger_popup->getItem($menu)->getAttribute('href'));
+						$this->assertStringContainsString($links, $popup->getItem($menu)->getAttribute('href'));
 					}
 				}
 			}
