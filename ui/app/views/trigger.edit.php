@@ -181,7 +181,7 @@ $expression_row[] = [
 ];
 
 $trigger_form_grid->addItem([
-	(new CLabel(_('Expression'), 'expression-field'))->setAsteriskMark(),
+	(new CLabel(_('Expression'), 'expression'))->setAsteriskMark(),
 	(new CFormField($expression_row))->setId('expression-row'),
 ]);
 
@@ -266,7 +266,7 @@ $recovery_expression_row[] = [
 ];
 
 $trigger_form_grid->addItem([
-	(new CLabel(_('Recovery expression'), 'recovery-expression-field'))->setAsteriskMark(),
+	(new CLabel(_('Recovery expression'), 'recovery_expression'))->setAsteriskMark(),
 	(new CFormField($recovery_expression_row))->setId('recovery-expression-row')
 ]);
 
@@ -307,7 +307,7 @@ $trigger_form_grid
 			->setAriaRequired()
 			->setId('correlation-tag')
 	])
-	->addItem([new CLabel(_('Allow manual close')),
+	->addItem([new CLabel(_('Allow manual close'), 'manual_close'),
 		new CFormField(
 			(new CCheckBox('manual_close'))
 				->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
@@ -320,7 +320,7 @@ $trigger_form_grid
 		new CLabel([
 			_('Menu entry name'),
 			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
-		]),
+		], 'url_name'),
 		(new CTextBox('url_name', array_key_exists('url_name', $data) ? $data['url_name'] : '', $discovered_trigger,
 			DB::getFieldLength('triggers', 'url_name')
 		))
@@ -328,18 +328,18 @@ $trigger_form_grid
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
 	->addItem([
-		new CLabel(_('Menu entry URL')),
+		new CLabel(_('Menu entry URL'), 'url'),
 		(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '', $discovered_trigger,
 			DB::getFieldLength('triggers', 'url')
 		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	])
-	->addItem([new CLabel(_('Description')),
+	->addItem([new CLabel(_('Description'), 'description'),
 		(new CTextArea('description', array_key_exists('comments', $data) ? $data['comments'] : ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 			->setReadonly($discovered_trigger)
 	])
-	->addItem([new CLabel(_('Enabled')), new CFormField((new CCheckBox('status'))->setChecked(
+	->addItem([new CLabel(_('Enabled'), 'status'), new CFormField((new CCheckBox('status'))->setChecked(
 		$data['status'] == TRIGGER_STATUS_ENABLED
 	))]);
 
