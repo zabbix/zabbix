@@ -565,6 +565,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		for (i = 0; i < num; i++)
 		{
+			int	timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
+
 			if (SUCCEED != errcodes[i])
 			{
 				/* items or host removed between checking item count and retrieving items */
@@ -618,14 +620,9 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, dc_items[i].lastlogsize);
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, dc_items[i].mtime);
 
-			if (NULL != dc_items[i].timeout_orig)
-			{
-				int	timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
+			zbx_is_time_suffix(dc_items[i].timeout_orig, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 
-				zbx_is_time_suffix(dc_items[i].timeout_orig, &timeout_sec, ZBX_LENGTH_UNLIMITED);
-
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMEOUT, timeout_sec);
-			}
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMEOUT, timeout_sec);
 
 			zbx_json_close(&json);
 
