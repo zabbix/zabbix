@@ -505,7 +505,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$metric['value'] = min($values);
 					break;
 				case AGGREGATE_AVG:
-					$metric['value'] = array_sum($values) / count(array_filter($values));
+					$metric['value'] = array_sum($values) / count($values);
 					break;
 				case AGGREGATE_COUNT:
 					$metric['value'] = count($values);
