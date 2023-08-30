@@ -6908,7 +6908,6 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 			proxy->nodata_win.values_num = 0;
 			proxy->nodata_win.period_end = 0;
-			memset(&proxy->item_timeouts, 0, sizeof(zbx_config_item_type_timeouts_t));
 
 			zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -9067,7 +9066,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	DCget_interface(&dst_item->interface, dc_interface);
 
-	if (src_item->timeout == NULL || '\0' == *src_item->timeout)
+	if ('\0' == *src_item->timeout)
 		timeout_global = dc_get_global_item_type_timeout(src_item);
 
 	switch (src_item->type)
