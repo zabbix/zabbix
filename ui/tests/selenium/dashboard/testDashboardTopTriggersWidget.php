@@ -1533,6 +1533,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$filter_element = CFilterElement::find()->one()->query('link', 'Last 1 day')->waitUntilPresent();
 		if ($filter_element->one()->isSelected(false)) {
 			$filter_element->one()->click();
+			$dashboard->waitUntilReady();
 		}
 
 		if (array_key_exists('fields', $data)) {
