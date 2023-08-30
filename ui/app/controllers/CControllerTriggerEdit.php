@@ -146,7 +146,7 @@ class CControllerTriggerEdit extends CController {
 
 		$data['description'] = $this->getInput('name', '');
 		$data['comments'] = $this->getInput('description', '');
-		$data['dependencies'] =  zbx_toObject($this->getInput('dependencies', []), 'triggerid');
+		$data['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
 
 		if ($data['tags'] && ($data['show_inherited_tags'] == 0 || !$this->trigger)) {
 			// Unset inherited tags.
@@ -303,16 +303,16 @@ class CControllerTriggerEdit extends CController {
 			if (array_key_exists($templateid, $db_templates)) {
 				foreach ($db_templates[$templateid]['tags'] as $tag) {
 					if (array_key_exists($tag['tag'], $inherited_tags)
-						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
 						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
 							$templateid => $template
 						];
 					}
 					else {
 						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-								'parent_templates' => [$templateid => $template],
-								'type' => ZBX_PROPERTY_INHERITED
-							];
+							'parent_templates' => [$templateid => $template],
+							'type' => ZBX_PROPERTY_INHERITED
+						];
 					}
 				}
 			}
