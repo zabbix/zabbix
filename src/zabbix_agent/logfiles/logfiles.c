@@ -113,11 +113,10 @@ out:
  *                                                                            *
  * Parameters:                                                                *
  *     filename        - [IN] first parameter of logrt[] or logrt.count[]     *
- *                       item                                                 *
+ *                            item                                            *
  *     directory       - [IN/OUT] directory part of 'filename'                *
  *     filename_regexp - [IN/OUT] file name regular expression part           *
- *     err_msg         - [IN/OUT] error message why item became               *
- *                       NOTSUPPORTED                                         *
+ *     err_msg         - [IN/OUT] error message why item became NOTSUPPORTED  *
  *                                                                            *
  * Return value: SUCCEED - on successful splitting                            *
  *               FAIL - on unable to split sensibly                           *
@@ -457,9 +456,7 @@ static void	print_logfile_list(const struct st_logfile *logfiles, int logfiles_n
 {
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
-		int	i;
-
-		for (i = 0; i < logfiles_num; i++)
+		for (int i = 0; i < logfiles_num; i++)
 		{
 			char	first_buf[ZBX_MD5_PRINT_BUF_LEN], last_buf[ZBX_MD5_PRINT_BUF_LEN];
 
@@ -619,7 +616,7 @@ static int	examine_md5_and_place(const md5_byte_t *buf1, const md5_byte_t *buf2,
 static int	is_same_file_logcpt(const struct st_logfile *old_file, const struct st_logfile *new_file, int use_ino,
 		const struct st_logfile *new_files, int num_new, char **err_msg)
 {
-	int	is_same_place, ret = ZBX_SAME_FILE_NO, found_matching_md5 = 0, same_name_in_new_list = 0, i, f;
+	int	is_same_place, ret = ZBX_SAME_FILE_NO, found_matching_md5 = 0, same_name_in_new_list = 0, f;
 
 	if (old_file->mtime > new_file->mtime)
 		return ZBX_SAME_FILE_NO;
@@ -703,7 +700,7 @@ clean1:
 	/*    - 'old_file->filename' can be the same as 'new_file->filename'  */
 	/*      (see ZBX-18883) making comparison pointless.                  */
 
-	for (i = 0; i < num_new; i++)
+	for (int i = 0; i < num_new; i++)
 	{
 		md5_byte_t	md5tmp[ZBX_MD5_DIGEST_SIZE];
 
@@ -1049,12 +1046,9 @@ clean:
  ******************************************************************************/
 static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const char *p_rows, const char *p_cols)
 {
-	int	i;
-	char	*p;
+	char	*p = arr + row * n_cols;		/* point to the first element of the 'row' */
 
-	p = arr + row * n_cols;		/* point to the first element of the 'row' */
-
-	for (i = 0; i < n_cols; i++)	/* process row */
+	for (int i = 0; i < n_cols; i++)	/* process row */
 	{
 		if ('1' != p_cols[i] && col != i)
 			p[i] = '0';
@@ -1062,7 +1056,7 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const
 
 	p = arr + col;			/* point to the top element of the 'col' */
 
-	for (i = 0; i < n_rows; i++)	/* process column */
+	for (int i = 0; i < n_rows; i++)	/* process column */
 	{
 		if ('1' != p_rows[i] && row != i)
 			p[i * n_cols] = '0';
@@ -1085,12 +1079,10 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const
  ******************************************************************************/
 static int	is_uniq_row(const char * const arr, int n_cols, int row)
 {
-	int		i, mappings = 0, ret = -1;
-	const char	*p;
+	int		mappings = 0, ret = -1;
+	const char	*p = arr + row * n_cols;			/* point to the first element of the 'row' */
 
-	p = arr + row * n_cols;			/* point to the first element of the 'row' */
-
-	for (i = 0; i < n_cols; i++)
+	for (int i = 0; i < n_cols; i++)
 	{
 		if ('1' == *p || '2' == *p)
 		{
@@ -1126,12 +1118,10 @@ static int	is_uniq_row(const char * const arr, int n_cols, int row)
  ******************************************************************************/
 static int	is_uniq_col(const char * const arr, int n_rows, int n_cols, int col)
 {
-	int		i, mappings = 0, ret = -1;
-	const char	*p;
+	int		mappings = 0, ret = -1;
+	const char	*p = arr + col;				/* point to the top element of the 'col' */
 
-	p = arr + col;				/* point to the top element of the 'col' */
-
-	for (i = 0; i < n_rows; i++)
+	for (int i = 0; i < n_rows; i++)
 	{
 		if ('1' == *p || '2' == *p)
 		{
@@ -1165,20 +1155,18 @@ static int	is_uniq_col(const char * const arr, int n_rows, int n_cols, int col)
  ******************************************************************************/
 static int	is_old2new_unique_mapping(const char * const old2new, int num_old, int num_new)
 {
-	int	i;
-
 	/* Is there 1:1 mapping in both directions between files in the old and the new list ? */
 	/* In this case every row and column has not more than one element '1' or '2', others are '0'. */
 	/* This is expected on UNIX (using inode numbers) and MS Windows (using FileID on NTFS, ReFS) */
 	/* unless 'copytruncate' rotation type is combined with multiple log file copies. */
 
-	for (i = 0; i < num_old; i++)		/* loop over rows (old files) */
+	for (int i = 0; i < num_old; i++)		/* loop over rows (old files) */
 	{
 		if (-1 == is_uniq_row(old2new, num_new, i))
 			return FAIL;
 	}
 
-	for (i = 0; i < num_new; i++)		/* loop over columns (new files) */
+	for (int i = 0; i < num_new; i++)		/* loop over columns (new files) */
 	{
 		if (-1 == is_uniq_col(old2new, num_old, num_new, i))
 			return FAIL;
@@ -1199,7 +1187,6 @@ static int	is_old2new_unique_mapping(const char * const old2new, int num_old, in
  ******************************************************************************/
 static void	resolve_old2new(char *old2new, int num_old, int num_new)
 {
-	int	i;
 	char	*protected_rows = NULL, *protected_cols = NULL;
 
 	if (SUCCEED == is_old2new_unique_mapping(old2new, num_old, num_new))
@@ -1217,7 +1204,7 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 	protected_rows = (char *)zbx_calloc(protected_rows, (size_t)num_old, sizeof(char));
 	protected_cols = (char *)zbx_calloc(protected_cols, (size_t)num_new, sizeof(char));
 
-	for (i = 0; i < num_old; i++)
+	for (int i = 0; i < num_old; i++)
 	{
 		int	c;
 
@@ -1260,17 +1247,16 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 		 *                                                                                                  *
 		 ****************************************************************************************************/
 
-		for (i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
+		for (int i = 0; i < num_old; i++)		/* loop over rows from top-left corner */
 		{
 			char	*p;
-			int	j;
 
 			if ('1' == protected_rows[i])
 				continue;
 
 			p = old2new + i * num_new;	/* the first element of the current row */
 
-			for (j = 0; j < num_new; j++)
+			for (int j = 0; j < num_new; j++)
 			{
 				if (('1' == p[j] || '2' == p[j]) && '1' != protected_cols[j])
 				{
@@ -1315,17 +1301,16 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 		 *                                                                                                  *
 		 ****************************************************************************************************/
 
-		for (i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
+		for (int i = num_old - 1; i >= 0; i--)	/* loop over rows from bottom-right corner */
 		{
 			char	*p;
-			int	j;
 
 			if ('1' == protected_rows[i])
 				continue;
 
 			p = old2new + i * num_new;	/* the first element of the current row */
 
-			for (j = num_new - 1; j >= 0; j--)
+			for (int j = num_new - 1; j >= 0; j--)
 			{
 				if (('1' == p[j] || '2' == p[j]) && '1' != protected_cols[j])
 				{
@@ -1358,10 +1343,9 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
  *                                                                            *
  * Comments:                                                                  *
  *    The array is filled with '0', '1' and '2'  which mean:                  *
- *       old2new[i][j] = '0' - the i-th old file IS NOT the j-th new file     *
- *       old2new[i][j] = '1' - the i-th old file COULD BE the j-th new file   *
- *       old2new[i][j] = '2' - the j-th new file is a copy of the i-th old    *
- *                             file                                           *
+ *       old2new[i][j] = '0' - i-th old file IS NOT j-th new file             *
+ *       old2new[i][j] = '1' - i-th old file COULD BE j-th new file           *
+ *       old2new[i][j] = '2' - j-th new file is copy of i-th old file         *
  *                                                                            *
  *    Thread-safe                                                             *
  *                                                                            *
@@ -1369,16 +1353,12 @@ static void	resolve_old2new(char *old2new, int num_old, int num_new)
 static char	*create_old2new_and_copy_of(zbx_log_rotation_options_t rotation_type, struct st_logfile *old_files,
 		int num_old, struct st_logfile *new_files, int num_new, int use_ino, char **err_msg)
 {
-	int		i, j;
-	char		*old2new, *p;
-
 	/* set up a two dimensional array of possible mappings from old files to new files */
-	old2new = (char *)zbx_malloc(NULL, (size_t)num_new * (size_t)num_old * sizeof(char));
-	p = old2new;
+	char	*old2new = (char *)zbx_malloc(NULL, (size_t)num_new * (size_t)num_old * sizeof(char)), *p = old2new;
 
-	for (i = 0; i < num_old; i++)
+	for (int i = 0; i < num_old; i++)
 	{
-		for (j = 0; j < num_new; j++)
+		for (int j = 0; j < num_new; j++)
 		{
 			switch (is_same_file_logrt(old_files + i, new_files + j, use_ino, rotation_type, new_files,
 					num_new, err_msg))
@@ -1438,10 +1418,9 @@ static char	*create_old2new_and_copy_of(zbx_log_rotation_options_t rotation_type
  ******************************************************************************/
 static int	find_old2new(const char * const old2new, int num_new, int i_old)
 {
-	int		i;
 	const char	*p = old2new + i_old * num_new;
 
-	for (i = 0; i < num_new; i++)		/* loop over columns (new files) on i_old-th row */
+	for (int i = 0; i < num_new; i++)		/* loop over columns (new files) on i_old-th row */
 	{
 		if ('1' == *p || '2' == *p)
 			return i;
@@ -1565,9 +1544,7 @@ out:
  ******************************************************************************/
 static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
 {
-	int	i;
-
-	for (i = 0; i < *logfiles_num; i++)
+	for (int i = 0; i < *logfiles_num; i++)
 		zbx_free((*logfiles)[i].filename);
 
 	*logfiles_num = 0;
@@ -1638,32 +1615,32 @@ static int	pick_logfile(const char *directory, const char *filename, int mtime, 
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: Finds logfiles in a directory and puts them into a list.          *
- *                                                                            *
- * Parameters:                                                                *
- *     directory      - [IN] directory where logfiles reside                  *
- *     mtime          - [IN] Selection criterion "logfile modification time". *
- *                      The logfile will be selected if modified not before   *
- *                      'mtime'.                                              *
- *     re             - [IN] Selection criterion "regexp describing filename  *
- *                      pattern".                                             *
- *     use_ino        - [OUT] how to use inodes in is_same_file()             *
- *     logfiles       - [IN/OUT] pointer to list of logfiles                  *
- *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
- *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
- *     err_msg        - [IN/OUT] error message why item became NOTSUPPORTED   *
- *                                                                            *
- * Return value: SUCCEED or FAIL                                              *
- *                                                                            *
- * Comments: This is a helper function for make_logfile_list().               *
- *                                                                            *
- * Comments: Thread-safety - readdir() is a gray area, supposed to work on    *
- *           modern implementations when the directory stream is not shared   *
- *           between threads.                                                 *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: Finds logfiles in a directory and puts them into a list.             *
+ *                                                                               *
+ * Parameters:                                                                   *
+ *     directory      - [IN] directory where logfiles reside                     *
+ *     mtime          - [IN] Selection criterion "logfile modification time".    *
+ *                           The logfile will be selected if modified not before *
+ *                           'mtime'.                                            *
+ *     re             - [IN] Selection criterion "regexp describing filename     *
+ *                           pattern".                                           *
+ *     use_ino        - [OUT] how to use inodes in is_same_file()                *
+ *     logfiles       - [IN/OUT] pointer to list of logfiles                     *
+ *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for     *
+ *     logfiles_num   - [IN/OUT] number of already inserted logfiles             *
+ *     err_msg        - [IN/OUT] error message why item became NOTSUPPORTED      *
+ *                                                                               *
+ * Return value: SUCCEED or FAIL                                                 *
+ *                                                                               *
+ * Comments: This is a helper function for make_logfile_list().                  *
+ *                                                                               *
+ * Comments: Thread-safety - readdir() is a gray area, supposed to work on       *
+ *           modern implementations when the directory stream is not shared      *
+ *           between threads.                                                    *
+ *                                                                               *
+ *********************************************************************************/
 static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *re, int *use_ino,
 		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, char **err_msg)
 {
@@ -1759,8 +1736,7 @@ clean:
  * Parameters:                                                                *
  *     filename_regexp - [IN] regexp to be compiled                           *
  *     re              - [OUT] compiled regexp                                *
- *     err_msg         - [OUT] error message why regexp could not be          *
- *                             compiled                                       *
+ *     err_msg         - [OUT] error message why regexp could not be compiled *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -1801,12 +1777,12 @@ static int	fill_file_details(struct st_logfile *logfiles, int logfiles_num, int 
 static int	fill_file_details(struct st_logfile *logfiles, int logfiles_num, char **err_msg)
 #endif
 {
-	int	i, ret = SUCCEED;
+	int	ret = SUCCEED;
 
 	/* Fill in MD5 sums and file indexes in the logfile list. */
 	/* These operations require opening of file, therefore we group them together. */
 
-	for (i = 0; i < logfiles_num; i++)
+	for (int i = 0; i < logfiles_num; i++)
 	{
 		int			f;
 		struct st_logfile	*p = logfiles + i;
@@ -1848,7 +1824,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Selects log files to be analyzed and make a list, set 'use_ino'   *
+ * Purpose: Selects log files to be analyzed and makes a list, sets 'use_ino' *
  *          parameter.                                                        *
  *                                                                            *
  * Parameters:                                                                *
@@ -2587,8 +2563,6 @@ static void	adjust_mtime_to_clock(int *mtime)
 
 static int	is_swap_required(const struct st_logfile *old_files, struct st_logfile *new_files, int use_ino, int idx)
 {
-	int	is_same_place;
-
 	/* if the 1st file is not processed at all while the 2nd file was processed (at least partially) */
 	/* then swap them */
 	if (0 == new_files[idx].seq && 0 < new_files[idx + 1].seq)
@@ -2606,7 +2580,7 @@ static int	is_swap_required(const struct st_logfile *old_files, struct st_logfil
 	if (NULL == old_files)	/* cannot consult the old file list */
 		return FAIL;
 
-	is_same_place = compare_file_places(old_files + new_files[idx + 1].copy_of, new_files + idx, use_ino);
+	int	is_same_place = compare_file_places(old_files + new_files[idx + 1].copy_of, new_files + idx, use_ino);
 
 	if (ZBX_FILE_PLACE_SAME == is_same_place && new_files[idx].seq >= new_files[idx + 1].seq)
 		return SUCCEED;
@@ -2623,9 +2597,7 @@ static int	is_swap_required(const struct st_logfile *old_files, struct st_logfil
 
 static void	swap_logfile_array_elements(struct st_logfile *array, int idx1, int idx2)
 {
-	struct st_logfile	*p1 = array + idx1;
-	struct st_logfile	*p2 = array + idx2;
-	struct st_logfile	tmp;
+	struct st_logfile	tmp, *p1 = array + idx1, *p2 = array + idx2;
 
 	memcpy(&tmp, p1, sizeof(struct st_logfile));
 	memcpy(p1, p2, sizeof(struct st_logfile));
@@ -2635,8 +2607,6 @@ static void	swap_logfile_array_elements(struct st_logfile *array, int idx1, int 
 static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, struct st_logfile *logfiles,
 		int logfiles_num, int use_ino, int *start_idx)
 {
-	int	i;
-
 	/* There is a special case when within 1 second of time:       */
 	/*   1. a log file ORG.log is copied to other file COPY.log,   */
 	/*   2. the original file ORG.log is truncated,                */
@@ -2647,7 +2617,7 @@ static void	ensure_order_if_mtimes_equal(const struct st_logfile *logfiles_old, 
 	/* processing ORG.log before COPY.log. We need to correct the order by swapping ORG.log and COPY.log  */
 	/* elements in the 'logfiles' list. */
 
-	for (i = 0; i < logfiles_num - 1; i++)
+	for (int i = 0; i < logfiles_num - 1; i++)
 	{
 		if (logfiles[i].mtime == logfiles[i + 1].mtime &&
 				SUCCEED == is_swap_required(logfiles_old, logfiles, use_ino, i))
@@ -2760,9 +2730,7 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 	/* truncated. Similar cases: the latest log file is copied but never truncated or is copied multiple */
 	/* times. */
 
-	int	j;
-
-	for (j = i + 1; j < logfiles_num; j++)
+	for (int j = i + 1; j < logfiles_num; j++)
 	{
 		if (SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 		{
@@ -2795,19 +2763,19 @@ static void	handle_multiple_copies(struct st_logfile *logfiles, int logfiles_num
 static void	delay_update_if_copies(struct st_logfile *logfiles, int logfiles_num, int *mtime,
 		zbx_uint64_t *lastlogsize)
 {
-	int	i, idx_to_keep = logfiles_num - 1;
+	int	idx_to_keep = logfiles_num - 1;
 
 	/* If there are copies in 'logfiles' list then find the element with the smallest index which must be */
 	/* preserved in the list to keep information about copies. */
 
-	for (i = 0; i < logfiles_num - 1; i++)
+	for (int i = 0; i < logfiles_num - 1; i++)
 	{
-		int	j, largest_for_i = -1;
+		int	largest_for_i = -1;
 
 		if (0 == logfiles[i].size)
 			continue;
 
-		for (j = i + 1; j < logfiles_num; j++)
+		for (int j = i + 1; j < logfiles_num; j++)
 		{
 			if (0 == logfiles[j].size)
 				continue;
@@ -2842,7 +2810,7 @@ static void	delay_update_if_copies(struct st_logfile *logfiles, int logfiles_num
 		if (logfiles_num - 1 > idx_to_keep)
 		{
 			/* ensure that next time processing starts from element'idx_to_keep' */
-			for (i = idx_to_keep + 1; i < logfiles_num; i++)
+			for (int i = idx_to_keep + 1; i < logfiles_num; i++)
 				logfiles[i].seq = 0;
 		}
 	}
@@ -2851,9 +2819,8 @@ static void	delay_update_if_copies(struct st_logfile *logfiles, int logfiles_num
 static zbx_uint64_t	max_processed_size_in_copies(const struct st_logfile *logfiles, int logfiles_num, int i)
 {
 	zbx_uint64_t	max_processed = 0;
-	int		j;
 
-	for (j = 0; j < logfiles_num; j++)
+	for (int j = 0; j < logfiles_num; j++)
 	{
 		if (i != j && SUCCEED == files_have_same_blocks_md5(logfiles + i, logfiles + j))
 		{
@@ -3177,9 +3144,8 @@ static int	jump_ahead(const char *key, struct st_logfile *logfiles, int logfiles
 static zbx_uint64_t	calculate_remaining_bytes(struct st_logfile *logfiles, int logfiles_num)
 {
 	zbx_uint64_t	remaining_bytes = 0;
-	int		i;
 
-	for (i = 0; i < logfiles_num; i++)
+	for (int i = 0; i < logfiles_num; i++)
 		remaining_bytes += logfiles[i].size - logfiles[i].processed_size;
 
 	return remaining_bytes;
@@ -3228,11 +3194,10 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 		int logfiles_num, const char *old2new, int *seq)
 {
 	const char	*p = old2new + idx * logfiles_num;	/* start of idx-th row in 'old2new' array */
-	int		j;
 
 	if (0 < logfiles_old[idx].processed_size && 0 == logfiles_old[idx].incomplete)
 	{
-		for (j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
+		for (int j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
 		{
 			if ('1' == *p || '2' == *p)
 			{
@@ -3258,7 +3223,7 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 	}
 	else if (1 == logfiles_old[idx].incomplete)
 	{
-		for (j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
+		for (int j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
 		{
 			if ('1' == *p || '2' == *p)
 			{
@@ -3291,7 +3256,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
 		int *start_idx, zbx_uint64_t *lastlogsize, char **err_msg)
 {
 	char	*old2new;
-	int	i, max_old_seq = 0, old_last;
+	int	max_old_seq = 0, old_last;
 
 	if (NULL == (old2new = create_old2new_and_copy_of(rotation_type, logfiles_old, logfiles_num_old,
 			logfiles, logfiles_num, use_ino, err_msg)))
@@ -3300,7 +3265,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
 	}
 
 	/* transfer data about fully and partially processed files from the old file list to the new list */
-	for (i = 0; i < logfiles_num_old; i++)
+	for (int i = 0; i < logfiles_num_old; i++)
 	{
 		if (ZBX_LOG_ROTATION_LOGCPT == rotation_type)
 			transfer_for_copytruncate(logfiles_old, i, logfiles, logfiles_num, old2new, seq);
@@ -4273,7 +4238,7 @@ out:
 
 struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num)
 {
-	int	i, max_seq = -1, last_file_idx = 0;
+	int	max_seq = -1, last_file_idx = 0;
 
 	if (1 == logfiles_num)
 		return logfiles;
@@ -4281,7 +4246,7 @@ struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *
 	/* The last (at least partially) processed file is the one with the maximum 'seq' value. */
 	/* If no any file is processed then return pointer to the list first element. */
 
-	for (i = 0; i < logfiles_num; i++)
+	for (int i = 0; i < logfiles_num; i++)
 	{
 		if (max_seq < logfiles[i].seq)
 		{
