@@ -99,6 +99,9 @@ class CWidgetFieldsGroupView extends CDiv {
 					$collection[] = [$label, (new CFormField($view))->addClass($class)];
 				}
 			}
+			else {
+				$collection[] = $field;
+			}
 		}
 
 		return unpack_object($collection);

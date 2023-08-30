@@ -82,6 +82,9 @@ class CWidgetFormFieldsetCollapsibleView extends CFormFieldsetCollapsible {
 					$collection[] = [$label, (new CFormField($view))->addClass($class)];
 				}
 			}
+			else {
+				$collection[] = $field;
+			}
 		}
 
 		return $this->makeLegend().unpack_object($collection);
