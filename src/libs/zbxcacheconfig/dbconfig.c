@@ -9068,10 +9068,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	DCget_interface(&dst_item->interface, dc_interface);
 
 	if (src_item->timeout == NULL || '\0' == *src_item->timeout)
-	{
-		zabbix_log(1, "DBG get global for itemid %llu", src_item->itemid);
 		timeout_global = dc_get_global_item_type_timeout(src_item);
-	}
 
 	switch (src_item->type)
 	{

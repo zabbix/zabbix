@@ -62,6 +62,7 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 				ret = zbx_tcp_send_to(s, *value, config_timeout);
 			}
 		}
@@ -75,6 +76,7 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 				static size_t	buffer_alloc = 256;
 				size_t		buffer_offset = 0;
 
+				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED ": %s]", *value);
 
 				if (NULL == buffer)
 					buffer = (char *)zbx_malloc(buffer, buffer_alloc);
@@ -88,7 +90,7 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 			}
 			else
 			{
-
+				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED "]");
 				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, config_timeout);
 			}
 		}
