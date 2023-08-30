@@ -278,13 +278,44 @@
 				});
 			})
 
-			this.addPopupValues(dependencies);
+			this.#sortDependencies(dependencies);
+			this.#addDependencies(dependencies);
 		}
 
 		#removeDependency(triggerid) {
 			const dependency_element = document.querySelector('#dependency_' + triggerid);
 
 			dependency_element.parentNode.removeChild(dependency_element);
+		}
+
+		#sortDependencies(dependencies) {
+			dependencies.sort((a, b) => {
+				if (a.name.toLowerCase() < b.name.toLowerCase()) {
+					return -1;
+				}
+				if (a.name.toLowerCase() > b.name.toLowerCase()) {
+					return 1;
+				}
+
+				return 0;
+			})
+		}
+
+		#addDependencies(dependencies) {
+			const dependency_table = this.form.querySelector('#dependency-table tbody');
+			let template;
+
+			Object.values(dependencies).forEach((dependency) => {
+				const element = {
+					name: dependency.name,
+					triggerid: dependency.triggerid,
+					prototype: dependency.prototype
+				};
+
+				template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
+
+				dependency_table.insertAdjacentHTML('beforeend', template.evaluate(element));
+			})
 		}
 
 		#toggleExpressionConstructor(id) {
@@ -676,30 +707,31 @@
 		 */
 		addPopupValues(data) {
 			const dependency_table = this.form.querySelector('#dependency-table tbody');
-			let existing_dependencies = [];
-			let template;
+			let dependencies = [];
 
 			dependency_table
 				.querySelectorAll('.js-related-trigger-edit')
 				.forEach(row => {
-				existing_dependencies.push(row.dataset.triggerid);
+				dependencies.push({
+					name: row.textContent,
+					triggerid: row.dataset.triggerid,
+					prototype: row.dataset.prototype
+				});
 			})
 
-			Object.values(data).forEach((dependency) => {
-				if (existing_dependencies.includes(dependency.triggerid)) {
+			Object.values(data).forEach((new_dependency) => {
+				if (dependencies.some(dependency => dependency.triggerid === new_dependency.triggerid)) {
 					return;
 				}
 
-				const element = {
-					name: dependency.name,
-					triggerid: dependency.triggerid,
-					prototype: dependency.prototype
-				};
-
-				template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
-
-				dependency_table.insertAdjacentHTML('beforeend', template.evaluate(element));
+				dependencies.push(new_dependency);
 			})
+
+			this.#sortDependencies(dependencies);
+
+			dependency_table.innerHTML = '';
+
+			this.#addDependencies(dependencies);
 		}
 
 		editTemplate(e, templateid) {
