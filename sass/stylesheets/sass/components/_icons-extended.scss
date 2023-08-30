@@ -185,10 +185,7 @@
 
 .zi-users-filled-small {
 	@extend .zi-users-filled;
-
-	&::before {
-		font-size: 16px;
-	}
+	@extend %icon-medium;
 }
 
 .zi-wrench-alt-small {

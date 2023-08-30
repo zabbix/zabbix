@@ -19,12 +19,24 @@
 
 class CWidgetFieldMultiselect {
 
+	static #reference_icon_template = `
+		<li class="reference">
+			<span class="${ZBX_ICON_REFERENCE}" data-hintbox="1"></span>
+			<div class="hint-box" style="display: none;">#{hint_text}</div>
+		</li>
+	`;
+
 	/**
 	 * Multiselect jQuery element.
 	 *
 	 * @type {Object}
 	 */
 	#multiselect;
+
+	/**
+	 * @type {HTMLUListElement}
+	 */
+	#multiselect_list;
 
 	/**
 	 * Field name.
@@ -105,7 +117,11 @@ class CWidgetFieldMultiselect {
 			...multiselect_params,
 			suggest_list_modifier: has_optional_sources ? (entities) => this.#modifySuggestedList(entities) : null,
 			custom_suggest_select_handler: has_optional_sources ? (entity) => this.#selectSuggested(entity) : null
-		});
+		})
+			.on('before-add', () => this.#onBeforeAdd())
+			.on('before-remove', () => this.#onBeforeRemove());
+
+		this.#multiselect_list = this.#multiselect[0].querySelector('.multiselect-list');
 
 		this.#selected_limit = this.#multiselect.multiSelect('getOption', 'selectedLimit');
 		this.#is_multiple = this.#selected_limit != 1;
@@ -155,11 +171,6 @@ class CWidgetFieldMultiselect {
 			selectedLimit: this.#selected_limit
 		});
 
-		if (this.#selected_typed_reference !== null) {
-			this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
-			this.#selected_typed_reference = null;
-		}
-
 		this.#multiselect.multiSelect('openSelectPopup', e.target);
 	}
 
@@ -173,6 +184,7 @@ class CWidgetFieldMultiselect {
 
 	#selectTypedReference(typed_reference) {
 		let caption = null;
+		let hint_text = null;
 
 		const typed_reference_dashboard = CWidgetBase.createTypedReference({
 			reference: CDashboard.REFERENCE_DASHBOARD,
@@ -181,11 +193,13 @@ class CWidgetFieldMultiselect {
 
 		if (typed_reference === typed_reference_dashboard) {
 			caption = {id: typed_reference_dashboard, name: t('Dashboard')}
+			hint_text = t('Dashboard is used as data source.');
 		}
 		else {
 			for (const widget of this.#getWidgets()) {
 				if (widget.id === typed_reference) {
 					caption = widget;
+					hint_text = t('Another widget is used as data source.');
 					break;
 				}
 			}
@@ -200,6 +214,13 @@ class CWidgetFieldMultiselect {
 			this.#selected_typed_reference = typed_reference;
 
 			this.#multiselect.multiSelect('addData', [caption]);
+
+			if (hint_text !== null) {
+				const reference_icon = new Template(CWidgetFieldMultiselect.#reference_icon_template)
+					.evaluateToElement({hint_text});
+
+				this.#multiselect_list.prepend(reference_icon);
+			}
 		}
 	}
 
@@ -278,5 +299,16 @@ class CWidgetFieldMultiselect {
 		}
 
 		return result;
+	}
+
+	#onBeforeAdd() {
+		if (this.#selected_typed_reference !== null) {
+			this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
+			this.#selected_typed_reference = null;
+		}
+	}
+
+	#onBeforeRemove() {
+		this.#multiselect_list.innerHTML = '';
 	}
 }

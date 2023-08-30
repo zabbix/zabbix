@@ -100,6 +100,8 @@
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
+				$obj.trigger('before-add', ms)
+
 				if (typeof trigger_change !== 'boolean') {
 					trigger_change = true;
 				}
@@ -770,15 +772,21 @@
 										var aria_text = sprintf(t('Removed, %1$s'), $selected.data('label'));
 
 										$selected = (e.which == KEY_BACKSPACE)
-											? ($selected.is(':first-child') ? $selected.next() : $selected.prev())
-											: ($selected.is(':last-child') ? $selected.prev() : $selected.next());
+											? ($selected.is(':first-child')
+												? $selected.next('[data-id]') :
+												$selected.prev('[data-id]')
+											)
+											: ($selected.is(':last-child')
+												? $selected.prev('[data-id]')
+												: $selected.next('[data-id]')
+											);
 
 										removeSelected($obj, id);
 
 										$obj.trigger('change', ms);
 
 										if ($selected.length) {
-											var $collection = $('.selected li', $obj);
+											var $collection = $('.selected li[data-id]', $obj);
 											$selected.addClass('selected');
 
 											aria_text += ', ' + sprintf(
@@ -990,6 +998,8 @@
 	function removeSelected($obj, id) {
 		var ms = $obj.data('multiSelect');
 
+		$obj.trigger('before-remove', ms);
+
 		$('.selected li[data-id]', $obj).each(function() {
 			if ($(this).data('id') == id) {
 				$(this).remove();
@@ -1003,7 +1013,7 @@
 
 		delete ms.values.selected[id];
 
-		if (!$('.selected li', $obj).length) {
+		if (!Object.keys(ms.values.selected).length) {
 			addDefaultValue($obj);
 		}
 

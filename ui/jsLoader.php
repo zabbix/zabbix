@@ -190,7 +190,9 @@ $translate_strings = [
 	],
 	'class.widget-field.multiselect.js' => [
 		'Dashboard' => _('Dashboard'),
-		'Widget' => _('Widget')
+		'Widget' => _('Widget'),
+		'Dashboard is used as data source.' => _('Dashboard is used as data source.'),
+		'Another widget is used as data source.' => _('Another widget is used as data source.')
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),

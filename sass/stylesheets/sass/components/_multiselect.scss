@@ -52,6 +52,7 @@
 		flex-wrap: wrap;
 		padding-left: 2px;
 		padding-bottom: 2px;
+		line-height: 18px;
 
 		li {
 			display: block; // Override ".table-forms li".
@@ -95,6 +96,13 @@
 				&:focus {
 					box-shadow: none;
 				}
+			}
+		}
+
+		.reference {
+			span::before {
+				font-size: $icon-medium-size;
+				color: $link-color;
 			}
 		}
 	}
