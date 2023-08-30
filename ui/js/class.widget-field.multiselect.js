@@ -118,8 +118,15 @@ class CWidgetFieldMultiselect {
 			suggest_list_modifier: has_optional_sources ? (entities) => this.#modifySuggestedList(entities) : null,
 			custom_suggest_select_handler: has_optional_sources ? (entity) => this.#selectSuggested(entity) : null
 		})
-			.on('before-add', () => this.#onBeforeAdd())
-			.on('before-remove', () => this.#onBeforeRemove());
+			.on('before-add', () => {
+				if (this.#selected_typed_reference !== null) {
+					this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
+					this.#selected_typed_reference = null;
+				}
+			})
+			.on('before-remove', () => {
+				this.#multiselect_list.innerHTML = '';
+			});
 
 		this.#multiselect_list = this.#multiselect[0].querySelector('.multiselect-list');
 
@@ -299,16 +306,5 @@ class CWidgetFieldMultiselect {
 		}
 
 		return result;
-	}
-
-	#onBeforeAdd() {
-		if (this.#selected_typed_reference !== null) {
-			this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
-			this.#selected_typed_reference = null;
-		}
-	}
-
-	#onBeforeRemove() {
-		this.#multiselect_list.innerHTML = '';
 	}
 }

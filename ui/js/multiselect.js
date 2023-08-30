@@ -100,7 +100,7 @@
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				$obj.trigger('before-add', ms)
+				$obj.trigger('before-add', ms);
 
 				if (typeof trigger_change !== 'boolean') {
 					trigger_change = true;
@@ -773,8 +773,8 @@
 
 										$selected = (e.which == KEY_BACKSPACE)
 											? ($selected.is(':first-child')
-												? $selected.next('[data-id]') :
-												$selected.prev('[data-id]')
+												? $selected.next('[data-id]')
+												: $selected.prev('[data-id]')
 											)
 											: ($selected.is(':last-child')
 												? $selected.prev('[data-id]')
