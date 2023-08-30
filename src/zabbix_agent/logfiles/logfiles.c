@@ -320,8 +320,7 @@ typedef struct {
  *     ino_lo   - [OUT] 64-bit nFileIndex or lower 64-bits of FileId          *
  *     ino_hi   - [OUT] higher 64-bits of FileId                              *
  *     filename - [IN] used in error logging                                  *
- *     err_msg  - [IN/OUT] error message why an item became NOTSUPPORTED      *
- *                                                                            *
+ *     err_msg  - [IN/OUT] error message why item became NOTSUPPORTED         *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
@@ -811,8 +810,8 @@ clean3:
  *          list could be the same file in case of simple rotation.           *
  *                                                                            *
  * Parameters:                                                                *
- *          old_file - [IN] file from the old list                            *
- *          new_file - [IN] file from the new list                            *
+ *          old_file - [IN] file from old list                                *
+ *          new_file - [IN] file from new list                                *
  *          use_ino  - [IN] 0 - do not use inodes in comparison,              *
  *                          1 - use up to 64-bit inodes in comparison,        *
  *                          2 - use 128-bit inodes in comparison.             *
@@ -824,7 +823,7 @@ clean3:
  * Return value: ZBX_SAME_FILE_NO - it is not same file                       *
  *               ZBX_SAME_FILE_YES - it could be same file                    *
  *               ZBX_SAME_FILE_ERROR - error                                  *
- *               ZBX_SAME_FILE_RETRY - retry on the next check                *
+ *               ZBX_SAME_FILE_RETRY - retry on next check                    *
  *                                                                            *
  * Comments: In some cases we can say that it IS NOT the same file.           *
  *           We can never say that it IS the same file and it has not been    *
@@ -1028,9 +1027,9 @@ clean:
  *          n_cols - [IN] number of columns in array                          *
  *          row    - [IN] number of cross point row                           *
  *          col    - [IN] number of cross point column                        *
- *          p_rows - [IN] vector with 'n_rows' elements.                      *
+ *          p_rows - [IN] Vector with 'n_rows' elements.                      *
  *                        Value '1' means protected row.                      *
- *          p_cols - [IN] vector with 'n_cols' elements.                      *
+ *          p_cols - [IN] Vector with 'n_cols' elements.                      *
  *                        Value '1' means protected column.                   *
  *                                                                            *
  * Example:                                                                   *
@@ -1076,7 +1075,7 @@ static void	cross_out(char *arr, int n_rows, int n_cols, int row, int col, const
  *                                                                            *
  * Parameters:                                                                *
  *          arr    - [IN] two dimensional array                               *
- *          n_cols - [IN] number of columns in the array                      *
+ *          n_cols - [IN] number of columns in array                          *
  *          row    - [IN] number of row to search                             *
  *                                                                            *
  * Return value: Number of column where the element '1' or '2' was found or   *
@@ -1116,8 +1115,8 @@ static int	is_uniq_row(const char * const arr, int n_cols, int row)
  *                                                                            *
  * Parameters:                                                                *
  *          arr    - [IN] two dimensional array                               *
- *          n_rows - [IN] number of rows in the array                         *
- *          n_cols - [IN] number of columns in the array                      *
+ *          n_rows - [IN] number of rows in array                             *
+ *          n_cols - [IN] number of columns in array                          *
  *          col    - [IN] number of column to search                          *
  *                                                                            *
  * Return value: Number of row where the element '1' or '2 ' was found or     *
@@ -1453,17 +1452,17 @@ static int	find_old2new(const char * const old2new, int num_new, int i_old)
 	return -1;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: adds information of logfile to list of logfiles                   *
- *                                                                            *
- * Parameters: logfiles - pointer to the list of logfiles                     *
- *             logfiles_alloc - number of logfiles memory was allocated for   *
- *             logfiles_num - number of already inserted logfiles             *
- *             filename - name of logfile (with full path)                    *
- *             st - structure returned by stat()                              *
- *                                                                            *
- ******************************************************************************/
+/*************************************************************************************
+ *                                                                                   *
+ * Purpose: adds information of logfile to list of logfiles                          *
+ *                                                                                   *
+ * Parameters: logfiles       - [IN/OUT] pointer to list of logfiles                 *
+ *             logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for *
+ *             logfiles_num   - [IN/OUT] number of already inserted logfiles         *
+ *             filename       - [IN] name of logfile (with full path)                *
+ *             st             - [IN] structure returned by stat()                    *
+ *                                                                                   *
+ *************************************************************************************/
 static void	add_logfile(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, const char *filename,
 		zbx_stat_t *st)
 {
@@ -1558,7 +1557,7 @@ out:
  * Purpose: releases resources allocated to logfile list                      *
  *                                                                            *
  * Parameters:                                                                *
- *     logfiles       - [IN/OUT] pointer to list of logfiles, can be NULL     *
+ *     logfiles       - [IN/OUT] Pointer to list of logfiles, can be NULL.    *
  *     logfiles_alloc - [IN/OUT] Pointer to number of logfiles memory was     *
  *                               allocated for, can be NULL.                  *
  *     logfiles_num   - [IN/OUT] valid pointer to number of inserted logfiles *
@@ -1588,10 +1587,10 @@ static void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_all
  *     directory      - [IN] directory where logfiles reside                  *
  *     filename       - [IN] name of logfile (without path)                   *
  *     mtime          - [IN] Selection criterion "logfile modification time". *
- *                      The logfile will be selected if modified not before   *
- *                      'mtime'.                                              *
+ *                           The logfile will be selected if modified not     *
+ *                           before 'mtime'.                                  *
  *     re             - [IN] selection criterion "regexp describing filename  *
- *                      pattern"                                              *
+ *                           pattern"                                         *
  *     logfiles       - [IN/OUT] pointer to list of logfiles                  *
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
@@ -1761,7 +1760,7 @@ clean:
  *     filename_regexp - [IN] regexp to be compiled                           *
  *     re              - [OUT] compiled regexp                                *
  *     err_msg         - [OUT] error message why regexp could not be          *
- *                       compiled                                             *
+ *                             compiled                                       *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
@@ -1854,7 +1853,7 @@ clean:
  *                                                                            *
  * Parameters:                                                                *
  *     flags          - [IN] bit flags with item type: log, logrt, log.count  *
- *                      or logrt.count                                        *
+ *                           or logrt.count                                   *
  *     filename       - [IN] logfile name (regular expression with path)      *
  *     mtime          - [IN] last modification time of file                   *
  *     logfiles       - [IN/OUT] pointer to list of logfiles                  *
@@ -1862,7 +1861,7 @@ clean:
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
  *     use_ino        - [IN/OUT] how to use inode numbers                     *
  *     err_msg        - [IN/OUT] error message (if FAIL or ZBX_NO_FILE_ERROR  *
- *                      is returned)                                          *
+ *                               is returned)                                 *
  *                                                                            *
  * Return value: SUCCEED - file list successfully built                       *
  *               ZBX_NO_FILE_ERROR - file(s) do not exist                     *
@@ -2462,61 +2461,61 @@ out:
 #undef BUF_SIZE
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: Matches new records in logfile with regexp, transmit matching     *
- *          records to Zabbix server.                                         *
- *                                                                            *
- * Parameters:                                                                *
- *     flags           - [IN] bit flags with item type: log, logrt, log.count *
- *                       or logrt.count                                       *
- *     logfile         - [IN/OUT] logfile attributes                          *
- *     lastlogsize     - [IN/OUT] offset from beginning of file               *
- *     mtime           - [IN/OUT] file modification time for reporting to     *
- *                       server                                               *
- *     lastlogsize_sent - [OUT] lastlogsize value that was last sent          *
- *     mtime_sent      - [OUT] mtime value that was last sent                 *
- *     skip_old_data   - [IN/OUT] start from beginning of file or jump to end *
- *     big_rec         - [IN/OUT] state variable to remember whether long     *
- *                       record is being processed                            *
- *     encoding        - [IN] text string describing encoding.                *
- *                       See function zbx_find_cr_lf_szbyte() for supported   *
- *                       encodings.                                           *
- *                       "" (empty string) means a single-byte character set  *
- *                       (e.g. ASCII).                                        *
- *     regexps         - [IN] vector of regexps                               *
- *     pattern         - [IN] pattern to match                                *
- *     output_template - [IN] output formatting template                      *
- *     p_count         - [IN/OUT] limit of records to be processed            *
- *     s_count         - [IN/OUT] limit of records to be sent to server       *
- *     process_value   - [IN] pointer to function process_value()             *
- *     addrs           - [IN] vector for passing server and port where to     *
- *                            send data                                       *
- *     agent2_result   - [IN] address of buffer where to store matching log   *
- *                            records (used only in Agent2)                   *
- *     hostname        - [IN] hostname data comes from                        *
- *     key             - [IN] item key data belongs to                        *
- *     processed_bytes - [OUT] number of processed bytes in logfile           *
- *     seek_offset     - [IN] position to seek in file                        *
- *     persistent_file_name - [IN] name of file for saving persistent data    *
- *     prep_vec        - [IN/OUT] vector with data for writing into           *
- *                                persistent files                            *
- *     config_tls      - [IN]                                                 *
- *     config_timeout  - [IN]                                                 *
- *     config_source_ip - [IN]                                                *
- *     itemid          - [IN] item id for logging when called from Agent 2.   *
- *                            It is 0 when called from Agent 1.               *
- *     err_msg         - [IN/OUT] error message why item became NOTSUPPORTED  *
- *                                                                            *
- * Return value: returns SUCCEED on successful reading                        *
- *               FAIL on other cases                                          *
- *                                                                            *
- * Comments:                                                                  *
- *           This function does not deal with log file rotation.              *
- *                                                                            *
- *           Thread-safe                                                      *
- *                                                                            *
- ******************************************************************************/
+/****************************************************************************************
+ *                                                                                      *
+ * Purpose: Matches new records in logfile with regexp, transmit matching records       *
+ *          to Zabbix server.                                                           *
+ *                                                                                      *
+ * Parameters:                                                                          *
+ *     flags                - [IN] bit flags with item type: log, logrt, log.count      *
+ *                                 or logrt.count                                       *
+ *     logfile              - [IN/OUT] logfile attributes                               *
+ *     lastlogsize          - [IN/OUT] offset from beginning of file                    *
+ *     mtime                - [IN/OUT] file modification time for reporting to server   *
+ *     lastlogsize_sent     - [OUT] lastlogsize value that was last sent                *
+ *     mtime_sent           - [OUT] mtime value that was last sent                      *
+ *     skip_old_data        - [IN/OUT] start from beginning of file or jump to end      *
+ *     big_rec              - [IN/OUT] state variable to remember whether long          *
+ *                                     record is being processed                        *
+ *     encoding             - [IN] text string describing encoding. See function        *
+ *                                 zbx_find_cr_lf_szbyte() for supported encodings.     *
+ *                                 "" (empty string) means a single-byte character set  *
+ *                                 (e.g. ASCII).                                        *
+ *     regexps              - [IN] vector of regexps                                    *
+ *     pattern              - [IN] pattern to match                                     *
+ *     output_template      - [IN] output formatting template                           *
+ *     p_count              - [IN/OUT] limit of records to be processed                 *
+ *     s_count              - [IN/OUT] limit of records to be sent to server            *
+ *     process_value        - [IN] pointer to function process_value()                  *
+ *     addrs                - [IN] vector for passing server and port where to send     *
+ *                                 data                                                 *
+ *     agent2_result        - [IN] address of buffer where to store matching log        *
+ *                                 records (used only in Agent2)                        *
+ *     hostname             - [IN] hostname data comes from                             *
+ *     key                  - [IN] item key data belongs to                             *
+ *     processed_bytes      - [OUT] number of processed bytes in logfile                *
+ *     seek_offset          - [IN] position to seek in file                             *
+ *     persistent_file_name - [IN] name of file for saving persistent data              *
+ *     prep_vec             - [IN/OUT] vector with data for writing into persistent     *
+ *                                     files                                            *
+ *     config_tls           - [IN]                                                      *
+ *     config_timeout       - [IN]                                                      *
+ *     config_source_ip     - [IN]                                                      *
+ *     itemid               - [IN] item id for logging when called from Agent 2.        *
+ *                                 It is 0 when called from Agent 1.                    *
+ *     config_buffer_send   - [IN]                                                      *
+ *     config_buffer_size   - [IN]                                                      *
+ *     err_msg              - [IN/OUT] error message why item became NOTSUPPORTED       *
+ *                                                                                      *
+ * Return value: returns SUCCEED on successful reading                                  *
+ *               FAIL on other cases                                                    *
+ *                                                                                      *
+ * Comments:                                                                            *
+ *           This function does not deal with log file rotation.                        *
+ *                                                                                      *
+ *           Thread-safe                                                                *
+ *                                                                                      *
+ ****************************************************************************************/
 static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		const char *encoding, zbx_vector_expression_t *regexps, const char *pattern,
@@ -2524,7 +2523,8 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset, const char *persistent_file_name,
 		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size, char **err_msg)
+		const char *config_source_ip, zbx_uint64_t itemid, int config_buffer_send, int config_buffer_size,
+		char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -3126,7 +3126,8 @@ out:
  *     logfiles      - [IN/OUT] list of log files                             *
  *     logfiles_num  - [IN] number of elements in 'logfiles'                  *
  *     jump_from_to  - [IN/OUT] on input - number of element where to start   *
- *                     jump, on output - number of element we jumped into     *
+ *                              jump, on output - number of element we jumped *
+ *                              into                                          *
  *     seq           - [IN/OUT] sequence number of last processed file        *
  *     lastlogsize   - [IN/OUT] offset from beginning of file                 *
  *     mtime         - [IN/OUT] last modification time of file                *
@@ -3328,67 +3329,66 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: finds new records in logfiles                                     *
- *                                                                            *
- * Parameters:                                                                *
- *     flags            - [IN] bit flags with item type: log, logrt,          *
- *                        log.count or logrt.count                            *
- *     filename         - [IN] logfile name (regular expression with path)    *
- *     lastlogsize      - [IN/OUT] offset from beginning of file              *
- *     mtime            - [IN/OUT] last modification time of file             *
- *     lastlogsize_sent - [OUT] lastlogsize value that was last sent          *
- *     mtime_sent       - [OUT] mtime value that was last sent                *
- *     skip_old_data    - [IN/OUT] start from beginning of file or jump to    *
- *                                 end                                        *
- *     big_rec          - [IN/OUT] state variable to remember whether long    *
- *                        record is being processed                           *
- *     use_ino          - [IN/OUT] how to use inode numbers                   *
- *     err_msg          - [IN/OUT] error message why item became NOTSUPPORTED *
- *     logfiles_old     - [IN/OUT] array of logfiles from last check          *
- *     logfiles_num_old - [IN] number of elements in "logfiles_old"           *
- *     logfiles_new     - [OUT] new array of logfiles                         *
- *     logfiles_num_new - [OUT] number of elements in "logfiles_new"          *
- *     encoding         - [IN] Text string describing encoding.               *
- *                        See function zbx_find_cr_lf_szbyte() for supported  *
- *                        encodings.                                          *
- *                        "" (empty string) means a single-byte character set *
- *                        (e.g. ASCII).                                       *
- *     regexps          - [IN] array of regexps                               *
- *     pattern          - [IN] pattern to match                               *
- *     output_template  - [IN] output formatting template                     *
- *     p_count          - [IN/OUT] limit of records to be processed           *
- *     s_count          - [IN/OUT] limit of records to be sent to server      *
- *     process_value    - [IN] pointer to function process_value()            *
- *     addrs            - [IN] vector for passing server and port where to    *
- *                             to send data                                   *
- *     agent2_result    - [IN] address of buffer where to store matching log  *
- *                             records (used only in Agent2)                  *
- *     hostname         - [IN] hostname data comes from                       *
- *     key              - [IN] item key data belongs to                       *
- *     jumped           - [OUT] flag to indicate that jump took place         *
- *     max_delay        - [IN] maximum allowed delay, s                       *
- *     start_time       - [IN/OUT] start time of check                        *
- *     processed_bytes  - [IN/OUT] number of bytes processed                  *
- *     rotation_type    - [IN] simple rotation or copy/truncate rotation      *
- *     persistent_file_name - [IN] name of file for saving persistent data    *
- *     prep_vec         - [IN/OUT] vector with data for writing into          *
- *                                 persistent files                           *
- *     config_tls       - [IN]                                                *
- *     config_timeout   - [IN]                                                *
- *     config_source_ip - [IN]                                                *
- *     itemid           - [IN] Item id for logging when called from Agent 2.  *
- *                             It is 0 when called from Agent 1.              *
- *     config_buffer_send - [IN]                                              *
- *     config_buffer_size - [IN]                                              *
- *                                                                            *
- * Return value: returns SUCCEED on successful reading                        *
- *               FAIL on other cases                                          *
- *                                                                            *
- * Comments: Supposed to be thread-safe, see pick_logfiles() comments.        *
- *                                                                            *
- ******************************************************************************/
+/**************************************************************************************
+ *                                                                                    *
+ * Purpose: finds new records in logfiles                                             *
+ *                                                                                    *
+ * Parameters:                                                                        *
+ *     flags               - [IN] bit flags with item type: log, logrt,               *
+ *                                log.count or logrt.count                            *
+ *     filename            - [IN] logfile name (regular expression with path)         *
+ *     lastlogsize         - [IN/OUT] offset from beginning of file                   *
+ *     mtime               - [IN/OUT] last modification time of file                  *
+ *     lastlogsize_sent    - [OUT] lastlogsize value that was last sent               *
+ *     mtime_sent          - [OUT] mtime value that was last sent                     *
+ *     skip_old_data       - [IN/OUT] start from beginning of file or jump to end     *
+ *     big_rec             - [IN/OUT] state variable to remember whether long         *
+ *                                    record is being processed                       *
+ *     use_ino             - [IN/OUT] how to use inode numbers                        *
+ *     err_msg             - [IN/OUT] error message why item became NOTSUPPORTED      *
+ *     logfiles_old        - [IN/OUT] array of logfiles from last check               *
+ *     logfiles_num_old    - [IN] number of elements in "logfiles_old"                *
+ *     logfiles_new        - [OUT] new array of logfiles                              *
+ *     logfiles_num_new    - [OUT] number of elements in "logfiles_new"               *
+ *     encoding            - [IN] Text string describing encoding.                    *
+ *                                See function zbx_find_cr_lf_szbyte() for supported  *
+ *                                encodings.                                          *
+ *                                "" (empty string) means a single-byte character set *
+ *                                (e.g. ASCII).                                       *
+ *     regexps              - [IN] array of regexps                                   *
+ *     pattern              - [IN] pattern to match                                   *
+ *     output_template      - [IN] output formatting template                         *
+ *     p_count              - [IN/OUT] limit of records to be processed               *
+ *     s_count              - [IN/OUT] limit of records to be sent to server          *
+ *     process_value        - [IN] pointer to function process_value()                *
+ *     addrs                - [IN] vector for passing server and port where to        *
+ *                                 to send data                                       *
+ *     agent2_result        - [IN] address of buffer where to store matching log      *
+ *                                 records (used only in Agent2)                      *
+ *     hostname             - [IN] hostname data comes from                           *
+ *     key                  - [IN] item key data belongs to                           *
+ *     jumped               - [OUT] flag to indicate that jump took place             *
+ *     max_delay            - [IN] maximum allowed delay, s                           *
+ *     start_time           - [IN/OUT] start time of check                            *
+ *     processed_bytes      - [IN/OUT] number of bytes processed                      *
+ *     rotation_type        - [IN] simple rotation or copy/truncate rotation          *
+ *     persistent_file_name - [IN] name of file for saving persistent data            *
+ *     prep_vec             - [IN/OUT] vector with data for writing into              *
+ *                                     persistent files                               *
+ *     config_tls           - [IN]                                                    *
+ *     config_timeout       - [IN]                                                    *
+ *     config_source_ip     - [IN]                                                    *
+ *     itemid               - [IN] Item id for logging when called from Agent 2.      *
+ *                                 It is 0 when called from Agent 1.                  *
+ *     config_buffer_send   - [IN]                                                    *
+ *     config_buffer_size   - [IN]                                                    *
+ *                                                                                    *
+ * Return value: returns SUCCEED on successful reading                                *
+ *               FAIL on other cases                                                  *
+ *                                                                                    *
+ * Comments: Supposed to be thread-safe, see pick_logfiles() comments.                *
+ *                                                                                    *
+ **************************************************************************************/
 static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t *lastlogsize, int *mtime,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, unsigned char *skip_old_data, int *big_rec,
 		int *use_ino, char **err_msg, struct st_logfile **logfiles_old, int logfiles_num_old,
