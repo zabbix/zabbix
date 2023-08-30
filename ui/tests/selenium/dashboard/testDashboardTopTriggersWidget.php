@@ -883,16 +883,19 @@ class testDashboardTopTriggersWidget extends CWebTest {
 							'severity' => TRIGGER_SEVERITY_WARNING
 						]
 					],
-					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
-						'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253'],
-						'Trigger' => 'triggers.php?form=update&triggerid=99252&context=host'.
+					'menu' => [
+						'VIEW' => [
+							'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
+							'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
+						],
+						'CONFIGURATION' => [
+							'Trigger' => 'triggers.php?form=update&triggerid=99252&context=host'.
 								'&backurl=zabbix.php%3Faction%3Ddashboard.view',
-						'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
+							'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
 								'&backurl=zabbix.php%3Faction%3Ddashboard.view'
+							]
 						]
-					],
-					'titles' => ['VIEW', 'CONFIGURATION']
+					]
 				]
 			],
 			// Check host urls.
@@ -908,24 +911,29 @@ class testDashboardTopTriggersWidget extends CWebTest {
 							'severity' => TRIGGER_SEVERITY_WARNING
 						]
 					],
-					'links' => [
-						'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
-						'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D=10084&filter_set=1',
-						'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D=10084&filter_set=1',
-						'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=10084&filter_set=1',
-						'Web' => '',
-						'Inventory' => 'hostinventories.php?hostid=10084',
-						'Host' => 'zabbix.php?action=host.edit&hostid=10084',
-						'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-						'Triggers' => 'triggers.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-						'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-						'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-						'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-						'Detect operating system' => '',
-						'Ping' => '',
-						'Traceroute' => ''
-					],
-					'titles' => ['VIEW', 'CONFIGURATION', 'SCRIPTS']
+					'menu' => [
+						'VIEW' => [
+							'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
+							'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D=10084&filter_set=1',
+							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D=10084&filter_set=1',
+							'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=10084&filter_set=1',
+							'Web' => 'menu-popup-item disabled',
+							'Inventory' => 'hostinventories.php?hostid=10084'
+						],
+						'CONFIGURATION' => [
+							'Host' => 'zabbix.php?action=host.edit&hostid=10084',
+							'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+							'Triggers' => 'triggers.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+							'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host'
+						],
+						'SCRIPTS' => [
+							'Detect operating system' => 'menu-popup-item',
+							'Ping' => 'menu-popup-item',
+							'Traceroute' => 'menu-popup-item'
+						]
+					]
 				]
 			],
 			// Check widget data with all possible severity types and different problems count.
@@ -1565,22 +1573,37 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 			// Check popup menu.
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($popup->hasTitles($data['titles']));
+			$this->assertTrue($popup->hasTitles(array_keys($data['menu'])));
 
-			foreach ($data['links'] as $menu => $links) {
-				// Check 2-level menu links.
-				if (is_array($links)) {
-					$item_link = $popup->getItem($menu)->query('xpath:./../ul//a')->one();
-					$this->assertEquals(array_keys($links), [$item_link->getText()]);
-					$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
-				}
-				else {
-					// Check 1-level menu links.
-					if ($links !== '') {
-						$this->assertStringContainsString($links, $popup->getItem($menu)->getAttribute('href'));
+			$menu_items = [];
+			foreach (array_values($data['menu']) as $links) {
+				foreach ($links as $menu_item => $link) {
+					$menu_items[] = $menu_item;
+
+					if (is_array($link)) {
+						foreach ($link as $menu => $attribute) {
+							// Check 2-level menu links.
+							$xpath = ".//a[text()=".CXPathHelper::escapeQuotes($menu_item).
+									"]/..//a[text()=".CXPathHelper::escapeQuotes($menu).
+									" and contains(@href, ".CXPathHelper::escapeQuotes($attribute).")]";
+							$this->assertTrue($popup->query('xpath', $xpath)->exists());
+						}
+					}
+					else {
+						// Check 1-level menu links.
+						if (str_contains($link, 'menu-popup-item')) {
+							$this->assertEquals($link, $popup->getItem($menu_item)->getAttribute('class'));
+						}
+						else {
+							$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_item).
+									" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
+							);
+						}
 					}
 				}
 			}
+
+			$this->assertTrue($popup->hasItems($menu_items));
 		}
 	}
 }
