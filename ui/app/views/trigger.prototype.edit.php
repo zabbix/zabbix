@@ -24,13 +24,7 @@
  * @var array $data
  */
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'trigger.prototype.list')
-	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-	->setArgument('context', $data['context'])
-	->getUrl();
-
-$trigger_form = (new CForm('post', $url))
+$trigger_form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
 	->setId('trigger-prototype-form')
 	->setName('trigger_edit_form')
@@ -331,7 +325,8 @@ if ($data['form_refresh'] == 0) {
 $triggers_tab->addTab('triggersTab',_('Trigger prototype'), $trigger_form_grid);
 
 // tags
-$triggers_tab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+$triggers_tab->addTab('tags-tab', _('Tags'),
+	new CPartial('configuration.tags.tab', [
 		'source' => 'trigger_prototype',
 		'tags' => $data['tags'],
 		'show_inherited_tags' => $data['show_inherited_tags'],

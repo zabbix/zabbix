@@ -85,9 +85,9 @@
 				}
 				else if (e.target.id === 'test-expression') {
 					return PopUp('popup.testtriggerexpr',
-						{expression: this.expression_full.value}, {
-						dialogue_class: 'modal-popup-generic'
-					});
+						{expression: this.expression_full.value},
+						{dialogue_class: 'modal-popup-generic'}
+					);
 				}
 				else if (e.target.name === 'correlation_mode') {
 					this.#changeCorrelationMode();
@@ -96,8 +96,7 @@
 					this.#changeRecoveryMode();
 				}
 				else if (e.target.id === 'recovery-expression-constructor'
-						|| e.target.id === 'close-recovery-expression-constructor'
-				) {
+						|| e.target.id === 'close-recovery-expression-constructor') {
 					this.#toggleRecoveryExpressionConstructor(e.target.id);
 				}
 				else if (e.target.id === 'insert-recovery-expression') {
@@ -354,7 +353,7 @@
 				expression_constructor.style.display = '';
 				this.expression.name = 'expression';
 				this.expression_full.name = 'expression-full';
-				this.expression.readOnly = this.readonly ? true : false;
+				this.expression.readOnly = this.readonly;
 				insert_expression.textContent = <?= json_encode(_('Add')) ?>;
 				this.expression.value = this.expression_full.value;
 			}
@@ -397,7 +396,7 @@
 				});
 
 				recovery_expression_constructor.style.display = '';
-				recovery_expression.readOnly = this.readonly ? true : false;
+				recovery_expression.readOnly = this.readonly;
 				recovery_expression.name = 'recovery_expression';
 				recovery_expression_full.name = 'recovery_expression_full';
 				insert_recovery_expression.textContent = <?= json_encode(_('Add')) ?>;
@@ -712,11 +711,11 @@
 			dependency_table
 				.querySelectorAll('.js-related-trigger-edit')
 				.forEach(row => {
-				dependencies.push({
-					name: row.textContent,
-					triggerid: row.dataset.triggerid,
-					prototype: row.dataset.prototype
-				});
+					dependencies.push({
+						name: row.textContent,
+						triggerid: row.dataset.triggerid,
+						prototype: row.dataset.prototype
+					});
 			})
 
 			Object.values(data).forEach((new_dependency) => {

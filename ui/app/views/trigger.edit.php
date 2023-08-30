@@ -24,12 +24,7 @@
  * @var array $data
  */
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', ($data['triggerid'] == 0) ? 'trigger.create' : 'trigger.update')
-	->setArgument('context', $data['context'])
-	->getUrl();
-
-$trigger_form = (new CForm('post', $url))
+$trigger_form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
 	->setid('trigger-form')
 	->setName('trigger_edit_form')
@@ -351,7 +346,8 @@ if ($data['form_refresh'] == 0) {
 $triggers_tab->addTab('triggersTab', _('Trigger'), $trigger_form_grid);
 
 // tags
-$triggers_tab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+$triggers_tab->addTab('tags-tab', _('Tags'),
+	new CPartial('configuration.tags.tab', [
 		'source' => 'trigger',
 		'tags' => $data['tags'],
 		'show_inherited_tags' => array_key_exists('show_inherited_tags', $data) ? $data['show_inherited_tags'] : false,
@@ -388,7 +384,6 @@ $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addIte
 	]))->setId('dependency_'.'#{triggerid}')
 );
 
-
 $buttons = null;
 
 if (!$discovered_trigger) {
@@ -417,7 +412,7 @@ $dependencies_table
 	)
 	->addItem($dependency_template_default);
 
-$dependencies_form_grid->addItem([_('Dependencies'),
+$dependencies_form_grid->addItem([new CLabel(_('Dependencies')),
 	(new CDiv($dependencies_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
