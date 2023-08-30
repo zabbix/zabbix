@@ -203,8 +203,14 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
-			->setLabel(_('Preprocessing steps')),
-		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'], ITEM_TYPE_SSH)))
+			->setLabel([
+				_('Preprocessing steps'),
+				makeHelpIcon(_(
+					'The "Check for not supported value" steps are always executed first, with an "any error" check as last of them.'."\n".
+					'If present, they will be arranged at the starting positions upon saving.'
+				))->addClass('js-steps-warning')
+			]),
+		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'], -1)))
 			->setId('preprocessing_div')
 	);
 

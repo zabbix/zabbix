@@ -308,6 +308,10 @@ function itemCompleteTest(overlay) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
 			}
 
+			if ('not_supported' in ret && jQuery('#not_supported', $form).length) {
+				$('#not_supported').prop('checked', ret.not_supported != 0);
+			}
+
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
 			}

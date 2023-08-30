@@ -6389,7 +6389,7 @@ svg {
     .preprocessing-list .step-parameters z-select:not(:last-child) {
       margin-right: 5px; }
   .preprocessing-list .step-parameters-toggle:disabled {
-    display: none; }
+    visibility: hidden; }
   .preprocessing-list .step-parameters-toggle input:disabled {
     display: none; }
   .preprocessing-list .step-on-fail {

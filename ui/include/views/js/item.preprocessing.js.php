@@ -47,7 +47,7 @@
 			(new CDiv($preproc_types_select))
 				->addClass('list-numbered-item')
 				->addClass('step-name'),
-			(new CDiv())->addClass('step-parameters'),
+			(new CFormFieldset())->addClass('step-parameters'),
 			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))->addClass('step-on-fail'),
 			(new CDiv([
 				(new CButton('preprocessing[#{rowNum}][test]', _('Test')))
@@ -232,21 +232,19 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-check-not-supported-row-tmpl">
-	<?= (new CFormFieldset(null, [
-			(new CSelect('preprocessing[#{rowNum}][params][0]'))
-				->addOptions(CSelect::createOptionsFromArray([
-					ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
-					ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
-					ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
-				]))
-					->setAttribute('placeholder', _('error-matching'))
-					->addClass('js-preproc-param-error-matching')
-					->setValue(ZBX_PREPROC_MATCH_ERROR_ANY),
-			(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
-				->removeId()
-				->setAttribute('placeholder', _('pattern'))
-				->setAttribute('disabled', 'disabled')
-		]))->addClass('step-parameters-toggle');
+	<?= (new CSelect('preprocessing[#{rowNum}][params][0]'))
+			->addOptions(CSelect::createOptionsFromArray([
+				ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
+				ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
+				ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
+			]))
+				->setAttribute('placeholder', _('error-matching'))
+				->addClass('js-preproc-param-error-matching')
+				->setValue(ZBX_PREPROC_MATCH_ERROR_ANY).
+		(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
+			->removeId()
+			->setAttribute('placeholder', _('pattern'))
+			->setAttribute('disabled', 'disabled');
 	?>
 </script>
 
@@ -379,15 +377,9 @@
 					}));
 
 				case '<?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>':
-					const $params = $(preproc_param_check_not_supported_tmpl.evaluate({
+					return $(preproc_param_check_not_supported_tmpl.evaluate({
 						rowNum: index
 					}));
-
-					$('#type').val() != <?= ITEM_TYPE_SSH ?>
-						? $params[0].disabled = true
-						: $params[0].removeAttribute('disabled');
-
-					return $params;
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_VALUE ?>':
 					return $(preproc_param_snmp_walk_value_tmpl.evaluate({
@@ -487,7 +479,11 @@
 				}));
 				const type = $('z-select[name*="type"]', $row).val();
 
-				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
+				$('.step-parameters', $row)
+					.html(makeParameterInput(step_index, type))
+					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>)
+					.prop('disabled', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
+
 				$(this).closest('.preprocessing-list-foot').before($row);
 
 				$('.preprocessing-list-head').show();
@@ -549,13 +545,17 @@
 				}
 
 				$preprocessing[0].dispatchEvent(change_event);
+				$preprocessing.trigger('update-ordered-warning')
 			})
 			.on('change', 'z-select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),
 					type = $(this).val(),
 					$on_fail = $row.find('[name*="on_fail"]');
 
-				$('.step-parameters', $row).html(makeParameterInput($row.data('step'), type));
+				$('.step-parameters', $row)
+					.html(makeParameterInput($row.data('step'), type))
+					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>)
+					.prop('disabled', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
 
 				// Disable "Custom on fail" for some of the preprocessing types.
 				switch (type) {
@@ -665,8 +665,8 @@
 					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb}));
 			})
 			.on('update-ordered-warning', function(e) {
-				$(this).closest('#preprocTab')
-					.find('.js-steps-warning').toggleClass('<?=ZBX_STYLE_DISPLAY_NONE?>', stepsInOrder(this));
+				$(this).closest('#preprocessing-form-list, #preprocTab').eq(0)
+					.find('.js-steps-warning').css('background-color', stepsInOrder(this) ? '' : 'orange');
 			})
 			.on('item-type-change', function (e) {
 				const $preproc_steps = $('z-select[name^="preprocessing["][name$="[type]"]'),

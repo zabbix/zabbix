@@ -411,6 +411,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						$preproc_test_data['runtime_error'] = $result['error'];
 						$preproc_test_data['state'] = self::NOT_SUPPORTED_STATE;
 
+						$output['not_supported'] = self::NOT_SUPPORTED_STATE;
 						$output['runtime_error'] = $result['error'];
 					}
 					else {

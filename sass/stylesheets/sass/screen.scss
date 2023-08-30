@@ -3331,7 +3331,7 @@ svg {
 
 	.step-parameters-toggle {
 		&:disabled {
-			display: none;
+			visibility: hidden;
 		}
 
 		input:disabled {

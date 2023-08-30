@@ -1274,7 +1274,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled($type == $step['type']));
+				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(
+					$step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED && $type == $step['type']
+				));
 			}
 
 			$preproc_types_select->addOptionGroup($opt_group);
@@ -1437,7 +1439,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 					$step_param_0_value = ZBX_PREPROC_MATCH_ERROR_ANY;
 				}
 
-				$fieldset = (new CFormFieldset(null, [
+				$params = (new CFormFieldset(null, [
 					(new CSelect('preprocessing['.$i.'][params][0]'))
 						->addOptions(CSelect::createOptionsFromArray([
 							ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
@@ -1452,13 +1454,11 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 						->setAttribute('placeholder', _('pattern'))
 						->setReadonly($readonly)
 						->setEnabled($step_param_0_value != ZBX_PREPROC_MATCH_ERROR_ANY)
-				]))->addClass('step-parameters-toggle');
+				]))->addClass('step-parameters step-parameters-toggle');
 
 				if ($item_type != ITEM_TYPE_SSH) {
-					$fieldset->setAttribute('disabled', 'disabled');
+					$params->setAttribute('disabled', 'disabled');
 				}
-
-				$params = [$fieldset];
 				break;
 
 
@@ -1619,7 +1619,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 					(new CDiv($preproc_types_select))
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
-					(new CDiv($params))->addClass('step-parameters'),
+					$step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+						? $params
+						: (new CFormFieldset(null, $params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
 					(new CDiv([
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))

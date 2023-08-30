@@ -894,7 +894,13 @@ $item_tabs = (new CTabView())
 		(new CFormGrid())
 			->setId('item_preproc_list')
 			->addItem([
-				new CLabel(_('Preprocessing steps')),
+				new CLabel([
+					_('Preprocessing steps'),
+					makeHelpIcon(_(
+						'The "Check for not supported value" steps are always executed first, with an "any error" check as last of them.'."\n".
+						'If present, they will be arranged at the starting positions upon saving.'
+					))->addClass('js-steps-warning')
+				]),
 				new CFormField(
 					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'], $data['type'])
 				)
