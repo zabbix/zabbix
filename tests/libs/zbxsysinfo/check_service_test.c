@@ -70,7 +70,9 @@ void	zbx_mock_test_entry(void **state)
 	strcat(key, "]");
 	zbx_parse_item_key(key, &request);
 
-	returned_code = zbx_check_service_default_addr(&request, default_addr, &result, 0);
+	returned_code = zbx_check_service_default_addr(&request, default_addr, &result, 0,
+			ZBX_CHECK_TIMEOUT_UNDEFINED);
+
 	if (SUCCEED != returned_code && NULL != result.msg && '\0' != *(result.msg))
 		printf("check_service_test error: %s\n", result.msg);
 
