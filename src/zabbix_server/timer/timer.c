@@ -86,18 +86,15 @@ static void	log_host_maintenance_update(const zbx_host_maintenance_diff_t* diff)
  ******************************************************************************/
 static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_ptr_t *updates)
 {
-	int					i;
-	const zbx_host_maintenance_diff_t	*diff;
 	char					*sql = NULL;
 	size_t					sql_alloc = 0, sql_offset = 0;
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	for (i = 0; i < updates->values_num; i++)
+	for (int i = 0; i < updates->values_num; i++)
 	{
-		char	delim = ' ';
-
-		diff = updates->values[i];
+		char					delim = ' ';
+		const zbx_host_maintenance_diff_t	*diff = updates->values[i];
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set");
 
@@ -308,8 +305,6 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 
 	if (0 != eventids.values_num)
 	{
-		int	i;
-
 		if (SUCCEED == read_tags)
 		{
 			tag_fields = "t.tag,t.value";
@@ -319,7 +314,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 		zbx_vector_uint64_uniq(&eventids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 #define ZBX_EVENT_BATCH_SIZE	1000
-		for (i = 0; i < eventids.values_num; i += ZBX_EVENT_BATCH_SIZE)
+		for (int i = 0; i < eventids.values_num; i += ZBX_EVENT_BATCH_SIZE)
 		{
 			char	*sql = NULL;
 			size_t	sql_alloc = 0, sql_offset = 0;
@@ -376,7 +371,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 		zbx_db_insert_t			db_insert;
 		char				*sql = NULL;
 		size_t				sql_alloc = 0, sql_offset = 0;
-		int				i, j, k;
+		int				j, k;
 		zbx_event_suppress_query_t	*query;
 		zbx_event_suppress_data_t	*data;
 		zbx_vector_uint64_pair_t	del_event_maintenances;
@@ -397,7 +392,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 				"suppress_until", (char *)NULL);
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		for (i = 0; i < event_queries.values_num; i++)
+		for (int i = 0; i < event_queries.values_num; i++)
 		{
 			query = event_queries.values[i];
 			zbx_vector_uint64_pair_sort(&query->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -453,8 +448,11 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 									query->eventid,
 									query->maintenances.values[k].first);
 
-						if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+						if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc,
+								&sql_offset))
+						{
 							goto cleanup;
+						}
 					}
 					j++;
 					k++;
@@ -481,7 +479,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 			}
 		}
 
-		for (i = 0; i < del_event_maintenances.values_num; i++)
+		for (int i = 0; i < del_event_maintenances.values_num; i++)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"delete from event_suppress"
@@ -596,7 +594,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		double sec = zbx_time();
+		double	sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (1 == process_num)

@@ -41,7 +41,7 @@ zbx_host_event_maintenance_t;
 
 ZBX_PTR_VECTOR_IMPL(host_maintenance_diff_ptr, zbx_host_maintenance_diff_t*)
 
-void    zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd)
+void	zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd)
 {
 	zbx_free(hmd);
 }
