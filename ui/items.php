@@ -475,10 +475,9 @@ else {
 }
 
 $ms_groups = [];
-$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
-	getRequest('context')
-);
+$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, getRequest('context'));
 $filter_hostids = getRequest('filter_hostids');
+
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([

@@ -2252,9 +2252,9 @@ static void	check_proxy_nodata(const zbx_timespec_t *ts, unsigned char proxy_sta
 
 	delay = ts->sec - diff->lastaccess;
 
-	if ((PROXY_MODE_PASSIVE == proxy_status &&
+	if ((PROXY_OPERATING_MODE_PASSIVE == proxy_status &&
 			(2 * proxydata_frequency) < delay && NET_DELAY_MAX < delay) ||
-			(PROXY_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
+			(PROXY_OPERATING_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
 	{
 		diff->nodata_win.values_num = 0;
 		diff->nodata_win.period_end = ts->sec;
@@ -2285,8 +2285,8 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
 
 	delay_empty = ts->sec - diff->nodata_win.period_end;
 
-	if (PROXY_MODE_PASSIVE == proxy_status ||
-			(PROXY_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay_empty))
+	if (PROXY_OPERATING_MODE_PASSIVE == proxy_status ||
+			(PROXY_OPERATING_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay_empty))
 	{
 		diff->nodata_win.period_end = 0;
 		diff->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;

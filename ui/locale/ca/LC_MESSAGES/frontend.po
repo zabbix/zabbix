@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-23 06:48+0000\n"
+"PO-Revision-Date: 2023-08-28 07:45+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1383,7 +1383,7 @@ msgstr "Qualsevol"
 
 #: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
 msgid "Any changes made in the current form will be lost."
-msgstr ""
+msgstr "Es perdran els canvis fets al formulari actual."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -14367,7 +14367,7 @@ msgstr "Nou nom d'etiqueta"
 
 #: app/views/template.edit.php:352
 msgid "New template"
-msgstr ""
+msgstr "Plantilla nova"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
@@ -16859,7 +16859,7 @@ msgstr "Fitxer de clau pública"
 
 #: app/controllers/CControllerAuditLogList.php:218
 msgid "Push"
-msgstr ""
+msgstr "Empènyer"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
