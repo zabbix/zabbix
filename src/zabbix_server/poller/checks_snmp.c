@@ -2467,7 +2467,7 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			{
 				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
 						"cannot retrieve OID: '%s' from [[%s]:%hu]:"
-						" timed DBG out", buffer, snmp_context->item.interface.addr,
+						" timed out", buffer, snmp_context->item.interface.addr,
 						snmp_context->item.interface.port));
 				snmp_context->item.ret = TIMEOUT_ERROR;
 			}
