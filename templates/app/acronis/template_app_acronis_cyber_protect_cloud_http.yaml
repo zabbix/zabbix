@@ -394,7 +394,8 @@ zabbix_export:
                 - uuid: f72a128c289540869ceeb4eb8a32519b
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.alert.severity[{#ALERT_ID}])=3'
                   name: 'Alert [{#TYPE}]:[{#ALERT_ID}]: Alert has "critical" severity'
-                  opdata: 'Current status: {ITEM.LASTVALUE}'
+                  event_name: 'Alert [{#ALERT_ID}]: "critical" severity'
+                  opdata: 'Alert type: {#TYPE}, Current status: {ITEM.LASTVALUE}'
                   priority: HIGH
                   description: 'Alert has "critical" severity.'
                   manual_close: 'YES'
@@ -404,7 +405,8 @@ zabbix_export:
                 - uuid: 360fcc25d3fe442194ddea76db8157be
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.alert.severity[{#ALERT_ID}])=2'
                   name: 'Alert [{#TYPE}]:[{#ALERT_ID}]: Alert has "error" severity'
-                  opdata: 'Current status: {ITEM.LASTVALUE}'
+                  event_name: 'Alert [{#ALERT_ID}]: "error" severity'
+                  opdata: 'Alert type: {#TYPE}, Current status: {ITEM.LASTVALUE}'
                   priority: AVERAGE
                   description: 'Alert has "error" severity.'
                   manual_close: 'YES'
@@ -417,7 +419,8 @@ zabbix_export:
                 - uuid: 687b26d91e6e448d911663f190328fb4
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.alert.severity[{#ALERT_ID}])=1'
                   name: 'Alert [{#TYPE}]:[{#ALERT_ID}]: Alert has "warning" severity'
-                  opdata: 'Current status: {ITEM.LASTVALUE}'
+                  event_name: 'Alert [{#ALERT_ID}]: "warning" severity'
+                  opdata: 'Alert type: {#TYPE}, Current status: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'Alert has "warning" severity.'
                   manual_close: 'YES'
@@ -480,14 +483,9 @@ zabbix_export:
                     - '$[?(@.name == "{#NAME}")].enabled.first()'
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not find customer status'
-                - type: JAVASCRIPT
+                - type: BOOL_TO_DECIMAL
                   parameters:
-                    - |
-                      const idx = [       // 10 - Unknown (default)
-                          'false',        // 0
-                          'true'          // 1
-                      ].indexOf(value);
-                      return idx !== -1 ? idx : 10;
+                    - ''
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -530,7 +528,7 @@ zabbix_export:
           description: 'Discovers devices.'
           item_prototypes:
             - uuid: 63f8280408c34e029085af75f15c0db3
-              name: 'Device [{#NAME}]: Agent enabled'
+              name: 'Device [{#NAME}]:[{#ID}]: Agent enabled'
               type: DEPENDENT
               key: 'acronis.cpc.device.agent.enabled[{#NAME}]'
               delay: '0'
@@ -561,7 +559,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7e33ba82ad90436c88beee8d32a3f29d
                   expression: 'max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.agent.enabled[{#NAME}],3m) < 1'
-                  name: 'Device [{#NAME}]: Agent disabled'
+                  name: 'Device [{#NAME}]:[{#ID}]: Agent disabled'
                   opdata: 'Current score: {ITEM.LASTVALUE}'
                   priority: INFO
                   description: 'Agent for this device is disabled for at least 3 minutes.'
@@ -570,7 +568,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: e1eaefb0e0af4793abadb0b3ad20ff4b
-              name: 'Device [{#NAME}]: Agent online'
+              name: 'Device [{#NAME}]:[{#ID}]: Agent online'
               type: DEPENDENT
               key: 'acronis.cpc.device.agent.online[{#NAME}]'
               delay: '0'
@@ -599,7 +597,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: 7bc04c3526704b578e2b7561e6c97b6a
-              name: 'Device [{#NAME}]: Agent version'
+              name: 'Device [{#NAME}]:[{#ID}]: Agent version'
               type: DEPENDENT
               key: 'acronis.cpc.device.agent.version[{#NAME}]'
               delay: '0'
@@ -628,7 +626,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: d8c3372e05f3480aaa499b143ab47e87
-              name: 'Device [{#NAME}]: Next machine backup run'
+              name: 'Device [{#NAME}]:[{#ID}]: Next machine backup run'
               type: DEPENDENT
               key: 'acronis.cpc.device.backup.next[{#NAME}]'
               delay: '0'
@@ -660,7 +658,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 6a2c53a89d7748f89956464849d0b7de
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.next[{#NAME}]) < now()'
-                  name: 'Device [{#NAME}]: Scheduled machine backup failed to run'
+                  name: 'Device [{#NAME}]:[{#ID}]: Scheduled machine backup failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Scheduled antimalware scan failed to run.'
@@ -669,7 +667,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 9fbbfa68438a406d82900d5c8801a756
-              name: 'Device [{#NAME}]: Previous successful machine backup run'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous successful machine backup run'
               type: DEPENDENT
               key: 'acronis.cpc.device.backup.prev.ok[{#NAME}]'
               delay: '0'
@@ -699,7 +697,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: cea527353e34488a92dc5d2c082f6710
-              name: 'Device [{#NAME}]: Previous machine backup run'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous machine backup run'
               type: DEPENDENT
               key: 'acronis.cpc.device.backup.prev[{#NAME}]'
               delay: '0'
@@ -729,7 +727,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: b45fb50f8caa40438eecfc4482d80fc2
-              name: 'Device [{#NAME}]: CyberFit score'
+              name: 'Device [{#NAME}]:[{#ID}]: CyberFit score'
               type: DEPENDENT
               key: 'acronis.cpc.device.cyberfit[{#NAME}]'
               delay: '0'
@@ -764,7 +762,7 @@ zabbix_export:
                     min(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.cyberfit[{#NAME}],3m) < {$ACRONIS.CPC.CYBERFIT.HIGH}
                     and
                     max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.cyberfit[{#NAME}],3m) <> -1
-                  name: 'Device [{#NAME}]: CyberFit score critical'
+                  name: 'Device [{#NAME}]:[{#ID}]: CyberFit score critical'
                   opdata: 'Current score: {ITEM.LASTVALUE}'
                   priority: HIGH
                   description: 'CyberFit score for this device is critical for at least 3 minutes.'
@@ -777,13 +775,13 @@ zabbix_export:
                     min(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.cyberfit[{#NAME}],3m) < {$ACRONIS.CPC.CYBERFIT.WARN}
                     and
                     max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.cyberfit[{#NAME}],3m) <> -1
-                  name: 'Device [{#NAME}]: CyberFit score low'
+                  name: 'Device [{#NAME}]:[{#ID}]: CyberFit score low'
                   opdata: 'Current score: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'CyberFit score for this device is low for at least 3 minutes.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'Device [{#NAME}]: CyberFit score critical'
+                    - name: 'Device [{#NAME}]:[{#ID}]: CyberFit score critical'
                       expression: |
                         min(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.cyberfit[{#NAME}],3m) < {$ACRONIS.CPC.CYBERFIT.HIGH}
                         and
@@ -792,7 +790,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 1f4d019c271c4272b055253d99d90244
-              name: 'Device [{#NAME}]: Next patch management run'
+              name: 'Device [{#NAME}]:[{#ID}]: Next patch management run'
               type: DEPENDENT
               key: 'acronis.cpc.device.patch.next[{#NAME}]'
               delay: '0'
@@ -824,7 +822,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7f82e95335b746c1a061b0ae811165a7
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.next[{#NAME}]) < now()'
-                  name: 'Device [{#NAME}]: Scheduled patch management failed to run'
+                  name: 'Device [{#NAME}]:[{#ID}]: Scheduled patch management failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Scheduled patch management failed to run.'
@@ -833,7 +831,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 8ff39ea389ec4c53aa572074266536da
-              name: 'Device [{#NAME}]: Previous successful patch management run'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous successful patch management run'
               type: DEPENDENT
               key: 'acronis.cpc.device.patch.prev.ok[{#NAME}]'
               delay: '0'
@@ -863,7 +861,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: 81bc4b10c3484673a76e9bb8e012af26
-              name: 'Device [{#NAME}]: Previous patch management run'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous patch management run'
               type: DEPENDENT
               key: 'acronis.cpc.device.patch.prev[{#NAME}]'
               delay: '0'
@@ -893,7 +891,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: 43dc6e6bb7e042149b356fb6b067f0d5
-              name: 'Device [{#NAME}]: Protection plan name'
+              name: 'Device [{#NAME}]:[{#ID}]: Protection plan name'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.name[{#NAME}]'
               delay: '0'
@@ -922,7 +920,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: 98701aa6f99f48c3a769529b2c3c3123
-              name: 'Device [{#NAME}]: Next antimalware protection scan'
+              name: 'Device [{#NAME}]:[{#ID}]: Next antimalware protection scan'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.scan.next[{#NAME}]'
               delay: '0'
@@ -954,7 +952,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 75156ffdb1ed4b90b594e50bce8752e5
                   expression: 'max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.next[{#NAME}],3m) < now()'
-                  name: 'Device [{#NAME}]: Scheduled antimalware scan failed to run'
+                  name: 'Device [{#NAME}]:[{#ID}]: Scheduled antimalware scan failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Scheduled antimalware scan failed to run for at least 3 minutes.'
@@ -963,7 +961,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: d9510ad24a1a40dfb14313e0e135a247
-              name: 'Device [{#NAME}]: Previous successful antimalware protection scan'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous successful antimalware protection scan'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.scan.prev.ok[{#NAME}]'
               delay: '0'
@@ -993,7 +991,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: 684b4a46e4d84a588bd84fac3e6cfc55
-              name: 'Device [{#NAME}]: Previous antimalware protection scan'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous antimalware protection scan'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.scan.prev[{#NAME}]'
               delay: '0'
@@ -1023,7 +1021,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: e0a94793d31c4cf08f64c0d230134870
-              name: 'Device [{#NAME}]: Protection status'
+              name: 'Device [{#NAME}]:[{#ID}]: Protection status'
               type: DEPENDENT
               key: 'acronis.cpc.device.protection.status[{#NAME}]'
               delay: '0'
@@ -1054,7 +1052,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 0c38a47343cb4df4bda534982f344c15
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.status[{#NAME}])="error"'
-                  name: 'Device [{#NAME}]: Protection status "error"'
+                  name: 'Device [{#NAME}]:[{#ID}]: Protection status "error"'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: AVERAGE
                   description: 'Device has "error" protection status.'
@@ -1064,19 +1062,19 @@ zabbix_export:
                       value: notice
                 - uuid: 3338e8c43c2149819e0a48156d6ec21a
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.status[{#NAME}])="warning"'
-                  name: 'Device [{#NAME}]: Protection status "warning"'
+                  name: 'Device [{#NAME}]:[{#ID}]: Protection status "warning"'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'Device has "warning" protection status.'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'Device [{#NAME}]: Protection status "error"'
+                    - name: 'Device [{#NAME}]:[{#ID}]: Protection status "error"'
                       expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.status[{#NAME}])="error"'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 70abd1e7291a4e51aca2e4094b10d89e
-              name: 'Device [{#NAME}]: Raw data resource'
+              name: 'Device [{#NAME}]:[{#ID}]: Raw data resource'
               type: DEPENDENT
               key: 'acronis.cpc.device.res.raw[{#NAME}]'
               delay: '0'
@@ -1096,7 +1094,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 20d93972ca2f47af96aed7ee9aa642af
-              name: 'Device [{#NAME}]: Raw data resources status'
+              name: 'Device [{#NAME}]:[{#ID}]: Raw data resources status'
               type: HTTP_AGENT
               key: 'acronis.cpc.device.res.status.raw[{#NAME}]'
               history: '0'
@@ -1125,7 +1123,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: e6905aa1998a41cfa0e6fda699558ceb
-              name: 'Device [{#NAME}]: Next vulnerability assessment'
+              name: 'Device [{#NAME}]:[{#ID}]: Next vulnerability assessment'
               type: DEPENDENT
               key: 'acronis.cpc.device.vuln.next[{#NAME}]'
               delay: '0'
@@ -1157,7 +1155,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b71001b751594fc5b4b9b38673133171
                   expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.next[{#NAME}]) < now()'
-                  name: 'Device [{#NAME}]: Scheduled vulnerability assessment failed to run'
+                  name: 'Device [{#NAME}]:[{#ID}]: Scheduled vulnerability assessment failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Scheduled vulnerability assessment failed to run.'
@@ -1166,7 +1164,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 36fb3f57c4ae4f5cad01913a453869dc
-              name: 'Device [{#NAME}]: Previous successful vulnerability assessment'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous successful vulnerability assessment'
               type: DEPENDENT
               key: 'acronis.cpc.device.vuln.prev.ok[{#NAME}]'
               delay: '0'
@@ -1196,7 +1194,7 @@ zabbix_export:
                 - tag: tenant
                   value: '{#TENANT_NAME}'
             - uuid: 9a45c38169c848fd92b8e6a782ad065b
-              name: 'Device [{#NAME}]: Previous vulnerability assessment'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous vulnerability assessment'
               type: DEPENDENT
               key: 'acronis.cpc.device.vuln.prev[{#NAME}]'
               delay: '0'
@@ -1228,7 +1226,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: f0a9c94a81ef4018a76b73cb98780f1f
               expression: 'max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.prev[{#NAME}],1m)'
-              name: 'Device [{#NAME}]: Previous machine backup run not successful'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous machine backup run not successful'
               opdata: 'Last scan: {ITEM.LASTVALUE2}, Last OK scan: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Previous machine backup did not run successfully.'
@@ -1238,7 +1236,7 @@ zabbix_export:
                   value: notice
             - uuid: 5ce3f0bc18cd40878059b48ba436fa6d
               expression: 'max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev[{#NAME}],1m)'
-              name: 'Device [{#NAME}]: Previous patch management run not successful'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous patch management run not successful'
               opdata: 'Last scan: {ITEM.LASTVALUE2}, Last OK scan: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Previous patch management run did not run successfully.'
@@ -1248,7 +1246,7 @@ zabbix_export:
                   value: notice
             - uuid: b0341da543c34c9491863a6fb8caea0c
               expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.prev.ok[{#NAME}])<>last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.prev[{#NAME}])'
-              name: 'Device [{#NAME}]: Previous protection scan not successful'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous protection scan not successful'
               opdata: 'Last scan: {ITEM.LASTVALUE2}, Last OK scan: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Device has "error" protection status.'
@@ -1258,7 +1256,7 @@ zabbix_export:
                   value: notice
             - uuid: 3c0f47531c1a435eb93d01107a6e0b3d
               expression: 'max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.prev[{#NAME}],1m)'
-              name: 'Device [{#NAME}]: Previous vulnerability assessment not successful'
+              name: 'Device [{#NAME}]:[{#ID}]: Previous vulnerability assessment not successful'
               opdata: 'Last scan: {ITEM.LASTVALUE2}, Last OK scan: {ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Previous vulnerability assessment did not run successfully.'
@@ -1268,7 +1266,7 @@ zabbix_export:
                   value: notice
           graph_prototypes:
             - uuid: feba1571ed4a47d5a5bbbb16153983b0
-              name: 'Device [{#NAME}]: CyberFit score'
+              name: 'Device [{#NAME}]:[{#ID}]: CyberFit score'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1279,6 +1277,8 @@ zabbix_export:
           lld_macro_paths:
             - lld_macro: '{#AGENT_ID}'
               path: $.agent_id
+            - lld_macro: '{#ID}'
+              path: $.id
             - lld_macro: '{#NAME}'
               path: $.name
             - lld_macro: '{#TENANT_NAME}'
@@ -1377,6 +1377,9 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: '"Information" severity alert count'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
                     - type: ITEM
                       name: itemid
                       value:
@@ -1406,6 +1409,9 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: '"OK" severity alert count'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
                     - type: ITEM
                       name: itemid
                       value:
@@ -1435,6 +1441,9 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: '"Warning" severity alert count'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
                     - type: ITEM
                       name: itemid
                       value:
@@ -1464,6 +1473,9 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: '"Error" severity alert count'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
                     - type: ITEM
                       name: itemid
                       value:
@@ -1493,6 +1505,9 @@ zabbix_export:
                     - type: STRING
                       name: description
                       value: '"Critical" severity alert count'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '8'
                     - type: ITEM
                       name: itemid
                       value:
@@ -1527,7 +1542,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Acronis Cyber Protect Cloud MSP by HTTP'
-                        name: 'Device [{#NAME}]: CyberFit score'
+                        name: 'Device [{#NAME}]:[{#ID}]: CyberFit score'
                     - type: INTEGER
                       name: rows
                       value: '2'
