@@ -465,7 +465,7 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_help(void);
+void	zbx_help(const char *param);
 void	zbx_usage(void);
 void	zbx_version(void);
 
