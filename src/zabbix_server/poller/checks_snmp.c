@@ -2644,11 +2644,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 
 	zbx_init_agent_result(&snmp_context->item.result);
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, &timeout_sec))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
-		goto out;
-	}
+	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 
 	snmp_context->config_timeout = timeout_sec;
 
@@ -3102,12 +3098,6 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 	SNMP_MT_EXECLOCK;
 
-	if (FAIL == zbx_validate_item_timeout(items[j].timeout, &timeout_sec))
-	{
-		SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid timeout was specified."));
-		goto out;
-	}
-
 	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
 	{
 		int	max_vars;
@@ -3115,6 +3105,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
+
+		zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
@@ -3183,6 +3175,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
 
+		zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
@@ -3206,6 +3200,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 
 		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
+
+		zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,

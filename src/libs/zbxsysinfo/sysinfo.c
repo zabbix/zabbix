@@ -2144,17 +2144,18 @@ char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
 	return dst_string;
 }
 
-int	zbx_validate_item_timeout(const char *timeout_str, int *timeout_out, char *error, size_t error_len)
+int	zbx_validate_item_timeout(const char *timeout_str, char *error, size_t error_len)
 {
 #define ZBX_ITEM_TIMEOUT_MAX	600
+	int	sec;
+
 	if ('\0' == *timeout_str)
 	{
-		*timeout_out = ZBX_CHECK_TIMEOUT_UNDEFINED;
 		return SUCCEED;
 	}
 
-	if (SUCCEED != zbx_is_time_suffix(timeout_str, timeout_out, ZBX_LENGTH_UNLIMITED) ||
-			ZBX_ITEM_TIMEOUT_MAX < *timeout_out)
+	if (SUCCEED != zbx_is_time_suffix(timeout_str, &sec, ZBX_LENGTH_UNLIMITED) ||
+			ZBX_ITEM_TIMEOUT_MAX < sec)
 	{
 		zbx_strlcpy(error, "Unsupported timeout value.", error_len);
 		return FAIL;

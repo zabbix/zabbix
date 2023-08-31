@@ -422,9 +422,9 @@ out:
 }
 
 static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+		const char *config_source_ip, char *error, size_t max_error_len)
 {
-	int		ret;
+	int		ret, timeout_sec;
 	AGENT_RESULT	agent_result;
 	char		*param = NULL, *port = NULL;
 	zbx_dc_item_t	item;

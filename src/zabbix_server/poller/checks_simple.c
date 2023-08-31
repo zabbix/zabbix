@@ -218,6 +218,8 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 
+	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
 		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0, timeout_sec))

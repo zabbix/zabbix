@@ -75,6 +75,8 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		zbx_free(param_esc);
 	}
 
+	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+
 	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), timeout_sec,
 			ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 	{

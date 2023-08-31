@@ -452,8 +452,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 
 	for (i = 0; i < num; i++)
 	{
-		int	timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
-
 		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
@@ -482,7 +480,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 							ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				}
 
-
 				if (FAIL == zbx_is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
@@ -506,8 +503,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
 
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
-						sizeof(error)))
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -562,8 +558,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
 
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
-						sizeof(error)))
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -581,8 +576,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON,
 						NULL, 0);
 
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
-						sizeof(error)))
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -641,8 +635,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
 
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
-						sizeof(error)))
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, error, sizeof(error)))
 				{
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 					errcodes[i] = CONFIG_ERROR;
@@ -686,8 +679,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].timeout,
 							ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
-					if (FAIL == zbx_validate_item_timeout(items[i].timeout, &timeout_sec, error,
-							sizeof(error)))
+					if (FAIL == zbx_validate_item_timeout(items[i].timeout, error, sizeof(error)))
 					{
 						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
 						errcodes[i] = CONFIG_ERROR;

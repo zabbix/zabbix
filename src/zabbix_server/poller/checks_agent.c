@@ -82,7 +82,6 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
 			item->interface.addr, item->key, zbx_tcp_connection_type_name(item->host.tls_connect));
 
@@ -116,6 +115,8 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 			ret = CONFIG_ERROR;
 			goto out;
 	}
+
+	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout_sec + 1,
 			item->host.tls_connect, tls_arg1, tls_arg2))

@@ -95,6 +95,8 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
+	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+
 	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, timeout_sec,
 			&error)))
 	{
