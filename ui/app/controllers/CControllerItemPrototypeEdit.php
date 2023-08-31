@@ -165,6 +165,10 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			$data['readonly'] = true;
 		}
 
+		if ($data['form']['tags']) {
+			CArrayHelper::sort($data['form']['tags'], ['tag', 'value']);
+		}
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Item prototype'));
 		$this->setResponse($response);

@@ -103,10 +103,6 @@ class CItemHelper extends CItemGeneralHelper {
 			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 		}
 
-		if ($item['tags']) {
-			CArrayHelper::sort($item['tags'], ['tag', 'value']);
-		}
-
 		return $item;
 	}
 

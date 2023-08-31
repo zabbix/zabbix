@@ -110,13 +110,6 @@ abstract class CControllerItemPrototype extends CController {
 			$field = 'tags';
 		}
 
-		$parameters = $this->getInput('parameters', []);
-
-		if ($ret && $parameters) {
-			$ret = array_key_exists('name', $parameters) && array_key_exists('value', $parameters);
-			$field = 'parameters';
-		}
-
 		$query_fields = $this->getInput('query_fields', []);
 
 		if ($ret && $query_fields) {
@@ -279,7 +272,7 @@ abstract class CControllerItemPrototype extends CController {
 			$input['preprocessing'] = $preprocessings;
 		}
 
-		if ($input['tags'] && $input['show_inherited_tags'] == 0) {
+		if ($input['tags']) {
 			// Unset inherited tags.
 			$tags = [];
 

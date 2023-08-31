@@ -270,12 +270,12 @@ class CItemGeneralHelper {
 		if ($input['parameters']) {
 			$parameters = [];
 
-			foreach ($input['parameters']['name'] as $i => $name) {
-				if ($name === '' || $input['parameters']['value'][$i] === '') {
+			foreach ($input['parameters'] as $parameter) {
+				if ($parameter['name'] === '' || $parameter['value'] === '') {
 					continue;
 				}
 
-				$parameters[] = ['name' => $name, 'value' => $input['parameters']['value'][$i]];
+				$parameters[] = $parameter;
 			}
 
 			$input['parameters'] = $parameters;
