@@ -157,16 +157,27 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		"making chrome headless request with parameters url: %s, width: %s, height: %s for report request from %s",
 		u.String(), req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
+	var cookieParams []*network.CookieParam
+
+	for _, pair := range strings.Split(req.Header["Cookie"], "; ") {
+		p := strings.SplitN(pair, "=", 2)
+
+		cookieParam := network.CookieParam{
+			Name:     p[0],
+			Value:    p[1],
+			URL:      req.URL,
+			Domain:   u.Hostname(),
+			SameSite: network.CookieSameSiteStrict,
+			HTTPOnly: true,
+		}
+
+		cookieParams = append(cookieParams, &cookieParam)
+	}
+
 	var buf []byte
-	cookieName := "zbx_session"
-	cookieValue := strings.Replace(req.Header["Cookie"], "zbx_session=", "", 1)
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
-		network.SetCookie(cookieName, cookieValue).
-			WithURL(req.URL).
-			WithDomain(u.Hostname()).
-			WithSameSite(network.CookieSameSiteStrict).
-			WithHTTPOnly(true),
+		network.SetCookies(cookieParams),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
 		navigateAndWaitFor(u.String(), "networkIdle"),
 		chromedp.ActionFunc(func(ctx context.Context) error {
