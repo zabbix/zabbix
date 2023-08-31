@@ -160,6 +160,10 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				}
 			}
 
+			if r.Timeout == 0 {
+				r.Timeout = agent.Options.Timeout
+			}
+
 			if !ok {
 				// create and register new exporter task
 				task = &exporterTask{
@@ -184,6 +188,8 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				task = tacc.task()
 				task.updated = now
 				task.item.key = r.Key
+				task.item.timeout = r.Timeout
+
 				if task.item.delay != r.Delay {
 					task.item.delay = r.Delay
 					if err = task.reschedule(now); err != nil {

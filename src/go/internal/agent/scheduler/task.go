@@ -165,7 +165,6 @@ func (t *exporterTask) perform(s Scheduler) {
 
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
 			if t.item.timeout != 0 {
 				tc := make(chan bool)
@@ -178,8 +177,10 @@ func (t *exporterTask) perform(s Scheduler) {
 				select {
 				case <-tc:
 				case <-time.After(time.Second * time.Duration(t.item.timeout)):
-					err = fmt.Errorf("Check has timed out")
+					err = fmt.Errorf("timed out")
 				}
+			} else {
+				ret, err = exporter.Export(key, params, t)
 			}
 
 			if err == nil {
