@@ -56,13 +56,23 @@ typedef struct
 	zbx_kstat_t		kstat;
 #endif
 }
-ZBX_COLLECTOR_DATA;
+zbx_collector_data;
 
-extern ZBX_COLLECTOR_DATA	*collector;
+int     cpu_collector_started(void);
+zbx_collector_data       *get_collector(void);
+
+//extern ZBX_COLLECTOR_DATA	*collector;
+//#ifndef _WINDOWS
+//extern ZBX_DISKDEVICES_DATA	*diskdevices;
+//extern int			my_diskstat_shmid;
+//#endif
 #ifndef _WINDOWS
-extern ZBX_DISKDEVICES_DATA	*diskdevices;
-extern int			my_diskstat_shmid;
+zbx_diskdevices_data     *get_diskdevices(void);
 #endif
+int     diskdevice_collector_started(void);
+
+void	stats_lock_diskstats(void);
+void	stats_unlock_diskstats(void);
 
 void	diskstat_shm_init(void);
 void	diskstat_shm_reattach(void);

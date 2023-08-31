@@ -98,7 +98,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA *device;
+	zbx_single_diskdevice_data *device;
 	char		devname[32], *tmp;
 	int		type, mode;
 	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
@@ -178,7 +178,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 	{
 		/* CPU statistics collector and (optionally) disk statistics collector is started only when Zabbix */
 		/* agentd is running as a daemon. When Zabbix agent or agentd is started with "-p" or "-t" parameter */

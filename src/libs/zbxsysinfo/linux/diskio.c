@@ -175,7 +175,7 @@ static int	get_kernel_devname(const char *devname, char *kernel_devname, size_t 
 
 static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA	*device;
+	zbx_single_diskdevice_data	*device;
 	char				*devname, *tmp, kernel_devname[MAX_STRING_LEN];
 	int				type, mode;
 	zbx_uint64_t			dstats[ZBX_DSTAT_MAX];
@@ -240,7 +240,7 @@ static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 	{
 		/* CPU statistics collector and (optionally) disk statistics collector is started only when Zabbix */
 		/* agentd is running as a daemon. When Zabbix agent or agentd is started with "-p" or "-t" parameter */

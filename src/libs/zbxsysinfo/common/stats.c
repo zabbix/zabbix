@@ -32,14 +32,52 @@ extern int get_cpu_num_win32(void);
 #	include "zbxnix.h"
 #endif
 
-ZBX_COLLECTOR_DATA	*collector = NULL;
+static zbx_collector_data	*collector = NULL;
+
+//#define CPU_COLLECTOR_STARTED(collector)      ((NULL != collector) && (collector)->cpus.queue_counter)
+
+int	cpu_collector_started(void)
+{
+#ifdef _WINDOWS
+	return ((NULL != collector) && (collector)->cpus.queue_counter);
+#else   /* not _WINDOWS */
+	return (NULL != collector);
+#endif
+}
+
+zbx_collector_data       *get_collector(void)
+{
+	return collector;
+}
+
+//#define DISKDEVICE_COLLECTOR_STARTED(collector)	((collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID)
+
+int	diskdevice_collector_started(void)
+{
+	return ((NULL != collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID);
+}
 
 #ifndef _WINDOWS
-static int		shm_id;
-int			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
-ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
-zbx_mutex_t		diskstats_lock = ZBX_MUTEX_NULL;
+static int			shm_id;
+int				my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
+static zbx_diskdevices_data	*diskdevices = NULL;
+zbx_diskdevices_data     *get_diskdevices(void)
+{
+	return diskdevices;
+}
+
+static zbx_mutex_t 	    	diskstats_lock = ZBX_MUTEX_NULL;
 #endif
+
+void	stats_lock_diskstats(void)
+{
+	zbx_mutex_lock(diskstats_lock);
+}
+
+void	stats_unlock_diskstats(void)
+{
+	zbx_mutex_unlock(diskstats_lock);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -126,7 +164,7 @@ int	zbx_init_collector_data(char **error)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	cpu_count = zbx_get_cpu_num();
-	sz = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_COLLECTOR_DATA));
+	sz = ZBX_SIZE_T_ALIGN8(sizeof(zbx_collector_data));
 
 #ifdef _WINDOWS
 	ZBX_UNUSED(error);
@@ -151,7 +189,7 @@ int	zbx_init_collector_data(char **error)
 		goto out;
 	}
 
-	if ((void *)(-1) == (collector = (ZBX_COLLECTOR_DATA *)shmat(shm_id, NULL, 0)))
+	if ((void *)(-1) == (collector = (zbx_collector_data *)shmat(shm_id, NULL, 0)))
 	{
 		*error = zbx_dsprintf(*error, "cannot attach shared memory for collector: %s", zbx_strerror(errno));
 		goto out;
@@ -250,7 +288,7 @@ void	diskstat_shm_init(void)
 	size_t	shm_size;
 
 	/* initially allocate memory for collecting statistics for only 1 disk */
-	shm_size = sizeof(ZBX_DISKDEVICES_DATA);
+	shm_size = sizeof(zbx_diskdevices_data);
 
 	if (-1 == (collector->diskstat_shmid = zbx_shm_create(shm_size)))
 	{
@@ -258,7 +296,7 @@ void	diskstat_shm_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if ((void *)(-1) == (diskdevices = (ZBX_DISKDEVICES_DATA *)shmat(collector->diskstat_shmid, NULL, 0)))
+	if ((void *)(-1) == (diskdevices = (zbx_diskdevices_data *)shmat(collector->diskstat_shmid, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
 				zbx_strerror(errno));
@@ -300,7 +338,7 @@ void	diskstat_shm_reattach(void)
 			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 		}
 
-		if ((void *)(-1) == (diskdevices = (ZBX_DISKDEVICES_DATA *)shmat(collector->diskstat_shmid, NULL, 0)))
+		if ((void *)(-1) == (diskdevices = (zbx_diskdevices_data *)shmat(collector->diskstat_shmid, NULL, 0)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
 					zbx_strerror(errno));
@@ -325,7 +363,7 @@ void	diskstat_shm_extend(void)
 #ifndef _WINDOWS
 	size_t			old_shm_size, new_shm_size;
 	int			old_shmid, new_shmid, old_max, new_max;
-	ZBX_DISKDEVICES_DATA	*new_diskdevices;
+	zbx_diskdevices_data	*new_diskdevices;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -339,8 +377,8 @@ void	diskstat_shm_extend(void)
 	else
 		new_max = old_max + 256;
 
-	old_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (old_max - 1);
-	new_shm_size = sizeof(ZBX_DISKDEVICES_DATA) + sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (new_max - 1);
+	old_shm_size = sizeof(zbx_diskdevices_data) + sizeof(zbx_single_diskdevice_data) * (old_max - 1);
+	new_shm_size = sizeof(zbx_diskdevices_data) + sizeof(zbx_single_diskdevice_data) * (new_max - 1);
 
 	if (-1 == (new_shmid = zbx_shm_create(new_shm_size)))
 	{
@@ -348,7 +386,7 @@ void	diskstat_shm_extend(void)
 		exit(EXIT_FAILURE);
 	}
 
-	if ((void *)(-1) == (new_diskdevices = (ZBX_DISKDEVICES_DATA *)shmat(new_shmid, NULL, 0)))
+	if ((void *)(-1) == (new_diskdevices = (zbx_diskdevices_data *)shmat(new_shmid, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for extending disk statistics collector: %s",
 				zbx_strerror(errno));
@@ -416,7 +454,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #ifdef _WINDOWS
 		collect_perfstat();
 #else
-		if (0 != CPU_COLLECTOR_STARTED(collector))
+		if (0 != cpu_collector_started())
 		{
 			collect_cpustat(&(collector->cpus));
 #ifdef _AIX
@@ -424,8 +462,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 #endif
 		}
 
-		if (0 != DISKDEVICE_COLLECTOR_STARTED(collector))
-			collect_stats_diskdevices();
+		if (0 != diskdevice_collector_started())
+			collect_stats_diskdevices(diskdevices);
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
 		zbx_procstat_collect();
@@ -445,7 +483,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	}
 
 #ifdef _WINDOWS
-	if (0 != CPU_COLLECTOR_STARTED(collector))
+	if (0 != cpu_collector_started())
 		free_cpu_collector(&(collector->cpus));
 
 	ZBX_DO_EXIT();

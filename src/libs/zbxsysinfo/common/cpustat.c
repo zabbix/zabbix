@@ -338,7 +338,7 @@ int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **
 	else
 		idx = cpu_num + 1;
 
-	return get_perf_counter_value(collector->cpus.cpu_counter[idx], interval, value, error);
+	return get_perf_counter_value(get_collector()->cpus.cpu_counter[idx], interval, value, error);
 }
 
 static int	get_cpu_perf_counter_status(zbx_perf_counter_status_t pc_status)
@@ -1121,13 +1121,13 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (0 == CPU_COLLECTOR_STARTED(collector))
+	if (0 == cpu_collector_started())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == (cpu = get_cpustat_by_num(&collector->cpus, cpu_num)))
+	if (NULL == (cpu = get_cpustat_by_num(&(get_collector())->cpus, cpu_num)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain CPU information."));
 		return SYSINFO_RET_FAIL;
@@ -1214,7 +1214,7 @@ int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode)
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (0 == CPU_COLLECTOR_STARTED(collector))
+	if (0 == cpu_collector_started(collector))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;
@@ -1343,7 +1343,7 @@ int	get_cpus(zbx_vector_uint64_pair_t *vector)
 	ZBX_CPUS_STAT_DATA	*pcpus;
 	int			idx, ret = FAIL;
 
-	if (!CPU_COLLECTOR_STARTED(collector) || NULL == (pcpus = &collector->cpus))
+	if (0 == cpu_collector_started() || NULL == (pcpus = &(get_collector())->cpus))
 		goto out;
 
 	LOCK_CPUSTATS;

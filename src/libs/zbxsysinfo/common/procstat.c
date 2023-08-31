@@ -76,7 +76,7 @@
  */
 
 /* the main collector data */
-extern ZBX_COLLECTOR_DATA	*collector;
+//extern ZBX_COLLECTOR_DATA	*collector;
 
 /* local reference to the procstat shared memory */
 static zbx_dshm_ref_t	procstat_ref;
@@ -345,7 +345,7 @@ static void	procstat_reattach(void)
 {
 	char	*errmsg = NULL;
 
-	if (FAIL == zbx_dshm_validate_ref(&collector->procstat, &procstat_ref, &errmsg))
+	if (FAIL == zbx_dshm_validate_ref(&(get_collector())->procstat, &procstat_ref, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot validate process data collector reference: %s", errmsg);
 		zbx_free(errmsg);
@@ -408,7 +408,7 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
  ******************************************************************************/
 static int	procstat_running(void)
 {
-	if (ZBX_NONEXISTENT_SHMID == collector->procstat.shmid)
+	if (ZBX_NONEXISTENT_SHMID == (get_collector())->procstat.shmid)
 		return FAIL;
 
 	return SUCCEED;
@@ -476,7 +476,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	/* when allocating a new collection reserve space for procstat header */
-	if (0 == collector->procstat.size)
+	if (0 == (get_collector())->procstat.size)
 		size += PROCSTAT_ALIGNED_HEADER_SIZE;
 
 	/* reserve space for process attributes */
@@ -500,11 +500,11 @@ static void	procstat_add(const char *procname, const char *username, const char 
 		/* recalculate the space required to store existing data + new query */
 		size += procstat_dshm_used_size(procstat_ref.addr);
 
-		if (FAIL == zbx_dshm_realloc(&collector->procstat, size, &errmsg))
+		if (FAIL == zbx_dshm_realloc(&(get_collector())->procstat, size, &errmsg))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot reallocate memory in process data collector: %s", errmsg);
 			zbx_free(errmsg);
-			zbx_dshm_unlock(&collector->procstat);
+			zbx_dshm_unlock(&(get_collector())->procstat);
 
 			exit(EXIT_FAILURE);
 		}
@@ -568,11 +568,11 @@ static void	procstat_try_compress(void *base)
 
 		size = procstat_dshm_used_size(base);
 
-		if (size < header->size && FAIL == zbx_dshm_realloc(&collector->procstat, size, &errmsg))
+		if (size < header->size && FAIL == zbx_dshm_realloc(&(get_collector())->procstat, size, &errmsg))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot reallocate memory in process data collector: %s", errmsg);
 			zbx_free(errmsg);
-			zbx_dshm_unlock(&collector->procstat);
+			zbx_dshm_unlock(&(get_collector())->procstat);
 
 			exit(EXIT_FAILURE);
 		}
@@ -603,7 +603,7 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 	zbx_procstat_query_data_t	*qdata;
 	int				flags = ZBX_SYSINFO_PROC_NONE, *pnext_query;
 
-	zbx_dshm_lock(&collector->procstat);
+	zbx_dshm_lock(&(get_collector())->procstat);
 
 	procstat_reattach();
 
@@ -662,7 +662,7 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 out:
 	procstat_try_compress(procstat_ref.addr);
 
-	zbx_dshm_unlock(&collector->procstat);
+	zbx_dshm_unlock(&(get_collector())->procstat);
 
 	return flags;
 }
@@ -849,16 +849,13 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runid,
 		const zbx_timespec_t *snapshot_timestamp)
 {
-	zbx_procstat_query_t		*query;
-	zbx_procstat_query_data_t	*qdata;
-	int				index;
-	int				i;
+	int				index, i = 0;
 
-	zbx_dshm_lock(&collector->procstat);
+	zbx_dshm_lock(&(get_collector())->procstat);
 
 	procstat_reattach();
 
-	for (query = PROCSTAT_QUERY_FIRST(procstat_ref.addr), i = 0; NULL != query;
+	for (zbx_procstat_query_t *query = PROCSTAT_QUERY_FIRST(procstat_ref.addr); NULL != query;
 			query = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query))
 	{
 		if (runid != query->runid)
@@ -870,7 +867,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 			break;
 		}
 
-		qdata = (zbx_procstat_query_data_t *)queries->values[i++];
+		zbx_procstat_query_data_t *qdata = (zbx_procstat_query_data_t *)queries->values[i++];
 
 		if (SUCCEED != (query->error = qdata->error))
 			continue;
@@ -903,7 +900,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 		query->h_data[index].timestamp = *snapshot_timestamp;
 	}
 
-	zbx_dshm_unlock(&collector->procstat);
+	zbx_dshm_unlock(&(get_collector())->procstat);
 }
 
 /*
@@ -918,7 +915,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
  ******************************************************************************/
 int	zbx_procstat_collector_started(void)
 {
-	if (NULL == collector)
+	if (NULL == get_collector())
 		return FAIL;
 
 	return SUCCEED;
@@ -935,7 +932,7 @@ void	zbx_procstat_init(void)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED != zbx_dshm_create(&collector->procstat, 0, ZBX_MUTEX_PROCSTAT,
+	if (SUCCEED != zbx_dshm_create(&(get_collector())->procstat, 0, ZBX_MUTEX_PROCSTAT,
 			procstat_copy_data, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize process data collector: %s", errmsg);
@@ -956,7 +953,7 @@ void	zbx_procstat_destroy(void)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED != zbx_dshm_destroy(&collector->procstat, &errmsg))
+	if (SUCCEED != zbx_dshm_destroy(&(get_collector())->procstat, &errmsg))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot free resources allocated by process data collector: %s", errmsg);
 		zbx_free(errmsg);
@@ -997,7 +994,7 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 	zbx_procstat_query_t	*query;
 	zbx_uint64_t		ticks_diff = 0, time_diff;
 
-	zbx_dshm_lock(&collector->procstat);
+	zbx_dshm_lock(&(get_collector())->procstat);
 
 	procstat_reattach();
 
@@ -1050,7 +1047,7 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 
 	ret = SUCCEED;
 out:
-	zbx_dshm_unlock(&collector->procstat);
+	zbx_dshm_unlock(&(get_collector())->procstat);
 
 	return ret;
 }

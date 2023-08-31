@@ -24,11 +24,11 @@
 #include "stats.h"
 #include "zbxmutexs.h"
 
-extern zbx_mutex_t		diskstats_lock;
-#define LOCK_DISKSTATS		zbx_mutex_lock(diskstats_lock)
-#define UNLOCK_DISKSTATS	zbx_mutex_unlock(diskstats_lock)
+//extern zbx_mutex_t		diskstats_lock;
+//#define LOCK_DISKSTATS		zbx_mutex_lock(diskstats_lock)
+//#define UNLOCK_DISKSTATS	zbx_mutex_unlock(diskstats_lock)
 
-static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_uint64_t *dstat)
+static void	apply_diskstat(zbx_single_diskdevice_data *device, time_t now, zbx_uint64_t *dstat)
 {
 	register int	i;
 	time_t		clock[ZBX_AVG_COUNT], sec;
@@ -109,12 +109,11 @@ static void	apply_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device, time_t now, zbx_u
 	SAVE_DISKSTAT(15);
 }
 
-static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
+static void	process_diskstat(zbx_single_diskdevice_data *device)
 {
-	time_t		now;
+	time_t		now = time(NULL);;
 	zbx_uint64_t	dstat[ZBX_DSTAT_MAX];
 
-	now = time(NULL);
 	if (FAIL == zbx_get_diskstat(device->name, dstat))
 		return;
 
@@ -123,14 +122,13 @@ static void	process_diskstat(ZBX_SINGLE_DISKDEVICE_DATA *device)
 	device->ticks_since_polled++;
 }
 
-void	collect_stats_diskdevices(void)
+void	collect_stats_diskdevices(zbx_diskdevices_data *diskdevices)
 {
-	int	i;
-
-	LOCK_DISKSTATS;
+	//LOCK_DISKSTATS;
+	stats_lock_diskstats();
 	diskstat_shm_reattach();
 
-	for (i = 0; i < diskdevices->count; i++)
+	for (int i = 0; i < diskdevices->count; i++)
 	{
 		process_diskstat(&diskdevices->device[i]);
 
@@ -140,7 +138,7 @@ void	collect_stats_diskdevices(void)
 			if ((diskdevices->count - 1) > i)
 			{
 				memcpy(diskdevices->device + i, diskdevices->device + i + 1,
-					sizeof(ZBX_SINGLE_DISKDEVICE_DATA) * (diskdevices->count - i));
+					sizeof(zbx_single_diskdevice_data) * (diskdevices->count - i));
 			}
 
 			diskdevices->count--;
@@ -148,74 +146,76 @@ void	collect_stats_diskdevices(void)
 		}
 	}
 
-	UNLOCK_DISKSTATS;
+	stats_unlock_diskstats();
 }
 
-ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
+zbx_single_diskdevice_data	*collector_diskdevice_get(const char *devname)
 {
 	int				i;
-	ZBX_SINGLE_DISKDEVICE_DATA	*device = NULL;
+	zbx_single_diskdevice_data	*device = NULL;
 
 	assert(devname);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __func__, devname);
 
-	LOCK_DISKSTATS;
-	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
+	stats_lock_diskstats();
+
+	if (0 == diskdevice_collector_started())
 		diskstat_shm_init();
 	else
 		diskstat_shm_reattach();
 
-	for (i = 0; i < diskdevices->count; i++)
+	for (i = 0; i < (get_diskdevices())->count; i++)
 	{
-		if (0 == strcmp(devname, diskdevices->device[i].name))
+		if (0 == strcmp(devname, (get_diskdevices())->device[i].name))
 		{
-			device = &diskdevices->device[i];
+			device = &(get_diskdevices())->device[i];
 			device->ticks_since_polled = 0;
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() device '%s' found", __func__, devname);
 			break;
 		}
 	}
-	UNLOCK_DISKSTATS;
+	stats_unlock_diskstats();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)device);
 
 	return device;
 }
 
-ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_add(const char *devname)
+zbx_single_diskdevice_data	*collector_diskdevice_add(const char *devname)
 {
-	ZBX_SINGLE_DISKDEVICE_DATA	*device = NULL;
+	zbx_single_diskdevice_data	*device = NULL;
 
 	assert(devname);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() devname:'%s'", __func__, devname);
 
-	LOCK_DISKSTATS;
-	if (0 == DISKDEVICE_COLLECTOR_STARTED(collector))
+	stats_lock_diskstats();
+
+	if (0 == diskdevice_collector_started())
 		diskstat_shm_init();
 	else
 		diskstat_shm_reattach();
 
-	if (diskdevices->count == MAX_DISKDEVICES)
+	if ((get_diskdevices())->count == MAX_DISKDEVICES)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() collector is full", __func__);
 		goto end;
 	}
 
-	if (diskdevices->count == diskdevices->max_diskdev)
+	if ((get_diskdevices())->count == (get_diskdevices())->max_diskdev)
 		diskstat_shm_extend();
 
-	device = &(diskdevices->device[diskdevices->count]);
-	memset(device, 0, sizeof(ZBX_SINGLE_DISKDEVICE_DATA));
+	device = &((get_diskdevices())->device[(get_diskdevices())->count]);
+	memset(device, 0, sizeof(zbx_single_diskdevice_data));
 	zbx_strlcpy(device->name, devname, sizeof(device->name));
 	device->index = -1;
 	device->ticks_since_polled = 0;
-	(diskdevices->count)++;
+	((get_diskdevices())->count)++;
 
 	process_diskstat(device);
 end:
-	UNLOCK_DISKSTATS;
+	stats_unlock_diskstats();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)device);
 

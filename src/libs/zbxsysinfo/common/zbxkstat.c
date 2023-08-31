@@ -28,7 +28,7 @@
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 
-extern ZBX_COLLECTOR_DATA	*collector;
+//extern ZBX_COLLECTOR_DATA	*collector;
 
 static kstat_ctl_t	*kc = NULL;
 static kid_t		kc_id = 0;
@@ -204,16 +204,16 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 	int			sysconf_pagesize, last, prev, ret = FAIL;
 	zbx_kstat_vminfo_t	*vminfo;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): collector:%p", __func__, collector);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): collector:%p", __func__, get_collector());
 
 	zbx_mutex_lock(kstat_lock);
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 		goto out;
 
-	last = collector->kstat.vminfo_index;
+	last = (get_collector())->kstat.vminfo_index;
 	prev = last ^ 1;
-	vminfo = collector->kstat.vminfo;
+	vminfo = (get_collector())->kstat.vminfo;
 
 	if (0 != vminfo[prev].updates && vminfo[prev].updates < vminfo[last].updates)
 	{
@@ -232,7 +232,7 @@ int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)
 out:
 	zbx_mutex_unlock(kstat_lock);
 
-	if (NULL == collector)
+	if (NULL == get_collector())
 	{
 		*error = zbx_strdup(*error, "Collector is not started.");
 		zabbix_log(LOG_LEVEL_DEBUG, "Collector is not started");
