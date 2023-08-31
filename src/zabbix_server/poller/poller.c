@@ -827,6 +827,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 
 				zbx_free(items[i].snmp_community);
 				zbx_free(items[i].snmp_oid);
+				zbx_free(items[i].timeout);
 				break;
 			case ITEM_TYPE_HTTPAGENT:
 				zbx_free(items[i].timeout);
