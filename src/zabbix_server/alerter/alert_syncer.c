@@ -54,7 +54,7 @@ zbx_am_db_t;
  *                                                                            *
  * Parameters: ...           - [IN] alert data                                *
  *                                                                            *
- * Return value: The alert object.                                            *
+ * Return value: alert object.                                                *
  *                                                                            *
  ******************************************************************************/
 static zbx_am_db_alert_t	*am_db_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediatypeid, int source,
@@ -309,9 +309,9 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
  * Purpose: updates alert manager media types                                 *
  *                                                                            *
  * Parameters: amdb            - [IN] alert manager cache                     *
- *             mediatypeids    - [IN] media type identifiers                  *
- *             medatypeids_num - [IN] number of media type identifiers        *
- *             mediatypes      - [OUT] updated mediatypes                     *
+ *             mediatypeids    - [IN]                                         *
+ *             medatypeids_num - [IN]                                         *
+ *             mediatypes      - [OUT]                                        *
  *                                                                            *
  ******************************************************************************/
 static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *mediatypeids, int mediatypeids_num,
@@ -387,10 +387,10 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 {
 	zbx_vector_am_db_mediatype_ptr_t	mediatypes;
-	zbx_vector_am_db_alert_ptr_t	alerts;
-	int				i, alerts_num;
-	zbx_am_db_alert_t		*alert;
-	zbx_vector_uint64_t		mediatypeids;
+	zbx_vector_am_db_alert_ptr_t		alerts;
+	int					alerts_num;
+	zbx_am_db_alert_t			*alert;
+	zbx_vector_uint64_t			mediatypeids;
 
 	zbx_vector_am_db_alert_ptr_create(&alerts);
 	zbx_vector_uint64_create(&mediatypeids);
@@ -399,7 +399,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 	if (FAIL == am_db_get_alerts(&alerts) || 0 == alerts.values_num)
 		goto out;
 
-	for (i = 0; i < alerts.values_num; i++)
+	for (int i = 0; i < alerts.values_num; i++)
 	{
 		alert = (zbx_am_db_alert_t *)alerts.values[i];
 		zbx_vector_uint64_append(&mediatypeids, alert->mediatypeid);
@@ -420,7 +420,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 		zbx_free(data);
 	}
 
-	for (i = 0; i < alerts.values_num; i += ZBX_ALERT_BATCH_SIZE)
+	for (int i = 0; i < alerts.values_num; i += ZBX_ALERT_BATCH_SIZE)
 	{
 		unsigned char	*data;
 		zbx_uint32_t	data_len;
@@ -584,7 +584,6 @@ out:
 static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_events_tags, zbx_db_insert_t *db_event,
 		zbx_db_insert_t *db_problem)
 {
-	int			index, i, j;
 	zbx_tag_t		tag_local, *tag;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -592,7 +591,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < update_events_tags->values_num; i++)
+	for (int i = 0; i < update_events_tags->values_num; i++)
 	{
 		local_event_tags = update_events_tags->values[i];
 
@@ -604,6 +603,8 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 
 			while (NULL != (row = zbx_db_fetch(result)))
 			{
+				int	index;
+
 				tag_local.tag = row[0];
 				tag_local.value = row[1];
 
@@ -618,7 +619,7 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 			zbx_db_free_result(result);
 		}
 
-		for (j = 0; j < local_event_tags->tags.values_num; j++)
+		for (int j = 0; j < local_event_tags->tags.values_num; j++)
 		{
 			tag = local_event_tags->tags.values[j];
 			zbx_db_insert_add_values(db_event, __UINT64_C(0), local_event_tags->eventid, tag->tag,
@@ -639,9 +640,8 @@ static void	am_service_add_event_tags(zbx_vector_events_tags_t *events_tags)
 {
 	unsigned char	*data = NULL;
 	size_t		data_alloc = 0, data_offset = 0;
-	int		i;
 
-	for (i = 0; i < events_tags->values_num; i++)
+	for (int i = 0; i < events_tags->values_num; i++)
 	{
 		zbx_event_tags_t	*event_tag = events_tags->values[i];
 

@@ -36,10 +36,10 @@ typedef struct
 
 	int			location;
 
-	/* the number of currently processing alerts */
+	/* number of currently processing alerts */
 	int			alerts_num;
 
-	/* the number of alert objects for this media type */
+	/* number of alert objects for this media type */
 	int			refcount;
 
 	/* alert pool queue */
