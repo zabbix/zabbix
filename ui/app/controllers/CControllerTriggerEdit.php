@@ -336,8 +336,7 @@ class CControllerTriggerEdit extends CController {
 		// Overwrite and attach trigger's own tags.
 		foreach ($input_tags as $tag) {
 			if (array_key_exists($tag['tag'], $inherited_tags)
-					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])
-			) {
+					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
 				if (!array_key_exists('type', $tag) || $tag['type'] != ZBX_PROPERTY_INHERITED) {
 					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
 				}
