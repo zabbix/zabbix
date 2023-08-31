@@ -9040,6 +9040,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
+	dst_item->timeout = NULL;
 
 	dst_item->delay = zbx_strdup(NULL, src_item->delay);	/* not used, should be initialized */
 
@@ -9067,6 +9068,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	if ('\0' == *src_item->timeout)
 		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
 
 	switch (src_item->type)
 	{
