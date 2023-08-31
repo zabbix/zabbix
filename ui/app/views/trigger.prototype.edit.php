@@ -50,356 +50,32 @@ if ($data['limited']) {
 		->addItem((new CVar('manual_close', $data['manual_close']))->removeId());
 }
 
-$trigger_form_grid = new CFormGrid();
-if ($data['templates']) {
-	$trigger_form_grid->addItem([new CLabel(_('Parent triggers')), new CFormField($data['templates'])]);
-}
-
-$trigger_form_grid
-	->addItem([
-		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['description'], $data['limited']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setAttribute('autofocus', 'autofocus')
-	])
-	->addItem([
-		(new CLabel(_('Event name'), 'event_name')),
-		(new CTextAreaFlexible('event_name', $data['event_name']))
-			->setReadonly($data['limited'])
-			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addItem([
-		new CLabel(_('Operational data'), 'opdata'),
-		(new CTextBox('opdata', $data['opdata'], $data['limited']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addItem([
-		new CLabel(_('Severity')),
-		new CSeverity('priority', (int) $data['priority'])
-	]);
-
-$expression_popup_parameters = [
-	'dstfrm' => $trigger_form->getName(),
-	'dstfld1' => 'expression',
-	'context' => $data['context'],
-	'parent_discoveryid' => $data['parent_discoveryid']
-];
-
-if ($data['hostid']) {
-	$expression_popup_parameters['hostid'] = $data['hostid'];
-}
-
-$expression_row = [
-	(new CTextArea('expression', $data['expression']))
-		->addClass(ZBX_STYLE_MONOSPACE_FONT)
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setReadonly($data['limited'])
-		->setAriaRequired(),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('add_expression', _('Add')))
-		->setId('insert-expression')
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->setEnabled(!$data['limited'])
-];
-
-$expression_row[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-// Append "Insert expression" button.
-$expression_row[] = (new CButton('insert_macro', _('Insert expression')))
-	->setId('insert-macro')
-	->addStyle('display: none')
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setMenuPopup(CMenuPopupHelper::getTriggerMacro())
-	->setEnabled(!$data['limited']);
-
-$expression_constructor_buttons = [];
-// Append "Add" button.
-$expression_constructor_buttons[] = (new CButton('add_expression', _('Add')))
-	->addStyle('display: none')
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-// Append "And" button.
-$expression_constructor_buttons[] = (new CButton('and_expression', _('And')))
-	->addStyle('display: none')
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-// Append "Or" button.
-$expression_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-$expression_constructor_buttons[] = (new CButton('or_expression', _('Or')))
-	->addStyle('display: none')
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-// Append "Replace" button.
-$expression_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-$expression_constructor_buttons[]= (new CButton('replace_expression', 'Replace'))
-	->addStyle('display: none')
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-$input_method_toggle = (new CButtonLink(_('Expression constructor')))->setId('expression-constructor');
-$expression_row[] = [
-	(new CDiv($expression_constructor_buttons))
-		->setId('expression-constructor-buttons')
-		->addStyle('display: none'),
-	new CDiv($input_method_toggle)
-];
-
-$trigger_form_grid->addItem([
-	(new CLabel(_('Expression'), 'expression'))->setAsteriskMark(),
-	(new CFormField($expression_row))->setId('expression-row')
-]);
-
-$trigger_form_grid->addItem(
-	(new CFormField())
-		->setId('expression-table')
-		->addStyle('display: none')
-);
-
-$input_method_toggle = new CDiv((new CButtonLink(_('Close expression constructor')))
-	->setId('close-expression-constructor')
-);
-$trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
-	->addStyle('display: none')
-	->setId('close-expression-constructor-field')
-);
-
-$trigger_form_grid->addItem([new CLabel(_('OK event generation')),
-	(new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
-		->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
-		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
-		->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
-		->setModern()
-		->setEnabled(!$data['limited'])
-]);
-
-$recovery_popup_parameters = [
-	'dstfrm' => $trigger_form->getName(),
-	'dstfld1' => 'recovery_expression',
-	'context' => $data['context'],
-	'parent_discoveryid' => $data['parent_discoveryid']
-];
-
-if ($data['hostid']) {
-	$recovery_popup_parameters['hostid'] = $data['hostid'];
-}
-
-$recovery_expression_row = [
-	(new CTextArea('recovery_expression', $data['recovery_expression']))
-		->addClass(ZBX_STYLE_MONOSPACE_FONT)
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setReadonly($data['limited'])
-		->setAriaRequired(),
-	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-	(new CButton('insert', _('Add')))
-		->setId('insert-recovery-expression')
-		->addClass(ZBX_STYLE_BTN_GREY)
-		->setEnabled(!$data['limited'])
-];
-
-$recovery_constructor_buttons = [];
-
-// Append "Add" button.
-$recovery_constructor_buttons[] = (new CButton('add_expression_recovery', _('Add')))
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-// Append "And" button.
-$recovery_constructor_buttons[] = (new CButton('and_expression_recovery', _('And')))
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-// Append "Or" button.
-$recovery_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-$recovery_constructor_buttons[] = (new CButton('or_expression_recovery', _('Or')))
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-// Append "Replace" button.
-$recovery_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-$recovery_constructor_buttons[] = (new CButton('replace_expression_recovery', _('Replace')))
-	->addClass(ZBX_STYLE_BTN_GREY)
-	->setEnabled(!$data['limited']);
-
-$input_method_toggle = (new CButtonLink(_('Expression constructor')))
-	->setId('recovery-expression-constructor');
-
-$recovery_expression_row[] = [
-	(new CDiv($recovery_constructor_buttons))
-		->setId('recovery-constructor-buttons')
-		->addStyle('display: none'),
-	new CDiv($input_method_toggle)
-];
-
-$trigger_form_grid->addItem([
-	(new CLabel(_('Recovery expression'), 'recovery_expression'))->setAsteriskMark(),
-	(new CFormField($recovery_expression_row))->setId('recovery-expression-row')
-]);
-
-$trigger_form_grid->addItem(
-	(new CFormField())
-		->setId('recovery-expression-table')
-		->addStyle('display: none')
-);
-
-$input_method_toggle = (new CButtonLink(_('Close expression constructor')))
-	->setId('close-recovery-expression-constructor');
-
-$trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
-	->addStyle('display: none')
-	->setId('close-recovery-expression-constructor-field')
-);
-
-$trigger_form_grid
-	->addItem([new CLabel(_('PROBLEM event generation mode')),
-		(new CRadioButtonList('type', (int) $data['type']))
-			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
-			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
-			->setModern()
-			->setEnabled(!$data['limited'])
-	])
-	->addItem([new CLabel(_('OK event closes')),
-		(new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
-			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
-			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
-			->setModern()
-			->setId('ok-event-closes')
-			->setEnabled(!$data['limited'])
-	])
-	->addItem([(new CLabel(_('Tag for matching'), 'correlation-tag'))->setAsteriskMark(),
-		(new CTextBox('correlation-tag', $data['correlation_tag'], $data['limited']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-			->setId('correlation-tag')
-	])
-	->addItem([new CLabel(_('Allow manual close'), 'manual_close'),
-		new CFormField(
-			(new CCheckBox('manual_close'))
-				->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
-				->setEnabled(!$data['limited'])
-		)
-	]);
-
-$trigger_form_grid
-	->addItem([
-		new CLabel([
-			_('Menu entry name'),
-			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
-		], 'url_name'),
-		(new CTextBox('url_name', array_key_exists('url_name', $data) ? $data['url_name'] : '', false,
-			DB::getFieldLength('triggers', 'url_name')
-		))
-			->setAttribute('placeholder', _('Trigger URL'))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addItem([
-		new CLabel(_('Menu entry URL'), 'url'),
-		(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '', false,
-			DB::getFieldLength('triggers', 'url')
-		))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addItem([new CLabel(_('Description'), 'description'),
-		(new CTextArea('description', array_key_exists('comments', $data) ? $data['comments'] : ''))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
-	])
-	->addItem([new CLabel(_('Create enabled'), 'status'),
-		new CFormField((new CCheckBox('status'))->setChecked($data['status'] == TRIGGER_STATUS_ENABLED))
-	])
-	->addItem([new CLabel(_('Discover'), 'discover'),
-		new CFormField(
-			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
-				->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
-				->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
-		)
-	]);
-
 // Append tabs to form.
-$triggers_tab = new CTabView();
+$triggers_tab = (new CTabView())
+	->addTab('triggersTab',_('Trigger prototype'),
+		new CPartial('trigger.edit.trigger.tab', $data += [
+			'readonly' => $data['limited'],
+			'form_name' => $trigger_form->getName()
+		])
+	)
+	->addTab('tags-tab', _('Tags'),
+		new CPartial('configuration.tags.tab', [
+			'source' => 'trigger_prototype',
+			'tags' => $data['tags'],
+			'show_inherited_tags' => $data['show_inherited_tags'],
+			'readonly' => false,
+			'tabs_id' => 'tabs',
+			'tags_tab_id' => 'tags-tab',
+			'with_label' => true
+		]), TAB_INDICATOR_TAGS
+	)
+	->addTab('dependenciesTab', _('Dependencies'), new CPartial('trigger.edit.dependencies.tab', $data),
+		TAB_INDICATOR_DEPENDENCY
+	);
+
 if ($data['form_refresh'] == 0) {
 	$triggers_tab->setSelected(0);
 }
-$triggers_tab->addTab('triggersTab',_('Trigger prototype'), $trigger_form_grid);
-
-// tags
-$triggers_tab->addTab('tags-tab', _('Tags'),
-	new CPartial('configuration.tags.tab', [
-		'source' => 'trigger_prototype',
-		'tags' => $data['tags'],
-		'show_inherited_tags' => $data['show_inherited_tags'],
-		'readonly' => false,
-		'tabs_id' => 'tabs',
-		'tags_tab_id' => 'tags-tab',
-		'with_label' => true
-	]), TAB_INDICATOR_TAGS
-);
-
-/*
- * Dependencies tab
- */
-$dependencies_form_grid = new CFormGrid();
-$dependencies_table = (new CTable())
-	->setId('dependency-table')
-	->setAttribute('style', 'width: 100%;')
-	->setHeader([_('Name'), _('Action')]);
-
-$dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addItem(
-	(new CRow([
-		(new CLink(['#{name}']))
-			->addClass('js-related-trigger-edit')
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->setAttribute('data-triggerid', '#{triggerid}')
-			->setAttribute('data-hostid', $data['hostid'])
-			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-			->setAttribute('data-prototype', '#{prototype}')
-			->setAttribute('data-context', $data['context']),
-		(new CButtonLink(_('Remove')))
-			->addClass('js-remove-dependency')
-			->setAttribute('data-triggerid', '#{triggerid}'),
-		(new CInput('hidden', 'dependencies[]', '#{triggerid}'))
-			->setId('dependencies_'.'#{triggerid}')
-	]))->setId('dependency_'.'#{triggerid}')
-);
-
-$buttons = $data['context'] === 'host'
-	? new CHorList([
-		(new CButton('add_dep_trigger', _('Add')))
-			->setAttribute('data-hostid', $data['hostid'])
-			->setId('add-dep-trigger')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton('add_dep_trigger_prototype', _('Add prototype')))
-			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-			->setId('add-dep-trigger-prototype')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	])
-	: new CHorList([
-		(new CButton('add_dep_trigger', _('Add')))
-			->setAttribute('data-templateid', $data['hostid'])
-			->setId('add-dep-template-trigger')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton('add_dep_trigger_prototype', _('Add prototype')))
-			->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-			->setId('add-dep-trigger-prototype')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		(new CButton('add_dep_host_trigger', _('Add host trigger')))
-			->setId('add-dep-host-trigger')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-$dependencies_table
-	->addItem((new CTag('tfoot', true))->addItem((new CCol($buttons))->setColSpan(4)))
-	->addItem($dependency_template_default);
-
-$dependencies_form_grid->addItem([new CLabel(_('Dependencies')),
-	(new CDiv([$dependencies_table]))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-]);
-
-$triggers_tab->addTab('dependenciesTab', _('Dependencies'), $dependencies_form_grid, TAB_INDICATOR_DEPENDENCY);
 
 if (!$data['triggerid']) {
 	$buttons = [
@@ -438,12 +114,25 @@ else {
 	];
 }
 
+$popup_parameters = [
+	'dstfrm' => $data['form_name'],
+	'context' => $data['context']
+];
+
+if (array_key_exists('parent_discoveryid', $data)) {
+	$popup_parameters['parent_discoveryid'] = $data['parent_discoveryid'];
+}
+
+if ($data['hostid']) {
+	$popup_parameters['hostid'] = $data['hostid'];
+}
+
 $trigger_form
 	->addItem($triggers_tab)
 	->addItem((new CScriptTag('trigger_edit_popup.init('.json_encode([
 			'triggerid' => $data['triggerid'],
-			'expression_popup_parameters' => $expression_popup_parameters,
-			'recovery_popup_parameters' => $recovery_popup_parameters,
+			'expression_popup_parameters' => $popup_parameters + ['dstfld1' => 'expression'],
+			'recovery_popup_parameters' => $popup_parameters + ['dstfld1' => 'recovery_expression'],
 			'readonly' => $data['limited'],
 			'db_dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.prototype.edit',
