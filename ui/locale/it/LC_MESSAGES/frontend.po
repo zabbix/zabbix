@@ -9270,12 +9270,12 @@ msgid "H"
 msgstr ""
 
 #: include/translateDefines.inc.php:37
-msgid "h:i A"
+msgid "H:i"
 msgstr "H:i"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:960
 #: include/translateDefines.inc.php:36
-msgid "h:i:s A"
+msgid "H:i:s"
 msgstr "H:i:s"
 
 #: app/views/administration.mediatype.edit.php:209
@@ -23543,11 +23543,11 @@ msgid "Y-m-d"
 msgstr "Y-m-d"
 
 #: include/translateDefines.inc.php:32
-msgid "Y-m-d h:i A"
+msgid "Y-m-d H:i"
 msgstr "Y-m-d H:i"
 
 #: include/translateDefines.inc.php:31
-msgid "Y-m-d h:i:s A"
+msgid "Y-m-d H:i:s"
 msgstr "Y-m-d H:i:s"
 
 #: include/translateDefines.inc.php:40
@@ -25121,7 +25121,7 @@ msgid "m-d"
 msgstr "m-d"
 
 #: include/translateDefines.inc.php:33
-msgid "m-d h:i A"
+msgid "m-d H:i"
 msgstr "m-d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:37
@@ -25319,8 +25319,8 @@ msgid "n-d"
 msgstr ""
 
 #: include/translateDefines.inc.php:39
-msgid "n-d h:i A"
-msgstr "n-d H:i"
+msgid "n-d H:i"
+msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
