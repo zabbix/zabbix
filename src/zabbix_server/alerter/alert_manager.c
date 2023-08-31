@@ -22,7 +22,6 @@
 #include "alerter_protocol.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
-#include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxembed.h"
@@ -36,6 +35,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxxml.h"
+#include "zbxjson.h"
 
 #define ZBX_AM_LOCATION_NOWHERE			0
 #define ZBX_AM_LOCATION_QUEUE			1

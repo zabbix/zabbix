@@ -24,6 +24,7 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
+#include "zbxdb.h"
 
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"
 
