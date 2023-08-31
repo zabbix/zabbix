@@ -773,10 +773,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($sector);
 
 		if (bccomp($sector_total_value, $total_value['value']) <= 0 || !$is_total_set) {
-			// Sectors use full total value or less.
-			foreach ($svg_sectors as &$sector) {
+			// Sectors use the full total value or less.
+			foreach ($svg_sectors as $key => &$sector) {
 				if ($sector['is_total']) {
 					$sector['percent_of_total'] -= $total_percentage_used;
+
+					// The non-total sectors use the full total value, no space left for the total sector.
+					if (bccomp($sector['percent_of_total'], '0') == 0) {
+						unset($svg_sectors[$key]);
+					}
 				}
 			}
 			unset($sector);
