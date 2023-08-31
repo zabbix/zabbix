@@ -1781,7 +1781,7 @@ static void	am_queue_alerts(zbx_am_t *manager, zbx_ipc_message_t *message, int n
 	for (int i = 0; i < alerts_num; i++)
 	{
 		zbx_am_alert_t	*alert = am_copy_db_alert(alerts[i]);
-		
+
 		if (FAIL == am_queue_alert(manager, alert, now))
 		{
 			am_alert_free(alert);
@@ -1819,7 +1819,7 @@ static void	am_drop_mediatypes(zbx_am_t *manager, zbx_ipc_message_t *message)
 {
 	zbx_uint64_t	*ids;
 	int		ids_num;
-	
+
 	zbx_alerter_deserialize_ids(message->data, &ids, &ids_num);
 
 	for (int i = 0; i < ids_num; i++)
