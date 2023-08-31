@@ -188,7 +188,8 @@ class CControllerUsergroupTagFilterCheck extends CController {
 									break;
 								}
 							}
-							// If the existing tag is not found in the new tags list, remove it (only from the host group which was open for editing).
+
+							// If the existing tag is not found in the opened for edit group's new tags list, remove it.
 							if (!$is_still_present && $groupid == $opened_groupid) {
 								unset($existing_tag_filters[$key]);
 							}

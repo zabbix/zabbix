@@ -271,6 +271,7 @@ $tabs = (new CTabView())
 		TAB_INDICATOR_HOST_PERMISSIONS
 	)
 	->addTab('tag_filter_tab', _('Problem tag filter'), $tag_filter_form_grid, TAB_INDICATOR_TAG_FILTER);
+
 if ($data['form_refresh'] == 0) {
 	$tabs->setSelected(0);
 }
