@@ -597,10 +597,22 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Empty tag/value'
+						'Name' => 'Empty tag and value'
 					],
 					'tags' => [
 						['name' => '', 'operator' => 'Contains', 'value' => '']
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Empty tag/value'
+					],
+					'tags' => [
+						['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
+						['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag']
 					]
 				]
 			],
