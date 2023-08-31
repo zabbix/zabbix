@@ -242,12 +242,6 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 
 	zbx_init_agent_result(&agent_context->item.result);
 
-	if (FAIL == zbx_validate_item_timeout(item->timeout, error, sizeof(error)))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, error));
-		goto out;
-	}
-
 	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 
 	agent_context->config_timeout = timeout_sec;

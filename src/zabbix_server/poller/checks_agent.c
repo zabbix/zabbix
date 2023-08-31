@@ -18,6 +18,7 @@
 **/
 
 #include "checks_agent.h"
+#include "../sysinfo.h"
 
 #include "zbxsysinfo.h"
 #include "zbxjson.h"
@@ -78,7 +79,7 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
-	int		timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
+	int		timeout_sec;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
@@ -116,7 +117,11 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 			goto out;
 	}
 
-	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+	if (NULL != item->timeout)
+		zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+	else
+		timeout_sec = sysinfo_get_config_timeout();
+
 
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout_sec + 1,
 			item->host.tls_connect, tls_arg1, tls_arg2))
