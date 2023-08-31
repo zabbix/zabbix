@@ -58,10 +58,6 @@
 #define ZBX_AM_MEDIATYPE_FLAG_NONE		0x00
 #define ZBX_AM_MEDIATYPE_FLAG_REMOVE		0x01
 
-#define ZBX_DB_PING_FREQUENCY			SEC_PER_MIN
-
-#define ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY	SEC_PER_HOUR
-
 #define ZBX_MEDIA_CONTENT_TYPE_DEFAULT		255
 
 /*
@@ -2291,6 +2287,8 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 {
+#define ZBX_DB_PING_FREQUENCY			SEC_PER_MIN
+#define ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY	SEC_PER_HOUR
 	zbx_thread_alert_manager_args	*alert_manager_args_in = (zbx_thread_alert_manager_args *)
 							(((zbx_thread_args_t *)args)->args);
 	zbx_am_t			manager;
@@ -2469,4 +2467,6 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 
 	zbx_ipc_service_close(&manager.ipc);
 	am_destroy(&manager);
+#undef ZBX_DB_PING_FREQUENCY
+#undef ZBX_AM_MEDIATYPE_CLEANUP_FREQUENCY
 }

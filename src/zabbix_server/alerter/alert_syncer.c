@@ -36,11 +36,6 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 
-#define ZBX_POLL_INTERVAL		1
-
-#define ZBX_ALERT_BATCH_SIZE		1000
-#define ZBX_MEDIATYPE_CACHE_TTL		SEC_PER_DAY
-
 typedef struct
 {
 	zbx_hashset_t		mediatypes;
@@ -420,6 +415,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 		zbx_free(data);
 	}
 
+#define ZBX_ALERT_BATCH_SIZE		1000
 	for (int i = 0; i < alerts.values_num; i += ZBX_ALERT_BATCH_SIZE)
 	{
 		unsigned char	*data;
@@ -433,6 +429,7 @@ static int	am_db_queue_alerts(zbx_am_db_t *amdb)
 		zbx_ipc_socket_write(&amdb->am, ZBX_IPC_ALERTER_ALERTS, data, data_len);
 		zbx_free(data);
 	}
+#undef ZBX_ALERT_BATCH_SIZE
 
 out:
 	zbx_vector_am_db_mediatype_ptr_destroy(&mediatypes);
@@ -802,6 +799,8 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 	zbx_vector_uint64_create(&dropids);
 	now = time(NULL);
 	zbx_hashset_iter_reset(&amdb->mediatypes, &iter);
+
+#define ZBX_MEDIATYPE_CACHE_TTL	SEC_PER_DAY
 	while (NULL != (mediatype = (zbx_am_db_mediatype_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (mediatype->last_access + ZBX_MEDIATYPE_CACHE_TTL <= now)
@@ -811,6 +810,7 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
 			zbx_hashset_iter_remove(&iter);
 		}
 	}
+#undef ZBX_MEDIATYPE_CACHE_TTL
 
 	if (0 != dropids.values_num)
 	{
@@ -911,6 +911,7 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 
 ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 {
+#define ZBX_POLL_INTERVAL		1
 	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
 							(((zbx_thread_args_t *)args)->args);
 	double				sec1, sec2, time_cleanup = 0, time_watchdog = 0;
@@ -983,4 +984,5 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
+#undef ZBX_POLL_INTERVAL
 }
