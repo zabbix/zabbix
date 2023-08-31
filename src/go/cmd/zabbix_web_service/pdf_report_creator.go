@@ -50,6 +50,14 @@ func newRequestBody() *requestBody {
 	return &requestBody{"", make(map[string]string), make(map[string]string)}
 }
 
+// httpCookiesGet parses Cookie HTTP request header returns HTTP cookies
+func (b *requestBody) httpCookiesGet() []*http.Cookie {
+	r := http.Request{Header: http.Header{}}
+	r.Header.Add("Cookie", b.Header["Cookie"])
+
+	return r.Cookies()
+}
+
 func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
 	log.Errf("%s", errMsg)
 	w.Header().Set("Content-Type", "application/problem+json")
@@ -159,12 +167,10 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 
 	var cookieParams []*network.CookieParam
 
-	for _, pair := range strings.Split(req.Header["Cookie"], "; ") {
-		p := strings.SplitN(pair, "=", 2)
-
+	for _, cookie := range req.httpCookiesGet() {
 		cookieParam := network.CookieParam{
-			Name:     p[0],
-			Value:    p[1],
+			Name:     cookie.Name,
+			Value:    cookie.Value,
 			URL:      req.URL,
 			Domain:   u.Hostname(),
 			SameSite: network.CookieSameSiteStrict,
