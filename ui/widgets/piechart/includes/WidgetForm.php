@@ -68,7 +68,7 @@ class WidgetForm extends CWidgetForm {
 
 	private const VALUE_DECIMALS_DEFAULT = 2;
 	private const VALUE_DECIMALS_MAX = 6;
-	private const VALUE_DECIMALS_MIN = 1;
+	private const VALUE_DECIMALS_MIN = 0;
 
 	public const VALUE_SIZE_CUSTOM = 1;
 	private const VALUE_SIZE_AUTO = 0;
