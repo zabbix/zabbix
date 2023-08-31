@@ -486,9 +486,7 @@ class CHostPrototype extends CHostBase {
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('group_prototype', 'name')]
-			]],
+			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => self::getGroupPrototypeValidationFields()],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -586,7 +584,10 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
-			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'groupPrototypes' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['group_prototypeid']], 'fields' => [
+				'group_prototypeid' =>	['type' => API_ID]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
@@ -605,6 +606,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		self::addInternalFields($db_hosts);
+		self::addAffectedGroupPrototypes($hosts, $db_hosts);
 
 		foreach ($hosts as $i => &$host) {
 			$db_host = $db_hosts[$host['hostid']];
@@ -619,9 +621,13 @@ class CHostPrototype extends CHostBase {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 
-			if (!CApiInputValidator::validate($api_input_rules, $host, '/'.($i + 1), $error)) {
+			$path = '/'.($i + 1);
+
+			if (!CApiInputValidator::validate($api_input_rules, $host, $path, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
+
+			self::validateGroupPrototypes($host, $db_host, $path.'/groupPrototypes');
 		}
 		unset($host);
 
@@ -635,7 +641,6 @@ class CHostPrototype extends CHostBase {
 		self::checkDuplicates($hosts, $db_hosts);
 		self::checkMainInterfaces($hosts);
 		self::checkGroupLinks($hosts, $db_hosts);
-		self::checkGroupPrototypes($hosts, $db_hosts);
 		$this->checkTemplates($hosts, $db_hosts);
 		$this->checkTemplatesLinks($hosts, $db_hosts);
 		$hosts = parent::validateHostMacros($hosts, $db_hosts);
@@ -681,10 +686,7 @@ class CHostPrototype extends CHostBase {
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['group_prototypeid']], 'fields' => [
-				'group_prototypeid' =>	['type' => API_ID],
-				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('group_prototype', 'name')]
-			]],
+			'groupPrototypes' =>	['type' => API_ANY],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -802,6 +804,62 @@ class CHostPrototype extends CHostBase {
 			]],
 			['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 		]];
+	}
+
+	/**
+	 * @param bool $is_update
+	 */
+	private static function getGroupPrototypeValidationFields(bool $is_update = false): array {
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
+		return ($is_update ? ['group_prototypeid' =>	['type' => API_ANY]] : []) + [
+			'name' =>	['type' => API_HG_NAME, 'flags' => $api_required | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('group_prototype', 'name')]
+		];
+	}
+
+	/**
+	 * @param array  $host
+	 * @param array  $db_host
+	 * @param string $path
+	 *
+	 * @throws APIException
+	 */
+	private static function validateGroupPrototypes(array &$host, array $db_host, string $path): void {
+		if (!array_key_exists('groupPrototypes', $host)) {
+			return;
+		}
+
+		foreach ($host['groupPrototypes'] as $i => &$group_prototype) {
+			if (array_key_exists('group_prototypeid', $group_prototype)) {
+				if (!array_key_exists($group_prototype['group_prototypeid'], $db_host['groupPrototypes'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path.'/'.($i + 1),
+						_('object does not exist or belongs to another object')
+					));
+				}
+
+				$db_group_prototype = $db_host['groupPrototypes'][$group_prototype['group_prototypeid']];
+
+				$group_prototype += array_intersect_key($db_group_prototype, array_flip(['name']));
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getGroupPrototypeValidationFields(true)];
+			}
+			else {
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getGroupPrototypeValidationFields()];
+			}
+
+			if (!CApiInputValidator::validate($api_input_rules, $group_prototype, $path.'/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+		unset($group_prototype);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+			'name' =>	['type' => API_HG_NAME]
+		]];
+
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $host['groupPrototypes'], $path, $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -984,7 +1042,8 @@ class CHostPrototype extends CHostBase {
 		$hostids = [];
 
 		foreach ($hosts as $host) {
-			if (array_key_exists('groupPrototypes', $host)) {
+			if (array_key_exists('groupPrototypes', $host)
+					&& !array_key_exists('groupPrototypes', $db_hosts[$host['hostid']])) {
 				$hostids[] = $host['hostid'];
 				$db_hosts[$host['hostid']]['groupPrototypes'] = [];
 			}
@@ -1316,55 +1375,6 @@ class CHostPrototype extends CHostBase {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Group prototype cannot be based on a discovered host group "%1$s".', $db_group['name'])
 				);
-			}
-		}
-	}
-
-	/**
-	 * Check if host group prototypes are valid.
-	 *
-	 * @param array $hosts
-	 * @param array $db_hosts
-	 *
-	 * @throws APIException
-	 */
-	private static function checkGroupPrototypes(array $hosts, array $db_hosts): void {
-		foreach ($hosts as $i1 => $host) {
-			if (!array_key_exists('groupPrototypes', $host)) {
-				continue;
-			}
-
-			$db_host = $db_hosts[$host['hostid']];
-			$path = '/'.($i1 + 1).'/groupPrototypes';
-
-			foreach ($host['groupPrototypes'] as $i2 => &$group_prototype) {
-				if (!$group_prototype) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path.'/'.($i2 + 1),
-						_('a group prototype ID or name is expected')
-					));
-				}
-
-				if (array_key_exists('group_prototypeid', $group_prototype)) {
-					$group_prototypeid = $group_prototype['group_prototypeid'];
-
-					if (!array_key_exists($group_prototypeid, $db_host['groupPrototypes'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/'.($i2 + 1).'/group_prototypeid',
-							_('cannot be a group prototype ID from another host prototype')
-						));
-					}
-
-					$group_prototype += ['name' => $db_host['groupPrototypes'][$group_prototypeid]['name']];
-				}
-			}
-			unset($group_prototype);
-
-			$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name' => ['type' => API_HG_NAME]
-			]];
-
-			if (!CApiInputValidator::validateUniqueness($api_input_rules, $host['groupPrototypes'], $path, $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
 	}
