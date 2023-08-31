@@ -19,6 +19,10 @@
 
 #include "timer.h"
 
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxnix.h"

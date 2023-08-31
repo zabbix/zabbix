@@ -28,7 +28,6 @@
 #include "zbxvault.h"
 #include "zbxdbhigh.h"
 #include "dbsync.h"
-#include "actions.h"
 #include "zbxtrends.h"
 #include "zbxserialize.h"
 #include "user_macro.h"
@@ -37,6 +36,7 @@
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
@@ -46,6 +46,11 @@
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxdbschema.h"
+#include "zbxeval.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxkvs.h"
 
 int	sync_in_progress = 0;
 

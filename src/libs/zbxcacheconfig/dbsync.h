@@ -22,6 +22,9 @@
 
 #include "dbconfig.h"
 
+#include "zbxalgo.h"
+#include "zbxdb.h"
+
 /* no changes */
 #define ZBX_DBSYNC_ROW_NONE	0
 /*  a new object must be added to configuration cache */

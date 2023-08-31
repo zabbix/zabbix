@@ -21,6 +21,9 @@
 #include "dbconfig.h"
 #include "dbsync.h"
 
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
+#include "zbxeval.h"
 #include "zbxalgo.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
