@@ -420,8 +420,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$value_type = $column['value_type'];
-
-
 			$aggregate_function = $column['aggregate_function'];
 			$time_from = $column['time_from'];
 			$time_to = $column['time_to'];
@@ -443,19 +441,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$result = [];
 
 			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
-
 				$values = Manager::History()->getAggregationByInterval(
 					$items, $time_from, $time_to, $function, $time_to
 				);
 
 				if ($values) {
-					$values = $values[$column['itemid']]['data'][0];
-
-					$result += $aggregate_function !== AGGREGATE_COUNT
-						? [$column['itemid'] => $values['value']]
-						: [$column['itemid'] => $values['count']];
+					foreach ($values as $value) {
+						$result += $aggregate_function !== AGGREGATE_COUNT
+							? [$value['data'][0]['itemid'] => $value['data'][0]['value']]
+							: [$value['data'][0]['itemid'] => $value['data'][0]['count']];
+					}
 				}
-			} else {
+			}
+			else {
 				switch ($function) {
 					case AGGREGATE_LAST:
 						$function = 'max';
@@ -470,14 +468,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 						break;
 				}
 
-				$non_numeric_history = Manager::History()->getAggregatedValue(
-					$column, $function, $time_from, $time_to
-				);
+				foreach ($items as $item) {
+					$non_numeric_history = Manager::History()->getAggregatedValue(
+						$item, $function, $time_from, $time_to
+					);
 
-				if ($non_numeric_history) {
-					$result = [
-						$column['itemid'] => $non_numeric_history
-					];
+					if ($non_numeric_history) {
+						$result += [
+							$item['itemid'] => $non_numeric_history
+						];
+					}
 				}
 			}
 		}
