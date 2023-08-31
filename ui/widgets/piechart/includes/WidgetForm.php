@@ -72,7 +72,7 @@ class WidgetForm extends CWidgetForm {
 
 	public const VALUE_SIZE_CUSTOM = 1;
 	private const VALUE_SIZE_AUTO = 0;
-	private const VALUE_SIZE_DEFAULT = 10;
+	private const VALUE_SIZE_DEFAULT = 20;
 	private const VALUE_SIZE_MAX = 100;
 	private const VALUE_SIZE_MIN = 1;
 
