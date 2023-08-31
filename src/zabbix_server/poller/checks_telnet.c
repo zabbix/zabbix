@@ -19,6 +19,7 @@
 
 #include "checks_telnet.h"
 #include "telnet_run.h"
+#include "../sysinfo.h"
 
 #include "zbxsysinfo.h"
 
@@ -76,7 +77,10 @@ int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RE
 
 	encoding = get_rparam(&request, 3);
 
-	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+	if (NULL != item->timeout)
+                zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+        else
+                timeout_sec = sysinfo_get_config_timeout();
 
 	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding), timeout_sec, config_source_ip);
 out:

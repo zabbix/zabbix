@@ -285,7 +285,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, ZBX_CHECK_TIMEOUT_UNDEFINED) ||
+				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, config_timeout) ||
 						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
 					ret = FAIL;

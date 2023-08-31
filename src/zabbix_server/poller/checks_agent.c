@@ -122,7 +122,6 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 	else
 		timeout_sec = sysinfo_get_config_timeout();
 
-
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout_sec + 1,
 			item->host.tls_connect, tls_arg1, tls_arg2))
 	{

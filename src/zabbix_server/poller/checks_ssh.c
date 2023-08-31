@@ -19,6 +19,7 @@
 
 #include "checks_ssh.h"
 #include "ssh_run.h"
+#include "../sysinfo.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 
@@ -79,7 +80,10 @@ int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESUL
 	encoding = get_rparam(&request, 3);
 	ssh_options = get_rparam(&request, 4);
 
-	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+	if (NULL != item->timeout)
+                zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+        else
+                timeout_sec = sysinfo_get_config_timeout();
 
 	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options), timeout_sec,
 			config_source_ip);
