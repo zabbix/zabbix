@@ -19,7 +19,7 @@
 
 #include "active_checks.h"
 
-#include "../zbxconf.h"
+#include "../agent_conf/agent_conf.h"
 #include "../logfiles/logfiles.h"
 #include "../logfiles/persistent_state.h"
 
@@ -842,7 +842,8 @@ static void	process_config_item(struct zbx_json *json, const char *config, size_
  ******************************************************************************/
 static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
-		const char *config_hostname, const char *config_host_metadata, const char *config_host_metadata_item,
+		const char *config_listen_ip, int config_listen_port, const char *config_hostname,
+		const char *config_host_metadata, const char *config_host_metadata_item,
 		const char *config_host_interface, const char *config_host_interface_item)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
@@ -880,21 +881,21 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 				config_host_metadata_item);
 	}
 
-	if (NULL != CONFIG_LISTEN_IP)
+	if (NULL != config_listen_ip)
 	{
 		char	*p;
 
-		if (NULL != (p = strchr(CONFIG_LISTEN_IP, ',')))
+		if (NULL != (p = strchr(config_listen_ip, ',')))
 			*p = '\0';
 
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_IP, CONFIG_LISTEN_IP, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_IP, config_listen_ip, ZBX_JSON_TYPE_STRING);
 
 		if (NULL != p)
 			*p = ',';
 	}
 
-	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, (zbx_uint64_t)CONFIG_LISTEN_PORT);
+	if (ZBX_DEFAULT_AGENT_PORT != config_listen_port)
+		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, (zbx_uint64_t)config_listen_port);
 
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CONFIG_REVISION, (zbx_uint64_t)*config_revision_local);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
@@ -1887,7 +1888,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		if (1 == need_update_userparam)
 		{
 			zbx_setproctitle("active checks #%d [reloading user parameters]", process_num);
-			reload_user_parameters(process_type, process_num, activechks_args_in->config_file);
+			reload_user_parameters(process_type, process_num, activechks_args_in->config_file,
+					activechks_args_in->config_user_parameters);
 			need_update_userparam = 0;
 		}
 #endif
@@ -1917,7 +1919,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					&config_revision_local, activechks_args_in->config_timeout,
-					activechks_args_in->config_source_ip, config_hostname,
+					activechks_args_in->config_source_ip, activechks_args_in->config_listen_ip,
+					activechks_args_in->config_listen_port, config_hostname,
 					activechks_args_in->config_host_metadata,
 					activechks_args_in->config_host_metadata_item,
 					activechks_args_in->config_host_interface,
@@ -1927,7 +1930,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			}
 			else
 			{
-				nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+				nextrefresh = time(NULL) + activechks_args_in->config_refresh_active_checks;
 				nextcheck = 0;
 			}
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
