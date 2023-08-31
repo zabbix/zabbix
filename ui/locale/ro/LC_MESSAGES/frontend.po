@@ -23701,7 +23701,7 @@ msgstr ""
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d H:i"
-msgstr "Y-m-d H:i"
+msgstr ""
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i:s"
