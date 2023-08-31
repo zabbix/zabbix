@@ -32,11 +32,11 @@ class NetworkDiscovery {
 			[
 				[
 					'name' => 'Proxy for Network discovery',
-					'mode' => 0
+					'operating_mode' => 0
 				],
 				[
 					'name' => 'Proxy for Network discovery cloning',
-					'mode' => 0
+					'operating_mode' => 0
 				]
 			]
 		);
