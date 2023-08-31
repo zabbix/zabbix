@@ -93,7 +93,7 @@ class Template {
 	 * @return {string}
 	 */
 	#match(match, data) {
-		if (data === null) {
+		if (data === undefined || data === null) {
 			return `${match[1]}`;
 		}
 
