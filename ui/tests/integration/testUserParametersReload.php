@@ -239,8 +239,8 @@ class testUserParametersReload extends CIntegrationTest {
 	 * @param string $lastvalue
 	 */
 	public function checkItemState(string $name, int $state, string $lastvalue = null) {
-		$wait_iterations = 10;
-		$wait_iteration_delay = 2;
+		$wait_iterations = 20;
+		$wait_iteration_delay = 1;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {
 			$item = $this->call('item.get', [
