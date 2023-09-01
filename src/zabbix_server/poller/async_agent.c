@@ -117,6 +117,18 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 						" timed out", agent_context->item.interface.addr,
 						agent_context->item.interface.port));
 				break;
+			case ZABBIX_AGENT_STEP_CONNECT_WAIT:
+				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
+						" failed: cannot establish TCP connection to [[%s]:%hu]:"
+						" timed out", agent_context->item.interface.addr,
+						agent_context->item.interface.port));
+				break;
+			case ZABBIX_AGENT_STEP_TLS_WAIT:
+				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
+						" failed: cannot establish TLS connection to [[%s]:%hu]:"
+						" timed out", agent_context->item.interface.addr,
+						agent_context->item.interface.port));
+				break;
 			default:
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed during %s: timed out",
