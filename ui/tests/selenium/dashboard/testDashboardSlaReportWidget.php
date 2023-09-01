@@ -2284,7 +2284,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	/**
 	 * When subtracting or adding months from/to current date in some rare cases strtotime() considers
 	 * that month contains an incorrect count of days. If the string in From/To field contains a number
-	 * of months to be added or subtracted, then timestamp is calcullated without the operation with
+	 * of months to be added or subtracted, then timestamp is calculated without the operation with
 	 * months to get the resulting day and then month is calculated by its number in AD.
 	 *
 	 * @param string	$date_string	the string that needs to be converted to YYY-MM-DD format
@@ -2358,6 +2358,14 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			$to_date = 'today';
 		}
 
+		// Check if the date string contains operations with months via regex and get the equivalent date accordingly.
+		if ((bool)preg_match('( \D (\d+ months|1 month))', $to_date, $month_string)) {
+			$to_date = $this->convertDateWithMonthOperations($to_date, $month_string[0]);
+		}
+		else {
+			$to_date = $to_date;
+		}
+
 		switch ($data['reporting_period']) {
 			case 'Daily':
 				for ($i = 0; $i < $show_periods; $i++) {
@@ -2380,16 +2388,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				break;
 
 			case 'Monthly':
-				// Check if the date string contains operations with months via regex and get the equivalent date accordingly.;
-				if ((bool)preg_match('( \D (\d+ months|1 month))', $to_date, $month_string)) {
-					$fill_date = $this->convertDateWithMonthOperations($to_date, $month_string[0]);
-				}
-				else {
-					$fill_date = $to_date;
-				}
-
 				for ($i = 0; $i < $show_periods; $i++) {
-					$period_values[] = date('Y-m', strtotime(date('Y-m-01', strtotime($fill_date)).' '.-$i.' month'));
+					$period_values[] = date('Y-m', strtotime(date('Y-m-01', strtotime($to_date)).' '.-$i.' month'));
 				}
 				break;
 
