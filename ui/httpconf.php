@@ -241,10 +241,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($field);
 			}
 
-			$step['posts'] = trim($step['posts']);
-
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
 				$step['posts'] = $step['post_fields'];
+			}
+			else {
+				$step['posts'] = trim($step['posts']);
 			}
 			unset($step['post_fields'], $step['post_type']);
 		}
