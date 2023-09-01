@@ -608,18 +608,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Name' => 'Empty tag/value'
-					],
-					'tags' => [
-						['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
-						['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag']
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
 						'Name' => 'Different types of macro in input fields {$A}',
 						'Problem' => '{HOST.HOST} {#ID}'
 					],
@@ -628,6 +616,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					]
 				]
 			],
+			// Check that tags table contains entries with UTF-8 4-byte characters, empty tag/value and all possible operators.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -635,6 +624,8 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						'Name' => 'Check tags table'
 					],
 					'tags' => [
+						['name' => 'empty value', 'operator' => 'Equals', 'value' => ''],
+						['name' => '', 'operator' => 'Does not contain', 'value' => 'empty tag'],
 						['name' => 'Check tag with operator - Equals ⚠️', 'operator' => 'Equals', 'value' => 'Warning ⚠️'],
 						['name' => 'Check tag with operator - Exists', 'operator' => 'Exists'],
 						['name' => 'Check tag with operator - Contains ❌', 'operator' => 'Contains', 'value' => 'tag value ❌'],
