@@ -69,8 +69,7 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.userTokenSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.userTokenSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.userTokenSuccess, {once: true});
 		},
 
 		massDeleteUserToken(target, tokenids) {

@@ -173,7 +173,18 @@
 			const overlay = PopUp(action, parameters, overlay_options);
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows(this.field.parent_discoveryid);
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+
+					uncheckTableRows(this.field.parent_discoveryid);
+				}
+
 				this.#navigate(e.detail, location.href);
 			});
 
@@ -190,18 +201,16 @@
 		}
 
 		openHostPopup(host_data) {
+			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 			const host_list = new Curl('zabbix.php');
-			const list_href = location.href;
 
 			host_list.setArgument('action', 'host.list');
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#navigate(e.detail, list_href));
-			overlay.$dialogue[0].addEventListener('dialogue.create', e => this.#navigate(e.detail, list_href));
-			overlay.$dialogue[0].addEventListener('dialogue.update', e => this.#navigate(e.detail, list_href));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#navigate(e.detail, original_url));
 			overlay.$dialogue[0].addEventListener('dialogue.delete', e => this.#navigate(e.detail, host_list.getUrl()));
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', list_href);

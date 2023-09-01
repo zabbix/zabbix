@@ -63,8 +63,8 @@ foreach ($data['queue_data'] as $itemid => $item_queue_data) {
 		zbx_date2age($item_queue_data['nextcheck']),
 		$host['name'],
 		$item['name'],
-		array_key_exists($data['hosts'][$item['hostid']]['proxy_hostid'], $data['proxies'])
-			? $data['proxies'][$data['hosts'][$item['hostid']]['proxy_hostid']]['host']
+		array_key_exists($data['hosts'][$item['hostid']]['proxyid'], $data['proxies'])
+			? $data['proxies'][$data['hosts'][$item['hostid']]['proxyid']]['name']
 			: ''
 	]);
 }

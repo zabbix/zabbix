@@ -260,6 +260,10 @@ $html_page
 	->addItem($httpForm)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('
+	view.init('.json_encode([
+		'checkbox_hash' => $data['hostid']
+	]).');
+'))
 	->setOnDocumentReady()
 	->show();

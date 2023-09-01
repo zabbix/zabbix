@@ -72,7 +72,7 @@
 
 		& > .sortable-item:focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
-			padding: 0 3.5px 0 3.5px;
+			padding: 0 3.5px;
 
 			& > div {
 				padding: 0 8px;
@@ -87,7 +87,7 @@
 		box-sizing: border-box;
 		display: block;
 		// Invisible padding for tab separation.
-		padding: 0 1.5px 0 1.5px;
+		padding: 0 1.5px;
 		margin: 0;
 		list-style-type: none;
 		outline: none;

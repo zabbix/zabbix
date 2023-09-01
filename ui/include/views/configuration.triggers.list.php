@@ -405,7 +405,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'g_triggerid'
+		'checkbox_object' => 'g_triggerid',
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()
