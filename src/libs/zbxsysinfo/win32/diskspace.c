@@ -96,7 +96,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *n
 
 static int	vfs_fs_size_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
-	char		*path, *mode, char *error;
+	char		*path, *mode, *error;
 	zbx_uint64_t	total, used, free;
 	double		pused, pfree;
 
