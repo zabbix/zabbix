@@ -341,10 +341,7 @@ static void	async_timer(evutil_socket_t fd, short events, void *arg)
 	ZBX_UNUSED(events);
 
 	if (ZBX_IS_RUNNING())
-	{
 		zbx_async_manager_queue_sync(poller_config->manager);
-		zbx_async_manager_interfaces_flush(poller_config->manager, &poller_config->interfaces);
-	}
 }
 
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
@@ -545,6 +542,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		{
 			async_initiate_queued_checks(&poller_config);
 			zbx_async_manager_requeue_flush(poller_config.manager);
+			zbx_async_manager_interfaces_flush(poller_config.manager, &poller_config.interfaces);
 		}
 
 		if (ZBX_IS_RUNNING())
