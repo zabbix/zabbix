@@ -26,6 +26,9 @@
 #include "zbxlog.h"
 #include "zbxalgo.h"
 
+#include <sys/vfs.h>
+#include <sys/vmount.h>
+
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
 		zbx_uint64_t *used, double *pfree, double *pused, char **error)
 {
@@ -210,8 +213,6 @@ int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 static const char	*zbx_get_vfs_name_by_type(int type)
 {
-	extern struct vfs_ent	*getvfsbytype(int type);
-
 	struct vfs_ent		*vfs;
 	static char		**vfs_names = NULL;
 	static size_t		vfs_names_alloc = 0;

@@ -68,11 +68,10 @@ zbx_collector_data       *get_collector(void);
 //#endif
 #ifndef _WINDOWS
 zbx_diskdevices_data     *get_diskdevices(void);
-#endif
 int     diskdevice_collector_started(void);
-
 void	stats_lock_diskstats(void);
 void	stats_unlock_diskstats(void);
+#endif
 
 void	diskstat_shm_init(void);
 void	diskstat_shm_reattach(void);

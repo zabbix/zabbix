@@ -26,8 +26,9 @@
 #ifdef _WINDOWS
 #	include "zbxwinservice.h"
 #	include "../win32/perfstat/perfstat.h"
+#	include "../win32/win32_cpu.h"
 /* defined in sysinfo lib */
-extern int get_cpu_num_win32(void);
+/*int get_cpu_num_win32(void);*/
 #else
 #	include "zbxnix.h"
 #endif
@@ -52,12 +53,13 @@ zbx_collector_data       *get_collector(void)
 
 //#define DISKDEVICE_COLLECTOR_STARTED(collector)	((collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID)
 
+#ifndef _WINDOWS
 int	diskdevice_collector_started(void)
 {
 	return ((NULL != collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID);
 }
 
-#ifndef _WINDOWS
+
 static int			shm_id;
 int				my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 static zbx_diskdevices_data	*diskdevices = NULL;
@@ -67,7 +69,6 @@ zbx_diskdevices_data     *get_diskdevices(void)
 }
 
 static zbx_mutex_t 	    	diskstats_lock = ZBX_MUTEX_NULL;
-#endif
 
 void	stats_lock_diskstats(void)
 {
@@ -78,6 +79,7 @@ void	stats_unlock_diskstats(void)
 {
 	zbx_mutex_unlock(diskstats_lock);
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
