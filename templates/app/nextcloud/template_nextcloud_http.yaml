@@ -364,18 +364,7 @@ zabbix_export:
               parameters:
                 - ''
               error_handler: CUSTOM_VALUE
-              error_handler_params: |
-                <ocs>
-                <meta>
-                <status>failure</status>
-                <statuscode>999</statuscode>
-                <message/>
-                </meta>
-                <data>
-                <message>Unknown error</message>
-                </data>
-                </ocs>
-                
+              error_handler_params: '<ocs><meta><status>failure</status><statuscode>999</statuscode><message/></meta><data><message>Unknown error</message></data></ocs>'
             - type: XML_TO_JSON
               parameters:
                 - ''
@@ -972,18 +961,7 @@ zabbix_export:
                   parameters:
                     - ''
                   error_handler: CUSTOM_VALUE
-                  error_handler_params: |
-                    <ocs>
-                    <meta>
-                    <status>failure</status>
-                    <statuscode>999</statuscode>
-                    <message/>
-                    </meta>
-                    <data>
-                    <message>Unknown error</message>
-                    </data>
-                    </ocs>
-                    
+                  error_handler_params: '<ocs><meta><status>failure</status><statuscode>999</statuscode><message/></meta><data><message>Unknown error</message></data></ocs>'
                 - type: XML_TO_JSON
                   parameters:
                     - ''
