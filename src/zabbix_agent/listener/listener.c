@@ -19,7 +19,8 @@
 
 #include "listener.h"
 
-#include "../zbxconf.h"
+#include "../agent_conf/agent_conf.h"
+
 #include "zbxsysinfo.h"
 #include "zbxlog.h"
 #include "zbxstr.h"
@@ -139,7 +140,8 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		if (1 == need_update_userparam)
 		{
 			zbx_setproctitle("listener #%d [reloading user parameters]", process_num);
-			reload_user_parameters(process_type, process_num, init_child_args_in->config_file);
+			reload_user_parameters(process_type, process_num, init_child_args_in->config_file,
+					init_child_args_in->config_user_parameters);
 			need_update_userparam = 0;
 		}
 #endif
@@ -155,8 +157,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 		{
 			zbx_setproctitle("listener #%d [processing request]", process_num);
 
-			if ('\0' != *CONFIG_HOSTS_ALLOWED &&
-					SUCCEED == (ret = zbx_tcp_check_allowed_peers(&s, CONFIG_HOSTS_ALLOWED)))
+			if ('\0' != *(init_child_args_in->config_hosts_allowed) &&
+					SUCCEED == (ret = zbx_tcp_check_allowed_peers(&s,
+					init_child_args_in->config_hosts_allowed)))
 			{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				if (ZBX_TCP_SEC_TLS_CERT != s.connection_type ||
