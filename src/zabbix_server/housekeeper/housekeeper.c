@@ -677,7 +677,6 @@ static int	housekeeping_history_and_trends(int now)
 	/* we need to clear records from */
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
-
 		if (ZBX_HK_MODE_DISABLED == *rule->poption_mode)
 			goto skip;
 
