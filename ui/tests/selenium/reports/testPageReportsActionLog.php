@@ -101,11 +101,13 @@ class testPageReportsActionLog extends CLegacyWebTest {
 				]
 		);
 
+		$table = $this->query('class:list-table')->asTable()->one();
 		$this->zbxTestExpandFilterTab();
 		$this->zbxTestClickButtonMultiselect('filter_userids_');
 		$this->zbxTestLaunchOverlayDialog('Users');
 		$this->zbxTestClickLinkText('guest');
 		$this->zbxTestClickXpathWait("//button[@name='filter_set']");
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent('No data found.');
 
 		$this->zbxTestClickButtonText('Reset');
