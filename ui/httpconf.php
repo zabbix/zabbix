@@ -231,9 +231,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['pairs']);
 			}
 
-			$step_fields = ['variables', 'headers', 'post_fields', 'query_fields'];
-
-			foreach ($step_fields as $step_field) {
+			foreach ($field_names as $step_field) {
 				foreach ($step[$step_field] as &$field) {
 					$field['name'] = trim($field['name']);
 					$field['value'] = trim($field['value']);
