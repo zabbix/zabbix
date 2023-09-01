@@ -20,14 +20,8 @@
 
 class CEventHub {
 
-	/**
-	 * @type {Map}
-	 */
 	#subscribers = new Map();
 
-	/**
-	 * @type {Map}
-	 */
 	#latest_data = new Map();
 
 	publish({data, descriptor}) {
