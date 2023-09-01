@@ -677,15 +677,18 @@ static int	housekeeping_history_and_trends(int now)
 	/* we need to clear records from */
 	for (rule = hk_history_rules; NULL != rule->table; rule++)
 	{
+
 		if (ZBX_HK_MODE_DISABLED == *rule->poption_mode)
 			goto skip;
+
+		if (SUCCEED == hk_history_rules_partition_is_table_name_excluded(rule->table))
+			goto process_delete_queue_for_housekeeping_rule;
 
 		/* If partitioning enabled for history and/or trends then drop partitions with expired history.  */
 		/* ZBX_HK_MODE_PARTITION is set during configuration sync based on the following: */
 		/* 1. "Override item history (or trend) period" must be on 2. DB must be PostgreSQL */
 		/* 3. config.db.extension must be set to "timescaledb" */
-		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode &&
-				FAIL == hk_history_rules_partition_is_table_name_excluded(rule->table))
+		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
 		{
 			hk_drop_partition(rule->table, *rule->poption, now);
 			goto skip;
@@ -726,8 +729,7 @@ static int	housekeeping_history_and_trends(int now)
 			}
 		}
 #endif
-		/* process delete queue for the housekeeping rule */
-
+process_delete_queue_for_housekeeping_rule:
 		zbx_vector_ptr_sort(&rule->delete_queue, hk_item_update_cache_compare);
 
 		for (i = 0; i < rule->delete_queue.values_num; i++)
