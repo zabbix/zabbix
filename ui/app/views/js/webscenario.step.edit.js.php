@@ -120,6 +120,7 @@ window.webscenario_step_edit_popup = new class {
 		});
 
 		this.#initTextareaFlexible($variables);
+		this.#initSortable($variables);
 	}
 
 	#initHeaders(headers) {

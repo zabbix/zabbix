@@ -89,12 +89,18 @@
 		#initVariables(variables) {
 			const $variables = jQuery('#variables');
 
-			jQuery('#variables').dynamicRows({
-				template: '#variable-row-tmpl',
-				rows: variables
+			$variables
+				.dynamicRows({
+					template: '#variable-row-tmpl',
+					rows: variables
+				})
+				.on('tableupdate.dynamicRows', (e) => {
+					this.#toggleDragIcon(e.target);
+					jQuery(e.target).sortable({disabled: e.target.querySelectorAll('.sortable').length < 2});
 			});
 
 			this.#initTextareaFlexible($variables);
+			this.#initSortable($variables);
 		}
 
 		#initHeaders(headers) {

@@ -172,7 +172,9 @@ $form_grid = (new CFormGrid())
 					),
 				(new CTemplateTag('step-variable-row-tmpl'))->addItem(
 					(new CRow([
-						'',
+						(new CCol(
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
@@ -188,7 +190,9 @@ $form_grid = (new CFormGrid())
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
-					]))->addClass('form_row')
+					]))
+						->addClass('form_row')
+						->addClass('sortable')
 				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
