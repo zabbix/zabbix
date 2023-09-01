@@ -99,9 +99,20 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 	if (0 != (event & EV_TIMEOUT))
 	{
 		agent_context->item.ret = TIMEOUT_ERROR;
-		SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed during %s:"
-				" %s", get_agent_step_string(agent_context->step), NULL != dnserr ? dnserr :
-				"timed out"));
+		switch (agent_context->step)
+		{
+			case ZABBIX_AGENT_STEP_RECV:
+				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
+						" failed: TCP connect successful, cannot read response from [[%s]:%hu]:"
+						" timed out", agent_context->item.interface.addr,
+						agent_context->item.interface.port));
+				break;
+			default:
+				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
+						" failed during %s: %s", get_agent_step_string(agent_context->step),
+						NULL != dnserr ? dnserr : "timed out"));
+		}
+
 		goto stop;
 	}
 
