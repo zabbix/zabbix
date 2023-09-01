@@ -99,19 +99,16 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			new CWidgetFieldMultiselect(
-				document.getElementById('.json_encode($this->getId()).'),
-				'.json_encode($this->getView()->getParams()).',
-				'.json_encode([
-					'field_name' => $this->field->getName(),
-					'field_value' => $this->field->getValue(),
-					'in_type' => $this->field->getInType(),
-					'object_labels' => $this->getObjectLabels(),
-					'default_prevented' => $this->field->isDefaultPrevented(),
-					'widget_accepted' => $this->field->isWidgetAccepted(),
-					'dashboard_accepted' => $this->field->isDashboardAccepted()
-				]).'
-			);
+			new CWidgetFieldMultiselect('.json_encode([
+				'field_name' => $this->field->getName(),
+				'field_value' => $this->field->getValue(),
+				'in_type' => $this->field->getInType(),
+				'default_prevented' => $this->field->isDefaultPrevented(),
+				'widget_accepted' => $this->field->isWidgetAccepted(),
+				'dashboard_accepted' => $this->field->isDashboardAccepted(),
+				'object_labels' => $this->getObjectLabels(),
+				'params' => $this->getView()->getParams()
+			]).');
 		';
 	}
 

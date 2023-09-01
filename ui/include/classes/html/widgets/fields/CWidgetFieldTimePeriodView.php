@@ -142,9 +142,9 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 				'field_name' => $this->field->getName(),
 				'field_value' => $this->field->getValue(),
 				'in_type' => $this->field->getInType(),
-				'data_source' => $this->field->getDataSource(),
 				'widget_accepted' => $this->field->isWidgetAccepted(),
-				'dashboard_accepted' => $this->field->isDashboardAccepted()
+				'dashboard_accepted' => $this->field->isDashboardAccepted(),
+				'data_source' => $this->field->getDataSource()
 			]).');
 		';
 	}

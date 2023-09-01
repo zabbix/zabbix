@@ -39,6 +39,11 @@ class CWidgetFieldMultiselect {
 	#multiselect_list;
 
 	/**
+	 * @type {Object}
+	 */
+	#multiselect_params;
+
+	/**
 	 * Field name.
 	 *
 	 * @type {string}
@@ -73,11 +78,6 @@ class CWidgetFieldMultiselect {
 	#labels;
 
 	/**
-	 * @type {boolean}
-	 */
-	#is_multiple;
-
-	/**
 	 * @type {string|null}
 	 */
 	#selected_typed_reference = null;
@@ -85,16 +85,27 @@ class CWidgetFieldMultiselect {
 	/**
 	 * @type {int}
 	 */
-	#selected_limit;
+	#selected_limit = 1;
 
-	constructor(element, multiselect_params, {
+	/**
+	 * @type {boolean}
+	 */
+	#is_multiple = true;
+
+	/**
+	 * @type {boolean}
+	 */
+	#is_disabled = false;
+
+	constructor({
 		field_name,
 		field_value,
 		in_type,
+		default_prevented = false,
+		widget_accepted = false,
+		dashboard_accepted = false,
 		object_labels,
-		default_prevented,
-		widget_accepted,
-		dashboard_accepted
+		params
 	}) {
 		this.#field_name = field_name;
 		this.#labels = object_labels;
@@ -102,19 +113,40 @@ class CWidgetFieldMultiselect {
 		this.#default_prevented = default_prevented;
 		this.#widget_accepted = widget_accepted;
 		this.#dashboard_accepted = dashboard_accepted;
+		this.#multiselect_params = params;
 
-		this.#initField(element, multiselect_params);
+		if ('selectedLimit' in params) {
+			this.#selected_limit = params.selectedLimit;
+			this.#is_multiple = this.#selected_limit != 1;
+		}
+
+		this.#initField();
 
 		if (CWidgetBase.FOREIGN_REFERENCE_KEY in field_value) {
 			this.#selectTypedReference(field_value[CWidgetBase.FOREIGN_REFERENCE_KEY]);
 		}
 	}
 
-	#initField(element, multiselect_params) {
+	get disabled() {
+		return this.#is_disabled;
+	}
+
+	set disabled(is_disabled) {
+		this.#is_disabled = is_disabled;
+
+		if (!this.#is_disabled) {
+			this.#multiselect.multiSelect('enable');
+		}
+		else {
+			this.#multiselect.multiSelect('disable');
+		}
+	}
+
+	#initField() {
 		const has_optional_sources = this.#widget_accepted && (!this.#default_prevented || this.#dashboard_accepted);
 
-		this.#multiselect = jQuery(element).multiSelect({
-			...multiselect_params,
+		this.#multiselect = jQuery(`#${this.#field_name}${this.#is_multiple ? '_' : ''}`).multiSelect({
+			...this.#multiselect_params,
 			suggest_list_modifier: has_optional_sources ? (entities) => this.#modifySuggestedList(entities) : null,
 			custom_suggest_select_handler: has_optional_sources ? (entity) => this.#selectSuggested(entity) : null
 		})
@@ -129,9 +161,6 @@ class CWidgetFieldMultiselect {
 			});
 
 		this.#multiselect_list = this.#multiselect[0].querySelector('.multiselect-list');
-
-		this.#selected_limit = this.#multiselect.multiSelect('getOption', 'selectedLimit');
-		this.#is_multiple = this.#selected_limit != 1;
 
 		const select_button = this.#multiselect.multiSelect('getSelectButton');
 

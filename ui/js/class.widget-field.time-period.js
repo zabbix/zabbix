@@ -81,9 +81,9 @@ class CWidgetFieldTimePeriod {
 		field_name,
 		field_value = {from: '', to: ''},
 		in_type,
-		data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT,
 		widget_accepted = false,
-		dashboard_accepted = false
+		dashboard_accepted = false,
+		data_source = CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT
 	}) {
 		this.#field_name = field_name;
 		this.#in_type = in_type;

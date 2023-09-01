@@ -146,6 +146,7 @@
 					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
 					$('.multiselect-button', $obj.parent()).prop('disabled', false);
+					$('.multiselect-optional-select-button', $obj.parent()).prop('disabled', false);
 					$('input', $obj).prop('disabled', false);
 					$obj.append(makeMultiSelectInput($obj));
 
@@ -170,6 +171,7 @@
 					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
 					$('.multiselect-button', $obj.parent()).prop('disabled', true);
+					$('.multiselect-optional-select-button', $obj.parent()).prop('disabled', true);
 					$('input[type="text"]', $obj).remove();
 					$('input', $obj).prop('disabled', true);
 
@@ -889,7 +891,7 @@
 		if (!ms.optional_select_menu.length) {
 			addSelectButton($obj, $('<button>', {
 				type: 'button',
-				class: `${ZBX_STYLE_BTN_GREY} ${ZBX_ICON_CHEVRON_DOWN_SMALL}`
+				class: `${ZBX_STYLE_BTN_GREY} ${ZBX_ICON_CHEVRON_DOWN_SMALL} multiselect-optional-select-button`
 			}).on('click', function(event) {
 				jQuery(event.target).menuPopup(
 					[{items: ms.optional_select_menu}],
