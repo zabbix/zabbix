@@ -126,14 +126,15 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				break;
 			case ZABBIX_AGENT_STEP_RECV:
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
-						" failed: TCP connect successful, cannot read response from [[%s]:%hu]:"
+						" failed: connect successful, cannot read response from [[%s]:%hu]:"
 						" timed out", agent_context->item.interface.addr,
 						agent_context->item.interface.port));
 				break;
 			case ZABBIX_AGENT_STEP_SEND:
 				SET_MSG_RESULT(&agent_context->item.result,
-						zbx_dsprintf(NULL, "Get value from agent failed: TCP successful, cannot"
-						" send to [[%s]:%hu]: timed out", agent_context->item.interface.addr,
+						zbx_dsprintf(NULL, "Get value from agent failed: connect successful,"
+						" cannot send to [[%s]:%hu]: timed out",
+						agent_context->item.interface.addr,
 						agent_context->item.interface.port));
 				break;
 		}
@@ -175,9 +176,10 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 						return state;
 
 					SET_MSG_RESULT(&agent_context->item.result,
-						zbx_dsprintf(NULL, "Get value from agent failed: TCP successful, cannot"
-						" establish TLS to [[%s]:%hu]: %s", agent_context->item.interface.addr,
-						agent_context->item.interface.port, error));
+							zbx_dsprintf(NULL, "Get value from agent failed:"
+							" TCP successful, cannot establish TLS to [[%s]:%hu]: %s",
+							agent_context->item.interface.addr,
+							agent_context->item.interface.port, error));
 					zbx_free(error);
 					agent_context->item.ret = NETWORK_ERROR;
 					break;
@@ -192,16 +194,17 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		case ZABBIX_AGENT_STEP_SEND:
 			zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s] itemid:" ZBX_FS_UI64, agent_context->item.key,
 					agent_context->item.itemid);
-
+			
 			if (SUCCEED != zbx_tcp_send_context(&agent_context->s, &agent_context->tcp_send_context,
 					&event_new))
 			{
 				if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
 					return state;
 
-				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
-				" failed during %s: %s", get_agent_step_string(agent_context->step),
-					zbx_socket_strerror()));
+				SET_MSG_RESULT(&agent_context->item.result,
+						zbx_dsprintf(NULL, "Get value from agent failed: connect successful,"
+						" cannot send to [[%s]:%hu]: %s", agent_context->item.interface.addr,
+						agent_context->item.interface.port, zbx_socket_strerror()));
 				agent_context->item.ret = NETWORK_ERROR;
 				break;
 			}
@@ -225,9 +228,10 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 			if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
 				return state;
 
-			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed"
-					" during %s: %s", get_agent_step_string(agent_context->step),
-					zbx_socket_strerror()));
+			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
+					" failed: connect successful, cannot read response from [[%s]:%hu]:"
+					" %s", agent_context->item.interface.addr,
+					agent_context->item.interface.port, zbx_socket_strerror()));
 			agent_context->item.ret = NETWORK_ERROR;
 			break;
 	}
