@@ -601,7 +601,6 @@
 				}
 			});
 
-
 			this.pairs[type] = new DynamicRows($table, {
 				add_before: $table.find('.element-table-add').closest('tr')[0],
 				template: httpconf.pair_row_template,
