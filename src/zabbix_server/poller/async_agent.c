@@ -99,6 +99,16 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 	if (0 != (event & EV_TIMEOUT))
 	{
 		agent_context->item.ret = TIMEOUT_ERROR;
+
+		if (NULL != dnserr)
+		{
+			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
+					" failed: Cannot resolve address [[%s]:%hu]: %s",
+					agent_context->item.interface.addr, agent_context->item.interface.port,
+					dnserr));
+			goto stop;
+		}
+
 		switch (agent_context->step)
 		{
 			case ZABBIX_AGENT_STEP_RECV:
@@ -109,8 +119,8 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				break;
 			default:
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
-						" failed during %s: %s", get_agent_step_string(agent_context->step),
-						NULL != dnserr ? dnserr : "timed out"));
+						" failed during %s: timed out",
+						get_agent_step_string(agent_context->step)));
 		}
 
 		goto stop;
