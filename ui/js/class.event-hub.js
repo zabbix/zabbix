@@ -20,9 +20,19 @@
 
 class CEventHub {
 
+	/**
+	 * @type {Map}
+	 */
+	#subscribers;
+
+	/**
+	 * @type {Map}
+	 */
+	#latest_data;
+
 	constructor() {
-		this.subscribers = new Map();
-		this.latest_data = new Map();
+		this.#subscribers = new Map();
+		this.#latest_data = new Map();
 	}
 
 	publish({data, descriptor}) {
@@ -37,10 +47,10 @@ class CEventHub {
 
 		const descriptor_hash = JSON.stringify(descriptor);
 
-		this.latest_data.delete(descriptor_hash);
-		this.latest_data.set(descriptor_hash, {data, descriptor});
+		this.#latest_data.delete(descriptor_hash);
+		this.#latest_data.set(descriptor_hash, {data, descriptor});
 
-		for (const {require, callback} of this.subscribers.values()) {
+		for (const {require, callback} of this.#subscribers.values()) {
 			if (CEventHub.#match(require, descriptor)) {
 				callback({data, descriptor});
 			}
@@ -48,7 +58,7 @@ class CEventHub {
 	}
 
 	subscribe({require = {}, callback}) {
-		for (const {data, descriptor} of [...this.latest_data.values()].reverse()) {
+		for (const {data, descriptor} of [...this.#latest_data.values()].reverse()) {
 			if (CEventHub.#match(require, descriptor)) {
 				callback({data, descriptor});
 
@@ -58,17 +68,17 @@ class CEventHub {
 
 		const subscription = {};
 
-		this.subscribers.set(subscription, {require, callback});
+		this.#subscribers.set(subscription, {require, callback});
 
 		return subscription;
 	}
 
 	unsubscribe(subscription) {
-		return this.subscribers.delete(subscription);
+		return this.#subscribers.delete(subscription);
 	}
 
 	getData(require) {
-		for (const {data, descriptor} of [...this.latest_data.values()].reverse()) {
+		for (const {data, descriptor} of [...this.#latest_data.values()].reverse()) {
 			if (CEventHub.#match(require, descriptor)) {
 				return data;
 			}
@@ -78,9 +88,9 @@ class CEventHub {
 	}
 
 	invalidateData(require) {
-		for (const [descriptor_hash, {descriptor}] of this.latest_data.entries()) {
+		for (const [descriptor_hash, {descriptor}] of this.#latest_data.entries()) {
 			if (CEventHub.#match(require, descriptor)) {
-				this.latest_data.delete(descriptor_hash);
+				this.#latest_data.delete(descriptor_hash);
 			}
 		}
 	}
