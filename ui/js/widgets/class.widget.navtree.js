@@ -34,7 +34,7 @@ class CWidgetNavTree extends CWidget {
 		this._maps_accessible = null;
 		this._show_unavailable = false;
 		this._problems = null;
-		this._max_depth = 10;
+		this._max_depth = null;
 		this._last_id = null;
 
 		this._has_contents = false;
@@ -141,14 +141,13 @@ class CWidgetNavTree extends CWidget {
 				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
 				const parent = button.getAttribute('data-id');
 
-				if (depth <= this._max_depth) {
-					this._itemEditDialog(0, parent, depth + 1, button);
-				}
+				this._itemEditDialog(0, parent, depth + 1, button);
 			},
 
 			addMaps: (e) => {
 				const button = e.target;
 
+				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
 				const id = button.getAttribute('data-id');
 
 				if (typeof window.addPopupValues === 'function') {
@@ -160,19 +159,21 @@ class CWidgetNavTree extends CWidget {
 
 					const root = this._target.querySelector(`.tree-item[data-id="${id}"] > ul.tree-list`);
 
-					for (const item of data.values) {
-						root.appendChild(this._makeTreeItem({
-							id: this._getNextId(),
-							name: item.name,
-							sysmapid: item.id,
-							parent: id
-						}));
+					if (root !== null) {
+						for (const item of data.values) {
+							root.appendChild(this._makeTreeItem({
+								id: this._getNextId(),
+								name: item.name,
+								sysmapid: item.id,
+								parent: id
+							}, depth + 1));
+						}
+
+						const tree_item = root.closest('.tree-item');
+
+						tree_item.classList.remove('closed');
+						tree_item.classList.add('opened');
 					}
-
-					const tree_item = root.closest('.tree-item');
-
-					tree_item.classList.remove('closed');
-					tree_item.classList.add('opened');
 
 					this._setTreeHandlers();
 					this._updateWidgetFields();
@@ -266,8 +267,7 @@ class CWidgetNavTree extends CWidget {
 			this._parseProblems();
 
 			if (this._navtree_item_selected === null
-				|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')
-			) {
+					|| !jQuery(`.tree-item[data-id=${this._navtree_item_selected}]`).is(':visible')) {
 				this._navtree_item_selected = jQuery('.tree-item:visible', jQuery(this._target))
 					.not('[data-sysmapid="0"]')
 					.first()
@@ -450,6 +450,7 @@ class CWidgetNavTree extends CWidget {
 		}
 
 		const ul = this._makeTreeBranch(item.id);
+
 		if (item.children !== undefined && this._max_depth > depth) {
 			let child_items_visible = 0;
 
@@ -686,22 +687,6 @@ class CWidgetNavTree extends CWidget {
 		// Set [data-depth] for list and each sublist.
 		jQuery('.tree-list', jQuery(this._target)).each(function() {
 			jQuery(this).attr('data-depth', jQuery(this).parents('.tree-list').length);
-		}).not('.root').promise().done(function() {
-			// Show/hide 'add new items' buttons.
-			jQuery('.tree-list', jQuery(this._target)).filter(function() {
-				return jQuery(this).attr('data-depth') >= this._max_depth;
-			}).each(function() {
-				jQuery('.js-button-add-maps', jQuery(this)).css('visibility', 'hidden');
-				jQuery('.js-button-add-child', jQuery(this)).css('visibility', 'hidden');
-			});
-
-			// Show/hide buttons in deepest levels.
-			jQuery('.tree-list', jQuery(this._target)).filter(function() {
-				return this._max_depth > jQuery(this).attr('data-depth');
-			}).each(function() {
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-maps', jQuery(this)).css('visibility', 'visible');
-				jQuery('> .tree-item > .tree-row > .tools > .js-button-add-child', jQuery(this)).css('visibility', 'visible');
-			});
 		});
 
 		// Change arrow style.
@@ -715,11 +700,16 @@ class CWidgetNavTree extends CWidget {
 				$arrow.removeClass('arrow-down a1').addClass('arrow-right');
 			}
 		});
+
+		for (const tree_element of document.querySelectorAll('.tree-list')) {
+			for (const button of tree_element.querySelectorAll('.js-button-add-child, .js-button-add-maps')) {
+				button.disabled = tree_element.dataset.depth >= this._max_depth;
+			}
+		}
 	}
 
 	_markTreeItemSelected(itemid) {
 		const selected_item = document.getElementById(`${this._unique_id}_tree-item-${itemid}`);
-
 		const item = this._navtree[itemid];
 
 		if (item === undefined || selected_item === null || item === this._navtree_item_selected) {
@@ -866,10 +856,11 @@ class CWidgetNavTree extends CWidget {
 									method: 'POST',
 									data: {
 										name: form_inputs.name.value.trim(),
-										sysmapid: typeof form_inputs.sysmapid !== 'undefined'
+										sysmapid: form_inputs.sysmapid !== undefined
 											? form_inputs.sysmapid.value
 											: '0',
-										add_submaps: form_inputs.add_submaps.checked ? 1 : 0,
+										add_submaps: form_inputs.add_submaps !== undefined
+											&& form_inputs.add_submaps.checked ? 1 : 0,
 										depth: depth
 									},
 									dataType: 'json',
@@ -888,6 +879,7 @@ class CWidgetNavTree extends CWidget {
 										}
 										else {
 											this._deactivateContentsEvents();
+
 											if (item_edit) {
 												const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
@@ -906,36 +898,40 @@ class CWidgetNavTree extends CWidget {
 
 												id = this._getNextId();
 
-												root.append(this._makeTreeItem({
-													id: id,
-													name: resp['name'],
-													sysmapid: resp['sysmapid'],
-													parent: parent
-												}));
+												if (root !== null) {
+													root.append(this._makeTreeItem({
+														id: id,
+														name: resp['name'],
+														sysmapid: resp['sysmapid'],
+														parent: parent
+													}, depth + 1));
 
-												root.closest('.tree-item').classList.remove('closed');
-												root.closest('.tree-item').classList.add('opened', 'is-parent');
+													root.closest('.tree-item').classList.remove('closed');
+													root.closest('.tree-item').classList.add('opened', 'is-parent');
+												}
 											}
 
 											const add_child_level = (sysmapid, itemid, depth) => {
-												if (typeof resp.hierarchy[sysmapid] !== 'undefined'
-													&& depth <= this._max_depth) {
+												if (resp.hierarchy[sysmapid] !== undefined
+														&& depth <= this._max_depth) {
 													const root = this._target
 														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
 
 													$.each(resp.hierarchy[sysmapid], (i, submapid) => {
-														if (typeof resp.submaps[submapid] !== 'undefined') {
-															const submap_item = resp.submaps[submapid];
-															const submap_itemid = this._getNextId();
-
-															root.append(this._makeTreeItem({
-																id: submap_itemid,
-																name: submap_item['name'],
-																sysmapid: submap_item['sysmapid'],
-																parent: itemid
-															}));
-															add_child_level(submapid, submap_itemid, depth + 1);
+														if (resp.submaps[submapid] === undefined) {
+															return;
 														}
+
+														const submap_item = resp.submaps[submapid];
+														const submap_itemid = this._getNextId();
+
+														root.append(this._makeTreeItem({
+															id: submap_itemid,
+															name: submap_item['name'],
+															sysmapid: submap_item['sysmapid'],
+															parent: itemid
+														}));
+														add_child_level(submapid, submap_itemid, depth + 1);
 													});
 
 													root.closest('.tree-item').classList.remove('closed');
@@ -989,12 +985,16 @@ class CWidgetNavTree extends CWidget {
 			if (id) {
 				const parent = document.getElementById(`${prefix}navtree.parent.${id}`).value;
 				const sysmapid = document.getElementById(`${prefix}navtree.sysmapid.${id}`).value;
-				const sibling = document.getElementById(`${prefix}children-of-${parent}`).childNodes;
+				const element = document.getElementById(`${prefix}children-of-${parent}`);
 
 				let order = 0;
 
-				while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
-					order++;
+				if (element !== null) {
+					const sibling = element.childNodes;
+
+					while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
+						order++;
+					}
 				}
 
 				this._fields[`navtree.name.${id}`] = field.value;

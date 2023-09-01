@@ -39,7 +39,12 @@ class CEventNameValidator extends CValidator {
 			'host_macro_n' => true,
 			'empty_host' => true
 		]);
-		$expr_func_macro = new CExpressionMacroFunctionParser();
+		$expr_func_macro = new CExpressionMacroFunctionParser([
+			'usermacros' => true,
+			'lldmacros' => true,
+			'host_macro_n' => true,
+			'empty_host' => true
+		]);
 
 		while (isset($value[$p])) {
 			if (substr($value, $p, 2) !== '{?') {

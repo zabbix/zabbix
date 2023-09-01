@@ -27,17 +27,18 @@
 #include "zbxhttp.h"
 #include "httpmacro.h"
 
-typedef struct
-{
-	long	rspcode;
-	double	total_time;
-	double	speed_download;
-}
-zbx_httpstat_t;
-
 extern int	CONFIG_HTTPPOLLER_FORKS;
 
 #ifdef HAVE_LIBCURL
+
+typedef struct
+{
+	long					rspcode;
+	double					total_time;
+	ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	speed_download;
+}
+zbx_httpstat_t;
+
 
 typedef struct
 {
@@ -257,7 +258,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	size_t		i, num = 0;
 	AGENT_RESULT	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_CURLINFO_SPEED_DOWNLOAD_FMT,
 			__func__, stat->rspcode, stat->total_time, stat->speed_download);
 
 	result = DBselect("select type,itemid from httpstepitem where httpstepid=" ZBX_FS_UI64, httpstepid);
@@ -672,7 +673,12 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
+#	if LIBCURL_VERSION_NUM >= 0x075500
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+#	else
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+#	endif
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 		goto clean;
@@ -896,15 +902,14 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
-
-			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD,
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, ZBX_CURLINFO_SPEED_DOWNLOAD,
 					&stat.speed_download)) && NULL == err_str)
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 			else
 			{
-				speed_download += stat.speed_download;
+				speed_download += (double)stat.speed_download;
 				speed_download_num++;
 			}
 

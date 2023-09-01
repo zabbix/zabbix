@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  *
  * @dataSource ScheduledReports
  *
- * @onBefore prepareTokenData
+ * @onBefore prepareData
  */
 class testSID extends CWebTest {
 
@@ -38,13 +38,34 @@ class testSID extends CWebTest {
 	 */
 	protected static $token_id;
 
-	public function prepareTokenData() {
+	public function prepareData() {
 		$response = CDataHelper::call('token.create', [
 			'name' => 'api_update',
 			'userid' => '1'
 		]);
 		$this->assertArrayHasKey('tokenids', $response);
 		self::$token_id = $response['tokenids'][0];
+
+		// Create event correlation.
+		CDataHelper::call('correlation.create', [
+			[
+				'name' => 'Event correlation for element remove',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'element remove'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			]
+		]);
 	}
 
 	/**
@@ -866,7 +887,14 @@ class testSID extends CWebTest {
 				[
 					'db' => 'SELECT * FROM correlation',
 					'incorrect_request' => true,
-					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit'
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Event correlation for element remove'
+						]
+					],
+					'link' => 'zabbix.php?action=correlation.list'
+
 				]
 			],
 
@@ -1184,6 +1212,13 @@ class testSID extends CWebTest {
 		$hash_before = CDBHelper::getHash($data['db']);
 		$url = (!str_contains($data['link'], 'tokenid') ? $data['link'] : $data['link'].self::$token_id);
 		$this->page->login()->open($url)->waitUntilReady();
+
+		if (array_key_exists('actions', $data)) {
+			foreach ($data['actions'] as $action) {
+				call_user_func_array([$this, $action['callback']], [CTestArrayHelper::get($action, 'element', null)]);
+			}
+		}
+
 		$this->query('xpath://input[@name="sid"]')->one()->delete();
 		$this->query(($this->query('button:Update')->exists()) ? 'button:Update' : 'xpath://button[text()="Add" and'.
 				' @type="submit"]')->waitUntilClickable()->one()->click();
@@ -1209,5 +1244,14 @@ class testSID extends CWebTest {
 		}
 
 		$this->assertEquals($hash_before, CDBHelper::getHash($data['db']));
+	}
+
+	/**
+	 * Find and click on the element that leads to the form.
+	 *
+	 * @param string  $locator		locator of the element that needs to be clicked to open form
+	 */
+	private function openFormWithLink($locator) {
+		$this->query($locator)->waitUntilPresent()->one()->click();
 	}
 }

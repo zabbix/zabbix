@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:37:15Z'
+  date: '2023-08-15T16:13:27Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -733,6 +733,8 @@ zabbix_export:
           headers:
             - name: X-Cisco-Meraki-API-Key
               value: '{$MERAKI.TOKEN}'
+            - name: User-Agent
+              value: 'ZabbixServer/1.0 Zabbix'
           tags:
             - tag: component
               value: raw
@@ -755,6 +757,8 @@ zabbix_export:
           headers:
             - name: X-Cisco-Meraki-API-Key
               value: '{$MERAKI.TOKEN}'
+            - name: User-Agent
+              value: 'ZabbixServer/1.0 Zabbix'
           tags:
             - tag: component
               value: log
@@ -781,6 +785,8 @@ zabbix_export:
           headers:
             - name: X-Cisco-Meraki-API-Key
               value: '{$MERAKI.TOKEN}'
+            - name: User-Agent
+              value: 'ZabbixServer/1.0 Zabbix'
           tags:
             - tag: component
               value: raw
