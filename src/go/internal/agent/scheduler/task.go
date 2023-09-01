@@ -166,21 +166,17 @@ func (t *exporterTask) perform(s Scheduler) {
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
 
-			if t.item.timeout != 0 {
-				tc := make(chan bool)
+			tc := make(chan bool)
 
-				go func() {
-					ret, err = exporter.Export(key, params, t)
-					tc <- true
-				}()
-
-				select {
-				case <-tc:
-				case <-time.After(time.Second * time.Duration(t.item.timeout)):
-					err = fmt.Errorf("timed out")
-				}
-			} else {
+			go func() {
 				ret, err = exporter.Export(key, params, t)
+				tc <- true
+			}()
+
+			select {
+			case <-tc:
+			case <-time.After(time.Second * time.Duration(t.item.timeout)):
+				err = fmt.Errorf("timed out")
 			}
 
 			if err == nil {
