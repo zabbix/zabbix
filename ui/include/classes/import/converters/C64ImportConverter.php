@@ -132,10 +132,9 @@ class C64ImportConverter extends CConverter {
 				$item['triggers'] = self::convertTriggers($item['triggers']);
 			}
 
-			if (array_key_exists('type', $item)) {
-				if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
-					$item['params'] = self::convertExpression($item['params']);
-				}
+			if (array_key_exists('type', $item) &&
+					$item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
+				$item['params'] = self::convertExpression($item['params']);
 			}
 		}
 		unset($item);
@@ -193,7 +192,7 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertSelements(array $selements): array {
 		foreach ($selements as &$selement) {
-			if ($selement['type'] == SYSMAP_ELEMENT_TYPE_TRIGGER && array_key_exists('elements', $selement)) {
+			if ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_TRIGGER) {
 				$selement['elements'] = self::convertTriggers($selement['elements']);
 			}
 		}
