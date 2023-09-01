@@ -23,17 +23,12 @@ class CEventHub {
 	/**
 	 * @type {Map}
 	 */
-	#subscribers;
+	#subscribers = new Map();
 
 	/**
 	 * @type {Map}
 	 */
-	#latest_data;
-
-	constructor() {
-		this.#subscribers = new Map();
-		this.#latest_data = new Map();
-	}
+	#latest_data = new Map();
 
 	publish({data, descriptor}) {
 		descriptor = Object.keys(descriptor).sort().reduce(
