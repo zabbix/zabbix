@@ -35,7 +35,7 @@ class CSVGPie {
 	static DRAW_TYPE_PIE = 0;
 	static DRAW_TYPE_DOUGHNUT = 1;
 
-	static TOTAL_VALUE_SIZE_DEFAULT = 20;
+	static TOTAL_VALUE_SIZE_DEFAULT = 10;
 	static TOTAL_VALUE_PADDING = 4;
 
 	/**
@@ -241,7 +241,6 @@ class CSVGPie {
 					const scale = this.#radius_inner * 2 / text_width;
 
 					this.#total_value_container
-						.attr('y', CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 0.3)
 						.attr('transform', `scale(${scale})`);
 				}
 
@@ -269,7 +268,6 @@ class CSVGPie {
 					const scale = this.#radius_inner * 2 / text_width;
 
 					this.#no_data_container
-						.attr('y', CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 0.3)
 						.attr('transform', `scale(${scale})`);
 				}
 
@@ -278,8 +276,8 @@ class CSVGPie {
 			}
 			else {
 				this.#no_data_container
-					.attr('y', CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10 / 2 / CSVGPie.LINE_HEIGHT - CSVGPie.TOTAL_VALUE_SIZE_DEFAULT)
-					.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10}px`)
+					.attr('y', 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10 / 2 / CSVGPie.LINE_HEIGHT - 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT)
+					.style('font-size', `${2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10}px`)
 			}
 		}
 
