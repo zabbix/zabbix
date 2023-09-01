@@ -63,8 +63,6 @@ typedef struct c_diskdevices_data
 	zbx_single_diskdevice_data	device[1];	/* more "slots" for disk statistics added dynamically */
 } zbx_diskdevices_data;
 
-//#define DISKDEVICE_COLLECTOR_STARTED(collector)	((collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID)
-
 zbx_single_diskdevice_data	*collector_diskdevice_get(const char *devname);
 zbx_single_diskdevice_data	*collector_diskdevice_add(const char *devname);
 void				collect_stats_diskdevices(zbx_diskdevices_data *diskdevices);

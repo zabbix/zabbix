@@ -61,11 +61,6 @@ zbx_collector_data;
 int     cpu_collector_started(void);
 zbx_collector_data       *get_collector(void);
 
-//extern ZBX_COLLECTOR_DATA	*collector;
-//#ifndef _WINDOWS
-//extern ZBX_DISKDEVICES_DATA	*diskdevices;
-//extern int			my_diskstat_shmid;
-//#endif
 #ifndef _WINDOWS
 zbx_diskdevices_data     *get_diskdevices(void);
 int     diskdevice_collector_started(void);

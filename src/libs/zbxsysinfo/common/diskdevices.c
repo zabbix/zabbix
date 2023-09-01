@@ -24,10 +24,6 @@
 #include "stats.h"
 #include "zbxmutexs.h"
 
-//extern zbx_mutex_t		diskstats_lock;
-//#define LOCK_DISKSTATS		zbx_mutex_lock(diskstats_lock)
-//#define UNLOCK_DISKSTATS	zbx_mutex_unlock(diskstats_lock)
-
 static void	apply_diskstat(zbx_single_diskdevice_data *device, time_t now, zbx_uint64_t *dstat)
 {
 	register int	i;
@@ -124,7 +120,6 @@ static void	process_diskstat(zbx_single_diskdevice_data *device)
 
 void	collect_stats_diskdevices(zbx_diskdevices_data *diskdevices)
 {
-	//LOCK_DISKSTATS;
 	stats_lock_diskstats();
 	diskstat_shm_reattach();
 
@@ -151,7 +146,6 @@ void	collect_stats_diskdevices(zbx_diskdevices_data *diskdevices)
 
 zbx_single_diskdevice_data	*collector_diskdevice_get(const char *devname)
 {
-	int				i;
 	zbx_single_diskdevice_data	*device = NULL;
 
 	assert(devname);
@@ -165,7 +159,7 @@ zbx_single_diskdevice_data	*collector_diskdevice_get(const char *devname)
 	else
 		diskstat_shm_reattach();
 
-	for (i = 0; i < (get_diskdevices())->count; i++)
+	for (int i = 0; i < (get_diskdevices())->count; i++)
 	{
 		if (0 == strcmp(devname, (get_diskdevices())->device[i].name))
 		{

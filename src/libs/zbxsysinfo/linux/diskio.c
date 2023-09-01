@@ -77,12 +77,11 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
 	FILE		*f;
 	char		tmp[MAX_STRING_LEN], name[MAX_STRING_LEN], dev_path[MAX_STRING_LEN];
-	int		i, ret = FAIL, dev_exists = FAIL;
+	int		ret = FAIL, dev_exists = FAIL, found = 0;
 	zbx_uint64_t	ds[ZBX_DSTAT_MAX], rdev_major, rdev_minor;
 	zbx_stat_t	dev_st;
-	int		found = 0;
 
-	for (i = 0; i < ZBX_DSTAT_MAX; i++)
+	for (int i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
 
 	if (NULL != devname && '\0' != *devname && 0 != strcmp(devname, "all"))
@@ -133,7 +132,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 /******************************************************************************
  *                                                                            *
- * Comments: Translate device name to the one used internally by kernel. The  *
+ * Comments: Translates device name to the one used internally by kernel. The *
  *           translation is done based on minor and major device numbers      *
  *           listed in INFO_FILE_NAME . If the names differ it is usually an  *
  *           LVM device which is listed in kernel device mapper.              *

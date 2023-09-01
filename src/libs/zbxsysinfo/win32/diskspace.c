@@ -42,12 +42,11 @@ zbx_wmpoint_t;
 
 static wchar_t	*zbx_wcsdup2(const char *filename, int line, wchar_t *old, const wchar_t *str)
 {
-	int	retry;
 	wchar_t	*ptr = NULL;
 
 	zbx_free(old);
 
-	for (retry = 10; 0 < retry && NULL == ptr; ptr = wcsdup(str), retry--)
+	for (int retry = 10; 0 < retry && NULL == ptr; ptr = wcsdup(str), retry--)
 		;
 
 	if (NULL != ptr)
@@ -97,10 +96,9 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *n
 
 static int	vfs_fs_size_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE timeout_event)
 {
-	char		*path, *mode;
-	char		*error;
+	char		*path, *mode, char *error;
 	zbx_uint64_t	total, used, free;
-	double		pused,pfree;
+	double		pused, pfree;
 
 	/* 'timeout_event' argument is here to make the vfs_fs_size() prototype as required by */
 	/* zbx_execute_threaded_metric() on MS Windows */
@@ -337,7 +335,7 @@ out:
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct zbx_json		j;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	zbx_vector_ptr_t	mount_paths;
 	char			*error = NULL, *fsname, *fstype, *fslabel, *fsdrivetype;
 
@@ -350,7 +348,7 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto out;
 	}
 
-	for (i = 0; i < mount_paths.values_num; i++)
+	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		get_fs_data(mount_paths.values[i], &fsname, &fstype, &fslabel, &fsdrivetype);
 

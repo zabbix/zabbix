@@ -85,8 +85,6 @@ typedef struct
 ZBX_CPUS_UTIL_DATA_AIX;
 #endif /* _AIX */
 
-//#define CPU_COLLECTOR_STARTED(collector)	(collector)
-
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
 #ifdef _AIX

@@ -28,8 +28,6 @@
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 
-//extern ZBX_COLLECTOR_DATA	*collector;
-
 static kstat_ctl_t	*kc = NULL;
 static kid_t		kc_id = 0;
 static kstat_t		*kc_vminfo;
@@ -40,9 +38,9 @@ static zbx_mutex_t	kstat_lock = ZBX_MUTEX_NULL;
  *                                                                            *
  * Purpose: refreshes kstat environment                                       *
  *                                                                            *
- * Parameters: error - [OUT] the error message                                *
+ * Parameters: error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the kstat environment was refreshed successfully   *
+ * Return value: SUCCEED - kstat environment was refreshed successfully       *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -78,12 +76,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize kstat environment                                      *
+ * Purpose: initializes kstat environment                                     *
  *                                                                            *
- * Parameters: kstat - [IN] the kstat data storage                            *
- *             error - [OUT] the error message                                *
+ * Parameters: kstat - [IN] kstat data storage                                *
+ *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the kstat environment was initialized successfully *
+ * Return value: SUCCEED - kstat environment was initialized successfully     *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
@@ -144,7 +142,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect kstat stats                                               *
+ * Purpose: collects kstat stats                                              *
  *                                                                            *
  * Comments: This function is called every second to collect statistics.      *
  *                                                                            *
@@ -188,15 +186,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get free memory size                                              *
+ * Purpose: gets free memory size                                             *
  *                                                                            *
- * Parameters: value - [OUT] the free memory size in bytes                    *
- *             error - [OUT] the error message                                *
+ * Parameters: value - [OUT] free memory size in bytes                        *
+ *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - the free memory size was stored in value           *
- *               FAIL - either an error occurred (error parameter is set) or  *
+ * Return value: SUCCEED - free memory size was stored in value               *
+ *               FAIL - Either an error occurred (error parameter is set) or  *
  *                      data was not collected yet (error parameter is left   *
- *                      unchanged)                                            *
+ *                      unchanged).                                           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_kstat_get_freemem(zbx_uint64_t *value, char **error)

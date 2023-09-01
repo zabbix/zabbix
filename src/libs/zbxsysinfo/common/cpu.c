@@ -43,7 +43,7 @@ int	system_cpu_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_vector_uint64_pair_t	cpus;
 	struct zbx_json			json;
-	int				i, ret = SYSINFO_RET_FAIL;
+	int				ret = SYSINFO_RET_FAIL;
 
 	ZBX_UNUSED(request);
 
@@ -57,7 +57,7 @@ int	system_cpu_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < cpus.values_num; i++)
+	for (int i = 0; i < cpus.values_num; i++)
 	{
 		zbx_json_addobject(&json, NULL);
 

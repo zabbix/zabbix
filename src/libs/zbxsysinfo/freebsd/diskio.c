@@ -33,7 +33,6 @@ static struct statinfo	*si = NULL;
 
 int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 {
-	int		i;
 	struct devstat	*ds = NULL;
 	int		ret = FAIL;
 	char		dev[DEVSTAT_NAME_LEN + 10];
@@ -41,7 +40,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 	assert(devname);
 
-	for (i = 0; i < ZBX_DSTAT_MAX; i++)
+	for (int i = 0; i < ZBX_DSTAT_MAX; i++)
 		dstat[i] = (zbx_uint64_t)__UINT64_C(0);
 
 	if (NULL == si)
@@ -64,7 +63,7 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 #endif
 		return FAIL;
 
-	for (i = 0; i < si->dinfo->numdevs; i++)
+	for (int i = 0; i < si->dinfo->numdevs; i++)
 	{
 		ds = &si->dinfo->devices[i];
 

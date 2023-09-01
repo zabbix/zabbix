@@ -706,7 +706,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			offset = 0;
-	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
+	int			ret = SYSINFO_RET_FAIL, show_pm, check_regex, check_manager;
 	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
 				*package, *saveptr;
 	zbx_vector_str_t	packages;
@@ -738,7 +738,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 	*buffer = '\0';
 	zbx_vector_str_create(&packages);
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
 		saveptr = NULL;
@@ -912,7 +912,7 @@ out:
 
 int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
+	int			ret = SYSINFO_RET_FAIL, check_regex, check_manager;
 	char			*regex, *manager, *line, *saveptr, *buf = NULL, error[MAX_STRING_LEN];
 	ZBX_PACKAGE_MANAGER	*mng;
 	struct zbx_json		json;
@@ -931,7 +931,7 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&json, 10 * ZBX_KIBIBYTE);
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
 		saveptr = NULL;

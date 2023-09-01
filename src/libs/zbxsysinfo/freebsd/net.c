@@ -267,7 +267,6 @@ int     net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			i;
 	struct zbx_json		j;
 	struct if_nameindex	*interfaces;
 
@@ -279,7 +278,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; 0 != interfaces[i].if_index; i++)
+	for (int i = 0; 0 != interfaces[i].if_index; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, "{#IFNAME}", interfaces[i].if_name, ZBX_JSON_TYPE_STRING);

@@ -54,7 +54,7 @@ static void	pack_ntp(const ntp_data *data, unsigned char *request, int length)
 	/* Pack the essential data into an NTP packet, bypassing struct layout  */
 	/* and endian problems. Note that it ignores fields irrelevant to SNTP. */
 
-	int	i, k;
+	int	k;
 	double	d;
 
 	memset(request, 0, length);
@@ -63,7 +63,7 @@ static void	pack_ntp(const ntp_data *data, unsigned char *request, int length)
 
 	d = data->transmit / NTP_SCALE;
 
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 	{
 		if ((k = (int)(d *= 256.0)) >= 256)
 			k = 255;
@@ -79,7 +79,7 @@ static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsign
 	/* Unpack the essential data from an NTP packet, bypassing struct layout */
 	/* and endian problems. Note that it ignores fields irrelevant to SNTP.  */
 
-	int	i, ret = FAIL;
+	int	ret = FAIL;
 	double	d;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -124,7 +124,7 @@ static int	unpack_ntp(ntp_data *data, const unsigned char *request, const unsign
 	}
 
 	d = 0.0;
-	for (i = 0; i < 8; i++)
+	for (int i = 0; i < 8; i++)
 		d = 256.0 * d + response[NTP_OFFSET_TRANSMIT + i];
 	data->transmit = d / NTP_SCALE;
 

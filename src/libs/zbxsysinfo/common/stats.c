@@ -28,14 +28,11 @@
 #	include "../win32/perfstat/perfstat.h"
 #	include "../win32/win32_cpu.h"
 /* defined in sysinfo lib */
-/*int get_cpu_num_win32(void);*/
 #else
 #	include "zbxnix.h"
 #endif
 
 static zbx_collector_data	*collector = NULL;
-
-//#define CPU_COLLECTOR_STARTED(collector)      ((NULL != collector) && (collector)->cpus.queue_counter)
 
 int	cpu_collector_started(void)
 {
@@ -51,14 +48,11 @@ zbx_collector_data       *get_collector(void)
 	return collector;
 }
 
-//#define DISKDEVICE_COLLECTOR_STARTED(collector)	((collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID)
-
 #ifndef _WINDOWS
 int	diskdevice_collector_started(void)
 {
 	return ((NULL != collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID);
 }
-
 
 static int			shm_id;
 int				my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
@@ -83,7 +77,7 @@ void	stats_unlock_diskstats(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns the number of processors which are currently online       *
+ * Purpose: Returns the number of processors which are currently online       *
  *          (i.e., available).                                                *
  *                                                                            *
  * Return value: number of CPUs                                               *
@@ -153,7 +147,7 @@ return_one:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Allocate memory for collector                                     *
+ * Purpose: allocates memory for collector                                    *
  *                                                                            *
  * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
@@ -243,7 +237,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Free memory allocated for collector                               *
+ * Purpose: frees memory allocated for collector                              *
  *                                                                            *
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
@@ -281,7 +275,7 @@ void	zbx_free_collector_data(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Allocate shared memory for collecting disk statistics             *
+ * Purpose: allocates shared memory for collecting disk statistics            *
  *                                                                            *
  ******************************************************************************/
 void	diskstat_shm_init(void)
@@ -314,11 +308,11 @@ void	diskstat_shm_init(void)
 #endif
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: If necessary, reattach to disk statistics shared memory segment.  *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: If necessary, reattaches to disk statistics shared memory segment. *
+ *                                                                             *
+ *******************************************************************************/
 void	diskstat_shm_reattach(void)
 {
 #ifndef _WINDOWS
@@ -356,7 +350,7 @@ void	diskstat_shm_reattach(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create a new, larger disk statistics shared memory segment and    *
+ * Purpose: Create a new, larger disk statistics shared memory segment and    *
  *          copy data from the old one.                                       *
  *                                                                            *
  ******************************************************************************/
@@ -427,14 +421,14 @@ void	diskstat_shm_extend(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Collect system information                                        *
+ * Purpose: collects system information                                       *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	unsigned char	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	int		server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int		process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int		server_num = ((zbx_thread_args_t *)args)->info.server_num,
+			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", server_num);
 

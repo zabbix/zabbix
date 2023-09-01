@@ -47,14 +47,14 @@ zbx_ifrow_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize the zbx_ifrow_t variable                               *
+ * Purpose: initializes zbx_ifrow_t variable                                  *
  *                                                                            *
  * Parameters:                                                                *
  *     pIfRow      - [IN/OUT] pointer to zbx_ifrow_t variable with all        *
  *                            members set to NULL                             *
  *                                                                            *
- * Comments: allocates memory, call zbx_ifrow_clean() with the same pointer   *
- *           to free it                                                       *
+ * Comments: allocates memory, calls zbx_ifrow_clean() with the pointer to    *
+ *           free it                                                          *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
@@ -92,12 +92,12 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clean the zbx_ifrow_t variable                                    *
+ * Purpose: cleans zbx_ifrow_t variable                                       *
  *                                                                            *
  * Parameters:                                                                *
  *     pIfRow      - [IN/OUT] pointer to initialized zbx_ifrow_t variable     *
  *                                                                            *
- * Comments: sets the members to NULL so the variable can be reused           *
+ * Comments: sets members to NULL so variable can be reused                   *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
@@ -108,14 +108,15 @@ static void	zbx_ifrow_clean(zbx_ifrow_t *pIfRow)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: call either GetIfEntry() or GetIfEntry2() based on the Windows    *
+ * Purpose: Calls either GetIfEntry() or GetIfEntry2() based on the Windows   *
  *          release to fill the passed MIB interface structure.               *
  *                                                                            *
  * Parameters:                                                                *
  *     pIfRow      - [IN/OUT] pointer to initialized zbx_ifrow_t variable     *
  *                                                                            *
- * Comments: the index of the interface must be set with                      *
- *           zbx_ifrow_set_index(), otherwise this function will return error *
+ * Comments: The index of the interface must be set with                      *
+ *           zbx_ifrow_set_index(), otherwise this function will return       *
+ *           error.                                                           *
  *                                                                            *
  ******************************************************************************/
 static DWORD	zbx_ifrow_call_get_if_entry(zbx_ifrow_t *pIfRow)
@@ -330,9 +331,11 @@ static char	*zbx_ifrow_get_guid_str(const zbx_ifrow_t *pIfRow)
 	return guid_cstr;
 }
 
-/*
- * returns interface statistics by IP address or interface name
- */
+/******************************************************************************
+ *                                                                            *
+ * Purpose: returns interface statistics by IP address or interface name      *
+ *                                                                            *
+ ******************************************************************************/
 static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 {
 	DWORD		dwSize, dwRetVal, i, j;
