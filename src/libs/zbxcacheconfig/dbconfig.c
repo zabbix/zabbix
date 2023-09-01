@@ -3068,7 +3068,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			httpitem = (ZBX_DC_HTTPITEM *)DCfind_id(&config->httpitems, itemid, sizeof(ZBX_DC_HTTPITEM),
 					&found);
 
-			dc_strpool_replace(found, &httpitem->timeout, row[30]);
 			dc_strpool_replace(found, &httpitem->url, row[31]);
 			dc_strpool_replace(found, &httpitem->query_fields, row[32]);
 			dc_strpool_replace(found, &httpitem->posts, row[33]);
@@ -3094,7 +3093,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		}
 		else if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
 		{
-			dc_strpool_release(httpitem->timeout);
 			dc_strpool_release(httpitem->url);
 			dc_strpool_release(httpitem->query_fields);
 			dc_strpool_release(httpitem->posts);
@@ -3118,7 +3116,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			scriptitem = (ZBX_DC_SCRIPTITEM *)DCfind_id(&config->scriptitems, itemid,
 					sizeof(ZBX_DC_SCRIPTITEM), &found);
 
-			dc_strpool_replace(found, &scriptitem->timeout, row[30]);
 			dc_strpool_replace(found, &scriptitem->script, row[11]);
 
 			if (0 == found)
@@ -3129,7 +3126,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		}
 		else if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid)))
 		{
-			dc_strpool_release(scriptitem->timeout);
 			dc_strpool_release(scriptitem->script);
 
 			zbx_vector_ptr_destroy(&scriptitem->params);
@@ -3387,7 +3383,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		{
 			httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid);
 
-			dc_strpool_release(httpitem->timeout);
 			dc_strpool_release(httpitem->url);
 			dc_strpool_release(httpitem->query_fields);
 			dc_strpool_release(httpitem->posts);
@@ -3410,7 +3405,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		{
 			scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid);
 
-			dc_strpool_release(scriptitem->timeout);
 			dc_strpool_release(scriptitem->script);
 
 			zbx_vector_ptr_destroy(&scriptitem->params);
@@ -9186,7 +9180,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
 					&src_item->itemid)))
 			{
-				zbx_strscpy(dst_item->timeout_orig, httpitem->timeout);
 				zbx_strscpy(dst_item->url_orig, httpitem->url);
 				zbx_strscpy(dst_item->query_fields_orig, httpitem->query_fields);
 				zbx_strscpy(dst_item->status_codes_orig, httpitem->status_codes);
@@ -9253,8 +9246,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				struct zbx_json	json;
 
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-
-				zbx_strscpy(dst_item->timeout_orig, scriptitem->timeout);
 
 				dst_item->params = zbx_strdup(NULL, scriptitem->script);
 

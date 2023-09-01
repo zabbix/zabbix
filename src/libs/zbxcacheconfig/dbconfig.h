@@ -290,7 +290,6 @@ ZBX_DC_CALCITEM;
 typedef struct
 {
 	zbx_uint64_t	itemid;
-	const char	*timeout;
 	const char	*url;
 	const char	*query_fields;
 	const char	*status_codes;
@@ -319,7 +318,6 @@ typedef struct
 {
 	zbx_uint64_t		itemid;
 	const char		*script;
-	const char		*timeout;
 	zbx_vector_ptr_t	params;
 }
 ZBX_DC_SCRIPTITEM;
