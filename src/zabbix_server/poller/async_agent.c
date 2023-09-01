@@ -194,7 +194,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		case ZABBIX_AGENT_STEP_SEND:
 			zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s] itemid:" ZBX_FS_UI64, agent_context->item.key,
 					agent_context->item.itemid);
-			
+
 			if (SUCCEED != zbx_tcp_send_context(&agent_context->s, &agent_context->tcp_send_context,
 					&event_new))
 			{
