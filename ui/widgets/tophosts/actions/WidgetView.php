@@ -22,6 +22,7 @@
 namespace Widgets\TopHosts\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CHousekeepingHelper,
@@ -31,7 +32,6 @@ use API,
 	CSettingsHelper,
 	Manager;
 
-use CArrayHelper;
 use Widgets\TopHosts\Widget;
 
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
@@ -81,7 +81,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$tags_exist = array_key_exists('tags', $this->fields_values);
-		$maintenance = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
+		$filter_maintenance = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
 			? HOST_MAINTENANCE_STATUS_OFF
 			: null;
 
@@ -91,18 +91,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'hostids' => $hostids,
 			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
 			'tags' => $tags_exist ? $this->fields_values['tags'] : null,
-			'filter' => ['maintenance_status' => $maintenance],
+			'filter' => ['maintenance_status' => $filter_maintenance],
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 
 		$hostids = array_keys($hosts);
-		$maintenance_ids = array_unique(array_column($hosts, 'maintenanceid'));
+		$maintenanceids = array_unique(array_column($hosts, 'maintenanceid'));
 
-		$db_maintenances = ($maintenance_ids && $maintenance === null)
+		$db_maintenances = ($maintenanceids && $filter_maintenance === null)
 			? API::Maintenance()->get([
 				'output' => ['name', 'maintenance_type', 'description'],
-				'maintenanceids' => $maintenance_ids,
+				'maintenanceids' => $maintenanceids,
 				'preservekeys' => true
 			])
 			: [];
@@ -111,14 +111,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			['name' => 'maintenance_name', 'description' => 'maintenance_description']
 		);
 
-		$has_data_text = false;
+		$has_text_column = false;
 		$item_names = [];
 		$items = [];
 
 		foreach ($configuration as $column_index => $column) {
 			switch ($column['data']) {
 				case CWidgetFieldColumnsList::DATA_TEXT:
-					$has_data_text = true;
+					$has_text_column = true;
 					break 2;
 
 				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
@@ -127,7 +127,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if (!$has_data_text) {
+		if (!$has_text_column && $item_names) {
 			$hosts_with_items = [];
 
 			foreach ($item_names as $column_index => $item_name) {
