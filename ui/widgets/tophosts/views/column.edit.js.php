@@ -120,7 +120,13 @@ window.tophosts_column_edit_form = new class {
 	}
 
 	handleFormSubmit(e, overlay) {
-		$.fn.trimValues(e.target);
+		const form_inputs = e.target.querySelectorAll('input, textarea');
+
+		form_inputs.forEach((input) => {
+			if (typeof (input.value) === 'string') {
+				input.value = input.value.trim();
+			}
+		});
 
 		fetch(new Curl(e.target.getAttribute('action')).getUrl(), {
 			method: 'POST',
