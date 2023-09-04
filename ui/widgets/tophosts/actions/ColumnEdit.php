@@ -21,8 +21,7 @@
 
 namespace Widgets\TopHosts\Actions;
 
-use CArrayHelper,
-	CController,
+use CController,
 	CControllerResponseData,
 	CNumberParser,
 	CParser;

@@ -28,7 +28,6 @@ use API,
 	CHousekeepingHelper,
 	CMacrosResolverHelper,
 	CNumberParser,
-	CParser,
 	CSettingsHelper,
 	Manager;
 
@@ -81,7 +80,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$tags_exist = array_key_exists('tags', $this->fields_values);
-		$filter_maintenance = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
+		$maintenance_status = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
 			? HOST_MAINTENANCE_STATUS_OFF
 			: null;
 
@@ -91,15 +90,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'hostids' => $hostids,
 			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
 			'tags' => $tags_exist ? $this->fields_values['tags'] : null,
-			'filter' => ['maintenance_status' => $filter_maintenance],
+			'filter' => ['maintenance_status' => $maintenance_status],
 			'monitored_hosts' => true,
 			'preservekeys' => true
 		]);
 
 		$hostids = array_keys($hosts);
-		$maintenanceids = array_filter(array_column($hosts, 'maintenanceid', 'maintenanceid'));;
+		$maintenanceids = array_filter(array_column($hosts, 'maintenanceid', 'maintenanceid'));
 
-		$db_maintenances = ($maintenanceids && $filter_maintenance === null)
+		$db_maintenances = $maintenanceids && $maintenance_status === null
 			? API::Maintenance()->get([
 				'output' => ['name', 'maintenance_type', 'description'],
 				'maintenanceids' => $maintenanceids,
