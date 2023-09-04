@@ -56,7 +56,7 @@ class testItemPreprocessing extends CAPITest {
 					'host' => 'test.ns.update',
 					'items' => [
 						['key_' => 'non-ssh.item'],
-						['key_' => 'ssh.item'] + self::SSH_ITEM_FIELDS,
+						['key_' => 'ssh.item'] + self::SSH_ITEM_FIELDS
 					],
 					'lld_rules' => [
 						[
@@ -443,7 +443,7 @@ class testItemPreprocessing extends CAPITest {
 					'hostid' => ':template:test.ns.create',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\ndef"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\ndef"]
 					]
 				] + self::SSH_ITEM_FIELDS),
 				'error' => null
@@ -455,7 +455,7 @@ class testItemPreprocessing extends CAPITest {
 					'hostid' => ':template:test.ns.create',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"]
 					]
 				] + self::SSH_ITEM_FIELDS),
 				'error' => null
@@ -476,7 +476,7 @@ class testItemPreprocessing extends CAPITest {
 					'hostid' => ':template:test.ns.create',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\ndef"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\ndef"]
 					]
 				] + self::SSH_ITEM_FIELDS),
 				'error' => null
@@ -488,7 +488,7 @@ class testItemPreprocessing extends CAPITest {
 					'hostid' => ':template:test.ns.create',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"]
 					]
 				] + self::SSH_ITEM_FIELDS),
 				'error' => null
@@ -952,7 +952,7 @@ class testItemPreprocessing extends CAPITest {
 					'itemid' => ':item:ssh.item',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\ndef"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\ndef"]
 					]
 				],
 				'error' => null
@@ -963,7 +963,7 @@ class testItemPreprocessing extends CAPITest {
 					'itemid' => ':item:ssh.item',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_REGEX."\nabc"]
 					]
 				],
 				'error' => null
@@ -982,7 +982,7 @@ class testItemPreprocessing extends CAPITest {
 					'itemid' => ':item:ssh.item',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\ndef"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\ndef"]
 					]
 				],
 				'error' => null
@@ -993,7 +993,7 @@ class testItemPreprocessing extends CAPITest {
 					'itemid' => ':item:ssh.item',
 					'preprocessing' => [
 						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"],
-						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"],
+						self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\nabc"]
 					]
 				],
 				'error' => null
