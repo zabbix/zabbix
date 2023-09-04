@@ -762,49 +762,51 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$svg_sectors = array_values($sectors);
 
 		foreach ($svg_sectors as &$sector) {
-			$sector['percent_of_total'] = bcmul(bcdiv($sector['value'], $total_value['value']), 100);
+			$sector['percent_of_total'] = ($sector['value'] / $total_value['value']) * 100;
 
 			if (!$sector['is_total']) {
-				$total_percentage_used = bcadd($total_percentage_used, $sector['percent_of_total']);
-				$sector_total_value = bcadd($sector_total_value, $sector['value']);
+				$total_percentage_used += $sector['percent_of_total'];
+				$sector_total_value += $sector['value'];
 				$non_total_sectors[] = $sector;
 			}
 		}
 		unset($sector);
 
 		if ($is_total_set) {
-			if (bccomp($sector_total_value, $total_value['value']) <= 0) {
+			if ($sector_total_value <= $total_value['value']) {
 				// Sectors use the full total value or less.
 				foreach ($svg_sectors as $key => &$sector) {
 					if ($sector['is_total']) {
 						$sector['percent_of_total'] -= $total_percentage_used;
 
 						// The non-total sectors use the full total value, no space left for the total sector.
-						if (bccomp($sector['percent_of_total'], '0') == 0) {
+						if ($sector['percent_of_total'] == 0) {
 							unset($svg_sectors[$key]);
 						}
 					}
 				}
 				unset($sector);
-			} else {
+			}
+			else {
 				// Sectors use more than total value.
 				$current_value = 0;
 				$remaining_value = $total_value['value'];
 				$sectors_to_keep = [];
 
 				foreach ($non_total_sectors as &$sector) {
-					if (bccomp(bcadd($current_value, $sector['value']), $remaining_value) <= 0) {
+					if (($current_value + $sector['value']) <= $remaining_value) {
 						// There is enough space for this sector.
 						$sectors_to_keep[] = $sector;
-						$current_value = bcadd($current_value, $sector['value']);
-						$remaining_value = bcsub($remaining_value, $sector['value']);
-					} elseif (bccomp($sector['value'], $remaining_value) >= 0
-						&& bccomp($current_value, $total_value['value']) < 0) {
+						$current_value += $sector['value'];
+						$remaining_value -= $sector['value'];
+					}
+					elseif ($sector['value'] >= $remaining_value && $current_value < $total_value['value']) {
 						// This sector needs to be cut, to fit.
-						$sector['percent_of_total'] = bcmul(bcdiv($remaining_value, $total_value['value']), 100);
+						$sector['percent_of_total'] = ($remaining_value / $total_value['value']) * 100;
 						$sectors_to_keep[] = $sector;
 						break;
-					} else {
+					}
+					else {
 						// This sector doesn't fit.
 						break;
 					}
