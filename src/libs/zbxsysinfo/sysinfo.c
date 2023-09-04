@@ -1171,6 +1171,8 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 	zbx_metric_t	*command = NULL;
 	AGENT_REQUEST	request;
 
+	zabbix_log(1, "DBG %s(), timeout = %i", __func__, timeout);
+
 	zbx_init_agent_request(&request);
 
 	if (SUCCEED != zbx_parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command :
@@ -1261,6 +1263,8 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 	if (ZBX_CHECK_TIMEOUT_UNDEFINED != timeout)
 		zbx_alarm_on(timeout);
+
+	request.timeout = (0 == timeout ? sysinfo_get_config_timeout() : timeout);
 
 	if (SYSINFO_RET_OK != command->function(&request, result))
 	{

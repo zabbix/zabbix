@@ -64,6 +64,7 @@ typedef struct
 	zbx_uint64_t			lastlogsize;
 	int				mtime;
 	zbx_request_parameter_type_t	*types;
+	int				timeout;
 }
 AGENT_REQUEST;
 

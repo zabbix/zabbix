@@ -98,6 +98,6 @@ int	system_users_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 #else
 	ZBX_UNUSED(request);
 
-	return execute_int("who | wc -l", result);
+	return execute_int("who | wc -l", result, request->timeout);
 #endif
 }
