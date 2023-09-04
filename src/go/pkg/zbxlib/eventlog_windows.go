@@ -244,14 +244,43 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 		return
 	}
+
+	cPSKIdentity := (C.CString)(tlsConfig.PSKIdentity)
+	cPSKKey := (C.CString)(tlsConfig.PSKKey)
+	cCAFile := (C.CString)(tlsConfig.CAFile)
+	cCRLFile := (C.CString)(tlsConfig.CRLFile)
+	cCertFile := (C.CString)(tlsConfig.CertFile)
+	cKeyFile := (C.CString)(tlsConfig.KeyFile)
+	cServerCertIssuer := (C.CString)(tlsConfig.ServerCertIssuer)
+	cServerCertSubject := (C.CString)(tlsConfig.ServerCertSubject)
+
+	defer func() {
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cPSKIdentity))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cPSKKey))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cCAFile))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cCRLFile))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cCertFile))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cKeyFile))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cServerCertIssuer))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(cServerCertSubject))
+	}()
+
+
 	if (nil != tlsConfig) {
 		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
 		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
-			(C.CString)(tlsConfig.PSKIdentity), (C.CString)(tlsConfig.PSKKey),
-			(C.CString)(tlsConfig.CAFile), (C.CString)(tlsConfig.CRLFile), (C.CString)(tlsConfig.CertFile),
-			(C.CString)(tlsConfig.KeyFile), (C.CString)(tlsConfig.ServerCertIssuer),
-			(C.CString)(tlsConfig.ServerCertSubject));
+			cPSKIdentity, cPSKKey, cCAFile, cCRLFile), cCertFile, cKeyFile, cServerCertIssuer,
+			cServerCertSubject);
 		ctlsConfig_p = &ctlsConfig
+
 	}
 
 	procValueFunc := C.process_eventlog_value_cb
@@ -267,6 +296,13 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 		(C.int)(agent.Options.Timeout), (C.CString)(agent.Options.SourceIP),
 		(C.CString)(agent.Options.Hostname), (C.int)(agent.Options.BufferSend),
 		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_eventlog_max_lines_per_second), &cerrmsg)
+
+	defer func() {
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(agent.Options.SourceIP))
+		log.Tracef("Calling C function \"free()\"")
+		C.free(unsafe.Pointer(agent.Options.Hostname))
+	}()
 
 	// add cached results
 	var cvalue, csource *C.char

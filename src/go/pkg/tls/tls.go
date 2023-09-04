@@ -1088,7 +1088,7 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 		if cfg.ServerCertIssuer != "" {
 			cIssuer = C.CString(cfg.ServerCertIssuer)
 			log.Tracef("Calling C function \"free()\"")
-			defer C.free(unsafe.Pointer(cSubject))
+			defer C.free(unsafe.Pointer(cIssuer))
 		}
 		if cfg.ServerCertSubject != "" {
 			cSubject = C.CString(cfg.ServerCertSubject)
