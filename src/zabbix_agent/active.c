@@ -1119,6 +1119,7 @@ static int	process_value(const char *server, unsigned short port, const char *ho
 		el->logeventid = (int)*logeventid;
 
 	zbx_timespec(&el->ts);
+
 	el->flags = flags;
 	el->id = ++last_valueid;
 
