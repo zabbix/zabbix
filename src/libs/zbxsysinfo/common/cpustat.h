@@ -34,8 +34,6 @@ typedef struct
 }
 ZBX_CPUS_STAT_DATA;
 
-//#define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.queue_counter)
-
 int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **error);
 
 #else	/* not _WINDOWS */

@@ -523,7 +523,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	FILE		*f_cmd = NULL, *f_stat = NULL;
 	zbx_uint64_t	mem_size = 0, byte_value = 0, total_memory;
 	double		pct_size = 0.0, pct_value = 0.0;
-	int		do_task, res, mem_type_code, mem_type_tried = 0, proccount = 0, invalid_user = 0, invalid_read = 0;
+	int		do_task, res, mem_type_code, mem_type_tried = 0, proccount = 0, invalid_user = 0,
+			invalid_read = 0;
 	char		*mem_type = NULL;
 	const char	*mem_type_search = NULL;
 

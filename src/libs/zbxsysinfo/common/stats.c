@@ -40,12 +40,12 @@ int	cpu_collector_started(void)
 {
 #ifdef _WINDOWS
 	return ((NULL != collector) && (collector)->cpus.queue_counter);
-#else   /* not _WINDOWS */
+#else /* not _WINDOWS */
 	return (NULL != collector);
 #endif
 }
 
-zbx_collector_data       *get_collector(void)
+zbx_collector_data	*get_collector(void)
 {
 	return collector;
 }
@@ -59,12 +59,12 @@ int	diskdevice_collector_started(void)
 static int			shm_id;
 int				my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 static zbx_diskdevices_data	*diskdevices = NULL;
-zbx_diskdevices_data     *get_diskdevices(void)
+zbx_diskdevices_data	*get_diskdevices(void)
 {
 	return diskdevices;
 }
 
-static zbx_mutex_t 	    	diskstats_lock = ZBX_MUTEX_NULL;
+static zbx_mutex_t	diskstats_lock = ZBX_MUTEX_NULL;
 
 void	stats_lock_diskstats(void)
 {
@@ -81,8 +81,6 @@ void	stats_unlock_diskstats(void)
  *                                                                            *
  * Purpose: Returns the number of processors which are currently online       *
  *          (i.e., available).                                                *
- *                                                                            *
- * Return value: number of CPUs                                               *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_get_cpu_num(void)
@@ -320,9 +318,7 @@ void	diskstat_shm_reattach(void)
 #ifndef _WINDOWS
 	if (my_diskstat_shmid != collector->diskstat_shmid)
 	{
-		int old_shmid;
-
-		old_shmid = my_diskstat_shmid;
+		int	old_shmid = my_diskstat_shmid;
 
 		if (ZBX_NONEXISTENT_SHMID != my_diskstat_shmid)
 		{
@@ -352,7 +348,7 @@ void	diskstat_shm_reattach(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Create a new, larger disk statistics shared memory segment and    *
+ * Purpose: Creates a new, larger disk statistics shared memory segment and   *
  *          copy data from the old one.                                       *
  *                                                                            *
  ******************************************************************************/

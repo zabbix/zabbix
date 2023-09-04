@@ -97,12 +97,10 @@ int	zbx_get_diskstat(const char *devname, zbx_uint64_t *dstat)
 
 static int	vfs_dev_rw(AGENT_REQUEST *request, AGENT_RESULT *result, int rw)
 {
-	zbx_single_diskdevice_data *device;
-	char		devname[32], *tmp;
+	zbx_single_diskdevice_data	*device;
+	char		devname[32], *tmp, *pd; /* pointer to device name without '/dev/' prefix, e.g. 'da0' */;
 	int		type, mode;
 	zbx_uint64_t	dstats[ZBX_DSTAT_MAX];
-	char		*pd;			/* pointer to device name without '/dev/' prefix, e.g. 'da0' */
-
 	if (3 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));

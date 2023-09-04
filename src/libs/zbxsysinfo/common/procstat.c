@@ -75,9 +75,6 @@
  * * Synchronise both references with procstat_reattach() before using procstat shared memory segment.
  */
 
-/* the main collector data */
-//extern ZBX_COLLECTOR_DATA	*collector;
-
 /* local reference to the procstat shared memory */
 static zbx_dshm_ref_t	procstat_ref;
 

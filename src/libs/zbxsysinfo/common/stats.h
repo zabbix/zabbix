@@ -43,7 +43,7 @@ typedef struct
 {
 	ZBX_CPUS_STAT_DATA	cpus;
 #ifndef _WINDOWS
-	int 			diskstat_shmid;
+	int			diskstat_shmid;
 #endif
 #ifdef ZBX_PROCSTAT_COLLECTOR
 	zbx_dshm_t		procstat;
@@ -58,12 +58,12 @@ typedef struct
 }
 zbx_collector_data;
 
-int     cpu_collector_started(void);
-zbx_collector_data       *get_collector(void);
+int	cpu_collector_started(void);
+zbx_collector_data	*get_collector(void);
 
 #ifndef _WINDOWS
-zbx_diskdevices_data     *get_diskdevices(void);
-int     diskdevice_collector_started(void);
+zbx_diskdevices_data	*get_diskdevices(void);
+int	diskdevice_collector_started(void);
 void	stats_lock_diskstats(void);
 void	stats_unlock_diskstats(void);
 #endif
