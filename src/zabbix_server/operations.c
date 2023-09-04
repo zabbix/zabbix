@@ -186,7 +186,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 		hostgroupid = zbx_db_get_maxid_num("hosts_groups", groupids->values_num);
 
-		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
+		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", (char *)NULL);
 
 		zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -442,14 +442,14 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				hostid = zbx_db_get_maxid("hosts");
 
 				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "host", "name",
-						NULL);
+						(char *)NULL);
 				zbx_db_insert_add_values(&db_insert, hostid, proxyid, host_unique,
 						hostname);
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
 
 				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
-						"active_available", NULL);
+						"active_available", (char *)NULL);
 
 				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid,
 						ZBX_INTERFACE_AVAILABLE_UNKNOWN);
@@ -583,7 +583,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid",
 							"host", "name", "tls_connect", "tls_accept",
-							"tls_psk_identity", "tls_psk", NULL);
+							"tls_psk_identity", "tls_psk", (char *)NULL);
 					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname, hostname,
 						tls_accepted, tls_accepted, psk_identity, psk);
 
@@ -594,7 +594,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				else
 				{
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "host",
-							"name", NULL);
+							"name", (char *)NULL);
 
 					zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname,
@@ -605,7 +605,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_clean(&db_insert);
 
 				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
-						"active_available", NULL);
+						"active_available", (char *)NULL);
 
 				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid,
 						ZBX_INTERFACE_AVAILABLE_UNKNOWN);
@@ -773,7 +773,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 		hosttagid = first_hosttagid = zbx_db_get_maxid_num("host_tag", new_tags_cnt);
 
 		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", "automatic",
-				NULL);
+				(char *)NULL);
 
 		for (i = 0; i < host_tags->values_num; i++)
 		{
@@ -898,6 +898,8 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
 	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames);
+
+	zbx_db_execute("delete from autoreg_host where host='%s'", hostname);
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);

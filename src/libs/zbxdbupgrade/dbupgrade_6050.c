@@ -390,7 +390,7 @@ static int	DBpatch_6050034(void)
 			{
 				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"name", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"operating_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"description", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0},
 				{"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -451,9 +451,9 @@ static int	DBpatch_6050039(void)
 			" where h.status in (%i,%i)",
 			DEPRECATED_STATUS_PROXY_PASSIVE, DEPRECATED_STATUS_PROXY_ACTIVE);
 
-	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "mode", "description", "tls_connect",
+	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "operating_mode", "description", "tls_connect",
 			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
-			"address", "port", NULL);
+			"address", "port", (char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -467,7 +467,7 @@ static int	DBpatch_6050039(void)
 
 		if (DEPRECATED_STATUS_PROXY_ACTIVE == status)
 		{
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_ACTIVE, row[3],
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_ACTIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], row[10],
 					"127.0.0.1", "10051");
 		}
@@ -488,7 +488,7 @@ static int	DBpatch_6050039(void)
 				zabbix_log(LOG_LEVEL_WARNING, "cannot select interface for proxy '%s'",  row[1]);
 			}
 
-			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_MODE_PASSIVE, row[3],
+			zbx_db_insert_add_values(&db_insert_proxies, proxyid, row[1], PROXY_OPERATING_MODE_PASSIVE, row[3],
 					tls_connect, tls_accept, row[6], row[7], row[8], row[9], "", address, port);
 		}
 	}
@@ -618,7 +618,7 @@ static int	DBpatch_6050054(void)
 		DEPRECATED_STATUS_PROXY_ACTIVE, DEPRECATED_STATUS_PROXY_PASSIVE);
 
 	zbx_db_insert_prepare(&db_insert_rtdata, "proxy_rtdata", "proxyid", "lastaccess", "version", "compatibility",
-			NULL);
+			(char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -698,7 +698,7 @@ static int	DBpatch_6050062(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update profiles"
 			" set value_str='name'"
-			" where value_str='host'"
+			" where value_str like 'host'"
 				" and idx='web.proxies.php.sort'"))
 	{
 		return FAIL;
@@ -728,6 +728,198 @@ static int	DBpatch_6050063(void)
 	}
 #undef TM_DATA_TYPE_TEST_ITEM
 #undef TM_DATA_TYPE_PROXYIDS
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050064(void)
+{
+	if (FAIL == zbx_db_index_exists("dashboard_user", "dashboard_user_2"))
+		return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050065(void)
+{
+	if (FAIL == zbx_db_index_exists("dashboard_usrgrp", "dashboard_usrgrp_2"))
+		return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050066(void)
+{
+	if (FAIL == zbx_db_index_exists("event_suppress", "event_suppress_4"))
+		return DBcreate_index("event_suppress", "event_suppress_4", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050067(void)
+{
+	if (FAIL == zbx_db_index_exists("group_discovery", "group_discovery_1"))
+		return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050068(void)
+{
+	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_2"))
+		return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050069(void)
+{
+	if (FAIL == zbx_db_index_exists("group_prototype", "group_prototype_3"))
+		return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050070(void)
+{
+	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_1"))
+		return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050071(void)
+{
+	if (FAIL == zbx_db_index_exists("host_discovery", "host_discovery_2"))
+		return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050072(void)
+{
+	if (FAIL == zbx_db_index_exists("hosts", "hosts_7"))
+		return DBcreate_index("hosts", "hosts_7", "templateid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050073(void)
+{
+	if (FAIL == zbx_db_index_exists("interface_discovery", "interface_discovery_1"))
+		return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050074(void)
+{
+	if (FAIL == zbx_db_index_exists("report", "report_2"))
+		return DBcreate_index("report", "report_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050075(void)
+{
+	if (FAIL == zbx_db_index_exists("report", "report_3"))
+		return DBcreate_index("report", "report_3", "dashboardid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050076(void)
+{
+	if (FAIL == zbx_db_index_exists("report_user", "report_user_2"))
+		return DBcreate_index("report_user", "report_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050077(void)
+{
+	if (FAIL == zbx_db_index_exists("report_user", "report_user_3"))
+		return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050078(void)
+{
+	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_2"))
+		return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050079(void)
+{
+	if (FAIL == zbx_db_index_exists("report_usrgrp", "report_usrgrp_3"))
+		return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050080(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmaps", "sysmaps_4"))
+		return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050081(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_element_trigger", "sysmap_element_trigger_2"))
+		return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050082(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_user", "sysmap_user_2"))
+		return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050083(void)
+{
+	if (FAIL == zbx_db_index_exists("sysmap_usrgrp", "sysmap_usrgrp_2"))
+		return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050084(void)
+{
+	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_1"))
+		return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050085(void)
+{
+	if (FAIL == zbx_db_index_exists("tag_filter", "tag_filter_2"))
+		return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050086(void)
+{
+	if (FAIL == zbx_db_index_exists("task", "task_2"))
+		return DBcreate_index("task", "task_2", "proxyid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050087(void)
+{
+	if (FAIL == zbx_db_index_exists("users", "users_3"))
+		return DBcreate_index("users", "users_3", "roleid", 0);
 
 	return SUCCEED;
 }
@@ -762,7 +954,7 @@ static int	zbx_wiget_field_compare(const void *d1, const void *d2)
 	return strcmp(f1->name, f2->name);
 }
 
-static void	DBpatch_6050064_transform(zbx_vector_wiget_field_t *timeshift, zbx_vector_wiget_field_t *interval,
+static void	DBpatch_6050088_transform(zbx_vector_wiget_field_t *timeshift, zbx_vector_wiget_field_t *interval,
 		zbx_vector_wiget_field_t *aggr_func, zbx_vector_wiget_field_t *time_from,
 		zbx_vector_wiget_field_t *time_to, zbx_vector_uint64_t *nofunc_ids)
 {
@@ -831,7 +1023,7 @@ static void	DBpatch_6050064_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 	}
 }
 
-static int	DBpatch_6050064_load(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to,
+static int	DBpatch_6050088_load(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to,
 		zbx_vector_uint64_t *nofunc_ids)
 {
 	zbx_db_result_t			result;
@@ -881,7 +1073,7 @@ static int	DBpatch_6050064_load(zbx_vector_wiget_field_t *time_from, zbx_vector_
 	}
 	zbx_db_free_result(result);
 
-	DBpatch_6050064_transform(&timeshift, &interval, &aggr_func, time_from, time_to, nofunc_ids);
+	DBpatch_6050088_transform(&timeshift, &interval, &aggr_func, time_from, time_to, nofunc_ids);
 
 	zbx_vector_wiget_field_clear_ext(&timeshift, zbx_wiget_field_free);
 	zbx_vector_wiget_field_clear_ext(&interval, zbx_wiget_field_free);
@@ -893,7 +1085,7 @@ static int	DBpatch_6050064_load(zbx_vector_wiget_field_t *time_from, zbx_vector_
 	return SUCCEED;
 }
 
-static int	DBpatch_6050064_remove(zbx_vector_uint64_t *nofuncs)
+static int	DBpatch_6050088_remove(zbx_vector_uint64_t *nofuncs)
 {
 	if (0 == nofuncs->values_num)
 		return SUCCEED;
@@ -903,7 +1095,7 @@ static int	DBpatch_6050064_remove(zbx_vector_uint64_t *nofuncs)
 	return zbx_db_execute_multiple_query("delete from widget_field where", "widget_fieldid", nofuncs);
 }
 
-static int	DBpatch_6050064_update(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to)
+static int	DBpatch_6050088_update(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -952,7 +1144,7 @@ static int	DBpatch_6050064_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 	return ret;
 }
 
-static int	DBpatch_6050064_insert(zbx_vector_wiget_field_t *time_from)
+static int	DBpatch_6050088_insert(zbx_vector_wiget_field_t *time_from)
 {
 	zbx_db_insert_t	db_insert;
 	int		i, ret = SUCCEED;
@@ -979,7 +1171,7 @@ static int	DBpatch_6050064_insert(zbx_vector_wiget_field_t *time_from)
 	return ret;
 }
 
-static int	DBpatch_6050064(void)
+static int	DBpatch_6050088(void)
 {
 	zbx_vector_wiget_field_t	time_from, time_to;
 	zbx_vector_uint64_t		nofuncs_ids;
@@ -992,10 +1184,10 @@ static int	DBpatch_6050064(void)
 	zbx_vector_wiget_field_create(&time_to);
 	zbx_vector_uint64_create(&nofuncs_ids);
 
-	if (SUCCEED == DBpatch_6050064_load(&time_from, &time_to, &nofuncs_ids)
-			&& SUCCEED == DBpatch_6050064_remove(&nofuncs_ids)
-			&& SUCCEED == DBpatch_6050064_update(&time_from, &time_to)
-			&& SUCCEED == DBpatch_6050064_insert(&time_from))
+	if (SUCCEED == DBpatch_6050088_load(&time_from, &time_to, &nofuncs_ids)
+			&& SUCCEED == DBpatch_6050088_remove(&nofuncs_ids)
+			&& SUCCEED == DBpatch_6050088_update(&time_from, &time_to)
+			&& SUCCEED == DBpatch_6050088_insert(&time_from))
 	{
 		ret = SUCCEED;
 	}
@@ -1080,5 +1272,29 @@ DBPATCH_ADD(6050061, 0, 1)
 DBPATCH_ADD(6050062, 0, 1)
 DBPATCH_ADD(6050063, 0, 1)
 DBPATCH_ADD(6050064, 0, 1)
+DBPATCH_ADD(6050065, 0, 1)
+DBPATCH_ADD(6050066, 0, 1)
+DBPATCH_ADD(6050067, 0, 1)
+DBPATCH_ADD(6050068, 0, 1)
+DBPATCH_ADD(6050069, 0, 1)
+DBPATCH_ADD(6050070, 0, 1)
+DBPATCH_ADD(6050071, 0, 1)
+DBPATCH_ADD(6050072, 0, 1)
+DBPATCH_ADD(6050073, 0, 1)
+DBPATCH_ADD(6050074, 0, 1)
+DBPATCH_ADD(6050075, 0, 1)
+DBPATCH_ADD(6050076, 0, 1)
+DBPATCH_ADD(6050077, 0, 1)
+DBPATCH_ADD(6050078, 0, 1)
+DBPATCH_ADD(6050079, 0, 1)
+DBPATCH_ADD(6050080, 0, 1)
+DBPATCH_ADD(6050081, 0, 1)
+DBPATCH_ADD(6050082, 0, 1)
+DBPATCH_ADD(6050083, 0, 1)
+DBPATCH_ADD(6050084, 0, 1)
+DBPATCH_ADD(6050085, 0, 1)
+DBPATCH_ADD(6050086, 0, 1)
+DBPATCH_ADD(6050087, 0, 1)
+DBPATCH_ADD(6050088, 0, 1)
 
 DBPATCH_END()

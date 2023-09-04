@@ -188,64 +188,6 @@ class testUrlParameters extends CLegacyWebTest {
 				]
 			],
 			[
-				'title' => 'Configuration of templates',
-				'check_server_name' => true,
-				'server_name_on_page' => true,
-				'test_cases' => [
-					[
-						'url' => 'templates.php?form=update&templateid=10001',
-						'text_present' => 'Templates'
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=9999999',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'No permissions to referred object or it does not exist!'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=abc',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not integer.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not integer.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid=-1',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Incorrect value "-1" for "templateid" field.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update&templateid%5B%5D=1',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is not correct: invalid data type.'
-						]
-					],
-					[
-						'url' => 'templates.php?form=update',
-						'text_not_present' => 'Templates',
-						'text_present' => [
-							'Zabbix has received an incorrect request.',
-							'Field "templateid" is mandatory.'
-						]
-					]
-				]
-			],
-			[
 				'title' => 'Configuration of host',
 				'check_server_name' => true,
 				'server_name_on_page' => false,
