@@ -63,6 +63,10 @@
 				this.name.dispatchEvent(new Event('input'));
 			});
 
+			// Tags tab events.
+			this.form.querySelectorAll('[name="show_inherited_tags"]')
+				.forEach(o => o.addEventListener('change', e => this.#toggleInheritedTags()));
+
 			this.form.addEventListener('click', (e) => {
 				if (e.target.id === 'expression-constructor' || e.target.id === 'close-expression-constructor') {
 					this.#toggleExpressionConstructor(e.target.id);
@@ -147,9 +151,6 @@
 				}
 				else if (e.target.classList.contains('js-edit-template')) {
 					this.editTemplate(e, e.target.dataset.templateid);
-				}
-				else if (e.target.name === 'show_inherited_tags') {
-					this.#toggleInheritedTags();
 				}
 			});
 		}

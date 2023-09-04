@@ -381,7 +381,7 @@ class CTriggerGeneralHelper {
 				'preservekeys' => true
 			]);
 
-			if ($data['parent_discoveryid']) {
+			if (array_key_exists('parent_discoveryid', $data)) {
 				$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
 					'output' => ['triggerid', 'description', 'flags'],
 					'selectHosts' => ['hostid', 'name'],

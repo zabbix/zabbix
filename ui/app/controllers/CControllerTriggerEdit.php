@@ -165,7 +165,8 @@ class CControllerTriggerEdit extends CController {
 
 			$data['tags'] = $tags;
 		}
-		elseif ($data['tags']) {
+
+		if ($data['tags']) {
 			$tags = $data['tags'];
 
 			foreach ($tags as $key => $tag) {
