@@ -59,7 +59,7 @@ VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_tag_t*, vmware_tag)
  * Parameters: counter - [IN] the performance counter data                    *
  *                                                                            *
  ******************************************************************************/
-void	vmware_perf_counter_shared_free(zbx_vmware_perf_counter_t *counter)
+void	vmware_shmem_perf_counter_free(zbx_vmware_perf_counter_t *counter)
 {
 	vmware_vector_str_uint64_pair_shared_clean(&counter->values);
 	zbx_vector_str_uint64_pair_destroy(&counter->values);
@@ -106,7 +106,7 @@ void	vmware_perf_counters_vector_ptr_create_ext(zbx_vmware_perf_entity_t *pentit
  * Parameters: diskextent   - [IN] the diskextent                             *
  *                                                                            *
  ******************************************************************************/
-void	vmware_diskextent_shared_free(zbx_vmware_diskextent_t *diskextent)
+void	vmware_shmem_diskextent_free(zbx_vmware_diskextent_t *diskextent)
 {
 	vmware_shared_strfree(diskextent->diskname);
 	__vm_shmem_free_func(diskextent);
@@ -131,7 +131,7 @@ void	vmware_shmem_free_datastore(zbx_vmware_datastore_t *datastore)
  * Parameters: datacenter   - [IN] the datacenter                             *
  *                                                                            *
  ******************************************************************************/
-void	vmware_datacenter_shared_free(zbx_vmware_datacenter_t *datacenter)
+void	vmware_shmem_datacenter_free(zbx_vmware_datacenter_t *datacenter)
 {
 	vmware_shared_strfree(datacenter->name);
 	vmware_shared_strfree(datacenter->id);
@@ -148,7 +148,7 @@ void	vmware_datacenter_shared_free(zbx_vmware_datacenter_t *datacenter)
  * Parameters: resourcepool   - [IN] the resourcepool                         *
  *                                                                            *
  ******************************************************************************/
-void	vmware_resourcepool_shared_free(zbx_vmware_resourcepool_t *resourcepool)
+void	vmware_shmem_resourcepool_free(zbx_vmware_resourcepool_t *resourcepool)
 {
 	vmware_shared_strfree(resourcepool->id);
 	vmware_shared_strfree(resourcepool->parentid);
@@ -164,7 +164,7 @@ void	vmware_resourcepool_shared_free(zbx_vmware_resourcepool_t *resourcepool)
  * Parameters: dvswitch - [IN] the dvswitch                                   *
  *                                                                            *
  ******************************************************************************/
-void	vmware_dvswitch_shared_free(zbx_vmware_dvswitch_t *dvswitch)
+void	vmware_shmem_dvswitch_free(zbx_vmware_dvswitch_t *dvswitch)
 {
 	vmware_shared_strfree(dvswitch->uuid);
 	vmware_shared_strfree(dvswitch->id);
@@ -181,7 +181,7 @@ void	vmware_dvswitch_shared_free(zbx_vmware_dvswitch_t *dvswitch)
  *             props_num - [IN] the number of properties in the list          *
  *                                                                            *
  ******************************************************************************/
-void	vmware_props_shared_free(char **props, int props_num)
+void	vmware_shmem_props_free(char **props, int props_num)
 {
 	int	i;
 
@@ -204,7 +204,7 @@ void	vmware_props_shared_free(char **props, int props_num)
  * Parameters: dev   - [IN] the vm device                                     *
  *                                                                            *
  ******************************************************************************/
-void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
+void	vmware_shmem_dev_free(zbx_vmware_dev_t *dev)
 {
 	if (NULL != dev->instance)
 		vmware_shared_strfree(dev->instance);
@@ -212,7 +212,7 @@ void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
 	if (NULL != dev->label)
 		vmware_shared_strfree(dev->label);
 
-	vmware_props_shared_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
+	vmware_shmem_props_free(dev->props, ZBX_VMWARE_DEV_PROPS_NUM);
 
 	__vm_shmem_free_func(dev);
 }
@@ -224,7 +224,7 @@ void	vmware_dev_shared_free(zbx_vmware_dev_t *dev)
  * Parameters: fs   - [IN] the file system                                    *
  *                                                                            *
  ******************************************************************************/
-void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
+void	vmware_shmem_fs_free(zbx_vmware_fs_t *fs)
 {
 	if (NULL != fs->path)
 		vmware_shared_strfree(fs->path);
@@ -239,7 +239,7 @@ void	vmware_fs_shared_free(zbx_vmware_fs_t *fs)
  * Parameters: custom_attr   - [IN] the custom attributes object              *
  *                                                                            *
  ******************************************************************************/
-void	vmware_custom_attr_shared_free(zbx_vmware_custom_attr_t *custom_attr)
+void	vmware_shmem_custom_attr_free(zbx_vmware_custom_attr_t *custom_attr)
 {
 	if (NULL != custom_attr->name)
 		vmware_shared_strfree(custom_attr->name);
@@ -257,7 +257,7 @@ void	vmware_custom_attr_shared_free(zbx_vmware_custom_attr_t *custom_attr)
  * Parameters: vm   - [IN] the virtual machine                                *
  *                                                                            *
  ******************************************************************************/
-void	vmware_shared_vm_free(zbx_vmware_vm_t *vm)
+void	vmware_shmem_vm_free(zbx_vmware_vm_t *vm)
 {
 	__vm_shmem_free_func(vm);
 }
@@ -269,7 +269,7 @@ void	vmware_shared_vm_free(zbx_vmware_vm_t *vm)
  * Parameters: dsname  - [IN] the datastore name                              *
  *                                                                            *
  ******************************************************************************/
-void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
+void	vmware_shmem_dsname_free(zbx_vmware_dsname_t *dsname)
 {
 	vmware_shared_strfree(dsname->name);
 	vmware_shared_strfree(dsname->uuid);
@@ -285,7 +285,7 @@ void	vmware_dsname_shared_free(zbx_vmware_dsname_t *dsname)
  * Parameters: nic - [IN] the physical NIC of hv                              *
  *                                                                            *
  ******************************************************************************/
-void	vmware_pnic_shared_free(zbx_vmware_pnic_t *nic)
+void	vmware_shmem_pnic_free(zbx_vmware_pnic_t *nic)
 {
 	vmware_shared_strfree(nic->name);
 	vmware_shared_strfree(nic->driver);
@@ -301,7 +301,7 @@ void	vmware_pnic_shared_free(zbx_vmware_pnic_t *nic)
  * Parameters: alarm - [IN] the alarm object                                  *
  *                                                                            *
  ******************************************************************************/
-void	vmware_alarm_shared_free(zbx_vmware_alarm_t *alarm)
+void	vmware_shmem_alarm_free(zbx_vmware_alarm_t *alarm)
 {
 	vmware_shared_strfree(alarm->key);
 	vmware_shared_strfree(alarm->name);
@@ -320,7 +320,7 @@ void	vmware_alarm_shared_free(zbx_vmware_alarm_t *alarm)
  * Parameters: di - [IN] the disk info object                                 *
  *                                                                            *
  ******************************************************************************/
-void	vmware_diskinfo_shared_free(zbx_vmware_diskinfo_t *di)
+void	vmware_shmem_diskinfo_free(zbx_vmware_diskinfo_t *di)
 {
 	vmware_shared_strfree(di->diskname);
 	vmware_shared_strfree(di->ds_uuid);
@@ -353,7 +353,7 @@ void	vmware_shmem_cluster_free(zbx_vmware_cluster_t *cluster)
  * Parameters: event - [IN] the vmware event                                  *
  *                                                                            *
  ******************************************************************************/
-void	vmware_event_shared_free(zbx_vmware_event_t *event)
+void	vmware_shmem_event_free(zbx_vmware_event_t *event)
 {
 	if (NULL != event->message)
 		vmware_shared_strfree(event->message);
@@ -416,7 +416,7 @@ void	vmware_shmem_service_free(zbx_vmware_service_t *service)
  * Return value: a copied vmware event object                                 *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src)
+zbx_vmware_event_t	*vmware_shmem_event_dup(const zbx_vmware_event_t *src)
 {
 	zbx_vmware_event_t	*event;
 
@@ -437,7 +437,7 @@ zbx_vmware_event_t	*vmware_event_shared_dup(const zbx_vmware_event_t *src)
  * Return value: a duplicated vmware diskextent object                        *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_diskextent_t	*vmware_diskextent_shared_dup(const zbx_vmware_diskextent_t *src)
+zbx_vmware_diskextent_t	*vmware_shmem_diskextent_dup(const zbx_vmware_diskextent_t *src)
 {
 	zbx_vmware_diskextent_t	*diskextent;
 
@@ -457,7 +457,7 @@ zbx_vmware_diskextent_t	*vmware_diskextent_shared_dup(const zbx_vmware_diskexten
  * Return value: a duplicated vmware resourcepool object                      *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_resourcepool_t	*vmware_resourcepool_shared_dup(const zbx_vmware_resourcepool_t *src)
+zbx_vmware_resourcepool_t	*vmware_shmem_resourcepool_dup(const zbx_vmware_resourcepool_t *src)
 {
 	zbx_vmware_resourcepool_t	*resourcepool;
 
@@ -479,7 +479,7 @@ zbx_vmware_resourcepool_t	*vmware_resourcepool_shared_dup(const zbx_vmware_resou
  * Return value: a duplicated vmware dvswitch object                          *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_dvswitch_t	*vmware_dvswitch_shared_dup(const zbx_vmware_dvswitch_t *src)
+zbx_vmware_dvswitch_t	*vmware_shmem_dvswitch_dup(const zbx_vmware_dvswitch_t *src)
 {
 	zbx_vmware_dvswitch_t	*dvs;
 
@@ -501,7 +501,7 @@ zbx_vmware_dvswitch_t	*vmware_dvswitch_shared_dup(const zbx_vmware_dvswitch_t *s
  * Return value: a duplicated vmware device object                            *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
+zbx_vmware_fs_t	*vmware_shmem_fs_dup(const zbx_vmware_fs_t *src)
 {
 	zbx_vmware_fs_t	*fs;
 
@@ -523,7 +523,7 @@ zbx_vmware_fs_t	*vmware_fs_shared_dup(const zbx_vmware_fs_t *src)
  * Return value: a duplicated vmware custom attribute object                  *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_custom_attr_t	*vmware_attr_shared_dup(const zbx_vmware_custom_attr_t *src)
+zbx_vmware_custom_attr_t	*vmware_shmem_attr_dup(const zbx_vmware_custom_attr_t *src)
 {
 	zbx_vmware_custom_attr_t	*custom_attr;
 
@@ -569,7 +569,7 @@ static char	**vmware_props_shared_dup(char ** const src, int props_num)
  * Return value: a duplicated vmware device object                            *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
+zbx_vmware_dev_t	*vmware_shmem_dev_dup(const zbx_vmware_dev_t *src)
 {
 	zbx_vmware_dev_t	*dev;
 
@@ -591,7 +591,7 @@ zbx_vmware_dev_t	*vmware_dev_shared_dup(const zbx_vmware_dev_t *src)
  * Return value: a duplicated vmware virtual machine object                   *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
+zbx_vmware_vm_t	*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src)
 {
 	zbx_vmware_vm_t	*vm;
 	int		i;
@@ -613,15 +613,15 @@ zbx_vmware_vm_t	*vmware_vm_shared_dup(const zbx_vmware_vm_t *src)
 	vm->snapshot_count = src->snapshot_count;
 
 	for (i = 0; i < src->devs.values_num; i++)
-		zbx_vector_ptr_append(&vm->devs, vmware_dev_shared_dup((zbx_vmware_dev_t *)src->devs.values[i]));
+		zbx_vector_ptr_append(&vm->devs, vmware_shmem_dev_dup((zbx_vmware_dev_t *)src->devs.values[i]));
 
 	for (i = 0; i < src->file_systems.values_num; i++)
-		zbx_vector_ptr_append(&vm->file_systems, vmware_fs_shared_dup((zbx_vmware_fs_t *)src->file_systems.values[i]));
+		zbx_vector_ptr_append(&vm->file_systems, vmware_shmem_fs_dup((zbx_vmware_fs_t *)src->file_systems.values[i]));
 
 	for (i = 0; i < src->custom_attrs.values_num; i++)
 	{
 		zbx_vector_vmware_custom_attr_append(&vm->custom_attrs,
-				vmware_attr_shared_dup(src->custom_attrs.values[i]));
+				vmware_shmem_attr_dup(src->custom_attrs.values[i]));
 	}
 
 	for (i = 0; i < src->alarm_ids.values_num; i++)
@@ -759,7 +759,7 @@ static void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 		zbx_vector_vmware_dsname_append(&dst->dsnames, vmware_dsname_shared_dup(src->dsnames.values[i]));
 
 	for (i = 0; i < src->vms.values_num; i++)
-		zbx_vector_ptr_append(&dst->vms, vmware_vm_shared_dup((zbx_vmware_vm_t *)src->vms.values[i]));
+		zbx_vector_ptr_append(&dst->vms, vmware_shmem_vm_dup((zbx_vmware_vm_t *)src->vms.values[i]));
 
 	for (i = 0; i < src->pnics.values_num; i++)
 		zbx_vector_vmware_pnic_append(&dst->pnics, vmware_pnic_shared_dup(src->pnics.values[i]));
@@ -915,7 +915,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	for (i = 0; i < src->diskextents.values_num; i++)
 	{
 		zbx_vector_vmware_diskextent_append(&datastore->diskextents,
-				vmware_diskextent_shared_dup(src->diskextents.values[i]));
+				vmware_shmem_diskextent_dup(src->diskextents.values[i]));
 	}
 
 	for (i = 0; i < src->alarm_ids.values_num; i++)
@@ -933,7 +933,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
  * Return value: a duplicated vmware data object                              *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
+zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 {
 	zbx_vmware_data_t	*data;
 	int			i;
@@ -970,7 +970,7 @@ zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 		zbx_vector_ptr_append(&data->clusters, vmware_cluster_shared_dup((zbx_vmware_cluster_t *)src->clusters.values[i]));
 
 	for (i = 0; i < src->events.values_num; i++)
-		zbx_vector_ptr_append(&data->events, vmware_event_shared_dup((zbx_vmware_event_t *)src->events.values[i]));
+		zbx_vector_ptr_append(&data->events, vmware_shmem_event_dup((zbx_vmware_event_t *)src->events.values[i]));
 
 	for (i = 0; i < src->datastores.values_num; i++)
 		zbx_vector_vmware_datastore_append(&data->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
@@ -984,13 +984,13 @@ zbx_vmware_data_t	*vmware_data_shared_dup(zbx_vmware_data_t *src)
 	for (i = 0; i < src->resourcepools.values_num; i++)
 	{
 		zbx_vector_vmware_resourcepool_append(&data->resourcepools,
-				vmware_resourcepool_shared_dup(src->resourcepools.values[i]));
+				vmware_shmem_resourcepool_dup(src->resourcepools.values[i]));
 	}
 
 	for (i = 0; i < src->dvswitches.values_num; i++)
 	{
 		zbx_vector_vmware_dvswitch_append(&data->dvswitches,
-				vmware_dvswitch_shared_dup(src->dvswitches.values[i]));
+				vmware_shmem_dvswitch_dup(src->dvswitches.values[i]));
 	}
 
 	for (i = 0; i < src->alarms.values_num; i++)

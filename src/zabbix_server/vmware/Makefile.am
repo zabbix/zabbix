@@ -2,17 +2,11 @@
 
 noinst_LIBRARIES = libzbxvmware.a
 
-if HAVE_LIBXML2
-if HAVE_LIBCURL
-VMWARE_FILES_WITH_LIBXML2 = vmware_perfcntr.c
-endif
-endif
-
 libzbxvmware_a_SOURCES = \
 	vmware_shmem.c \
 	vmware_shmem.h \
 	vmware_stats.c \
-	$(VMWARE_FILES_WITH_LIBXML2) \
+	vmware_perfcntr.c \
 	vmware_perfcntr.h \
 	vmware_rest.c \
 	vmware_manager.c \

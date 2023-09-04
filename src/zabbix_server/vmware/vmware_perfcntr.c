@@ -17,11 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "config.h"
-
+#include "vmware_perfcntr.h"
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "vmware_perfcntr.h"
 #include "vmware_shmem.h"
 #include "vmware.h"
 #include "vmware_internal.h"
@@ -32,6 +30,7 @@
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
+
 
 #define ZBX_XML_DATETIME		26
 
@@ -256,7 +255,7 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
  ******************************************************************************/
 void	vmware_shared_perf_entity_clean(zbx_vmware_perf_entity_t *entity)
 {
-	zbx_vector_ptr_clear_ext(&entity->counters, (zbx_mem_free_func_t)vmware_perf_counter_shared_free);
+	zbx_vector_ptr_clear_ext(&entity->counters, (zbx_mem_free_func_t)vmware_shmem_perf_counter_free);
 	zbx_vector_ptr_destroy(&entity->counters);
 
 	vmware_shared_strfree(entity->query_instance);
@@ -1073,7 +1072,7 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_ptr_t *counters)
 			continue;
 		}
 
-		vmware_perf_counter_shared_free(counter);
+		vmware_shmem_perf_counter_free(counter);
 		zbx_vector_ptr_remove(counters, i);
 	}
 

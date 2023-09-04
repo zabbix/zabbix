@@ -798,7 +798,7 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 	vmware_vector_str_uint64_pair_shared_clean(&datastore->hv_uuids_access);
 	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
 
-	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_diskextent_shared_free);
+	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_shmem_diskextent_free);
 	zbx_vector_vmware_diskextent_destroy(&datastore->diskextents);
 
 	zbx_vector_str_clear_ext(&datastore->alarm_ids, vmware_shared_strfree);
@@ -816,13 +816,13 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
  ******************************************************************************/
 static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_shared_free);
+	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_shmem_dev_free);
 	zbx_vector_ptr_destroy(&vm->devs);
 
-	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_shared_free);
+	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_shmem_fs_free);
 	zbx_vector_ptr_destroy(&vm->file_systems);
 
-	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_shared_free);
+	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_shmem_custom_attr_free);
 	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
 
 	zbx_vector_str_clear_ext(&vm->alarm_ids, vmware_shared_strfree);
@@ -834,9 +834,9 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 	if (NULL != vm->id)
 		vmware_shared_strfree(vm->id);
 
-	vmware_props_shared_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
+	vmware_shmem_props_free(vm->props, ZBX_VMWARE_VMPROPS_NUM);
 
-	vmware_shared_vm_free(vm);
+	vmware_shmem_vm_free(vm);
 }
 
 /******************************************************************************
@@ -848,19 +848,19 @@ static void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
  ******************************************************************************/
 static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_vmware_dsname_clear_ext(&hv->dsnames, vmware_dsname_shared_free);
+	zbx_vector_vmware_dsname_clear_ext(&hv->dsnames, vmware_shmem_dsname_free);
 	zbx_vector_vmware_dsname_destroy(&hv->dsnames);
 
 	zbx_vector_ptr_clear_ext(&hv->vms, (zbx_clean_func_t)vmware_vm_shared_free);
 	zbx_vector_ptr_destroy(&hv->vms);
 
-	zbx_vector_vmware_pnic_clear_ext(&hv->pnics, vmware_pnic_shared_free);
+	zbx_vector_vmware_pnic_clear_ext(&hv->pnics, vmware_shmem_pnic_free);
 	zbx_vector_vmware_pnic_destroy(&hv->pnics);
 
 	zbx_vector_str_clear_ext(&hv->alarm_ids, vmware_shared_strfree);
 	zbx_vector_str_destroy(&hv->alarm_ids);
 
-	zbx_vector_vmware_diskinfo_clear_ext(&hv->diskinfo, vmware_diskinfo_shared_free);
+	zbx_vector_vmware_diskinfo_clear_ext(&hv->diskinfo, vmware_shmem_diskinfo_free);
 	zbx_vector_vmware_diskinfo_destroy(&hv->diskinfo);
 
 	if (NULL != hv->uuid)
@@ -884,7 +884,7 @@ static void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 	if (NULL != hv->ip)
 		vmware_shared_strfree(hv->ip);
 
-	vmware_props_shared_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
+	vmware_shmem_props_free(hv->props, ZBX_VMWARE_HVPROPS_NUM);
 }
 
 /******************************************************************************
@@ -939,22 +939,22 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		zbx_vector_ptr_clear_ext(&data->clusters, (zbx_clean_func_t)vmware_cluster_shared_free);
 		zbx_vector_ptr_destroy(&data->clusters);
 
-		zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_event_shared_free);
+		zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_shmem_event_free);
 		zbx_vector_ptr_destroy(&data->events);
 
 		zbx_vector_vmware_datastore_clear_ext(&data->datastores, vmware_datastore_shared_free);
 		zbx_vector_vmware_datastore_destroy(&data->datastores);
 
-		zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_shared_free);
+		zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_shmem_datacenter_free);
 		zbx_vector_vmware_datacenter_destroy(&data->datacenters);
 
-		zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_shared_free);
+		zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_shmem_resourcepool_free);
 		zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
 
-		zbx_vector_vmware_dvswitch_clear_ext(&data->dvswitches, vmware_dvswitch_shared_free);
+		zbx_vector_vmware_dvswitch_clear_ext(&data->dvswitches, vmware_shmem_dvswitch_free);
 		zbx_vector_vmware_dvswitch_destroy(&data->dvswitches);
 
-		zbx_vector_vmware_alarm_clear_ext(&data->alarms, vmware_alarm_shared_free);
+		zbx_vector_vmware_alarm_clear_ext(&data->alarms, vmware_shmem_alarm_free);
 		zbx_vector_vmware_alarm_destroy(&data->alarms);
 
 		zbx_vector_str_clear_ext(&data->alarm_ids, vmware_shared_strfree);
@@ -7139,7 +7139,7 @@ out:
 	}
 
 	vmware_data_shared_free(service->data);
-	service->data = vmware_data_shared_dup(data);
+	service->data = vmware_shmem_data_dup(data);
 	service->eventlog.skip_old = evt_skip_old;
 
 	if (0 != events.values_num)
