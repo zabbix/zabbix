@@ -3198,24 +3198,24 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 
 	if (0 < logfiles_old[idx].processed_size && 0 == logfiles_old[idx].incomplete)
 	{
-		for (int j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
+		for (int i = 0; i < logfiles_num; i++, p++)	/* loop over columns (new files) on idx-th row */
 		{
 			if ('1' == *p || '2' == *p)
 			{
 				if (logfiles_old[idx].size == logfiles_old[idx].processed_size &&
-						logfiles_old[idx].size == logfiles[j].size)
+						logfiles_old[idx].size == logfiles[i].size)
 				{
 					/* the file was fully processed during the previous check and must be ignored */
 					/* during this check */
-					logfiles[j].processed_size = logfiles[j].size;
-					logfiles[j].seq = (*seq)++;
+					logfiles[i].processed_size = logfiles[i].size;
+					logfiles[i].seq = (*seq)++;
 				}
 				else
 				{
 					/* the file was not fully processed during the previous check or has grown */
-					if (logfiles[j].processed_size < logfiles_old[idx].processed_size)
+					if (logfiles[i].processed_size < logfiles_old[idx].processed_size)
 					{
-						logfiles[j].processed_size = MIN(logfiles[j].size,
+						logfiles[i].processed_size = MIN(logfiles[i].size,
 								logfiles_old[idx].processed_size);
 					}
 				}
@@ -3224,22 +3224,22 @@ static void	transfer_for_copytruncate(const struct st_logfile *logfiles_old, int
 	}
 	else if (1 == logfiles_old[idx].incomplete)
 	{
-		for (int j = 0; j < logfiles_num; j++, p++)		/* loop over columns (new files) on idx-th row */
+		for (int i = 0; i < logfiles_num; i++, p++)	/* loop over columns (new files) on idx-th row */
 		{
 			if ('1' == *p || '2' == *p)
 			{
-				if (logfiles_old[idx].size < logfiles[j].size)
+				if (logfiles_old[idx].size < logfiles[i].size)
 				{
 					/* The file was not fully processed because of incomplete last record but it */
 					/* has grown. Try to process it further. */
-					logfiles[j].incomplete = 0;
+					logfiles[i].incomplete = 0;
 				}
 				else
-					logfiles[j].incomplete = 1;
+					logfiles[i].incomplete = 1;
 
-				if (logfiles[j].processed_size < logfiles_old[idx].processed_size)
+				if (logfiles[i].processed_size < logfiles_old[idx].processed_size)
 				{
-					logfiles[j].processed_size = MIN(logfiles[j].size,
+					logfiles[i].processed_size = MIN(logfiles[i].size,
 							logfiles_old[idx].processed_size);
 				}
 			}
