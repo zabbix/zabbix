@@ -130,7 +130,7 @@ window.tophosts_column_edit_form = new class {
 
 		if ('thresholds' in fields) {
 			for (const threshold of Object.values(fields.thresholds)) {
-				threshold[threshold] = threshold[threshold].trim();
+				threshold.threshold = threshold.threshold.trim();
 			}
 		}
 
@@ -138,9 +138,13 @@ window.tophosts_column_edit_form = new class {
 	}
 
 	handleFormSubmit(e, overlay) {
-		fetch(new Curl(e.target.getAttribute('action')).getUrl(), {
+		const curl = new Curl(e.target.getAttribute('action'));
+		const fields = this.#trimFields(getFormFields(e.target));
+
+		fetch(curl.getUrl(), {
 			method: 'POST',
-			body: new URLSearchParams(this.#trimFields(getFormFields(e.target)))
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData(fields)
 		})
 			.then(response => response.json())
 			.then(response => {
