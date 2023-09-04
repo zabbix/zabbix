@@ -290,19 +290,22 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	var cerrmsg *C.char
 	log.Tracef("Calling C function \"process_eventlog_check()\"")
-	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
-		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
-		C.zbx_process_value_func_t(procValueFunc), &clastLogsizeSent, ctlsConfig_p,
-		(C.int)(agent.Options.Timeout), (C.CString)(agent.Options.SourceIP),
-		(C.CString)(agent.Options.Hostname), (C.int)(agent.Options.BufferSend),
-		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_eventlog_max_lines_per_second), &cerrmsg)
+
+	cSourceIP := (C.CString)(agent.Options.SourceIP)
+	cHostname := (C.CString)(agent.Options.Hostname)
 
 	defer func() {
 		log.Tracef("Calling C function \"free()\"")
-		C.free(unsafe.Pointer(agent.Options.SourceIP))
+		C.free(unsafe.Pointer(cSourceIP)
 		log.Tracef("Calling C function \"free()\"")
-		C.free(unsafe.Pointer(agent.Options.Hostname))
+		C.free(unsafe.Pointer(cHostname))
 	}()
+
+	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
+		C.zbx_vector_expression_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
+		C.zbx_process_value_func_t(procValueFunc), &clastLogsizeSent, ctlsConfig_p,
+		(C.int)(agent.Options.Timeout), cSourceIP, cHostname, (C.int)(agent.Options.BufferSend),
+		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_eventlog_max_lines_per_second), &cerrmsg)
 
 	// add cached results
 	var cvalue, csource *C.char
