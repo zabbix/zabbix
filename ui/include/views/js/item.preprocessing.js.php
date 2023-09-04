@@ -447,8 +447,8 @@
 
 				$('.step-parameters', $row)
 					.html(makeParameterInput(step_index, type))
-					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>)
-					.prop('disabled', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
+					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>);
+				$('.step-parameters-toggle', $row).prop('disabled', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
 
 				$(this).closest('.preprocessing-list-foot').before($row);
 
@@ -519,8 +519,8 @@
 
 				$('.step-parameters', $row)
 					.html(makeParameterInput($row.data('step'), type))
-					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>)
-					.prop('disabled', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
+					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>);
+				$('.step-parameters-toggle', $row).prop('disabled', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
 
 				// Disable "Custom on fail" for some of the preprocessing types.
 				switch (type) {
