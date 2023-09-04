@@ -518,6 +518,7 @@
 					$on_fail = $row.find('[name*="on_fail"]');
 
 				$('.step-parameters', $row)
+					.prop('disabled', false)
 					.html(makeParameterInput($row.data('step'), type))
 					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>);
 				$('.step-parameters-toggle', $row).prop('disabled', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
