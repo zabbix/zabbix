@@ -28,6 +28,7 @@
 #include "dir.h"
 #include "zbxalgo.h"
 #include "zbxfile.h"
+#include "zbxjson.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"

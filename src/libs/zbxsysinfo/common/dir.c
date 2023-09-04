@@ -18,9 +18,10 @@
 **/
 
 #include "dir.h"
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
+#include "zbxalgo.h"
+#include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxparam.h"

@@ -20,13 +20,11 @@
 /* strptime() on newer and older GNU/Linux systems */
 #define _GNU_SOURCE
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 #include "software.h"
 
 #include "zbxalgo.h"
 #include "zbxexec.h"
-#include "cfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"

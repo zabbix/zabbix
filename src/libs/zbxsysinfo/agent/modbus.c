@@ -18,11 +18,11 @@
 **/
 
 #include "modbtype.h"
-#include "../sysinfo.h"
+#include "zbxsysinfo.h"
 
-#include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 
 #ifdef HAVE_LIBMODBUS
 #include "zbxmutexs.h"

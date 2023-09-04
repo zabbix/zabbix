@@ -22,6 +22,8 @@
 #include "zbxlog.h"
 #include "zbxtime.h"
 #include "zbxmutexs.h"
+#include "zbxsysinfo.h"
+#include "zbxthreads.h"
 
 #ifdef _WINDOWS
 #	include "zbxwinservice.h"
