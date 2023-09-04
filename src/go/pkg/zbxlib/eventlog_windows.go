@@ -277,7 +277,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	if (nil != tlsConfig) {
 		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
 		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
-			cPSKIdentity, cPSKKey, cCAFile, cCRLFile), cCertFile, cKeyFile, cServerCertIssuer,
+			cPSKIdentity, cPSKKey, cCAFile, cCRLFile, cCertFile, cKeyFile, cServerCertIssuer,
 			cServerCertSubject);
 		ctlsConfig_p = &ctlsConfig
 
