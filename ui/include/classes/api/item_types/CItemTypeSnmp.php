@@ -37,7 +37,7 @@ class CItemTypeSnmp extends CItemType {
 		return [
 			'interfaceid' =>	self::getCreateFieldRule('interfaceid', $item),
 			'snmp_oid' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'snmp_oid')],
-			'timeout' =>		self::getCreateFieldRule('delay', $item),
+			'timeout' =>		self::getCreateFieldRule('timeout', $item),
 			'delay' =>			self::getCreateFieldRule('delay', $item)
 		];
 	}

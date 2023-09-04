@@ -67,7 +67,7 @@ class CItemTypeTelnet extends CItemType {
 			'username' =>		self::getUpdateFieldRuleInherited('username', $db_item),
 			'password' =>		self::getUpdateFieldRuleInherited('password', $db_item),
 			'params' =>			self::getUpdateFieldRuleInherited('params', $db_item),
-			'timeout' =>		self::getUpdateFieldRuleInherited('delay', $db_item),
+			'timeout' =>		self::getUpdateFieldRuleInherited('timeout', $db_item),
 			'delay' =>			self::getUpdateFieldRuleInherited('delay', $db_item)
 		];
 	}
