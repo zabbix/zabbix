@@ -146,7 +146,11 @@ const char	*help_message[] = {
 	"",
 	"Options:",
 	"  -c --config config-file        Path to the configuration file",
+#ifdef _WINDOWS
+	"                                 (default: \"{DEFAULT_CONFIG_FILE}\")",
+#else
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
+#endif
 	"  -f --foreground                Run Zabbix agent in foreground",
 	"  -p --print                     Print known items and exit",
 	"  -t --test item-key             Test specified item and exit",
@@ -379,7 +383,12 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #endif
 			case 'h':
 				t->task = ZBX_TASK_SHOW_HELP;
+#ifdef _WINDOWS
+				goto cf_out;
+#else
 				goto out;
+#endif
+
 			case 'V':
 				t->task = ZBX_TASK_SHOW_VERSION;
 				goto out;
@@ -545,6 +554,37 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 		goto out;
 	}
 
+#ifdef _WINDOWS
+#define PATH_BUF_LEN	4096
+cf_out:
+	if (NULL == config_file)
+	{
+		char	*ptr, *process_path = NULL;
+		wchar_t	szProcessName[PATH_BUF_LEN];
+
+		if (0 == GetModuleFileNameEx(GetCurrentProcess(), NULL, szProcessName, ARRSIZE(szProcessName)))
+		{
+			zbx_error("failed to get Zabbix agent executable file path while initializing default config"
+					" path");
+			goto skip;
+		}
+
+		process_path = zbx_unicode_to_utf8(szProcessName);
+
+		if (NULL == (ptr = get_program_name(process_path)))
+		{
+			zbx_error("got unexpected Zabbix agent executable file path '%s' while initializing"
+					" default config path", ptr);
+			goto skip;
+		}
+
+		*ptr = '\0';
+		config_file = zbx_dsprintf(config_file, "%s%s", process_path, get_program_name(DEFAULT_CONFIG_FILE));
+skip:
+		zbx_free(process_path);
+	}
+#undef PATH_BUF_LEN
+#endif
 	if (NULL == config_file)
 		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 out:
@@ -1590,7 +1630,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			zbx_help();
+			zbx_help(config_file);
 			exit(EXIT_SUCCESS);
 			break;
 		default:

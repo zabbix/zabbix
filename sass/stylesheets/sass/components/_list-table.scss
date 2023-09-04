@@ -225,6 +225,8 @@
 	.btn-icon,
 	.icon,
 	.link-action {
+		vertical-align: top;
+
 		&:not(.no-indent):not(:first-child) {
 			margin-left: 5px;
 		}

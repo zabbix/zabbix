@@ -1,8 +1,7 @@
 output {
 	position: relative;
 	box-sizing: border-box;
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
 	align-items: center;
 	flex-shrink: 0;
 	min-height: 48px;
@@ -11,15 +10,15 @@ output {
 	background: $ui-bg-color;
 	border-style: solid;
 	border-width: 2px 2px 2px 60px;
-	border-radius: 2px;
+	border-radius: 4px;
 
 	&::before {
 		@extend %icons-font;
 
 		position: absolute;
-		top: 8px;
-		left: -42px;
-		font-size: 28px;
+		top: 6px;
+		left: -45px;
+		font-size: 32px;
 		color: rgba(#fff, .9);
 		text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
 	}
@@ -28,20 +27,21 @@ output {
 		font-size: $font-h4-size;
 	}
 
-	.link-action {
-		margin-right: 10px;
-		line-height: 14px;
+	.msg-buttons {
+		margin-top: 4px;
+		text-align: right;
+
+		button {
+			font-size: $font-h4-size;
+
+			&:not(:first-child) {
+				margin-left: 10px;
+			}
+		}
 	}
 
 	.msg-details {
-		width: 100%;
-
-		&:not(:first-child) {
-			margin-top: 6px;
-			padding-top: 6px;
-			border-top: 1px dashed;
-			border-color: inherit;
-		}
+		overflow: hidden;
 
 		ul {
 			@extend %webkit-scrollbar;
@@ -63,16 +63,53 @@ output {
 		}
 	}
 
-	.msg-buttons {
-		width: 100%;
-		margin-top: 10px;
-		text-align: right;
+	&.collapsible {
+		grid-template: 16.8px 1fr / max-content 1fr;
+		grid-gap: 6px 10px;
 
-		button {
-			font-size: $font-h4-size;
+		@if $ui-transitions {
+			transition: grid-template-rows $ui-transition-duration,
+						grid-row-gap $ui-transition-duration;
+		}
 
-			&:not(:first-child) {
-				margin-left: 10px;
+		.link-action {
+			line-height: 14px;
+
+			.arrow-down,
+			.arrow-up {
+				margin-left: 3px;
+				pointer-events: none;
+			}
+		}
+
+		.msg-buttons,
+		.msg-details {
+			grid-column: 1 / -1;
+		}
+
+		.msg-details {
+			padding-top: 6px;
+			border-top: 1px dashed;
+			border-color: inherit;
+			opacity: 1;
+			transform: scaleY(1) translateY(0);
+
+			@if $ui-transitions {
+				transition: padding-top $ui-transition-duration,
+							opacity $ui-transition-duration,
+							transform $ui-transition-duration;
+			}
+		}
+
+		&.collapsed {
+			grid-template-rows: 32px 0fr;
+			grid-row-gap: 0;
+
+			.msg-details {
+				padding-top: 0;
+				border-top: none;
+				opacity: 0;
+				transform: scaleY(0) translateY(50%);
 			}
 		}
 	}
@@ -81,7 +118,7 @@ output {
 		border-color: $msg-bad-color;
 
 		&::before {
-			content: $zi-circle-info-filled;
+			content: $zi-circle-warning-filled;
 		}
 
 		.msg-buttons {
@@ -118,7 +155,7 @@ output {
 		border-color: $msg-warning-color;
 
 		&::before {
-			content: $zi-circle-info-filled;
+			content: $zi-circle-warning-filled;
 		}
 	}
 
@@ -135,10 +172,10 @@ output {
 		padding-top: 4px;
 		padding-bottom: 4px;
 		margin: 0;
-		min-height: 32px;
+		min-height: 37px;
 
 		&::before {
-			top: 0;
+			top: 1px;
 		}
 	}
 }
