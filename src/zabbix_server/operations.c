@@ -708,6 +708,8 @@ void	op_host_del(const DB_EVENT *event)
 
 	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
 
+	DBexecute("delete from autoreg_host where host='%s'", hostname);
+
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
 	zbx_vector_uint64_destroy(&hostids);
