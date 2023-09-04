@@ -1147,7 +1147,7 @@ class testItemPreprocessing extends CAPITest {
 					'preprocessing' => self::NS_STEP_FIELDS + ['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\n".'abc{#LLD}abc']
 				],
 				'error' => null
-			],
+			]
 		];
 	}
 
