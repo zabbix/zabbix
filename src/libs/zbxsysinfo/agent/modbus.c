@@ -18,6 +18,7 @@
 **/
 
 #include "modbtype.h"
+#include "../sysinfo.h"
 #include "zbxsysinfo.h"
 
 #include "zbxip.h"
