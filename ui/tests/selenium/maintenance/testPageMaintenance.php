@@ -205,7 +205,7 @@ class testPageMaintenance extends CWebTest {
 		$this->assertFalse($this->query('button', 'Delete')->one()->isEnabled());
 
 		// Check rows in the table.
-//		$this->assertTableHasData($data);
+		$this->assertTableHasData($data);
 
 		// Get filter element.
 		$filter = CFilterElement::find()->one();
