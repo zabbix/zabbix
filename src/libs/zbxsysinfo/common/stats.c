@@ -349,7 +349,7 @@ void	diskstat_shm_reattach(void)
 /******************************************************************************
  *                                                                            *
  * Purpose: Creates a new, larger disk statistics shared memory segment and   *
- *          copy data from the old one.                                       *
+ *          copies data from the old one.                                     *
  *                                                                            *
  ******************************************************************************/
 void	diskstat_shm_extend(void)
