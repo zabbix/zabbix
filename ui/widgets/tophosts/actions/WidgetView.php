@@ -97,7 +97,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$hostids = array_keys($hosts);
-		$maintenanceids = array_diff(array_unique(array_column($hosts, 'maintenanceid')), ['0']);
+		$maintenanceids = array_filter(array_column($hosts, 'maintenanceid', 'maintenanceid'));;
 
 		$db_maintenances = ($maintenanceids && $filter_maintenance === null)
 			? API::Maintenance()->get([

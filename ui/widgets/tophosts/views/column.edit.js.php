@@ -119,16 +119,28 @@ window.tophosts_column_edit_form = new class {
 		});
 	}
 
+	#trimFields(fields) {
+		fields.name = fields.name.trim();
+
+		for (const field of ['text', 'timeshift', 'aggregate_interval', 'min', 'max', 'decimal_places']) {
+			if (field in fields) {
+				fields[field] = fields[field].trim();
+			}
+		}
+
+		if ('thresholds' in fields) {
+			for (const threshold of Object.values(fields.thresholds)) {
+				threshold[threshold] = threshold[threshold].trim();
+			}
+		}
+
+		return fields;
+	}
+
 	handleFormSubmit(e, overlay) {
-		const form_inputs = e.target.querySelectorAll('input, textarea');
-
-		form_inputs.forEach((input) => {
-			input.value = input.value.trim();
-		});
-
 		fetch(new Curl(e.target.getAttribute('action')).getUrl(), {
 			method: 'POST',
-			body: new URLSearchParams(new FormData(e.target))
+			body: new URLSearchParams(this.#trimFields(getFormFields(e.target)))
 		})
 			.then(response => response.json())
 			.then(response => {
