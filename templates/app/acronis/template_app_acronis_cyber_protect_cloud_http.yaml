@@ -293,7 +293,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Fetch all devices.'
+          description: 'Fetches all devices.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -345,7 +345,7 @@ zabbix_export:
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.SEVERITY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          lifetime: 7d
+          lifetime: 1d
           description: 'Discovers alerts.'
           item_prototypes:
             - uuid: b298e768dc0447b4b5c29c99a5852453
@@ -661,7 +661,7 @@ zabbix_export:
                   name: 'Device [{#NAME}]:[{#ID}]: Scheduled machine backup failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Scheduled antimalware scan failed to run.'
+                  description: 'Scheduled machine backup failed to run.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1327,10 +1327,10 @@ zabbix_export:
           description: 'Sets the customer name regex filter to use in customer discovery for excluding.'
         - macro: '{$ACRONIS.CPC.CYBERFIT.HIGH}'
           value: '579'
-          description: 'CyberFit score threshold for high severity trigger.'
+          description: 'CyberFit score threshold for "high" severity trigger.'
         - macro: '{$ACRONIS.CPC.CYBERFIT.WARN}'
           value: '669'
-          description: 'CyberFit score threshold for warning severity trigger.'
+          description: 'CyberFit score threshold for "warning" severity trigger.'
         - macro: '{$ACRONIS.CPC.DATACENTER.URL}'
           description: 'Acronis Cyber Protect Cloud datacenter URL, e.g., https://eu2-cloud.acronis.com.'
         - macro: '{$ACRONIS.CPC.DEVICE.DISCOVERY.TENANT.MATCHES}'

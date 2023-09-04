@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Setup
 
-This template is not meant to be used independently. A host with the `Acronis Cyber Protect Cloud by HTTP` template will request API token and automatically and create a host prototype with this template assigned to it.
+This template is not meant to be used independently. A host with the `Acronis Cyber Protect Cloud by HTTP` template will request API token and automatically create a host prototype with this template assigned to it.
 
 If needed, you can specify an HTTP proxy for the template to use by changing the value of `{$ACRONIS.CPC.HTTP.PROXY}` user macro.
 
@@ -31,8 +31,8 @@ If needed, you can specify an HTTP proxy for the template to use by changing the
 |----|-----------|-------|
 |{$ACRONIS.CPC.DATACENTER.URL}|<p>Acronis Cyber Protect Cloud datacenter URL, e.g., https://eu2-cloud.acronis.com.</p>||
 |{$ACRONIS.CPC.HTTP.PROXY}|<p>Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
-|{$ACRONIS.CPC.CYBERFIT.WARN}|<p>CyberFit score threshold for warning severity trigger.</p>|`669`|
-|{$ACRONIS.CPC.CYBERFIT.HIGH}|<p>CyberFit score threshold for high severity trigger.</p>|`579`|
+|{$ACRONIS.CPC.CYBERFIT.WARN}|<p>CyberFit score threshold for "warning" severity trigger.</p>|`669`|
+|{$ACRONIS.CPC.CYBERFIT.HIGH}|<p>CyberFit score threshold for "high" severity trigger.</p>|`579`|
 |{$ACRONIS.CPC.ALERT.DISCOVERY.CATEGORY.MATCHES}|<p>Sets the alert category regex filter to use in alert discovery for including.</p>|`.*`|
 |{$ACRONIS.CPC.ALERT.DISCOVERY.CATEGORY.NOT_MATCHES}|<p>Sets the alert category regex filter to use in alert discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
 |{$ACRONIS.CPC.ALERT.DISCOVERY.SEVERITY.MATCHES}|<p>Sets the alert severity regex filter to use in alert discovery for including.</p>|`.*`|
@@ -57,7 +57,7 @@ If needed, you can specify an HTTP proxy for the template to use by changing the
 |----|-----------|----|-----------------------|
 |Acronis CPC: Get alerts|<p>Fetches all alerts.</p>|HTTP agent|acronis.cpc.alerts.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
 |Acronis CPC: Get customers|<p>Fetches all customers.</p>|HTTP agent|acronis.cpc.customers.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
-|Acronis CPC: Get devices|<p>Fetch all devices.</p>|HTTP agent|acronis.cpc.devices.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
+|Acronis CPC: Get devices|<p>Fetches all devices.</p>|HTTP agent|acronis.cpc.devices.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li></ul>|
 |Acronis CPC: Alerts with "ok" severity|<p>Gets count of alerts with "ok" severity.</p>|Dependent item|acronis.cpc.alerts.severity.ok<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'ok')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Acronis CPC: Alerts with "warning" severity|<p>Gets count of alerts with "warning" severity.</p>|Dependent item|acronis.cpc.alerts.severity.warn<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'warning')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Acronis CPC: Alerts with "error" severity|<p>Gets count of alerts with "error" severity.</p>|Dependent item|acronis.cpc.alerts.severity.err<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..[?(@.severity == 'error')].length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -139,7 +139,7 @@ If needed, you can specify an HTTP proxy for the template to use by changing the
 |Device [{#NAME}]:[{#ID}]: Previous protection scan not successful|<p>Device has "error" protection status.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.prev.ok[{#NAME}])<>last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.prev[{#NAME}])`|Average|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Scheduled antimalware scan failed to run|<p>Scheduled antimalware scan failed to run for at least 3 minutes.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.next[{#NAME}],3m) < now()`|Warning|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Previous machine backup run not successful|<p>Previous machine backup did not run successfully.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.prev[{#NAME}],1m)`|Average|**Manual close**: Yes|
-|Device [{#NAME}]:[{#ID}]: Scheduled machine backup failed to run|<p>Scheduled antimalware scan failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
+|Device [{#NAME}]:[{#ID}]: Scheduled machine backup failed to run|<p>Scheduled machine backup failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Previous vulnerability assessment not successful|<p>Previous vulnerability assessment did not run successfully.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.prev[{#NAME}],1m)`|Average|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Scheduled vulnerability assessment failed to run|<p>Scheduled vulnerability assessment failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Previous patch management run not successful|<p>Previous patch management run did not run successfully.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev[{#NAME}],1m)`|Average|**Manual close**: Yes|
@@ -166,10 +166,10 @@ This template has been tested on:
 
 ## Setup
 
-This is a master template that needs to be assigned to a host, and it will create MSP host prototype automatically which will monitor Acronis Cyber Protect Cloud metrics.
+This is a master template that needs to be assigned to a host, and it will automatically create MSP host prototype, which will monitor Acronis Cyber Protect Cloud metrics.
 
-Before using this template it is required to create a new MSP level API client for Zabbix to use. To do that, sign into your Acronis Cyber Protect Cloud WEB interface, navigate to `Settings` -> `API clients` and create new API client.
-You will be shown credentials for this API client. These credentials need to be entered in the following user macros of this templates:
+Before using this template it is required to create a new MSP-level API client for Zabbix to use. To do that, sign into your Acronis Cyber Protect Cloud WEB interface, navigate to `Settings` -> `API clients` and create new API client.
+You will be shown credentials for this API client. These credentials need to be entered in the following user macros of this template:
 
 * `{$ACRONIS.CPC.AUTH.CLIENT.ID}` - enter `Client ID` here;
 
