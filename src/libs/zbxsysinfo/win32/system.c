@@ -177,9 +177,8 @@ int	system_uname(AGENT_REQUEST *request, AGENT_RESULT *result)
 		*proc_architecture = NULL, *proc_addresswidth = NULL, *wmi_namespace = "root\\cimv2",
 		*arch = "<unknown architecture>";
 	int	ret = SYSINFO_RET_FAIL;
-	double	start_time, time_previous_query_finished;
-
-	time_previous_query_finished = start_time = zbx_time();
+	double	start_time = zbx_time();
+	double	time_previous_query_finished = start_time;
 
 	/* Emulates uname(2) (POSIX) since it is not provided natively by Windows by taking */
 	/* the relevant values from Win32_OperatingSystem and Win32_Processor WMI classes.  */
