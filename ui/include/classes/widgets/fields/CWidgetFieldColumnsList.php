@@ -68,13 +68,13 @@ class CWidgetFieldColumnsList extends CWidgetField {
 												['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'default' => 'now-1h'],
 												['else' => true,
-													'type' => API_STRING_UTF8],
+													'type' => API_STRING_UTF8]
 				]],
 				'time_to'				=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 													'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'default' => 'now'],
 												['else' => true,
-													'type' => API_STRING_UTF8],
+													'type' => API_STRING_UTF8]
 				]],
 				'display'				=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
