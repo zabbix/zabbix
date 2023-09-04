@@ -772,48 +772,47 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		unset($sector);
 
-		if (bccomp($sector_total_value, $total_value['value']) <= 0 || !$is_total_set) {
-			// Sectors use the full total value or less.
-			foreach ($svg_sectors as $key => &$sector) {
-				if ($sector['is_total']) {
-					$sector['percent_of_total'] -= $total_percentage_used;
+		if ($is_total_set) {
+			if (bccomp($sector_total_value, $total_value['value']) <= 0) {
+				// Sectors use the full total value or less.
+				foreach ($svg_sectors as $key => &$sector) {
+					if ($sector['is_total']) {
+						$sector['percent_of_total'] -= $total_percentage_used;
 
-					// The non-total sectors use the full total value, no space left for the total sector.
-					if (bccomp($sector['percent_of_total'], '0') == 0) {
-						unset($svg_sectors[$key]);
+						// The non-total sectors use the full total value, no space left for the total sector.
+						if (bccomp($sector['percent_of_total'], '0') == 0) {
+							unset($svg_sectors[$key]);
+						}
 					}
 				}
-			}
-			unset($sector);
-		}
-		else {
-			// Sectors use more than total value.
-			$current_value = 0;
-			$remaining_value = $total_value['value'];
-			$sectors_to_keep = [];
+				unset($sector);
+			} else {
+				// Sectors use more than total value.
+				$current_value = 0;
+				$remaining_value = $total_value['value'];
+				$sectors_to_keep = [];
 
-			foreach ($non_total_sectors as &$sector) {
-				if (bccomp(bcadd($current_value, $sector['value']), $remaining_value) <= 0) {
-					// There is enough space for this sector.
-					$sectors_to_keep[] = $sector;
-					$current_value = bcadd($current_value, $sector['value']);
-					$remaining_value = bcsub($remaining_value, $sector['value']);
-				}
-				elseif (bccomp($sector['value'], $remaining_value) >= 0
+				foreach ($non_total_sectors as &$sector) {
+					if (bccomp(bcadd($current_value, $sector['value']), $remaining_value) <= 0) {
+						// There is enough space for this sector.
+						$sectors_to_keep[] = $sector;
+						$current_value = bcadd($current_value, $sector['value']);
+						$remaining_value = bcsub($remaining_value, $sector['value']);
+					} elseif (bccomp($sector['value'], $remaining_value) >= 0
 						&& bccomp($current_value, $total_value['value']) < 0) {
-					// This sector needs to be cut, to fit.
-					$sector['percent_of_total'] = bcmul(bcdiv($remaining_value, $total_value['value']), 100);
-					$sectors_to_keep[] = $sector;
-					break;
+						// This sector needs to be cut, to fit.
+						$sector['percent_of_total'] = bcmul(bcdiv($remaining_value, $total_value['value']), 100);
+						$sectors_to_keep[] = $sector;
+						break;
+					} else {
+						// This sector doesn't fit.
+						break;
+					}
 				}
-				else {
-					// This sector doesn't fit.
-					break;
-				}
-			}
-			unset($sector);
+				unset($sector);
 
-			$svg_sectors = $sectors_to_keep;
+				$svg_sectors = $sectors_to_keep;
+			}
 		}
 
 		foreach($svg_sectors as &$sector) {
