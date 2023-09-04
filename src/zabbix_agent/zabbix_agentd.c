@@ -54,7 +54,7 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 int	zbx_config_buffer_size		= 100;
 int	zbx_config_buffer_send		= 5;
 
-int	CONFIG_MAX_LINES_PER_SECOND		= 20;
+static int	zbx_config_max_lines_per_second	= 20;
 static int	zbx_config_eventlog_max_lines_per_second = 20;
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
@@ -773,7 +773,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 != err)
 		exit(EXIT_FAILURE);
 
-	zbx_config_eventlog_max_lines_per_second = CONFIG_MAX_LINES_PER_SECOND;
+	zbx_config_eventlog_max_lines_per_second = zbx_config_max_lines_per_second;
 }
 
 static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
@@ -812,6 +812,7 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 		config_active_args[forks].config_buffer_size = zbx_config_buffer_size;
 		config_active_args[forks].config_eventlog_max_lines_per_second =
 				zbx_config_eventlog_max_lines_per_second;
+		config_active_args[forks].config_max_lines_per_second = zbx_config_max_lines_per_second;
 		config_active_args[forks].config_refresh_active_checks = zbx_config_refresh_active_checks;
 		config_active_args[forks].config_user_parameters = zbx_config_user_parameters;
 	}
@@ -944,7 +945,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"RefreshActiveChecks",		&zbx_config_refresh_active_checks,	TYPE_INT,
 			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
 			MAX_ACTIVE_CHECKS_REFRESH_FREQUENCY},
-		{"MaxLinesPerSecond",		&CONFIG_MAX_LINES_PER_SECOND,		TYPE_INT,
+		{"MaxLinesPerSecond",		&zbx_config_max_lines_per_second,	TYPE_INT,
 			PARM_OPT,	1,			1000},
 		{"EnableRemoteCommands",	&parser_load_enable_remove_commands,	TYPE_CUSTOM,
 			PARM_OPT,	0,			1},
