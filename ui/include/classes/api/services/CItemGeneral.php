@@ -2793,7 +2793,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	public static function validatePreprocessingStepsByType(array $item, string $path): void {
+	public static function validatePreprocessingStepsByType(array &$item, string $path): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'preprocessing' => [
 				'type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED,
@@ -2818,11 +2818,11 @@ abstract class CItemGeneral extends CApiService {
 					$params[$_i + 1] = $param;
 				}
 
-				$params[1] = (int) $params[1];
+				$params[1] = $params[1] === '' ? ZBX_PREPROC_MATCH_ERROR_ANY : (int) $params[1];
 
 				if ($params[1] == ZBX_PREPROC_MATCH_ERROR_ANY) {
 					if ($match_any_exists) {
-						$error = _s('Invalid parameter "%1$s": %2$s.', $path.($j + 1),
+						$error = _s('Invalid parameter "%1$s": %2$s.', $path.'/'.($j + 1),
 							_s('only one object can exist within the combinations of %1$s',
 								'('.implode(', ', ['type', 'params']).')=('.
 								implode(', ', [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, $step['params']]).')'
