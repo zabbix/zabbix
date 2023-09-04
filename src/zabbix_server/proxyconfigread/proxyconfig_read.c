@@ -1091,8 +1091,8 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 		if (proxy_config_revision < dc_revision->expression)
 			flags |= ZBX_PROXYCONFIG_SYNC_EXPRESSIONS;
 
-		if (proxy_config_revision < dc_revision->config_table)
-			flags |= ZBX_PROXYCONFIG_SYNC_CONFIG;
+		/* force config table sync because of possible proxy timeout changes overriding global timeouts */
+		flags |= ZBX_PROXYCONFIG_SYNC_CONFIG;
 
 		if (0 != httptestids.values_num)
 			flags |= ZBX_PROXYCONFIG_SYNC_HTTPTESTS;
