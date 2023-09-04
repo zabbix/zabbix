@@ -89,14 +89,15 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			foreach ($filters as $index => $tabfilter) {
 				if (!$tabfilter['filter_custom_time']) {
 					$tabfilter = [
-						'from' => $profile->from,
-						'to' => $profile->to
+						'from' => $tabfilter['from'],
+						'to' => $tabfilter['to']
 					] + $tabfilter;
 				}
 				else {
 					$tabfilter['show'] = TRIGGERS_OPTION_ALL;
 				}
 
+				$data['timeselector_label'][$index] = relativeDateToText($filters[$index]['from'], $filters[$index]['to']);
 				$data['filter_counters'][$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
 
