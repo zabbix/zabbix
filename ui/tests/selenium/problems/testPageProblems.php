@@ -19,32 +19,228 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../traits/TagTrait.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup profiles
  */
-class testPageProblems extends CLegacyWebTest {
+class testPageProblems extends CWebTest {
 
 	use TagTrait;
 	use TableTrait;
 
-	public function testPageProblems_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckTitle('Problems');
-		$this->zbxTestCheckHeader('Problems');
+	public function testPageProblems_Layout() {
+		$this->page->login()->open('zabbix.php?action=problem.view&show_timeline=0&filter_reset=1');
+		$this->page->assertTitle('Problems');
+		$this->page->assertHeader('Problems');
 
-		$this->assertTrue($this->zbxTestCheckboxSelected('show_10'));
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
-			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Age less than', 'Host inventory', 'Tags',
-			'Show suppressed problems', 'Acknowledgement status', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
-			'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
+		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
+		$this->assertTrue($filter_tab->isExpanded());
 
-		$this->zbxTestCheckNoRealHostnames();
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter_tab->expand($status);
+			$this->assertTrue($filter_tab->isExpanded($status));
+		}
+
+		$filter_form = $filter_tab->getForm();
+		$this->assertEquals(['Show', 'Host groups', 'Hosts', 'Triggers', 'Problem', 'Severity', 'Age less than',
+				'Show symptoms', 'Show suppressed problems', 'Acknowledgement status', 'Host inventory',
+				'Tags', 'Show tags', 'Tag display priority', 'Show operational data', 'Compact view',
+				'Show details'], $filter_form->getLabels()->asText()
+		);
+		$filter_form->getRequiredLabels([]);
+
+		$fields_values = [
+			'Show' => ['value' => 'Recent problems', 'enabled' => true],
+			'id:groupids_0_ms' => ['value' => '', 'enabled' => true, 'placeholder' => 'type here to search'],
+			'id:hostids_0_ms' => ['value' => '', 'enabled' => true, 'placeholder' => 'type here to search'],
+			'id:triggerids_0_ms' => ['value' => '', 'enabled' => true, 'placeholder' => 'type here to search'],
+			'Problem' => ['value' => '', 'enabled' => true, 'maxlength' => 255],
+			'Not classified' => ['value' => false, 'enabled' => true],
+			'Information' => ['value' => false, 'enabled' => true],
+			'Warning' => ['value' => false, 'enabled' => true],
+			'Average' => ['value' => false, 'enabled' => true],
+			'High' => ['value' => false, 'enabled' => true],
+			'Disaster' => ['value' => false, 'enabled' => true],
+			'name:age_state' => ['value' => false, 'enabled' => true],
+			'name:age' => ['value' => 14, 'enabled' => false],
+			'Show symptoms' => ['value' => false, 'enabled' => true],
+			'Show suppressed problems' => ['value' => false, 'enabled' => true],
+			'Acknowledgement status' => ['value' => 'all', 'enabled' => true],
+			'id:acknowledged_by_me_0' => ['value' => false, 'enabled' => false],
+			'name:inventory[0][field]' => ['value' => 'Type', 'enabled' => true],
+			'name:inventory[0][value]' => ['value' => '', 'enabled' => true, 'maxlength' => 255],
+			'id:evaltype_0' => ['value' => 'And/Or', 'enabled' => true],
+			'name:tags[0][tag]' => ['value' => '', 'enabled' => true, 'placeholder' => 'tag', 'maxlength' => 255],
+			'id:tags_00_operator' => ['value' => 'Contains', 'enabled' => true],
+			'id:tags_00_value' => ['value' => '', 'enabled' => true, 'placeholder' => 'value', 'maxlength' => 255],
+			'Show tags' => ['value' => 3, 'enabled' => true],
+			'id:tag_name_format_0' => ['value' => 'Full', 'enabled' => true],
+			'Tag display priority' => ['value' => '', 'enabled' => true, 'placeholder' => 'comma-separated list', 'maxlength' => 255],
+			'Show operational data' => ['value' => 'None', 'enabled' => true],
+			'Compact view' => ['value' => false, 'enabled' => true],
+			'Show details' => ['value' => false, 'enabled' => true],
+			'id:show_timeline_0' => ['value' => true, 'enabled' => true],
+			'id:highlight_row_0' => ['value' => false, 'enabled' => false]
+		];
+
+		foreach ($fields_values as $label => $attributes) {
+			$field = $filter_form->getField($label);
+			$this->assertEquals($attributes['value'], $field->getValue());
+			$this->assertTrue($field->isVisible());
+			$this->assertTrue($field->isEnabled($attributes['enabled']));
+
+			if (CTestArrayHelper::get($attributes, 'placeholder')) {
+				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
+			}
+
+			if (CTestArrayHelper::get($attributes, 'maxlength')) {
+				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
+			}
+		}
+
+		$segmented_radios = [
+			'Show' => ['Recent problems', 'Problems', 'History'],
+			'Acknowledgement status' => ['all', 'Unacknowledged', 'Acknowledged'],
+			'Tags' => ['And/Or', 'Or'],
+			'Show tags' => ['None', 1, 2, 3],
+			'id:tag_name_format_0' => ['Full', 'Shortened', 'None'],
+			'Show operational data' => ['None', 'Separately', 'With problem name']
+		];
+
+		foreach ($segmented_radios as $field => $labels) {
+			$this->assertEquals($labels,  $filter_form->getField($field)->asSegmentedRadio()->getLabels()->asText());
+		}
+
+		$dropdowns = [
+			'name:inventory[0][field]' => ['Type', 'Type (Full details)', 'Name', 'Alias', 'OS', 'OS (Full details)',
+					'OS (Short)', 'Serial number A', 'Serial number B', 'Tag', 'Asset tag',  'MAC address A',
+					'MAC address B', 'Hardware', 'Hardware (Full details)', 'Software', 'Software (Full details)',
+					'Software application A', 'Software application B', 'Software application C', 'Software application D',
+					'Software application E', 'Contact', 'Location', 'Location latitude', 'Location longitude',
+					'Notes', 'Chassis', 'Model', 'HW architecture', 'Vendor', 'Contract number', 'Installer name',
+					'Deployment status', 'URL A', 'URL B', 'URL C', 'Host networks', 'Host subnet mask', 'Host router',
+					'OOB IP address', 'OOB subnet mask', 'OOB router', 'Date HW purchased', 'Date HW installed',
+					'Date HW maintenance expires', 'Date HW decommissioned', 'Site address A', 'Site address B',
+					'Site address C', 'Site city', 'Site state / province', 'Site country', 'Site ZIP / postal',
+					'Site rack location', 'Site notes', 'Primary POC name', 'Primary POC email', 'Primary POC phone A',
+					'Primary POC phone B', 'Primary POC cell', 'Primary POC screen name', 'Primary POC notes',
+					'Secondary POC name', 'Secondary POC email', 'Secondary POC phone A', 'Secondary POC phone B',
+					'Secondary POC cell', 'Secondary POC screen name', 'Secondary POC notes'
+			],
+			'id:tags_00_operator' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain']
+		];
+
+		foreach ($dropdowns as $field => $options) {
+			$this->assertEquals($options, $filter_form->getField($field)->asDropdown()->getOptions()->asText());
+		}
+
+		// Check how filter form changes depending on 'Show' field settings.
+		$age_field = $filter_form->getField('Age less than');
+
+		$dependant_fields = [
+			'History' => [
+				'xpath://button[@data-action="selectPrevTab"]' => true,
+				'xpath://button[@data-action="toggleTabsList"]' => true,
+				'xpath://button[@data-action="selectNextTab"]' => true,
+				'xpath://button[contains(@class, "js-btn-time-left")]' => true,
+				'button:Zoom out' => true,
+				'xpath://button[contains(@class, "js-btn-time-right")]' => false,
+				'xpath://a[contains(@class, "zi-clock")]' => true
+			],
+			'Problems' => [
+				'xpath://button[@data-action="selectPrevTab"]' => true,
+				'xpath://button[@data-action="toggleTabsList"]' => true,
+				'xpath://button[@data-action="selectNextTab"]' => true,
+				'xpath://button[contains(@class, "js-btn-time-left")]' => false,
+				'button:Zoom out' => false,
+				'xpath://button[contains(@class, "js-btn-time-right")]' => false,
+				'xpath://a[contains(@class, "zi-clock")]' => false
+			]
+		];
+
+		foreach ($dependant_fields as $show => $checked_elements) {
+			$filter_form->fill(['Show' => $show]);
+
+			if ($show === 'History') {
+				$age_field->waitUntilNotVisible();
+				$fields_values['Show']['value'] = 'History';
+				$fields_values['name:age_state']['visible'] = false;
+				$fields_values['name:age_state']['enabled'] = false;
+				$fields_values['name:age']['visible'] = false;
+			}
+			else {
+				$age_field->waitUntilVisible();
+				$fields_values['Show']['value'] = 'Problems';
+				$fields_values['name:age_state']['visible'] = true;
+				$fields_values['name:age_state']['enabled'] = true;
+				$fields_values['name:age']['visible'] = true;
+			}
+
+			foreach ($checked_elements as $query => $state) {
+				$this->assertTrue($this->query($query)->one()->isEnabled($state));
+			}
+
+			foreach ($fields_values as $label => $attributes) {
+				$field = $filter_form->getField($label);
+				$this->assertTrue($field->isVisible(CTestArrayHelper::get($attributes, 'visible', true)));
+				$this->assertTrue($field->isEnabled($attributes['enabled']));
+			}
+		}
+
+		// Check Age field editability.
+		foreach ([false, true] as $state) {
+			$filter_form->fill(['id:age_state_0' => $state]);
+			$this->assertTrue($filter_form->getField('name:age')->isEnabled($state));
+		}
+
+		// Acknowledgement status field editability.
+		foreach (['all' => false, 'Unacknowledged' => false, 'Acknowledged' => true] as $label => $status) {
+			$filter_form->fill(['Acknowledgement status' => $label]);
+			$this->assertTrue($filter_form->getField('id:acknowledged_by_me_0')->isEnabled($status));
+		}
+
+		// Tags fields editability.
+		foreach (['None' => false, 1 => true, 2 => true, 3 => true] as $label => $status) {
+			$filter_form->fill(['Show tags' => $label]);
+
+			foreach (['id:tag_name_format_0', 'Tag display priority'] as $field) {
+				$this->assertTrue($filter_form->getField($field)->isEnabled($status));
+			}
+		}
+
+		// Show operational data and checkboxes dependency.
+		foreach ([true, false] as $state) {
+			$filter_form->fill(['Compact view' => $state]);
+
+			foreach (['Show operational data', 'Show details', 'id:show_timeline_0'] as $field) {
+					$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
+			}
+			$this->assertTrue($filter_form->getField('id:highlight_row_0')->isEnabled($state));
+		}
+
+		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
+
+		// Check Problems table layout.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertEquals(['', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem',
+				'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
+		);
+
+		$this->assertEquals(['Time', 'Severity', 'Host', 'Problem'], $table->getSortableHeaders()->asText());
+		$this->assertEquals(false, $this->query('button:Mass update')->one()->isClickable());
+
+		// Check that some unfiltered data is displayed in the table.
+		$this->assertTableStats(CDBHelper::getCount(
+				'SELECT null FROM problem'.
+				' WHERE eventid'.
+					' NOT IN (SELECT eventid FROM event_suppress)'
+		));
 	}
 
 	public function testPageProblems_History_CheckLayout() {
