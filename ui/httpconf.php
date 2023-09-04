@@ -203,17 +203,27 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
 		$steps = getRequest('steps', []);
+		$field_names = ['headers', 'variables', 'post_fields', 'query_fields'];
 
 		$i = 1;
 		foreach ($steps as &$step) {
 			$step['no'] = $i++;
 
-			foreach (['query_fields', 'variables', 'headers'] as $field) {
+			foreach ($field_names as $field) {
 				$step[$field] = array_key_exists($field, $step) ? $step[$field] : [];
+
+				foreach ($step[$field] as &$field_values) {
+					$field_values['name'] = trim($field_values['name']);
+					$field_values['value'] = trim($field_values['value']);
+				}
+				unset($field_values);
 			}
 
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
-				$step['posts'] = array_key_exists('post_fields', $step) ? $step['post_fields'] : [];
+				$step['posts'] = $step['post_fields'];
+			}
+			else {
+				$step['posts'] = trim($step['posts']);
 			}
 			unset($step['post_fields'], $step['post_type']);
 		}
@@ -243,12 +253,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		foreach (['variables', 'headers'] as $pair_type) {
 			foreach (getRequest($pair_type, []) as $pair) {
+				$pair['name'] = trim($pair['name']);
+				$pair['value'] = trim($pair['value']);
+
 				if ($pair['name'] === '' && $pair['value'] === '') {
 					continue;
-				}
-
-				if ($pair_type === 'variables') {
-					$pair['name'] = trim($pair['name']);
 				}
 
 				$httpTest[$pair_type][] = $pair;
