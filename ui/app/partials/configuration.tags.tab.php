@@ -24,15 +24,17 @@
  * @var array    $data
  */
 
+$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
+$with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
+$field_label = array_key_exists('field_label', $data) ? $data['field_label'] : null;
+$data['readonly'] = array_key_exists('readonly', $data) ? $data['readonly'] : false;
+
 if (!$data['readonly']) {
 	$this->includeJsFile('configuration.tags.tab.js.php');
 }
 
-$show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['show_inherited_tags'];
-$with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
-
 // form list
-$form_grid = (new CFormGrid())->setId('tagsFormList');
+$form_grid = (new CFormGrid());
 
 $table = (new CTable())
 	->addClass('tags-table')
@@ -175,10 +177,14 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 	);
 }
 
-if (array_key_exists('with_label', $data)) {
-	$form_grid->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+if ($field_label) {
+	$form_grid->addItem([
+		new CLabel($field_label),
+		new CFormField((new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
+	]);
+}
+else {
+	$form_grid->addItem(new CFormField($table));
 }
 
-$form_grid
-	->addItem(new CFormField($table))
-	->show();
+$form_grid->show();

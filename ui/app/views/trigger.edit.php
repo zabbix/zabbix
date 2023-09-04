@@ -74,7 +74,7 @@ $triggers_tab = (new CTabView())
 			'readonly' => $discovered_trigger,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab',
-			'with_label' => true
+			'field_label' => _('Tags')
 		]),
 		TAB_INDICATOR_TAGS
 	)

@@ -63,10 +63,9 @@ $triggers_tab = (new CTabView())
 			'source' => 'trigger_prototype',
 			'tags' => $data['tags'],
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'readonly' => false,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab',
-			'with_label' => true
+			'field_label' => _('Tags')
 		]), TAB_INDICATOR_TAGS
 	)
 	->addTab('dependenciesTab', _('Dependencies'), new CPartial('trigger.edit.dependencies.tab', $data),
