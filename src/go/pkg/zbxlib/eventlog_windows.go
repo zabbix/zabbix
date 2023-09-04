@@ -296,7 +296,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	defer func() {
 		log.Tracef("Calling C function \"free()\"")
-		C.free(unsafe.Pointer(cSourceIP)
+		C.free(unsafe.Pointer(cSourceIP))
 		log.Tracef("Calling C function \"free()\"")
 		C.free(unsafe.Pointer(cHostname))
 	}()
