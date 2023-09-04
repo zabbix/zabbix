@@ -190,20 +190,6 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['params']));
 				}
 
-				$timeout_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
-					ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
-					ITEM_TYPE_SCRIPT
-				];
-
-				if (in_array($item['type'], $timeout_types)) {
-					if (!in_array($db_item['type'], $timeout_types)
-							|| ($db_item['type'] == ITEM_TYPE_SIMPLE
-								&& (strncmp($db_item['key_'], 'icmpping', 8) === 0
-									|| strncmp($db_item['key_'], 'vmware', 6) === 0))) {
-						$item += array_intersect_key($db_item, array_flip(['timeout']));
-					}
-				}
-
 				$delay_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 					ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
 					ITEM_TYPE_CALCULATED, ITEM_TYPE_JMX, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
