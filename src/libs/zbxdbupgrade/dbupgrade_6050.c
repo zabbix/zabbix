@@ -923,6 +923,50 @@ static int	DBpatch_6050087(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050088(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050089(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050090(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.items.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050091(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.disc_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1017,5 +1061,9 @@ DBPATCH_ADD(6050084, 0, 1)
 DBPATCH_ADD(6050085, 0, 1)
 DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
+DBPATCH_ADD(6050088, 0, 1)
+DBPATCH_ADD(6050089, 0, 1)
+DBPATCH_ADD(6050090, 0, 1)
+DBPATCH_ADD(6050091, 0, 1)
 
 DBPATCH_END()
