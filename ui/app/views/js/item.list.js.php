@@ -289,6 +289,13 @@
 			this.openHostPopup(host_data);
 		}
 
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		}
+
 		openHostPopup(host_data) {
 			let original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
@@ -329,6 +336,16 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			});
+		}
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
 		}
 	};
 </script>
