@@ -1429,14 +1429,14 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get pids matching specified process name, user name and           *
+ * Purpose: gets pids matching specified process name, user name and          *
  *          command line                                                      *
  *                                                                            *
  * Parameters: processes   - [IN] list of system processes                    *
  *             procname    - [IN] NULL - all                                  *
  *             username    - [IN] ...                                         *
  *             cmdline     - [IN] ...                                         *
- *             pids        - [OUT] tvector of matching pids                   *
+ *             pids        - [OUT] vector of matching pids                    *
  *                                                                            *
  * Return value: SUCCEED   - pids were read successfully                      *
  *               -errno    - failed to read pids                              *

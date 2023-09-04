@@ -19,6 +19,7 @@
 
 #include "zbxsysinfo.h"
 #include "sysinfo.h"
+
 #include "alias/alias.h"
 
 #include "zbxlog.h"

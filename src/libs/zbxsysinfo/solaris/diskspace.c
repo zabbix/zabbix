@@ -23,7 +23,6 @@
 #include "inodes.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxalgo.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,

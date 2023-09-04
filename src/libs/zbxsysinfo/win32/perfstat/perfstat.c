@@ -18,10 +18,10 @@
 **/
 
 #include "perfstat.h"
+#include "zbxsysinfo.h"
 
 #include "zbxlog.h"
 #include "zbxmutexs.h"
-#include "zbxsysinfo.h"
 #include "zbxstr.h"
 
 #define OBJECT_CACHE_REFRESH_INTERVAL	60

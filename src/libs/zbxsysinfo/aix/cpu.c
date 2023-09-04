@@ -20,11 +20,11 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxlog.h"
+#include "../common/stats.h"
+
 #include "zbxnum.h"
 
 #include <sys/dr.h>
-#include "../common/stats.h"
 
 int	system_cpu_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

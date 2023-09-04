@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 
 #include <sys/ioctl.h>
 #include <sys/sockio.h>

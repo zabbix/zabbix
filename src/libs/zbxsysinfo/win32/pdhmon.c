@@ -24,7 +24,6 @@
 #include "zbxthreads.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
-#include "zbxlog.h"
 
 #include "perfstat/perfstat.h"
 

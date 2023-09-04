@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "zbxlog.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
 

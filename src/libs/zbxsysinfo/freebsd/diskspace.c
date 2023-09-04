@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxalgo.h"
 #include "inodes.h"
 

@@ -20,12 +20,13 @@
 #include "vfs_file.h"
 #include "../sysinfo.h"
 
+#include "dir.h"
+
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
-#include "dir.h"
 #include "zbxalgo.h"
 #include "zbxfile.h"
 #include "zbxjson.h"

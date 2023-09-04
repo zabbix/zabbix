@@ -21,11 +21,11 @@
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
+#include "zbxsysinfo.h"
+
 #include "stats.h"
 
 #include "zbxmutexs.h"
-#include "zbxlog.h"
-#include "zbxsysinfo.h"
 #include "zbxstr.h"
 
 static kstat_ctl_t	*kc = NULL;

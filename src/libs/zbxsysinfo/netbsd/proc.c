@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "zbxlog.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
 
@@ -246,7 +245,8 @@ out:
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args;
-	int			zbx_proc_stat, count, i, proc_ok, stat_ok, comm_ok, op, arg, proccount = 0, invalid_user = 0;
+	int			zbx_proc_stat, count, i, proc_ok, stat_ok, comm_ok, op, arg, proccount = 0,
+				invalid_user = 0;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
 

@@ -28,7 +28,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "zbxlog.h"
 #include "zbxstr.h"
 
 #include <sys/pstat.h>

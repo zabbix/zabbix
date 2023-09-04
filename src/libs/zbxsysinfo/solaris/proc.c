@@ -20,9 +20,9 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxregexp.h"
-#include "zbxlog.h"
 #include "../common/stats.h"
+
+#include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

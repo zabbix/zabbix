@@ -22,7 +22,6 @@
 #include "../common/zbxsysinfo_common.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxnum.h"
 
 static struct ifmibdata	ifmd;

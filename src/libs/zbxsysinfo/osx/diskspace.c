@@ -23,7 +23,6 @@
 #include "inodes.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxalgo.h"
 
 static zbx_mntopt_t	mntopts[] = {

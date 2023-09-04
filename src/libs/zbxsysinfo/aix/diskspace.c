@@ -23,7 +23,6 @@
 #include "inodes.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 #include "zbxalgo.h"
 
 #include <sys/vfs.h>

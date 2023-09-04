@@ -19,10 +19,10 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+
 #include "../common/zbxsysinfo_common.h"
 
 #include "zbxnum.h"
-#include "zbxlog.h"
 
 static struct ifmibdata	ifmd;
 
