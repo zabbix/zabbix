@@ -1352,7 +1352,7 @@ class testFormAdministrationProxies extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'proxy' => self::$delete_proxy_with_discovery_rule,
-					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
+					'error' => "Proxy \"Proxy for Discovery rule\" is used by action \"Autoregistration action 1\"."
 				]
 			]
 		]);
