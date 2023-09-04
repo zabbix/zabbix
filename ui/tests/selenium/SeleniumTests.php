@@ -143,6 +143,10 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Maintenance
+require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
+require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
+
 // Media types.
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
@@ -232,10 +236,6 @@ require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
 require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
-
-// Maintenance
-require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
-require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 

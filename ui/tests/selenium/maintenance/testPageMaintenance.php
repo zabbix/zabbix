@@ -60,7 +60,7 @@ class testPageMaintenance extends CWebTest {
 				'active_till' => 2019600000,
 				'groups' => [
 					[
-						'groupid' => '20'
+						'groupid' => 20
 					]
 				],
 				'timeperiods' => [[]]
@@ -72,10 +72,10 @@ class testPageMaintenance extends CWebTest {
 				'active_till' => 1420070400,
 				'groups' => [
 					[
-						'groupid' => '4'
+						'groupid' => 4
 					],
 					[
-						'groupid' => '5'
+						'groupid' => 5
 					]
 				],
 				'timeperiods' => [[]]
@@ -87,7 +87,7 @@ class testPageMaintenance extends CWebTest {
 				'active_till' => 1577923200,
 				'hosts' => [
 					[
-						'hostid' => '10084'
+						'hostid' => 10084
 					]
 				],
 				'timeperiods' => [[]]
@@ -99,7 +99,7 @@ class testPageMaintenance extends CWebTest {
 				'active_till' => 1688601600,
 				'groups' => [
 					[
-						'groupid' => '4'
+						'groupid' => 4
 					]
 				],
 				'timeperiods' => [[]]
@@ -111,7 +111,7 @@ class testPageMaintenance extends CWebTest {
 				'active_till' => 2019600000,
 				'groups' => [
 					[
-						'groupid' => '4'
+						'groupid' => 4
 					]
 				],
 				'timeperiods' => [[]]
@@ -124,7 +124,7 @@ class testPageMaintenance extends CWebTest {
 				'description' => 'Test description of the maintenance',
 				'groups' => [
 					[
-						'groupid' => '4'
+						'groupid' => 4
 					]
 				],
 				'timeperiods' => [[]]
@@ -190,8 +190,8 @@ class testPageMaintenance extends CWebTest {
 	}
 
 	/**
-	* @dataProvider getMaintenanceData
-	*/
+	 * @dataProvider getMaintenanceData
+	 */
 	public function testPageMaintenance_CheckLayout($data) {
 		$maintenances = CDBHelper::getCount(self::MAINTENANCE_SQL);
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
@@ -204,7 +204,7 @@ class testPageMaintenance extends CWebTest {
 		);
 		$this->assertFalse($this->query('button', 'Delete')->one()->isEnabled());
 
-		// Check all rows in the table.
+		// Check rows in the table.
 		$this->assertTableHasData($data);
 
 		// Get filter element.
@@ -215,7 +215,7 @@ class testPageMaintenance extends CWebTest {
 		$this->assertTrue($filter->isExpanded());
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
-			// Leave the page and reopen the previous page to make sure the filter state is still saved..
+			// Leave the page and reopen the previous page to make sure the filter state is still saved.
 			$this->page->open('zabbix.php?action=host.list')->waitUntilReady();
 			$this->page->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 			$this->assertTrue($filter->isExpanded($state));
@@ -406,7 +406,7 @@ class testPageMaintenance extends CWebTest {
 		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'expected', []));
 
 		// Check the displaying amount.
-		$this-> assertTableStats(count((CTestArrayHelper::get($data, 'expected', []))));
+		$this-> assertTableStats(count(CTestArrayHelper::get($data, 'expected', [])));
 
 		// Reset filter to not influence further tests.
 		$this->query('button:Reset')->one()->click();
@@ -446,19 +446,14 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => [
-						self::APPROACHING_MAINTENANCE
-					]
+					'name' => [self::APPROACHING_MAINTENANCE]
 				]
 			],
 			// Delete 2 maintenances.
 			[
 				[
 					'expected' => TEST_GOOD,
-					'name' => [
-						self::MULTIPLE_GROUPS_MAINTENANCE,
-						self::HOST_MAINTENANCE
-					]
+					'name' => [self::MULTIPLE_GROUPS_MAINTENANCE, self::HOST_MAINTENANCE]
 				]
 			],
 			// Delete all maintenances.
@@ -484,13 +479,13 @@ class testPageMaintenance extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Maintenance period'.(($count_names === 1) ? '' : 's').' deleted');
 		$this->assertSelectedCount(0);
 
-		if ($count_names > 0) {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name IN ('.
-					CDBHelper::escape($data['name']).')')
-			);
-		}
+		$all = CDBHelper::getCount(self::MAINTENANCE_SQL);
+		$db_check = $count_names > 0
+				? CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name IN ('.CDBHelper::escape($data['name']).')')
+				: $all;
+		$this->assertEquals(0, $db_check);
 
-		$this->assertTableStats(CDBHelper::getCount(self::MAINTENANCE_SQL));
+		$this->assertTableStats($all);
 	}
 
 	protected function cancelDelete($maintenances = []) {
