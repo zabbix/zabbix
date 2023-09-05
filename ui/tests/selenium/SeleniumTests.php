@@ -54,6 +54,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardGaugeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidgetSelectedHosts.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
@@ -150,6 +151,11 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 
 // Monitoring.
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
+
+// Network discovery.
+// TODO: Uncomment when DEV-2507 is merged.
+//require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
+require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
 require_once dirname(__FILE__).'/permissions/testPermissionsWithoutCSRF.php';
@@ -248,7 +254,6 @@ require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
-require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -274,7 +279,6 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
-require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -338,6 +342,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
+		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPages');
@@ -428,6 +433,11 @@ class SeleniumTests {
 
 		// Monitoring.
 		$suite->addTestSuite('testPageMonitoringLatestData');
+
+		// Network discovery.
+		// TODO: Uncomment when DEV-2507 is merged.
+//		$suite->addTestSuite('testFormNetworkDiscovery');
+		$suite->addTestSuite('testPageNetworkDiscovery');
 
 		// Permissions.
 		$suite->addTestSuite('testPermissionsWithoutCSRF');
@@ -521,7 +531,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
-		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
@@ -547,7 +556,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');

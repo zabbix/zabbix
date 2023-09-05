@@ -18,6 +18,7 @@
 **/
 
 #include "zbxcommon.h"
+#include "zbxstr.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 {
@@ -296,11 +297,13 @@ static const char	help_message_footer[] =
  * Purpose: print help of application parameters on stdout by application     *
  *          request with parameter '-h'                                       *
  *                                                                            *
+ * Parameters: param - pointer to modification parameter                      *
+ *                                                                            *
  * Comments:  help_message - is global variable which must be initialized     *
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_help(void)
+void	zbx_help(const char *param)
 {
 	const char	**p = help_message;
 
@@ -308,7 +311,19 @@ void	zbx_help(void)
 	printf("\n");
 
 	while (NULL != *p)
+	{
+		if (NULL != param && NULL != strstr(*p, "{DEFAULT_CONFIG_FILE}"))
+		{
+			char	*ptr;
+
+			ptr = zbx_string_replace(*p++, "{DEFAULT_CONFIG_FILE}", param);
+			printf("%s\n", ptr);
+			zbx_free(ptr);
+			continue;
+		}
+
 		printf("%s\n", *p++);
+	}
 
 	printf("\n");
 	puts(help_message_footer);

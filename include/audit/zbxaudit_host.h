@@ -40,8 +40,8 @@ void	zbx_audit_##funcname##_update_json_update_snmp_interface(zbx_uint64_t hosti
 PREPARE_AUDIT_SNMP_INTERFACE_H(host)
 PREPARE_AUDIT_SNMP_INTERFACE_H(host_prototype)
 
-void	zbx_audit_host_update_json_add_proxy_hostid_and_hostname_and_inventory_mode(zbx_uint64_t hostid,
-		zbx_uint64_t proxy_hostid, const char *hostname, int inventory_mode);
+void	zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(zbx_uint64_t hostid,
+		zbx_uint64_t proxyid, const char *hostname, int inventory_mode);
 void	zbx_audit_host_update_json_add_tls_and_psk(zbx_uint64_t hostid, int tls_connect, int tls_accept,
 		const char *tls_psk_identity, const char *tls_psk);
 void	zbx_audit_host_update_json_add_inventory_mode(zbx_uint64_t hostid, int inventory_mode);
@@ -86,7 +86,7 @@ void	zbx_audit_host_update_json_update_##resource(zbx_uint64_t hostid, type1 old
 
 PREPARE_AUDIT_HOST_UPDATE_H(host, const char*)
 PREPARE_AUDIT_HOST_UPDATE_H(name, const char*)
-PREPARE_AUDIT_HOST_UPDATE_H(proxy_hostid, zbx_uint64_t)
+PREPARE_AUDIT_HOST_UPDATE_H(proxyid, zbx_uint64_t)
 PREPARE_AUDIT_HOST_UPDATE_H(ipmi_authtype, int)
 PREPARE_AUDIT_HOST_UPDATE_H(ipmi_privilege, int)
 PREPARE_AUDIT_HOST_UPDATE_H(ipmi_username, const char*)
@@ -131,7 +131,7 @@ void	zbx_audit_hostgroup_update_json_delete_group(zbx_uint64_t hostid, zbx_uint6
 void	zbx_audit_host_hostgroup_delete(zbx_uint64_t hostid, const char* hostname, zbx_vector_uint64_t *hostgroupids,
 		zbx_vector_uint64_t *groupids);
 void	zbx_audit_host_del(zbx_uint64_t hostid, const char *hostname);
-void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxy_hostid,
+void	zbx_audit_host_update_json_add_details(zbx_uint64_t hostid, const char *host, zbx_uint64_t proxyid,
 		int ipmi_authtype, int ipmi_privilege, const char *ipmi_username, const char *ipmi_password,
 		int status, int flags, int tls_connect, int tls_accept, const char *tls_issuer, const char *tls_subject,
 		const char *tls_psk_identity, const char *tls_psk, int custom_interfaces, int inventory_mode);
@@ -207,5 +207,5 @@ void	zbx_audit_host_group_update_json_update_##resource(zbx_uint64_t groupid, ty
 PREPARE_AUDIT_HOST_GROUP_UPDATE_H(name, const char*)
 #undef PREPARE_AUDIT_HOST_UPDATE_H
 
-void	zbx_audit_host_update_json_add_proxy_hostid(zbx_uint64_t hostid, zbx_uint64_t proxy_hostid);
+void	zbx_audit_host_update_json_add_proxyid(zbx_uint64_t hostid, zbx_uint64_t proxyid);
 #endif	/* ZABBIX_AUDIT_HOST_H */
