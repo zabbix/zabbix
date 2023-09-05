@@ -871,7 +871,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Take a screenshot to test draggable object position of columns.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-//			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
+			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
 		}
 
 		$form->fill($data['main_fields']);
@@ -1586,6 +1586,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'test column 1',
 							'Data' => 'Item value',
 							'Item' => '1_item'
 						]
@@ -1601,6 +1602,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'test column 1',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Bar',
@@ -1624,6 +1626,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'test column 1',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Bar',
@@ -1647,6 +1650,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'test column 1',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Indicators',
@@ -1670,6 +1674,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'test column 1',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Indicators',
@@ -1693,10 +1698,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'test column 0',
 							'Data' => 'Item value',
 							'Item' => '1_item'
 						],
 						[
+							'Name' => 'test column 1',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Indicators',
@@ -1709,6 +1716,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							]
 						],
 						[
+							'Name' => 'test column 2',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Indicators',
@@ -1721,6 +1729,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							]
 						],
 						[
+							'Name' => 'test column 3',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Bar',
@@ -1733,6 +1742,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							]
 						],
 						[
+							'Name' => 'test column 4',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Bar',
@@ -1762,7 +1772,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Check widget added and assert screenshots.
 		$element = CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
 				->query('class:list-table')->one();
-//		$this->assertScreenshot($element, $data['screen_name']);
+		$this->assertScreenshot($element, $data['screen_name']);
 	}
 
 	/**
@@ -1817,11 +1827,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_text'
 						]
 					],
-					'text' => 'Text for text item'
+					'text' => "column1\nText for text item"
 				]
 			],
 			// #1 text item, history data Trends - value displayed.
@@ -1832,12 +1843,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_text',
 							'History data' => 'Trends'
 						]
 					],
-					'text' => 'Text for text item'
+					'text' => "column1\nText for text item"
 				]
 			],
 			// #2 text item, display Bar - value not displayed.
@@ -1848,11 +1860,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_text',
 							'Display' => 'Bar'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #3 text item, display Indicators - value not displayed.
@@ -1863,11 +1877,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_text',
 							'Display' => 'Indicators'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #4 text item, Aggregation function max - value not displayed.
@@ -1878,11 +1894,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_text',
 							'Aggregation function' => 'max'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #5 text item, Threshold - value not displayed.
@@ -1893,6 +1911,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_text',
 							'Thresholds' => [
@@ -1901,7 +1920,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 								]
 							]
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #6 log item - value displayed.
@@ -1912,11 +1932,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_log'
 						]
 					],
-					'text' => 'Logs for text item'
+					'text' => "column1\nLogs for text item"
 				]
 			],
 			// #7 log item, history data Trends - value displayed.
@@ -1927,12 +1948,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_log',
 							'History data' => 'Trends'
 						]
 					],
-					'text' => 'Logs for text item'
+					'text' => "column1\nLogs for text item"
 				]
 			],
 			// #8 log item, display Bar - value not displayed.
@@ -1943,11 +1965,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_log',
 							'Display' => 'Bar'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #9 log item, display Indicators - value not displayed.
@@ -1958,11 +1982,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_log',
 							'Display' => 'Indicators'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #10 log item, Aggregation function max - value not displayed.
@@ -1973,11 +1999,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_log',
 							'Aggregation function' => 'max'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #11 log item, Threshold - value not displayed.
@@ -1988,6 +2016,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_log',
 							'Thresholds' => [
@@ -1996,7 +2025,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 								]
 							]
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #12 char item - value displayed.
@@ -2007,11 +2037,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_char'
 						]
 					],
-					'text' => 'characters_here'
+					'text' => "column1\ncharacters_here"
 				]
 			],
 			// #13 char item, history data Trends - value displayed.
@@ -2022,12 +2053,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_char',
 							'History data' => 'Trends'
 						]
 					],
-					'text' => 'characters_here'
+					'text' => "column1\ncharacters_here"
 				]
 			],
 			// #14 char item, display Bar - value not displayed.
@@ -2038,11 +2070,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_char',
 							'Display' => 'Bar'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #15 char item, display Indicators - value not displayed.
@@ -2053,11 +2087,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_char',
 							'Display' => 'Indicators'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #16 char item, Aggregation function max - value not displayed.
@@ -2068,11 +2104,13 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_char',
 							'Aggregation function' => 'max'
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			],
 			// #17 char item, Threshold - value not displayed.
@@ -2083,6 +2121,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
+							'Name' => 'column1',
 							'Data' => 'Item value',
 							'Item' => 'top_hosts_trap_char',
 							'Thresholds' => [
@@ -2091,7 +2130,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 								]
 							]
 						]
-					]
+					],
+					'text' => "column1\nNo data found."
 				]
 			]
 		];
@@ -2106,15 +2146,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->createTopHostsWidget($data, 'top_host_text_items');
 
 		// Check if value displayed in column table.
-		$value = (array_key_exists('text', $data)) ? $data['text'] : 'No data found.';
-		$this->assertEquals($value, CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
+		$this->assertEquals($data['text'], CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
 				->getContent()->getText());
 	}
 
 	/**
 	 * Function used to create Top Hosts widget with special columns for CheckTextItems and WidgetAppearance scenarios.
 	 *
-	 * @param type $data	dataprovider values.
+	 * @param type $data	data provider values.
 	 * @param type $name	name of the dashboard where to create Top Hosts widget.
 	 */
 	private function createTopHostsWidget($data, $name) {
