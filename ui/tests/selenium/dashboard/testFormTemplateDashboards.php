@@ -4195,6 +4195,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 */
 	public function testFormTemplateDashboards_UpdateWidget($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_for_update);
+		CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 
 		// Update widget configuration and save filled in data for further validation.
 		$filled_data = $this->fillWidgetConfigurationFrom($data);
