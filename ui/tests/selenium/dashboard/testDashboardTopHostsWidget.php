@@ -165,31 +165,20 @@ class testDashboardTopHostsWidget extends CWebTest {
 		];
 		$this->checkFieldsAttributes($column_default_fields, $column_form);
 
+		// Reassign new fields' values for comparing them in other 'Data' values.
+		foreach (['visible', 'enabled'] as $attribute) {
+			foreach (['Aggregation function', 'Item', 'Time shift', 'Display', 'History data', 'Min',
+					'Max', 'Decimal places','Thresholds' ] as $field) {
+				$column_default_fields[$field][$attribute] = false;
+			}
+		}
+
 		foreach (['Host name', 'Text'] as $data) {
 			$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL($data)]);
 
 			$column_default_fields['Data']['value'] = ($data === 'Host name') ? 'Host name' : 'Text';
 			$column_default_fields['Text']['visible'] = $data === 'Text';
 			$column_default_fields['Text']['enabled'] = $data === 'Text';
-			$column_default_fields['Aggregation function']['visible'] = false;
-			$column_default_fields['Aggregation function']['enabled'] = false;
-			$column_default_fields['Item']['visible'] = false;
-			$column_default_fields['Item']['enabled'] = false;
-			$column_default_fields['Time shift']['visible'] = false;
-			$column_default_fields['Time shift']['enabled'] = false;
-			$column_default_fields['Display']['visible'] = false;
-			$column_default_fields['Display']['enabled'] = false;
-			$column_default_fields['History data']['visible'] = false;
-			$column_default_fields['History data']['enabled'] = false;
-			$column_default_fields['Min']['visible'] = false;
-			$column_default_fields['Min']['enabled'] = false;
-			$column_default_fields['Max']['visible'] = false;
-			$column_default_fields['Max']['enabled'] = false;
-			$column_default_fields['Decimal places']['visible'] = false;
-			$column_default_fields['Decimal places']['enabled'] = false;
-			$column_default_fields['Thresholds']['visible'] = false;
-			$column_default_fields['Thresholds']['enabled'] = false;
-
 			$this->checkFieldsAttributes($column_default_fields, $column_form);
 		}
 
