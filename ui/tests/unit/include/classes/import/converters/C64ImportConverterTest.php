@@ -84,7 +84,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'items' => $source_items,
 							'discovery_rules' => $source_lld_rules
 						]
-					],
+					]
 				],
 				[
 					'templates' => [
@@ -98,7 +98,7 @@ class C64ImportConverterTest extends CImportConverterTest {
 							'items' => $expected_items,
 							'discovery_rules' => $expected_lld_rules
 						]
-					],
+					]
 				]
 			]
 		];
