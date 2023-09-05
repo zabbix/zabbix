@@ -38,6 +38,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 */
 	private static $updated_name = 'Top hosts update';
 
+	private function getCreateDashboardId() {
+		return CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
+	}
+
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
@@ -82,6 +86,229 @@ class testDashboardTopHostsWidget extends CWebTest {
 			]
 		])->waitUntilVisible()->one();
 	}
+
+	public function testDashboardTopHostsWidget_Layout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$this->getCreateDashboardId());
+		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
+		$form = $dialog->asForm();
+		$this->assertEquals('Add widget', $dialog->getTitle());
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Host tags',
+				'Show hosts in maintenance', 'Columns', 'Order', 'Order column', 'Host count'], $form->getLabels()->asText()
+		);
+		$form->getRequiredLabels(['Columns', 'Order column', 'Host count']);
+
+		// Check default fields.
+		$fields = [
+			'Name' => ['value' => '', 'placeholder' => 'default', 'maxlength' => 255],
+			'Refresh interval' => ['value' => 'Default (1 minute)'],
+			'Show header' => ['value' => true],
+			'id:groupids__ms' => ['value' => '', 'placeholder' => 'type here to search'],
+			'id:evaltype' => ['value' => 'And/Or', 'labels' => ['And/Or', 'Or']],
+			'id:tags_0_tag' => ['value' => '', 'placeholder' => 'tag', 'maxlength' => 255],
+			'id:tags_0_operator' => ['value' => 'Contains', 'options' => ['Exists', 'Equals', 'Contains',
+					'Does not exist', 'Does not equal', 'Does not contain']
+			],
+			'id:tags_0_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255],
+			'Order' => ['value' => 'Top N', 'labels' => ['Top N', 'Bottom N']],
+			'Host count' => ['value' => 10, 'maxlength' => 3]
+		];
+		$this->checkFieldsAttributes($fields, $form);
+
+		// Check Columns table.
+		$this->assertEquals(['', 'Name', 'Data', 'Action'],
+				$form->getFieldContainer('Columns')->query('id:list_columns')->asTable()->one()->getHeadersText()
+		);
+
+		// Check clickable buttons.
+		$dialog_buttons = [
+			['count' => 2, 'query' => $dialog->getFooter()->query('button', ['Add', 'Cancel'])],
+			['count' => 2, 'query' => $form->query('id:tags_table_tags')->one()->query('button', ['Add', 'Remove'])],
+			['count' => 1, 'query' => $form->getFieldContainer('Columns')->query('button:Add')]
+		];
+
+		foreach ($dialog_buttons as $field) {
+			$this->assertEquals($field['count'], $field['query']->all()->filter(CElementFilter::CLICKABLE)->count());
+		}
+
+		// Check Columns popup.
+		$form->getFieldContainer('Columns')->query('button:Add')->one()->waitUntilClickable()->click();
+		$column_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$column_form = $column_dialog->asForm();
+
+		$this->assertEquals('New column', $column_dialog->getTitle());
+		$this->assertEquals(['Name', 'Data', 'Text', 'Item', 'Time shift', 'Aggregation function', 'Aggregation interval',
+				'Display', 'History data', 'Base color', 'Min', 'Max', 'Decimal places', 'Thresholds'],
+				$column_form->getLabels()->asText()
+		);
+		$form->getRequiredLabels(['Name', 'Item', 'Aggregation interval']);
+
+		$column_default_fields = [
+			'Name' => ['value' => '', 'maxlength' => 255],
+			'Data' => ['value' => 'Item value', 'options' => ['Item value', 'Host name', 'Text']],
+			'Text' => ['value' => '', 'placeholder' => 'Text, supports {INVENTORY.*}, {HOST.*} macros','maxlength' => 255,
+					'visible' => false, 'enabled' => false
+			],
+			'Aggregation function' => ['value' => 'none', 'options' => ['none', 'min', 'max', 'avg', 'count', 'sum',
+					'first', 'last']
+			],
+			'Aggregation interval' => ['value' => '1h', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
+			'Item' => ['value' => ''],
+			'Time shift' => ['value' => '', 'placeholder' => 'none', 'maxlength' => 255],
+			'Display' => ['value' => 'As is', 'labels' => ['As is', 'Bar', 'Indicators']],
+			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
+			'xpath:.//input[@id="base_color"]/..' => ['color' => ''],
+			'Min' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
+			'Max' => ['value' => '', 'placeholder' => 'calculated', 'maxlength' => 255, 'visible' => false, 'enabled' => false],
+			'Decimal places' => ['value' => 2, 'maxlength' => 2] ,
+			'Thresholds' => ['visible' => true]
+		];
+		$this->checkFieldsAttributes($column_default_fields, $column_form);
+
+		foreach (['Host name', 'Text'] as $data) {
+			$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL($data)]);
+
+			$column_default_fields['Data']['value'] = ($data === 'Host name') ? 'Host name' : 'Text';
+			$column_default_fields['Text']['visible'] = $data === 'Text';
+			$column_default_fields['Text']['enabled'] = $data === 'Text';
+			$column_default_fields['Aggregation function']['visible'] = false;
+			$column_default_fields['Aggregation function']['enabled'] = false;
+			$column_default_fields['Item']['visible'] = false;
+			$column_default_fields['Item']['enabled'] = false;
+			$column_default_fields['Time shift']['visible'] = false;
+			$column_default_fields['Time shift']['enabled'] = false;
+			$column_default_fields['Display']['visible'] = false;
+			$column_default_fields['Display']['enabled'] = false;
+			$column_default_fields['History data']['visible'] = false;
+			$column_default_fields['History data']['enabled'] = false;
+			$column_default_fields['Min']['visible'] = false;
+			$column_default_fields['Min']['enabled'] = false;
+			$column_default_fields['Max']['visible'] = false;
+			$column_default_fields['Max']['enabled'] = false;
+			$column_default_fields['Decimal places']['visible'] = false;
+			$column_default_fields['Decimal places']['enabled'] = false;
+			$column_default_fields['Thresholds']['visible'] = false;
+			$column_default_fields['Thresholds']['enabled'] = false;
+
+			$this->checkFieldsAttributes($column_default_fields, $column_form);
+		}
+
+		// Check hintboxes.
+		$column_form->fill(['Data' => CFormElement::RELOADABLE_FILL('Item value')]);
+
+		// Adding those fields new info icons appear.
+		$warning_visibility = [
+			'Aggregation function' => ['none' => false, 'min' => true, 'max' => true, 'avg' => true, 'count' => true,
+					'sum' => true, 'first' => true, 'last' => true
+			],
+			'Display' => ['As is' => false, 'Bar' => true, 'Indicators' => true],
+			'History data' => ['Auto' => false, 'History' => false, 'Trends' => true]
+		];
+
+		// Check warning and hintbox message, as well as Aggregation interval, Min/Max and Thresholds fields visibility.
+		foreach ($warning_visibility as $warning_label => $options) {
+			$hint_text = ($warning_label === 'History data')
+				? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
+				: 'With this setting only numeric items will be displayed in this column.';
+			$warning_button = $column_form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+
+			foreach ($options as $option => $visible) {
+				$column_form->fill([$warning_label => $option]);
+				$this->assertTrue($warning_button->isVisible($visible));
+
+				if ($visible) {
+					$warning_button->click();
+
+					// Check hintbox text.
+					$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+					$this->assertEquals($hint_text, $hint_dialog->getText());
+
+					// Close the hintbox.
+					$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+					$hint_dialog->waitUntilNotPresent();
+				}
+
+				// Together with hintbox there are some additional fields' dependency.
+				if ($warning_label === 'Aggregation function') {
+					$this->assertTrue($column_form->getField('Aggregation interval')->isVisible($visible));
+				}
+
+				if ($warning_label === 'Display') {
+					foreach (['Min', 'Max'] as $field) {
+						$this->assertTrue($column_form->getField($field)->isVisible($visible));
+					}
+				}
+			}
+		}
+
+		// Check Columns table.
+		$this->assertEquals(['', 'Threshold', 'Action'],
+			$column_form->getFieldContainer('Thresholds')->query('id:thresholds_table')->asTable()->one()->getHeadersText()
+		);
+
+		$thresholds_icon = $column_form->getLabel('Thresholds')->query('xpath:.//button[@data-hintbox]')->one();
+		$this->assertFalse($thresholds_icon->isVisible());
+		$thresholds_container = $column_form->getFieldContainer('Thresholds');
+		$thresholds_container->query('button:Add')->one()->waitUntilClickable()->click();
+
+		foreach (['lbl_thresholds_0_color', 'thresholds_0_threshold', 'thresholds_0_remove'] as $id) {
+			$element = $thresholds_container->query('id',$id)->one();
+			$this->assertTrue($element->isVisible());
+			$this->assertTrue($element->isEnabled());
+		}
+
+		$column_form->checkValue([
+			'xpath:.//input[@id="thresholds_0_color"]/..' => 'FF465C',
+			'id:thresholds_0_threshold' => ''
+		]);
+
+		$thresholds_icon->click();
+		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
+		$this->assertEquals('With this setting only numeric items will be displayed in this column.',
+				$hint_dialog->getText()
+		);
+		$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+		$hint_dialog->waitUntilNotPresent();
+	}
+
+	/**
+	 * Check fields attributes for given form.
+	 *
+	 * @param array         $data	provided data
+	 * @param CFormElement  $form	form to be checked
+	 */
+	private function checkFieldsAttributes($data, $form) {
+		foreach ($data as $label => $attributes) {
+			$field = $form->getField($label);
+			$this->assertTrue($field->isVisible(CTestArrayHelper::get($attributes, 'visible', true)));
+			$this->assertTrue($field->isEnabled(CTestArrayHelper::get($attributes, 'enabled', true)));
+
+			if (array_key_exists('value', $attributes)) {
+				$this->assertEquals($attributes['value'], $field->getValue());
+			}
+
+			if (array_key_exists('maxlength', $attributes)) {
+				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
+			}
+
+			if (array_key_exists('placeholder', $attributes)) {
+				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
+			}
+
+			if (array_key_exists('labels', $attributes)) {
+				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
+			}
+
+			if (array_key_exists('options', $attributes)) {
+				$this->assertEquals($attributes['options'], $field->asDropdown()->getOptions()->asText());
+			}
+
+			if (array_key_exists('color', $attributes)) {
+				$this->assertEquals($attributes['color'], $form->query($label)->asColorPicker()->one()->getValue());
+			}
+		}
+	}
+
 
 	public static function getCreateData() {
 		return [
@@ -850,8 +1077,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$this->getCreateDashboardId());
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -913,8 +1139,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Hash before simple update.
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_update');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$this->getCreateDashboardId());
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->getWidget(self::$updated_name)->edit()->submit();
 		$dashboard->save();
@@ -1303,8 +1528,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_update');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$this->getCreateDashboardId());
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 
@@ -1360,8 +1584,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function testDashboardTopHostsWidget_Delete() {
 		$name = 'Top hosts delete';
 
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_delete');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$this->getCreateDashboardId());
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$dashboard->deleteWidget($name);
 		$this->page->waitUntilReady();
@@ -1410,8 +1633,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getRemoveData
 	 */
 	public function testDashboardTopHostsWidget_Remove($data) {
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_remove');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$this->getCreateDashboardId());
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts for remove')->edit();
 
@@ -1775,48 +1997,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->assertScreenshot($element, $data['screen_name']);
 	}
 
-	/**
-	 * Check warning and info messages.
-	 */
-	public function testDashboardTopHostsWidget_CheckInfoMessages() {
-		$label_warnings = ['Aggregation function', 'Display', 'History data', 'Thresholds'];
-		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => 'Top hosts']);
-		COverlayDialogElement::find()->waitUntilReady()->one();
-
-		// Add column.
-		$form->query('id:add')->waitUntilClickable()->one()->click();
-		$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
-
-		// Check that no warning icon displayed before adding fields.
-		foreach ($label_warnings as $label) {
-			$this->assertFalse($column_form->getLabel($label)->query('xpath:.//button[@data-hintbox]')->one()->isVisible());
-		}
-
-		// Adding those fields new info icons appear.
-		$column_form->fill(['Aggregation function' => 'min', 'Display' => 'Bar', 'History data' => 'Trends']);
-		$column_form->getField('Thresholds')->query('button:Add')->one()->click();
-
-		// Check warning and info icon message.
-		foreach ($label_warnings as $label) {
-			$column_form->getLabel($label)->query('xpath:.//button[@data-hintbox]')->one()->click();
-
-			// Check hint-box.
-			$hint = $column_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-			$hintbox = ($label === 'History data')
-					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
-					: 'With this setting only numeric items will be displayed in this column.';
-			$this->assertEquals($hintbox, $hint->one()->getText());
-
-			// Close the hint-box.
-			$hint->query('xpath://button[@class="btn-overlay-close"]')->one()->click();
-			$hint->waitUntilNotPresent();
-		}
-	}
-
 	public static function getCheckTextItemsData() {
 		return [
 			// #0 text item - value displayed.
@@ -2153,8 +2333,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 	/**
 	 * Function used to create Top Hosts widget with special columns for CheckTextItems and WidgetAppearance scenarios.
 	 *
-	 * @param type $data	data provider values.
-	 * @param type $name	name of the dashboard where to create Top Hosts widget.
+	 * @param array  $data	data provider values.
+	 * @param string $name	name of the dashboard where to create Top Hosts widget.
 	 */
 	private function createTopHostsWidget($data, $name) {
 		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.'.$name);
