@@ -57,23 +57,10 @@ class testDependentItems extends CAPITest {
 							'key_' => 'template.dependent.level.last',
 							'master_itemid' => ':item:template.dependent.descendant'
 						],
-						['key_' => 'template.item.another'],
-						['key_' => 'mixed.dependency.master.item'],
-						[
-							'key_' => 'mixed.dependency.dependent.item',
-							'master_itemid' => ':item:mixed.dependency.master.item'
-						],
-						[
-							'key_' => 'mixed.dependency.dependent.descendant',
-							'master_itemid' => ':item:mixed.dependency.dependent.item'
-						]
+						['key_' => 'template.overflow.item']
 					],
 					'lld_rules' => [
 						['key_' => 'template.discovery.rule.update'],
-						[
-							'key_' => 'mixed.dependency.dependent.rule',
-							'master_itemid' => ':item:mixed.dependency.dependent.descendant'
-						],
 						[
 							'key_' => 'template.discovery.rule',
 							'item_prototypes' => [
@@ -90,10 +77,31 @@ class testDependentItems extends CAPITest {
 									'key_' => 'template.dependent.item.prototype.level.last[{#LLD}]',
 									'master_itemid' => ':item_prototype:template.dependent.item.prototype.descendant[{#LLD}]'
 								],
-								['key_' => 'template.dependent.item.prototype.another[{#LLD}]']
+								['key_' => 'template.overflow.item.prototype[{#LLD}]']
 							]
 						]
 					],
+				],
+				[
+					'host' => 't.mixed.dependencies',
+					'items' => [
+						['key_' => 'mixed.dependency.master.item'],
+						[
+							'key_' => 'mixed.dependency.dependent.item',
+							'master_itemid' => ':item:mixed.dependency.master.item'
+						],
+						[
+							'key_' => 'mixed.dependency.dependent.descendant',
+							'master_itemid' => ':item:mixed.dependency.dependent.item'
+						],
+						['key_' => 'mixed.dependency.item.overflow']
+					],
+					'lld_rules' => [
+						[
+							'key_' => 'mixed.dependency.dependent.rule',
+							'master_itemid' => ':item:mixed.dependency.dependent.descendant'
+						]
+					]
 				],
 				[
 					'host' => 't.dep.2',
@@ -143,7 +151,6 @@ class testDependentItems extends CAPITest {
 				[
 					'host' => 'h.dep',
 					'items' => [
-						['key_' => 'independent.item'],
 						['key_' => 'master.item'],
 						[
 							'key_' => 'dependent.item',
@@ -158,10 +165,9 @@ class testDependentItems extends CAPITest {
 							'key_' => 'i.after.last[t.dep.2]',
 							'master_itemid' => ':item:i.last[t.dep.2]'
 						],
-						['key_' => 'master.for.discovered.item'],
+						['key_' => 'independent.item']
 					],
 					'lld_rules' => [
-						['key_' => 'independent.rule'],
 						[
 							'key_' => 'discovery.rule',
 							'item_prototypes' => [
@@ -178,19 +184,6 @@ class testDependentItems extends CAPITest {
 								[
 									'key_' => 'dependent.item_prototype.descendant[{#LLD}]',
 									'master_itemid' => ':item_prototype:dependent.item.prototype[{#LLD}]'
-								],
-								[
-									'key_' => 'independent.item.prototype[{#LLD}]'
-								],
-								[
-									'key_' => 'item.prototype.for.discovered.item[{#LLD}]',
-									'master_itemid' => ':item:master.for.discovered.item',
-									'discovered_items' => [
-										[
-											'key_' => 'discovered.dependent.item[eth0]',
-											'master_itemid' => ':item:master.for.discovered.item'
-										]
-									]
 								]
 							]
 						],
@@ -205,6 +198,29 @@ class testDependentItems extends CAPITest {
 								[
 									'key_' => 'i.after.last[{#LLD}, t.dep.3]',
 									'master_itemid' => ':item_prototype:i.last[{#LLD}, t.dep.3]'
+								]
+							]
+						]
+					]
+				],
+				[
+					'host' => 'h.discovered.items',
+					'items' => [
+						['key_' => 'master.for.discovered.item']
+					],
+					'lld_rules' => [
+						[
+							'key_' => 'discovered.items.rule',
+							'item_prototypes' => [
+								[
+									'key_' => 'item.prototype.for.discovered.item[{#LLD}]',
+									'master_itemid' => ':item:master.for.discovered.item',
+									'discovered_items' => [
+										[
+											'key_' => 'discovered.dependent.item[eth0]',
+											'master_itemid' => ':item:master.for.discovered.item'
+										]
+									]
 								]
 							]
 						]
@@ -228,6 +244,12 @@ class testDependentItems extends CAPITest {
 									'key_' => 'dependent.item.prototype.other[{#LLD}]',
 									'master_itemid' => ':item_prototype:master.item.prototype.other[{#LLD}]'
 								]
+							]
+						],
+						[
+							'key_' => 'independent.rule',
+							'item_prototypes' => [
+								['key_' => 'independent.item.prototype[{#LLD}]']
 							]
 						]
 					]
@@ -613,20 +635,20 @@ class testDependentItems extends CAPITest {
 			'Check for maximum depth of the items tree (update). Add 4th level.' => [
 				'method' => 'item.update',
 				'params' => [
-					'itemid' => ':item:template.item.another',
+					'itemid' => ':item:template.overflow.item',
 					'type' => ITEM_TYPE_DEPENDENT,
 					'master_itemid' => ':item:template.dependent.level.last'
 				],
-				'error' => 'Cannot set dependency for item with key "template.item.another" on the master item with key "template.dependent.level.last" on the template "t.dep": allowed count of dependency levels would be exceeded.'
+				'error' => 'Cannot set dependency for item with key "template.overflow.item" on the master item with key "template.dependent.level.last" on the template "t.dep": allowed count of dependency levels would be exceeded.'
 			],
 			'Check for maximum depth of the item prototypes tree (update). Add 4th level.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
-					'itemid' => ':item_prototype:template.dependent.item.prototype.another[{#LLD}]',
+					'itemid' => ':item_prototype:template.overflow.item.prototype[{#LLD}]',
 					'type' => ITEM_TYPE_DEPENDENT,
 					'master_itemid' => ':item_prototype:template.dependent.item.prototype.level.last[{#LLD}]'
 				],
-				'error' => 'Cannot set dependency for item prototype with key "template.dependent.item.prototype.another[{#LLD}]" on the master item prototype with key "template.dependent.item.prototype.level.last[{#LLD}]" on the template "t.dep": allowed count of dependency levels would be exceeded.'
+				'error' => 'Cannot set dependency for item prototype with key "template.overflow.item.prototype[{#LLD}]" on the master item prototype with key "template.dependent.item.prototype.level.last[{#LLD}]" on the template "t.dep": allowed count of dependency levels would be exceeded.'
 			],
 			'Check for maximum depth of the discovery rule tree (update). Add 4th level.' => [
 				'method' => 'discoveryrule.update',
@@ -642,27 +664,27 @@ class testDependentItems extends CAPITest {
 				'params' => [
 					'itemid' => ':item:template.master.item',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => ':item:template.item.another'
+					'master_itemid' => ':item:template.overflow.item'
 				],
-				'error' => 'Cannot set dependency for item with key "template.master.item" on the master item with key "template.item.another" on the template "t.dep": allowed count of dependency levels would be exceeded.'
+				'error' => 'Cannot set dependency for item with key "template.master.item" on the master item with key "template.overflow.item" on the template "t.dep": allowed count of dependency levels would be exceeded.'
 			],
 			'Check for maximum depth of the mixed tree (update). Add 4th level at the top.' => [
 				'method' => 'item.update',
 				'params' => [
 					'itemid' => ':item:mixed.dependency.master.item',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => ':item:template.item.another'
+					'master_itemid' => ':item:mixed.dependency.item.overflow'
 				],
-				'error' => 'Cannot set dependency for item with key "mixed.dependency.master.item" on the master item with key "template.item.another" on the template "t.dep": allowed count of dependency levels would be exceeded.'
+				'error' => 'Cannot set dependency for item with key "mixed.dependency.master.item" on the master item with key "mixed.dependency.item.overflow" on the template "t.mixed.dependencies": allowed count of dependency levels would be exceeded.'
 			],
 			'Check for maximum depth of the item prototypes tree (update). Add 4th level at the top.' => [
 				'method' => 'itemprototype.update',
 				'params' => [
 					'itemid' => ':item_prototype:template.master.item.prototype[{#LLD}]',
 					'type' => ITEM_TYPE_DEPENDENT,
-					'master_itemid' => ':item_prototype:template.dependent.item.prototype.another[{#LLD}]'
+					'master_itemid' => ':item_prototype:template.overflow.item.prototype[{#LLD}]'
 				],
-				'error' => 'Cannot set dependency for item prototype with key "template.master.item.prototype[{#LLD}]" on the master item prototype with key "template.dependent.item.prototype.another[{#LLD}]" on the template "t.dep": allowed count of dependency levels would be exceeded.'
+				'error' => 'Cannot set dependency for item prototype with key "template.master.item.prototype[{#LLD}]" on the master item prototype with key "template.overflow.item.prototype[{#LLD}]" on the template "t.dep": allowed count of dependency levels would be exceeded.'
 			],
 
 			'Check for maximum depth of the items tree (link a template).' => [
@@ -692,9 +714,9 @@ class testDependentItems extends CAPITest {
 				'params' => CTestDataHelper::prepareItemSet([
 					'key_' => 'dependent.item',
 					'hostid' => ':template:t.dep',
-					'master_itemid' => ':item:template.item.another'
+					'master_itemid' => ':item:template.overflow.item'
 				], 1, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1),
-				'error' => 'Cannot set dependency for item with key "dependent.item.1" on the master item with key "template.item.another" on the template "t.dep": allowed count of dependent items would be exceeded.'
+				'error' => 'Cannot set dependency for item with key "dependent.item.1" on the master item with key "template.overflow.item" on the template "t.dep": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the template level, no previous dependents.' => [
 				'method' => 'item.create',
@@ -702,15 +724,15 @@ class testDependentItems extends CAPITest {
 					CTestDataHelper::prepareItemSet([
 						'key_' => 'dependent.item.set.1',
 						'hostid' => ':template:t.dep',
-						'master_itemid' => ':item:template.item.another'
+						'master_itemid' => ':item:template.overflow.item'
 					], 1, 100),
 					CTestDataHelper::prepareItemSet([
 						'key_' => 'dependent.item.set.2',
 						'hostid' => ':template:t.dep',
-						'master_itemid' => ':item:template.item.another'
+						'master_itemid' => ':item:template.overflow.item'
 					], 101, ZBX_DEPENDENT_ITEM_MAX_COUNT + 1)
 				),
-				'error' => 'Cannot set dependency for item with key "dependent.item.set.1.1" on the master item with key "template.item.another" on the template "t.dep": allowed count of dependent items would be exceeded.'
+				'error' => 'Cannot set dependency for item with key "dependent.item.set.1.1" on the master item with key "template.overflow.item" on the template "t.dep": allowed count of dependent items would be exceeded.'
 			],
 			'Check for maximum count of items in the tree on the template level, add one set to existing tree.' => [
 				'method' => 'item.create',

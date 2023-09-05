@@ -28,6 +28,12 @@ class CTestDataHelper {
 
 	/**
 	 * Create objects using API.
+	 * Usually only the object's "name/key" need to be provided. Some defaults (e.g. item's type, value_type) are mixed
+	 * in and the "parent ID" property (e.g. host's groupid, item's hostid, etc.), if not specified, inferred by using
+	 * the last known such object's ID. Previously defined objects can be linked by their reference ID, f.e.:
+	 * `'master_itemid' => ':item:key.of.master.item'`.
+	 *
+	 * Call CTestDataHelper::cleanUp() to delete objects defined here along with child objects created during the test.
 	 *
 	 * @param array $objects
 	 */
@@ -285,7 +291,6 @@ class CTestDataHelper {
 			$_items = [];
 
 			foreach ($items as $i => $item) {
-
 				self::$objectids['items'][$item['key_']][$host_refs[$i]] = array_shift($result['itemids']);
 
 				if (array_key_exists($i, $dep_items)) {
@@ -624,7 +629,10 @@ class CTestDataHelper {
 	 * Check for, and replace a reference ID with the corresponding object's record ID.
 	 *
 	 * @param array  $object    Array containing the referenced property.
-	 * @param string $property  The reference key.
+	 * @param string $property  The reference key. A "." symbol is used as a separator for nested property references,
+	 *                          f.e., `templates.templateid`. In case of matching object names (e.g. item inherited from
+	 *                          template to host), the contained reference should include further specific parent object
+	 *                          references, e.g.: `:item:item.key:host:my.name` vs `:items:item.key:template:my.name`.
 	 */
 	private static function processReference(array &$object, string $property): void {
 		if (strpos($property, '.') !== false) {
@@ -749,7 +757,6 @@ class CTestDataHelper {
 
 		if (is_string(key($params))) {
 			foreach ($ref_fields as $ref_field) {
-				$abc = 1;
 				self::processReference($params, $ref_field);
 			}
 		}
