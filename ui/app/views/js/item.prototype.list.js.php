@@ -208,30 +208,43 @@
 		}
 
 		openHostPopup(host_data) {
-			const original_url = location.href;
+			let original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
-			const host_list = new Curl('zabbix.php');
 
-			host_list.setArgument('action', 'host.list');
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#navigate(e.detail, original_url));
-			overlay.$dialogue[0].addEventListener('dialogue.delete', e => this.#navigate(e.detail, host_list.getUrl()));
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
-				history.replaceState({}, '', list_href);
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('zabbix.php');
+					list_url.setArgument('action', 'host.list');
+					original_url = list_url.getUrl();
+				}
+
+				history.replaceState({}, '', original_url);
+				this.#navigate(e.detail, original_url);
 			});
 		}
 
 		openTemplatePopup(template_data) {
+			let original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => this.#navigate(e.detail, location.href));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('zabbix.php');
+					list_url.setArgument('action', 'template.list');
+					original_url = list_url.getUrl();
+				}
+
+				history.replaceState({}, '', original_url);
+				this.#navigate(e.detail, original_url);
+			});
 		}
 
 		#navigate(response, url) {

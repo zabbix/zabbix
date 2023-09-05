@@ -303,49 +303,59 @@
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
-			const reloadPage = (e) => {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = original_url;
-			}
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
 				if (['item.update', 'item.create', 'item.delete'].indexOf(e.detail.action) != -1) {
 					uncheckTableRows('item');
 				}
 
-				reloadPage(e);
-			});
-			overlay.$dialogue[0].addEventListener('dialogue.create', reloadPage);
-			overlay.$dialogue[0].addEventListener('dialogue.update', reloadPage);
-			overlay.$dialogue[0].addEventListener('dialogue.delete', e => {
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('zabbix.php');
+					list_url.setArgument('action', 'host.list');
+					original_url = list_url.getUrl();
+				}
 
-				original_url = curl.getUrl();
-				return reloadPage(e);
-			});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
+				this.#navigate(e.detail, original_url);
 			});
 		}
 
 		openTemplatePopup(template_data) {
+			let original_url = location.href;
 			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('zabbix.php');
+					list_url.setArgument('action', 'template.list');
+					original_url = list_url.getUrl();
+				}
+
+				this.#navigate(e.detail, original_url)
+			});
+		}
+
+		#navigate(response, url) {
+			if ('error' in response) {
+				if ('title' in response.error) {
+					postMessageError(response.error.title);
+				}
+
+				postMessageDetails('error', response.error.messages);
+			}
+			else if ('success' in response) {
+				postMessageOk(response.success.title);
+
+				if ('messages' in response.success) {
+					postMessageDetails('success', response.success.messages);
+				}
+			}
+
+			location.href = url;
 		}
 	};
 </script>

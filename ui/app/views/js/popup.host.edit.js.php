@@ -153,11 +153,7 @@ window.host_edit_popup = {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
-					detail: {
-						success: response.success
-					}
-				}));
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
