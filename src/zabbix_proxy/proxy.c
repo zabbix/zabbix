@@ -1576,15 +1576,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	proxy_db_init();
-
-	if (FAIL == zbx_pb_init(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
+	if (FAIL == zbx_pb_create(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
 			config_proxy_memory_buffer_age, config_proxy_offline_buffer * SEC_PER_HOUR, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy buffer: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	proxy_db_init();
+
+	zbx_pb_init();
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
