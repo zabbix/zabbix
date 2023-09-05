@@ -424,9 +424,6 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		cSourceIP, cHostname, C.zbx_uint64_t(itemid), (C.int)(agent.Options.BufferSend),
 		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_max_lines_per_second))
 
-	log.Tracef("Calling C function \"free_prep_vec()\"")
-	C.free_prep_vec(cprepVec)
-
 	// add cached results
 	var cvalue *C.char
 	var clastlogsize C.zbx_uint64_t
