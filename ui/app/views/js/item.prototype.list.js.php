@@ -242,7 +242,6 @@
 					original_url = list_url.getUrl();
 				}
 
-				history.replaceState({}, '', original_url);
 				this.#navigate(e.detail, original_url);
 			});
 		}

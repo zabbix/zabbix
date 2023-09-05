@@ -115,7 +115,7 @@ foreach ($data['tags'] as $i => $tag) {
 			foreach ($tag['parent_templates'] as $templateid => $template) {
 				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
 					$template_list[] = (new CLink($template['name']))
-						->onClick('view.editTemplate(event, this.dataset.templateid);')
+						->addClass('js-edit-template')
 						->setAttribute('data-templateid', $templateid);
 				}
 				else {

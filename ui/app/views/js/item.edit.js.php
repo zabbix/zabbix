@@ -225,6 +225,18 @@ window.item_edit_form = new class {
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
 			.forEach(o => o.addEventListener('change', e => reloadPopup(this.form, this.actions.form)));
+		this.form.addEventListener('click', e => {
+			const target = e.target;
+
+			if (target.matches('.js-edit-template')) {
+				e.preventDefault();
+
+				if (!this.#isFormModified()
+						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
+					this.#openTemplatePopup(target.dataset);
+				}
+			}
+		});
 
 		// Preprocessing tab events.
 		this.field.value_type_steps.addEventListener('change', e => this.#valueTypeChangeHandler(e));
@@ -583,6 +595,21 @@ window.item_edit_form = new class {
 		}, {dialogue_class: 'modal-popup-generic'});
 
 		return false;
+	}
+
+	#openTemplatePopup(template_data) {
+		overlayDialogueDestroy(this.overlay.dialogueid);
+
+		let original_url = location.href;
+		const overlay =  PopUp('template.edit', template_data, {
+			dialogueid: 'templates-form',
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+		});
 	}
 }
 })();
