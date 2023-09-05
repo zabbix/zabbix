@@ -187,6 +187,11 @@ class CMathFunctionValidatorTest extends TestCase {
 			['insert("a", 1, 1, "a")', ['rc' => true, 'error' => null]],
 			['insert("a", 1, 1, "a", 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "insert"']],
 
+			['kurtosis()', ['rc' => false, 'error' => 'invalid number of parameters in function "kurtosis"']],
+			['kurtosis(1)', ['rc' => true, 'error' => null]],
+			['kurtosis(1, 1)', ['rc' => true, 'error' => null]],
+			['kurtosis(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "kurtosis"']],
+
 			['left()', ['rc' => false, 'error' => 'invalid number of parameters in function "left"']],
 			['left("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "left"']],
 			['left("a", 1)', ['rc' => true, 'error' => null]],
@@ -208,6 +213,11 @@ class CMathFunctionValidatorTest extends TestCase {
 			['ltrim("a")', ['rc' => true, 'error' => null]],
 			['ltrim("a", "a")', ['rc' => true, 'error' => null]],
 			['ltrim("a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "ltrim"']],
+
+			['mad()', ['rc' => false, 'error' => 'invalid number of parameters in function "mad"']],
+			['mad(1)', ['rc' => true, 'error' => null]],
+			['mad(1, 1)', ['rc' => true, 'error' => null]],
+			['mad(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "mad"']],
 
 			['max()', ['rc' => false, 'error' => 'invalid number of parameters in function "max"']],
 			['max(1)', ['rc' => true, 'error' => null]],

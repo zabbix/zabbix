@@ -28,8 +28,6 @@ package zbxlib
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 #include "zbx_item_constants.h"
 
-extern int CONFIG_MAX_LINES_PER_SECOND;
-
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
@@ -244,6 +242,8 @@ void	zbx_config_tls_init_for_agent2(zbx_config_tls_t *config_tls, unsigned int a
 
 	return;
 }
+
+int	zbx_config_max_lines_per_second = 20;
 */
 import "C"
 
@@ -422,7 +422,10 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, cprepVec, ctlsConfig_p, (C.int)(agent.Options.Timeout),
 		cSourceIP, cHostname, C.zbx_uint64_t(itemid), (C.int)(agent.Options.BufferSend),
-		(C.int)(agent.Options.BufferSize))
+		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_max_lines_per_second))
+
+	log.Tracef("Calling C function \"free_prep_vec()\"")
+	C.free_prep_vec(cprepVec)
 
 	// add cached results
 	var cvalue *C.char
@@ -494,5 +497,5 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 }
 
 func SetMaxLinesPerSecond(num int) {
-	C.CONFIG_MAX_LINES_PER_SECOND = C.int(num)
+	C.zbx_config_max_lines_per_second = C.int(num)
 }
