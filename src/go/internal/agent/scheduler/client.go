@@ -140,6 +140,10 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		var tacc exporterTaskAccessor
 
+		if r.Timeout == 0 {
+			r.Timeout = agent.Options.Timeout
+		}
+
 		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
 			var scheduling bool
@@ -158,10 +162,6 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					task.deactivate()
 					ok = false
 				}
-			}
-
-			if r.Timeout == 0 {
-				r.Timeout = agent.Options.Timeout
 			}
 
 			if !ok {

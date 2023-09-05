@@ -675,8 +675,12 @@ func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}},
-		time.Now())
+	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{
+		Key:         key,
+		LastLogsize: &lastLogsize,
+		Mtime:       &mtime,
+		Timeout:     int(timeout.Seconds()),
+	}}, time.Now())
 
 	select {
 	case r := <-w:

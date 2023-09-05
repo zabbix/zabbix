@@ -258,6 +258,10 @@ func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+func (t *exporterTask) Timeout() int {
+	return t.item.timeout
+}
+
 // directExporterTask provides access to plugin Exporter interaface.
 // It's used for non-recurring exporter requests - single passive checks
 // and internal requests to obtain HostnameItem, HostMetadataItem,
@@ -355,6 +359,10 @@ func (t *directExporterTask) Meta() (meta *plugin.Meta) {
 
 func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *directExporterTask) Timeout() int {
+	return t.item.timeout
 }
 
 // starterTask provides access to plugin Exporter interaface Start() method.
@@ -460,6 +468,10 @@ func (t *watcherTask) Meta() (meta *plugin.Meta) {
 
 func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *watcherTask) Timeout() int {
+	return 0
 }
 
 // configuratorTask provides access to plugin Configurator interaface.
