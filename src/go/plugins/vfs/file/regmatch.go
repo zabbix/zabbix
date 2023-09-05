@@ -31,7 +31,7 @@ import (
 
 const MAX_BUFFER_LEN = 65536
 
-func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error) {
+func (p *Plugin) exportRegmatch(params []string, timeout int) (result interface{}, err error) {
 	var startline, endline, curline uint64
 
 	start := time.Now()
@@ -79,7 +79,7 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 
 	elapsed := time.Since(start)
 
-	if elapsed.Seconds() > float64(p.options.Timeout) {
+	if elapsed.Seconds() > float64(timeout) {
 		return nil, errors.New("Timeout while processing item.")
 	}
 
@@ -95,7 +95,7 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 	for 0 < undecodedBufNumBytes || initial {
 		initial = false
 		elapsed := time.Since(start)
-		if elapsed.Seconds() > float64(p.options.Timeout) {
+		if elapsed.Seconds() > float64(timeout) {
 			return nil, errors.New("Timeout while processing item.")
 		}
 

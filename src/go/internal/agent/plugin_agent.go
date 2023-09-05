@@ -104,7 +104,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, errors.New("Invalid recursive HostMetadataItem value.")
 		}
 
-		return processConfigItem(time.Duration(Options.Timeout)*time.Second, "HostMetadata",
+		return processConfigItem(time.Duration(ctx.Timeout())*time.Second, "HostMetadata",
 			Options.HostMetadata, Options.HostMetadataItem, HostMetadataLen, LocalChecksClientID)
 	case "agent.ping":
 		return 1, nil

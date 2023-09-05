@@ -44,7 +44,7 @@ type Plugin struct {
 	options PluginOptions
 }
 
-//Session struct
+// Session struct
 type Session struct {
 	// Endpoint is a connection string consisting of a protocol scheme, a host address and a port or seral port name and attributes.
 	Endpoint string `conf:"optional"`
@@ -58,9 +58,6 @@ type Session struct {
 
 // PluginOptions -
 type PluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
-
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]*Session `conf:"optional"`
 }
@@ -157,7 +154,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Invalid number of parameters:%d", len(params))
 	}
 
-	timeout := p.options.Timeout
+	timeout := ctx.Timeout()
 	session, ok := p.options.Sessions[params[0]]
 	if ok {
 		if session.Timeout > 0 {
@@ -200,10 +197,6 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
-
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
-	}
 }
 
 // Validate implements the Configurator interface.
@@ -216,10 +209,6 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	if err = conf.Unmarshal(options, &opts); err != nil {
 		return err
-	}
-
-	if opts.Timeout > 30 || opts.Timeout < 0 {
-		return fmt.Errorf("Unacceptable Timeout value:%d", opts.Timeout)
 	}
 
 	for _, s := range opts.Sessions {

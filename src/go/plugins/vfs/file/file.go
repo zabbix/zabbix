@@ -27,7 +27,6 @@ import (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 	Capacity             int `conf:"optional,range=1:100"`
 }
 
@@ -43,7 +42,7 @@ var impl Plugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
 	case "vfs.file.cksum":
-		return p.exportCksum(params)
+		return p.exportCksum(params, ctx.Timeout())
 	case "vfs.file.contents":
 		return p.exportContents(params)
 	case "vfs.file.exists":
@@ -53,11 +52,11 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "vfs.file.time":
 		return p.exportTime(params)
 	case "vfs.file.regexp":
-		return p.exportRegexp(params)
+		return p.exportRegexp(params, ctx.Timeout())
 	case "vfs.file.regmatch":
-		return p.exportRegmatch(params)
+		return p.exportRegmatch(params, ctx.Timeout())
 	case "vfs.file.md5sum":
-		return p.exportMd5sum(params)
+		return p.exportMd5sum(params, ctx.Timeout())
 	case "vfs.file.owner":
 		return p.exportOwner(params)
 	case "vfs.file.permissions":
@@ -72,9 +71,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
 	}
 }
 

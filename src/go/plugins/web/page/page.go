@@ -36,7 +36,6 @@ import (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 }
 
 type Plugin struct {
@@ -49,9 +48,6 @@ var impl Plugin
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
 	}
 }
 
@@ -118,7 +114,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			output = "\\0"
 		}
 
-		s, err := web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, true)
+		s, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true)
 		if err != nil {
 			return nil, err
 		}
@@ -141,7 +137,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		start := time.Now()
 
-		_, err := web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, false)
+		_, err := web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, false)
 		if err != nil {
 			return nil, err
 		}
@@ -152,7 +148,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return nil, fmt.Errorf("Too many parameters.")
 		}
 
-		return web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, true)
+		return web.Get(params[0], time.Duration(ctx.Timeout())*time.Second, true)
 	}
 
 }
