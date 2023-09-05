@@ -2291,6 +2291,33 @@ class testProxy extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+
+			// Check "custom_timeouts".
+			'Test proxy.create: with "custom_timeouts" disabled' => [
+				'proxy' => [
+					'name' => 'API create proxy with custom timeouts disabled',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED
+				],
+				'expected_error' => null
+			],
+			'Test proxy.create: with "custom_timeouts" enabled (user macros)' => [
+				'proxy' => [
+					'name' => 'API create proxy with custom timeouts enabled 2',
+					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
+					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
+					'timeout_zabbix_agent' => '{$TIMEOUT.ZABBIX.AGENT}',
+					'timeout_simple_check' => '{$TIMEOUT.SIMPLE.CHECK}',
+					'timeout_snmp_agent' => '{$TIMEOUT.SNMP.AGENT}',
+					'timeout_external_check' => '{$TIMEOUT.EXTERNAL.CHECK}',
+					'timeout_db_monitor' => '{$TIMEOUT.DB.MONITOR}',
+					'timeout_http_agent' => '{$TIMEOUT.HTTP.AGENT}',
+					'timeout_ssh_agent' => '{$TIMEOUT.SSH.AGENT}',
+					'timeout_telnet_agent' => '{$TIMEOUT.TELNET.AGENT}',
+					'timeout_script' => '{$TIMEOUT.SCRIPT}'
+				],
+				'expected_error' => null
 			]
 		];
 	}
@@ -4330,7 +4357,22 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					'proxyid' => 'update_version_current_custom_timeouts',
 					'timeout_snmp_agent' => '30s',
+					'timeout_ssh_agent' => '5m'
+				],
+				'expected_error' => null
+			],
+			'Test proxy.update: update multiple per-item-type timeouts with macros values if custom timeouts are enabled' => [
+				'proxy' => [
+					'proxyid' => 'update_version_current_custom_timeouts',
+					'timeout_zabbix_agent' => '{$TIMEOUT.ZABBIX.AGENT}',
+					'timeout_simple_check' => '{$TIMEOUT.SIMPLE.CHECK}',
+					'timeout_snmp_agent' => '{$TIMEOUT.SNMP.AGENT}',
+					'timeout_external_check' => '{$TIMEOUT.EXTERNAL.CHECK}',
+					'timeout_db_monitor' => '{$TIMEOUT.DB.MONITOR}',
+					'timeout_http_agent' => '{$TIMEOUT.HTTP.AGENT}',
 					'timeout_ssh_agent' => '{$TIMEOUT.SSH.AGENT}',
+					'timeout_telnet_agent' => '{$TIMEOUT.TELNET.AGENT}',
+					'timeout_script' => '{$TIMEOUT.SCRIPT}'
 				],
 				'expected_error' => null
 			],
