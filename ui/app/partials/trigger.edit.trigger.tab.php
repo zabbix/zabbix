@@ -58,6 +58,7 @@ $trigger_form_grid
 			->setReadonly($readonly)
 			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 		)])
 	->addItem([
 		new CLabel(_('Operational data'), 'opdata'),
@@ -79,6 +80,7 @@ $expression_row = [
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
+		->disableSpellcheck()
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', _('Add')))
@@ -165,6 +167,7 @@ $recovery_expression_row = [
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setReadonly($readonly)
+		->disableSpellcheck()
 		->setAriaRequired(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', _('Add')))
