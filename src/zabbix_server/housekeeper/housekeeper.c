@@ -1159,7 +1159,7 @@ static int	housekeeping_audit(int now, int config_max_hk_delete)
 	return 0;
 }
 
-static int	housekeeping_autoreg_host(void)
+static int	housekeeping_autoreg_host(int config_max_housekeeper_delete)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1190,7 +1190,7 @@ static int	housekeeping_autoreg_host(void)
 			EVENT_OBJECT_ZABBIX_ACTIVE
 	);
 
-	result = zbx_db_select_n(sql, CONFIG_MAX_HOUSEKEEPER_DELETE);
+	result = zbx_db_select_n(sql, config_max_housekeeper_delete);
 
 	zbx_vector_uint64_create(&autoreg_hostids);
 
@@ -1520,7 +1520,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		d_audit = housekeeping_audit(now, housekeeper_args_in->config_housekeeping_frequency);
 
 		zbx_setproctitle("%s [removing old autoreg_hosts]", get_process_type_string(process_type));
-		d_autoreg_host = housekeeping_autoreg_host();
+		d_autoreg_host = housekeeping_autoreg_host(housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
 		records = housekeeping_proxy_dhistory(now);
