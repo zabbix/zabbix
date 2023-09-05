@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @backup maintenances
  *
  * @onBefore prepareMaintenanceData
+ *
+ * @dataSource HostTemplateGroups
  */
 class testPageMaintenance extends CWebTest {
 
@@ -47,7 +49,7 @@ class testPageMaintenance extends CWebTest {
 	const APPROACHING_MAINTENANCE = 'Approaching maintenance';
 	const HOST_MAINTENANCE = 'Maintenance with assigned host';
 	const MULTIPLE_GROUPS_MAINTENANCE = 'Maintenance with 2 host groups';
-	const FILTER_NAME_MAINTENANCE = 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲȼ€🙂';
+	const FILTER_NAME_MAINTENANCE = 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲc€🙂';
 	const ACTIVE_MAINTENANCE = 'Active maintenance';
 	const DESCRIPTION_MAINTENANCE = 'Description maintenance';
 
@@ -60,7 +62,7 @@ class testPageMaintenance extends CWebTest {
 				'active_till' => 2019600000,
 				'groups' => [
 					[
-						'groupid' => 20
+						'groupid' => CDataHelper::get('HostTemplateGroups.hostgroups.Group for Maintenance')
 					]
 				],
 				'timeperiods' => [[]]
@@ -75,7 +77,7 @@ class testPageMaintenance extends CWebTest {
 						'groupid' => 4
 					],
 					[
-						'groupid' => 5
+						'groupid' => 5 // "Discovered hosts" group
 					]
 				],
 				'timeperiods' => [[]]
@@ -177,7 +179,7 @@ class testPageMaintenance extends CWebTest {
 						'Description'=> ''
 					],
 					[
-						'Name' => 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲȼ€🙂',
+						'Name' => 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲc€🙂',
 						'Type' => 'With data collection',
 						'Active since' => '2023-06-06 03:00',
 						'Active till' => '2023-07-06 03:00',
@@ -192,7 +194,7 @@ class testPageMaintenance extends CWebTest {
 	/**
 	 * @dataProvider getMaintenanceData
 	 */
-	public function testPageMaintenance_CheckLayout($data) {
+	public function testPageMaintenance_Layout($data) {
 		$maintenances = CDBHelper::getCount(self::MAINTENANCE_SQL);
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->page->assertTitle('Configuration of maintenance periods');
@@ -296,7 +298,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'ʍąɨɲţ€ɲąɲȼ€🙂'
+						'Name' => 'ʍąɨɲţ€ɲąɲc€🙂'
 					],
 					'expected' => [
 						self::FILTER_NAME_MAINTENANCE
@@ -343,6 +345,7 @@ class testPageMaintenance extends CWebTest {
 					],
 					'expected' => [
 						self::DESCRIPTION_MAINTENANCE,
+						'Maintenance for host group testing',
 						'Maintenance for update (data collection)',
 						'Maintenance period 1 (data collection)',
 						'Maintenance period 2 (no data collection)',
@@ -363,6 +366,7 @@ class testPageMaintenance extends CWebTest {
 						self::APPROACHING_MAINTENANCE,
 						self::DESCRIPTION_MAINTENANCE,
 						'Maintenance for Host availability widget',
+						'Maintenance for host group testing',
 						'Maintenance for suppression test',
 						'Maintenance for update (data collection)',
 						'Maintenance period 1 (data collection)',
