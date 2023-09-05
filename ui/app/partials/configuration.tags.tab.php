@@ -34,7 +34,7 @@ if (!$data['readonly']) {
 }
 
 // form list
-$form_grid = (new CFormGrid());
+$form_grid = (new CFormGrid())->setId('tagsFormList');
 
 $table = (new CTable())
 	->addClass('tags-table')
