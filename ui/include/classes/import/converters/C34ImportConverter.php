@@ -154,6 +154,7 @@ class C34ImportConverter extends CConverter {
 				'verify_peer', 'verify_host', 'allow_traps'
 			], ''
 		));
+		$default['timeout'] = '3s';
 		$default['query_fields'] = [];
 		$default['headers'] = [];
 
@@ -173,6 +174,7 @@ class C34ImportConverter extends CConverter {
 				'verify_host', 'allow_traps'
 			], ''
 		));
+		$default['timeout'] = '3s';
 		$default['query_fields'] = [];
 		$default['headers'] = [];
 

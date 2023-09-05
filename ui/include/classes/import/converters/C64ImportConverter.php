@@ -98,15 +98,8 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertItems(array $items): array {
 		foreach ($items as &$item) {
-			switch ($item['type']) {
-				case CXmlConstantName::TRAP:
-				case CXmlConstantName::INTERNAL:
-				case CXmlConstantName::IPMI:
-				case CXmlConstantName::CALCULATED:
-				case CXmlConstantName::JMX:
-				case CXmlConstantName::SNMP_TRAP:
-				case CXmlConstantName::DEPENDENT:
-					unset($item['timeout']);
+			if ($item['type'] !== CXmlConstantName::HTTP_AGENT && $item['type'] !== CXmlConstantName::SCRIPT) {
+				unset($item['timeout']);
 			}
 		}
 		unset($item);
@@ -123,13 +116,9 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertDiscoveryRules(array $discovery_rules): array {
 		foreach ($discovery_rules as &$discovery_rule) {
-			switch ($discovery_rule['type']) {
-				case CXmlConstantName::TRAP:
-				case CXmlConstantName::INTERNAL:
-				case CXmlConstantName::IPMI:
-				case CXmlConstantName::JMX:
-				case CXmlConstantName::DEPENDENT:
-					unset($discovery_rule['timeout']);
+			if ($discovery_rule['type'] !== CXmlConstantName::HTTP_AGENT
+					&& $discovery_rule['type'] !== CXmlConstantName::SCRIPT) {
+				unset($discovery_rule['timeout']);
 			}
 
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
@@ -150,15 +139,9 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertItemPrototypes(array $item_prototypes): array {
 		foreach ($item_prototypes as &$item_prototype) {
-			switch ($item_prototype['type']) {
-				case CXmlConstantName::TRAP:
-				case CXmlConstantName::INTERNAL:
-				case CXmlConstantName::IPMI:
-				case CXmlConstantName::CALCULATED:
-				case CXmlConstantName::JMX:
-				case CXmlConstantName::SNMP_TRAP:
-				case CXmlConstantName::DEPENDENT:
-					unset($item_prototype['timeout']);
+			if ($item_prototype['type'] !== CXmlConstantName::HTTP_AGENT
+					&& $item_prototype['type'] !== CXmlConstantName::SCRIPT) {
+				unset($item_prototype['timeout']);
 			}
 		}
 		unset($item_prototype);
