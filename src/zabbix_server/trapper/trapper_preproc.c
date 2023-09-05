@@ -327,7 +327,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 	for (i = 0; i < bypass_first; i++)
 	{
 		zbx_json_addobject(json, NULL);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, ZBX_PROTO_TAG_VALUE, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1], ZBX_JSON_TYPE_STRING);
 		zbx_json_close(json);
 	}
 
