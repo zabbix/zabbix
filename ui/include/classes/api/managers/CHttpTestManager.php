@@ -732,65 +732,42 @@ class CHttpTestManager {
 		$ins_fields = [];
 		$upd_fields = [];
 		$del_fieldids = [];
+		$httptest_fields = ['variables', 'headers'];
 
 		foreach ($httptests as &$httptest) {
-			if (array_key_exists('headers', $httptest)) {
-				$db_headers = $db_httptests !== null ? $db_httptests[$httptest['httptestid']]['headers'] : [];
+			foreach ($httptest_fields as $httptest_field) {
+				if (array_key_exists($httptest_field, $httptest)) {
+					$db_fields = $db_httptests !== null ? $db_httptests[$httptest['httptestid']][$httptest_field] : [];
 
-				foreach ($httptest['headers'] as &$header) {
-					$db_fieldid = key(array_filter($db_headers,
-						static function (array $db_header) use ($header): bool {
-							return $header['name'] == $db_header['name'] && $header['value'] == $db_header['value'];
+					foreach ($httptest[$httptest_field] as &$field) {
+						$db_field = array_shift($db_fields);
+
+						if ($db_field) {
+							$upd_field = DB::getUpdatedValues('httptest_field', $field, $db_field);
+
+							if ($upd_field) {
+								$upd_fields[] = [
+									'values' => $upd_field,
+									'where' => ['httptest_fieldid' => $db_field['httptest_fieldid']]
+								];
+
+								$field['httptest_fieldid'] = $db_field['httptest_fieldid'];
+							}
+						} else {
+							$ins_fields[] = [
+									'httptestid' => $httptest['httptestid'],
+									'type' => ($httptest_field === 'variables')
+										? ZBX_HTTPFIELD_VARIABLE
+										: ZBX_HTTPFIELD_HEADER
+								] + $field;
 						}
-					));
-
-					if ($db_fieldid !== null) {
-						$header['httptest_fieldid'] = $db_fieldid;
-						unset($db_headers[$db_fieldid]);
 					}
-					else {
-						$ins_fields[] = [
-							'httptestid' => $httptest['httptestid'],
-							'type' => ZBX_HTTPFIELD_HEADER
-						] + $header;
+					unset($field);
+
+					foreach ($db_fields as $old_db_field) {
+						$del_fieldids[] = $old_db_field['httptest_fieldid'];
 					}
 				}
-				unset($header);
-
-				$del_fieldids = array_merge($del_fieldids, array_keys($db_headers));
-			}
-
-			if (array_key_exists('variables', $httptest)) {
-				$db_variables = $db_httptests !== null
-					? array_column($db_httptests[$httptest['httptestid']]['variables'], null, 'name')
-					: [];
-
-				foreach ($httptest['variables'] as &$variable) {
-					if (array_key_exists($variable['name'], $db_variables)) {
-						$db_variable = $db_variables[$variable['name']];
-
-						$upd_variable = DB::getUpdatedValues('httptest_field', $variable, $db_variable);
-
-						if ($upd_variable) {
-							$upd_fields[] = [
-								'values' => $upd_variable,
-								'where' => ['httptest_fieldid' => $db_variable['httptest_fieldid']]
-							];
-						}
-
-						$variable['httptest_fieldid'] = $db_variable['httptest_fieldid'];
-						unset($db_variables[$variable['name']]);
-					}
-					else {
-						$ins_fields[] = [
-							'httptestid' => $httptest['httptestid'],
-							'type' => ZBX_HTTPFIELD_VARIABLE
-						] + $variable;
-					}
-				}
-				unset($variable);
-
-				$del_fieldids = array_merge($del_fieldids, array_column($db_variables, 'httptest_fieldid'));
 			}
 		}
 		unset($httptest);
@@ -1132,61 +1109,53 @@ class CHttpTestManager {
 					? $db_httptest['steps'][$step['httpstepid']]
 					: null;
 
-				if (array_key_exists('headers', $step)) {
-					$db_headers = $db_step !== null ? $db_step['headers'] : [];
+				$step_fields = ['headers', 'variables', 'query_fields'];
 
-					foreach ($step['headers'] as &$header) {
-						$db_fieldid = key(array_filter($db_headers,
-							static function (array $db_header) use ($header): bool {
-								return $header['name'] == $db_header['name'] && $header['value'] == $db_header['value'];
+				foreach ($step_fields as $step_field) {
+					if (array_key_exists($step_field, $step)) {
+						$db_fields = $db_step !== null ? $db_step[$step_field] : [];
+
+						foreach ($step[$step_field] as &$field) {
+							$db_field = array_shift($db_fields);
+
+							if ($db_field) {
+								$upd_field = DB::getUpdatedValues('httpstep_field', $field, $db_field);
+
+								if ($upd_field) {
+									$upd_fields[] = [
+										'values' => $upd_field,
+										'where' => ['httpstep_fieldid' => $db_field['httpstep_fieldid']]
+									];
+
+									$field['httpstep_fieldid'] = $db_field['httpstep_fieldid'];
+								}
+							} else {
+								$type = '';
+
+								switch ($step_field) {
+									case 'headers':
+										$type = ZBX_HTTPFIELD_HEADER;
+										break;
+									case 'variables':
+										$type = ZBX_HTTPFIELD_VARIABLE;
+										break;
+									case 'query_fields':
+										$type = ZBX_HTTPFIELD_QUERY_FIELD;
+										break;
+								}
+
+								$ins_fields[] = [
+										'httpstepid' => $step['httpstepid'],
+										'type' => $type
+									] + $field;
 							}
-						));
-
-						if ($db_fieldid !== null) {
-							$header['httpstep_fieldid'] = $db_fieldid;
-							unset($db_headers[$db_fieldid]);
 						}
-						else {
-							$ins_fields[] = [
-								'httpstepid' => $step['httpstepid'],
-								'type' => ZBX_HTTPFIELD_HEADER
-							] + $header;
+						unset($field);
+
+						foreach ($db_fields as $old_db_field) {
+							$del_fieldids[] = $old_db_field['httpstep_fieldid'];
 						}
 					}
-					unset($header);
-
-					$del_fieldids = array_merge($del_fieldids, array_keys($db_headers));
-				}
-
-				if (array_key_exists('variables', $step)) {
-					$db_variables = $db_step !== null ? array_column($db_step['variables'], null, 'name') : [];
-
-					foreach ($step['variables'] as &$variable) {
-						if (array_key_exists($variable['name'], $db_variables)) {
-							$db_variable = $db_variables[$variable['name']];
-
-							$upd_variable = DB::getUpdatedValues('httpstep_field', $variable, $db_variable);
-
-							if ($upd_variable) {
-								$upd_fields[] = [
-									'values' => $upd_variable,
-									'where' => ['httpstep_fieldid' => $db_variable['httpstep_fieldid']]
-								];
-							}
-
-							$variable['httpstep_fieldid'] = $db_variable['httpstep_fieldid'];
-							unset($db_variables[$variable['name']]);
-						}
-						else {
-							$ins_fields[] = [
-								'httpstepid' => $step['httpstepid'],
-								'type' => ZBX_HTTPFIELD_VARIABLE
-							] + $variable;
-						}
-					}
-					unset($variable);
-
-					$del_fieldids = array_merge($del_fieldids, array_column($db_variables, 'httpstep_fieldid'));
 				}
 
 				if (array_key_exists('posts', $step)) {
@@ -1194,57 +1163,34 @@ class CHttpTestManager {
 						$db_posts = $db_step !== null && is_array($db_step['posts']) ? $db_step['posts'] : [];
 
 						foreach ($step['posts'] as &$post) {
-							$db_fieldid = key(array_filter($db_posts,
-								static function (array $db_post) use ($post): bool {
-									return $post['name'] == $db_post['name'] && $post['value'] == $db_post['value'];
-								}
-							));
+							$db_post = array_shift($db_posts);
 
-							if ($db_fieldid !== null) {
-								$post['httpstep_fieldid'] = $db_fieldid;
-								unset($db_posts[$db_fieldid]);
-							}
-							else {
+							if ($db_post) {
+								$upd_field = DB::getUpdatedValues('httpstep_field', $post, $db_post);
+
+								if ($upd_field) {
+									$upd_fields[] = [
+										'values' => $upd_field,
+										'where' => ['httpstep_fieldid' => $db_post['httpstep_fieldid']]
+									];
+
+									$post['httpstep_fieldid'] = $db_post['httpstep_fieldid'];
+								}
+							} else {
 								$ins_fields[] = [
-									'httpstepid' => $step['httpstepid'],
-									'type' => ZBX_HTTPFIELD_POST_FIELD
-								] + $post;
+										'httpstepid' => $step['httpstepid'],
+										'type' => ZBX_HTTPFIELD_POST_FIELD
+									] + $post;
 							}
 						}
 						unset($post);
 
-						$del_fieldids = array_merge($del_fieldids, array_keys($db_posts));
-					}
-					elseif ($db_step !== null && is_array($db_step['posts'])) {
+						foreach ($db_posts as $old_db_post) {
+							$del_fieldids[] = $old_db_post['httpstep_fieldid'];
+						}
+					} elseif ($db_step !== null && is_array($db_step['posts'])) {
 						$del_fieldids = array_merge($del_fieldids, array_keys($db_step['posts']));
 					}
-				}
-
-				if (array_key_exists('query_fields', $step)) {
-					$db_query_fields = $db_step !== null ? $db_step['query_fields'] : [];
-
-					foreach ($step['query_fields'] as &$query_field) {
-						$db_fieldid = key(array_filter($db_query_fields,
-							static function (array $db_query_field) use ($query_field): bool {
-								return $query_field['name'] == $db_query_field['name']
-									&& $query_field['value'] == $db_query_field['value'];
-							}
-						));
-
-						if ($db_fieldid !== null) {
-							$query_field['httpstep_fieldid'] = $db_fieldid;
-							unset($db_query_fields[$db_fieldid]);
-						}
-						else {
-							$ins_fields[] = [
-								'httpstepid' => $step['httpstepid'],
-								'type' => ZBX_HTTPFIELD_QUERY_FIELD
-							] + $query_field;
-						}
-					}
-					unset($query_field);
-
-					$del_fieldids = array_merge($del_fieldids, array_keys($db_query_fields));
 				}
 			}
 			unset($step);

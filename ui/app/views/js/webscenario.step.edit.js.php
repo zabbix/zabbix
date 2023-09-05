@@ -90,10 +90,25 @@ window.webscenario_step_edit_popup = new class {
 	#initQueryFields(query_fields) {
 		const $query_fields = jQuery(this.#query_fields);
 
-		$query_fields.dynamicRows({
-			template: '#step-query-field-row-tmpl',
-			rows: query_fields
-		});
+		$query_fields
+			.dynamicRows({
+				template: '#step-query-field-row-tmpl',
+				rows: query_fields
+			})
+			.on('sortstop.dynamicRows', (e) => {
+				const rows = e.target.querySelectorAll('.form_row.sortable');
+
+				rows.forEach((row, index) => {
+					const textareas = row.querySelectorAll('textarea');
+
+					textareas.forEach((textarea) => {
+						const original_name = textarea.getAttribute('name');
+						const new_name = original_name.replace(/\[\d+/, `[${index}]`);
+
+						textarea.setAttribute('name', new_name);
+					});
+				});
+			});
 
 		this.#initTextareaFlexible($query_fields);
 		this.#initSortable($query_fields);
@@ -102,10 +117,25 @@ window.webscenario_step_edit_popup = new class {
 	#initPostFields(post_fields) {
 		const $post_fields = jQuery(this.#post_fields);
 
-		$post_fields.dynamicRows({
-			template: '#step-post-field-row-tmpl',
-			rows: post_fields
-		});
+		$post_fields
+			.dynamicRows({
+				template: '#step-post-field-row-tmpl',
+				rows: post_fields
+			})
+			.on('sortstop.dynamicRows', (e) => {
+				const rows = e.target.querySelectorAll('.form_row.sortable');
+
+				rows.forEach((row, index) => {
+					const textareas = row.querySelectorAll('textarea');
+
+					textareas.forEach((textarea) => {
+						const original_name = textarea.getAttribute('name');
+						const new_name = original_name.replace(/\[\d+/, `[${index}]`);
+
+						textarea.setAttribute('name', new_name);
+					});
+				});
+			});
 
 		this.#initTextareaFlexible($post_fields);
 		this.#initSortable($post_fields);
@@ -114,10 +144,25 @@ window.webscenario_step_edit_popup = new class {
 	#initVariables(variables) {
 		const $variables = jQuery('#step-variables');
 
-		$variables.dynamicRows({
-			template: '#step-variable-row-tmpl',
-			rows: variables
-		});
+		$variables
+			.dynamicRows({
+				template: '#step-variable-row-tmpl',
+				rows: variables
+			})
+			.on('sortstop.dynamicRows', (e) => {
+				const rows = e.target.querySelectorAll('.form_row.sortable');
+
+				rows.forEach((row, index) => {
+					const textareas = row.querySelectorAll('textarea');
+
+					textareas.forEach((textarea) => {
+						const original_name = textarea.getAttribute('name');
+						const new_name = original_name.replace(/\[\d+/, `[${index}]`);
+
+						textarea.setAttribute('name', new_name);
+					});
+				});
+			});
 
 		this.#initTextareaFlexible($variables);
 		this.#initSortable($variables);
@@ -126,10 +171,25 @@ window.webscenario_step_edit_popup = new class {
 	#initHeaders(headers) {
 		const $headers = jQuery('#step-headers');
 
-		$headers.dynamicRows({
-			template: '#step-header-row-tmpl',
-			rows: headers
-		});
+		$headers
+			.dynamicRows({
+				template: '#step-header-row-tmpl',
+				rows: headers
+			})
+			.on('sortstop.dynamicRows', (e) => {
+				const rows = e.target.querySelectorAll('.form_row.sortable');
+
+				rows.forEach((row, index) => {
+					const textareas = row.querySelectorAll('textarea');
+
+					textareas.forEach((textarea) => {
+						const original_name = textarea.getAttribute('name');
+						const new_name = original_name.replace(/\[\d+/, `[${index}]`);
+
+						textarea.setAttribute('name', new_name);
+					});
+				});
+			});
 
 		this.#initTextareaFlexible($headers);
 		this.#initSortable($headers);
