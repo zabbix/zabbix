@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-15T16:13:27Z'
+  date: '2023-09-05T08:04:41Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -431,7 +431,7 @@ zabbix_export:
                 uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
             
                 if (uplinksLL.length > 0) {
-                    uplinks = uplinksLL.filter(function(device) {
+                    uplinksLL = uplinksLL.filter(function(device) {
                         return device.serial == params.serial;
                     });
                 }
@@ -442,7 +442,7 @@ zabbix_export:
             
             return JSON.stringify({
                 'device': device,
-                'uplinksLL': uplinks,
+                'uplinksLL': uplinksLL,
                 'error': error_msg.toString()
             });
           description: 'Item for gathering device data from Meraki API.'
@@ -646,13 +646,13 @@ zabbix_export:
           value: '^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$'
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
-          value: ^$
+          value: ^null$
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
-          value: .+
+          value: '.*'
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
-          value: ^$
+          value: ^null$
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
