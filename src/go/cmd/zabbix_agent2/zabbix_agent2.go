@@ -27,15 +27,14 @@ import (
 	"strings"
 	"time"
 
-	_ "zabbix.com/plugins"
-
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin/comms"
+	"git.zabbix.com/ap/plugin-support/zbxflag"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/remotecontrol"
 	"zabbix.com/internal/agent/resultcache"
+	"zabbix.com/internal/agent/runtimecontrol"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/agent/serverconnector"
 	"zabbix.com/internal/agent/serverlistener"
@@ -45,21 +44,67 @@ import (
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxlib"
+	_ "zabbix.com/plugins"
+)
+
+const runtimeCommandSendingTimeout = time.Second
+
+const usageMessageFormat = //
+`Usage of Zabbix agent 2:
+  %[1]s [-c config-file]
+  %[1]s [-c config-file] [-v] -p
+  %[1]s [-c config-file] [-v] -t item-key
+  %[1]s [-c config-file] -R runtime-option
+  %[1]s -h
+  %[1]s -V
+
+A Zabbix daemon for monitoring of various server parameters.
+
+Options:
+%[2]s
+
+Default loadable module location:
+  LoadModulePath                 "/usr/local/lib/modules"
+
+Example: %[1]s -c %[3]s
+
+Report bugs to: <https://support.zabbix.com>
+Zabbix home page: <http://www.zabbix.com>
+Documentation: <https://www.zabbix.com/documentation>
+`
+
+const usageMessageFormatRuntimeControlFormat = //
+`Perform administrative functions (%s timeout)
+
+    Remote control interface, available commands:
+      log_level_increase     Increase log level
+      log_level_decrease     Decrease log level
+      userparameter_reload   Reload user parameters
+      metrics                List available metrics
+      version                Display Agent version
+`
+
+// variables set at build
+var (
+	confDefault     string
+	applicationName string
+)
+
+var (
+	manager          *scheduler.Manager
+	listeners        []*serverlistener.ServerListener
+	serverConnectors []*serverconnector.Connector
+	closeChan        = make(chan bool)
+	stopChan         = make(chan bool)
+	pidFile          *pidfile.File
+	pluginsocket     string
 )
 
 type AgentUserParamOption struct {
 	UserParameter []string `conf:"optional"`
 }
 
-const remoteCommandSendingTimeout = time.Second
-
-var manager *scheduler.Manager
-var listeners []*serverlistener.ServerListener
-var serverConnectors []*serverconnector.Connector
-var closeChan = make(chan bool)
-var stopChan = make(chan bool)
-
-func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
+func processLoglevelIncreaseCommand(c *runtimecontrol.Client) (err error) {
 	if log.IncreaseLogLevel() {
 		message := fmt.Sprintf("Increased log level to %s", log.Level())
 		log.Infof(message)
@@ -72,7 +117,7 @@ func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
 	return
 }
 
-func processLoglevelDecreaseCommand(c *remotecontrol.Client) (err error) {
+func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
 	if log.DecreaseLogLevel() {
 		message := fmt.Sprintf("Decreased log level to %s", log.Level())
 		log.Infof(message)
@@ -85,28 +130,17 @@ func processLoglevelDecreaseCommand(c *remotecontrol.Client) (err error) {
 	return
 }
 
-func processMetricsCommand(c *remotecontrol.Client) (err error) {
+func processMetricsCommand(c *runtimecontrol.Client) (err error) {
 	data := manager.Query("metrics")
 	return c.Reply(data)
 }
 
-func processVersionCommand(c *remotecontrol.Client) (err error) {
+func processVersionCommand(c *runtimecontrol.Client) (err error) {
 	data := version.Long()
 	return c.Reply(data)
 }
 
-func processHelpCommand(c *remotecontrol.Client) (err error) {
-	help := `Remote control interface, available commands:
-	log_level_increase - Increase log level
-	log_level_decrease - Decrease log level
-	userparameter_reload - Reload user parameters
-	metrics - List available metrics
-	version - Display Agent version
-	help - Display this help message`
-	return c.Reply(help)
-}
-
-func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
+func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
 	var userparams AgentUserParamOption
 
 	if err = conf.LoadUserParams(&userparams); err != nil {
@@ -130,7 +164,7 @@ func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
 	return
 }
 
-func processRemoteCommand(c *remotecontrol.Client) (err error) {
+func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
 	switch len(params) {
 	case 0:
@@ -145,8 +179,6 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 		err = processLoglevelIncreaseCommand(c)
 	case "log_level_decrease":
 		err = processLoglevelDecreaseCommand(c)
-	case "help":
-		err = processHelpCommand(c)
 	case "metrics":
 		err = processMetricsCommand(c)
 	case "version":
@@ -159,15 +191,14 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 	return
 }
 
-var pidFile *pidfile.File
-
-func run() (err error) {
+func run() error {
 	sigs := createSigsChan()
 
-	var control *remotecontrol.Conn
-	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
-		return
+	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
+	if err != nil {
+		return err
 	}
+
 	confirmService()
 	control.Start()
 
@@ -181,7 +212,7 @@ loop:
 		case client := <-control.Client():
 			if rerr := processRemoteCommand(client); rerr != nil {
 				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
-					log.Warningf("cannot reply to remote command: %s", rerr)
+					log.Warningf("cannot reply to runtime command: %s", rerr)
 				}
 			}
 
@@ -196,84 +227,118 @@ loop:
 	return nil
 }
 
-var (
-	confDefault     string
-	applicationName string
-	pluginsocket    string
-
-	argConfig  bool
-	argTest    bool
-	argPrint   bool
-	argVersion bool
-	argVerbose bool
-)
-
 func main() {
-	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
-
-	var confFlag string
-	const (
-		confDescription = "Path to the configuration file"
+	version.Init(
+		applicationName,
+		tls.CopyrightMessage(),
+		copyrightMessageMQTT(),
+		copyrightMessageModbus(),
 	)
-	flag.StringVar(&confFlag, "config", confDefault, confDescription)
-	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorthand)")
 
-	var foregroundFlag bool
-	const (
-		foregroundDefault     = true
-		foregroundDescription = "Run Zabbix agent in foreground"
+	var (
+		confFlag           string
+		foregroundFlag     bool
+		testFlag           string
+		printFlag          bool
+		verboseFlag        bool
+		versionFlag        bool
+		runtimeCommandFlag string
+		helpFlag           bool
 	)
-	flag.BoolVar(&foregroundFlag, "foreground", foregroundDefault, foregroundDescription)
-	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorthand)")
 
-	var testFlag string
-	const (
-		testDefault     = ""
-		testDescription = "Test specified item and exit"
-	)
-	flag.StringVar(&testFlag, "test", testDefault, testDescription)
-	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorthand)")
+	f := zbxflag.Flags{
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:      "config",
+				Shorthand: "c",
+				Description: fmt.Sprintf(
+					"Path to the configuration file (default: %q)", confDefault,
+				),
+			},
+			Default: confDefault,
+			Dest:    &confFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "foreground",
+				Shorthand:   "f",
+				Description: "Run Zabbix agent in foreground",
+			},
+			Default: true,
+			Dest:    &foregroundFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "print",
+				Shorthand:   "p",
+				Description: "Print known items and exit",
+			},
+			Default: false,
+			Dest:    &printFlag,
+		},
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:        "test",
+				Shorthand:   "t",
+				Description: "Test specified item and exit",
+			},
+			Default: "",
+			Dest:    &testFlag,
+		},
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:      "runtime-control",
+				Shorthand: "R",
+				Description: fmt.Sprintf(
+					usageMessageFormatRuntimeControlFormat,
+					runtimeCommandSendingTimeout.String(),
+				),
+			},
+			Default: "",
+			Dest:    &runtimeCommandFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "verbose",
+				Shorthand:   "v",
+				Description: "Enable verbose output for metric testing or printing",
+			},
+			Default: false,
+			Dest:    &verboseFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "help",
+				Shorthand:   "h",
+				Description: "Display this help message",
+			},
+			Default: false,
+			Dest:    &helpFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "version",
+				Shorthand:   "V",
+				Description: "Print program version and exit",
+			},
+			Default: false,
+			Dest:    &versionFlag,
+		},
+		osDependentFlags(),
+	}
 
-	var printFlag bool
-	const (
-		printDefault     = false
-		printDescription = "Print known items and exit"
-	)
-	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
-	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorthand)")
+	f.Register(flag.CommandLine)
+	flag.Usage = func() {
+		fmt.Printf(
+			usageMessageFormat,
+			os.Args[0],
+			f.Usage(),
+			usageMessageExampleConfPath,
+		)
+	}
 
-	var verboseFlag bool
-	const (
-		verboseDefault     = false
-		verboseDescription = "Enable verbose output for metric testing or printing"
-	)
-	flag.BoolVar(&verboseFlag, "verbose", verboseDefault, verboseDescription)
-	flag.BoolVar(&verboseFlag, "v", verboseDefault, verboseDescription+" (shorthand)")
-
-	var versionFlag bool
-	const (
-		versionDefault     = false
-		versionDescription = "Print program version and exit"
-	)
-	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
-	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
-
-	var remoteCommand string
-	const remoteDefault = ""
-	var remoteDescription = "Perform administrative functions (send 'help' for available commands) " +
-		"(" + remoteCommandSendingTimeout.String() + " timeout)"
-	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
-
-	var helpFlag bool
-	const (
-		helpDefault     = false
-		helpDescription = "Display this help message"
-	)
-	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
-	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
-
-	loadOSDependentFlags()
 	flag.Parse()
+
 	setServiceRun(foregroundFlag)
 
 	if helpFlag {
@@ -305,13 +370,15 @@ func main() {
 		os.Exit(0)
 	}
 
-	var err error
-	if err = openEventLog(); err != nil {
+	err := openEventLog()
+	if err != nil {
 		fatalExit("", err)
 	}
 
-	if err = validateExclusiveFlags(); err != nil {
-		if eerr := eventLogErr(err); eerr != nil {
+	err = validateExclusiveFlags()
+	if err != nil {
+		eerr := eventLogErr(err)
+		if eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
 		fatalExit("", err)
@@ -348,24 +415,29 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	if remoteCommand != "" {
+	if runtimeCommandFlag != "" {
 		if agent.Options.ControlSocket == "" {
-			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
+			log.Errf("Cannot send runtime command: ControlSocket configuration parameter is not defined")
+
 			os.Exit(0)
 		}
 
-		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
-			remoteCommandSendingTimeout); err != nil {
-			log.Errf("Cannot send remote command: %s", err)
+		reply, err := runtimecontrol.SendCommand(
+			agent.Options.ControlSocket, runtimeCommandFlag, runtimeCommandSendingTimeout,
+		)
+		if err != nil {
+			log.Errf("Cannot send runtime command: %s", err)
 		} else {
 			log.Infof(reply)
 		}
+
 		os.Exit(0)
 	}
 
 	if pluginsocket, err = initExternalPlugins(&agent.Options); err != nil {
 		fatalExit("cannot register plugins", err)
 	}
+
 	defer cleanUpExternal()
 
 	if argTest || argPrint {

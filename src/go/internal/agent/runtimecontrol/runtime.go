@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package remotecontrol
+package runtimecontrol
 
 import (
 	"bufio"
@@ -106,7 +106,6 @@ func (c *Conn) handleError(err error) error {
 func (c *Conn) run() {
 	for {
 		conn, err := c.listener.Accept()
-
 		if err != nil {
 			if c.handleError(err) == nil {
 				continue
