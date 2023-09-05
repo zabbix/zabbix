@@ -55,6 +55,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
+
 	zbxlib.SetMaxLinesPerSecond(p.options.MaxLinesPerSecond)
 }
 

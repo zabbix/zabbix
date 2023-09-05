@@ -1019,7 +1019,7 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_version();
