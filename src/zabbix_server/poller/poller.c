@@ -756,6 +756,23 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
 				break;
+			case ITEM_TYPE_EXTERNAL:
+				if (ZBX_MACRO_EXPAND_NO == expand_macros)
+					break;
+
+				ZBX_STRDUP(items[i].timeout, items[i].timeout_orig);
+
+				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+
+				if (FAIL == zbx_validate_item_timeout(items[i].timeout, error, sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+				break;
 		}
 	}
 
@@ -861,8 +878,8 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].jmx_endpoint);
 				break;
 			case ITEM_TYPE_ZABBIX:
-				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_ZABBIX_ACTIVE:
+			case ITEM_TYPE_EXTERNAL:
 				zbx_free(items[i].timeout);
 				break;
 		}
