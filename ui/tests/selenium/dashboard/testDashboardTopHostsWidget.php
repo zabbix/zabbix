@@ -241,7 +241,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			}
 		}
 
-		// Check Columns table.
+		// Check Thresholds table.
 		$this->assertEquals(['', 'Threshold', 'Action'],
 			$column_form->getFieldContainer('Thresholds')->query('id:thresholds_table')->asTable()->one()->getHeadersText()
 		);
@@ -251,16 +251,14 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$thresholds_container = $column_form->getFieldContainer('Thresholds');
 		$thresholds_container->query('button:Add')->one()->waitUntilClickable()->click();
 
-		foreach (['lbl_thresholds_0_color', 'thresholds_0_threshold', 'thresholds_0_remove'] as $id) {
-			$element = $thresholds_container->query('id',$id)->one();
-			$this->assertTrue($element->isVisible());
-			$this->assertTrue($element->isEnabled());
-		}
-
-		$column_form->checkValue([
-			'xpath:.//input[@id="thresholds_0_color"]/..' => 'FF465C',
-			'id:thresholds_0_threshold' => ''
-		]);
+		$this->checkFieldsAttributes([
+				'xpath:.//input[@id="thresholds_0_color"]/..' => ['color' => 'FF465C'],
+				'id:thresholds_0_threshold' => ['value' => '', 'maxlength' => 255]
+			], $column_form
+		);
+		$this->assertEquals(2, $thresholds_container->query('button', ['Add', 'Remove'])->all()
+				->filter(CElementFilter::CLICKABLE)->count()
+		);
 
 		$thresholds_icon->click();
 		$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue"]')->one()->waitUntilVisible();
