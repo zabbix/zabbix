@@ -1171,8 +1171,6 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 	zbx_metric_t	*command = NULL;
 	AGENT_REQUEST	request;
 
-	zabbix_log(1, "DBG %s(), timeout = %i", __func__, timeout);
-
 	zbx_init_agent_request(&request);
 
 	if (SUCCEED != zbx_parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command :
