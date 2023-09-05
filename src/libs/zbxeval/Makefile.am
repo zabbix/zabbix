@@ -3,7 +3,7 @@
 noinst_LIBRARIES = libzbxeval.a
 
 libzbxeval_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) $(LIBXML2_CFLAGS)
 
 libzbxeval_a_SOURCES = \
 	count_pattern.c \
