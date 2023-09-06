@@ -269,7 +269,6 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->key = zbx_strdup(NULL, key);
 			metric->lastlogsize = lastlogsize;
 			metric->mtime = mtime;
-			metric->timeout = timeout;
 			metric->big_rec = 0;
 			metric->use_ino = 0;
 			metric->error_count = 0;
@@ -316,6 +315,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->nextcheck = 0;
 			metric->refresh = refresh;
 		}
+
+		metric->timeout = timeout;
 
 		goto out;
 	}
