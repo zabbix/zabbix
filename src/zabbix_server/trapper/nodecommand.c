@@ -74,7 +74,7 @@ static int	is_value_in_csv_list(const char *value, const char *csv)
 	int ret = FAIL;
 	char *list, *l, *token, *saveptr;
 
-	list = zbx_strdup(list, csv);
+	list = zbx_strdup(NULL, csv);
 
 	for (l = list; NULL != (token = strtok_r(l, ",", &saveptr)); l = NULL)
 	{
