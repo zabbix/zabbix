@@ -255,21 +255,21 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	cServerCertSubject := (C.CString)(tlsConfig.ServerCertSubject)
 
 	defer func() {
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cPSKIdentity)\"")
 		C.free(unsafe.Pointer(cPSKIdentity))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cPSKKey)\"")
 		C.free(unsafe.Pointer(cPSKKey))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cCAFile)\"")
 		C.free(unsafe.Pointer(cCAFile))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cCRLFile)\"")
 		C.free(unsafe.Pointer(cCRLFile))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cCertFile)\"")
 		C.free(unsafe.Pointer(cCertFile))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cKeyFile)\"")
 		C.free(unsafe.Pointer(cKeyFile))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cServerCertIssuer)\"")
 		C.free(unsafe.Pointer(cServerCertIssuer))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cServerCertSubject)\"")
 		C.free(unsafe.Pointer(cServerCertSubject))
 	}()
 
@@ -295,9 +295,9 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 	cHostname := (C.CString)(agent.Options.Hostname)
 
 	defer func() {
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cSourceIP)\"")
 		C.free(unsafe.Pointer(cSourceIP))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cHostname)\"")
 		C.free(unsafe.Pointer(cHostname))
 	}()
 

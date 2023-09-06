@@ -43,7 +43,7 @@ func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.T
 
 	cdelay := C.CString(delay)
 	defer func() {
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cdelay)\"")
 		C.free(unsafe.Pointer(cdelay))
 	}()
 

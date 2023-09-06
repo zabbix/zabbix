@@ -85,9 +85,9 @@ func MatchGlobalRegexp(
 	cpattern := C.CString(pattern)
 
 	defer func() {
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cvalue)\"")
 		defer C.free(unsafe.Pointer(cvalue))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cpattern)\"")
 		defer C.free(unsafe.Pointer(cpattern))
 	}()
 

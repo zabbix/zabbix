@@ -372,21 +372,21 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		cServerCertSubject := (C.CString)(tlsConfig.ServerCertSubject)
 
 		defer func() {
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cPSKIdentity)\"")
 			C.free(unsafe.Pointer(cPSKIdentity))
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cPSKKey)\"")
 			C.free(unsafe.Pointer(cPSKKey))
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cCAFile)\"")
 			C.free(unsafe.Pointer(cCAFile))
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cCRLFile)\"")
 			C.free(unsafe.Pointer(cCRLFile))
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cCertFile)\"")
 			C.free(unsafe.Pointer(cCertFile))
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cKeyFile)\"")
 			C.free(unsafe.Pointer(cKeyFile))
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cServerCertIssuer)\"")
 			C.free(unsafe.Pointer(cServerCertIssuer))
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cServerCertSubject)\"")
 			C.free(unsafe.Pointer(cServerCertSubject))
 		}()
 
@@ -410,9 +410,9 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	cHostname := (C.CString)(agent.Options.Hostname)
 
 	defer func() {
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cSourceIP)\"")
 		C.free(unsafe.Pointer(cSourceIP))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cHostname)\"")
 		C.free(unsafe.Pointer(cHostname))
 	}()
 
@@ -422,7 +422,7 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, cprepVec, ctlsConfig_p, (C.int)(agent.Options.Timeout),
 		cSourceIP, cHostname, C.zbx_uint64_t(itemid), (C.int)(agent.Options.BufferSend),
-		(C.int)(agent.Options.BufferSize), (C.int)(C.zbx_config_max_lines_per_second))
+		(C.int)(agent.Options.BufferSize), (C.zbx_config_max_lines_per_second))
 
 	// add cached results
 	var cvalue *C.char
