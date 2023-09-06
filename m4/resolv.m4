@@ -7,8 +7,7 @@ AC_DEFUN([LIBRESOLV_TRY_LINK],
 [
 am_save_LIBS="$LIBS"
 LIBS="$LIBS $1"
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #ifdef HAVE_SYS_TYPES_H
 #	include <sys/types.h>
 #endif
@@ -27,15 +26,13 @@ AC_TRY_LINK(
 #ifndef T_SOA
 #	define T_SOA	ns_t_soa
 #endif	/* T_SOA */
-],
-[
+]], [[
 	char	*buf;
 
 	res_init();
 	res_query("", C_IN, T_SOA, (unsigned char *)buf, 0);
-],
-found_resolv="yes"
-RESOLV_LIBS="$1")
+]])],[found_resolv="yes"
+RESOLV_LIBS="$1"],[])
 LIBS="$am_save_LIBS"
 ])dnl
 

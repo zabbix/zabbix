@@ -5,7 +5,7 @@
 
 This template is designed to monitor Google Cloud Platform (hereinafter - GCP) by Zabbix.
 It works without any external scripts and uses the script item.
-Currently the template supports discovery of [Compute Engine](https://cloud.google.com/compute)/[Cloud SQL](https://cloud.google.com/sql) instances and Compute Engine project quota metrics.
+The template currently supports the discovery of [Compute Engine](https://cloud.google.com/compute)/[Cloud SQL](https://cloud.google.com/sql) instances and Compute Engine project quota metrics.
 
 
 ## Requirements
@@ -19,23 +19,25 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-1. Create the service account in Google Cloud Console for the project you have to monitor.
+1. Enable the `Stackdriver Monitoring API` for the GCP project you wish to monitor.
+>Refer to the [vendor documentation](https://cloud.google.com/monitoring/api/enable-api).
+2. Create a service account in Google Cloud console for the project you have to monitor.
 >Refer to the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
-2. Create and download the service account key in JSON format.
+3. Create and download the service account key in JSON format.
 >Refer to the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
-3. If you want to monitor Cloud SQL services - don't forget to activate the Cloud SQL Admin API. 
+4. If you want to monitor Cloud SQL services - don't forget to activate the Cloud SQL Admin API. 
 >Refer to the [vendor documentation](https://cloud.google.com/sql/docs/mysql/admin-api) for the details.
-4. Copy the `project_id`, `private_key_id`, `private_key`, `client_email` from the JSON key file and add them  to the corresponding macros `{$GCP.PROJECT.ID}`, `{$GCP.PRIVATE.KEY.ID}`, `{$GCP.PRIVATE.KEY}`, `{$GCP.CLIENT.EMAIL}` on the template/host.
+5. Copy the `project_id`, `private_key_id`, `private_key`, `client_email` from the JSON key file and add them to their corresponding macros `{$GCP.PROJECT.ID}`, `{$GCP.PRIVATE.KEY.ID}`, `{$GCP.PRIVATE.KEY}`, `{$GCP.CLIENT.EMAIL}` on the template/host.
 
 **Additional information**: 
 
-    Ensure, that you're creating the service account using the credentials with the `Project Owner/Project IAM Admin/service account Admin` role.
+    Make sure that you're creating the service account using the credentials with the `Project Owner/Project IAM Admin/service account Admin` role.
        
-    The service account JSON key file can only be downloaded once. Regenerate it if the previous key has been lost.
+    The service account JSON key file can only be downloaded once: regenerate it if the previous key has been lost.
 
     The service account should have `Project Viewer` permissions or granular permissions for the GCP Compute Engine API/GCP Cloud SQL. 
 
@@ -45,11 +47,16 @@ This template has been tested on:
        
 **IMPORTANT!!!**
 
+     Secret authorization token is defined as a plain text in host prototype settings by default due to Zabbix templates export/import limits: therefore, it is highly recommended to change the user macro `{$GCP.AUTH.TOKEN}` value type to `SECRET` for all host prototypes after the template `GCP by HTTP` import.
+
+     All the instances/quotas/metrics discovered are related to a particular GCP project. 
+     To monitor several GCP projects - create their corresponding service accounts/Zabbix hosts.
+
      GCP Access Token is available for 1 hour (3600 seconds) after the generation request.
 
      To avoid a GCP token inconsistency between Zabbix database and Zabbix server configuration cache, don't set Zabbix server configuration parameter CacheUpdateFrequency to a value over 45 minutes and don't set the update interval for the GCP Authorization item to more than 1 hour (maximum CacheUpdateFrequency value).
 
-Additional information about metrics and used API methods.
+Additional information about metrics and used API methods:
 
   [Compute Engine](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute)
   
@@ -65,7 +72,7 @@ Additional information about metrics and used API methods.
 |{$GCP.PRIVATE.KEY.ID}|<p>Service account private key id.</p>||
 |{$GCP.PRIVATE.KEY}|<p>Service account private key data.</p>||
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
-|{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Authorization item, which also equals to the access token regeneration requests frequency.</p><p>Check the template documentation notes carefully for more details.</p>|`45m`|
+|{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency. </p><p>Check the template documentation notes carefully for more details.</p>|`45m`|
 |{$GCP.GCE.INST.NAME.MATCHES}|<p>The filter to include GCP Compute Engine instances by namespace.</p>|`.*`|
 |{$GCP.GCE.INST.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.GCE.ZONE.MATCHES}|<p>The filter to include GCP Compute Engine instances by zone.</p>|`.*`|
@@ -97,10 +104,10 @@ Additional information about metrics and used API methods.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; required only once and used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
+|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
 |GCP Compute Engine: Instances get|<p>Get GCP Compute Engine instances.</p>|Dependent item|gcp.gce.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP: Authorization errors check|<p>A list of errors from API requests.</p>|Dependent item|gcp.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
-|GCP Cloud SQL: Instances get|<p>GCP Cloud SQL: Instances Get.</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|GCP Cloud SQL: Instances get|<p>GCP Cloud SQL: Instances get.</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Cloud SQL: Instances total|<p>GCP Cloud SQL instances total count.</p>|Dependent item|gcp.cloudsql.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Instances count|<p>GCP Cloud SQL MSSQL instances count.</p>|Dependent item|gcp.gce.instances.mssql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'SQLSERVER')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL MySQL: Instances count|<p>GCP Cloud SQL MySQL instances count.</p>|Dependent item|gcp.gce.instances.mysql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'MYSQL')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -114,7 +121,7 @@ Additional information about metrics and used API methods.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP: Authorization has failed|<p>GCP: Authorization has failed. Check the authorization parameters and GCP API availability from network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
+|GCP: Authorization has failed|<p>GCP: Authorization has failed. Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
 
 ### LLD rule GCP Compute Engine: Instances discovery
 
@@ -181,11 +188,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -235,14 +242,14 @@ This template will be connected to discovered entities automatically with all re
 |GCP Compute Engine: Integrity: Early boot validation status|<p>The validation status of early boot integrity policy. </p><p>Empty value if integrity monitoring isn't enabled.</p>|Dependent item|gcp.gce.integrity.early_boot_validation_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.early_boot_validation_status`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Compute Engine: Integrity: Late boot validation status|<p>The validation status of late boot integrity policy. </p><p>Empty value if integrity monitoring isn't enabled.</p>|Dependent item|gcp.gce.integrity.late_boot_validation_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.late_boot_validation_status`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Compute Engine: Instance uptime|<p>Elapsed time since the VM was started, in seconds.</p>|Dependent item|gcp.gce.instance.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime_total`</p></li></ul>|
-|GCP Compute Engine: Instance state|<p>GCP Compute Engine instance state.</p>|HTTP agent|gcp.gce.instance.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|GCP Compute Engine: Disks get|<p>Disk entities and metrics related to particular instance.</p>|Script|gcp.gce.disks.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Instance state|<p>GCP Compute Engine instance state.</p>|HTTP agent|gcp.gce.instance.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|GCP Compute Engine: Disks get|<p>Disk entities and metrics related to a particular instance.</p>|Script|gcp.gce.disks.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP Compute Engine: High CPU Utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}`|Average|**Manual close**: Yes|
+|GCP Compute Engine: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}`|Average|**Manual close**: Yes|
 |GCP Compute Engine: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}`|Average||
 |GCP Compute Engine: Instance is in suspended state|<p>The VM is in a suspended state. You can resume the VM or delete it.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 7`|Info|**Manual close**: Yes|
 |GCP Compute Engine: The instance is in repairing state|<p>The VM is being repaired. Repairing occurs when the VM encounters an internal error or the underlying machine is unavailable due to maintenance. During this time, the VM is unusable.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 4`|Warning|**Manual close**: Yes|
@@ -283,11 +290,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -304,7 +311,7 @@ This template will be connected to discovered entities automatically with all re
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MySQL: Metrics get|<p>MySQL Metrics in raw format.</p>|Script|gcp.cloudsql.mysql.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Cloud SQL MySQL: Metrics get|<p>MySQL metrics in raw format.</p>|Script|gcp.cloudsql.mysql.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL MySQL: Reserved CPU cores|<p>Number of cores reserved for the database.</p>|Dependent item|gcp.cloudsql.mysql.cpu.reserved_cores<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_reserved_cores`</p></li></ul>|
 |GCP Cloud SQL MySQL: CPU usage time|<p>Cumulative CPU usage time in seconds.</p>|Dependent item|gcp.cloudsql.mysql.cpu.usage_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_usage_time`</p></li></ul>|
 |GCP Cloud SQL MySQL: CPU utilization|<p>Current CPU utilization represented as a percentage of the reserved CPU that is currently in use.</p>|Dependent item|gcp.cloudsql.mysql.cpu.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
@@ -320,8 +327,8 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MySQL: Network: Received bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.mysql.network.received_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_received_bytes_count`</p></li></ul>|
 |GCP Cloud SQL MySQL: Network: Sent bytes|<p>Delta count of bytes sent through the network.</p>|Dependent item|gcp.cloudsql.mysql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
 |GCP Cloud SQL MySQL: Connections|<p>Number of connections to the databases on the Cloud SQL instance.</p>|Dependent item|gcp.cloudsql.mysql.network.connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_connections`</p></li></ul>|
-|GCP Cloud SQL MySQL: Instance state|<p>GCP Cloud SQL MySQL Current instance state.</p>|HTTP agent|gcp.cloudsql.mysql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|GCP Cloud SQL MySQL: DB engine state|<p>GCP Cloud SQL MySQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.mysql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|GCP Cloud SQL MySQL: Instance state|<p>GCP Cloud SQL MySQL Current instance state.</p>|HTTP agent|gcp.cloudsql.mysql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|GCP Cloud SQL MySQL: DB engine state|<p>GCP Cloud SQL MySQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.mysql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |GCP Cloud SQL MySQL: InnoDB dirty pages|<p>Number of unflushed pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.mysql.innodb_buffer_pool_pages_dirty<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_dirty`</p></li></ul>|
 |GCP Cloud SQL MySQL: InnoDB free pages|<p>Number of unused pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.mysql.innodb_buffer_pool_pages_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_free`</p></li></ul>|
 |GCP Cloud SQL MySQL: InnoDB total pages|<p>Total number of pages in the InnoDB buffer pool.</p>|Dependent item|gcp.cloudsql.mysql.innodb_buffer_pool_pages_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mysql_innodb_buffer_pool_pages_total`</p></li></ul>|
@@ -343,14 +350,14 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MySQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.cpu.utilization,5m) >= {$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}`|Average||
 |GCP Cloud SQL MySQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL MySQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}`|Average||
-|GCP Cloud SQL MySQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}`|High||
-|GCP Cloud SQL MySQL: Instance is in suspended state|<p>The instance is in Suspended state. It is not available, for example due to problems with billing. </p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1`|Warning||
+|GCP Cloud SQL MySQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}`|High||
+|GCP Cloud SQL MySQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1`|Warning||
 |GCP Cloud SQL MySQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2`|Info||
 |GCP Cloud SQL MySQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4`|Info||
-|GCP Cloud SQL MySQL: Instance is in Failed state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5`|Average||
-|GCP Cloud SQL MySQL: Instance is in Unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6`|Average||
+|GCP Cloud SQL MySQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5`|Average||
+|GCP Cloud SQL MySQL: Instance is in unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6`|Average||
 |GCP Cloud SQL MySQL: Failed to get the instance state|<p>Failed to get the instance state. Check access permissions to GCP API or service account.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10`|Average||
-|GCP Cloud SQL MySQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MySQL: Instance is in suspended state</li><li>GCP Cloud SQL MySQL: Instance is in maintenance</li><li>GCP Cloud SQL MySQL: Instance is in Failed state</li><li>GCP Cloud SQL MySQL: Instance is in Unknown state</li><li>GCP Cloud SQL MySQL: Failed to get the instance state</li></ul>|
+|GCP Cloud SQL MySQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MySQL: Instance is in suspended state</li><li>GCP Cloud SQL MySQL: Instance is in maintenance</li><li>GCP Cloud SQL MySQL: Instance is in failed state</li><li>GCP Cloud SQL MySQL: Instance is in unknown state</li><li>GCP Cloud SQL MySQL: Failed to get the instance state</li></ul>|
 
 # GCP Cloud SQL MySQL Replica by HTTP
 
@@ -370,11 +377,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -414,11 +421,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -452,8 +459,8 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL PostgreSQL: Memory utilization|<p>The fraction of the memory quota that is currently in use.</p><p>Shown as percentage.</p>|Dependent item|gcp.cloudsql.pgsql.memory.utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_ram_pused`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Network: Received bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.pgsql.network.received_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_received_bytes_count`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Network: Sent bytes|<p>Delta count of bytes sent through the network.</p>|Dependent item|gcp.cloudsql.pgsql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Instance state|<p>GCP Cloud SQL PostgreSQL Current instance state.</p>|HTTP agent|gcp.cloudsql.pgsql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: DB engine state|<p>GCP Cloud SQL PostgreSQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.pgsql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Instance state|<p>GCP Cloud SQL PostgreSQL Current instance state.</p>|HTTP agent|gcp.cloudsql.pgsql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: DB engine state|<p>GCP Cloud SQL PostgreSQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.pgsql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Transaction ID utilization|<p>Current utilization represented as a percentage of transaction IDs consumed by the Cloud SQL PostgreSQL instance.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_id_utilization<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_transaction_id_utilization`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Assigned transactions|<p>Delta count of assigned transaction IDs.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_id_count_assigned<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_assigned`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Frozen transactions|<p>Delta count of frozen transaction IDs.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_id_count_frozen<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pgsql_frozen`</p></li></ul>|
@@ -472,20 +479,20 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL PostgreSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.cpu.utilization,5m) >= {$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}`|Average||
 |GCP Cloud SQL PostgreSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL PostgreSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}`|Average||
-|GCP Cloud SQL PostgreSQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}`|High||
-|GCP Cloud SQL PostgreSQL: Instance is in suspended state|<p>The instance is in Suspended state. It is not available, for example due to problems with billing. </p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1`|Warning||
+|GCP Cloud SQL PostgreSQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}`|High||
+|GCP Cloud SQL PostgreSQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1`|Warning||
 |GCP Cloud SQL PostgreSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2`|Info||
 |GCP Cloud SQL PostgreSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4`|Info||
-|GCP Cloud SQL PostgreSQL: Instance is in Failed state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5`|Average||
-|GCP Cloud SQL PostgreSQL: Instance is in Unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6`|Average||
+|GCP Cloud SQL PostgreSQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5`|Average||
+|GCP Cloud SQL PostgreSQL: Instance is in unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6`|Average||
 |GCP Cloud SQL PostgreSQL: Failed to get the instance state|<p>Failed to get the instance state. Check access permissions to GCP API or service account.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10`|Average||
-|GCP Cloud SQL PostgreSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL PostgreSQL: Instance is in suspended state</li><li>GCP Cloud SQL PostgreSQL: Instance is in maintenance</li><li>GCP Cloud SQL PostgreSQL: Instance is in Failed state</li><li>GCP Cloud SQL PostgreSQL: Instance is in Unknown state</li><li>GCP Cloud SQL PostgreSQL: Failed to get the instance state</li></ul>|
+|GCP Cloud SQL PostgreSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL PostgreSQL: Instance is in suspended state</li><li>GCP Cloud SQL PostgreSQL: Instance is in maintenance</li><li>GCP Cloud SQL PostgreSQL: Instance is in failed state</li><li>GCP Cloud SQL PostgreSQL: Instance is in unknown state</li><li>GCP Cloud SQL PostgreSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule GCP Cloud SQL PostgreSQL: Databases discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL PostgreSQL: Databases discovery|<p>Databases discovery for the particular PostgreSQL instance.</p>|HTTP agent|gcp.cloudsql.pgsql.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Databases discovery|<p>Databases discovery for the particular PostgreSQL instance.</p>|HTTP agent|gcp.cloudsql.pgsql.db.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for GCP Cloud SQL PostgreSQL: Databases discovery
 
@@ -496,7 +503,7 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples returned|<p>Total number of rows scanned while processing the queries of the [{#PGSQL.DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.pgsql.tuples_returned_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tuples_returned_count`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples fetched|<p>Total number of rows fetched as a result of queries to the [{#PGSQL.DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.pgsql.tuples_fetched_count[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tuples_fetched_count`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Committed transactions|<p>Delta count of number of committed transactions to the [{#PGSQL.DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_count_commit[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.commit`</p></li></ul>|
-|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled back transactions|<p>Delta count of number of rolled back transactions in the [{#PGSQL.DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rollback`</p></li></ul>|
+|GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled-back transactions|<p>Delta count of number of rolled-back transactions in the [{#PGSQL.DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rollback`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Buffer cache blocks read.|<p>Number of buffer cache blocks read by the [{#PGSQL.DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.pgsql.blocks_read_count_buffer_cache[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.buffer_cache`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Disk blocks read.|<p>Number of disk blocks read by the [{#PGSQL.DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.pgsql.blocks_read_count_disk[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disk`</p></li></ul>|
 |GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Inserted rows processed.|<p>Number of tuples(rows) processed for insert operations for the database with the name [{#PGSQL.DB.NAME}].</p>|Dependent item|gcp.cloudsql.pgsql.tuples_processed_count_insert[{#PGSQL.DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.insert`</p></li></ul>|
@@ -523,11 +530,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -565,15 +572,15 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- GCP Cloud SQL MSSQL versions: 2019 Standard/Enterprise, 2017 Standard/Enterprise
+- GCP Cloud SQL MSSQL versions: 2022 Standard/Enterprise, 2019 Standard/Enterprise, 2017 Standard/Enterprise.
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -612,8 +619,8 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MSSQL: Network: Received bytes|<p>Delta count of bytes received through the network.</p>|Dependent item|gcp.cloudsql.mssql.network.received_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_received_bytes_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Network: Sent bytes|<p>Delta count of bytes sent through the network.</p>|Dependent item|gcp.cloudsql.mssql.network.sent_bytes_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_sent_bytes_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Connections|<p>Number of connections to the databases on the Cloud SQL instance.</p>|Dependent item|gcp.cloudsql.mssql.network.connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_connections`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Instance state|<p>GCP Cloud SQL MSSQL Current instance state.</p>|HTTP agent|gcp.cloudsql.mssql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|GCP Cloud SQL MSSQL: DB engine state|<p>GCP Cloud SQL MSSQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.mssql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Instance state|<p>GCP Cloud SQL MSSQL Current instance state.</p>|HTTP agent|gcp.cloudsql.mssql.inst.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].stringValue`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|GCP Cloud SQL MSSQL: DB engine state|<p>GCP Cloud SQL MSSQL DB Engine State.</p>|HTTP agent|gcp.cloudsql.mssql.db.state<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.timeSeriesData[0].pointData[0].values[0].int64Value`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Connection resets|<p>Total number of login operations started from the connection pool since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.connection_reset_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_connection_reset_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Login attempts|<p>Total number of login attempts since the last restart of SQL Server service. </p><p>This does not include pooled connections.</p>|Dependent item|gcp.cloudsql.mssql.conn.login_attempt_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_login_attempt_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Logouts|<p>Total number of logout operations since the last restart of SQL Server service.</p>|Dependent item|gcp.cloudsql.mssql.conn.logout_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_logout_count`</p></li></ul>|
@@ -633,7 +640,7 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MSSQL: SQL recompilations|<p>Total number of SQL recompilations.</p>|Dependent item|gcp.cloudsql.mssql.trans.sql_recompilation_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_sql_recompilation_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Read page operations|<p>Total number of physical database page reads. </p><p>This metric counts physical page reads across all databases.</p>|Dependent item|gcp.cloudsql.mssql.memory.page_ops.read<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_read`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Write age operations|<p>Total number of physical database page writes. </p><p>This metric counts physical page writes across all databases.</p>|Dependent item|gcp.cloudsql.mssql.memory.page_ops.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_write`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Audits size|<p>Tracks the size in bytes of stored SQLServer audit files on an instance.</p><p>Empty value if there are no audits enabled.</p>|Dependent item|gcp.cloudsql.mssql.audits_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_audits_size`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Audits size|<p>Tracks the size in bytes of stored SQLServer audit files on an instance.</p><p>Empty value if there are no audits enabled.</p>|Dependent item|gcp.cloudsql.mssql.audits_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_audits_size`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL MSSQL: Audits successfully uploaded|<p>Tracks the size in bytes of stored SQLServer audit files on an instance.</p><p>Empty value if there are no audits enabled.</p>|Dependent item|gcp.cloudsql.mssql.audits_upload_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_success`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL MSSQL: Resources get|<p>MSSQL resources data in raw format.</p>|Script|gcp.cloudsql.mssql.resources.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL MSSQL: Databases get|<p>MSSQL databases data in raw format.</p>|Script|gcp.cloudsql.mssql.db.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -646,14 +653,14 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MSSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.cpu.utilization,5m) >= {$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}`|Average||
 |GCP Cloud SQL MSSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL MSSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}`|Average||
-|GCP Cloud SQL MSSQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}`|High||
-|GCP Cloud SQL MSSQL: Instance is in suspended state|<p>The instance is in Suspended state. It is not available, for example due to problems with billing. </p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1`|Warning||
+|GCP Cloud SQL MSSQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}`|High||
+|GCP Cloud SQL MSSQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1`|Warning||
 |GCP Cloud SQL MSSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2`|Info||
 |GCP Cloud SQL MSSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4`|Info||
-|GCP Cloud SQL MSSQL: Instance is in Failed state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5`|Average||
-|GCP Cloud SQL MSSQL: Instance is in Unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6`|Average||
+|GCP Cloud SQL MSSQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5`|Average||
+|GCP Cloud SQL MSSQL: Instance is in unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6`|Average||
 |GCP Cloud SQL MSSQL: Failed to get the instance state|<p>Failed to get the instance state. Check access permissions to GCP API or service account.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10`|Average||
-|GCP Cloud SQL MSSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MSSQL: Instance is in suspended state</li><li>GCP Cloud SQL MSSQL: Instance is in maintenance</li><li>GCP Cloud SQL MSSQL: Instance is in Failed state</li><li>GCP Cloud SQL MSSQL: Instance is in Unknown state</li><li>GCP Cloud SQL MSSQL: Failed to get the instance state</li></ul>|
+|GCP Cloud SQL MSSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MSSQL: Instance is in suspended state</li><li>GCP Cloud SQL MSSQL: Instance is in maintenance</li><li>GCP Cloud SQL MSSQL: Instance is in failed state</li><li>GCP Cloud SQL MSSQL: Instance is in unknown state</li><li>GCP Cloud SQL MSSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule Resources discovery
 
@@ -681,26 +688,26 @@ This template will be connected to discovered entities automatically with all re
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Raw data|<p>Data in raw format for the [{#DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.mssql.db.raw[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.database == "{#DB.NAME}")].metrics.first()`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Log bytes flushed|<p>Total number of log bytes flushed  for the [{#DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.mssql.db.log_bytes_flushed_count[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.log_bytes_flushed_count`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Log bytes flushed|<p>Total number of log bytes flushed for the [{#DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.mssql.db.log_bytes_flushed_count[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.log_bytes_flushed_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Database [{#DB.NAME}]: Transactions started|<p>Total number of transactions started for the [{#DB.NAME}] database.</p>|Dependent item|gcp.cloudsql.mssql.db.transaction_count[{#DB.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.transaction_count`</p></li></ul>|
 
 ### LLD rule Schedulers discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Schedulers discovery|<p>Databases discovery.</p>|Dependent item|gcp.cloudsql.schedulers.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Schedulers discovery|<p>Schedulers discovery.</p>|Dependent item|gcp.cloudsql.schedulers.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Schedulers discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Raw data|<p>Data in raw format associated with the scheduler with ID [{#SCHEDULER.ID}].</p>|Dependent item|gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scheduler == "{#SCHEDULER.ID}")].metrics.first()`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers|<p>Current number of active workers associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_workers`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current tasks|<p>Current number of current tasks associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_tasks`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current workers|<p>Current number of workers associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>It includes workers that are not assigned any task.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_workers`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Pending I/O operations|<p>Current number of pending I/Os waiting to be completed that are associated with the scheduler with ID [{#SCHEDULER.ID}]. </p><p>Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. </p><p>The count is incremented when the request is inserted. </p><p>This count is decremented when the request is completed. </p><p>This number does not indicate the state of the I/Os.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pending_disk_io`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Runnable tasks|<p>Current number of workers that are associated with the scheduler with ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.runnable_tasks`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Work queue|<p>Current number of tasks in the pending queue associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>These tasks are waiting for a worker to pick them up.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.work_queue`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Raw data|<p>Data in raw format associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p>|Dependent item|gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scheduler == "{#SCHEDULER.ID}")].metrics.first()`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers|<p>Current number of active workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_workers`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current tasks|<p>Current number of present tasks associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_tasks`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current workers|<p>Current number of workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>It includes workers that are not assigned any task.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_workers`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Pending I/O operations|<p>Current number of pending I/Os waiting to be completed that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}]. </p><p>Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. </p><p>The count is incremented when the request is inserted. </p><p>This count is decremented when the request is completed. </p><p>This number does not indicate the state of the I/Os.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pending_disk_io`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Runnable tasks|<p>Current number of workers that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.runnable_tasks`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Work queue|<p>Current number of tasks in the pending queue associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>These tasks are waiting for a worker to pick them up.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.work_queue`</p></li></ul>|
 
 # GCP Cloud SQL MSSQL Replica by HTTP
 
@@ -720,11 +727,11 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -737,7 +744,7 @@ This template will be connected to discovered entities automatically with all re
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MSSQL: Replica metrics get|<p>MSSQL Replica metrics data in raw format.</p>|Script|gcp.cloudsql.mssql.repl.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Cloud SQL MSSQL: Replica metrics get|<p>MSSQL replica metrics data in raw format.</p>|Script|gcp.cloudsql.mssql.repl.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL MSSQL: Bytes sent to replica|<p>Total number of bytes sent to the remote availability replica. </p><p>For an async replica, returns the number of bytes before compression. </p><p>For a sync replica without compression, returns the actual number of bytes.</p>|Dependent item|gcp.cloudsql.mssql.repl.bytes_sent_to_replica_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.bytes_sent_to_replica_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Resent messages|<p>Total count of Always On messages to resend.  </p><p>This includes messages that were attempted to be sent but failed and require resending.</p>|Dependent item|gcp.cloudsql.mssql.repl.resent_message_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.resent_message_count`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Log apply pending queue|<p>Current number of log blocks that are waiting to be applied to replica.</p>|Dependent item|gcp.cloudsql.mssql.repl.log_apply_pending_queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.log_apply_pending_queue`</p></li></ul>|
