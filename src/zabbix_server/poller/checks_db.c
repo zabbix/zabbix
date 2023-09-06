@@ -100,7 +100,7 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, timeout_sec,
 			&error)))
 	{
-		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, &error)))
+		if (NULL != (query_result = zbx_odbc_select(data_source, item->params, timeout_sec, &error)))
 		{
 			char	*text = NULL;
 
