@@ -496,7 +496,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
  ******************************************************************************/
 static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slaveid, unsigned char function,
 		unsigned short address, unsigned short count, modbus_datatype_t type, modbus_endianness_t endianness,
-		unsigned short offset, unsigned short total_count, AGENT_RESULT *res, char **error)
+		unsigned short offset, unsigned short total_count, int timeout, AGENT_RESULT *res, char **error)
 {
 
 	modbus_t	*mdb_ctx;
@@ -530,12 +530,12 @@ static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slave
 	{
 		struct timeval	tv;
 
-		tv.tv_sec = sysinfo_get_config_timeout();
+		tv.tv_sec = (time_t)timeout;
 		tv.tv_usec = 0;
 		modbus_set_response_timeout(mdb_ctx, &tv);
 	}
 #else /* HAVE_LIBMODBUS_3_1 at the moment */
-	if (0 !=  modbus_set_response_timeout(mdb_ctx, sysinfo_get_config_timeout(), 0))
+	if (0 !=  modbus_set_response_timeout(mdb_ctx, (uint32_t)timeout, 0))
 	{
 		*error = zbx_dsprintf(*error, "modbus_set_response_timeout() failed: %s", modbus_strerror(errno));
 		goto out;
@@ -820,7 +820,7 @@ int	modbus_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (SUCCEED != modbus_read_data(&endpoint, slaveid, function, address, count, type, endianness, offset,
-			(unsigned short)total_count, result, &err))
+			(unsigned short)total_count, response->timeout, result, &err))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot read modbus data: %s.", err));
 		goto err;

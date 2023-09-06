@@ -218,16 +218,16 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 
-	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+	zbx_is_time_suffix(item->timeout, &request.timeout, ZBX_LENGTH_UNLIMITED);
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
-		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0, timeout_sec))
+		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0))
 			ret = SUCCEED;
 	}
 	else if (0 == strcmp(request.key, "net.tcp.service.perf") || 0 == strcmp(request.key, "net.udp.service.perf"))
 	{
-		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 1, timeout_sec))
+		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
 	}
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))

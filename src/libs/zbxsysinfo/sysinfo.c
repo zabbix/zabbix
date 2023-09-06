@@ -1259,9 +1259,6 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	if (ZBX_CHECK_TIMEOUT_UNDEFINED != timeout)
-		zbx_alarm_on(timeout);
-
 	request.timeout = (0 == timeout ? sysinfo_get_config_timeout() : timeout);
 
 	if (SYSINFO_RET_OK != command->function(&request, result))
@@ -1273,15 +1270,6 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 		goto notsupported;
 	}
-
-	if (timeout != ZBX_CHECK_TIMEOUT_UNDEFINED && SUCCEED == zbx_alarm_timed_out())
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Timed out during check execution."));
-		goto notsupported;
-	}
-
-	if (ZBX_CHECK_TIMEOUT_UNDEFINED != timeout)
-		zbx_alarm_off();
 
 	ret = SUCCEED;
 notsupported:
@@ -1787,7 +1775,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	close(fds[1]);
 
-	zbx_alarm_on(sysinfo_get_config_timeout());
+	zbx_alarm_on(request->timeout);
 
 	while (0 != (n = read(fds[0], buffer, sizeof(buffer))))
 	{
@@ -1969,7 +1957,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	}
 
 	/* 1000 is multiplier for converting seconds into milliseconds */
-	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, sysinfo_get_config_timeout() * 1000)))
+	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, request->timeout * 1000)))
 	{
 		/* unexpected error */
 
