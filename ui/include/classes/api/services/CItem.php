@@ -686,11 +686,11 @@ class CItem extends CItemGeneral {
 		}
 		unset($item);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_', 'flags']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['type', 'key_']);
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags']);
 
 		self::validateUniqueness($items);
 
@@ -710,7 +710,6 @@ class CItem extends CItemGeneral {
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>	['type' => API_ANY],
-			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
@@ -757,7 +756,6 @@ class CItem extends CItemGeneral {
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>	['type' => API_ANY],
-			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -789,7 +787,6 @@ class CItem extends CItemGeneral {
 	private static function getDiscoveredValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>	['type' => API_ANY],
-			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],

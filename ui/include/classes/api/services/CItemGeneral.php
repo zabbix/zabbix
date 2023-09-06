@@ -268,7 +268,11 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if (array_key_exists('preprocessing', $item)) {
-				self::validatePreprocessingStepsByType($item, '/'.($i + 1).'/preprocessing');
+				$_item = $item + ($db_item === null ? [] : ['flags' => $db_item['flags']]);
+
+				self::validatePreprocessingStepsByType($_item,'/'.($i + 1).'/preprocessing');
+
+				$item['preprocessing'] = $_item['preprocessing'];
 			}
 
 			if (array_key_exists('query_fields', $item)) {
