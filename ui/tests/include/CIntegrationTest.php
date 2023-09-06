@@ -35,7 +35,7 @@ class CIntegrationTest extends CAPITest {
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
-	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
+	const CACHE_RELOAD_DELAY			= 7; // Configuration cache reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
 
