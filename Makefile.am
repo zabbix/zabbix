@@ -135,6 +135,7 @@ WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=fgets \
+	-Wl,--wrap=fstat \
 	-Wl,--wrap=open
 
 WRAP_FS_FUNCS = \

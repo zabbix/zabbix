@@ -31,6 +31,20 @@ install:
 		go install -ldflags="${GOLDFLAGS}" zabbix.com/cmd/zabbix_agent2
 	test -f "$(DESTDIR)@AGENT2_CONFIG_FILE@" || cp "conf/zabbix_agent2.conf" "$(DESTDIR)@AGENT2_CONFIG_FILE@"
 
+sbom.json:
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" cyclonedx-gomod mod \
+		   -output-version 1.4 \
+		   -licenses -assert-licenses -json -output "$@"
+
+# cyclonedx-gomod mod defaults to xml as the output format if the -json flag is not given
+# there is no way to specify this explicitly
+sbom.xml:
+	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" cyclonedx-gomod mod \
+		   -output-version 1.4 \
+		   -licenses -assert-licenses -output "$@"
+
+sbom: sbom.json
+
 check:
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" go test ./...
 style:
