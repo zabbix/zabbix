@@ -577,18 +577,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			unset($metric);
 
-			foreach ($metrics as $key => $metric) {
-				if ($metric['value'] <= 0 || $raw_total_value <= 0) {
+			foreach ($sectors as $key => $sector) {
+				if ($sector['value'] <= 0 || $raw_total_value <= 0) {
 					$percentage = 0;
 				}
 				else {
-					$percentage = ($metric['value'] / $raw_total_value) * 100;
+					$percentage = ($sector['value'] / $raw_total_value) * 100;
 				}
 
 				if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON
 						&& $percentage < $merge_sectors['percent']) {
 					$below_threshold_count++;
-					$others_value += max($metric['value'], 0);
+					$others_value += max($sector['value'], 0);
 
 					$below_threshold_sectors[] = $key;
 				}
