@@ -663,7 +663,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 	{
 		"dpkg",
 		"dpkg --version 2> /dev/null",
-		"/opt/out.sh",
+		"dpkg --get-selections",
 		"LC_ALL=C dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
 		dpkg_list,
 		dpkg_details
