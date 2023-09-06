@@ -145,7 +145,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 		$this->getInputs($data, array_keys($form_fields));
 
 		if ($this->hasInput('form_refresh') && $data['form_refresh']) {
-			$data['manual_close'] = !array_key_exists('manual_close', $data)
+			$data['manual_close'] = (!array_key_exists('manual_close', $data) || !$data['manual_close'])
 				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 				: ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
 
