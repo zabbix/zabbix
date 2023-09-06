@@ -356,7 +356,7 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_version();

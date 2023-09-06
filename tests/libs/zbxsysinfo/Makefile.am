@@ -35,7 +35,7 @@ check_service_test_SOURCES = \
 
 parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
-	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
+	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
@@ -171,7 +171,6 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \

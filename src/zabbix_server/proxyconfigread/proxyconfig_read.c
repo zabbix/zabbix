@@ -29,8 +29,6 @@
 #include "zbxcrypto.h"
 #include "zbx_item_constants.h"
 
-extern int	CONFIG_TRAPPER_TIMEOUT;
-
 typedef struct
 {
 	char		*path;
@@ -1172,7 +1170,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_vault_t *config_vault, int config_timeout, const char *config_source_ip)
+		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
+		const char *config_source_ip)
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
@@ -1200,7 +1199,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	version_str = zbx_get_proxy_protocol_version_str(jp);
 	version_int = zbx_get_proxy_protocol_version_int(version_str);
 
-	zbx_update_proxy_data(&proxy, version_str, version_int, (int)time(NULL), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
+	zbx_update_proxy_data(&proxy, version_str, version_int, time(NULL), ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG);
 
 	flags |= ZBX_TCP_COMPRESS;
 
@@ -1241,7 +1240,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 			(double)reserved / (double)buffer_size);
 
 	ret = zbx_tcp_send_ext(sock, buffer, buffer_size, reserved, (unsigned char)flags,
-			CONFIG_TRAPPER_TIMEOUT);
+			config_trapper_timeout);
 
 	if (SUCCEED != ret)
 	{

@@ -161,7 +161,7 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_MODE_ACTIVE, events_cbs,
+		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE, events_cbs,
 				proxydata_frequency, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
@@ -185,7 +185,7 @@ out:
 	if (SUCCEED == status)	/* moved the unpredictable long operation to the end */
 				/* we are trying to save info about lastaccess to detect communication problem */
 	{
-		int	lastaccess;
+		time_t	lastaccess;
 
 		if (ZBX_PROXY_UPLOAD_DISABLED == upload_status)
 			lastaccess = (int)time(NULL);
