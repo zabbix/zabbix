@@ -306,7 +306,6 @@ function itemCompleteTest(overlay) {
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
-				jQuery('#runtime_error', $form).data('multilineInput').$input.prop('title', ret.runtime_error);
 			}
 
 			if ('not_supported' in ret && jQuery('#not_supported', $form).length) {
@@ -501,11 +500,11 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
-				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('enable');
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('unsetReadOnly');
 			}
 			else {
 				$('#value', $form).multilineInput('unsetReadOnly');
-				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('disable');
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 			}
 		});
 
@@ -517,7 +516,7 @@ jQuery(document).ready(function($) {
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
-				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('disable');
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 				$not_supported.prop('disabled', true);
 
 				<?php if ($data['show_prev']): ?>
@@ -589,7 +588,7 @@ jQuery(document).ready(function($) {
 			else {
 				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
 				$not_supported.is(':checked') && $('#runtime_error').length
-					&& $('#runtime_error', $form).multilineInput('enable');
+					&& $('#runtime_error', $form).multilineInput('unsetReadOnly');
 				$not_supported.prop('disabled', false);
 
 				<?php if ($data['show_prev']): ?>
