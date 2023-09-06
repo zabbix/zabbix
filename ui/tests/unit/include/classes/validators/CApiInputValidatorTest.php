@@ -7692,6 +7692,18 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/params": unexpected parameter "3".'
 			],
 			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"\\n",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value contains unescaped backslash at position 0.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
+				"zabbix\nzabbix\ ",
+				'/1/params',
+				'Invalid parameter "/1/params/2": value contains unescaped backslash at position 6.'
+			],
+			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
 				"1.3.1.6.2.1\n0",
 				'/1/params',

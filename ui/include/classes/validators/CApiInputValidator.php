@@ -682,6 +682,31 @@ class CApiInputValidator {
 			return false;
 		}
 
+		// Check if all backslashe characters in given string are escaped.
+		if ($flags & API_ESCAPED_BACKSLASHES && mb_strpos($data, '\\') !== false) {
+			$pos_unescaped_backslash = (function ($string) {
+				$offset = 0;
+
+				while (($pos = mb_strpos($string, '\\', $offset)) !== false) {
+					if (mb_substr($string, $pos + 1, 1) !== '\\') {
+						return $pos;
+					}
+
+					$offset = $pos + 2;
+				}
+
+				return -1;
+			}) ($data);
+
+			if ($pos_unescaped_backslash != -1) {
+				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('value contains unescaped backslash at position %1$d', $pos_unescaped_backslash)
+				);
+
+				return false;
+			}
+		}
+
 		return true;
 	}
 
@@ -4148,8 +4173,8 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
+					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ESCAPED_BACKSLASHES],
+					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_ESCAPED_BACKSLASHES, 'default' => '']
 				]];
 				break;
 
