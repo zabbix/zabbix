@@ -624,7 +624,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Plain text widget ' . microtime());
+		$data['fields']['Name'] = CTestArrayHelper::get($data, 'fields.Name', 'Plain text widget '.microtime());
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
@@ -635,8 +635,9 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Plain text')]);
 
+		// Prepare the data for filling in "Items" field of widget, get item names.
 		if (array_key_exists('items', $data)) {
-			foreach($data['items'] as $array) {
+			foreach ($data['items'] as $array) {
 				$data['fields']['Items'][] = implode(array_values($array));
 			}
 		}
@@ -666,21 +667,19 @@ class testDashboardPlainTextWidget extends CWebTest {
 		}
 		else {
 			$items_count = count($data['items']);
-			if ($items_count > 1) {
-				if ($data['fields']['Name'] === '') {
+			if ($data['fields']['Name'] === '') {
+				if ($items_count > 1) {
 					$header = (array_key_exists('same_host', $data))
 						? $data['same_host'].': '.$items_count.' items'
 						: 'Plain text';
 				}
 				else {
-					$header = $data['fields']['Name'];
+					// If name is empty string it is replaced by item name.
+					$header = implode(array_keys($data['items'][0])).': '.implode($data['fields']['Items']);
 				}
 			}
 			else {
-				// If name is empty string it is replaced by item name.
-				$header = ($data['fields']['Name'] === '')
-					? implode(array_keys($data['items'][0])).': '.implode($data['fields']['Items'])
-					: $data['fields']['Name'];
+				$header = $data['fields']['Name'];
 			}
 
 			if ($update) {
@@ -702,10 +701,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$saved_form = $widget->edit();
 			$this->assertEquals($values, $saved_form->getValues());
 
+			// Prepare data to check widget "Items" field, should be in the format "Host name: Item name".
 			$data['fields']['Items'] = [];
 			foreach ($data['items'] as $host_item) {
 				foreach ($host_item as $host => $item) {
-					$data['fields']['Items'][] = $host.': '. $item;
+					$data['fields']['Items'][] = $host.': '.$item;
 				}
 			}
 
@@ -1059,7 +1059,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 	}
 
 	/**
-	 * @backup history, history_uint, history_str
+	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
 	 */
