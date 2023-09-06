@@ -194,15 +194,13 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
+	)
+	->addItem(
+		new CFormActions(new CSubmit('update', _('Update')), [new CButton('reset-defaults', _('Reset defaults'))])
 	);
 
 $form->addItem(
-	(new CTabView())
-		->addTab('timeouts-tab', _('Timeouts'), $form_grid)
-		->setFooter(makeFormFooter(
-			new CSubmit('update', _('Update')),
-			[new CButton('reset-defaults', _('Reset defaults'))]
-		))
+	(new CTabView())->addTab('timeouts-tab', _('Timeouts'), $form_grid)
 );
 
 (new CHtmlPage())
