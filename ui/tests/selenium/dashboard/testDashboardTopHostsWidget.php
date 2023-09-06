@@ -37,17 +37,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * Widget name for update.
 	 */
 	protected static $updated_name = 'Top hosts update';
-	protected static $dashboards;
-
-	protected function getCreateDashboardId() {
-		self::$dashboards = [
-			'create' => CDataHelper::get('TopHostsWidget.dashboardids.top_host_create'),
-			'update' => CDataHelper::get('TopHostsWidget.dashboardids.top_host_update'),
-			'delete' => CDataHelper::get('TopHostsWidget.dashboardids.top_host_delete'),
-			'remove' => CDataHelper::get('TopHostsWidget.dashboardids.top_host_remove')
-		];
-		return self::$dashboards;
-	}
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -95,7 +84,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 	}
 
 	public function testDashboardTopHostsWidget_Layout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboards['create']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				CDataHelper::get('TopHostsWidget.dashboardids.top_host_create')
+		);
 		$dialog = CDashboardElement::find()->one()->edit()->addWidget();
 		$form = $dialog->asForm();
 		$this->assertEquals('Add widget', $dialog->getTitle());
@@ -1071,7 +1062,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardTopHostsWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboards['create']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				CDataHelper::get('TopHostsWidget.dashboardids.top_host_create')
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -1133,7 +1126,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 		// Hash before simple update.
 		$old_hash = CDBHelper::getHash($this->sql);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboards['update']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+			CDataHelper::get('TopHostsWidget.dashboardids.top_host_update')
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->edit()->getWidget(self::$updated_name)->edit()->submit();
 		$dashboard->save();
@@ -1522,7 +1517,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 			$old_hash = CDBHelper::getHash($this->sql);
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboards['update']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				CDataHelper::get('TopHostsWidget.dashboardids.top_host_update')
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget(self::$updated_name)->edit();
 
@@ -1578,7 +1575,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function testDashboardTopHostsWidget_Delete() {
 		$name = 'Top hosts delete';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboards['delete']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				CDataHelper::get('TopHostsWidget.dashboardids.top_host_delete')
+		);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$dashboard->deleteWidget($name);
 		$this->page->waitUntilReady();
@@ -1627,7 +1626,9 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * @dataProvider getRemoveData
 	 */
 	public function testDashboardTopHostsWidget_Remove($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboards['remove']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
+				CDataHelper::get('TopHostsWidget.dashboardids.top_host_remove')
+		);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->getWidget('Top hosts for remove')->edit();
 
