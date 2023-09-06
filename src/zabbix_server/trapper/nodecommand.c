@@ -529,7 +529,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "script (name:%s) "
 				"does not accept additional manual input, but request contains it anyway",
-				script.name, zbx_result_string(ret));
+				script.name);
 	}
 
 	if (0 != hostid)	/* script on host */
