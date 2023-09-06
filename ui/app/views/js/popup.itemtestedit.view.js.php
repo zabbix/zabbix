@@ -306,6 +306,7 @@ function itemCompleteTest(overlay) {
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
+				jQuery('#runtime_error', $form).data('multilineInput').$input.prop('title', ret.runtime_error);
 			}
 
 			if ('not_supported' in ret && jQuery('#not_supported', $form).length) {

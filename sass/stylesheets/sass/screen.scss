@@ -3338,16 +3338,6 @@ svg {
 		}
 	}
 
-	.step-parameters-toggle {
-		&:disabled {
-			visibility: hidden;
-		}
-
-		input:disabled {
-			display: none;
-		}
-	}
-
 	.step-on-fail {
 		flex: 0 0 $on-fail-width;
 		max-width: $on-fail-width;

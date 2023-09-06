@@ -88,7 +88,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		if ($ret) {
 			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
-			$this->item_type = $this->hasInput('item_type') ? $this->getInput('item_type') : -1;
+			$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
 			$this->test_type = $this->getInput('test_type');
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
@@ -108,7 +108,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			 */
 			$steps = $this->getInput('steps', []);
 			if ($ret && $steps) {
-				$steps = normalizeItemPreprocessingSteps($steps);
+				$steps = normalizeItemPreprocessingSteps($steps, $this->item_type);
 
 				switch ($this->test_type) {
 					case self::ZBX_TEST_TYPE_ITEM:
@@ -161,7 +161,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps = normalizeItemPreprocessingSteps($this->getInput('steps', []));
+		$preprocessing_steps = normalizeItemPreprocessingSteps($this->getInput('steps', []), $this->item_type);
 		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE);

@@ -1847,10 +1847,11 @@ function validateDelay(CUpdateIntervalParser $parser, $field_name, $value, &$err
  * Normalizes item preprocessing step parameters after item preprocessing form submit.
  *
  * @param array $preprocessing  Array of item preprocessing steps, as received from form submit.
+ * @param int   $item_type
  *
  * @return array
  */
-function normalizeItemPreprocessingSteps(array $preprocessing): array {
+function normalizeItemPreprocessingSteps(array $preprocessing, int $item_type): array {
 	foreach ($preprocessing as &$step) {
 		switch ($step['type']) {
 			case ZBX_PREPROC_MULTIPLIER:
@@ -1909,7 +1910,11 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 				if (array_key_exists('params', $step)) {
-					$step['params'] = implode("\n", $step['params']);
+					if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+						unset($step['params'][1]);
+					}
+
+					$step['params'] = $item_type == ITEM_TYPE_SSH ? implode("\n", $step['params']) : '';
 				}
 				break;
 

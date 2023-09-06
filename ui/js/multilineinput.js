@@ -258,7 +258,7 @@
 					obj.$input.val(value_lines.length > 1
 						? value_lines[0] + String.fromCharCode(8230) // U+2026 Horizontal ellipsis character.
 						: value_lines[0]
-					).prop('title', value_lines);
+					);
 					$this.trigger('change');
 				});
 			}

@@ -127,22 +127,6 @@ class CSelect extends CTag {
 	}
 
 	/**
-	 * @param bool $value
-	 *
-	 * @return self
-	 */
-	public function setHidden(bool $value = true): self {
-		if ($value) {
-			$this->setAttribute('hidden', 'hidden');
-		}
-		else {
-			$this->removeAttribute('hidden');
-		}
-
-		return $this;
-	}
-
-	/**
 	 * Enable or disable readonly mode for the element.
 	 *
 	 * @param bool $value

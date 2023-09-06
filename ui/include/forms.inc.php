@@ -1453,7 +1453,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 					$step_param_1
 						->setAttribute('placeholder', _('pattern'))
 						->setReadonly($readonly)
-						->setEnabled($step_param_0_value != ZBX_PREPROC_MATCH_ERROR_ANY)
+						->addStyle($step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? 'visibility:hidden;' : '')
 				]))->addClass('step-parameters step-parameters-toggle');
 
 				if ($item_type != ITEM_TYPE_SSH) {
