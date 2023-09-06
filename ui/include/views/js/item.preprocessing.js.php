@@ -47,7 +47,7 @@
 			(new CDiv($preproc_types_select))
 				->addClass('list-numbered-item')
 				->addClass('step-name'),
-			(new CFormFieldset())->addClass('step-parameters'),
+			(new CDiv())->addClass('step-parameters'),
 			(new CDiv(new CCheckBox('preprocessing[#{rowNum}][on_fail]')))->addClass('step-on-fail'),
 			(new CDiv([
 				(new CButton('preprocessing[#{rowNum}][test]', _('Test')))
@@ -244,7 +244,7 @@
 		(new CTextBox('preprocessing[#{rowNum}][params][1]', ''))
 			->removeId()
 			->setAttribute('placeholder', _('pattern'))
-			->addStyle('visibility: hidden;');
+			->addClass(ZBX_STYLE_VISIBILITY_HIDDEN);
 	?>
 </script>
 
@@ -427,7 +427,7 @@
 			update: function() {
 				let i = 0;
 
-				$(this).closest('#preprocessing').find('li.sortable').each(function() {
+				$(this).find('li.sortable').each(function() {
 						$(this).find('[name*="sortorder"]').val(i++);
 					});
 			}
@@ -447,10 +447,9 @@
 
 				$('.step-parameters', $row)
 					.html(makeParameterInput(step_index, type))
-					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>);
-				$('.step-parameters-toggle', $row).css('visibility',
-					$('#type').val() == <?= ITEM_TYPE_SSH ?> ? '' : 'hidden'
-				);
+					.toggleClass('js-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>);
+				$('.js-parameters-toggle', $row)
+					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
 
 				$(this).closest('.preprocessing-list-foot').before($row);
 
@@ -520,12 +519,10 @@
 					$on_fail = $row.find('[name*="on_fail"]');
 
 				$('.step-parameters', $row)
-					.prop('disabled', false)
 					.html(makeParameterInput($row.data('step'), type))
-					.toggleClass('step-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>);
-				$('.step-parameters-toggle', $row).css('visibility',
-					$('#type').val() == <?= ITEM_TYPE_SSH ?> ? '' : 'hidden'
-				);
+					.toggleClass('js-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>);
+				$('.js-parameters-toggle', $row)
+					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
 
 				// Disable "Custom on fail" for some of the preprocessing types.
 				switch (type) {
@@ -597,9 +594,8 @@
 				$(this).next('input').prop('disabled', $(this).val() !== '<?= ZBX_PREPROC_PROMETHEUS_LABEL ?>');
 			})
 			.on('change', '.js-preproc-param-error-matching', function() {
-				$(this).next('input').css('visibility',
-					this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?> ? 'hidden' : ''
-				);
+				$(this).next('input')
+					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
 			})
 			.on('click', '.js-group-json-action-delete', function() {
 				const table = this.closest('.group-json-mapping');
@@ -641,8 +637,8 @@
 				for (let select of $preproc_steps) {
 					for (let option of select.getOptions()) {
 						if (option.value == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
-							$(select).closest('.preprocessing-step')
-								.find('.step-parameters-toggle').css('visibility', no_parameters ? 'hidden' : '');
+							$(select).closest('.preprocessing-step').find('.js-parameters-toggle')
+								.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', no_parameters);
 							break;
 						}
 					}

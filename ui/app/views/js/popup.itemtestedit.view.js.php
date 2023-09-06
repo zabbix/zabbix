@@ -302,14 +302,18 @@ function itemCompleteTest(overlay) {
 				}
 			<?php endif ?>
 
-			jQuery('#value', $form).multilineInput('value', ret.value);
-
-			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
-				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
-			}
-
 			if ('not_supported' in ret && jQuery('#not_supported', $form).length) {
 				$('#not_supported').prop('checked', ret.not_supported != 0);
+			}
+
+			jQuery('#value', $form)
+				.multilineInput('value', ret.value)
+				.multilineInput($('#not_supported').is(':checked') ? 'setReadOnly' : 'unsetReadOnly');
+
+			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
+				jQuery('#runtime_error', $form)
+					.multilineInput('value', ret.runtime_error)
+					.multilineInput($('#not_supported').is(':checked') ? 'unsetReadOnly' : 'setReadOnly');
 			}
 
 			if (typeof ret.eol !== 'undefined') {
@@ -468,7 +472,7 @@ jQuery(document).ready(function($) {
 		value: <?= json_encode($data['value']) ?>,
 		monospace_font: false,
 		autofocus: true,
-		readonly: false,
+		readonly: <?= $data['not_supported'] != 0 ? 'true' : 'false' ?>,
 		grow: 'auto',
 		rows: 0
 	});
@@ -480,7 +484,7 @@ jQuery(document).ready(function($) {
 		value: <?= json_encode($data['runtime_error']) ?>,
 		monospace_font: false,
 		autofocus: true,
-		disabled: <?= array_key_exists('not_supported', $data) ? 'false' : 'true' ?>,
+		readonly: <?= $data['not_supported'] != 0 ? 'false' : 'true' ?>,
 		grow: 'auto',
 		rows: 0
 	});
@@ -586,7 +590,7 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
+				$('#value', $form).multilineInput($not_supported.is(':checked') ? 'setReadOnly' : 'unsetReadOnly');
 				$not_supported.is(':checked') && $('#runtime_error').length
 					&& $('#runtime_error', $form).multilineInput('unsetReadOnly');
 				$not_supported.prop('disabled', false);

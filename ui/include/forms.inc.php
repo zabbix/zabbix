@@ -1439,7 +1439,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 					$step_param_0_value = ZBX_PREPROC_MATCH_ERROR_ANY;
 				}
 
-				$params = (new CFormFieldset(null, [
+				$params = [
 					(new CSelect('preprocessing['.$i.'][params][0]'))
 						->addOptions(CSelect::createOptionsFromArray([
 							ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
@@ -1453,12 +1453,10 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 					$step_param_1
 						->setAttribute('placeholder', _('pattern'))
 						->setReadonly($readonly)
-						->addStyle($step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? 'visibility:hidden;' : '')
-				]))->addClass('step-parameters step-parameters-toggle');
-
-				if ($item_type != ITEM_TYPE_SSH) {
-					$params->setAttribute('disabled', 'disabled');
-				}
+						->addClass(
+							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_VISIBILITY_HIDDEN : null
+						)
+				];
 				break;
 
 
@@ -1619,9 +1617,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 					(new CDiv($preproc_types_select))
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
-					$step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
-						? $params
-						: (new CFormFieldset(null, $params))->addClass('step-parameters'),
+					(new CDiv($params))
+						->addClass('step-parameters')
+						->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 'js-parameters-toggle' : null),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
 					(new CDiv([
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))
