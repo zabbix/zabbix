@@ -135,7 +135,7 @@ class CControllerTriggerEdit extends CController {
 		$this->getInputs($data, array_keys($form_fields));
 
 		if ($this->hasInput('form_refresh') && $data['form_refresh']) {
-			$data['manual_close'] = !array_key_exists('manual_close', $data)
+			$data['manual_close'] = (!array_key_exists('manual_close', $data) || !$data['manual_close'])
 				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
 				: ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
 
@@ -212,6 +212,7 @@ class CControllerTriggerEdit extends CController {
 		$data['expression_full'] = $data['expression'];
 		$data['recovery_expression_full'] = $data['recovery_expression'];
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['db_trigger'] = CTriggerGeneralHelper::convertApiInputForForm($this->trigger);
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

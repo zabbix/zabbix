@@ -144,7 +144,8 @@ $trigger_form
 			'readonly' => $readonly,
 			'db_dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.edit',
-			'context' => $data['context']
+			'context' => $data['context'],
+			'db_trigger' => $data['db_trigger']
 		]).');'))->setOnDocumentReady()
 	);
 

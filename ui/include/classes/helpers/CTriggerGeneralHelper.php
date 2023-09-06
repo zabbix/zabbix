@@ -400,4 +400,40 @@ class CTriggerGeneralHelper {
 
 		order_result($data['db_dependencies'], 'description');
 	}
+
+	/**
+	 * Takes data returned from API and transforms it to data that matches trigger edit form fields.
+	 *
+	 * @param array $db_trigger
+	 * @return array
+	 */
+	public static function convertApiInputForForm(array $db_trigger): array {
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+		$trigger = reset($triggers);
+
+		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ) {
+			unset($trigger['hostid']);
+		}
+		else {
+			$data['hostid'] = $trigger['hosts'][0]['hostid'];
+		}
+
+		$data = [
+			'description' => $trigger['comments'],
+			'name' => $trigger['description'],
+			'correlation-tag' => $trigger['correlation_tag'],
+			'status' => $trigger['status'] == TRIGGER_STATUS_ENABLED ? '1' : '0'
+		];
+
+		unset($trigger['comments'], $trigger['hosts'], $trigger['discoveryRule'], $trigger['flags'], $trigger['state'],
+			$trigger['templateid'], $trigger['triggerDiscovery'], $trigger['dependencies'], $trigger['correlation_tag'],
+			$trigger['items']
+		);
+
+		$data = array_merge($trigger, $data);
+
+		return $data;
+	}
 }

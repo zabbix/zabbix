@@ -23,7 +23,7 @@
 	window.trigger_edit_popup = new class {
 
 		init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies, action,
-				context
+				context, db_trigger
 		}) {
 			this.triggerid = triggerid;
 			this.expression_popup_parameters = expression_popup_parameters;
@@ -32,6 +32,7 @@
 			this.db_dependencies = db_dependencies;
 			this.action = action;
 			this.context = context;
+			this.db_trigger = db_trigger;
 			this.overlay = overlays_stack.getById('trigger-edit');
 			this.dialogue = this.overlay.$dialogue[0];
 			this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -264,6 +265,18 @@
 		}
 
 		#loadDependencyTable(data) {
+			let dependencies = this.#prepareDependencies(data);
+
+			this.#addDependencies(dependencies);
+		}
+
+		#removeDependency(triggerid) {
+			const dependency_element = document.querySelector('#dependency_' + triggerid);
+
+			dependency_element.parentNode.removeChild(dependency_element);
+		}
+
+		#prepareDependencies(data) {
 			const dependencies = [];
 
 			Object.values(data).forEach((dependency) => {
@@ -279,13 +292,8 @@
 			})
 
 			this.#sortDependencies(dependencies);
-			this.#addDependencies(dependencies);
-		}
 
-		#removeDependency(triggerid) {
-			const dependency_element = document.querySelector('#dependency_' + triggerid);
-
-			dependency_element.parentNode.removeChild(dependency_element);
+			return dependencies;
 		}
 
 		#sortDependencies(dependencies) {
@@ -598,7 +606,30 @@
 		}
 
 		#isFormModified() {
-			const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form));
+			let form_fields = getFormFields(this.form);
+
+			// Values are modified to match this.db_trigger values.
+			form_fields.tags = Object.values(form_fields.tags).map(obj => obj);
+			delete form_fields.context;
+			delete form_fields._csrf_token;
+
+			if (this.db_dependencies == []) {
+				// Dependencies are sorted alphabetically as in form to appear in the same order for JSON.stringify().
+				let dependencies = this.#prepareDependencies(this.db_dependencies);
+				this.db_trigger.dependencies = dependencies.map(obj => obj.triggerid);
+			}
+
+			if (form_fields.show_inherited_tags === '1') {
+				delete form_fields.show_inherited_tags;
+				delete form_fields.tags;
+				delete this.db_trigger.tags;
+			}
+			else {
+				delete form_fields.show_inherited_tags;
+			}
+
+			let db_trigger_modified = {...form_fields, ...this.db_trigger};
+			const diff = JSON.stringify(db_trigger_modified) === JSON.stringify(form_fields);
 
 			if (!diff) {
 				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {

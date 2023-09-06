@@ -222,6 +222,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 		$data['expression_full'] = $data['expression'];
 		$data['recovery_expression_full'] = $data['recovery_expression'];
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['db_trigger'] = CTriggerGeneralHelper::convertApiInputForForm($this->trigger_prototype);
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
