@@ -214,12 +214,12 @@ include __DIR__.'/itemtest.js.php';
 		openProxyPopup(proxy_data) {
 			const overlay = PopUp('popup.proxy.edit', proxy_data, {
 				dialogueid: 'proxy_edit',
-				dialogue_class: 'modal-popup-large',
+				dialogue_class: 'modal-popup-static',
 				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit',
-				this.events.elementSuccess.bind(this, this.context), {once: true}
+				this.events.elementSuccess.bind(this, this.context)
 			);
 		},
 
