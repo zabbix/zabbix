@@ -449,7 +449,7 @@
 					.html(makeParameterInput(step_index, type))
 					.toggleClass('js-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>);
 				$('.js-parameters-toggle', $row)
-					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
+					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
 
 				$(this).closest('.preprocessing-list-foot').before($row);
 
@@ -522,7 +522,7 @@
 					.html(makeParameterInput($row.data('step'), type))
 					.toggleClass('js-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>);
 				$('.js-parameters-toggle', $row)
-					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
+					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
 
 				// Disable "Custom on fail" for some of the preprocessing types.
 				switch (type) {
@@ -595,7 +595,7 @@
 			})
 			.on('change', '.js-preproc-param-error-matching', function() {
 				$(this).next('input')
-					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
+					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
 			})
 			.on('click', '.js-group-json-action-delete', function() {
 				const table = this.closest('.group-json-mapping');
@@ -638,7 +638,7 @@
 					for (let option of select.getOptions()) {
 						if (option.value == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
 							$(select).closest('.preprocessing-step').find('.js-parameters-toggle')
-								.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN?>', no_parameters);
+								.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', no_parameters);
 							break;
 						}
 					}
