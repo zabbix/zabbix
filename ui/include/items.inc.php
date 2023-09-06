@@ -2539,9 +2539,9 @@ function getInheritedTimeouts(string $proxyid): array {
 			'proxyids' => $proxyid,
 			'nopermissions' => true
 		]);
-		$db_proxy = $db_proxies[0];
+		$db_proxy = reset($db_proxies);
 
-		if ($db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
+		if ($db_proxy && $db_proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED) {
 			return [
 				'source' => 'proxy',
 				'proxyid' => $proxyid,
