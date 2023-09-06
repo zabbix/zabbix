@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -420,14 +421,27 @@ class testFormUserPermissions extends CWebTest {
 
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid=8')->waitUntilReady();
 		$this->query('link:Host permissions')->one()->click();
-		$permission_table = $this->query('xpath:.//table[@id="new-group-right-table"]')->asTable()->one();
-		$groups = ['Empty group' => 'Deny', 'Discovered hosts' => 'Read', 'Group to check Overview' => 'Read-write'];
-		foreach ($groups as $group => $level) {
-			$permission_table->query('class:multiselect-control')->asMultiselect()->one()->fill($group);
-			$this->query('id:new_group_right_permission')->asSegmentedRadio()->one()->select($level);
-			$permission_table->query('button:Add')->one()->click();
+		$permission_table = $this->query('id:hostgroup-right-table')->asTable()->one();
+
+		$data = [
+			[
+				'Host groups' => 'Empty group',
+				'Permissions' => 'Deny'
+			],
+			[
+				'Host groups' => 'Discovered hosts',
+				'Permissions' => 'Read'
+			],
+			[
+				'Host groups' => 'Group to check Overview',
+				'Permissions' => 'Read-write'
+			]
+		];
+		foreach ($data as $parameters) {
+			$permission_table->asMultifieldTable()->fill($parameters);
 			$this->page->waitUntilReady();
 		}
+
 		$this->query('button:Update')->one()->click();
 
 		$this->page->open('zabbix.php?action=user.edit&userid=2')->waitUntilReady();

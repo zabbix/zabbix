@@ -705,6 +705,10 @@ class testFormGroups extends CWebTest {
 					],
 					[
 						'permission' => PERM_READ_WRITE,
+						'id' => $host_groupids['Europe/Latvia/Riga/Zabbix']
+					],
+					[
+						'permission' => PERM_READ_WRITE,
 						'id' => $host_groupids['Europe/Test']
 					],
 					[
@@ -724,6 +728,10 @@ class testFormGroups extends CWebTest {
 					[
 						'permission' => PERM_READ,
 						'id' => $template_groupids['Europe/Latvia']
+					],
+					[
+						'permission' => PERM_READ_WRITE,
+						'id' => $template_groupids['Europe/Latvia/Riga/Zabbix']
 					],
 					[
 						'permission' => PERM_READ_WRITE,
@@ -773,35 +781,67 @@ class testFormGroups extends CWebTest {
 					'create' => 'Cities',
 					// "groups_before" parameter isn't used in test, but groups are listed here for test clarity.
 					'groups_before' => [
-						'All groups' => 'None',
 						'Cities/Cesis' => 'Read',
 						'Europe' =>	'Deny',
 						'Europe/Latvia' => 'Read',
-						'Europe/Latvia/Riga/Zabbix' => 'None',
+						'Europe/Latvia/Riga/Zabbix' => 'Read-write',
 						'Europe/Test' => 'Read-write',
-						'Europe/Test/Zabbix' => 'None',
+						'Europe/Test/Zabbix' => 'Read',
 						'Streets' => 'Deny'
 					],
 					'tags_before' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'country: test'],
-						['Host group' => 'Streets', 'Tags' => 'street']
+						[
+							'Host groups' => 'Cities/Cesis',
+							'Tags' => 'city: Cesis'
+						],
+						[
+							'Host groups' => 'Europe',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Test',
+							'Tags' => 'country: test'
+						],
+						[
+							'Host groups' => 'Streets',
+							'Tags' => 'street'
+						]
 					],
 					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe' =>	'Deny',
-						'Europe/Latvia' => 'Read',
-						'Europe/Latvia/Riga/Zabbix' => 'None',
-						'Europe/Test (including subgroups)' => 'Read-write',
-						'Streets' => 'Deny'
+						[
+							['Europe/Latvia/Riga/Zabbix', 'Europe/Test', 'Europe/Test/Zabbix'],
+							'Permissions' => 'Read-write'
+						],
+						[
+							['Cities/Cesis', 'Europe/Latvia'],
+							'Permissions' => 'Read'
+						],
+						[
+							['Europe', 'Streets'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_after' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe' , 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'country: test'],
-						['Host group' => 'Europe/Test/Zabbix', 'Tags' => 'country: test'],
-						['Host group' => 'Streets', 'Tags' => 'street']
+						[
+							'Host groups' => 'Cities/Cesis',
+							'Tags' => 'city: Cesis'
+						],
+						[
+							'Host groups' => 'Europe',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Test',
+							'Tags' => 'country: test'
+						],
+						[
+							'Host groups' => 'Europe/Test/Zabbix',
+							'Tags' => 'country: test'
+						],
+						[
+							'Host groups' => 'Streets',
+							'Tags' => 'street'
+						]
 					]
 				]
 			],
@@ -818,26 +858,43 @@ class testFormGroups extends CWebTest {
 						'Streets' => 'Deny'
 					],
 					'tags_before' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'country: test'],
-						// For host group scenario, there will be additional tag 'country: test' for 'Europe/Test/Zabbix'
-						['Host group' => 'Streets', 'Tags' => 'street']
+						[
+							'Host groups' => 'Cities/Cesis',
+							'Tags' => 'city: Cesis'
+						],
+						[
+							'Host groups' => 'Europe',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Test',
+							'Tags' => 'country: test'
+						],
+						[
+							'Host groups' => 'Streets',
+							'Tags' => 'street'
+						]
 					],
 					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe (including subgroups)' => 'Deny',
-						'Streets (including subgroups)' => 'Deny'
+						[
+							'Cities/Cesis',
+							'Permissions' => 'Read'
+						],
+						[
+							['Europe', 'Europe/Latvia', 'Europe/Latvia/Riga/Zabbix',
+								'Europe/Test', 'Europe/Test/Zabbix', 'Streets', 'Streets/Dzelzavas'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_after' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia/Riga/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Streets', 'Tags' => 'street'],
-						['Host group' => 'Streets/Dzelzavas', 'Tags' => 'street']
+						['Host groups' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
+						['Host groups' => 'Europe', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Latvia', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Latvia/Riga/Zabbix', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Test', 'Tags' => 'world'],
+						['Host groups' => 'Europe/Test/Zabbix', 'Tags' => 'world'],
+						['Host groups' => 'Streets', 'Tags' => 'street'],
+						['Host groups' => 'Streets/Dzelzavas', 'Tags' => 'street']
 					]
 				]
 			]
@@ -850,20 +907,9 @@ class testFormGroups extends CWebTest {
 	 * @param array $data  data provider
 	 */
 	public function checkSubgroupsPermissions($data) {
-		// Prepare groups array according framework function assertTableData().
-		$selector = 'xpath:.//input[@checked]/following-sibling::label';
-		$groups = [];
-		foreach ($data['groups_after'] as $group => $permissions) {
-			$groups[] = [
-				ucfirst($this->object).' group' => $group,
-				'Permissions' => [
-					'text' => $permissions,
-					'selector' => $selector
-				]
-			];
+		foreach ($data['groups_after'] as $group => $value) {
+			[ucfirst($this->object).' groups' => $group];
 		}
-		$data['groups_after'] = $groups;
-		array_unshift($data['groups_after'], [ucfirst($this->object).' group' => 'All groups', 'Permissions' => 'None']);
 
 		// Create new parent or subgroup to check nested permissions.
 		if (array_key_exists('create', $data)) {
@@ -898,9 +944,7 @@ class testFormGroups extends CWebTest {
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid='.self::$user_groupid)->waitUntilReady();
 		$group_form = $this->query('id:user-group-form')->asForm()->one();
 		$group_form->selectTab(ucfirst($this->object).' permissions');
-		$this->assertTableData($data['groups_after'],
-				'id:'.(($this->object === 'template') ? 'template' : '').'group-right-table'
-		);
+		$group_form->getField('Permissions')->asMultifieldTable()->checkValue($data['groups_after']);
 		$group_form->selectTab('Problem tag filter');
 		$this->assertTableData(($this->object === 'template') ? $data['tags_before'] : $data['tags_after'],
 				'id:tag-filter-table'

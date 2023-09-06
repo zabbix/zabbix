@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
@@ -59,21 +60,22 @@ class testTagBasedPermissions extends CLegacyWebTest {
 					}
 
 					foreach ($values as $i => $value) {
-						$i += 1;
-						$this->zbxTestClickButtonMultiselect('new_tag_filter_groupids_');
-						$this->zbxTestLaunchOverlayDialog('Host groups');
-						$this->zbxTestClickLinkTextWait($hostgroup);
+						$tags_table = $this->query('id:tag-filter-table');
+						$tags_table->query('button', 'Add')->one()->click();
+						$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+						$form = $dialog->asForm();
+						$dialog->query('button', 'Select')->one()->click();
+						$this->query('link', $hostgroup)->waitUntilVisible()->one()->click();
 
-						if ($tag !== '') {
-							$this->zbxTestInputType('new_tag_filter_tag', $tag);
-						}
-						if ($value !== '') {
-							$this->zbxTestInputType('new_tag_filter_value', $value);
+						if ($tag !== '' || $value !== '') {
+							$form->fill(['Filter' => 'Tag list', 'id:new_tag_filter_0_tag' => $tag,
+									'id:new_tag_filter_0_value' => $value]
+							);
 						}
 
-						$this->zbxTestClickXpath("//div[@id='tag_filter_tab']//button[text()='Add']");
-						$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath)	);
+						$form->submit();
+						$xpath = '//table[@id="tag-filter-table"]//tbody//tr[1]//td/button[text()="Remove"]';
+						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
 					}
 				}
 			}
