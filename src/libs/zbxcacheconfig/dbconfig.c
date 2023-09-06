@@ -6762,8 +6762,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		ZBX_STR2UCHAR(proxy->tls_connect, row[3]);
 		ZBX_STR2UCHAR(proxy->tls_accept, row[4]);
 
-		if ((PROXY_MODE_PASSIVE == mode && 0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_connect)) ||
-				(PROXY_MODE_ACTIVE == mode && 0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_accept)))
+		if ((PROXY_OPERATING_MODE_PASSIVE == mode && 0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_connect)) ||
+				(PROXY_OPERATING_MODE_ACTIVE == mode && 0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_accept)))
 		{
 			if (NULL != config_vault->token || NULL != config_vault->name)
 			{
@@ -6806,7 +6806,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		dc_strpool_replace(found, &proxy->address, row[10]);
 		dc_strpool_replace(found, &proxy->port, row[11]);
 
-		if (PROXY_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
+		if (PROXY_OPERATING_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
 		{
 			proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(proxyid, proxyconfig_frequency,
 					now);
@@ -6817,7 +6817,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 			DCupdate_proxy_queue(proxy);
 		}
-		else if (PROXY_MODE_ACTIVE == mode && ZBX_LOC_QUEUE == proxy->location)
+		else if (PROXY_OPERATING_MODE_ACTIVE == mode && ZBX_LOC_QUEUE == proxy->location)
 		{
 			zbx_binary_heap_remove_direct(&config->pqueue, proxy->proxyid);
 			proxy->location = ZBX_LOC_NOWHERE;
@@ -11879,7 +11879,7 @@ static void	DCget_proxy(zbx_dc_proxy_t *dst_proxy, const ZBX_DC_PROXY *src_proxy
 	}
 #endif
 
-	if (PROXY_MODE_PASSIVE == src_proxy->mode)
+	if (PROXY_OPERATING_MODE_PASSIVE == src_proxy->mode)
 	{
 		zbx_strscpy(dst_proxy->addr_orig, src_proxy->address);
 		zbx_strscpy(dst_proxy->port_orig, src_proxy->port);
@@ -12013,7 +12013,7 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t proxyid, unsigned char update_nextcheck, 
 		else if (CONFIG_ERROR == proxy_conn_err)
 			dc_proxy->last_cfg_error_time = now;
 
-		if (PROXY_MODE_PASSIVE == dc_proxy->mode)
+		if (PROXY_OPERATING_MODE_PASSIVE == dc_proxy->mode)
 		{
 			if (0 != (update_nextcheck & ZBX_PROXY_CONFIG_NEXTCHECK))
 			{
@@ -13682,7 +13682,7 @@ int	zbx_dc_get_active_proxy_by_name(const char *name, zbx_dc_proxy_t *proxy, cha
 		goto out;
 	}
 
-	if (PROXY_MODE_ACTIVE != dc_proxy->mode)
+	if (PROXY_OPERATING_MODE_ACTIVE != dc_proxy->mode)
 	{
 		*error = zbx_dsprintf(*error, "proxy \"%s\" is configured for passive mode", name);
 		goto out;
@@ -14749,7 +14749,7 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 
 		zbx_json_addstring(&json, "name", proxy->name, ZBX_JSON_TYPE_STRING);
 
-		if (PROXY_MODE_PASSIVE == proxy->mode)
+		if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
 			zbx_json_addstring(&json, "passive", "true", ZBX_JSON_TYPE_INT);
 		else
 			zbx_json_addstring(&json, "passive", "false", ZBX_JSON_TYPE_INT);
@@ -14764,7 +14764,7 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 		{
 			unsigned int	encryption;
 
-			if (PROXY_MODE_PASSIVE == proxy->mode)
+			if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
 				encryption = dc_proxy->tls_connect;
 			else
 				encryption = dc_proxy->tls_accept;

@@ -79,8 +79,6 @@ package zbxlib
 #cgo openssl LDFLAGS: -lssl -lcrypto
 #cgo LDFLAGS: -Wl,--end-group
 
-int CONFIG_MAX_LINES_PER_SECOND = 20;
-
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	*progname = NULL;
