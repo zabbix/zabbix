@@ -152,7 +152,7 @@ class testHistoryPush extends CIntegrationTest {
 				'key_' => 'http_agent_text',
 				'type' => ITEM_TYPE_HTTPAGENT,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'url' => 'http://127.0.0.1/test',
+				'url' => 'http://127.0.0.1:7123/httptest',
 				'delay' => '10s',
 				'allow_traps' => 1
 			],
@@ -160,7 +160,7 @@ class testHistoryPush extends CIntegrationTest {
 				'key_' => 'http_agent_text_no_trap',
 				'type' => ITEM_TYPE_HTTPAGENT,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'url' => 'http://127.0.0.1/test',
+				'url' => 'http://127.0.0.1:7123/httptest',
 				'delay' => '10s',
 				'allow_traps' => 0
 			]
