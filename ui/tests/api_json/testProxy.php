@@ -2304,7 +2304,7 @@ class testProxy extends CAPITest {
 			],
 			'Test proxy.create: with "custom_timeouts" enabled (user macros)' => [
 				'proxy' => [
-					'name' => 'API create proxy with custom timeouts enabled 2',
+					'name' => 'API create proxy with custom timeouts enabled',
 					'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 					'custom_timeouts' => ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED,
 					'timeout_zabbix_agent' => '{$TIMEOUT.ZABBIX.AGENT}',
