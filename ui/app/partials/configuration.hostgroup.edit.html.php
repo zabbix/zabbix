@@ -44,7 +44,7 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			$count++;
 
 			if ($data['allowed_ui_conf_hosts'] && $data['is_discovery_rule_editable']
-				&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
+					&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
 				$discovery_rules[] = (new CLink($ldd_rule['name'],
 					(new CUrl('host_prototypes.php'))
 						->setArgument('form', 'update')
@@ -58,11 +58,12 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 			}
 
 			if ($ldd_rule_count > 5 && $count === 5) {
-				$discovery_rules[] = (new CSpan(',...'));
+				$discovery_rules[] = (new CSpan(', ...'));
 
 				break;
 			}
-			elseif ($count < $ldd_rule_count) {
+
+			if ($count < $ldd_rule_count) {
 				$discovery_rules[] = (new CSpan(', '));
 			}
 		}

@@ -117,7 +117,7 @@ class CControllerHostGroupList extends CController {
 		]);
 		CArrayHelper::sort($data['groups'], [['field' => $sort_field, 'order' => $sort_order]]);
 
-		$host_prototype_ids = [];
+		$host_prototypeids = [];
 
 		foreach ($data['groups'] as &$group) {
 			if ($group['discoveryRules']) {
@@ -128,7 +128,7 @@ class CControllerHostGroupList extends CController {
 				]);
 
 				foreach ($group['hostPrototypes'] as $host_prototype) {
-					$host_prototype_ids[$host_prototype['hostid']] = true;
+					$host_prototypeids[$host_prototype['hostid']] = true;
 				}
 			}
 
@@ -137,14 +137,14 @@ class CControllerHostGroupList extends CController {
 		}
 		unset($group);
 
-		$host_prototypes = $host_prototype_ids !== null
+		$host_prototypes = $host_prototypeids
 			? API::HostPrototype()->get([
 				'output' => ['hostid'],
 				'selectDiscoveryRule' => ['itemid'],
-				'hostids' => array_keys($host_prototype_ids),
+				'hostids' => array_keys($host_prototypeids),
 				'editable' => true
 			])
-			: null;
+			: [];
 
 		$data['ldd_rule_to_host_prototype'] = [];
 

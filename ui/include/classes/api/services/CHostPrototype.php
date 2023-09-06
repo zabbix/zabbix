@@ -2541,13 +2541,13 @@ class CHostPrototype extends CHostBase {
 			' FROM group_discovery'.
 			' WHERE '.dbConditionId('groupid', array_keys($db_groups)).
 			' GROUP BY groupid'.
-			' HAVING count(groupid) > 1'
+			' HAVING count(groupid)>1'
 		), 'groupid');
 
-		foreach (array_keys($multi_lld_rule_groups) as $group_id) {
-			$multi_lld_rule_groups[$group_id] = $db_groups[$group_id];
+		foreach (array_keys($multi_lld_rule_groups) as $groupid) {
+			$multi_lld_rule_groups[$groupid] = $db_groups[$groupid];
 
-			unset($db_groups[$group_id]);
+			unset($db_groups[$groupid]);
 		}
 
 		if ($db_groups) {

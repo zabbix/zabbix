@@ -78,24 +78,25 @@ class CControllerHostGroupEdit extends CController{
 			$data = array_merge($data, $groups[0]);
 			CArrayHelper::sort($data['discoveryRules'], ['name']);
 
-			$discovery_rule_ids = $data['discoveryRules']
+			$discovery_ruleids = $data['discoveryRules']
 				? array_column($data['discoveryRules'], 'itemid')
 				: [];
 
-			$data['is_discovery_rule_editable'] = $discovery_rule_ids
+			$data['is_discovery_rule_editable'] = $discovery_ruleids
 				&& API::DiscoveryRule()->get([
 					'output' => [],
-					'itemids' => $discovery_rule_ids,
+					'itemids' => $discovery_ruleids,
 					'editable' => true
 				]);
 
-			$host_prototypes_itemids = $discovery_rule_ids
+			$host_prototypes_itemids = $discovery_ruleids
 				? API::HostPrototype()->get([
 					'output' => ['hostid'],
 					'selectDiscoveryRule' => ['itemid'],
 					'hostids' => array_column($data['hostPrototypes'], 'hostid'),
 					'editable' => true
-				]) : [];
+				])
+				: [];
 
 			$data['ldd_rule_to_host_prototype'] = [];
 

@@ -1533,7 +1533,7 @@ class CHostGroup extends CApiService {
 		}
 
 		// adding discovery rule
-		if ($options['selectDiscoveryRules'] !== null && $options['selectDiscoveryRules'] != API_OUTPUT_COUNT) {
+		if ($options['selectDiscoveryRules'] !== null) {
 			// discovered items
 			$discoveryRules = DBFetchArray(DBselect(
 				'SELECT gd.groupid,hd.parent_itemid'.
