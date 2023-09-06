@@ -663,7 +663,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 	{
 		"dpkg",
 		"dpkg --version 2> /dev/null",
-		"dpkg --get-selections",
+		"/opt/out.sh",
 		"LC_ALL=C dpkg-query -W -f='${Status},${Package},${Version},${Architecture},${Installed-Size}\n'",
 		dpkg_list,
 		dpkg_details
@@ -746,11 +746,11 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
