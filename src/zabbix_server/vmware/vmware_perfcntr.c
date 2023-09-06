@@ -18,6 +18,9 @@
 **/
 
 #include "vmware_perfcntr.h"
+
+#include "zbxcommon.h"
+
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "vmware_shmem.h"
