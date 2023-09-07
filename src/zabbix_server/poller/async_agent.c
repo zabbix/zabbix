@@ -285,7 +285,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 		agent_context->server_name = NULL;
 #endif
 	zbx_socket_clean(&agent_context->s);
-	zbx_tcp_send_context_init(agent_context->item.key, strlen(agent_context->item.key), timeout_sec + 1, ZBX_TCP_PROTOCOL,
+	zbx_tcp_send_context_init(agent_context->item.key, strlen(agent_context->item.key), timeout_sec, ZBX_TCP_PROTOCOL,
 		&agent_context->tcp_send_context);
 	agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
 
