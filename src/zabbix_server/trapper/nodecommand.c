@@ -500,7 +500,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		zbx_free(expanded_cmd);
 	}
-	else if (NULL == manualinput) /* script does not take additional input yet we've received a value anyway */
+	else if (NULL != manualinput) /* script does not take additional input yet we've received a value anyway */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "script (name:%s) "
 				"does not accept additional manual input, but request contains it anyway",
