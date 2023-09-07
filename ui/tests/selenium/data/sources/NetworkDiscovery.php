@@ -342,10 +342,10 @@ class NetworkDiscovery {
 
 		$discovery_ruleids = CDataHelper::getIds('name');
 		$check_id_delete = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
-			.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
+				.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
 		);
 		$check_id_cancel = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
-			.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
+				.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
 		);
 
 		CDataHelper::call('action.create', [
@@ -381,7 +381,6 @@ class NetworkDiscovery {
 					'conditions' => [
 						[
 							'conditiontype' => CONDITION_TYPE_DCHECK,
-							'operator' => 0,
 							'operator' => 0,
 							'value' => $check_id_delete
 						],

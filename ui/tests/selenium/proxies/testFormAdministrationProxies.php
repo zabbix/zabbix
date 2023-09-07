@@ -57,14 +57,14 @@ class testFormAdministrationProxies extends CWebTest {
 		CDataHelper::call('proxy.create', [
 			[
 				'name' => self::$update_proxy,
-				'mode' => PROXY_MODE_ACTIVE,
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Description for update',
 				'tls_connect' => 1,
 				'tls_accept'=> 1
 			],
 			[
 				'name' => self::CHANGE_ACTIVE_PROXY,
-				'mode' => PROXY_MODE_ACTIVE,
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Active description for refresh',
 				'tls_connect' => 1,
 				'tls_accept'=> 7,
@@ -76,7 +76,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				'name' => self::CHANGE_PASSIVE_PROXY,
-				'mode' => PROXY_MODE_PASSIVE,
+				'operating_mode' => PROXY_MODE_PASSIVE,
 				'address' => '127.9.9.9',
 				'port' => 10051,
 				'description' => '_Passive description for refresh',
@@ -93,7 +93,7 @@ class testFormAdministrationProxies extends CWebTest {
 			// Data for Active proxy mode and Connections to proxy - No encryption.
 			[
 				[
-					'mode' => 'Active',
+					'operating_mode' => 'Active',
 					'check_layout' => true,
 					'check_alert' => true,
 					'Connections to proxy' => 'No encryption',
@@ -181,7 +181,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Active',
+					'operating_mode' => 'Active',
 					'Connections to proxy' => 'PSK',
 					'settings' => [
 						[
@@ -267,7 +267,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Active',
+					'operating_mode' => 'Active',
 					'Connections to proxy' => 'Certificate',
 					'settings' => [
 						[
@@ -354,7 +354,7 @@ class testFormAdministrationProxies extends CWebTest {
 			// Data for Passive proxy mode.
 			[
 				[
-					'mode' => 'Passive',
+					'operating_mode' => 'Passive',
 					'check_layout' => true,
 					'Connections from proxy' => [
 						'id:tls_accept_none' => true,
@@ -394,7 +394,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Passive',
+					'operating_mode' => 'Passive',
 					'Connections from proxy' => [
 						'id:tls_accept_none' => false,
 						'id:tls_accept_psk' => true,
@@ -433,7 +433,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				[
-					'mode' => 'Passive',
+					'operating_mode' => 'Passive',
 					'Connections from proxy' => [
 						'id:tls_accept_none' => false,
 						'id:tls_accept_psk' => false,
@@ -485,7 +485,7 @@ class testFormAdministrationProxies extends CWebTest {
 
 		// Following checks should be performed only in first case, because form is the same in all cases.
 		if (CTestArrayHelper::get($data, 'check_layout')) {
-			if ($data['mode'] === 'Active') {
+			if ($data['operating_mode'] === 'Active') {
 				// Check fields lengths.
 				$field_maxlengths = [
 					'Proxy name' => 128,
@@ -539,7 +539,7 @@ class testFormAdministrationProxies extends CWebTest {
 			]);
 		}
 		else {
-			if ($data['mode'] === 'Passive') {
+			if ($data['operating_mode'] === 'Passive') {
 				$form->fill(['Proxy mode' => 'Passive']);
 			}
 
@@ -547,16 +547,16 @@ class testFormAdministrationProxies extends CWebTest {
 		}
 
 		// Condition for checking connection encryption fields.
-		$condition = ($data['mode'] === 'Active')
+		$condition = ($data['operating_mode'] === 'Active')
 			? ($data['Connections to proxy'] !== 'No encryption')
 			: ($data['Connections from proxy'] !== [
-					'id:tls_accept_none' => true,
-					'id:tls_accept_psk' => false,
-					'id:tls_accept_certificate' => false
-				]);
+				'id:tls_accept_none' => true,
+				'id:tls_accept_psk' => false,
+				'id:tls_accept_certificate' => false
+			]);
 
-		$checked_proxy = ($data['mode'] === 'Active') ? 'Active' : 'Passive';
-		$opposite_proxy = ($data['mode'] === 'Active') ? 'Passive' : 'Active';
+		$checked_proxy = ($data['operating_mode'] === 'Active') ? 'Active' : 'Passive';
+		$opposite_proxy = ($data['operating_mode'] === 'Active') ? 'Passive' : 'Active';
 
 		$this->switchAndAssertEncryption($data, $form, $condition, $checked_proxy, $opposite_proxy);
 
@@ -1401,4 +1401,3 @@ class testFormAdministrationProxies extends CWebTest {
 		$this->page->assertTitle('Configuration of proxies');
 	}
 }
-
