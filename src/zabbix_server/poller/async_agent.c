@@ -217,7 +217,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 		const char *config_source_ip)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
-	int			ret = NOTSUPPORTED, timeout_sec = 0;
+	int			ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'  conn:'%s'", __func__, item->key,
 			item->host.host, item->interface.addr, zbx_tcp_connection_type_name(item->host.tls_connect));
