@@ -743,7 +743,7 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Time',
 							'type' => 'complex_field',
-							// TODO: remove flag when issue in framework is solved (complex field + radio button).
+							// TODO: remove flag here and in other complex fields when DEV-2652 is fixed.
 							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-time"]',
 							'contents' => [
 								[
