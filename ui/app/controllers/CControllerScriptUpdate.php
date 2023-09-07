@@ -52,11 +52,37 @@ class CControllerScriptUpdate extends CController {
 			'groupid' =>				'db scripts.groupid',
 			'usrgrpid' =>				'db scripts.usrgrpid',
 			'hgstype' =>				'in 0,1',
-			'confirmation' =>			'db scripts.confirmation|not_empty',
-			'enable_confirmation' =>	'in 1'
+			'enable_user_input' =>		'db scripts.manualinput|in '.SCRIPT_MANUALINPUT_ENABLED,
+			'input_prompt' =>			'db scripts.manualinput_prompt',
+			'show_dropdown' =>			'db scripts.manualinput_validator_type|in '.SCRIPT_MANUALINPUT_ENABLED,
+			'default_user_input' =>		'db scripts.manualinput_default_value|string',
+			'validate_user_input' =>	'db scripts.manualinput_validator',
+			'enable_confirmation' =>	'in 1',
+			'confirmation' =>			'db scripts.confirmation|not_empty'
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret) {
+			if ($this->getInput('scope') != ZBX_SCRIPT_SCOPE_ACTION && $this->hasInput('enable_user_input')) {
+				if ($this->getInput('input_prompt', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.', _('input_prompt'), _('cannot be empty')));
+
+					$ret = false;
+				}
+
+				if ($this->hasInput('show_dropdown') && $this->getInput('default_user_input', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.', _('default_user_input'), _('cannot be empty')));
+
+					$ret = false;
+				}
+				else if (!$this->hasInput('show_dropdown') && $this->getInput('validate_user_input', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.', _('validate_user_input'), _('cannot be empty')));
+
+					$ret = false;
+				}
+			}
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -78,8 +104,11 @@ class CControllerScriptUpdate extends CController {
 
 	protected function doAction(): void {
 		$script = [];
+		$result = false;
+		$output = [];
 
 		$this->getInputs($script, ['scriptid', 'name', 'description', 'groupid']);
+
 		$script['scope'] = $this->getInput('scope', ZBX_SCRIPT_SCOPE_ACTION);
 		$script['type'] = $this->getInput('type', ZBX_SCRIPT_TYPE_WEBHOOK);
 
@@ -88,6 +117,56 @@ class CControllerScriptUpdate extends CController {
 			$script['host_access'] = $this->getInput('host_access', PERM_READ);
 			$script['confirmation'] = $this->getInput('confirmation', '');
 			$script['usrgrpid'] = $this->getInput('usrgrpid', 0);
+
+			$script['manualinput'] = $this->hasInput('enable_user_input')
+				? SCRIPT_MANUALINPUT_ENABLED
+				: SCRIPT_MANUALINPUT_DISABLED;
+
+			if ($script['manualinput']) {
+				$default_user_input = trim($this->getInput('default_user_input', ''));
+				$script['manualinput_default_value'] = trim($default_user_input);
+
+				if ($this->hasInput('show_dropdown')) {
+					// Check if values are unique.
+					$user_input_values = array_map('trim', explode(",", $default_user_input));
+
+					if (array_unique($user_input_values) !== $user_input_values) {
+						error(_('Default user input values should be unique.'));
+					}
+				}
+				else {
+					$user_input_value = $default_user_input;
+					$validate_user_input = trim($this->getInput('validate_user_input'));
+
+					if (!preg_match('/'.str_replace('/', '\/', $validate_user_input).'/', $user_input_value)) {
+						error(
+							_s('Incorrect value for field "%1$s": %2$s.', 'default_user_input',
+								_s('input does not match the provided pattern: %1$s', $validate_user_input)
+							)
+						);
+					}
+
+					$script['manualinput_validator'] = $validate_user_input;
+				}
+
+				$script['manualinput_prompt'] = $this->getInput('input_prompt');
+				$script['manualinput_validator_type'] = $this->hasInput('show_dropdown')
+					? SCRIPT_MANUALINPUT_TYPE_LIST
+					: SCRIPT_MANUALINPUT_TYPE_REGEX;
+			}
+			else {
+				$script['manualinput_default_value'] = DB::getDefault('scripts', 'manualinput_default_value');
+				$script['manualinput_validator'] = DB::getDefault('scripts', 'manualinput_validator');
+			}
+		}
+
+		// Reset the manualinput values to default, if scope changed to Action operation.
+		if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
+			$script['manualinput'] = DB::getDefault('scripts', 'manualinput');
+			$script['manualinput_prompt'] = DB::getDefault('scripts', 'manualinput_prompt');
+			$script['manualinput_validator_type'] = DB::getDefault('scripts', 'manualinput_validator_type');
+			$script['manualinput_default_value'] = DB::getDefault('scripts', 'manualinput_default_value');
+			$script['manualinput_validator'] = DB::getDefault('scripts', 'manualinput_validator');
 		}
 
 		switch ($script['type']) {
@@ -151,8 +230,9 @@ class CControllerScriptUpdate extends CController {
 			$script['groupid'] = 0;
 		}
 
-		$result = (bool) API::Script()->update($script);
-		$output = [];
+		if (count(filter_messages()) == 0) {
+			$result = (bool) API::Script()->update($script);
+		}
 
 		if ($result) {
 			$output['success']['title'] = _('Script updated');

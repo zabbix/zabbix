@@ -91,7 +91,9 @@ class CControllerScriptEdit extends CController {
 			'confirmation' => '',
 			'enable_confirmation' => false,
 			'hgstype' => 0,
-			'actions' => []
+			'actions' => [],
+			'enable_user_input' => false,
+			'show_dropdown' => false
 		];
 
 		// Get values from the database.
@@ -99,7 +101,9 @@ class CControllerScriptEdit extends CController {
 			$scripts = API::Script()->get([
 				'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 					'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username',
-					'password', 'publickey', 'privatekey', 'menu_path', 'parameters', 'url', 'new_window'
+					'password', 'publickey', 'privatekey', 'menu_path', 'parameters', 'url', 'new_window',
+					'manualinput', 'manualinput_prompt', 'manualinput_validator', 'manualinput_validator_type',
+					'manualinput_default_value'
 				],
 				'scriptids' => $this->getInput('scriptid'),
 				'selectActions' => []
@@ -140,6 +144,11 @@ class CControllerScriptEdit extends CController {
 				$data['menu_path'] = $script['menu_path'];
 				$data['parameters'] = $script['parameters'];
 				$data['actions'] = $script['actions'];
+				$data['enable_user_input'] = $script['manualinput'];
+				$data['input_prompt'] = $script['manualinput_prompt'];
+				$data['input_validator'] = $script['manualinput_validator'];
+				$data['show_dropdown'] = $script['manualinput_validator_type'];
+				$data['input_default_value'] = $script['manualinput_default_value'];
 
 				if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 					CArrayHelper::sort($data['parameters'], ['name']);

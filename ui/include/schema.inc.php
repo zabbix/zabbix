@@ -1744,6 +1744,34 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1'
+			],
+			'manualinput' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'default' => '0'
+			],
+			'manualinput_prompt' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'manualinput_validator_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'default' => '0'
+			],
+			'manualinput_validator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'manualinput_default_value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			]
 		]
 	],

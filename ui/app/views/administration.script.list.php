@@ -26,6 +26,7 @@
 
 $this->includeJsFile('administration.script.list.js.php');
 $this->addJsFile('multilineinput.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
 
 if ($data['uncheck']) {
 	uncheckTableRows('script');

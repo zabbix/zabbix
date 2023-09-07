@@ -64,7 +64,8 @@ class CScript extends CApiService {
 	public function get(array $options) {
 		$script_fields = ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 			'confirmation', 'type', 'execute_on', 'timeout', 'parameters', 'scope', 'port', 'authtype', 'username',
-			'password', 'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
+			'password', 'publickey', 'privatekey', 'menu_path', 'url', 'new_window', 'manualinput',
+			'manualinput_prompt', 'manualinput_validator', 'manualinput_validator_type', 'manualinput_default_value'
 		];
 		$group_fields = ['groupid', 'name', 'flags', 'uuid'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxyid', 'inventory_mode', 'flags',
@@ -265,9 +266,13 @@ class CScript extends CApiService {
 		 */
 		foreach ($scripts as $index => $script) {
 			$type_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
-			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
+			$scope_rules = $this->getScopeValidationRules(
+				$script['scope'],
+				$script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED ? $script['manualinput_validator_type'] : null,
+				$scope_fields
+			);
 
-			// Temporary remove scope fields from script to validate type fields.
+			// Temporary remove scope and manualinput fields from script to validate type fields.
 			$tmp = $script;
 			$tmp_fields = array_intersect_key($scope_rules['fields'], $script);
 
@@ -283,7 +288,6 @@ class CScript extends CApiService {
 
 			// Validate all fields together.
 			$scope_rules['fields'] += $type_rules['fields'] + $common_fields + $scope_fields;
-
 			if (!CApiInputValidator::validate($scope_rules, $script, '/'.($index + 1), $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
@@ -477,7 +481,11 @@ class CScript extends CApiService {
 			}
 
 			$type_rules = $this->getTypeValidationRules($script['type'], $method, $type_fields);
-			$scope_rules = $this->getScopeValidationRules($script['scope'], $scope_fields);
+			$scope_rules = $this->getScopeValidationRules(
+				$script['scope'],
+				$script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED ? $script['manualinput_validator_type'] : null,
+				$scope_fields
+			);
 
 			// Temporary remove scope fields from script to validate type fields.
 			$tmp = $script;
@@ -644,25 +652,30 @@ class CScript extends CApiService {
 		 * script types. Set only type for now. Unique parameter names, lengths and other flags are set later.
 		 */
 		$api_input_rules['fields'] += $common_fields + [
-			'command' =>		['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
-			'execute_on' =>		['type' => API_INT32],
-			'menu_path' =>		['type' => API_STRING_UTF8],
-			'usrgrpid' =>		['type' => API_ID],
-			'host_access' =>	['type' => API_INT32],
-			'confirmation' =>	['type' => API_STRING_UTF8],
-			'port' =>			['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
-			'authtype' =>		['type' => API_INT32],
-			'username' =>		['type' => API_STRING_UTF8],
-			'publickey' =>		['type' => API_STRING_UTF8],
-			'privatekey' =>		['type' => API_STRING_UTF8],
-			'password' =>		['type' => API_STRING_UTF8],
-			'timeout' =>		['type' => API_TIME_UNIT],
-			'parameters' =>			['type' => API_OBJECTS, 'fields' => [
-				'name' =>				['type' => API_STRING_UTF8],
-				'value' =>				['type' => API_STRING_UTF8]
+			'command' =>					['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'command')],
+			'execute_on' =>					['type' => API_INT32],
+			'menu_path' =>					['type' => API_STRING_UTF8],
+			'usrgrpid' =>					['type' => API_ID],
+			'host_access' =>				['type' => API_INT32],
+			'confirmation' =>				['type' => API_STRING_UTF8],
+			'port' =>						['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO],
+			'authtype' =>					['type' => API_INT32],
+			'username' =>					['type' => API_STRING_UTF8],
+			'publickey' =>					['type' => API_STRING_UTF8],
+			'privatekey' =>					['type' => API_STRING_UTF8],
+			'password' =>					['type' => API_STRING_UTF8],
+			'timeout' =>					['type' => API_TIME_UNIT],
+			'parameters' =>					['type' => API_OBJECTS, 'fields' => [
+				'name' =>							['type' => API_STRING_UTF8],
+				'value' =>							['type' => API_STRING_UTF8]
 			]],
-			'url' =>			['type' => API_URL],
-			'new_window' =>		['type' => API_INT32]
+			'url' =>						['type' => API_URL],
+			'new_window' =>					['type' => API_INT32],
+			'manualinput' =>				['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_ENABLED, SCRIPT_MANUALINPUT_DISABLED])],
+			'manualinput_prompt' =>			['type' => API_STRING_UTF8],
+			'manualinput_validator_type' =>	['type' => API_INT32],
+			'manualinput_validator' =>		['type' => API_STRING_UTF8],
+			'manualinput_default_value' =>	['type' => API_STRING_UTF8]
 		];
 
 		return $api_input_rules;
@@ -671,25 +684,55 @@ class CScript extends CApiService {
 	/**
 	 * Get validation rules for script scope.
 	 *
-	 * @param int    $scope  [IN]          Script scope.
-	 * @param array  $common_fields [OUT]  Returns common fields for specific script scope.
+	 * @param int           $scope  [IN]            Script scope.
+	 * @param null|integer  $manualinput_type [IN]  Script manual input type or null if manualinput is disabled.
+	 * @param array         $common_fields [OUT]    Returns common fields for specific script scope.
 	 *
 	 * @return array
 	 */
-	protected function getScopeValidationRules(int $scope, &$common_fields = []): array {
+	protected function getScopeValidationRules(int $scope, $manualinput_type, &$common_fields = []): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 		$common_fields = [];
 
 		if ($scope == ZBX_SCRIPT_SCOPE_HOST || $scope == ZBX_SCRIPT_SCOPE_EVENT) {
-			$common_fields = [
+			$common_fields += [
 				'menu_path' =>		['type' => API_SCRIPT_MENU_PATH, 'length' => DB::getFieldLength('scripts', 'menu_path')],
 				'usrgrpid' =>		['type' => API_ID],
 				'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
-				'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')]
+				'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
+				'manualinput' =>	['type' =>  API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_DISABLED, SCRIPT_MANUALINPUT_ENABLED])],
 			];
 
-			$api_input_rules['fields'] += $common_fields;
+			if ($manualinput_type !== null) {
+				$common_fields += [
+					'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
+					'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_REGEX])]
+				];
+			}
+
+			if ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_LIST) {
+				$common_fields += [
+					'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
+				];
+			}
+			elseif ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_REGEX) {
+				$common_fields += [
+					'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
+					'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
+				];
+			}
 		}
+		else {
+			$common_fields += [
+				'manualinput' =>				['type' =>  API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_DISABLED],
+				'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
+				'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_TYPE_REGEX],
+				'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
+				'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
+			];
+		}
+
+		$api_input_rules['fields'] += $common_fields;
 
 		return $api_input_rules;
 	}

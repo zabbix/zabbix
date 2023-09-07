@@ -418,6 +418,15 @@ function PopUp(action, parameters, {
 						});
 						break;
 
+					case 'script.userinput.edit':
+						buttons.unshift({
+							'title': t('Cancel'),
+							'class': 'btn-alt js-cancel',
+							'cancel': true,
+							'action': (typeof resp.cancel_action !== 'undefined') ? resp.cancel_action : function() {}
+						});
+						break;
+
 					default:
 						buttons.push({
 							'title': t('Cancel'),

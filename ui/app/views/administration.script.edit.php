@@ -320,27 +320,79 @@ $form_grid
 				->setId('host-access')
 		))->setId('host-access-field')
 	])
-	->addItem([
-		(new CLabel(_('Enable confirmation'), 'enable-confirmation'))->setId('enable-confirmation-label'),
-		(new CFormField(
-			(new CCheckBox('enable_confirmation'))
-				->setChecked($data['enable_confirmation'])
-				->setId('enable-confirmation')
-		))->setId('enable-confirmation-field')
-	])
-	->addItem([
-		(new CLabel(_('Confirmation text'), 'confirmation'))->setId('confirmation-label'),
-		(new CFormField([
-			(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
-				->setAttribute('disabled', $data['enable_confirmation'])
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			NBSP(),
-			(new CButton('testConfirmation', _('Test confirmation')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->setAttribute('disabled', $data['enable_confirmation'])
-				->setId('test-confirmation')
-		]))->setId('confirmation-field')
-	]);
+	->addItem((new CFormFieldsetCollapsible(_('Advanced configuration')))
+		->setId('advanced-configuration')
+		->addItem([
+			(new CLabel(_('Enable user input'), 'enable-userinput'))->setId('enable-user-input-label'),
+			(new CFormField(
+				(new CCheckBox('enable_user_input'))
+					->setChecked($data['enable_user_input'])
+					->setId('enable-user-input')
+			))->setId('enable-user-input-field')
+		])
+		->addItem([
+			(new CLabel(_('User input prompt'), 'inputprompt'))->setId('prompt-label')->setAsteriskMark(),
+			(new CFormField([
+				(new CTextBox('input_prompt', $data['input_prompt'], false, DB::getFieldLength('scripts', 'manualinput_prompt')))
+					->setAttribute('disabled', !$data['enable_user_input'])
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				NBSP(),
+				(new CButton('test-prompt', _('Test user input')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->setAttribute('disabled', !$data['enable_user_input'])
+					->setId('test-user-input')
+			]))->setId('input-prompt-field')
+		])
+		->addItem([
+			(new CLabel(
+				[_('Show dropdown'), makeHelpIcon(_('Put comma-separated options in Default user input.'))],
+				'show_dropdown'
+			))->setId('show_dropdown_label'),
+			(new CFormField(
+				(new CCheckBox('show_dropdown'))
+					->setAttribute('disabled', !$data['enable_user_input'])
+					->setChecked($data['show_dropdown'])
+					->setId('show_dropdown')
+			))->setId('show_dropdown_field')
+		])
+		->addItem([
+			(new CLabel(_('Default user input'), 'default-user-input'))->setId('default-user-input-label'),
+			(new CFormField([
+				(new CTextBox('default_user_input', $data['input_default_value'], false, DB::getFieldLength('scripts', 'manualinput_default_value')))
+					->setAttribute('disabled', $data['enable_user_input'])
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			]))
+		])
+		->addItem([
+			(new CLabel(_('Validate user input'), 'validate-user-input'))->setId('validate-input-label')->setAsteriskMark(),
+			(new CFormField([
+				(new CTextBox('validate_user_input', $data['input_validator'], false, DB::getFieldLength('scripts', 'manualinput_validator')))
+					->setAttribute('placeholder', 'regular expression')
+					->setAttribute('disabled', true)
+			]))->setId('validate-input-field')
+		])
+		->addItem([
+			(new CLabel(_('Enable confirmation'), 'enable-confirmation'))->setId('enable-confirmation-label'),
+			(new CFormField(
+				(new CCheckBox('enable_confirmation'))
+					->setChecked($data['enable_confirmation'])
+					->setId('enable-confirmation')
+			))->setId('enable-confirmation-field')
+		])
+		->addItem([
+			(new CLabel(_('Confirmation text'), 'confirmation'))->setId('confirmation-label'),
+			(new CFormField([
+				(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
+					->setAttribute('disabled', $data['enable_confirmation'])
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				NBSP(),
+				(new CButton('testConfirmation', _('Test confirmation')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->setAttribute('disabled', $data['enable_confirmation'])
+					->setId('test-confirmation')
+			]))->setId('confirmation-field')
+		])
+	);
 
 if ($data['scriptid'] === null) {
 	$buttons = [

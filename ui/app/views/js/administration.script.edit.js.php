@@ -39,6 +39,8 @@ window.script_edit_popup = new class {
 		for (const parameter of script.parameters) {
 			this.#addParameter(parameter);
 		}
+
+		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	#initActions() {
@@ -96,8 +98,18 @@ window.script_edit_popup = new class {
 		// Load type fields.
 		type.onchange = (e) => this.#loadTypeFields(script, e);
 
+		// Update user input fields.
+		this.form.querySelector('#enable-user-input').onchange = (e) => this.#loadUserInputFields(e);
+		this.form.querySelector('#enable-user-input').dispatchEvent(new Event('change'));
+
+
 		// Update confirmation fields.
 		this.form.querySelector('#enable-confirmation').onchange = (e) => this.#loadConfirmationFields(e);
+
+		// Test user input button.
+		this.form.querySelector('#test-user-input').addEventListener('click', (e) =>
+			this.#openTestPopup()
+		);
 
 		// Test confirmation button.
 		this.form.querySelector('#test-confirmation').addEventListener('click', (e) =>
@@ -113,6 +125,22 @@ window.script_edit_popup = new class {
 		hgstype.dispatchEvent(new Event('change'));
 		this.form.removeAttribute('style');
 		this.overlay.recoverFocus();
+	}
+
+	#openTestPopup() {
+		const parameters = {
+			input_prompt: this.form.querySelector('#input_prompt').value,
+			default_value: this.form.querySelector('#default_user_input').value,
+			show_dropdown: this.show_dropdown_checked
+				? <?= SCRIPT_MANUALINPUT_TYPE_LIST ?>
+				: <?= SCRIPT_MANUALINPUT_TYPE_REGEX ?>,
+			validate_input: this.form.querySelector('#validate_user_input').value,
+			test: 1
+		};
+		PopUp('script.userinput.edit', parameters, {
+			dialogueid: 'script-userinput-form',
+			dialogue_class: 'modal-popup-small'
+		});
 	}
 
 	clone({title, buttons}) {
@@ -230,7 +258,7 @@ window.script_edit_popup = new class {
 				const show_fields = [
 					'#menu-path', '#menu-path-label', '#usergroup-label', '#usergroup', '#host-access-label',
 					'#host-access-field', '#enable-confirmation-label', '#enable-confirmation-field',
-					'#confirmation-label', '#confirmation-field'
+					'#advanced-configuration'
 				];
 
 				show_fields.forEach((field) => {
@@ -386,6 +414,82 @@ window.script_edit_popup = new class {
 	}
 
 	/**
+	 * Displays or hides and enables or disables user input fields in the Advanced configuration.
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION.
+	 *
+	 * @param {object} event  The event object.
+	 */
+	#loadUserInputFields(event) {
+		if (event.target.value) {
+			this.user_input_checked = event.target.checked;
+		}
+
+		const user_input_prompt = this.form.querySelector('#input_prompt');
+		const test_user_input = this.form.querySelector('#test-user-input');
+		const validate_user_input = this.form.querySelector('#validate_user_input');
+		const default_user_input = this.form.querySelector('#default_user_input');
+		const show_dropdown = this.form.querySelector('#show_dropdown');
+
+		this.show_dropdown_checked = this.form.querySelector('#show_dropdown').checked;
+
+		if (this.user_input_checked) {
+			// Enable all user input fields.
+			show_dropdown.disabled = false;
+			validate_user_input.disabled = false;
+			user_input_prompt.disabled = false;
+			default_user_input.disabled = false;
+
+			// Hide/show Validate user input field:
+			show_dropdown.onchange = (e) => {
+				this.show_dropdown_checked = e.target.checked;
+
+				if (this.show_dropdown_checked) {
+					this.form.querySelector('#validate-input-label').style.display = 'none';
+					this.form.querySelector('#validate-input-field').style.display = 'none';
+
+					const updateTestUserInput = () => {
+						test_user_input.disabled = !(
+							user_input_prompt.value !== '' && default_user_input.value !== '' && this.user_input_checked
+						);
+					};
+
+					user_input_prompt.onkeyup = updateTestUserInput;
+					default_user_input.onkeyup = updateTestUserInput;
+
+					user_input_prompt.dispatchEvent(new Event('keyup'));
+					default_user_input.dispatchEvent(new Event('keyup'));
+				}
+				else {
+					this.form.querySelector('#validate-input-label').style.display = '';
+					this.form.querySelector('#validate-input-field').style.display = '';
+
+					const updateTestUserInput = () => {
+						test_user_input.disabled = !(
+							user_input_prompt.value !== '' && validate_user_input.value !== ''
+								&& this.user_input_checked
+						);
+					};
+
+					user_input_prompt.onkeyup = updateTestUserInput;
+					validate_user_input.onkeyup = updateTestUserInput;
+
+					user_input_prompt.dispatchEvent(new Event('keyup'));
+					validate_user_input.dispatchEvent(new Event('keyup'));
+				}
+			};
+		}
+		else {
+			const disable_elements = [
+				user_input_prompt, test_user_input, show_dropdown, default_user_input, validate_user_input
+			];
+
+			disable_elements.forEach(element => element.disabled = true);
+		}
+
+		this.form.querySelector('#show_dropdown').dispatchEvent(new Event('change'));
+	}
+
+	/**
 	 * Displays or hides confirmation fields in the popup based on the value of selected scope.
 	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION.
 	 *
@@ -441,7 +545,7 @@ window.script_edit_popup = new class {
 				'#password-label', '#password-field', '#port-label', '#port-field', '#publickey-label',
 				'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
 				'#usergroup-label', '#usergroup', '#host-access-label', '#host-access-field',
-				'#enable-confirmation-label', '#enable-confirmation-field', '#confirmation-label', '#confirmation-field'
+				'#enable-confirmation-label', '#enable-confirmation-field', '#advanced-configuration'
 			];
 		}
 
