@@ -2788,7 +2788,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 		zbx_vector_var_t *output, char **error)
 {
 	int		ret;
-	char		*ret_value;
+	char		*ret_value = NULL;
 	zbx_variant_t	*json_value, *path, value, *default_value = NULL;
 	zbx_jsonobj_t	obj;
 
@@ -2825,14 +2825,14 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 		if (ZBX_VARIANT_NONE != default_value->type &&
 				SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
 		{
-			*error = zbx_strdup(NULL, "invalid third parameter");
+			*error = zbx_strdup(*error, "invalid third parameter");
 			return FAIL;
 		}
 	}
 
 	if (FAIL == zbx_jsonobj_open(json_value->data.str, &obj))
 	{
-		*error = zbx_strdup(NULL, zbx_json_strerror());
+		*error = zbx_strdup(*error, zbx_json_strerror());
 		return FAIL;
 	}
 
@@ -2840,13 +2840,21 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	{
 		zbx_variant_set_str(&value, ret_value);
 	}
-	else if (NULL != default_value)
-	{
-		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
-	}
 	else {
-		*error = zbx_strdup(NULL, zbx_json_strerror());
+		*error = zbx_strdup(*error, zbx_json_strerror());
 		return FAIL;
+	}
+
+	if (NULL == ret_value)
+	{
+		if (NULL != default_value)
+		{
+			zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
+		}
+		else {
+			*error = zbx_strdup(*error, "jsonpath returned no value");
+			return FAIL;
+		}
 	}
 
 	zbx_jsonobj_clear(&obj);
@@ -2871,7 +2879,8 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		ret;
+	int		ret, is_empty;
+	char		*ret_value = NULL;
 	zbx_variant_t	*xml_value, *path, value, *default_value = NULL;
 
 	if (2 > token->opt || 3 < token->opt)
@@ -2907,21 +2916,29 @@ static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const z
 		if (ZBX_VARIANT_NONE != default_value->type &&
 				SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
 		{
-			*error = zbx_strdup(NULL, "invalid third parameter");
+			*error = zbx_strdup(*error, "invalid third parameter");
 			return FAIL;
 		}
 	}
 
 	zbx_variant_set_str(&value, zbx_strdup(NULL, xml_value->data.str));
-	ret = zbx_query_xpath(&value, path->data.str, error);
+	ret = zbx_query_xpath_contents(&value, path->data.str, &is_empty, error);
 
-	if (FAIL == ret  && NULL != default_value)
-	{
-		zbx_variant_clear(&value);
-		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
-	}
-	else if (FAIL == ret) {
+	if (FAIL == ret)
 		return FAIL;
+
+	if (SUCCEED == is_empty)
+	{
+		if (NULL != default_value)
+		{
+			zbx_variant_clear(&value);
+			zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
+		}
+		else
+		{
+			*error = zbx_strdup(*error, "XML xpath returned empty nodeset");
+			return FAIL;
+		}
 	}
 
 	eval_function_return(token->opt, &value, output);

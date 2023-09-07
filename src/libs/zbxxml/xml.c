@@ -255,19 +255,77 @@ void zbx_xml_escape_xpath(char **data)
 	*data = buffer;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: execute xpath query                                               *
- *                                                                            *
- * Parameters: value  - [IN/OUT] the value to process                         *
- *             params - [IN] the operation parameters                         *
- *             errmsg - [OUT] error message                                   *
- *                                                                            *
- * Return value: SUCCEED - the value was processed successfully               *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
+typedef int(*store_xpath_nodeset_t)(zbx_variant_t *value, xmlDoc *doc, xmlXPathObject *xpathObj,
+		int *is_empty, char **errmsg);
+
+static int	xpath_nodeset_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathObject *xpathObj,
+		int *is_empty, char **errmsg)
+{
+#ifdef HAVE_LIBXML2
+	char 		*tmp;
+	xmlNodeSetPtr	nodeset;
+	xmlBufferPtr	xmlBufferLocal;
+
+	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+		return FAIL;
+
+	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		nodeset = xpathObj->nodesetval;
+		*is_empty = (0 == nodeset->nodeNr) ? SUCCEED : FAIL;
+
+		for (int i = 0; i < nodeset->nodeNr; i++)
+			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
+	}
+	else
+		*is_empty = SUCCEED;
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
+
+	xmlBufferFree(xmlBufferLocal);
+#endif
+
+	return SUCCEED;
+}
+
+static int	xpath_nodeset_contents_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathObject *xpathObj,
+		int *is_empty, char **errmsg)
+{
+#ifdef HAVE_LIBXML2
+	char 		*result;
+	xmlNodeSetPtr	nodeset;
+	xmlChar		*buf;
+
+	result = (char *)zbx_malloc(NULL, 1 * sizeof(char));
+	*result = '\0';
+
+	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+	{
+		nodeset = xpathObj->nodesetval;
+		*is_empty = (0 == nodeset->nodeNr) ? SUCCEED : FAIL;
+
+		for (int i = 0; i < nodeset->nodeNr; i++)
+		{
+			if (NULL != (buf = (char *)xmlNodeListGetString(doc, nodeset->nodeTab[i]->xmlChildrenNode, 1)))
+			{
+				result = zbx_dsprintf(result, "%s%s", result, buf);
+				xmlFree((xmlChar *)buf);
+			}
+		}
+	}
+	else
+		*is_empty = SUCCEED;
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, result);
+#endif
+
+	return SUCCEED;
+}
+
+static int	query_xpath(zbx_variant_t *value, const char *params, store_xpath_nodeset_t process_nodeset,
+		int *is_empty, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(value);
@@ -275,14 +333,15 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
 	return FAIL;
 #else
-	int		i, ret = FAIL;
+	int		ret = FAIL;
 	char		buffer[32], *ptr;
 	xmlDoc		*doc = NULL;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlErrorPtr	pErr;
-	xmlBufferPtr	xmlBufferLocal;
+
+	*is_empty = FAIL;
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
 	{
@@ -307,21 +366,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 	switch (xpathObj->type)
 	{
 		case XPATH_NODESET:
-			if (NULL == (xmlBufferLocal = xmlBufferCreate()))
-				break;
-
-			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-			{
-				nodeset = xpathObj->nodesetval;
-
-				for (i = 0; i < nodeset->nodeNr; i++)
-					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
-			}
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
-
-			xmlBufferFree(xmlBufferLocal);
-			ret = SUCCEED;
+			ret = process_nodeset(value, doc, xpathObj, is_empty, errmsg);
 			break;
 		case XPATH_STRING:
 			zbx_variant_clear(value);
@@ -361,6 +406,43 @@ out:
 
 	return ret;
 #endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute xpath query                                               *
+ *                                                                            *
+ * Parameters: value  - [IN/OUT] the value to process                         *
+ *             params - [IN] the operation parameters                         *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	int	is_empty;
+
+	return query_xpath(value, params, xpath_nodeset_to_string, &is_empty, errmsg);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: execute xpath query and return the contents of the result         *
+ *                                                                            *
+ * Parameters: value    - [IN/OUT] the value to process                       *
+ *             params   - [IN] the operation parameters                       *
+ *             is_empty - [OUT] whether the xpath returned empty nodeset      *
+ *             errmsg   - [OUT] error message                                 *
+ *                                                                            *
+ * Return value: SUCCEED - the value was processed successfully               *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_query_xpath_contents(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
+{
+	return query_xpath(value, params, xpath_nodeset_contents_to_string, is_empty, errmsg);
 }
 
 #ifdef HAVE_LIBXML2
