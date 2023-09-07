@@ -199,7 +199,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The average system load (the number of processes in the system run queue), last 5 minute.'
+          description: 'The average system load (the number of processes in the system run queue), last 5 minutes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -220,7 +220,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The average system load (the number of processes in the system run queue), last 15 minute.'
+          description: 'The average system load (the number of processes in the system run queue), last 15 minutes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1274,8 +1274,6 @@ zabbix_export:
           headers:
             - name: OCS-APIRequest
               value: 'true'
-            - name: Content-Type
-              value: application/json
           lld_macro_paths:
             - lld_macro: '{#NEXTCLOUD.USER}'
               path: $.user_name
