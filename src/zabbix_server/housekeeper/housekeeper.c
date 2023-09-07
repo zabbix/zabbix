@@ -1147,6 +1147,78 @@ static int	housekeeping_audit(int now)
 	return 0;
 }
 
+static int	housekeeping_autoreg_host(void)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	int			deleted = 0;
+	zbx_vector_uint64_t	autoreg_hostids;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select ah.autoreg_hostid"
+			" from autoreg_host ah"
+			" where not exists ("
+					"select null"
+					" from hosts h"
+					" where ah.host=h.host"
+			")"
+				" and not exists ("
+						"select null"
+						" from events e"
+						" where ah.autoreg_hostid=e.objectid"
+							" and e.source=%d"
+							" and e.object=%d"
+				")"
+			" order by ah.autoreg_hostid",
+			EVENT_SOURCE_AUTOREGISTRATION,
+			EVENT_OBJECT_ZABBIX_ACTIVE
+	);
+
+	result = zbx_db_select_n(sql, CONFIG_MAX_HOUSEKEEPER_DELETE);
+
+	zbx_vector_uint64_create(&autoreg_hostids);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	autoreg_hostid;
+
+		ZBX_STR2UINT64(autoreg_hostid, row[0]);
+
+		zbx_vector_uint64_append(&autoreg_hostids, autoreg_hostid);
+
+	}
+	zbx_db_free_result(result);
+
+	if (autoreg_hostids.values_num != 0)
+	{
+		int	ret;
+
+		sql_offset = 0;
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "delete from autoreg_host where");
+
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid", autoreg_hostids.values,
+				autoreg_hostids.values_num);
+
+		ret = zbx_db_execute("%s", sql);
+
+		if (ZBX_DB_OK <= ret)
+			deleted = ret;
+	}
+
+	zbx_free(sql);
+
+	zbx_vector_uint64_destroy(&autoreg_hostids);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
+
+	return deleted;
+}
+
 static int	housekeeping_events(int now)
 {
 #define ZBX_HK_EVENT_RULE		" and not exists(" \
@@ -1305,7 +1377,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	zbx_thread_housekeeper_args	*housekeeper_args_in = (zbx_thread_housekeeper_args *)
 							(((zbx_thread_args_t *)args)->args);
 	int				now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions,
-					d_services, d_audit, sleeptime, records;
+					d_services, d_autoreg_host, d_audit, sleeptime, records;
 	double				sec, time_slept, time_now;
 	char				sleeptext[25];
 	zbx_ipc_async_socket_t		rtc;
@@ -1434,6 +1506,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
 		d_audit = housekeeping_audit(now);
 
+		zbx_setproctitle("%s [removing old autoreg_hosts]", get_process_type_string(process_type));
+		d_autoreg_host = housekeeping_autoreg_host();
+
 		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
 		records = housekeeping_proxy_dhistory(now);
 
@@ -1442,9 +1517,10 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit, %d records in " ZBX_FS_DBL " sec, %s]",
+				" %d sessions, %d alarms, %d audit, %d autoreg_host, %d records in " ZBX_FS_DBL
+				" sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_problems, d_sessions, d_services, d_audit, records, sec, sleeptext);
+				d_problems, d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
 
 		zbx_config_clean(&cfg);
 
@@ -1453,9 +1529,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_dc_cleanup_sessions();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items/triggers, %d events, %d sessions, %d alarms,"
-				" %d audit items, %d records in " ZBX_FS_DBL " sec, %s]",
+				" %d audit items, %d autoreg_host, %d records in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
-				d_sessions, d_services, d_audit, records, sec, sleeptext);
+				d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
 	}
 out:
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

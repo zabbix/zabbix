@@ -175,9 +175,10 @@ struct zbx_snmp_context
 
 typedef struct
 {
-	AGENT_RESULT	*result;
-	int		errcode;
-	int		finished;
+	AGENT_RESULT		*result;
+	int			errcode;
+	struct event_base	*base;
+	int			finished;
 }
 zbx_snmp_result_t;
 
@@ -2476,8 +2477,23 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 
 		if (0 != snmp_sess_read2(snmp_context->ssp, &bulkwalk_context->fdset))
 		{
+			char		*tmp_err_str = NULL;
+
 			snmp_context->item.ret = NOTSUPPORTED;
-			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "snmp_sess_read2() failed"));
+
+			snmp_sess_error(snmp_context->ssp, NULL, NULL, &tmp_err_str);
+			if (NULL != snmp_context->ssp)
+			{
+				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "cannot read from"
+						" session: %s", tmp_err_str));
+			}
+			else
+			{
+				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "cannot read from"
+						" session"));
+			}
+
+			zbx_free(tmp_err_str);
 			goto stop;
 		}
 
@@ -3043,11 +3059,11 @@ static void	process_snmp_result(void *data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s'", __func__, snmp_context->item.key,
 			snmp_context->item.host, snmp_context->item.interface.addr);
-
-	snmp_result->finished = 1;
 	*snmp_result->result = snmp_context->item.result;
 	zbx_init_agent_result(&snmp_context->item.result);
 	snmp_result->errcode = snmp_context->item.ret;
+	event_base_loopbreak(snmp_result->base);
+	snmp_result->finished = 1;
 
 	zbx_async_check_snmp_clean(snmp_context);
 
@@ -3078,7 +3094,50 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 	SNMP_MT_EXECLOCK;
 
-	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
+	if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
+	{
+		struct evdns_base	*dnsbase;
+		zbx_snmp_result_t	snmp_result = {.result = &results[j]};
+
+		if (NULL == (snmp_result.base = event_base_new()))
+		{
+			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot initialize event base"));
+			errcodes[j] = CONFIG_ERROR;
+			goto out;
+		}
+
+		if (NULL == (dnsbase = evdns_base_new(snmp_result.base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
+		{
+			event_base_free(snmp_result.base);
+			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot initialize asynchronous DNS library"));
+			errcodes[j] = CONFIG_ERROR;
+			goto out;
+		}
+
+		zbx_set_snmp_bulkwalk_options();
+
+		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
+				&snmp_result, NULL, snmp_result.base, dnsbase, config_timeout, config_source_ip)))
+		{
+			if (1 == snmp_result.finished || -1 != event_base_dispatch(snmp_result.base))
+			{
+				errcodes[j] = snmp_result.errcode;
+			}
+			else
+			{
+				SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot process event base"));
+				errcodes[j] = CONFIG_ERROR;
+			}
+
+		}
+
+		evdns_base_free(dnsbase, 0);
+		event_base_free(snmp_result.base);
+
+		zbx_unset_snmp_bulkwalk_options();
+		goto out;
+	}
+	else if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
 	{
 		int	max_vars;
 		zbx_dc_item_t	*item = &items[j];
@@ -3102,44 +3161,6 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 				&max_succeed, &min_fail, max_vars, bulk);
 
 		zbx_snmp_close_session(ssp);
-	}
-	else if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
-	{
-		struct event_base	*base;
-		struct evdns_base	*dnsbase;
-		zbx_snmp_result_t	snmp_result = {.result = &results[j]};
-
-		if (NULL == (base = event_base_new()))
-		{
-			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot initialize event base"));
-			errcodes[j] = CONFIG_ERROR;
-			goto out;
-		}
-
-		if (NULL == (dnsbase = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS)))
-		{
-			event_base_free(base);
-			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, "cannot initialize asynchronous DNS library"));
-			errcodes[j] = CONFIG_ERROR;
-			goto out;
-		}
-
-		zbx_set_snmp_bulkwalk_options();
-
-		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
-				&snmp_result, NULL, base, dnsbase, config_timeout, config_source_ip)))
-		{
-			while (0 == snmp_result.finished)
-				event_base_loop(base, EVLOOP_ONCE);
-
-			errcodes[j] = snmp_result.errcode;
-		}
-
-		evdns_base_free(dnsbase, 0);
-		event_base_free(base);
-
-		zbx_unset_snmp_bulkwalk_options();
-		goto out;
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{

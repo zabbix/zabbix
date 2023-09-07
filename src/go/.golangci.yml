@@ -255,3 +255,12 @@ issues:
     - path: pkg/zbxlib/logfile.go
       linters:
        - nlreturn
+    - path: plugins/vfs/file/encoding
+      linters:
+       - nlreturn
+    - path: pkg/tls/tls.go
+      linters:
+       - nlreturn
+    - path: pkg/zbxlib/expressions.go
+      linters:
+       - nlreturn

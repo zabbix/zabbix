@@ -84,21 +84,25 @@ func ExecuteCheck(key string, params []string) (result *string, err error) {
 
 	var cvalue, cerrmsg *C.char
 	ckey := C.CString(itemutil.MakeKey(key, params))
+	defer func() {
+		log.Tracef("Calling C function \"free(ckey)\"")
+		C.free(unsafe.Pointer(ckey))
+	}()
+
 	log.Tracef("Calling C function \"execute_check()\"")
 	if C.execute_check(ckey, C.zbx_agent_check_t(cfunc), &cvalue, &cerrmsg) == Succeed {
 		if cvalue != nil {
 			value := C.GoString(cvalue)
 			result = &value
 		}
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cvalue)\"")
 		C.free(unsafe.Pointer(cvalue))
 
 	} else {
 		err = errors.New(C.GoString(cerrmsg))
-		log.Tracef("Calling C function \"free()\"")
+		log.Tracef("Calling C function \"free(cerrmsg)\"")
 		C.free(unsafe.Pointer(cerrmsg))
 	}
-	log.Tracef("Calling C function \"free()\"")
-	C.free(unsafe.Pointer(ckey))
+
 	return
 }

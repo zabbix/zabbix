@@ -171,7 +171,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	public function testFormLowLevelDiscovery_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('zabbix.php?action=template.list');
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($form, $data['template']);
 			$hostid = 30000;

@@ -173,7 +173,7 @@ class testGraphAxis extends CWebTest {
 		$this->waitUntilGraphIsLoaded();
 		$this->query('id:from')->one()->fill($data['start_period']);
 		$this->query('id:to')->one()->fill($data['end_period']);
-		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->query('id:apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 		// TODO: This sleep is added here because of DEV-1908.
 		sleep(1);

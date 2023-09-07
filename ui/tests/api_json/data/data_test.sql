@@ -256,7 +256,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (9
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004, 2, 1, '{$SNMP_COMMUNITY}');
 
 -- discovery action
-INSERT INTO proxy (proxyid, name, mode, description) VALUES (99000, 'API active proxy for discovery action', 0, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99000, 'API active proxy for discovery action', 0, '');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
@@ -303,7 +303,7 @@ INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
 
 -- discovery rules
-INSERT INTO proxy (proxyid, name, mode, description) VALUES (99006, 'Api active proxy for discovery', 0, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99006, 'Api active proxy for discovery', 0, '');
 INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (10,NULL,'API discovery rule for delete 1','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (10,10,4,'','','80','',0,'','',0,0,0,'');
 INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (11,99006,'API discovery rule for delete with proxy','192.168.0.1-254','1h',0);

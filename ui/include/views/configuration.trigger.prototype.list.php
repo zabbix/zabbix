@@ -236,6 +236,15 @@ $triggersForm->addItem([
 	)
 ]);
 
+(new CScriptTag('
+	view.init('.json_encode([
+		'context' => $data['context'],
+		'checkbox_hash' => $data['parent_discoveryid']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
+
 $html_page
 	->addItem($triggersForm)
 	->show();
