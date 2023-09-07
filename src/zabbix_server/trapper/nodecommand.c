@@ -57,41 +57,6 @@ static void	substitute_macro(const char *in, const char *macro, const char *macr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds whether a given value is in a given comma-separated value   *
- *          list using case sensitive comparison.                             *
- *                                                                            *
- * Parameters:  value   - [IN] value to search for                            *
- *              csv     - [IN] comma-separated list of values                 *
- *                                                                            *
- * Return value:  SUCCEED - the value appears in the list                     *
- *                FAIL    - the value is not in the given list                *
- *                                                                            *
- * Assumptions: The list given in csv does not contain duplicates             *
- *                                                                            *
- ******************************************************************************/
-static int	is_value_in_csv_list(const char *value, const char *csv)
-{
-	int ret = FAIL;
-	char *list, *l, *token, *saveptr;
-
-	list = zbx_strdup(NULL, csv);
-
-	for (l = list; NULL != (token = strtok_r(l, ",", &saveptr)); l = NULL)
-	{
-		if (0 == strcmp(value, token))
-		{
-			ret = SUCCEED;
-			break;
-		}
-	}
-
-	zbx_free(list);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: execute remote command and wait for the result                    *
  *                                                                            *
  * Return value:  SUCCEED - the remote command was executed successfully      *
@@ -313,7 +278,7 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
 			ret = (NULL != zbx_regexp_match(manualinput, validator, NULL) ? SUCCEED : FAIL);
 			break;
 		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST:
-			ret = is_value_in_csv_list(manualinput, validator);
+			ret = zbx_str_in_list(validator, manualinput, ',');
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
