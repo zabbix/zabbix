@@ -1359,6 +1359,10 @@ msgstr ""
 msgid "Any"
 msgstr "Bất cứ gì"
 
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
+
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
 msgid "Any character string included"
@@ -5726,6 +5730,10 @@ msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] "Bảng điều khiển đã xóa"
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr ""
@@ -8035,6 +8043,10 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr "Danh sách sự kiện [20 trở lại]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "Theo dõi log sự kiện. Trả về log"
@@ -9489,6 +9501,10 @@ msgstr "Host không thể có nhiều hơn một interface mặc định cu
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Đếm host"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14197,6 +14213,10 @@ msgstr ""
 msgid "New tag name"
 msgstr ""
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14208,6 +14228,10 @@ msgstr "Trigger mới"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
@@ -16297,6 +16321,10 @@ msgstr ""
 msgid "Preview"
 msgstr "Xem trước"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -16674,6 +16702,10 @@ msgstr "Khóa công khai"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Key file công khai"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -23817,6 +23849,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474

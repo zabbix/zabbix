@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  * @backup dashboard
  *
  * @onBefore prepareDashboardData
+ *
+ * @dataSource WebScenarios
  */
 class testDashboardItemValueWidget extends CWebTest {
 
@@ -760,7 +762,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:show_header' => false,
 						'Name' => '#$%^&*()!@{}[]<>,.|',
 						'Refresh interval' => '10 minutes',
-						'Item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
+						'Item' => 'Response code for step "step 1 of scenario 1" of scenario "Scenario for Update".',
 						// Description checkbox.
 						'id:show_1' => false,
 						// Value checkbox.
@@ -842,7 +844,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'id:show_header' => false,
 						'Name' => 'Color pick',
 						'Refresh interval' => '10 minutes',
-						'Item' => 'Response code for step "testFormWeb1" of scenario "testFormWeb1".',
+						'Item' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".',
 						// Description checkbox.
 						'id:show_1' => true,
 						// Value checkbox.

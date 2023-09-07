@@ -545,28 +545,41 @@ class testDocumentationLinks extends CWebTest {
 			// #49 Template list view.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates'
 				]
 			],
 			// #50 Create template view.
 			[
 				[
-					'url' => 'templates.php?form=create',
+					'url' => 'zabbix.php?action=template.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create template'
+						]
+					],
+					'open_button' => 'button:Create template',
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
 			// #51 Update template view.
 			[
 				[
-					'url' => 'templates.php?form=update&templateid=10047',
+					'url' => 'zabbix.php?action=template.list',
+					'actions' => [
+								[
+									'callback' => 'openFormWithLink',
+									'element' => 'xpath://a[text()="AIX by Zabbix agent"]'
+								]
+							],
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
 			// #52 Template import popup.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -579,7 +592,7 @@ class testDocumentationLinks extends CWebTest {
 			// #53 Template mass update popup.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -1262,28 +1275,28 @@ class testDocumentationLinks extends CWebTest {
 			// #130 Host Web scenario list view.
 			[
 				[
-					'url' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'url' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D=50001&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/web'
 				]
 			],
 			// #131 Host Web scenario create form.
 			[
 				[
-					'url' => 'httpconf.php?form=create&hostid=40001&context=host',
+					'url' => 'httpconf.php?form=create&hostid=50001&context=host',
 					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 				]
 			],
 			// #132 Host Web scenario edit form.
 			[
 				[
-					'url' => 'httpconf.php?form=update&hostid=40001&httptestid=94&context=host',
+					'url' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host',
 					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 				]
 			],
 			// #133 Host Web scenario step configuration form popup.
 			[
 				[
-					'url' => 'httpconf.php?form=update&hostid=40001&httptestid=94&context=host',
+					'url' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -2422,14 +2435,32 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/data_overview'
 				]
 			],
-			// #233 Connectors list view.
+			// #233 Start creating Gauge  widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Gauge',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/gauge'
+				]
+			],
+			// #234 Connectors list view.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#connectors'
 				]
 			],
-			// #234 Create connectors popup.
+			// #235 Create connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
@@ -2442,7 +2473,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #235 Edit connectors popup.
+			// #236 Edit connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',

@@ -30,8 +30,8 @@ INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) 
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (9,'Autoregistration action 1',2,0,0,'1h');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (15,'Autoregistration action 2',2,0,1,'1h');
 
-INSERT INTO hosts (hostid, host, status, description) VALUES (20000, 'Proxy for Discovery rule', 5, '');
-INSERT INTO hosts (hostid, host, status, description) VALUES (20001, 'Proxy for Actions', 5, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20000, 'Proxy for Discovery rule', 0, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (20001, 'Proxy for Actions', 0, '');
 
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (500, 9, 22, 3, 'DB2');
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value) VALUES (501, 9, 22, 2, 'MySQL');
@@ -262,34 +262,6 @@ INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history
 -- first, one that references a non-existent user macro in the key and then references that key parameter in the item name using a positional reference
 INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, posts, headers) VALUES (23100, 'Item_referencing_a_non-existent_user_macro', 0, 10053, 'a. i am referencing a non-existent user macro $1', 'key[{$I_DONT_EXIST}]', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 10021, '', '');
 INSERT INTO items (itemid, name, type, hostid, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, inventory_link, posts, headers) VALUES (23101, 'Item_populating_filed_Type', 0, 10053, 'i am populating filed Type', 'key.test.pop.type', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 10021, 1, '', '');
-
--- test discovery rule
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (3, NULL, 'External network', '192.168.3.1-255', 600, 0);
-
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (6, 3, 9, 'system.uname', '', '10050', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (7, 3, 3, '', '', '21,1021', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (8, 3, 4, '', '', '80,8080', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (9, 3, 14, '', '', '443', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (10, 3, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (11, 3, 7, '', '', '143-145', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (12, 3, 1, '', '', '389', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (13, 3, 6, '', '', '119', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (14, 3, 5, '', '', '110', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (15, 3, 2, '', '', '25', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (16, 3, 10, 'ifIndex0', 'public', '161', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (17, 3, 11, 'ifInOut0', 'private1', '162', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (18, 3, 13, 'ifIn0', '', '161', 'private2', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (19, 3, 0, '', '', '22', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (20, 3, 8, '', '', '10000-20000', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (21, 3, 15, '', '', '23', '', 0, '', '', 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (22, 3, 9, 'agent.uname', '', '10050', '', 0, '', '', 0);
-
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (4, 20000, 'Discovery rule for update', '192.14.3.1-255', 600, 0);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (23, 4, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (5, 20000, 'Disabled discovery rule for update', '192.15.3.1-255', 600, 1);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (24, 5, 12, '', '', '0', '', 0, '', '', 0);
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (6, 20000, 'Discovery rule to check delete', '192.16.3.1-255', 600, 1);
-INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq) VALUES (25, 6, 12, '', '', '0', '', 0, '', '', 0);
 
 -- Global macros
 INSERT INTO globalmacro (globalmacroid, macro, value, description) VALUES (6,'{$DEFAULT_DELAY}','30','');
@@ -809,64 +781,6 @@ INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, 
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600005, 600002, 23804, 1, 1, 'FF5555', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600006, 600003, 99102, 1, 1, 'FF5555', 0, 2, 0);
 INSERT INTO graphs_items (gitemid, graphid, itemid, drawtype, sortorder, color, yaxisside, calc_fnc, type) VALUES (600007, 600003, 23804, 1, 1, 'FF5555', 0, 2, 0);
-
--- testFormWeb.SimpleUpdate
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (94, 40001, 'testFormWeb1', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (95, 40001, 'testFormWeb2', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (96, 40001, 'testFormWeb3', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httptest (httptestid, hostid, name, delay, status, agent) VALUES (97, 40001, 'testFormWeb4', '1m', 0, 'Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (94, 94, 'testFormWeb1', 1, 'testFormWeb1', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (95, 95, 'testFormWeb2', 1, 'testFormWeb2', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (96, 96, 'testFormWeb3', 1, 'testFormWeb3', 15, '', '', '');
-INSERT INTO httpstep (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) VALUES (97, 97, 'testFormWeb4', 1, 'testFormWeb4', 15, '', '', '');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23420,9,40001,'Download speed for scenario "testFormWeb1".','web.test.in[testFormWeb1,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23421,9,40001,'Failed step of scenario "testFormWeb1".','web.test.fail[testFormWeb1]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23422,9,40001,'Last error message of scenario "testFormWeb1".','web.test.error[testFormWeb1]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23423,9,40001,'Download speed for step "testFormWeb1" of scenario "testFormWeb1".','web.test.in[testFormWeb1,testFormWeb1,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23424,9,40001,'Response time for step "testFormWeb1" of scenario "testFormWeb1".','web.test.time[testFormWeb1,testFormWeb1,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23425,9,40001,'Response code for step "testFormWeb1" of scenario "testFormWeb1".','web.test.rspcode[testFormWeb1,testFormWeb1]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23426,9,40001,'Download speed for scenario "testFormWeb2".','web.test.in[testFormWeb2,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23427,9,40001,'Failed step of scenario "testFormWeb2".','web.test.fail[testFormWeb2]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23428,9,40001,'Last error message of scenario "testFormWeb2".','web.test.error[testFormWeb2]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23429,9,40001,'Download speed for step "testFormWeb2" of scenario "testFormWeb2".','web.test.in[testFormWeb2,testFormWeb2,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23430,9,40001,'Response time for step "testFormWeb2" of scenario "testFormWeb2".','web.test.time[testFormWeb2,testFormWeb2,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23431,9,40001,'Response code for step "testFormWeb2" of scenario "testFormWeb2".','web.test.rspcode[testFormWeb2,testFormWeb2]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23432,9,40001,'Download speed for scenario "testFormWeb3".','web.test.in[testFormWeb3,,bps]','60s',30,'90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23433,9,40001,'Failed step of scenario "testFormWeb3".','web.test.fail[testFormWeb3]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23434,9,40001,'Last error message of scenario "testFormWeb3".','web.test.error[testFormWeb3]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23435,9,40001,'Download speed for step "testFormWeb3" of scenario "testFormWeb3".','web.test.in[testFormWeb3,testFormWeb3,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23436,9,40001,'Response time for step "testFormWeb3" of scenario "testFormWeb3".','web.test.time[testFormWeb3,testFormWeb3,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23437,9,40001,'Response code for step "testFormWeb3" of scenario "testFormWeb3".','web.test.rspcode[testFormWeb3,testFormWeb3]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23438,9,40001,'Download speed for scenario "testFormWeb4".','web.test.in[testFormWeb4,,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23439,9,40001,'Failed step of scenario "testFormWeb4".','web.test.fail[testFormWeb4]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23440,9,40001,'Last error message of scenario "testFormWeb4".','web.test.error[testFormWeb4]','60s','30d','90d',0,1,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23441,9,40001,'Download speed for step "testFormWeb4" of scenario "testFormWeb4".','web.test.in[testFormWeb4,testFormWeb4,bps]','60s','30d','90d',0,0,'','Bps','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23442,9,40001,'Response time for step "testFormWeb4" of scenario "testFormWeb4".','web.test.time[testFormWeb4,testFormWeb4,resp]','60s','30d','90d',0,0,'','s','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO items (itemid,type,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,posts,headers) VALUES (23443,9,40001,'Response code for step "testFormWeb4" of scenario "testFormWeb4".','web.test.rspcode[testFormWeb4,testFormWeb4]','60s','30d','90d',0,3,'','','',NULL,NULL,'','',0,'','','','',0,NULL,'',0,'30','','');
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (910,94,23420,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (911,94,23421,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (912,94,23422,4);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (913,95,23426,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (914,95,23427,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (915,95,23428,4);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (916,96,23432,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (917,96,23433,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (918,96,23434,4);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (919,97,23438,2);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (920,97,23439,3);
-INSERT INTO httptestitem (httptestitemid,httptestid,itemid,type) VALUES (921,97,23440,4);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (910,94,23423,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (911,94,23424,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (912,94,23425,0);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (913,95,23429,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (914,95,23430,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (915,95,23431,0);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (916,96,23435,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (917,96,23436,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (918,96,23437,0);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (919,97,23441,2);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (920,97,23442,1);
-INSERT INTO httpstepitem (httpstepitemid,httpstepid,itemid,type) VALUES (921,97,23443,0);
 
 -- testZBX6663.MassSelect
 INSERT INTO hosts (hostid, host, name, status, description) VALUES (50000, 'Template ZBX6663 First', 'Template ZBX6663 First', 3, '');
@@ -1586,8 +1500,8 @@ INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severit
 INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity, acknowledged) VALUES ( 9007, 0, 0, 100040, 1533555726, 726692808, '4_trigger_Average', 3, 1);
 INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message, action, old_severity, new_severity) VALUES (1, 1, 9005, 1533629135, '1 acknowledged', 2, 0, 0);
 INSERT INTO acknowledges (acknowledgeid, userid, eventid, clock, message, action, old_severity, new_severity) VALUES (2, 1, 9006, 1533629135, '2 acknowledged', 2, 0, 0);
-INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (1, 4, 1, 1533631968, 0, NULL);
-INSERT INTO task (taskid, type, status, clock, ttl, proxy_hostid) VALUES (2, 4, 1, 1533631968, 0, NULL);
+INSERT INTO task (taskid, type, status, clock, ttl, proxyid) VALUES (1, 4, 1, 1533631968, 0, NULL);
+INSERT INTO task (taskid, type, status, clock, ttl, proxyid) VALUES (2, 4, 1, 1533631968, 0, NULL);
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (1, 1);
 INSERT INTO task_acknowledge (taskid, acknowledgeid) VALUES (2, 2);
 
@@ -2005,6 +1919,14 @@ INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUE
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90076, 100029, 7, 'graphid', 0, 700034);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90077, 100030, 0, 'dynamic', 1);
 INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_graphid) VALUES (90078, 100030, 7, 'graphid', 0, 700035);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100031, 15700, 'gauge', '', 11, 11, 6, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90079, 100031, 4, 'itemid', 0, 99104);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90080, 100031, 0, 'dynamic', 1);
+
+INSERT INTO widget (widgetid, dashboard_pageid, type, name, x, y, width, height) VALUES (100032, 15700, 'gauge', '', 17, 11, 6, 5);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int, value_itemid) VALUES (90081, 100032, 4, 'itemid', 0, 99103);
+INSERT INTO widget_field (widget_fieldid, widgetid, type, name, value_int) VALUES (90082, 100032, 0, 'dynamic', 1);
 
 -- testFormUserMedia
 INSERT INTO media (mediaid, userid, mediatypeid, sendto, active, severity, period) VALUES (4,1,10,'test@jabber.com',0,16,'1-7,00:00-24:00');

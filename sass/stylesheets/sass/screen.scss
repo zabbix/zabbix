@@ -209,18 +209,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 }
 
+.host-dashboard-header-navigation,
 .header-navigation {
-	display: inline-block;
-	position: relative;
-	margin: 0 0 5px;
-	z-index: 3;
-	max-width: calc(100% - 200px);
 	min-height: 24px;
 
 	& > ul {
 		display: flex;
-		flex-wrap: wrap;
-		align-items: baseline;
 
 		& > li {
 			margin-right: 5px;
@@ -228,8 +222,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 			> ul {
 				display: flex;
-				align-items: baseline;
-				flex-wrap: wrap;
 
 				li {
 					margin-right: 5px;
@@ -243,16 +235,12 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 					}
 				}
 			}
-
-			.status-container {
-				margin-right: 5px;
-				vertical-align: text-bottom;
-			}
 		}
 
 		li > span {
 			display: inline-block;
 			padding: 2px 7px;
+			margin: 1px 0;
 			line-height: 18px;
 			white-space: nowrap;
 			vertical-align: top;
@@ -261,15 +249,98 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 			max-width: 250px;
 
 			a {
+				margin-top: 2px;
 				vertical-align: top;
 				text-overflow: ellipsis;
 				overflow: hidden;
 				max-width: 200px;
 				display: inline-block;
-				margin-top: 2px;
 				line-height: 14px;
 			}
+		}
+	}
+}
 
+.host-dashboard-header-navigation {
+	display: grid;
+	grid-template-columns: max-content 1fr max-content;
+	column-gap: 10px;
+
+	.host-dashboard-navigation {
+		display: grid;
+		grid-template-columns: max-content 1fr max-content;
+		column-gap: 5px;
+
+		.host-dashboard-navigation-tabs {
+			@extend .dashboard-navigation-tabs;
+
+			margin: -2px 0;
+		}
+
+		.host-dashboard-navigation-controls {
+			.btn-icon:not(:first-child) {
+				margin-left: 5px;
+			}
+		}
+	}
+
+	.filter-space {
+		display: contents;
+
+		.filter-container {
+			grid-column: 1 / -1;
+		}
+
+		li .ui-tabs-anchor {
+			vertical-align: top;
+		}
+
+		ul.ui-tabs-nav li:focus {
+			outline: none;
+		}
+
+		.filter-btn-container {
+			height: 29px;
+			z-index: 2;
+		}
+
+		.ui-tabs-nav {
+			height: 29px;
+			border-bottom: 0;
+
+			a {
+				display: inline-block;
+				box-sizing: border-box;
+				line-height: 22px;
+				margin-bottom: 5px;
+				text-align: center;
+			}
+		}
+	}
+
+	& + .list-table {
+		margin-top: 4px;
+	}
+}
+
+.header-navigation {
+	display: inline-block;
+	position: relative;
+	margin: 0 0 5px;
+	z-index: 3;
+	max-width: calc(100% - 200px);
+
+	& > ul {
+		flex-wrap: wrap;
+
+		& > li {
+			.status-container {
+				margin-right: 5px;
+				vertical-align: text-bottom;
+			}
+		}
+
+		li > span {
 			&.selected {
 				background-color: $ui-bg-color;
 				border-radius: 2px;
@@ -412,6 +483,14 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+
+		span {
+			white-space: normal;
+		}
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -470,7 +549,6 @@ form {
 .filter-container {
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	margin: 0 0 10px;
 	padding: 10px 0;
 	position: relative;
 
@@ -544,6 +622,7 @@ form {
 	color: $font-color;
 	background-color: transparent;
 	border-color: transparent;
+	vertical-align: top;
 
 	&[disabled] {
 		color: $form-disabled-font-color;
@@ -656,10 +735,12 @@ form {
 		.subfilter-enabled {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
+			-webkit-text-fill-color: $multiselect-item-disabled-color;
 
 			.btn-icon {
 				pointer-events: none;
 				color: $multiselect-item-disabled-color;
+				-webkit-text-fill-color: $multiselect-item-disabled-color;
 			}
 		}
 	}
@@ -1049,8 +1130,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 	}
 }
 
@@ -1073,8 +1153,7 @@ textarea {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 
 		&:focus {
 			border-color: $form-focus-border-color;
@@ -1290,6 +1369,12 @@ select {
 	&:focus {
 		border-color: $form-focus-border-color;
 	}
+
+	&::placeholder {
+		color: $input-placeholder-color;
+		-webkit-text-fill-color: $input-placeholder-color;
+		opacity: 1;
+	}
 }
 
 .filter-space {
@@ -1460,24 +1545,23 @@ select {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
-%form-disabled {
-	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color !important;
+%form-readonly {
+	color: $font-color;
+	-webkit-text-fill-color: $font-color;
+	background-color: $form-disabled-bg-color;
 	border-color: $form-disabled-border-color;
 }
 
-/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
-.safari {
-	%form-disabled {
-		-webkit-text-fill-color: $form-disabled-font-color;
-	}
+%form-disabled {
+	color: $form-disabled-font-color;
+	-webkit-text-fill-color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border-color: $form-disabled-border-color;
 
-	input,
-	textarea {
-		&[readonly] {
-			-webkit-text-fill-color: $font-color !important;
-			@extend %form-disabled;
-		}
+	&::placeholder {
+		color: $input-disabled-placeholder-color;
+		-webkit-text-fill-color: $input-disabled-placeholder-color;
+		opacity: 1;
 	}
 }
 
@@ -1839,7 +1923,7 @@ select {
 		}
 
 		.overlay-dialogue-body {
-			overflow: auto;
+			overflow-y: auto;
 			overflow-x: hidden;
 			width: 100%;
 			max-height: calc(100vh - 220px);
@@ -1849,7 +1933,7 @@ select {
 			position: relative;
 			@extend %webkit-scrollbar;
 
-			> form {
+			form {
 				padding: 2px 0;
 			}
 
@@ -3349,18 +3433,6 @@ svg {
 	}
 }
 
-:-ms-input-placeholder {
-	color: $input-placeholder-color !important;
-}
-
-::-ms-input-placeholder {
-	color: $input-placeholder-color;
-}
-
-::placeholder {
-	color: $input-placeholder-color;
-}
-
 .ui-sortable {
 	tbody {
 		position: relative;
@@ -3769,8 +3841,8 @@ svg {
 	.table-col-action { width: 55px; }
 }
 
-z-select,
-.z-select {
+.z-select,
+z-select {
 	&.z-select-host-interface {
 		.description:not(:empty) {
 			display: block;
@@ -3977,6 +4049,23 @@ z-select,
 	#tagsFormList,
 	#macrosFormList,
 	#valuemap-formlist {
+		.form-field {
+			grid-column-start: 1;
+		}
+
+		.table-forms-td-left {
+			display: none;
+		}
+
+		.table-forms-td-right {
+			width: 100%;
+		}
+	}
+}
+
+.overlay-dialogue #templates-form {
+	#tagsFormList,
+	#macrosFormList {
 		.form-field {
 			grid-column-start: 1;
 		}

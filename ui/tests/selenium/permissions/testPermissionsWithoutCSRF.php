@@ -135,16 +135,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=create',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'create'
 				]
 			],
 			// #7 Template update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=update&templateid=10169',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'update'
 				]
 			],
 			// #8 Host create.
