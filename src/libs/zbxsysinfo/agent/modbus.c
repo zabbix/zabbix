@@ -820,7 +820,7 @@ int	modbus_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (SUCCEED != modbus_read_data(&endpoint, slaveid, function, address, count, type, endianness, offset,
-			(unsigned short)total_count, response->timeout, result, &err))
+			(unsigned short)total_count, request->timeout, result, &err))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot read modbus data: %s.", err));
 		goto err;
