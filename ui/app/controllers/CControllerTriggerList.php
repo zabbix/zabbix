@@ -27,7 +27,7 @@ class CControllerTriggerList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>				'in '.implode(',', ['host', 'template']),
+			'context' =>				'required|in '.implode(',', ['host', 'template']),
 			'filter_evaltype' =>		'in '.implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]),
 			'filter_dependent' =>		'in '.implode(',', [-1, 0, 1]),
 			'filter_discovered' =>		'in '.implode(',', [-1, 0, 1]),

@@ -32,7 +32,7 @@ class CControllerTriggerPrototypeList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>				'in '.implode(',', ['host', 'template']),
+			'context' =>				'required|in '.implode(',', ['host', 'template']),
 			'page' =>					'ge 1',
 			'parent_discoveryid' =>		'required|db items.itemid',
 			'sort' =>					'in '.implode(',', ['description', 'priority', 'status']),
