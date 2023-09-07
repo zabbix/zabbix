@@ -1418,7 +1418,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 		alarmid = DBget_maxid_num("service_alarms", alarms->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "service_alarms", "servicealarmid", "serviceid", "value", "clock",
-				NULL);
+				(char *)NULL);
 
 		for (i = 0; i < alarms->values_num; i++)
 		{
@@ -1463,7 +1463,7 @@ static int	its_write_status_and_alarms(zbx_vector_ptr_t *alarms, zbx_hashset_t *
 		service_problemid = DBget_maxid_num("service_problem", service_problems_new->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "service_problem", "service_problemid", "eventid", "serviceid",
-				"severity", NULL);
+				"severity", (char *)NULL);
 
 		for (i = 0; i < service_problems_new->values_num; i++)
 		{
@@ -2032,15 +2032,15 @@ static void	db_create_service_events(zbx_service_manager_t *manager, const zbx_v
 		goto out;
 
 	zbx_db_insert_prepare(&db_insert_events, "events", "eventid", "source", "object", "objectid", "clock", "value",
-			"ns", "name", "severity", NULL);
+			"ns", "name", "severity", (char *)NULL);
 	zbx_db_insert_prepare(&db_insert_problem, "problem", "eventid", "source", "object", "objectid", "clock", "ns",
-			"name", "severity", NULL);
+			"name", "severity", (char *)NULL);
 
-	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
-	zbx_db_insert_prepare(&db_insert_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", (char *)NULL);
+	zbx_db_insert_prepare(&db_insert_problem_tag, "problem_tag", "problemtagid", "eventid", "tag", "value", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
-			NULL);
+			(char *)NULL);
 
 	eventid = DBget_maxid_num("events", events_num);
 
@@ -2212,9 +2212,9 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 	/* insert recovery events */
 
 	zbx_db_insert_prepare(&db_insert_events, "events", "eventid", "source", "object", "objectid", "clock", "value",
-			"ns", "name", "severity", NULL);
+			"ns", "name", "severity", (char *)NULL);
 
-	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert_event_tag, "event_tag", "eventtagid", "eventid", "tag", "value", (char *)NULL);
 
 	eventid = DBget_maxid_num("events", problem_service.values_num);
 
@@ -2269,7 +2269,7 @@ static void	db_resolve_service_events(zbx_service_manager_t *manager, const zbx_
 	sql_offset = 0;
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", NULL);
+	zbx_db_insert_prepare(&db_insert_recovery, "event_recovery", "eventid", "r_eventid", (char *)NULL);
 
 	for (i = 0; i < recoveries.values_num; i++)
 	{
@@ -2367,7 +2367,7 @@ static void	db_update_service_events(zbx_service_manager_t *manager, const zbx_v
 		goto out;
 
 	zbx_db_insert_prepare(&db_insert_escalations, "escalations", "escalationid", "actionid", "eventid", "serviceid",
-			"servicealarmid", NULL);
+			"servicealarmid", (char *)NULL);
 
 	for (i = 0; i < updates->values_num; i++)
 	{

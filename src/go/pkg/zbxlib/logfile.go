@@ -274,6 +274,8 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	default:
 		return nil, errors.New("Unsupported item key.")
 	}
+
+	/* will be freed in FreeActiveMetric */
 	ckey := C.CString(itemutil.MakeKey(key, params))
 	log.Tracef("Calling C function \"new_metric()\"")
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
@@ -301,12 +303,16 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	var cerrmsg *C.char
 	log.Tracef("Calling C function \"new_prep_vec()\"")
 	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
+
+	defer func() {
+		log.Tracef("Calling C function \"free_prep_vec()\"")
+		C.free_prep_vec(cprepVec)
+	}()
+
 	log.Tracef("Calling C function \"process_log_check()\"")
 	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
 		&cmtimeSent, &cerrmsg, cprepVec, C.zbx_uint64_t(itemid))
-	log.Tracef("Calling C function \"free_prep_vec()\"")
-	C.free_prep_vec(cprepVec)
 
 	// add cached results
 	var cvalue *C.char
