@@ -22,6 +22,9 @@
 
 #include "zbxcacheconfig.h"
 
+#define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX	0
+#define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST	1
+
 void	zbx_script_init(zbx_script_t *script);
 void	zbx_script_clean(zbx_script_t *script);
 int	zbx_check_script_permissions(zbx_uint64_t groupid, zbx_uint64_t hostid);

@@ -28,9 +28,6 @@
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 
-#define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX	0
-#define	ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST	1
-
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
