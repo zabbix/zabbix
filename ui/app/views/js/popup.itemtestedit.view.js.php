@@ -302,18 +302,16 @@ function itemCompleteTest(overlay) {
 				}
 			<?php endif ?>
 
-			if ('not_supported' in ret && jQuery('#not_supported', $form).length) {
-				$('#not_supported').prop('checked', ret.not_supported != 0);
+			if ('not_supported' in ret && jQuery('[name="not_supported"]', $form).length) {
+				$('[name="not_supported"]', $form)
+					.prop('checked', ret.not_supported != 0)
+					.trigger('change');
 			}
 
-			jQuery('#value', $form)
-				.multilineInput('value', ret.value)
-				.multilineInput($('#not_supported').is(':checked') ? 'setReadOnly' : 'unsetReadOnly');
+			jQuery('#value', $form).multilineInput('value', ret.value);
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
-				jQuery('#runtime_error', $form)
-					.multilineInput('value', ret.runtime_error)
-					.multilineInput($('#not_supported').is(':checked') ? 'unsetReadOnly' : 'setReadOnly');
+				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
 			}
 
 			if (typeof ret.eol !== 'undefined') {
@@ -414,7 +412,7 @@ function saveItemTestInputs() {
 		$test_obj,
 		input_values = {
 			value: jQuery('#value').multilineInput('value'),
-			not_supported: jQuery('#not_supported').is(':checked') ? 1 : 0,
+			not_supported: jQuery('[name="not_supported"]').is(':checked') ? 1 : 0,
 			eol: jQuery('#eol').find(':checked').val()
 		},
 		form_data = $form.serializeJSON(),
@@ -477,8 +475,6 @@ jQuery(document).ready(function($) {
 		rows: 0
 	});
 
-	$('#not_supported').prop('checked', <?= $data['not_supported'] != 0 ? 'true' : 'false' ?>);
-
 	$('#runtime_error').length && $('#runtime_error').multilineInput({
 		placeholder: <?= json_encode(_('error text')) ?>,
 		value: <?= json_encode($data['runtime_error']) ?>,
@@ -500,28 +496,24 @@ jQuery(document).ready(function($) {
 
 	<?php if ($data['is_item_testable']): ?>
 		$('#not_supported').on('change', function() {
-			var $form = $('#preprocessing-test-form');
+			const $form = $('#preprocessing-test-form');
 
-			if ($(this).is(':checked')) {
-				$('#value', $form).multilineInput('setReadOnly');
-				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('unsetReadOnly');
-			}
-			else {
-				$('#value', $form).multilineInput('unsetReadOnly');
-				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
-			}
+			$('#value', $form).multilineInput(this.checked ? 'setReadOnly' : 'unsetReadOnly');
+			$('#runtime_error').length && $('#runtime_error', $form).multilineInput(
+				this.checked && !$('[name="get_value"]', $form).is(':checked') ? 'unsetReadOnly' : 'setReadOnly'
+			);
 		});
 
 		$('#get_value').on('change', function() {
 			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
 				$form = $('#preprocessing-test-form'),
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
-				$not_supported = $('#not_supported', $form);
+				$not_supported = $('[name="not_supported"]', $form);
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
-				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 				$not_supported.prop('disabled', true);
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('setReadOnly');
@@ -590,10 +582,9 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				$('#value', $form).multilineInput($not_supported.is(':checked') ? 'setReadOnly' : 'unsetReadOnly');
-				$not_supported.is(':checked') && $('#runtime_error').length
-					&& $('#runtime_error', $form).multilineInput('unsetReadOnly');
-				$not_supported.prop('disabled', false);
+				$not_supported
+					.prop('disabled', false)
+					.trigger('change');
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');

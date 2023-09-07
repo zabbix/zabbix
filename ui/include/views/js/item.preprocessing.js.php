@@ -428,8 +428,8 @@
 				let i = 0;
 
 				$(this).find('li.sortable').each(function() {
-						$(this).find('[name*="sortorder"]').val(i++);
-					});
+					$(this).find('[name*="sortorder"]').val(i++);
+				});
 			}
 		});
 
@@ -630,7 +630,7 @@
 					.querySelector('tbody')
 					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb}));
 			})
-			.on('item-type-change', function (e) {
+			.on('item.type.change', function (e) {
 				const $preproc_steps = $('z-select[name^="preprocessing["][name$="[type]"]'),
 					no_parameters = $('#type').val() != <?= ITEM_TYPE_SSH ?>;
 

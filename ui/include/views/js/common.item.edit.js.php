@@ -188,7 +188,7 @@
 					item_type_lookup.update();
 				}
 
-				$('#preprocessing').trigger('item-type-change');
+				$('#preprocessing').trigger('item.type.change');
 			})
 			.trigger('change');
 

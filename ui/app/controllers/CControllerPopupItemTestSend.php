@@ -195,7 +195,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						CItemGeneral::validatePreprocessingStepsByType($item, '/steps');
 
 						$steps = $item['preprocessing'];
-					} catch (Exception $e) {
+					}
+					catch (Exception $e) {
 						error($e->getMessage());
 						$ret = false;
 					}
