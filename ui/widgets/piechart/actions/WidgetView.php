@@ -548,14 +548,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 					&& $metric['options']['type'] == CWidgetFieldDataSet::ITEM_TYPE_TOTAL);
 
 				if ($is_total) {
-					$raw_total_value = $metric['value'] !== null ? max($metric['value'], 0) : null;
+					$raw_total_value = $metric['value'] !== null ? abs($metric['value']) : null;
 					$has_total = true;
 				}
 				elseif (!$has_total && $metric['value'] !== null) {
 					if ($raw_total_value === null) {
 						$raw_total_value = 0;
 					}
-					$raw_total_value += max($metric['value'], 0);
+					$raw_total_value += abs($metric['value']);
 				}
 
 				if ($units_config['units_show'] == self::SHOW_UNITS_ON && $units_config['units_value'] !== '') {
@@ -577,16 +577,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($metric);
 
 			foreach ($sectors as $key => $sector) {
-				if ($sector['value'] <= 0 || $raw_total_value <= 0) {
+				if ($sector['value'] == 0 || $raw_total_value == 0) {
 					$percentage = 0;
 				}
 				else {
-					$percentage = ($sector['value'] / $raw_total_value) * 100;
+					$percentage = (abs($sector['value']) / $raw_total_value) * 100;
 				}
 
 				if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON
 						&& $percentage < $merge_sectors['percent']) {
-					$others_value += max($sector['value'], 0);
+					$others_value += abs($sector['value']);
 
 					$below_threshold_sectors[] = $key;
 				}
@@ -745,7 +745,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$has_total_item = false;
 
 		$sectors = array_filter($sectors, function ($sector) {
-			return $sector['value'] > 0;
+			return $sector['value'] != 0;
 		});
 
 		// Move total sector to the end.
@@ -761,11 +761,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$svg_sectors = array_values($sectors);
 
 		foreach ($svg_sectors as &$sector) {
-			$sector['percent_of_total'] = ($sector['value'] / $total_value['value']) * 100;
+			$sector['percent_of_total'] = (abs($sector['value']) / $total_value['value']) * 100;
 
 			if (!$sector['is_total']) {
 				$total_percentage_used += $sector['percent_of_total'];
-				$sector_total_value += $sector['value'];
+				$sector_total_value += abs($sector['value']);
 				$non_total_sectors[] = $sector;
 			}
 		}
@@ -793,13 +793,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$sectors_to_keep = [];
 
 				foreach ($non_total_sectors as &$sector) {
-					if (($current_value + $sector['value']) <= $remaining_value) {
+					if (($current_value + abs($sector['value'])) <= $remaining_value) {
 						// There is enough space for this sector.
 						$sectors_to_keep[] = $sector;
-						$current_value += $sector['value'];
-						$remaining_value -= $sector['value'];
+						$current_value += abs($sector['value']);
+						$remaining_value -= abs($sector['value']);
 					}
-					elseif ($sector['value'] >= $remaining_value && $current_value < $total_value['value']) {
+					elseif (abs($sector['value']) >= $remaining_value && $current_value < $total_value['value']) {
 						// This sector needs to be cut, to fit.
 						$sector['percent_of_total'] = ($remaining_value / $total_value['value']) * 100;
 						$sectors_to_keep[] = $sector;
