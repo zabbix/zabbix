@@ -61,7 +61,10 @@ CDate.prototype = {
 			mnts = this.getMinutes(),
 			sec = this.getSeconds();
 
-		var ampm = (hrs < 12) ? 'AM' : 'PM';
+		if (format[format.length - 1] === 'A') {
+			var ampm = (hrs < 12) ? 'AM' : 'PM',
+				ampmhrs = appendZero((hrs + 11) % 12 + 1);
+		}
 
 		/**
 		 * Append date suffix according to English rules e.g., 3 becomes 3rd.
@@ -101,8 +104,8 @@ CDate.prototype = {
 			case 'H:i':
 				return  appendZero(hrs) + ':' + appendZero(mnts);
 			case 'M jS, Y h:i A':
-				hrs = appendZero((hrs + 11) % 12 + 1);
-				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + hrs + ':' + appendZero(mnts) + ' ' + ampm;
+				return shortMn[mnth] + ' ' + appSfx(dt) + ', ' + yr + ' ' + ampmhrs + ':' + appendZero(mnts) + ' ' +
+					ampm;
 			case 'Y M d H:i':
 				return  yr + ' ' + shortMn[mnth] + ' ' +appendZero(dt) + ' ' + appendZero(hrs) + ':' + appendZero(mnts);
 			case 'd.m.Y H:i':
@@ -116,9 +119,8 @@ CDate.prototype = {
 				return appendZero(dt) + ' ' + appendZero(mnth + 1) + ' ' + yr + ' ' + appendZero(hrs) + ' ' +
 					appendZero(mnts);
 			case 'Y-m-d h:i:s A':
-				hrs = appendZero((hrs + 11) % 12 + 1);
-				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + hrs + ':' + appendZero(mnts) +
-					':' + appendZero(sec) + ' ' + ampm;
+				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + ampmhrs + ':' +
+					appendZero(mnts) + ':' + appendZero(sec) + ' ' + ampm;
 			default:
 				// defaults to Y-m-d H:i:s
 				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + appendZero(hrs) + ':' +

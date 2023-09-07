@@ -163,7 +163,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	$page_header
 		->addJavaScript('
-			const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+			const PHP_ZBX_FULL_DATE_TIME = "'.DATE_TIME_FORMAT_SECONDS.'";
 			const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
 		')
 		->addJsFile((new CUrl('js/browsers.js'))->getUrl());
