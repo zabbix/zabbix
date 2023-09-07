@@ -51,9 +51,6 @@
 			if (this.db_dependencies) {
 				this.#loadDependencyTable(this.db_dependencies);
 			}
-
-			// Form fields should be collected after dependency table is loaded.
-			this.initial_form_fields = getFormFields(this.form);
 		}
 
 		#initActions() {
