@@ -391,13 +391,10 @@ class CDataHelper extends CAPIHelper {
 			$time = array_values($time);
 		}
 
-		// Set correct history table where to insert data.
-		$history_table = static::getItemDataTable($itemid);
-
 		foreach (array_values($values) as $key => $value) {
 			$clock = is_array($time) ? $time[$key] : $time;
-			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
-					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
+			DBexecute('INSERT INTO '.self::getItemDataTable($itemid).' (itemid, clock, value) VALUES ('
+					.zbx_dbstr($itemid).', '.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
 		}
 	}
 
@@ -407,10 +404,7 @@ class CDataHelper extends CAPIHelper {
 	 * @param string $itemid		item id
 	 */
 	public static function removeItemData($itemid) {
-		// Set correct history table from where to delete data.
-		$history_table = static::getItemDataTable($history_table);
-
-		DBexecute('DELETE FROM '.$history_table.' WHERE itemid='.zbx_dbstr($itemid));
+		DBexecute('DELETE FROM '.self::getItemDataTable($itemid).' WHERE itemid='.zbx_dbstr($itemid));
 	}
 
 	/**
