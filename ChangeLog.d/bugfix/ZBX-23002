@@ -1,1 +1,0 @@
-...G....S. [ZBX-23002] made vfs_file_contents, vfs_file_regmatch, vfs_file_regexp, log, log.count, logrt, logrt.count and telnet items to fail when non-existing encoding is used (arimdjonoks)

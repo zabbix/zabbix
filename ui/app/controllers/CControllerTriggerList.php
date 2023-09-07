@@ -126,7 +126,7 @@ class CControllerTriggerList extends CController {
 
 		$checkbox_hash = crc32(implode('', $filter_hostids));
 		$ms_groups = [];
-		$filter_groupids_enriched = getSubGroups($filter_groupids, $ms_groups, ['editable' => true], $data['context']);
+		$filter_groupids_enriched = getSubGroups($filter_groupids, $ms_groups, $data['context']);
 
 		if ($filter_hostids) {
 			if ($data['context'] === 'host') {

@@ -9658,7 +9658,7 @@ return [
 				'length' => 128,
 				'default' => ''
 			],
-			'mode' => [
+			'operating_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
