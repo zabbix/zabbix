@@ -122,7 +122,9 @@ $available_js = [
 
 $translate_strings = [
 	'gtlc.js' => [
-		'S_MINUTE_SHORT' => _x('m', 'minute short')
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
+		'Failed to update time selector.' => _('Failed to update time selector.'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),

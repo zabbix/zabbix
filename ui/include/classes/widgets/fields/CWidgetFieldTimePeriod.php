@@ -31,7 +31,7 @@ use Zabbix\Widgets\CWidgetField;
 class CWidgetFieldTimePeriod extends CWidgetField {
 
 	public const DEFAULT_VIEW = \CWidgetFieldTimePeriodView::class;
-	public const DEFAULT_VALUE = ['from' => '', 'to' => ''];
+	public const DEFAULT_VALUE = ['from' => '', 'from_ts' => 0, 'to' => '', 'to_ts' => 0];
 
 	public const DATA_SOURCE_DEFAULT = 0;
 	public const DATA_SOURCE_WIDGET = 1;
@@ -61,10 +61,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function setValue($value): self {
 		$value = (array) $value;
 
-		if (array_key_exists('data_source', $value)) {
-			unset($value['data_source']);
-		}
-
 		if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
 			[
 				'reference' => $reference
@@ -74,9 +70,14 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				? self::DATA_SOURCE_DASHBOARD
 				: self::DATA_SOURCE_WIDGET;
 		}
+		elseif (array_key_exists('data_source', $value)) {
+			$this->data_source = $value['data_source'];
+		}
 		else {
 			$this->data_source = self::DATA_SOURCE_DEFAULT;
 		}
+
+		unset($value['data_source']);
 
 		$this->value = $value;
 
@@ -84,19 +85,45 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	}
 
 	public function validate(bool $strict = false): array {
-		$errors = [];
-
 		$validation_rules = $this->getValidationRules($strict);
+
 		$field_label = $this->full_name ?? $this->label ?? $this->name;
 		$field_value = $this->getValue();
 
-		if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
+		$errors = [];
+
+		if ($this->data_source !== self::DATA_SOURCE_DEFAULT) {
+			$data_source_label = $this->data_source === self::DATA_SOURCE_DASHBOARD ? _('Dashboard') : _('Widget');
+
+			$reference_value = array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $field_value)
+				? $field_value[CWidgetField::FOREIGN_REFERENCE_KEY]
+				: '';
+
+			if (!CApiInputValidator::validate($validation_rules['fields'][CWidgetField::FOREIGN_REFERENCE_KEY],
+					$reference_value, $field_label.'/'.$data_source_label, $error)) {
+				$errors[] = $error;
+			}
+		}
+		else {
 			$absolute_time_parser = new CAbsoluteTimeParser();
 			$relative_time_parser = new CRelativeTimeParser();
-			$period = ['from' => 0, 'to' => 0];
 
-			foreach ($field_value as $name => &$value) {
-				$label = $field_label.'/'.($name === 'from' ? $this->getFromLabel() : $this->getToLabel());
+			$name_labels = [
+				'from' => $this->getFromLabel(),
+				'to' => $this->getToLabel()
+			];
+
+			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
+				if (!array_key_exists($name, $field_value)) {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label,
+						_s('the parameter "%1$s" is missing', $name_labels[$name])
+					);
+					continue;
+				}
+
+				$value = &$field_value[$name];
+				$value_ts = &$field_value[$name_ts];
+				$label = $field_label.'/'.$name_labels[$name];
 
 				if (!CApiInputValidator::validate($validation_rules['fields'][$name], $value, $label, $error)) {
 					$errors[] = $error;
@@ -104,6 +131,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				}
 
 				if ($value === self::DEFAULT_VALUE[$name]) {
+					$value_ts = self::DEFAULT_VALUE[$name_ts];
 					continue;
 				}
 
@@ -112,7 +140,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					$time_range = $name === 'from' ? '00:00:00' : '23:59:59';
 
 					if (!$this->is_date_only || $datetime->format('H:i:s') === $time_range) {
-						$period[$name] = $datetime->getTimestamp();
+						$value_ts = $datetime->getTimestamp();
 						continue;
 					}
 				}
@@ -131,7 +159,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					}
 
 					if (!$has_errors) {
-						$period[$name] = $datetime->getTimestamp();
+						$value_ts = $datetime->getTimestamp();
 						continue;
 					}
 				}
@@ -142,21 +170,21 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					)
 				];
 			}
-			unset($value);
 
-			if ($period['from'] !== 0 && $period['to'] !== 0 && $period['from'] >= $period['to']) {
-				$errors[] = [
-					_s('Invalid parameter "%1$s": %2$s.', $field_label,
-						$this->is_date_only ? _('a date is expected') : _('a time is expected')
-					)
-				];
+			if (!$errors) {
+				if ($field_value['from'] !== '' && $field_value['to'] !== ''
+						&& $field_value['from_ts'] >= $field_value['to_ts']) {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label.'/'.$name_labels['to'],
+						_s('value must be greater than "%1$s"', $field_label.'/'.$name_labels['from'])
+					);
+				}
 			}
+		}
 
-			if ($errors) {
-				$this->setValue($this->getDefault());
+		if ($errors) {
+			$this->setValue($this->getDefault());
 
-				return $errors;
-			}
+			return $errors;
 		}
 
 		$this->setValue($field_value);
@@ -226,18 +254,20 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
 			$validation_rules = parent::getValidationRules($strict);
 
-			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
 				self::setValidationRuleFlag($validation_rules['fields']['from'], API_NOT_EMPTY);
 				self::setValidationRuleFlag($validation_rules['fields']['to'], API_NOT_EMPTY);
 			}
 		}
 		else {
 			$validation_rules = ['type' => API_OBJECT, 'fields' => [
-				'reference' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+				CWidgetField::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]];
 
-			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
-				self::setValidationRuleFlag($validation_rules['fields']['reference'], API_NOT_EMPTY);
+			if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+				self::setValidationRuleFlag($validation_rules['fields'][CWidgetField::FOREIGN_REFERENCE_KEY],
+					API_NOT_EMPTY
+				);
 			}
 		}
 

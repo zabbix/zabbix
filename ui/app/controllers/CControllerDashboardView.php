@@ -112,6 +112,17 @@ class CControllerDashboardView extends CController {
 
 		$dashboard['can_edit_dashboards'] = $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 
+		$hostid = $this->getInput('hostid', CProfile::get('web.dashboard.hostid', 0));
+
+		$hosts = $hostid !== 0
+			? CArrayHelper::renameObjectsKeys(API::Host()->get([
+				'output' => ['hostid', 'name'],
+				'hostids' => [$hostid]
+			]), ['hostid' => 'id'])
+			: [];
+
+		$dashboard_host = $hosts ? $hosts[0] : null;
+
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',
 			'profileIdx2' => $dashboard['dashboardid'] ?? 0,
@@ -121,10 +132,12 @@ class CControllerDashboardView extends CController {
 
 		updateTimeSelectorPeriod($time_selector_options);
 
+		$dashboard_time_period = getTimeSelectorPeriod($time_selector_options);
+
 		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
 
 		$data = [
-			// The dashboard variable shall only contain data used by the JavaScript framework.
+			// The dashboard property shall only contain data used by the JavaScript framework.
 			'dashboard' => $dashboard,
 			'widget_defaults' => $widget_defaults,
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
@@ -134,28 +147,12 @@ class CControllerDashboardView extends CController {
 			'can_view_reports' => $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS),
 			'can_create_reports' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS),
 			'has_related_reports' => $stats['has_related_reports'],
-			'use_dashboard_host' => $stats['use_dashboard_host'],
-			'has_time_selector' => $stats['use_dashboard_time_period'],
-			'time_period' => getTimeSelectorPeriod($time_selector_options),
+			'broadcast_requirements' => $stats['broadcast_requirements'],
+			'dashboard_host' => $dashboard_host,
+			'dashboard_time_period' => $dashboard_time_period,
 			'clone' => $this->hasInput('clone'),
 			'active_tab' => CProfile::get('web.dashboard.filter.active', 1)
 		];
-
-		if ($stats['use_dashboard_host']) {
-			$hostid = $this->getInput('hostid', CProfile::get('web.dashboard.hostid', 0));
-
-			$hosts = ($hostid != 0)
-				? CArrayHelper::renameObjectsKeys(API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => [$hostid]
-				]), ['hostid' => 'id'])
-				: [];
-
-			$data['dashboard_host'] = $hosts ? $hosts[0] : null;
-		}
-		else {
-			$data['dashboard_host'] = null;
-		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboard'));
@@ -166,13 +163,12 @@ class CControllerDashboardView extends CController {
 	 * Get dashboard data from API.
 	 */
 	private function getDashboard(): array {
-		// The dashboard variable shall only contain data used by the JavaScript framework.
+		// The dashboard property shall only contain data used by the JavaScript framework.
 		$dashboard = null;
 
 		$stats = [
 			'has_related_reports' => false,
-			'use_dashboard_host' => false,
-			'use_dashboard_time_period' => false
+			'broadcast_requirements' => []
 		];
 		$error = null;
 
@@ -230,10 +226,7 @@ class CControllerDashboardView extends CController {
 					],
 				];
 
-				$dashboard_requirements = CDashboardHelper::getDashboardRequirements($widgets_and_forms);
-
-				$stats['use_dashboard_host'] = $dashboard_requirements['use_dashboard_host'];
-				$stats['use_dashboard_time_period'] = $dashboard_requirements['use_dashboard_time_period'];
+				$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
 			}
 			else {
 				$error = _('No permissions to referred object or it does not exist!');
@@ -286,10 +279,7 @@ class CControllerDashboardView extends CController {
 						'limit' => 1
 					]);
 
-					$dashboard_requirements = CDashboardHelper::getDashboardRequirements($widgets_and_forms);
-
-					$stats['use_dashboard_host'] = $dashboard_requirements['use_dashboard_host'];
-					$stats['use_dashboard_time_period'] = $dashboard_requirements['use_dashboard_time_period'];
+					$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
 
 					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}

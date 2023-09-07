@@ -29,22 +29,22 @@
 		is_busy: false,
 		is_busy_saving: false,
 
+		skip_time_selector_range_update: false,
+
 		init({
 			dashboard,
 			widget_defaults,
 			widget_last_type,
 			configuration_hash,
-			has_time_selector,
-			time_period,
-			use_dashboard_host,
+			broadcast_requirements,
 			dashboard_host,
+			dashboard_time_period,
 			web_layout_mode,
 			clone
 		}) {
 			this.dashboard = dashboard;
-			this.has_time_selector = has_time_selector;
-			this.time_period = time_period;
-			this.use_dashboard_host = use_dashboard_host;
+			this.broadcast_requirements = broadcast_requirements;
+			this.dashboard_time_period = dashboard_time_period;
 			this.clone = clone;
 
 			timeControl.refreshPage = false;
@@ -89,8 +89,10 @@
 				is_edit_mode: dashboard.dashboardid === null || clone,
 				can_edit_dashboards: dashboard.can_edit_dashboards,
 				is_kiosk_mode: web_layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>,
-				hostid: dashboard_host !== null ? dashboard_host.id : null,
-				time_period,
+				broadcast_options: {
+					_hostid: {rebroadcast: false},
+					_timeperiod: {rebroadcast: true}
+				},
 				csrf_token: <?= json_encode(CCsrfTokenHelper::get('dashboard')) ?>
 			});
 
@@ -102,13 +104,23 @@
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
 
+			ZABBIX.Dashboard.broadcast({
+				_hostid: dashboard_host !== null ? dashboard_host.id : null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
+
 			ZABBIX.Dashboard.activate();
 
 			if (web_layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_EDIT, () => this.edit());
 				ZABBIX.Dashboard.on(DASHBOARD_EVENT_APPLY_PROPERTIES, this.events.applyProperties);
 
-				if (use_dashboard_host) {
+				if ('_hostid' in broadcast_requirements) {
 					jQuery('#dashboard_hostid').on('change', this.events.dashboardHostChange);
 				}
 
@@ -126,11 +138,16 @@
 				}
 			}
 
+			ZABBIX.Dashboard.on(CDashboard.EVENT_FEEDBACK, this.events.feedback);
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_CONFIGURATION_OUTDATED, this.events.configurationOutdated);
 
-			if (use_dashboard_host) {
+			if ('_hostid' in broadcast_requirements) {
 				// Perform dynamic host switch when browser back/previous buttons are pressed.
 				window.addEventListener('popstate', this.events.popState);
+			}
+
+			if ('_timeperiod' in broadcast_requirements) {
+				jQuery.subscribe('timeselector.rangeupdate', this.events.timeSelectorRangeUpdate);
 			}
 
 			jqBlink.blink();
@@ -139,7 +156,7 @@
 		edit() {
 			timeControl.disableAllSBox();
 
-			if (this.use_dashboard_host) {
+			if ('_hostid' in this.broadcast_requirements) {
 				jQuery('#dashboard_hostid').off('change', this.events.dashboardHostChange);
 			}
 
@@ -384,7 +401,7 @@
 
 				jQuery('#dashboard_hostid').multiSelect('addData', host ? [host] : [], false);
 
-				ZABBIX.Dashboard.setHostId(host !== null ? host.id : null);
+				ZABBIX.Dashboard.broadcast({_hostid: host !== null ? host.id : null});
 			},
 
 			dashboardHostChange() {
@@ -398,9 +415,9 @@
 					curl.setArgument('dashboardid', view.dashboard.dashboardid);
 				}
 
-				if (view.has_time_selector) {
-					curl.setArgument('from', view.time_period.from);
-					curl.setArgument('to', view.time_period.to);
+				if ('_timeperiod' in view.broadcast_requirements) {
+					curl.setArgument('from', view.dashboard_time_period.from);
+					curl.setArgument('to', view.dashboard_time_period.to);
 				}
 
 				if (host !== null) {
@@ -409,7 +426,7 @@
 
 				history.pushState({host: host}, '', curl.getUrl());
 
-				ZABBIX.Dashboard.setHostId(host !== null ? host.id : null);
+				ZABBIX.Dashboard.broadcast({_hostid: host !== null ? host.id : null});
 
 				updateUserProfile('web.dashboard.hostid', host !== null ? host.id : 1, []);
 			},
@@ -447,6 +464,36 @@
 				}
 
 				location.href = location.href;
+			},
+
+			timeSelectorRangeUpdate: (e, data) => {
+				view.dashboard_time_period = data;
+
+				if (view.skip_time_selector_range_update) {
+					view.skip_time_selector_range_update = false;
+
+					return;
+				}
+
+				ZABBIX.Dashboard.broadcast({
+					_timeperiod: {
+						from: data.from,
+						from_ts: data.from_ts,
+						to: data.to,
+						to_ts: data.to_ts
+					}
+				});
+			},
+
+			feedback(e) {
+				if (e.detail.type === '_timeperiod') {
+					view.skip_time_selector_range_update = true;
+
+					$.publish('timeselector.rangechange', {
+						from: e.detail.value.from,
+						to: e.detail.value.to
+					});
+				}
 			}
 		}
 	}

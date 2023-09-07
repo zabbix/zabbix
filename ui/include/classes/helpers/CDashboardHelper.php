@@ -171,18 +171,13 @@ class CDashboardHelper {
 	 *
 	 * @return array
 	 */
-	public static function getDashboardRequirements(array $widgets_and_forms): array {
-		$use_dashboard_host = false;
-		$use_dashboard_time_period = false;
-
-		$data_types = CWidgetsData::getDataTypes();
+	public static function getBroadcastRequirements(array $widgets_and_forms): array {
+		$requirements = [];
 
 		/** @var CWidgetForm $form */
 		foreach ($widgets_and_forms as ['form' => $form]) {
 			foreach ($form->getFields() as $field) {
 				if ($field->isDashboardAccepted()) {
-					$data_type_spec = $data_types[$field->getInType()];
-
 					$value = $field->getValue();
 
 					if (!array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value)) {
@@ -190,30 +185,18 @@ class CDashboardHelper {
 					}
 
 					[
-						'reference' => $reference
+						'reference' => $reference,
+						'type' => $type
 					] = CWidgetField::parseTypedReference($value[CWidgetField::FOREIGN_REFERENCE_KEY]);
 
 					if ($reference === CWidgetField::REFERENCE_DASHBOARD) {
-						if ($data_type_spec['accepts_dashboard_host']) {
-							$use_dashboard_host = true;
-						}
-
-						if ($data_type_spec['accepts_dashboard_time_period']) {
-							$use_dashboard_time_period = true;
-						}
-					}
-
-					if ($use_dashboard_host && $use_dashboard_time_period) {
-						break 2;
+						$requirements[$type] = true;
 					}
 				}
 			}
 		}
 
-		return [
-			'use_dashboard_host' => $use_dashboard_host,
-			'use_dashboard_time_period' => $use_dashboard_time_period
-		];
+		return $requirements;
 	}
 
 	/**
@@ -592,28 +575,6 @@ class CDashboardHelper {
 		}
 
 		return $fields_new;
-	}
-
-	/**
-	 * Checks, if any of widgets needs time selector.
-	 *
-	 * @param array $pages
-	 *
-	 * @return bool
-	 */
-	public static function hasTimeSelector(array $pages): bool {
-		foreach ($pages as $page) {
-			foreach ($page['widgets'] as $widget_data) {
-				$widget = App::ModuleManager()->getModule($widget_data['type']);
-
-				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET
-						&& $widget->usesTimeSelector($widget_data['fields'])) {
-					return true;
-				}
-			}
-		}
-
-		return false;
 	}
 
 	/**

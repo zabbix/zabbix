@@ -24,8 +24,7 @@ namespace Widgets\TopTriggers\Actions;
 use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
-	CControllerResponseData,
-	CRangeTimeParser;
+	CControllerResponseData;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -33,14 +32,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'from' => 'string',
-			'to' => 'string'
+			'has_custom_time_period' => 'in 1'
 		]);
 	}
 
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
+			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -70,14 +69,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$hostids = $this->fields_values['hostids'] ?: null;
 		}
 
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($this->getInput('from'));
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($this->getInput('to'));
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-
 		$db_problems = API::Event()->get([
 			'countOutput' => true,
 			'groupBy' => ['objectid'],
@@ -86,8 +77,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
-			'time_from' => $time_from,
-			'time_till' => $time_to,
+			'time_from' => $this->fields_values['time_period']['from_ts'],
+			'time_till' => $this->fields_values['time_period']['to_ts'],
 			'search' => [
 				'name' => $this->fields_values['problem'] !== '' ? $this->fields_values['problem'] : null
 			],
@@ -125,5 +116,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		return $db_triggers;
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }

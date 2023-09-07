@@ -30,6 +30,20 @@ class CWidgetGraph extends CWidget {
 		if (this.getFieldsReferredData().has('override_hostid')) {
 			this.#override_hostid = this.getFieldsReferredData().get('override_hostid').value;
 		}
+
+		this.events_handlers = {
+			rangeUpdate: (e) => {
+				if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
+					const time_period = e.detail;
+
+					timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], time_period);
+					timeControl.refreshObject(`graph_${this._unique_id}`);
+
+					this.feedback({time_period});
+					this.broadcast({_timeperiod: time_period});
+				}
+			}
+		};
 	}
 
 	onActivate() {
@@ -46,13 +60,13 @@ class CWidgetGraph extends CWidget {
 
 	onResize() {
 		if (this._is_graph_mode && this.getState() === WIDGET_STATE_ACTIVE) {
-			const graph_size = this._getGraphSize();
+			const graph_size = this._getContentsSize();
 
 			if (graph_size.width <= 0 || graph_size.height <= 0) {
 				return;
 			}
 
-			const image = document.getElementById('graph_' + this._unique_id);
+			const image = document.getElementById(`graph_${this._unique_id}`);
 
 			if (!image.complete) {
 				image.addEventListener('load', () => this.resize(), {once: true});
@@ -60,8 +74,8 @@ class CWidgetGraph extends CWidget {
 				return;
 			}
 
-			timeControl.objectList['graph_' + this._unique_id].objDims.width = graph_size.width;
-			timeControl.objectList['graph_' + this._unique_id].objDims.graphHeight = graph_size.height;
+			timeControl.objectList[`graph_${this._unique_id}`].objDims.width = graph_size.width;
+			timeControl.objectList[`graph_${this._unique_id}`].objDims.graphHeight = graph_size.height;
 
 			const image_curl = new Curl(image.src);
 
@@ -89,7 +103,24 @@ class CWidgetGraph extends CWidget {
 		}
 	}
 
+	onFeedback({type, value, descriptor}) {
+		if (type === '_timeperiod' && this.getFieldsReferredData().has('time_period')) {
+			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`], value);
+			timeControl.refreshObject(`graph_${this._unique_id}`);
+
+			this.feedback({time_period: value});
+
+			return true;
+		}
+
+		return super.onFeedback({type, value, descriptor});
+	}
+
 	promiseUpdate() {
+		if (!this.hasBroadcast('time_period') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		}
+
 		if (this._is_graph_mode) {
 			if (this.getFieldsReferredData().has('override_hostid')) {
 				const override_hostid = this.getFieldsReferredData().get('override_hostid').value;
@@ -104,12 +135,39 @@ class CWidgetGraph extends CWidget {
 				}
 			}
 
-			timeControl.refreshObject('graph_' + this._unique_id);
+			timeControl.objectUpdate.call(timeControl.objectList[`graph_${this._unique_id}`],
+				this.getFieldsData().time_period
+			);
+			timeControl.refreshObject(`graph_${this._unique_id}`);
 
 			return Promise.resolve();
 		}
 
 		return super.promiseUpdate();
+	}
+
+	getUpdateRequestData() {
+		let has_custom_time_period = true;
+
+		if (this.getFieldsReferredData().has('time_period')) {
+			const descriptor = this.getFieldsReferredData().get('time_period').descriptor;
+
+			if (descriptor.sender_type === 'widget' && descriptor.widget_type === 'graphprototype') {
+				const graph_prototype_widget = ZABBIX.Dashboard.getSelectedDashboardPage().getWidget(
+					descriptor.sender_unique_id
+				);
+
+				has_custom_time_period = graph_prototype_widget.hasCustomTimePeriod();
+			}
+			else {
+				has_custom_time_period = false;
+			}
+		}
+
+		return {
+			...super.getUpdateRequestData(),
+			has_custom_time_period: has_custom_time_period ? 1 : undefined
+		}
 	}
 
 	setContents(response) {
@@ -121,10 +179,10 @@ class CWidgetGraph extends CWidget {
 			this._graph_url = response.async_data.graph_url;
 
 			this._flickerfreescreen = this._body.querySelector('.flickerfreescreen');
-			this._flickerfreescreen.id = 'flickerfreescreen_graph_' + this._unique_id;
+			this._flickerfreescreen.id = `flickerfreescreen_graph_${this._unique_id}`;
 
 			this._flickerfreescreen_container = this._flickerfreescreen.querySelector('.dashboard-widget-graph-link');
-			this._flickerfreescreen_container.id = 'graph_container_' + this._unique_id;
+			this._flickerfreescreen_container.id = `graph_container_${this._unique_id}`;
 
 			if (this._graph_url !== null && this.isEditMode()) {
 				this._flickerfreescreen_container.href = 'javascript:void(0)';
@@ -133,13 +191,13 @@ class CWidgetGraph extends CWidget {
 
 			this._time_control_data = {
 				...response.async_data.time_control_data,
-				id: 'graph_' + this._unique_id,
-				containerid: 'graph_container_' + this._unique_id
+				id: `graph_${this._unique_id}`,
+				containerid: `graph_container_${this._unique_id}`
 			};
 
 			this._flickerfreescreen_data = {
 				...response.async_data.flickerfreescreen_data,
-				id: 'graph_' + this._unique_id
+				id: `graph_${this._unique_id}`
 			};
 
 			this._activateGraph();
@@ -147,48 +205,45 @@ class CWidgetGraph extends CWidget {
 	}
 
 	_activateGraph() {
+		const time_period = {...this.getFieldsData().time_period};
+
 		if (this._graph_url !== null) {
 			const curl = new Curl(this._graph_url);
 
-			curl.setArgument('from', this._time_period.from);
-			curl.setArgument('to', this._time_period.to);
+			curl.setArgument('from', time_period.from);
+			curl.setArgument('to', time_period.to);
 
 			this._flickerfreescreen_container.href = curl.getUrl();
 		}
 
-		const graph_size = this._getGraphSize();
+		const graph_size = this._getContentsSize();
 
 		this._time_control_data.objDims.width = graph_size.width;
 		this._time_control_data.objDims.graphHeight = graph_size.height;
 
 		const curl = new Curl(this._time_control_data.src);
 
-		curl.setArgument('from', this._time_period.from);
-		curl.setArgument('to', this._time_period.to);
+		curl.setArgument('from', time_period.from);
+		curl.setArgument('to', time_period.to);
 
 		this._time_control_data.src = curl.getUrl();
 
-		this._flickerfreescreen_data.timeline = this._time_period;
+		this._flickerfreescreen_data.timeline = time_period;
 
-		timeControl.addObject('graph_' + this._unique_id, this._time_period, this._time_control_data);
+		timeControl.addObject(`graph_${this._unique_id}`, time_period, this._time_control_data);
 		timeControl.processObjects();
 
 		flickerfreeScreen.add(this._flickerfreescreen_data);
+
+		this._flickerfreescreen_container.addEventListener('rangeupdate', this.events_handlers.rangeUpdate);
 	}
 
 	_deactivateGraph() {
-		timeControl.removeObject('graph_' + this._unique_id);
+		timeControl.removeObject(`graph_${this._unique_id}`);
+
 		flickerfreeScreen.remove(this._flickerfreescreen_data);
-	}
 
-	_getGraphSize() {
-		const contents = this._contents;
-		const style = getComputedStyle(contents);
-
-		return {
-			width: Math.floor(contents.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)),
-			height: Math.floor(contents.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom))
-		};
+		this._flickerfreescreen_container.removeEventListener('rangeupdate', this.events_handlers.rangeUpdate);
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {

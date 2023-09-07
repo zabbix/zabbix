@@ -43,6 +43,14 @@
 		(new CWidgetFieldTextBoxView($data['fields']['message']))->setPlaceholder(_('subject or body text'))
 	)
 	->addField(
+		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setDefaultFromValue('now-1h')
+			->setDefaultToValue('now')
+	)
+	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
 	)
 	->addField(

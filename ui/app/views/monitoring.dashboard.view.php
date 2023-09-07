@@ -69,7 +69,7 @@ $web_layout_mode = $this->getLayoutMode();
 
 $main_filter_form = null;
 
-if ($data['use_dashboard_host']) {
+if (array_key_exists(CWidgetsData::DATA_TYPE_HOST_ID, $data['broadcast_requirements'])) {
 	$main_filter_form = (new CForm('get'))
 		->setAttribute('name', 'dashboard_filter')
 		->setAttribute('aria-label', _('Main filter'))
@@ -197,12 +197,12 @@ $html_page = (new CHtmlPage())
 			->addClass(ZBX_STYLE_SELECTED)
 	])));
 
-if ($data['has_time_selector']) {
+if (array_key_exists(CWidgetsData::DATA_TYPE_TIME_PERIOD, $data['broadcast_requirements'])) {
 	$html_page->addItem(
 		(new CFilter())
-			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
+			->setProfile($data['dashboard_time_period']['profileIdx'], $data['dashboard_time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
-			->addTimeSelector($data['time_period']['from'], $data['time_period']['to'],
+			->addTimeSelector($data['dashboard_time_period']['from'], $data['dashboard_time_period']['to'],
 				$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
 			)
 	);
@@ -261,10 +261,9 @@ $html_page
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
 		'configuration_hash' => $data['configuration_hash'],
-		'has_time_selector' => $data['has_time_selector'],
-		'time_period' => $data['time_period'],
-		'use_dashboard_host' => $data['use_dashboard_host'],
+		'broadcast_requirements' => $data['broadcast_requirements'],
 		'dashboard_host' => $data['dashboard_host'],
+		'dashboard_time_period' => $data['dashboard_time_period'],
 		'web_layout_mode' => $web_layout_mode,
 		'clone' => $data['clone']
 	]).');

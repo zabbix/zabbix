@@ -85,12 +85,8 @@ class CWidget extends CModule {
 
 				$field->setInType($data_type);
 
-				if (array_key_exists($data_type, $data_types)) {
-					$data_type_spec = $data_types[$data_type];
-
-					if ($data_type_spec['accepts_dashboard_host'] || $data_type_spec['accepts_dashboard_time_period']) {
-						$field->acceptDashboard();
-					}
+				if (array_key_exists($data_type, $data_types) && $data_types[$data_type]['accepts_dashboard']) {
+					$field->acceptDashboard();
 				}
 
 				$field->acceptWidget();
@@ -189,10 +185,6 @@ class CWidget extends CModule {
 		return array_key_exists($this->manifest['widget']['refresh_rate'], self::getRefreshRates())
 			? (int) $this->manifest['widget']['refresh_rate']
 			: self::DEFAULT_REFRESH_RATE;
-	}
-
-	public function usesTimeSelector(array $fields_values): bool {
-		return (bool) $this->manifest['widget']['use_time_selector'];
 	}
 
 	private static function getRefreshRates(): array {

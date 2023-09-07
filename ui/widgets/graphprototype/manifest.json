@@ -14,7 +14,16 @@
 			"height": 5
 		},
 		"js_class": "CWidgetGraphPrototype",
-		"use_time_selector": true
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		},
+		"out": [
+			{
+				"type": "_timeperiod"
+			}
+		]
 	},
 	"actions": {
 		"widget.graphprototype.view": {

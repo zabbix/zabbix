@@ -184,11 +184,13 @@ class CWidgetFieldTimePeriod {
 			reference_form_rows.hidden = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET;
 		}
 
-		if (!this.#is_disabled && this.#data_source == CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET) {
-			this.#reference_multiselect.multiSelect('enable');
-		}
-		else {
-			this.#reference_multiselect.multiSelect('disable');
+		if (this.#widget_accepted) {
+			if (!this.#is_disabled && this.#data_source == CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET) {
+				this.#reference_multiselect.multiSelect('enable');
+			}
+			else {
+				this.#reference_multiselect.multiSelect('disable');
+			}
 		}
 
 		const date_picker_element_ids = [

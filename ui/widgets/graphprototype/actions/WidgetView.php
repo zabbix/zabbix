@@ -25,9 +25,11 @@ use API,
 	APP,
 	CControllerResponseData,
 	CControllerWidgetIterator,
-	CTableInfo;
+	CTableInfo,
+	CWidgetsData;
 
-use Zabbix\Core\CWidget;
+use Zabbix\Widgets\CWidgetField;
+use Zabbix\Widgets\Fields\CWidgetFieldReference;
 
 class WidgetView extends CControllerWidgetIterator {
 
@@ -37,7 +39,8 @@ class WidgetView extends CControllerWidgetIterator {
 		parent::init();
 
 		$this->addValidationRules([
-			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER])
+			'view_mode' => 'in '.implode(',', [ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER]),
+			'has_custom_time_period' => 'in 1'
 		]);
 	}
 
@@ -142,21 +145,31 @@ class WidgetView extends CControllerWidgetIterator {
 		$widget = APP::ModuleManager()->getModule(self::GRAPH_WIDGET_ID);
 
 		if ($widget !== null) {
+			$widget_defaults = $widget->getDefaults();
+
 			foreach ($graphs_collected as $graphid => $name) {
 				$child_fields = [
 					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_GRAPH,
 					'graphid' => $graphid,
+					'time_period' => [
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							$this->fields_values[CWidgetFieldReference::FIELD_NAME],
+							CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					],
 					'show_legend' => $this->fields_values['show_legend']
 				];
 
 				$child_form = $widget->getForm($child_fields, null);
+
+				$child_form->validate(false);
 
 				$children[] = [
 					'widgetid' => (string) $graphid,
 					'type' => self::GRAPH_WIDGET_ID,
 					'name' => $name,
 					'fields' => $child_form->getFieldsValues(),
-					'defaults' => $widget->getDefaults()
+					'defaults' => $widget_defaults
 				];
 			}
 		}
@@ -175,6 +188,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 		return [
 			'name' => $widget_name,
+			'info' => $this->makeWidgetInfo(),
 			'children' => $children,
 			'page' => $page,
 			'page_count' => $page_count
@@ -260,21 +274,31 @@ class WidgetView extends CControllerWidgetIterator {
 		$widget = APP::ModuleManager()->getModule(self::GRAPH_WIDGET_ID);
 
 		if ($widget !== null) {
+			$widget_defaults = $widget->getDefaults();
+
 			foreach ($items_collected as $itemid => $name) {
 				$child_fields = [
 					'source_type' => ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH,
 					'itemid' => $itemid,
+					'time_period' => [
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							$this->fields_values[CWidgetFieldReference::FIELD_NAME],
+							CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					],
 					'show_legend' => $this->fields_values['show_legend']
 				];
 
 				$child_form = $widget->getForm($child_fields, null);
+
+				$child_form->validate(false);
 
 				$children[] = [
 					'widgetid' => (string) $itemid,
 					'type' => self::GRAPH_WIDGET_ID,
 					'name' => $name,
 					'fields' => $child_form->getFieldsValues(),
-					'defaults' => $widget->getDefaults()
+					'defaults' => $widget_defaults
 				];
 			}
 		}
@@ -290,6 +314,7 @@ class WidgetView extends CControllerWidgetIterator {
 
 		return [
 			'name' => $widget_name,
+			'info' => $this->makeWidgetInfo(),
 			'children' => $children,
 			'page' => $page,
 			'page_count' => $page_count
@@ -306,5 +331,23 @@ class WidgetView extends CControllerWidgetIterator {
 				->setNoDataMessage(_('No permissions to referred object or it does not exist!'))
 				->toString()
 		];
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }

@@ -286,42 +286,18 @@ abstract class CController {
 		}
 
 		try {
-			$max_period = 'now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD);
+			$errors = (new CTimePeriodService($this->getInput('from'), $this->getInput('to')))->getErrors();
+
+			if ($errors) {
+				foreach ($errors as $error) {
+					info($error);
+				}
+
+				return false;
+			}
 		}
 		catch (Exception $x) {
 			access_deny(ACCESS_DENY_PAGE);
-
-			return false;
-		}
-
-		$ts = [];
-		$ts['now'] = time();
-		$range_time_parser = new CRangeTimeParser();
-
-		foreach (['from', 'to'] as $field) {
-			$range_time_parser->parse($this->getInput($field));
-			$ts[$field] = $range_time_parser
-				->getDateTime($field === 'from')
-				->getTimestamp();
-		}
-
-		$period = $ts['to'] - $ts['from'] + 1;
-		$range_time_parser->parse($max_period);
-		$max_period = 1 + $ts['now'] - $range_time_parser
-			->getDateTime(true)
-			->getTimestamp();
-
-		if ($period < ZBX_MIN_PERIOD) {
-			info(_n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
-			));
-
-			return false;
-		}
-		elseif ($period > $max_period) {
-			info(_n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
-			));
 
 			return false;
 		}

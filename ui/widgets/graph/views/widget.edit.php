@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+use Zabbix\Widgets\Fields\CWidgetFieldReference;
+
 if (array_key_exists('itemid', $data['fields'])) {
 	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 		->setPopupParameter('numeric', true);
@@ -39,6 +41,7 @@ else {
 }
 
 (new CWidgetFormView($data))
+	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME])
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
@@ -46,6 +49,14 @@ else {
 	->addField(array_key_exists('graphid', $data['fields'])
 		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'])
 		: null
+	)
+	->addField(
+		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setDefaultFromValue('now-1h')
+			->setDefaultToValue('now')
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_legend'])

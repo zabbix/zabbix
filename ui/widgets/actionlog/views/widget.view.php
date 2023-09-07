@@ -85,6 +85,12 @@ foreach ($data['alerts'] as $alert) {
 	]);
 }
 
-(new CWidgetView($data))
+$view = new CWidgetView($data);
+
+if ($data['info']) {
+	$view->setVar('info', $data['info']);
+}
+
+$view
 	->addItem($table)
 	->show();

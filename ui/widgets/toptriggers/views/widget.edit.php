@@ -52,6 +52,14 @@ $form
 		new CWidgetFieldTagsView($data['fields']['tags'])
 	)
 	->addField(
+		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setDefaultFromValue('now-1h')
+			->setDefaultToValue('now')
+	)
+	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 	)
 	->show();

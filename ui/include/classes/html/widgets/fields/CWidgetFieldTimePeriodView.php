@@ -27,6 +27,9 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 	private string $date_format = '';
 
+	private ?string $default_from_value = null;
+	private ?string $default_to_value = null;
+
 	private ?string $from_placeholder = null;
 	private ?string $to_placeholder = null;
 
@@ -101,12 +104,12 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 			];
 		}
 
-		$date_selector_from = (new CDateSelector($field_name.'[from]'))
+		$date_selector_from = (new CDateSelector($field_name.'[from]', $this->default_from_value))
 			->setMaxLength($this->field->getMaxLength())
 			->setPlaceholder($this->from_placeholder)
 			->setEnabled(!$this->isDisabled());
 
-		$date_selector_to = (new CDateSelector($field_name.'[to]'))
+		$date_selector_to = (new CDateSelector($field_name.'[to]', $this->default_to_value))
 			->setMaxLength($this->field->getMaxLength())
 			->setPlaceholder($this->to_placeholder)
 			->setEnabled(!$this->isDisabled());
@@ -147,6 +150,18 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 				'data_source' => $this->field->getDataSource()
 			]).');
 		';
+	}
+
+	public function setDefaultFromValue(string $value): self {
+		$this->default_from_value = $value;
+
+		return $this;
+	}
+
+	public function setDefaultToValue(string $value): self {
+		$this->default_to_value = $value;
+
+		return $this;
 	}
 
 	public function setDateFormat(string $date_format): self {

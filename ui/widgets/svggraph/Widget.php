@@ -31,10 +31,6 @@ class Widget extends CWidget {
 		return _('Graph');
 	}
 
-	public function usesTimeSelector(array $fields_values): bool {
-		return !WidgetForm::hasOverrideTime($fields_values);
-	}
-
 	public function getTranslationStrings(): array {
 		return [
 			'class.widget.js' => [

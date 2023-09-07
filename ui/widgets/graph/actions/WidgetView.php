@@ -30,8 +30,6 @@ use API,
 	CUrl,
 	CWebUser;
 
-use Zabbix\Core\CWidget;
-
 class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function init(): void {
@@ -41,7 +39,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'contents_width' => 'int32',
-			'contents_height' => 'int32'
+			'contents_height' => 'int32',
+			'has_custom_time_period' => 'in 1'
 		]);
 	}
 
@@ -85,7 +84,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'objDims' => $graph_dims,
 			'loadSBox' => 0,
 			'loadImage' => 1,
-			'reloadOnAdd' => 1
+			'reloadOnAdd' => 1,
+			'useCustomEvents' => 1
 		];
 
 		$flickerfreescreen_data = [
@@ -94,7 +94,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'timeline' => [],
 			'resourcetype' => $resource_type,
 			'profileIdx' => $profileIdx,
-			'profileIdx2' => $profileIdx2
+			'profileIdx2' => $profileIdx2,
+			'useCustomEvents' => 1
 		];
 
 		// Replace graph item by particular host item if the host has been overridden.
@@ -241,7 +242,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($is_resource_available) {
 			// Build graph action and data source links.
 			if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-				if (!$edit_mode) {
+				if (!$edit_mode && !$this->hasInput('has_custom_time_period')) {
 					$time_control_data['loadSBox'] = 1;
 				}
 
@@ -322,7 +323,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$graph_src = (new CUrl('chart2.php'))->setArgument('graphid', $resourceid);
 					}
 
-					if (!$edit_mode) {
+					if (!$edit_mode && !$this->hasInput('has_custom_time_period')) {
 						$time_control_data['loadSBox'] = 1;
 					}
 				}
@@ -351,7 +352,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			else {
 				if ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
-					$has_host_graph = !$this->fields_values['override_hostid']
+					$has_host_graph = $this->fields_values['override_hostid']
 						? (bool) API::Graph()->get([
 							'output' => [],
 							'hostids' => $this->fields_values['override_hostid'],
@@ -396,11 +397,30 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_control_data' => $time_control_data,
 				'flickerfreescreen_data' => $flickerfreescreen_data
 			],
+			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
 		$this->setResponse(new CControllerResponseData($response));
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }

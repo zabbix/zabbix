@@ -85,6 +85,8 @@ class CWidgetBase {
 
 	#fields_referred_data_subscriptions = [];
 
+	#broadcast_cache = new Map();
+
 	#feedback_cache = new Map();
 
 	/**
@@ -127,14 +129,6 @@ class CWidgetBase {
 	 * @param {number}      min_rows            Minimum number of dashboard cell rows per single widget.
 	 * @param {boolean}     is_editable         Whether to display the "Edit" button.
 	 * @param {boolean}     is_edit_mode        Whether the widget is being created in the editing mode.
-	 *
-	 * @param {Object|null} time_period         Selected time period (if widget.use_time_selector in manifest.json is
-	 *                                          set to true in any of the loaded widgets), or null.
-	 *        {string}      time_period.from    Relative time of period start (like "now-1h").
-	 *        {number}      time_period.from_ts Timestamp of period start.
-	 *        {string}      time_period.to      Relative time of period end (like "now").
-	 *        {number}      time_period.to_ts   Timestamp of period end.
-	 *
 	 * @param {string|null} csrf_token          CSRF token for AJAX requests.
 	 * @param {string}      unique_id           Run-time, unique ID of the widget.
 	 */
@@ -155,7 +149,6 @@ class CWidgetBase {
 		min_rows,
 		is_editable,
 		is_edit_mode,
-		time_period,
 		csrf_token = null,
 		unique_id
 	}) {
@@ -193,7 +186,6 @@ class CWidgetBase {
 		this._min_rows = min_rows;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
-		this._time_period = time_period;
 		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
@@ -395,8 +387,30 @@ class CWidgetBase {
 				}
 			});
 
-			this.#feedback_cache.set(type, value);
+			this.#broadcast_cache.set(type, value);
 		}
+	}
+
+	/**
+	 * Check if data of specified type has been already broadcast.
+	 *
+	 * @param {string} type
+	 *
+	 * @returns {boolean}
+	 */
+	hasBroadcast(type) {
+		const descriptor = {
+			context: 'dashboard',
+			sender_unique_id: this._unique_id,
+			sender_type: 'widget',
+			widget_type: this._type,
+			event_type: 'broadcast',
+			event_origin: this._unique_id,
+			reference: this._fields.reference,
+			type
+		};
+
+		return ZABBIX.EventHub.getData(descriptor) !== undefined;
 	}
 
 	/**
@@ -404,21 +418,8 @@ class CWidgetBase {
 	 */
 	#broadcastDefaults() {
 		for (const {type} of this._defaults.out) {
-			const descriptor = {
-				context: 'dashboard',
-				sender_unique_id: this._unique_id,
-				sender_type: 'widget',
-				widget_type: this._type,
-				event_type: 'broadcast',
-				event_origin: this._unique_id,
-				reference: this._fields.reference,
-				type
-			};
-
-			if (ZABBIX.EventHub.getData(descriptor) === undefined) {
-				ZABBIX.EventHub.publish({data: null, descriptor});
-
-				this.#feedback_cache.set(type, null);
+			if (!this.hasBroadcast(type)) {
+				this.broadcast({[type]: null});
 			}
 		}
 	}
@@ -432,6 +433,8 @@ class CWidgetBase {
 		const accessors = this.#getFieldsReferencesAccessors();
 
 		for (const [path, value] of Object.entries(data)) {
+			this.#feedback_cache.set(path, value);
+
 			if (!accessors.has(path)) {
 				continue;
 			}
@@ -485,6 +488,8 @@ class CWidgetBase {
 				this.#fields_referred_data.set(path, {value: null, descriptor: null});
 				this.#fields_referred_data_updated.add(path);
 
+				this.#feedback_cache.delete(path);
+
 				continue;
 			}
 
@@ -504,6 +509,8 @@ class CWidgetBase {
 
 					this.#fields_referred_data.set(path, {value: data, descriptor});
 					this.#fields_referred_data_updated.add(path);
+
+					this.#feedback_cache.delete(path);
 
 					if (this._state === WIDGET_STATE_ACTIVE) {
 						this._startUpdating();
@@ -531,8 +538,8 @@ class CWidgetBase {
 					return;
 				}
 
-				if (this.#feedback_cache.get(descriptor.type) !== data) {
-					this.#feedback_cache.set(descriptor.type, data);
+				if (JSON.stringify(this.#broadcast_cache.get(descriptor.type)) !== JSON.stringify(data)) {
+					this.#broadcast_cache.set(descriptor.type, data);
 
 					if (this.onFeedback({type: descriptor.type, value: data})) {
 						ZABBIX.EventHub.publish({
@@ -575,6 +582,8 @@ class CWidgetBase {
 		this.#fields_referred_data_updated.clear();
 		this.#fields_referred_data_subscriptions = [];
 
+		this.#feedback_cache.clear();
+
 		this.#resetFieldsReferencesAccessors();
 	}
 
@@ -613,7 +622,17 @@ class CWidgetBase {
 	getFieldsData() {
 		const fields_data = JSON.parse(JSON.stringify(this._fields));
 
+		const fields_data_update = new Map();
+
 		for (const [path, {value}] of this.#fields_referred_data) {
+			fields_data_update.set(path, value);
+		}
+
+		for (const [path, value] of this.#feedback_cache) {
+			fields_data_update.set(path, value);
+		}
+
+		for (const [path, value] of fields_data_update) {
 			let container = {fields_data};
 			let key = 'fields_data';
 
@@ -658,20 +677,6 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	onEdit() {
-	}
-
-	/**
-	 * Set the time period selected in the time selector of the dashboard.
-	 *
-	 * @param {Object|null} time_period  Selected time period (if widget.use_time_selector in manifest.json is set to
-	 *                                   true in any of the loaded widgets), or null.
-	 *        {string}      time_period.from     Relative time of period start (like "now-1h").
-	 *        {number}      time_period.from_ts  Timestamp of period start.
-	 *        {string}      time_period.to       Relative time of period end (like "now").
-	 *        {number}      time_period.to_ts    Timestamp of period end.
-	 */
-	setTimePeriod(time_period) {
-		this._time_period = time_period;
 	}
 
 	/**
@@ -968,7 +973,7 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Create a typed reference (a reference to a foreign data source).
+	 * Create typed reference (a reference to a foreign data source).
 	 *
 	 * @param {string} reference
 	 * @param {string} type

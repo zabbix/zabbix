@@ -11,7 +11,11 @@
 	"widget": {
 		"js_class": "CWidgetTopTriggers",
 		"refresh_rate": 0,
-		"use_time_selector": true
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		}
 	},
 	"actions": {
 		"widget.toptriggers.view": {

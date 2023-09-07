@@ -20,24 +20,18 @@
 
 
 /**
- * This controller is used by gtlc.js to update time selector date and time interval in user's profile.
+ * Controller for manipulating a time period.
  */
-class CControllerTimeSelectorUpdate extends CController {
-
-	public static $profiles = ['web.dashboard.filter', 'web.charts.filter', 'web.httpdetails.filter',
-		'web.problem.filter', 'web.auditlog.filter', 'web.actionlog.filter', 'web.item.graph.filter',
-		'web.toptriggers.filter', 'web.avail_report.filter', CControllerHost::FILTER_IDX, CControllerProblem::FILTER_IDX
-	];
+class CControllerTimeSelectorCalc extends CController {
 
 	public function init() {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
 		$fields = [
-			'method' =>			'required|in increment,decrement,zoomout,rangechange,rangeoffset',
-			'idx' =>			'required|in '.implode(',', static::$profiles),
-			'idx2' =>			'required|id',
+			'method' =>			'required|in zoomout,rangeoffset',
 			'from' =>			'required|string',
 			'to' =>				'required|string',
 			'from_offset' =>	'int32|ge 0',
@@ -46,7 +40,7 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->getInput('method') === 'rangeoffset') {
+		if ($ret && $this->getInput('method', '') === 'rangeoffset') {
 			$validator = new CNewValidator($this->getInputAll(), [
 				'from_offset' => 'required',
 				'to_offset' => 'required'
@@ -83,22 +77,10 @@ class CControllerTimeSelectorUpdate extends CController {
 
 		$fields_errors = $time_period_service->getErrors();
 
-		if (!$fields_errors) {
+		if (!$fields_errors && $this->hasInput('method')) {
 			switch ($this->getInput('method')) {
-				case 'increment':
-					$time_period_service->increment();
-					break;
-
-				case 'decrement':
-					$time_period_service->decrement();
-					break;
-
 				case 'zoomout':
 					$time_period_service->zoomOut();
-					break;
-
-				case 'rangechange':
-					$time_period_service->rangeChange();
 					break;
 
 				case 'rangeoffset':
@@ -113,24 +95,7 @@ class CControllerTimeSelectorUpdate extends CController {
 			$output = ['fields_errors' => $fields_errors];
 		}
 		else {
-			$data = $time_period_service->getData();
-
-			updateTimeSelectorPeriod([
-				'profileIdx' => $this->getInput('idx'),
-				'profileIdx2' => $this->getInput('idx2'),
-				'from' => $data['from'],
-				'to' => $data['to']
-			]);
-
-			$output = [
-				'label' => relativeDateToText($data['from'], $data['to']),
-				'from' => $data['from'],
-				'from_ts' => $data['from_ts'],
-				'from_date' => date(ZBX_FULL_DATE_TIME, $data['from_ts']),
-				'to' => $data['to'],
-				'to_ts' => $data['to_ts'],
-				'to_date' => date(ZBX_FULL_DATE_TIME, $data['to_ts']),
-			] + getTimeselectorActions($data['from'], $data['to']);
+			$output = $time_period_service->getData();
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

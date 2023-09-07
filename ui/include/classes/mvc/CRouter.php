@@ -307,6 +307,7 @@ class CRouter {
 		'templategroup.edit'						=> ['CControllerTemplateGroupEdit',						'layout.htmlpage',		'configuration.templategroup.edit'],
 		'templategroup.list'						=> ['CControllerTemplateGroupList',						'layout.htmlpage',		'configuration.templategroup.list'],
 		'templategroup.update'						=> ['CControllerTemplateGroupUpdate',					'layout.json',			null],
+		'timeselector.calc'							=> ['CControllerTimeSelectorCalc',						'layout.json',			null],
 		'timeselector.update'						=> ['CControllerTimeSelectorUpdate',					'layout.json',			null],
 		'token.create'								=> ['CControllerTokenCreate',							'layout.json',			null],
 		'token.delete'								=> ['CControllerTokenDelete',							'layout.json',			null],

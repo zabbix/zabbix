@@ -453,8 +453,7 @@ final class CModuleManager {
 				'in' => [],
 				'out' => [],
 				'size' => CWidget::DEFAULT_SIZE,
-				'refresh_rate' => CWidget::DEFAULT_REFRESH_RATE,
-				'use_time_selector' => false
+				'refresh_rate' => CWidget::DEFAULT_REFRESH_RATE
 			];
 		}
 

@@ -40,7 +40,11 @@ class CDashboard {
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
-	#hostid = null;
+	static EVENT_FEEDBACK = 'dashboard-feedback';
+
+	#broadcast_options;
+
+	#broadcast_cache = new Map();
 
 	#edit_widget_cache = null;
 
@@ -62,8 +66,7 @@ class CDashboard {
 		is_edit_mode,
 		can_edit_dashboards,
 		is_kiosk_mode,
-		hostid,
-		time_period,
+		broadcast_options = {},
 		csrf_token = null
 	}) {
 		this._target = target;
@@ -103,8 +106,8 @@ class CDashboard {
 		this._is_edit_mode = is_edit_mode;
 		this._can_edit_dashboards = can_edit_dashboards;
 		this._is_kiosk_mode = is_kiosk_mode;
-		this.#hostid = hostid;
-		this._time_period = time_period;
+		this._is_kiosk_mode = is_kiosk_mode;
+		this.#broadcast_options = broadcast_options;
 		this._csrf_token = csrf_token;
 
 		this.#initialize();
@@ -164,8 +167,6 @@ class CDashboard {
 
 		this._state = DASHBOARD_STATE_ACTIVE;
 
-		this.setHostId(this.getHostId() ?? null);
-
 		this.#activateEvents();
 
 		const dashboard_page = this._getInitialDashboardPage();
@@ -186,6 +187,25 @@ class CDashboard {
 	}
 
 	// External events management methods.
+
+	broadcast(data) {
+		for (const [type, value] of Object.entries(data)) {
+			ZABBIX.EventHub.publish({
+				data: value,
+				descriptor: {
+					context: 'dashboard',
+					sender_unique_id: 'dashboard',
+					sender_type: 'dashboard',
+					event_type: 'broadcast',
+					event_origin: 'dashboard',
+					reference: CDashboard.REFERENCE_DASHBOARD,
+					type
+				}
+			});
+
+			this.#broadcast_cache.set(type, {value: {...value}});
+		}
+	}
 
 	isEditMode() {
 		return this._is_edit_mode;
@@ -212,46 +232,6 @@ class CDashboard {
 		if (is_internal_call) {
 			this.fire(DASHBOARD_EVENT_EDIT);
 		}
-	}
-
-	getHostId() {
-		return this.#hostid;
-	}
-
-	setHostId(hostid) {
-		this.#hostid = hostid;
-
-		if (this._state === DASHBOARD_STATE_ACTIVE) {
-			this.#broadcastHost();
-		}
-	}
-
-	#broadcastHost() {
-		ZABBIX.EventHub.publish({
-			data: this.#hostid,
-			descriptor: {
-				context: 'dashboard',
-				sender_unique_id: 'dashboard',
-				sender_type: 'dashboard',
-				event_type: 'broadcast',
-				event_origin: 'dashboard',
-				reference: CDashboard.REFERENCE_DASHBOARD,
-				type: '_hostid'
-			}
-		});
-
-		ZABBIX.EventHub.publish({
-			data: this.#hostid !== null ? [this.#hostid] : null,
-			descriptor: {
-				context: 'dashboard',
-				sender_unique_id: 'dashboard',
-				sender_type: 'dashboard',
-				event_type: 'broadcast',
-				event_origin: 'dashboard',
-				reference: CDashboard.REFERENCE_DASHBOARD,
-				type: '_hostids'
-			}
-		});
 	}
 
 	_startSlideshow() {
@@ -529,7 +509,6 @@ class CDashboard {
 			widget_defaults: this._widget_defaults,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
-			time_period: this._time_period,
 			csrf_token: this._csrf_token,
 			unique_id: this._createUniqueId()
 		});
@@ -2123,7 +2102,9 @@ class CDashboard {
 			dashboardPageWidgetActions: (e) => {
 				const menu = e.detail.widget.getActionsContextMenu({
 					can_copy_widget: this._can_edit_dashboards
-						&& (this._data.templateid === null || this.#hostid === null),
+						&& (this._data.templateid === null || !this.#broadcast_cache.has('_hostid')
+							|| this.#broadcast_cache.get('_hostid') === null
+						),
 					can_paste_widget: this._can_edit_dashboards && this.getStoredWidgetDataCopy() !== null
 				});
 
@@ -2294,21 +2275,38 @@ class CDashboard {
 				);
 			},
 
-			timeSelectorRangeUpdate: (e, time_period) => {
-				this._time_period = {
-					from: time_period.from,
-					from_ts: time_period.from_ts,
-					to: time_period.to,
-					to_ts: time_period.to_ts
-				};
-
-				for (const dashboard_page of this._dashboard_pages.keys()) {
-					dashboard_page.setTimePeriod(this._time_period);
-				}
-			},
-
 			editWidgetPropertiesClose: () => {
 				this._selected_dashboard_page.resetWidgetPlaceholder();
+			},
+
+			feedback: ({data, descriptor}) => {
+				if (!('type' in descriptor) || !this.#broadcast_cache.has(descriptor.type)) {
+					return;
+				}
+
+				if (JSON.stringify(this.#broadcast_cache.get(descriptor.type)) !== JSON.stringify(data)) {
+					this.#broadcast_cache.set(descriptor.type, data);
+
+					this.fire(CDashboard.EVENT_FEEDBACK, {
+						type: descriptor.type,
+						value: data
+					});
+
+					if (this.#broadcast_options[descriptor.type].rebroadcast) {
+						ZABBIX.EventHub.publish({
+							data,
+							descriptor: {
+								context: 'dashboard',
+								sender_unique_id: 'dashboard',
+								sender_type: 'dashboard',
+								event_type: 'broadcast',
+								event_origin: descriptor.event_origin,
+								reference: CDashboard.REFERENCE_DASHBOARD,
+								type: descriptor.type
+							}
+						});
+					}
+				}
 			}
 		};
 	}
@@ -2347,9 +2345,14 @@ class CDashboard {
 			}
 		}
 
-		if (this._time_period !== null) {
-			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
-		}
+		ZABBIX.EventHub.subscribe({
+			require: {
+				context: 'dashboard',
+				event_type: 'feedback',
+				reference: CDashboard.REFERENCE_DASHBOARD
+			},
+			callback: this._events.feedback
+		});
 	}
 
 	/**

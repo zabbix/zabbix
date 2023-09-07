@@ -329,6 +329,8 @@ class CWidgetIterator extends CWidget {
 			this._setHeaderName(response.name);
 		}
 
+		this._updateInfo(response.info);
+
 		if ('body' in response || 'messages' in response) {
 			this._clearContents();
 
@@ -382,7 +384,6 @@ class CWidgetIterator extends CWidget {
 			min_rows: this._min_rows,
 			is_editable: false,
 			is_edit_mode: false,
-			time_period: this._time_period,
 			unique_id: this._createUniqueId()
 		});
 	}

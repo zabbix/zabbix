@@ -30,19 +30,23 @@ class CSvgGraphHelper {
 	 * Calculate graph data and draw SVG graph based on given graph configuration.
 	 *
 	 * @param array  $options                     Options for graph.
-	 * @param array  $options['data_sets']        Graph data set options.
-	 * @param int    $options['data_source']      Data source of graph.
-	 * @param bool   $options['dashboard_time']   True if dashboard time is used.
-	 * @param array  $options['time_period']      Graph time period used.
-	 * @param array  $options['left_y_axis']      Options for graph left Y axis.
-	 * @param array  $options['right_y_axis']     Options for graph right Y axis.
-	 * @param array  $options['x_axis']           Options for graph X axis.
-	 * @param array  $options['legend']           Options for graph legend.
-	 * @param int    $options['legend_lines']     Number of lines in the legend.
-	 * @param array  $options['problems']         Graph problems options.
-	 * @param array  $options['overrides']        Graph override options.
+	 *        array  $options['data_sets']        Graph data set options.
+	 *        int    $options['data_source']      Data source of graph.
+	 *        array  $options['time_period']      Graph time period used.
+	 *        bool   $options['fix_time_period']  Whether to keep time period fixed.
+	 *        array  $options['left_y_axis']      Options for graph left Y axis.
+	 *        array  $options['right_y_axis']     Options for graph right Y axis.
+	 *        array  $options['x_axis']           Options for graph X axis.
+	 *        array  $options['legend']           Options for graph legend.
+	 *        int    $options['legend_lines']     Number of lines in the legend.
+	 *        array  $options['problems']         Graph problems options.
+	 *        array  $options['overrides']        Graph override options.
+	 *
+	 * @param int $width
+	 * @param int $height
 	 *
 	 * @throws Exception
+	 * @return array
 	 */
 	public static function get(array $options, int $width, int $height): array {
 		$metrics = [];
@@ -84,8 +88,7 @@ class CSvgGraphHelper {
 			)
 			->draw();
 
-		// SBox available only for graphs without overridden relative time.
-		if ($options['dashboard_time']) {
+		if (!$options['fix_time_period']) {
 			$graph->addSBox();
 		}
 

@@ -134,31 +134,25 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 }
 
 function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$graph_time = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_time']));
-	$time_from = $form->registerField(
-		(new CWidgetFieldDatePickerView($fields['time_from']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-	);
-	$time_to = $form->registerField(
-		(new CWidgetFieldDatePickerView($fields['time_to']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-	);
+	$time_period_field = (new CWidgetFieldTimePeriodView($fields['time_period']))
+		->setDateFormat(ZBX_FULL_DATE_TIME)
+		->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+		->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+		->setDefaultFromValue('now-1h')
+		->setDefaultToValue('now');
 
-	return (new CFormGrid())
-		->addItem([
-			$graph_time->getLabel(),
-			new CFormField($graph_time->getView())
-		])
-		->addItem([
-			$time_from->getLabel(),
-			new CFormField($time_from->getView())
-		])
-		->addItem([
-			$time_to->getLabel(),
-			new CFormField($time_to->getView())
+	$form->registerField($time_period_field);
+
+	$form_grid = new CFormGrid();
+
+	foreach ($time_period_field->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+		$form_grid->addItem([
+			$label,
+			(new CFormField($view))->addClass($class)
 		]);
+	}
+
+	return $form_grid;
 }
 
 function getAxesTab(CWidgetFormView $form, array $fields): CDiv {

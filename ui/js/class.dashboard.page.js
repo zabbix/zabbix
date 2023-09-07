@@ -51,7 +51,6 @@ class CDashboardPage {
 		widget_defaults,
 		is_editable,
 		is_edit_mode,
-		time_period,
 		csrf_token = null,
 		unique_id
 	}) {
@@ -79,7 +78,6 @@ class CDashboardPage {
 		this._widget_defaults = widget_defaults;
 		this._is_editable = is_editable;
 		this._is_edit_mode = is_edit_mode;
-		this._time_period = time_period;
 		this._csrf_token = csrf_token;
 		this._unique_id = unique_id;
 
@@ -232,14 +230,6 @@ class CDashboardPage {
 			this._activateWidgetDragging();
 			this._activateWidgetResizing();
 			this.resetWidgetPlaceholder();
-		}
-	}
-
-	setTimePeriod(time_period) {
-		this._time_period = time_period;
-
-		for (const widget of this._widgets.keys()) {
-			widget.setTimePeriod(this._time_period);
 		}
 	}
 
@@ -414,7 +404,6 @@ class CDashboardPage {
 			min_rows: this._widget_min_rows,
 			is_editable: this._is_editable,
 			is_edit_mode: this._is_edit_mode,
-			time_period: this._time_period,
 			csrf_token: this._csrf_token,
 			unique_id
 		});

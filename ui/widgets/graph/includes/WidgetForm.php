@@ -31,8 +31,12 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectGraph,
 	CWidgetFieldMultiSelectItem,
 	CWidgetFieldMultiSelectOverrideHost,
-	CWidgetFieldRadioButtonList
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldReference,
+	CWidgetFieldTimePeriod
 };
+
+use CWidgetsData;
 
 /**
  * Graph (classic) widget form.
@@ -41,6 +45,9 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
+			->addField(
+				new CWidgetFieldReference()
+			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('source_type', _('Source'), [
 					ZBX_WIDGET_FIELD_RESOURCE_GRAPH => _('Graph'),
@@ -57,6 +64,15 @@ class WidgetForm extends CWidgetForm {
 				: (new CWidgetFieldMultiSelectGraph('graphid', _('Graph')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
+			)
+			->addField(
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
