@@ -82,18 +82,9 @@ class CControllerDashboardConfigHash extends CController {
 			}
 
 			if ($db_dashboards) {
-				$dashboard = $db_dashboards[0];
-				$dashboard['pages'] = CDashboardHelper::preparePages(
-					CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'],
-						$this->hasInput('templateid') ? $this->getInput('templateid') : null
-					),
-					$dashboard['pages'],
-					true
+				$configuration_hash = CDashboardHelper::getConfigurationHash($db_dashboards[0],
+					APP::ModuleManager()->getWidgetsDefaults()
 				);
-
-				$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
-
-				$configuration_hash = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
 			}
 		}
 

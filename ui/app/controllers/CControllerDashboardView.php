@@ -83,11 +83,10 @@ class CControllerDashboardView extends CController {
 		return true;
 	}
 
-	/**
-	 * @throws JsonException
-	 */
 	protected function doAction() {
-		[$dashboard, $stats, $error] = $this->getDashboard();
+		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
+
+		[$dashboard, $stats, $error] = $this->getDashboard($widget_defaults);
 
 		if ($error !== null) {
 			$response = new CControllerResponseData(['error' => $error]);
@@ -134,16 +133,12 @@ class CControllerDashboardView extends CController {
 
 		$dashboard_time_period = getTimeSelectorPeriod($time_selector_options);
 
-		$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
-
 		$data = [
 			// The dashboard property shall only contain data used by the JavaScript framework.
 			'dashboard' => $dashboard,
 			'widget_defaults' => $widget_defaults,
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
-			'configuration_hash' => $dashboard['dashboardid'] !== null
-				? CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults)
-				: null,
+			'configuration_hash' => $stats['configuration_hash'],
 			'can_view_reports' => $this->checkAccess(CRoleHelper::UI_REPORTS_SCHEDULED_REPORTS),
 			'can_create_reports' => $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SCHEDULED_REPORTS),
 			'has_related_reports' => $stats['has_related_reports'],
@@ -162,13 +157,14 @@ class CControllerDashboardView extends CController {
 	/**
 	 * Get dashboard data from API.
 	 */
-	private function getDashboard(): array {
+	private function getDashboard(array $widget_defaults): array {
 		// The dashboard property shall only contain data used by the JavaScript framework.
 		$dashboard = null;
 
 		$stats = [
 			'has_related_reports' => false,
-			'broadcast_requirements' => []
+			'broadcast_requirements' => [],
+			'configuration_hash' => null
 		];
 		$error = null;
 
@@ -192,6 +188,8 @@ class CControllerDashboardView extends CController {
 					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
 				],
 			];
+
+			$stats['configuration_hash'] = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
 		}
 		elseif ($this->hasInput('clone')) {
 			$db_dashboards = API::Dashboard()->get([
@@ -207,6 +205,9 @@ class CControllerDashboardView extends CController {
 				$dashboard['pages'] = CDashboardHelper::unsetInaccessibleFields($dashboard['pages']);
 
 				$widgets_and_forms = CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null);
+
+				$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
+				$stats['configuration_hash'] = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
 
 				$dashboard = [
 					'dashboardid' => $db_dashboards[0]['dashboardid'],
@@ -225,8 +226,6 @@ class CControllerDashboardView extends CController {
 						'userGroups' => $db_dashboards[0]['userGroups']
 					],
 				];
-
-				$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
 			}
 			else {
 				$error = _('No permissions to referred object or it does not exist!');
@@ -266,6 +265,9 @@ class CControllerDashboardView extends CController {
 
 					$widgets_and_forms = CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null);
 
+					$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
+					$stats['configuration_hash'] = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
+
 					$dashboard['pages'] = CDashboardHelper::preparePages($widgets_and_forms, $dashboard['pages'], true);
 
 					$dashboard['owner'] = [
@@ -278,8 +280,6 @@ class CControllerDashboardView extends CController {
 						'filter' => ['dashboardid' => $dashboard['dashboardid']],
 						'limit' => 1
 					]);
-
-					$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
 
 					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}
