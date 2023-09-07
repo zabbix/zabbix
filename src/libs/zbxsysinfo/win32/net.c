@@ -59,7 +59,6 @@ zbx_ifrow_t;
  ******************************************************************************/
 static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 {
-
 	HMODULE		module;
 	static	char	check_done = FALSE;
 
@@ -276,7 +275,7 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 	else
 	{
 		static wchar_t *(*mb_to_unicode)(const char *) = NULL;
-		wchar_t 	*wdescr;
+		wchar_t	*wdescr;
 		char		*utf8_descr;
 
 		if (NULL == mb_to_unicode)
@@ -584,7 +583,7 @@ clean:
 
 int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	DWORD		dwSize, dwRetVal, i;
+	DWORD		dwSize, dwRetVal;
 	int		ret = SYSINFO_RET_FAIL;
 
 	/* variables used for GetIfTable and GetIfEntry */
@@ -592,7 +591,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_ifrow_t	ifrow = {NULL, NULL};
 
 	struct zbx_json	j;
-	char 		*utf8_descr, *guid;
+	char		*utf8_descr, *guid;
 
 	/* Allocate memory for our pointers. */
 	dwSize = sizeof(MIB_IFTABLE);
@@ -617,7 +616,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_ifrow_init(&ifrow);
 
-	for (i = 0; i < pIfTable->dwNumEntries; i++)
+	for (DWORD i = 0; i < pIfTable->dwNumEntries; i++)
 	{
 		zbx_ifrow_set_index(&ifrow, pIfTable->table[i].dwIndex);
 		if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))

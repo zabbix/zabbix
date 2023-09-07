@@ -187,7 +187,7 @@ static int			procstat_snapshot_num;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check if the procstat shared memory segment has at least          *
+ * Purpose: Checks if the procstat shared memory segment has at least         *
  *          the specified amount of free bytes in the segment.                *
  *                                                                            *
  * Parameters: base - [IN] procstat shared memory segment                     *
@@ -209,7 +209,7 @@ static int	procstat_dshm_has_enough_space(void *base, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate actual shared memory size used by procstat              *
+ * Purpose: calculates actual shared memory size used by procstat             *
  *                                                                            *
  * Parameters: base - [IN] procstat shared memory segment                     *
  *                                                                            *

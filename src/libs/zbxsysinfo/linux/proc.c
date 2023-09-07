@@ -334,7 +334,7 @@ static int	check_user(FILE *f_stat, struct passwd *usrinfo)
 static int	check_proccomm(FILE *f_cmd, const char *proccomm)
 {
 	char	*tmp = NULL;
-	size_t	i, l;
+	size_t	l;
 	int	ret = SUCCEED;
 
 	if (NULL == proccomm || '\0' == *proccomm)
@@ -342,7 +342,9 @@ static int	check_proccomm(FILE *f_cmd, const char *proccomm)
 
 	if (SUCCEED == get_cmdline(f_cmd, &tmp, &l))
 	{
-		for (i = 0, l -= 2; i < l; i++)
+		l = l - 2;
+
+		for (size_t i = 0; i < l; i++)
 			if ('\0' == tmp[i])
 				tmp[i] = ' ';
 

@@ -219,7 +219,7 @@ static int	add_fs_to_vector(zbx_vector_ptr_t *mntpoints, wchar_t *path, char **e
 	zbx_wmpoint_t	*mntpoint;
 	zbx_uint64_t	total, not_used, used;
 	double		pfree, pused;
-	char 		*fsname = NULL, *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
+	char		*fsname = NULL, *fstype = NULL, *fslabel = NULL, *fsdrivetype = NULL;
 
 	get_fs_data(path, &fsname, &fstype, &fslabel, &fsdrivetype);
 
@@ -383,7 +383,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	struct zbx_json		j;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_wmpoint_t		*mpoint;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	char			*error = NULL;
 	zbx_vector_ptr_t	mount_paths;
 
@@ -401,7 +401,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 	ZBX_UNUSED(timeout_event);
 	zbx_vector_ptr_create(&mntpoints);
 
-	for (i = 0; i < mount_paths.values_num; i++)
+	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		if (FAIL == add_fs_to_vector(&mntpoints, mount_paths.values[i], &error))
 		{
@@ -418,7 +418,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result, HANDLE
 		goto out;
 	}
 
-	for (i = 0; i < mount_paths.values_num; i++)
+	for (int i = 0; i < mount_paths.values_num; i++)
 	{
 		zbx_wmpoint_t	mpoint_local;
 		int		idx;

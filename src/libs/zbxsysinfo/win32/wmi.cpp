@@ -262,7 +262,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 		if (WBEM_S_TIMEDOUT == hres)
 		{
 			ret = SYSINFO_RET_FAIL;
-			*error = zbx_strdup(*error, "WMI query timeout.");
+			*Error = zbx_strdup(*error, "WMI query timeout.");
 			return ret;
 		}
 
@@ -737,7 +737,7 @@ extern "C" int	convert_wmiarray_json(VARIANT *vtProp, const char *prop_name, ULO
 		LONG **index, struct zbx_json *jdoc, char **error)
 {
 	HRESULT		hres;
-	LONG		i, lBound, uBound;
+	LONG		lBound, uBound;
 	int		ret = SYSINFO_RET_OK;
 	SAFEARRAY	*sa = V_ARRAY(vtProp);
 
@@ -768,7 +768,7 @@ extern "C" int	convert_wmiarray_json(VARIANT *vtProp, const char *prop_name, ULO
 	}
 
 
-	for (i = lBound; i <= uBound && SYSINFO_RET_OK == ret; i++)
+	for (LONG i = lBound; i <= uBound && SYSINFO_RET_OK == ret; i++)
 	{
 		(*index)[offset_dim-1] = i;
 

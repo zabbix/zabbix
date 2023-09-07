@@ -76,10 +76,10 @@
 #endif
 
 #if (__FreeBSD_version) < 500000
-#	define ZBX_PROC_FLAG 	kp_proc.p_flag
+#	define ZBX_PROC_FLAG	kp_proc.p_flag
 #	define ZBX_PROC_MASK	P_INMEM
 #elif (__FreeBSD_version) < 700000
-#	define ZBX_PROC_FLAG 	ki_sflag
+#	define ZBX_PROC_FLAG	ki_sflag
 #	define ZBX_PROC_MASK	PS_INMEM
 #else
 #	define ZBX_PROC_TDFLAG	ki_tdflags
@@ -149,7 +149,7 @@ static void	proc_data_free(proc_data_t *proc_data)
 #define ARGV_START_SIZE	64
 static char	*get_commandline(struct kinfo_proc *proc)
 {
-	int		mib[4], i;
+	int		mib[4];
 	size_t		sz;
 	static char	*args = NULL;
 #if (__FreeBSD_version >= 802510)
@@ -215,7 +215,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 	if (-1 == err)
 		return NULL;
 #endif
-	for (i = 0; i < (int)(sz - 1); i++)
+	for (int i = 0; i < (int)(sz - 1); i++)
 		if (args[i] == '\0')
 			args[i] = ' ';
 
@@ -226,7 +226,7 @@ static char	*get_commandline(struct kinfo_proc *proc)
 }
 #undef ARGV_START_SIZE
 
-int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #define ZBX_SIZE	1
 #define ZBX_RSS		2
@@ -236,7 +236,7 @@ int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
 	char		*procname, *proccomm, *param, *args, *mem_type = NULL;
-	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
+	int		do_task, pagesize, count, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
 	unsigned int	mibs;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
 	double		pct_size = 0.0, pct_value = 0.0;
@@ -386,7 +386,7 @@ int     proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	count = sz / sizeof(struct kinfo_proc);
 
-	for (i = 0; i < count; i++)
+	for (int i = 0; i < count; i++)
 	{
 		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, proc[i].ZBX_PROC_COMM))
 			continue;

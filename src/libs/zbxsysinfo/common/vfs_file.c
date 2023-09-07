@@ -1297,7 +1297,7 @@ static char	*get_print_time(time_t st_raw)
 
 static char	*canonicalize_path(const char *fullname)
 {
-	int			i, up_level = 0;
+	int			up_level = 0;
 	char			*name;
 	const char		*p_start = &fullname[1], *p_to_delimiter;
 	size_t			name_alloc = 0, name_offset = 0;
@@ -1321,9 +1321,9 @@ static char	*canonicalize_path(const char *fullname)
 
 	name = NULL;
 
-	for (i = names.values_num - 1; 0 <= i; i--)
+	for (int i = names.values_num - 1; 0 <= i; i--)
 	{
-		char *ptr = names.values[i];
+		char	*ptr = names.values[i];
 
 		if (0 == strcmp(ptr, ".") || 0 == strlen(ptr))
 		{
@@ -1346,7 +1346,7 @@ static char	*canonicalize_path(const char *fullname)
 
 	if (0 < names.values_num)
 	{
-		for (i = 0; i < names.values_num; i++)
+		for (int i = 0; i < names.values_num; i++)
 			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/%s", names.values[i]);
 	}
 	else

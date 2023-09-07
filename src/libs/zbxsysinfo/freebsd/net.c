@@ -179,7 +179,7 @@ int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -210,7 +210,7 @@ int     net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return res;
 }
 
-int     net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;
@@ -241,7 +241,7 @@ int     net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return res;
 }
 
-int     net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*if_name, *error;
 
