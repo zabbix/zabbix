@@ -76,7 +76,7 @@ class testFormAdministrationProxies extends CWebTest {
 			],
 			[
 				'name' => self::CHANGE_PASSIVE_PROXY,
-				'operating_mode' => PROXY_MODE_PASSIVE,
+				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 				'address' => '127.9.9.9',
 				'port' => 10051,
 				'description' => '_Passive description for refresh',
