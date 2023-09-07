@@ -14,22 +14,19 @@
 AC_DEFUN([ZLIB_TRY_LINK],
 [
 found_zlib=$1
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <zlib.h>
-],
-[
+]], [[
 	z_stream	defstream;
 	deflateInit(&defstream, Z_BEST_COMPRESSION);
-],
-found_zlib="yes")
+]])],[found_zlib="yes"],[])
 ])dnl
 
 AC_DEFUN([ZLIB_CHECK_CONFIG],
 [
 	AC_ARG_WITH([zlib],[
 If you want to specify zlib installation directories:
-AC_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install directory (DIR), default is to search through a number of common places for the zlib files.])],
+AS_HELP_STRING([--with-zlib@<:@=DIR@:>@],[use zlib from given base install directory (DIR), default is to search through a number of common places for the zlib files.])],
 		[
 			test "x$withval" = "xyes" && withval=/usr
 			ZLIB_CFLAGS="-I$withval/include"
@@ -39,9 +36,8 @@ AC_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install dire
 	)
 
 	AC_ARG_WITH([zlib-include],
-		AC_HELP_STRING([--with-zlib-include=DIR],
-			[use zlib include headers from given path.]
-		),
+		AS_HELP_STRING([--with-zlib-include=DIR],[use zlib include headers from given path.
+		]),
 		[
 			ZLIB_CFLAGS="-I$withval"
 			_zlib_dir_set="yes"
@@ -49,9 +45,8 @@ AC_HELP_STRING([--with-zlib@<:@=DIR@:>@], [use zlib from given base install dire
 	)
 
 	AC_ARG_WITH([zlib-lib],
-		AC_HELP_STRING([--with-zlib-lib=DIR],
-			[use zlib libraries from given path.]
-		),
+		AS_HELP_STRING([--with-zlib-lib=DIR],[use zlib libraries from given path.
+		]),
 		[
 			ZLIB_LDFLAGS="-L$withval"
 			_zlib_dir_set="yes"
