@@ -277,9 +277,13 @@ static int	proc_get_process_info(const char *pid, unsigned int flags, zbx_sysinf
 
 				if (0 != (flags & ZBX_SYSINFO_PROC_CMDLINE))
 				{
-					for (int i = 0, l -= 2; i < l; i++)
+					l = l - 2;
+
+					for (int i = 0; i < l; i++)
+					{
 						if ('\0' == line[i])
 							line[i] = ' ';
+					}
 
 					proc->cmdline = zbx_strdup(NULL, line);
 				}

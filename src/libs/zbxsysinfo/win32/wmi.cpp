@@ -262,7 +262,7 @@ extern "C" static int	parse_all(IEnumWbemClassObject *pEnumerator, double timeou
 		if (WBEM_S_TIMEDOUT == hres)
 		{
 			ret = SYSINFO_RET_FAIL;
-			*Error = zbx_strdup(*error, "WMI query timeout.");
+			*error = zbx_strdup(*error, "WMI query timeout.");
 			return ret;
 		}
 

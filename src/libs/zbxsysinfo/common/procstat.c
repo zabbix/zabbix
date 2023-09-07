@@ -724,8 +724,8 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
  *                                                                            *
  * Purpose: gets cpu utilization data snapshot for monitored processes        *
  *                                                                            *
- * Parameters: stats - [OUT] current reading of the per-pid cpu usage         *
- *                           statistics (array, items correspond to pids)     *
+ * Parameters: stats - [OUT] current reading of per-pid cpu usage statistics  *
+*                            (array, items correspond to pids)                *
  *             pids  - [IN]  pids (unique) for which to collect data in this  *
  *                           iteration                                        *
  *                                                                            *
@@ -733,7 +733,7 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
  *                                                                            *
  ******************************************************************************/
 static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_t *stats,
-				zbx_vector_uint64_t *pids)
+		zbx_vector_uint64_t *pids)
 {
 	zbx_timespec_t	snapshot_timestamp;
 

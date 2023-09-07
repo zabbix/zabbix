@@ -404,7 +404,6 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	cpu_status = (unsigned char *)zbx_malloc(cpu_status, sizeof(unsigned char) * (pcpus->count + 1));
 
-
 	for (idx = 0; idx <= pcpus->count; idx++)
 		cpu_status[idx] = SYSINFO_RET_FAIL;
 
@@ -454,7 +453,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 #elif defined(HAVE_SYS_PSTAT_H)
 	struct pst_dynamic	psd;
-	struct pst_processor	psp
+	struct pst_processor	psp;
 
 	for (int idx = 0; idx <= pcpus->count; idx++)
 	{

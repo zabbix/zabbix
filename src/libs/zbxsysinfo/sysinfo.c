@@ -691,7 +691,7 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
  *                                                                            *
  * Purpose: adds new key access rule from AllowKey and DenyKey parameters     *
  *                                                                            *
- * Parameters: parameter - [IN] parameter that defined the rule               *
+ * Parameters: parameter - [IN] parameter that defined rule                   *
  *             pattern   - [IN] key access rule wildcard                      *
  *             type      - [IN] key access rule type (allow/deny)             *
  *                                                                            *
@@ -1514,7 +1514,8 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
 /******************************************************************************
  *                                                                            *
  * Purpose: Returns value of the result in the special type.                  *
- *          If value missing, converts existing value to requested type.      *
+ *          If value is missing, it converts existing value to requested      *
+ *          type.                                                             *
  *                                                                            *
  * Return value:                                                              *
  *         NULL - if value is missing or can't be converted                   *
@@ -1900,7 +1901,7 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Execute metric in a separate process/thread so it can be          *
+ * Purpose: Executes metric in a separate process/thread so it can be         *
  *          killed/terminated when timeout is detected.                       *
  *                                                                            *
  * Parameters: metric_func - [IN] metric function to execute                  *

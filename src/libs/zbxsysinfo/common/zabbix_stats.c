@@ -29,8 +29,8 @@
  *                                                                            *
  * Purpose: checks whether JSON response is "success" or "failed"             *
  *                                                                            *
- * Parameters: response - [IN] request                                        *
- *             result   - [OUT] check result                                  *
+ * Parameters: response - [IN]                                                *
+ *             result   - [OUT]                                               *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - error occurred                                       *

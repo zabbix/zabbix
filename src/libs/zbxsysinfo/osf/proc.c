@@ -153,7 +153,7 @@ out:
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	DIR		*dir;
-	struct  dirent	*entries;
+	struct dirent	*entries;
 	zbx_stat_t	buf;
 	struct passwd	*usrinfo;
 	struct prpsinfo	psinfo;
