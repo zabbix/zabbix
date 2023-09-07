@@ -496,8 +496,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 		substitute_macro(script.command, "{MANUALINPUT}", manualinput, &expanded_cmd, &expanded_cmd_size);
 
-		if (NULL == (script.command = zbx_strdup(script.command, expanded_cmd)))
-			goto fail;
+		script.command = zbx_strdup(script.command, expanded_cmd);
 
 		zbx_free(expanded_cmd);
 	}
