@@ -92,10 +92,13 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 	{
 		if (ZBX_IS_RUNNING())
 		{
-			zbx_preprocess_item_value(item->itemid, item->hostid,
-					item->value_type, item->flags, NULL, &timespec,
-					ITEM_STATE_NOTSUPPORTED, item->result.msg);
+			if (NOTSUPPORTED == item->ret || AGENT_ERROR == item->ret || CONFIG_ERROR == item->ret)
+			{
+				zbx_preprocess_item_value(item->itemid, item->hostid, item->value_type,
+					item->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, item->result.msg);
+			}
 		}
+
 		interface_status->error = item->result.msg;
 		SET_MSG_RESULT(&item->result, NULL);
 	}
@@ -338,10 +341,7 @@ static void	async_timer(evutil_socket_t fd, short events, void *arg)
 	ZBX_UNUSED(events);
 
 	if (ZBX_IS_RUNNING())
-	{
 		zbx_async_manager_queue_sync(poller_config->manager);
-		zbx_async_manager_interfaces_flush(poller_config->manager, &poller_config->interfaces);
-	}
 }
 
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
@@ -542,6 +542,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		{
 			async_initiate_queued_checks(&poller_config);
 			zbx_async_manager_requeue_flush(poller_config.manager);
+			zbx_async_manager_interfaces_flush(poller_config.manager, &poller_config.interfaces);
 		}
 
 		if (ZBX_IS_RUNNING())

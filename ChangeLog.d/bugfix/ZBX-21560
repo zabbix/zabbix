@@ -1,1 +1,0 @@
-...G...... [ZBX-21560] fixed default Zabbix agent 1 and 2 config file name and path for Windows; fixed logging to stderr in Zabbix agent 2 (mprihodko)
