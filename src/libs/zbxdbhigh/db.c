@@ -956,7 +956,7 @@ int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsuppo
 
 	if (DB_VERSION_HIGHER_THAN_MAXIMUM == info->ext_flag)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Recommended version should not be higher than %s %s.",
+		zabbix_log(LOG_LEVEL_WARNING, "TimescaleDB version is too new. Recommended version is up to %s %s.",
 				ZBX_TIMESCALE_LICENSE_COMMUNITY_STR, ZBX_TIMESCALE_MAX_VERSION_STR);
 		info->ext_err_code = ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM;
 
