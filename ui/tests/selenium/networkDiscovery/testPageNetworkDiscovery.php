@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup drules
  *
- * @dataSource NetworkDiscovery
+ * @dataSource NetworkDiscovery, Proxies
  */
 class testPageNetworkDiscovery extends CWebTest {
 
@@ -146,6 +146,7 @@ class testPageNetworkDiscovery extends CWebTest {
 					'expected' => [
 						'External network',
 						'Discovery rule for update',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for cancelling scenario'
 					]
 				]
@@ -180,6 +181,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule to check delete',
 						'Discovery rule for update',
 						'Discovery rule for successful deleting',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
 						'Discovery rule for deleting, check used in Action',
 						'Discovery rule for clone',
@@ -199,6 +201,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule to check delete',
 						'Discovery rule for update',
 						'Discovery rule for successful deleting',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
 						'Discovery rule for deleting, check used in Action',
 						'Discovery rule for clone',
@@ -217,6 +220,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule to check delete',
 						'Discovery rule for update',
 						'Discovery rule for successful deleting',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
 						'Discovery rule for deleting, check used in Action',
 						'Discovery rule for clone',
