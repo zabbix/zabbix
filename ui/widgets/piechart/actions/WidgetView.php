@@ -764,7 +764,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$sector['percent_of_total'] = (abs($sector['value']) / $total_value['value']) * 100;
 
 			if (!$sector['is_total']) {
-				$total_percentage_used += $sector['percent_of_total'];
 				$sector_total_value += abs($sector['value']);
 				$non_total_sectors[] = $sector;
 			}
@@ -773,18 +772,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($has_total_item) {
 			if ($sector_total_value <= $total_value['value']) {
-				// Sectors use the full total value or less.
-				foreach ($svg_sectors as $key => &$sector) {
-					if ($sector['is_total']) {
-						$sector['percent_of_total'] -= $total_percentage_used;
-
-						// The non-total sectors use the full total value, no space left for the total sector.
-						if ($sector['percent_of_total'] == 0) {
-							unset($svg_sectors[$key]);
-						}
-					}
+				// Sectors use the full total value, no remaining space for the total sector.
+				if ($sector_total_value == $total_value['value']) {
+					array_pop($svg_sectors);
 				}
-				unset($sector);
+				// Sectors use less than total value, the remaining of the total sector will be displayed.
+				else {
+					$svg_sectors[count($svg_sectors) - 1]['percent_of_total'] =
+						($total_value['value']-$sector_total_value)*100/$total_value['value'];
+				}
 			}
 			else {
 				// Sectors use more than total value.
