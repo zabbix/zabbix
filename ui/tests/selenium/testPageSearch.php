@@ -309,7 +309,7 @@ class testPageSearch extends CWebTest {
 				// Assert text of the table field.
 				$this->assertEquals($column['text'], $column_element->getText());
 
-				if (isset($column['href'])) {
+				if (array_key_exists('href', $column)) {
 					// Check that the link href matches.
 					$expected_href = str_replace('{id}', $widget_params['link_id'], $column['href']);
 					$this->assertEquals($expected_href, $column_element->query('tag:a')->one()->getAttribute('href'));
@@ -433,14 +433,14 @@ class testPageSearch extends CWebTest {
 	public function testPageSearch_VerifyResults($data) {
 		// Get expected result count from DB.
 		if (CTestArrayHelper::get($data, 'count_from_db')) {
-			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
-			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
+			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE '.zbx_dbstr('%'.$data['search_string'].'%').' AND status=3';
+			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE '.zbx_dbstr('%'.$data['search_string'].'%');
 			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h LEFT JOIN interface i on i.hostid=h.hostid'.
 				' WHERE h.status in (0,1) AND h.flags in (0,4)'.
-				' AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\''.
-				' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\''.
-				' OR i.dns LIKE \'%'.$data['search_string'].'%\''.
-				' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
+				' AND (LOWER(h.host) LIKE '.zbx_dbstr('%'.$data['search_string'].'%').
+				' OR LOWER(h.name) LIKE '.zbx_dbstr('%'.$data['search_string'].'%').
+				' OR i.dns LIKE '.zbx_dbstr('%'.$data['search_string'].'%').
+				' OR i.ip LIKE '.zbx_dbstr('%'.$data['search_string'].'%').')';
 
 			$db_count = [];
 			foreach (['hosts' => $host_sql, 'host_groups' => $hostgroup_sql, 'templates' => $template_sql] as $type => $sql) {
@@ -464,7 +464,7 @@ class testPageSearch extends CWebTest {
 			// Assert table stats.
 			$expected_count = CTestArrayHelper::get($data, 'count_from_db')
 				? $db_count[$widget_params['key']]
-				: (isset($data[$widget_params['key']]) ? count($data[$widget_params['key']]) : 0);
+				: (array_key_exists($widget_params['key'], $data) ? count($data[$widget_params['key']]) : 0);
 			$footer_text = $widget->query('xpath:.//ul[@class="dashboard-widget-foot"]//li')->one()->getText();
 			// Only a maximum of 100 records are displayed at once.
 			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
@@ -568,22 +568,24 @@ class testPageSearch extends CWebTest {
 		// For each widget type.
 		foreach (self::$widgets as $widget_params) {
 			// Only check widget if any expected data is set for it.
-			if (isset($data[$widget_params['key']])) {
-				$table_row = $this->query($widget_params['table_selector'])->asTable()->one()->getRow(0);
+			if (!array_key_exists($widget_params['key'], $data)) {
+				continue;
+			}
 
-				// For each expected column.
-				foreach ($data[$widget_params['key']] as $column_name => $column_data) {
-					// Use column index when specified. This is because many columns are grouped.
-					$column = $table_row->getColumn(CTestArrayHelper::get($column_data, 'column_index', $column_name));
+			$table_row = $this->query($widget_params['table_selector'])->asTable()->one()->getRow(0);
 
-					if (isset($column_data['count'])) {
-						$this->assertEquals($column_data['count'], $column->query('tag:sup')->one()->getText());
-						$this->assertFalse($column->isAttributePresent('href'));
-					}
-					else {
-						// The text should not end with a space and a number.
-						$this->assertEquals(0, preg_match('/ [0-9]+$/', $column->getText()));
-					}
+			// For each expected column.
+			foreach ($data[$widget_params['key']] as $column_name => $column_data) {
+				// Use column index when specified. This is because many columns are grouped.
+				$column = $table_row->getColumn(CTestArrayHelper::get($column_data, 'column_index', $column_name));
+
+				if (CTestArrayHelper::get($column_data, 'count')) {
+					$this->assertEquals($column_data['count'], $column->query('tag:sup')->one()->getText());
+					$this->assertFalse($column->isAttributePresent('href'));
+				}
+				else {
+					// The text should not end with a space and a number.
+					$this->assertEquals(0, preg_match('/ [0-9]+$/', $column->getText()));
 				}
 			}
 		}
@@ -666,7 +668,7 @@ class testPageSearch extends CWebTest {
 		$item_selector = 'xpath://ul[@class="search-suggest"]//li';
 
 		// Verify suggestions or the total count of suggestions.
-		if (isset($data['expected_suggestions'])) {
+		if (array_key_exists('expected_suggestions', $data)) {
 			if (count($data['expected_suggestions']) > 0) {
 				$items = $this->query($item_selector)->waitUntilVisible()->all()->asText();
 				$this->assertEquals($data['expected_suggestions'], array_values($items));
