@@ -679,7 +679,6 @@ else {
 		$filter_groupids = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter_groupids,
-			'editable' => true,
 			'preservekeys' => true
 		]);
 		$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);
