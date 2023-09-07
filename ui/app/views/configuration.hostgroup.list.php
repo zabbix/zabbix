@@ -119,7 +119,7 @@ foreach ($data['groups'] as $group) {
 		if ($group['discoveryRules']) {
 			$ldd_rule_count = count($group['discoveryRules']);
 
-			if ($ldd_rule_count > 2) {
+			if ($ldd_rule_count > 1) {
 				$group['discoveryRules'] = [
 					reset($group['discoveryRules']),
 					end($group['discoveryRules'])
