@@ -31,6 +31,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
 #include "zbxpreproc.h"
+#include "../sysinfo.h"
 
 extern unsigned char	program_type;
 extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
@@ -857,7 +858,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 				zbx_json_free(&json);
 			}
-			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number, result))
+			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number, sysinfo_get_config_timeout(), result))
 				goto out;
 		}
 		else
@@ -904,7 +905,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 					zbx_json_free(&json);
 				}
 				else if (SUCCEED != zbx_get_remote_zabbix_stats_queue(ip, port_number, tmp, tmp1,
-						result))
+						sysinfo_get_config_timeout(), result))
 				{
 					goto out;
 				}
