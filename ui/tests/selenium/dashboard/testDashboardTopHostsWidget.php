@@ -1257,28 +1257,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #3 Incorrect threshold value.
-			// TODO Uncomment when ZBXNEXT-7687 (14) is fixed.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'column_fields' => [
-//						[
-//							'Data' => 'Item value',
-//							'Item' => 'Available memory',
-//							'Thresholds' => [
-//								[
-//									'threshold' => '     '
-//								]
-//							]
-//						]
-//					],
-//					'column_error' => [
-//						'Invalid parameter "/1/thresholds/3/threshold": a number is expected.'
-//					]
-//				]
-//			],
-			// #4 Error message when update Host count incorrectly.
+			// #3 Error message when update Host count incorrectly.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1290,7 +1269,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #5 Time shift error in column.
+			// #4 Time shift error in column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1305,7 +1284,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #6 Time shift error in column when add 1M.
+			// #5 Time shift error in column when add 1M.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1320,7 +1299,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #7 Time shift error in column when add 1y.
+			// #6 Time shift error in column when add 1y.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1335,7 +1314,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #8 Aggregation interval error in column.
+			// #7 Aggregation interval error in column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1351,7 +1330,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #9 Empty aggregation interval error in column.
+			// #8 Empty aggregation interval error in column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1367,7 +1346,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #10 No item error in column.
+			// #9 No item error in column.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1382,7 +1361,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #11 Incorrect base color.
+			// #10 Incorrect base color.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1398,7 +1377,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #12 Update all main fields.
+			// #11 Update all main fields.
 			[
 				[
 					'main_fields' =>  [
@@ -1413,7 +1392,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #13 Update first item column to Text column and add some values.
+			// #12 Update first item column to Text column and add some values.
 			[
 				[
 					'main_fields' =>  [
@@ -1430,7 +1409,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #14 Update first column to Host name column and add some values.
+			// #13 Update first column to Host name column and add some values.
 			[
 				[
 					'main_fields' =>  [
@@ -1445,7 +1424,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #15 Update first column to Item column and check time suffix - seconds.
+			// #14 Update first column to Item column and check time suffix - seconds.
 			[
 				[
 					'main_fields' =>  [
@@ -1460,7 +1439,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #16 Time suffix "minutes" is checked in this case.
+			// #15 Time suffix "minutes" is checked in this case.
 			[
 				[
 					'main_fields' =>  [
@@ -1475,7 +1454,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #17 Time suffix "hours" is checked in this case.
+			// #16 Time suffix "hours" is checked in this case.
 			[
 				[
 					'main_fields' =>  [
@@ -1490,7 +1469,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #18 Time suffix "weeks" is checked in this case.
+			// #17 Time suffix "weeks" is checked in this case.
 			[
 				[
 					'main_fields' =>  [
@@ -1505,7 +1484,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #19 Spaces in fields' values.
+			// #18 Spaces in fields' values.
 			[
 				[
 					'trim' => true,
@@ -1548,7 +1527,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 					]
 				]
 			],
-			// #20 User macros in fields' values.
+			// #19 User macros in fields' values.
 			[
 				[
 					'trim' => true,
@@ -1571,7 +1550,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				],
-				// #21 Global macros in fields' values.
+				// #20 Global macros in fields' values.
 				[
 					[
 						'trim' => true,
@@ -1595,7 +1574,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						]
 					]
 				],
-				// #22 Update item column adding new values and fields.
+				// #21 Update item column adding new values and fields.
 				[
 					[
 						'main_fields' =>  [
