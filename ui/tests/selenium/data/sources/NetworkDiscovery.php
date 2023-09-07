@@ -111,7 +111,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Discovery rule for clone',
 				'iprange' => '192.168.2.3-255',
-				'proxyid' => $proxyid,
+				'proxy_hostid' => $proxyid,
 				'delay' => '25h',
 				'status' =>  1,
 				'concurrency_max' => 0,
