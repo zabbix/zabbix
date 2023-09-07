@@ -85,6 +85,8 @@ class CWidgetPieChart extends CWidget {
 			total_value: response.total_value
 		};
 
+		this.#setLegend(legend, total_item);
+
 		if (this.#pie_chart === null) {
 			const padding = {
 				vertical: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
@@ -94,8 +96,6 @@ class CWidgetPieChart extends CWidget {
 			this.#pie_chart = new CSVGPie(this._body, padding, response.config);
 			this.#pie_chart.setSize(this.#getSize());
 		}
-
-		this.#setLegend(legend, total_item);
 
 		this.#pie_chart.setValue(value_data);
 	}
