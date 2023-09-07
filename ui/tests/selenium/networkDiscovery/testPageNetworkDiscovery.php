@@ -534,4 +534,3 @@ class testPageNetworkDiscovery extends CWebTest {
 		}
 	}
 }
-
