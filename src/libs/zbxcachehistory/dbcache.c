@@ -34,7 +34,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxpreproc.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"
@@ -172,6 +171,12 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_get_history_compression_age(void);
+
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
+{
+	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
+		zbx_free(opt->source);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -376,7 +381,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
-			"value_max", NULL);
+			"value_max", (char *)NULL);
 
 	for (i = 0; i < trends_num; i++)
 	{

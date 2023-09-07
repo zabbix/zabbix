@@ -967,11 +967,11 @@ class testFormWebScenarioStep extends CWebTest {
 			// #3 Invalid URL part removed during parsing.
 			[
 				[
-					'url' => 'http://www.zabbix.com/enterprise_ready#test',
+					'url' => 'https://www.zabbix.com/enterprise_ready#test',
 					'parsed_query' => [
 						['name' => '', 'value' => '']
 					],
-					'resulting_url' => 'http://www.zabbix.com/enterprise_ready'
+					'resulting_url' => 'https://www.zabbix.com/enterprise_ready'
 				]
 			],
 			// #4 Empty query parameter name or value.

@@ -31,7 +31,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxautoreg.h"
-#include "../scripts/scripts.h"
+#include "zbxscripts.h"
 
 extern unsigned char	program_type;
 
