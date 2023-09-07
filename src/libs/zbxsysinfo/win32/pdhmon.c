@@ -201,7 +201,6 @@ int	perf_instance_discovery_ex(const char *function, AGENT_REQUEST *request, AGE
 	{
 		wchar_t			*cnt_list, *inst_list, *instance;
 		zbx_vector_str_t	instances, instances_uniq;
-		int			i;
 
 		cnt_list = zbx_malloc(NULL, sizeof(wchar_t) * cnt_len);
 		inst_list = zbx_malloc(NULL, sizeof(wchar_t) * inst_len);
@@ -227,7 +226,7 @@ int	perf_instance_discovery_ex(const char *function, AGENT_REQUEST *request, AGE
 		zbx_vector_str_sort(&instances_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
 		zbx_vector_str_uniq(&instances_uniq, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
-		for (i = 0; i < instances_uniq.values_num; i++)
+		for (int i = 0; i < instances_uniq.values_num; i++)
 		{
 			zbx_json_addobject(&j, NULL);
 			zbx_json_addstring(&j, "{#INSTANCE}", instances_uniq.values[i], ZBX_JSON_TYPE_STRING);

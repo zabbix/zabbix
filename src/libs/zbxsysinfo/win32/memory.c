@@ -22,7 +22,7 @@
 
 #include "zbxwin32.h"
 
-int     vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	PERFORMANCE_INFORMATION pfi;
 	MEMORYSTATUSEX		ms_ex;
@@ -106,7 +106,7 @@ int     vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else if (0 == strcmp(mode, "pavailable") && 0 != ms.dwTotalPhys)
 			SET_DBL_RESULT(result, ms.dwAvailPhys / (double)ms.dwTotalPhys * 100);
 		else
-		{
+	{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			return SYSINFO_RET_FAIL;
 		}

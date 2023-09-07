@@ -80,12 +80,9 @@ int	get_cpu_num_win32(void)
 
 		if (get_lpiex(RelationProcessorCore, buffer, &buffer_length))
 		{
-			unsigned int	i;
-			PSYS_LPI_EX	ptr;
-
-			for (i = 0; i < buffer_length; i += (unsigned int)ptr->Size)
+			for (unsigned int i = 0; i < buffer_length; i += (unsigned int)ptr->Size)
 			{
-				ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
+				PSYS_LPI_EX	ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 
 				for (WORD group = 0; group < ptr->Processor.GroupCount; group++)
 				{
@@ -192,9 +189,7 @@ int	get_numa_node_num_win32(void)
 
 		if (get_lpiex(RelationNumaNode, buffer, &buffer_length))
 		{
-			unsigned int	i;
-
-			for (i = 0, numa_node_count = 0; i < buffer_length; numa_node_count++)
+			for (unsigned int i = 0, numa_node_count = 0; i < buffer_length; numa_node_count++)
 			{
 				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 				i += (unsigned)ptr->Size;

@@ -372,11 +372,9 @@ out:
 
 static void	free_perf_counter_list(void)
 {
-	zbx_perf_counter_data_t	*cptr;
-
 	while (NULL != ppsd.pPerfCounterList)
 	{
-		cptr = ppsd.pPerfCounterList;
+		zbx_perf_counter_data_t	*cptr = ppsd.pPerfCounterList;
 		ppsd.pPerfCounterList = cptr->next;
 
 		zbx_free(cptr->name);

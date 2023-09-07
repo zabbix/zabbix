@@ -22,7 +22,6 @@
 #include "diskdevices.h"
 
 #include "stats.h"
-#include "zbxmutexs.h"
 
 static void	apply_diskstat(zbx_single_diskdevice_data *device, time_t now, zbx_uint64_t *dstat)
 {
