@@ -275,7 +275,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 			[
 				[
 					'main_fields' =>  [
-						'Name' => 'Name of Top hosts widget',
+						'Name' => 'Name of Top hosts widget 😅',
 						'Refresh interval' => 'Default (1 minute)',
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'ЗАББИКС Сервер',
@@ -289,11 +289,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 						['name' => 'AvF%21', 'operator' => 'Exists'],
 						['name' => '_', 'operator' => 'Does not exist'],
 						['name' => 'кириллица', 'value' => 'BcDa', 'operator' => 'Does not equal'],
-						['name' => 'aaa6', 'value' => 'bbb6', 'operator' => 'Does not contain']
+						['name' => 'aaa6 😅', 'value' => 'bbb6 😅', 'operator' => 'Does not contain']
 					],
 					'column_fields' => [
 						[
-							'Name' => 'All fields',
+							'Name' => 'All fields 😅',
 							'Data' => 'Item value',
 							'Item' => 'Available memory'
 						]
@@ -329,7 +329,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 					],
 					'column_fields' => [
 						[
-							'Name' => 'Column 1',
 							'Data' => 'Item value',
 							'Name' => 'min',
 							'Aggregation function' => 'min',
@@ -337,7 +336,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						],
 						[
-							'Name' => 'Column 2',
 							'Data' => 'Item value',
 							'Name' => 'max',
 							'Aggregation function' => 'max',
@@ -345,7 +343,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						],
 						[
-							'Name' => 'Column 3',
 							'Data' => 'Item value',
 							'Name' => 'avg',
 							'Aggregation function' => 'avg',
@@ -353,7 +350,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						],
 						[
-							'Name' => 'Column 4',
 							'Data' => 'Item value',
 							'Name' => 'count',
 							'Aggregation function' => 'count',
@@ -361,7 +357,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						],
 						[
-							'Name' => 'Column 5',
 							'Data' => 'Item value',
 							'Name' => 'sum',
 							'Aggregation function' => 'sum',
@@ -369,7 +364,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						],
 						[
-							'Name' => 'Column 6',
 							'Data' => 'Item value',
 							'Name' => 'first',
 							'Aggregation function' => 'first',
@@ -377,7 +371,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Item' => 'Available memory'
 						],
 						[
-							'Name' => 'Column 7',
 							'Data' => 'Item value',
 							'Name' => 'last',
 							'Aggregation function' => 'last',
@@ -596,7 +589,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => 'Text column name 1',
 							'Data' => 'Text',
-							'Text' => 'Here is some text'
+							'Text' => 'Here is some text 😅'
 						],
 						[
 							'Data' => 'Text',
@@ -1403,7 +1396,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => 'Text column changed',
 							'Data' => 'Text',
-							'Text' => 'some text',
+							'Text' => 'some text 😅',
 							'Base color' => '039BE5'
 						]
 					]
@@ -1499,7 +1492,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						[
 							'Name' => '     Text column name with spaces 1     ',
 							'Data' => 'Text',
-							'Text' => '          Spaces in text          '
+							'Text' => '          Spaces in text 😅          '
 						],
 						[
 							'Name' => '     Text column name with spaces2      ',
@@ -1578,7 +1571,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				[
 					[
 						'main_fields' =>  [
-							'Name' => 'Updated values for item column'
+							'Name' => 'Updated values for item column 😅'
 						],
 						'column_fields' => [
 							[
@@ -1586,7 +1579,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 								'Name' => 'Only name changed'
 							],
 							[
-								'Data' => 'Item value',
+								'Data' => 'Item value 😅',
 								'Item' => 'Available memory',
 								'Time shift' => '1',
 								'Display' => 'Indicators',
@@ -1618,7 +1611,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 							['name' => 'AvF%21', 'operator' => 'Exists'],
 							['name' => '_', 'operator' => 'Does not exist'],
 							['name' => 'кириллица', 'value' => 'BcDa', 'operator' => 'Does not equal'],
-							['name' => 'aaa6', 'value' => 'bbb6', 'operator' => 'Does not contain']
+							['name' => 'aaa6 😅', 'value' => 'bbb6 😅', 'operator' => 'Does not contain']
 						]
 					]
 				]
