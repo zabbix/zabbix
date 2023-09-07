@@ -30,6 +30,21 @@
 
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: replace occurence of macro in input string with value given in        *
+ *          macrovalue, with memory management                                    *
+ *                                                                                *
+ * Parameters:  in               - [IN] input string to be processed              *
+ *              macro            - [IN] macro to replace                          *
+ *              macrovalue       - [IN] value to replace the macro with           *
+ *              out              - [IN/OUT] pointer to memory holding the result  *
+ *              out_alloc        - [IN/OUT] size of the memory holding the result *
+ *                                                                                *
+ * Return value:  SUCCEED - the remote command was executed successfully          *
+ *                FAIL    - an error occurred                                     *
+ *                                                                                *
+ **********************************************************************************/
 static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
 {
 	zbx_token_t	token;
@@ -251,10 +266,10 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validates a given user input with a validator of a given type     *
+ * Purpose: validates given user input with a validator of given type         *
  *                                                                            *
- * Parameters:  manualinput     - [IN] the user provided input string         *
- *              validator       - [IN] a string containing a validator        *
+ * Parameters:  manualinput     - [IN] user provided input string             *
+ *              validator       - [IN] string containing a validator          *
  *              validator_type  - [IN] indicator for how to interpret the     *
  *                                     validator string                       *
  *                                                                            *
