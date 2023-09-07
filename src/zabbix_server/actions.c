@@ -593,11 +593,11 @@ static int	check_trigger_name_condition(const zbx_vector_ptr_t *esc_events, zbx_
 		switch (condition->op)
 		{
 			case CONDITION_OPERATOR_LIKE:
-				if (NULL != strstr(event->trigger.description, condition->value))
+				if (NULL != strstr(event->name, condition->value))
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
 			case CONDITION_OPERATOR_NOT_LIKE:
-				if (NULL == strstr(event->trigger.description, condition->value))
+				if (NULL == strstr(event->name, condition->value))
 					zbx_vector_uint64_append(&condition->eventids, event->eventid);
 				break;
 		}
