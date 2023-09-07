@@ -1,6 +1,18 @@
-Changes for 5.0.37rc1
+Changes for 5.0.38rc1
 
 New features:
+
+Bug fixes:
+..F....... [ZBX-17279] fixed graph widget loading (apoga)
+A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37
+
+5.0.37rc1 was released as 5.0.37 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37rc1
 
 Bug fixes:
 ...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
@@ -2831,9 +2843,19 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.48rc1
+Changes for 4.0.49rc1
 
 New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48
+
+4.0.48rc1 was released as 4.0.48 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48rc1
 
 Bug fixes:
 

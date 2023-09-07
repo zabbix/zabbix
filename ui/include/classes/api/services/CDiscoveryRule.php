@@ -708,7 +708,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 				'templateid', 'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag',
-				'opdata', 'discover'
+				'manual_close', 'opdata', 'discover'
 			],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'selectItems' => ['itemid', 'type'],

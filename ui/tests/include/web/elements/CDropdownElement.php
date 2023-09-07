@@ -53,7 +53,9 @@ class CDropdownElement extends CElement {
 	 * @return $this
 	 */
 	public function select($text) {
-		$xpath = 'xpath:.//li[not(@optgroup) and text()='.CXPathHelper::escapeQuotes($text).']';
+		$xpath = ($text === '')
+			? "xpath:.//li[not(@optgroup)][not(text())]"
+			: "xpath:.//li[not(@optgroup) and text()=".CXPathHelper::escapeQuotes($text)."]";
 
 		if ($text === $this->getText()) {
 			return $this;
