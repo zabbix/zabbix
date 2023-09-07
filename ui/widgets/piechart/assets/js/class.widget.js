@@ -19,23 +19,25 @@
 
 
 class CWidgetPieChart extends CWidget {
+
 	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V = 8;
 	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H = 10;
 
-	onInitialize() {
-		this.pie_chart = null;
-	}
+	/**
+	 * @type {CSVGPie|null}
+	 */
+	#pie_chart = null;
 
 	onResize() {
-		if (this._state === WIDGET_STATE_ACTIVE && this.pie_chart !== null) {
-			this.pie_chart.setSize(this.getSize());
+		if (this.getState() === WIDGET_STATE_ACTIVE && this.#pie_chart !== null) {
+			this.#pie_chart.setSize(this.#getSize());
 		}
 	}
 
 	setTimePeriod(time_period) {
 		super.setTimePeriod(time_period);
 
-		if (this._state === WIDGET_STATE_ACTIVE) {
+		if (this.getState() === WIDGET_STATE_ACTIVE) {
 			this._startUpdating();
 		}
 	}
@@ -45,21 +47,21 @@ class CWidgetPieChart extends CWidget {
 			...super.getUpdateRequestData(),
 			from: this._time_period.from,
 			to: this._time_period.to,
-			with_config: this.pie_chart === null ? 1 : undefined
+			with_config: this.#pie_chart === null ? 1 : undefined
 		};
 	}
 
 	updateProperties({name, view_mode, fields}) {
-		if (this.pie_chart !== null) {
-			this.pie_chart.destroy();
-			this.pie_chart = null;
+		if (this.#pie_chart !== null) {
+			this.#pie_chart.destroy();
+			this.#pie_chart = null;
 		}
 
 		super.updateProperties({name, view_mode, fields});
 	}
 
 	setContents(response) {
-		let legend = {...response.legend};
+		const legend = {...response.legend};
 
 		let total_item = null;
 		let total_item_index = -1;
@@ -83,27 +85,22 @@ class CWidgetPieChart extends CWidget {
 			total_value: response.total_value
 		};
 
-		if (this.pie_chart !== null) {
-			this.setLegend(legend, total_item);
+		if (this.#pie_chart === null) {
+			const padding = {
+				vertical: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
+				horizontal: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
+			};
 
-			this.pie_chart.setValue(value_data);
-
-			return;
+			this.#pie_chart = new CSVGPie(this._body, padding, response.config);
+			this.#pie_chart.setSize(this.#getSize());
 		}
 
-		const padding = {
-			vertical: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
-			horizontal: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
-		};
+		this.#setLegend(legend, total_item);
 
-		this.setLegend(legend, total_item);
-
-		this.pie_chart = new CSVGPie(this._body, padding, response.config);
-		this.pie_chart.setSize(this.getSize());
-		this.pie_chart.setValue(value_data);
+		this.#pie_chart.setValue(value_data);
 	}
 
-	setLegend(legend, total_item) {
+	#setLegend(legend, total_item) {
 		let container = this._body.querySelector('.svg-pie-chart-legend');
 
 		if (container !== null) {
@@ -124,17 +121,18 @@ class CWidgetPieChart extends CWidget {
 				this._body.append(container);
 			}
 
-			container.setAttribute('style', `--lines: ${legend.lines}; --columns: ${legend.columns}`);
+			container.style.setProperty('--lines', legend.lines);
+			container.style.setProperty('--columns', legend.columns);
 
 			if (total_item !== null) {
-				legend.data.splice(legend.data.length - 1, 1);
+				legend.data.pop();
 				legend.data.unshift(total_item);
 			}
 
 			for (let i = 0; i < legend.data.length; i++) {
 				const item = document.createElement('div');
 				item.classList.add('svg-pie-chart-legend-item');
-				item.setAttribute('style', `--color: ${legend.data[i].color}`);
+				item.style.setProperty('--color', legend.data[i].color);
 
 				const name = document.createElement('span');
 				name.append(legend.data[i].name);
@@ -146,7 +144,7 @@ class CWidgetPieChart extends CWidget {
 		}
 	}
 
-	getSize() {
+	#getSize() {
 		const size = super._getContentsSize();
 
 		const legend = this._body.querySelector('.svg-pie-chart-legend');
@@ -196,10 +194,9 @@ class CWidgetPieChart extends CWidget {
 
 		menu_actions.items.push({
 			label: t('Download image'),
-			disabled: this.pie_chart === null,
+			disabled: this.#pie_chart === null,
 			clickCallback: () => {
-				downloadSvgImage(this.pie_chart.getSVGElement(), 'image.png',
-						'.svg-pie-chart-legend');
+				downloadSvgImage(this.#pie_chart.getSVGElement(), 'image.png', '.svg-pie-chart-legend');
 			}
 		});
 
