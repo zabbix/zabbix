@@ -61,7 +61,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		$this->assertEquals(['Name', 'Status'], $form->getLabels()->asText());
 
 		$this->assertEquals(['Any', 'Enabled', 'Disabled'], $form->getField('Status')->asSegmentedRadio()
-			->getLabels()->asText()
+				->getLabels()->asText()
 		);
 
 		// Check if default enabled buttons are clickable.
@@ -79,7 +79,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 		// Check if default disabled buttons are not clickable.
 		$this->assertEquals(0, $this->query('button', ['Enable', 'Disable', 'Delete'])
-			->all()->filter(CElementFilter::CLICKABLE)->count()
+				->all()->filter(CElementFilter::CLICKABLE)->count()
 		);
 
 		// Check if filter collapses/ expands.
@@ -481,7 +481,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 			$this->assertMessage(TEST_GOOD, 'Discovery rule '.($data['default'] ? 'enabled' : 'disabled'));
 			$this->assertEquals($data['default'] ? 'Enabled' : 'Disabled',
-				$row->getColumnData('Status', $data['default'] ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED)
+					$row->getColumnData('Status', $data['default'] ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED)
 			);
 		}
 		else {
@@ -510,8 +510,8 @@ class testPageNetworkDiscovery extends CWebTest {
 				}
 				else {
 					$this->assertMessage(TEST_GOOD, 'Discovery '.
-						(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
-						' '.lcfirst($data['action']).'d'
+							(CTestArrayHelper::get($data, 'single', false) ? 'rule' : 'rules').
+							' '.lcfirst($data['action']).'d'
 					);
 				}
 
@@ -524,7 +524,9 @@ class testPageNetworkDiscovery extends CWebTest {
 						: $count - count($data['name'])
 					);
 					if (CTestArrayHelper::get($data, 'single', false) === true) {
-						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.CDBHelper::escape($data['name']).')'));
+						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.
+								CDBHelper::escape($data['name']).')')
+						);
 					}
 					else {
 						$this->assertEquals($count - count($data['name']), CDBHelper::getCount('SELECT *FROM drules'));
