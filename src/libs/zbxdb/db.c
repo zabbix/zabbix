@@ -3045,7 +3045,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) compression availability              *
+ * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
  * Return value: compression availability as as integer                       *
  *               0 (OFF): compression is not available                        *

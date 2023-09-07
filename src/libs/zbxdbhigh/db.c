@@ -834,7 +834,7 @@ void	zbx_db_extract_version_info(struct zbx_db_version_info_t *version_info)
 #ifdef HAVE_POSTGRESQL
 /******************************************************************************
  *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) license information                   *
+ * Purpose: retrieves TimescaleDB (TSDB) license information                  *
  *                                                                            *
  * Return value: license information from datase as string                    *
  *               "apache"    for TimescaleDB Apache 2 Edition                 *
