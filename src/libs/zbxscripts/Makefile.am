@@ -3,8 +3,7 @@
 noinst_LIBRARIES = libzbxscripts.a
 
 libzbxscripts_a_SOURCES = \
-	scripts.c \
-	scripts.h
+	scripts.c
 
 libzbxscripts_a_CFLAGS = \
 	$(TLS_CFLAGS)

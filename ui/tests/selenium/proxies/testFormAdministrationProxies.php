@@ -516,9 +516,7 @@ class testFormAdministrationProxies extends CWebTest {
 				// Check Interface field for passive scenario.
 				$selector = 'xpath:.//div[@class="table-forms-separator"]/table';
 				$this->assertTrue($dialog->query($selector)->one()->isEnabled());
-				$this->assertEquals(['Address', 'Port'],
-						$dialog->query($selector)->one()->asTable()->getHeadersText()
-				);
+				$this->assertEquals(['Address', 'Port'],    $dialog->query($selector)->one()->asTable()->getHeadersText());
 
 				// Check interface fields values.
 				foreach (['address' => '127.0.0.1', 'port' => '10051'] as $id => $value) {
@@ -552,10 +550,10 @@ class testFormAdministrationProxies extends CWebTest {
 		$condition = ($data['mode'] === 'Active')
 			? ($data['Connections to proxy'] !== 'No encryption')
 			: ($data['Connections from proxy'] !== [
-				'id:tls_accept_none' => true,
-				'id:tls_accept_psk' => false,
-				'id:tls_accept_certificate' => false
-			]);
+					'id:tls_accept_none' => true,
+					'id:tls_accept_psk' => false,
+					'id:tls_accept_certificate' => false
+				]);
 
 		$checked_proxy = ($data['mode'] === 'Active') ? 'Active' : 'Passive';
 		$opposite_proxy = ($data['mode'] === 'Active') ? 'Passive' : 'Active';
@@ -1115,7 +1113,9 @@ class testFormAdministrationProxies extends CWebTest {
 			$dialog->close();
 
 			// Check DB.
-			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM proxy WHERE name ='.zbx_dbstr($data['proxy_fields']['Proxy name'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM proxy WHERE name ='.
+					zbx_dbstr($data['proxy_fields']['Proxy name']))
+			);
 
 			if ($update) {
 				self::$update_proxy = $data['proxy_fields']['Proxy name'];
@@ -1353,7 +1353,7 @@ class testFormAdministrationProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'proxy' => self::DELETE_PROXY_WITH_DISCOVERY_RULE,
 					'error' => "Proxy \"Delete Proxy used in Network discovery rule\" is used by discovery rule ".
-							"\"Discovery rule for proxy delete test\"."
+						"\"Discovery rule for proxy delete test\"."
 				]
 			]
 		]);
@@ -1401,3 +1401,4 @@ class testFormAdministrationProxies extends CWebTest {
 		$this->page->assertTitle('Configuration of proxies');
 	}
 }
+

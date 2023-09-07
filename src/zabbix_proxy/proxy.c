@@ -65,7 +65,7 @@
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
-#include "../zabbix_server/scripts/scripts.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -239,7 +239,7 @@ static int	get_config_forks(unsigned char process_type)
 }
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
-
+static int	zbx_config_trapper_timeout	= 300;
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
 static int	config_housekeeping_frequency	= 1;
@@ -249,7 +249,6 @@ static int	config_histsyncer_frequency	= 1;
 
 static int	config_listen_port		= ZBX_DEFAULT_SERVER_PORT;
 static char	*config_listen_ip		= NULL;
-int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 static int	config_heartbeat_frequency	= -1;
 
@@ -888,7 +887,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
-		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
+		{"TrapperTimeout",		&zbx_config_trapper_timeout,		TYPE_INT,
 			PARM_OPT,	1,			300},
 		{"UnreachablePeriod",		&config_unreachable_period,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
@@ -1189,7 +1188,7 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -1243,7 +1242,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	zbx_init_library_dbupgrade(get_program_type);
-	zbx_init_library_dbwrap(NULL);
+	zbx_init_library_dbwrap(NULL, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
@@ -1366,7 +1365,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_config_comms_args_t			config_comms = {zbx_config_tls, config_hostname, config_server,
 								config_proxymode, zbx_config_timeout,
-								zbx_config_source_ip};
+								zbx_config_trapper_timeout, zbx_config_source_ip};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 								config_startup_time, config_unavailable_delay,

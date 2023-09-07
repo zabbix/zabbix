@@ -216,11 +216,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 					(new CTag('tfoot', true))
 						->addItem(
 							(new CCol(
-								(new CList())
-									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
-									->addItem(
-										(new CButtonLink(_('Add')))->addClass('js-add')
-									)
+								(new CButtonLink(_('Add')))->addClass('js-add')
 							))->setColSpan(5)
 						)
 				]);

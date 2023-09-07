@@ -35,9 +35,9 @@ class testFormNetworkDiscovery extends CWebTest {
 	const CLONE_RULE = 'Discovery rule for clone';
 	const CHECKS_RULE = 'Discovery rule for changing checks';
 	const DELETE_RULES = [
-		'success' => 'Discovery rule for successful deleting',
-		'action_used' => 'Discovery rule for deleting, used in Action',
-		'action_check_used' => 'Discovery rule for deleting, check used in Action'
+			'success' => 'Discovery rule for successful deleting',
+			'action_used' => 'Discovery rule for deleting, used in Action',
+			'action_check_used' => 'Discovery rule for deleting, check used in Action'
 	];
 
 	/**
@@ -184,7 +184,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						$checks_form->checkValue(['SNMP community' => '', 'SNMP OID' => '']);
 
 						foreach (['SNMP community' => 255, 'SNMP OID' => 512] as $name => $maxlength) {
-							$this->assertEquals($maxlength, $checks_form->getField($name)->getAttribute('maxlength'));
+								$this->assertEquals($maxlength, $checks_form->getField($name)->getAttribute('maxlength'));
 						}
 						break;
 
@@ -805,11 +805,11 @@ class testFormNetworkDiscovery extends CWebTest {
 					'fields' => [
 						'Name' => 'IPv6 list in IP range',
 						'IP range' => "2001:db8:3333:4444:5555:6666:7777:8888,".
-								"\n::1234:5678,".
-								"\n2001:db8::,".
-								"\n2001:db8::1234:5678,".
-								"\n2001:0db8:0001:0000:0000:0ab9:C0A8:0102,".
-								"\n2001:DB8:0000:0000:244:17FF:FEB6:D37D/115"
+							"\n::1234:5678,".
+							"\n2001:db8::,".
+							"\n2001:db8::1234:5678,".
+							"\n2001:0db8:0001:0000:0000:0ab9:C0A8:0102,".
+							"\n2001:DB8:0000:0000:244:17FF:FEB6:D37D/115"
 					],
 					'Checks' => [['default' => true]]
 				]
@@ -1228,9 +1228,9 @@ class testFormNetworkDiscovery extends CWebTest {
 					foreach ($radio_labels as $label) {
 						$field = $form->getField($label);
 						$this->assertEquals(in_array($check['Check type'],
-							['Zabbix agent', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent']),
-							$field->query('xpath:.//input[@type="radio"]/../label[text()='.CXPathHelper::escapeQuotes($type_text).
-								']')->exists()
+								['Zabbix agent', 'SNMPv1 agent', 'SNMPv2 agent', 'SNMPv3 agent']),
+								$field->query('xpath:.//input[@type="radio"]/../label[text()='.
+								CXPathHelper::escapeQuotes($type_text).']')->exists()
 						);
 					}
 				}
@@ -1448,25 +1448,8 @@ class testFormNetworkDiscovery extends CWebTest {
 					],
 					'expected_checks' => [
 						'SNMPv1 agent (200) "new test SNMP OID"'
+
 					],
-//					'expected_radios' => [
-//						'Device uniqueness criteria' => [
-//							'IP address' => true,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false
-//						],
-//						'Host name' => [
-//							'DNS name' => true,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false
-//						],
-//						'Visible name' => [
-//							'Host name' => true,
-//							'DNS name' => false,
-//							'IP address' => false,
-//							'SNMPv1 agent (200) "new test SNMP OID"' => false
-//						]
-//					]
-					// TODO: Change expected_radios to commented lines when ZBX-23088 is fixed.
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
 							'IP address' => true,
@@ -1777,14 +1760,14 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'discovery' => self::DELETE_RULES['action_used'],
 					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_used']).
-							' is used in "Action with discovery rule" action.'
+						' is used in "Action with discovery rule" action.'
 				]
 			],
 			[
 				[
 					'discovery' => self::DELETE_RULES['action_check_used'],
 					'error' => 'Discovery rule '.CXPathHelper::escapeQuotes(self::DELETE_RULES['action_check_used']).
-							' is used in "Action with discovery check" action.'
+						' is used in "Action with discovery check" action.'
 				]
 			]
 		];
@@ -1951,7 +1934,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				]);
 
 				$form->getFieldContainer('Checks')->query('button', $data['action'] === 'Add' ? 'Add' : 'Edit')
-						->waitUntilClickable()->one()->click();
+					->waitUntilClickable()->one()->click();
 				$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$checks_form = $checks_dialog->asForm();
 				$checks_form->fill([
@@ -1979,7 +1962,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			}
 
 			$dialog->query('button', ($data['action'] === 'Simple update') ? 'Update' : 'Cancel')
-					->waitUntilClickable()->one()->click();
+				->waitUntilClickable()->one()->click();
 		}
 
 		$dialog->waitUntilNotVisible();

@@ -32,15 +32,15 @@ class NetworkDiscovery {
 			[
 				[
 					'name' => 'Proxy for Network discovery',
-					'mode' => 0
+					'operating_mode' => 0
 				],
 				[
 					'name' => 'Proxy for Network discovery cloning',
-					'mode' => 0
+					'operating_mode' => 0
 				]
 			]
 		);
-		$proxyid= $proxies['proxyids'][0];
+		$proxyid = $proxies['proxyids'][0];
 
 		CDataHelper::call('drule.create', [
 			[
@@ -196,14 +196,156 @@ class NetworkDiscovery {
 						'snmpv3_privpassphrase' => 'cancel_privpassphrase'
 					]
 				]
+			],
+			[
+				'name' => 'External network',
+				'iprange' => '192.168.3.1-255',
+				'delay' => 600,
+				'dchecks' => [
+					[
+						'type' => SVC_AGENT,
+						'key_' => 'system.uname',
+						'ports' => 10050,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_FTP,
+						'ports' => '21,1021',
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_HTTP,
+						'ports' => '80,8080',
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_ICMPPING,
+						'ports' => 0,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_IMAP,
+						'ports' => '143-145',
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_LDAP,
+						'ports' => 389,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_NNTP,
+						'ports' => 119,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_POP,
+						'ports' => 110,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_SMTP,
+						'ports' => 25,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_SNMPv1,
+						'key_' => 'ifIndex0',
+						'snmp_community' => 'public',
+						'ports' => 161,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_SNMPv2c,
+						'key_' => 'ifInOut0',
+						'snmp_community' => 'private1',
+						'ports' => 162,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_SNMPv3,
+						'key_' => 'ifIn0',
+						'ports' => 161,
+						'snmpv3_securityname' => 'private2',
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_SSH,
+						'ports' => 22,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_TCP,
+						'ports' => '10000-20000',
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_TELNET,
+						'ports' => 23,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					],
+					[
+						'type' => SVC_AGENT,
+						'key_' => 'agent.uname',
+						'ports' => 10050,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					]
+				]
+			],
+			[
+				'name' => 'Discovery rule to check delete',
+				'iprange' => '192.168.3.1-255',
+				'proxy_hostid' => 20000,
+				'delay' => 600,
+				'status' => DRULE_STATUS_DISABLED,
+				'dchecks' => [
+					[
+						'type' => SVC_ICMPPING,
+						'ports' => 0,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					]
+				]
+			],
+			[
+				'name' => "<img src=\"x\" onerror=\"alert('UWAGA');\"/>",
+				'iprange' => '192.168.3.1-255',
+				'proxy_hostid' => 20000,
+				'delay' => 600,
+				'status' => DRULE_STATUS_DISABLED,
+				'dchecks' => [
+					[
+						'type' => SVC_ICMPPING,
+						'ports' => 0,
+						'snmpv3_securitylevel' => 0,
+						'uniq' => 0
+					]
+				]
 			]
 		]);
+
 		$discovery_ruleids = CDataHelper::getIds('name');
 		$check_id_delete = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
-				.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
+			.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
 		);
 		$check_id_cancel = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
-				.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
+			.zbx_dbstr($discovery_ruleids['Discovery rule for cancelling scenario'])
 		);
 
 		CDataHelper::call('action.create', [
@@ -239,6 +381,7 @@ class NetworkDiscovery {
 					'conditions' => [
 						[
 							'conditiontype' => CONDITION_TYPE_DCHECK,
+							'operator' => 0,
 							'operator' => 0,
 							'value' => $check_id_delete
 						],
