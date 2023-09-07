@@ -62,7 +62,9 @@ class CControllerTriggerPrototypeList extends CController {
 
 		$this->discovery_rule = reset($discovery_rule);
 
-		return true;
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	protected function doAction() {
