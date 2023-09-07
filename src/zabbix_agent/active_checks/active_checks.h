@@ -35,6 +35,8 @@ typedef struct
 	char			*config_file;
 	int			config_timeout;
 	const char		*config_source_ip;
+	const char		*config_listen_ip;
+	int			config_listen_port;
 	const char		*config_hostname;
 	const char		*config_host_metadata;
 	const char		*config_host_metadata_item;
@@ -44,6 +46,9 @@ typedef struct
 	int			config_buffer_send;
 	int			config_buffer_size;
 	int			config_eventlog_max_lines_per_second;
+	int			config_max_lines_per_second;
+	int			config_refresh_active_checks;
+	char			**config_user_parameters;
 }
 zbx_thread_activechk_args;
 

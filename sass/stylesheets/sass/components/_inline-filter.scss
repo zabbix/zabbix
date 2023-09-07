@@ -1,12 +1,10 @@
 .inline-filter {
+	line-height: 24px;
 	text-align: right;
 
+	button,
+	input,
 	label {
-		line-height: 24px;
-	}
-
-	label,
-	input {
 		vertical-align: top;
 	}
 

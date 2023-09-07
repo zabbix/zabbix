@@ -334,10 +334,12 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByName() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill($this->HostName);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
@@ -390,6 +392,7 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByAllFields() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
@@ -397,6 +400,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('IP')->fill($this->HostIp);
 		$filter->getField('Port')->fill($this->HostPort);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}

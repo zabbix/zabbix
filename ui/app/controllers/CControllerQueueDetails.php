@@ -80,7 +80,7 @@ class CControllerQueueDetails extends CController {
 			]);
 
 			$proxyids = array_flip(array_column($hosts, 'proxyid'));
-			unset($proxies[0]);
+			unset($proxyids[0]);
 
 			$proxies = $proxyids
 				? API::Proxy()->get([

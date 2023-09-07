@@ -225,7 +225,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	public function testFormTriggerPrototype_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('zabbix.php?action=template.list');
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($data['template'], $form);
 			$discoveryRule = $this->discoveryRuleTemplate;
@@ -602,7 +602,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url_name' => 'Trigger context menu name for trigger URL.',
-					'url' => 'http://www.zabbix.com',
+					'url' => 'https://www.zabbix.com',
 					'severity' => 'High',
 					'status' => false
 				]

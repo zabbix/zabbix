@@ -28,8 +28,10 @@ typedef struct
 	zbx_socket_t		*listen_sock;
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
-	char			*config_file;
+	const char		*config_file;
 	int			config_timeout;
+	const char		*config_hosts_allowed;
+	char			**config_user_parameters;
 }
 zbx_thread_listener_args;
 

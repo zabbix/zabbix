@@ -1405,6 +1405,10 @@ msgstr "Ročne"
 msgid "Any"
 msgstr "Akékoľvek"
 
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
+
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
 msgid "Any character string included"
@@ -5944,6 +5948,10 @@ msgstr[0] "Dashboard bol odstránený"
 msgstr[1] "Dashboardy boli odstránené"
 msgstr[2] " "
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "Vlastnosti stránky dashboardu"
@@ -8264,6 +8272,10 @@ msgstr "Udalosť nie je potvrdená"
 msgid "Event list [previous 20]"
 msgstr "Zoznam udalostí [posledných 20]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "Monitoring logu udalostí. Vráti log"
@@ -9726,6 +9738,10 @@ msgstr "Host nemôže mať viac ako jedno predvolené rozhranie toho istého typ
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Počet hostov"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14490,6 +14506,10 @@ msgstr ""
 msgid "New tag name"
 msgstr "Nový názov značky"
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14502,6 +14522,10 @@ msgstr "Nové trigger"
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
 msgstr "Nové mapovanie skupiny používateľov"
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16592,6 +16616,10 @@ msgstr "Predch. čas"
 msgid "Preview"
 msgstr "Náhľad"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -16971,6 +16999,10 @@ msgstr "Verejný kľúč"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Súbor s verejným kľúčom"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -24168,6 +24200,10 @@ msgstr "by bol prekročený povolený počet závislých položiek"
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr "očakáva sa IP adresa"
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
+msgstr ""
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481
