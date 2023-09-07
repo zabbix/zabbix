@@ -391,10 +391,13 @@ class CDataHelper extends CAPIHelper {
 			$time = array_values($time);
 		}
 
+		// Set correct history table where to insert data.
+		$history_table = static::getItemDataTable($itemid);
+
 		foreach (array_values($values) as $key => $value) {
 			$clock = is_array($time) ? $time[$key] : $time;
-			DBexecute('INSERT INTO '.self::getItemDataTable($itemid).' (itemid, clock, value) VALUES ('
-					.zbx_dbstr($itemid).', '.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
+			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
+					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
 		}
 	}
 
