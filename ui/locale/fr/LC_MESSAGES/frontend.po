@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-07-25 08:40+0000\n"
+"PO-Revision-Date: 2023-08-28 18:59+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -952,7 +952,7 @@ msgstr "Ajouter hôte"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "Ajouter des tags d'hôte"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -1381,6 +1381,10 @@ msgstr "Annuellement"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Tous"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr "Toutes les modifications apportées au formulaire actuel seront perdues."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -5842,6 +5846,10 @@ msgid_plural "Dashboards deleted"
 msgstr[0] "Tableau de bord supprimé"
 msgstr[1] "Tableaux de bord supprimés"
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "Propriétés de la page du tableau de bord"
@@ -8156,6 +8164,10 @@ msgstr "L'événement n'est pas acquitté"
 msgid "Event list [previous 20]"
 msgstr "Liste d'événements [20 précédents]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "Supervision du journal d'événements. Retourne un journal"
@@ -9614,6 +9626,10 @@ msgstr "Un hôte ne peut pas avoir plus d'une interface par défaut du même typ
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Nombre d'hôtes"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14350,6 +14366,10 @@ msgstr "Nouvelle étape du scénario web"
 msgid "New tag name"
 msgstr "Nouveau nom de tag"
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr "Nouveau modèle"
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14362,6 +14382,10 @@ msgstr "Nouveaux déclencheurs"
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
 msgstr "Nouvelle correspondance de groupe d'utilisateurs"
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr "Tableau de bord suivant"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16451,6 +16475,10 @@ msgstr "Temps précédent"
 msgid "Preview"
 msgstr "Aperçu"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr "Tableau de bord précédent"
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -16829,6 +16857,10 @@ msgstr "Clé publique"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Fichier de clé publique"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr "Pousser"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -17322,7 +17354,7 @@ msgstr "Supprimer l'hôte"
 
 #: include/actions.inc.php:656 include/actions.inc.php:872
 msgid "Remove host tags"
-msgstr ""
+msgstr "Supprimer les tags d'hôte"
 
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
@@ -19576,6 +19608,10 @@ msgstr "Super administrateur"
 msgid "Support"
 msgstr "Support"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr "La prise en charge d'Oracle DB est obsolète depuis Zabbix 7.0 et sera supprimée dans les futures versions."
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr "La prise en charge de l'ancien type numérique est obsolète. Veuillez passer aux valeurs numériques de la plage étendue."
@@ -20540,7 +20576,7 @@ msgstr "Haut"
 #: include/classes/helpers/CMenuHelper.php:144
 #: include/classes/helpers/CRoleHelper.php:424
 msgid "Top 100 triggers"
-msgstr ""
+msgstr "Top 100 des déclencheurs"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
@@ -20552,7 +20588,7 @@ msgstr "Top des hôtes"
 
 #: widgets/toptriggers/Widget.php:29
 msgid "Top triggers"
-msgstr ""
+msgstr "Top des déclencheurs"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20765,7 +20801,7 @@ msgstr[1] "Déclencheurs copiés"
 
 #: widgets/toptriggers/includes/WidgetForm.php:72
 msgid "Trigger count"
-msgstr ""
+msgstr "Nombre de déclencheurs"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -23149,6 +23185,10 @@ msgstr "Avertissement"
 msgid "Warning message"
 msgstr "Message d'alerte"
 
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr "Attention ! La prise en charge d'Oracle DB est obsolète depuis Zabbix 7.0 et sera supprimée dans les futures versions."
+
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
 msgstr "Avertissement ! Impossible de récupérer la version de la base de données."
@@ -23994,6 +24034,10 @@ msgstr "le nombre autorisé d'éléments dépendants serait dépassé"
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr "une adresse IP est attendue"
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
+msgstr "une IP ou un DNS est attendu"
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481

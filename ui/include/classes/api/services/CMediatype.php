@@ -512,8 +512,10 @@ class CMediatype extends CApiService {
 				}
 
 				if ($type != $db_mediatype['type']) {
-					$mediatype =
-						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])) + $mediatype;
+					$mediatype = array_merge(
+						array_intersect_key($db_defaults, array_flip($type_fields[$db_mediatype['type']])),
+						$mediatype
+					);
 				}
 			}
 		}
@@ -683,11 +685,15 @@ class CMediatype extends CApiService {
 				continue;
 			}
 
-			$uniq_field = $mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
+			$db_params = [];
 
-			$db_params = ($method === 'update')
-				? array_column($db_mediatypes[$mediatype['mediatypeid']]['parameters'], null, $uniq_field)
-				: [];
+			if ($method === 'update') {
+				$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
+				$db_uniq_field = $db_mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
+				$db_params = array_column($db_mediatype['parameters'], null, $db_uniq_field);
+			}
+
+			$uniq_field = $mediatype['type'] == MEDIA_TYPE_EXEC ? 'sortorder' : 'name';
 
 			foreach ($mediatype['parameters'] as &$param) {
 				if (array_key_exists($param[$uniq_field], $db_params)) {

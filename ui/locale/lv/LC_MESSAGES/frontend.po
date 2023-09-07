@@ -1406,6 +1406,10 @@ msgstr "Ik gadu"
 msgid "Any"
 msgstr "Jebkurš"
 
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
+
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
 msgid "Any character string included"
@@ -5929,6 +5933,10 @@ msgstr[0] "Informācijas panelis izdzēsts"
 msgstr[1] "Informācijas paneļi izdzēsti"
 msgstr[2] "Informācijas paneļi izdzēsti"
 
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "Informācijas paneļa lapas īpašības"
@@ -8249,6 +8257,10 @@ msgstr ""
 msgid "Event list [previous 20]"
 msgstr ""
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr ""
@@ -9710,6 +9722,10 @@ msgstr ""
 #: app/views/administration.proxy.list.php:82 hostinventoriesoverview.php:89
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
 msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
@@ -14475,6 +14491,10 @@ msgstr ""
 msgid "New tag name"
 msgstr ""
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14486,6 +14506,10 @@ msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
@@ -16577,6 +16601,10 @@ msgstr ""
 msgid "Preview"
 msgstr "Priekšskatījums"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -16956,6 +16984,10 @@ msgstr "Publiskā atslēga"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Publiskās atslēgas fails"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -19711,6 +19743,10 @@ msgstr ""
 #: include/views/general.login.php:94
 msgid "Support"
 msgstr "Atbalsts"
+
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
 
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
@@ -23298,6 +23334,10 @@ msgstr ""
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
 msgstr ""
@@ -24144,6 +24184,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474
