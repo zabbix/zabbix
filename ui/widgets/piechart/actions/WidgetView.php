@@ -525,7 +525,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$chart_units = null;
 		$raw_total_value = null;
 		$others_value = 0;
-		$below_threshold_count = 0;
 		$below_threshold_sectors = [];
 		$sectors = [];
 
@@ -587,14 +586,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON
 						&& $percentage < $merge_sectors['percent']) {
-					$below_threshold_count++;
 					$others_value += max($sector['value'], 0);
 
 					$below_threshold_sectors[] = $key;
 				}
 			}
 
-			if ($below_threshold_count >= 2) {
+			if (count($below_threshold_sectors) >= 2) {
 				foreach ($below_threshold_sectors as $sector_key) {
 					unset($sectors[$sector_key]);
 				}
@@ -744,7 +742,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$sector_total_value = 0;
 		$total_percentage_used = 0;
 		$non_total_sectors = [];
-		$is_total_set = false;
+		$has_total_item = false;
 
 		$sectors = array_filter($sectors, function ($sector) {
 			return $sector['value'] > 0;
@@ -753,7 +751,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		// Move total sector to the end.
 		foreach ($sectors as $key => $sector) {
 			if ($sector['is_total']) {
-				$is_total_set = true;
+				$has_total_item = true;
 				$sectors[] = $sector;
 				unset($sectors[$key]);
 				break;
@@ -773,7 +771,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		unset($sector);
 
-		if ($is_total_set) {
+		if ($has_total_item) {
 			if ($sector_total_value <= $total_value['value']) {
 				// Sectors use the full total value or less.
 				foreach ($svg_sectors as $key => &$sector) {
