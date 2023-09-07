@@ -38,8 +38,9 @@ static int	connector_object_compare_func(const void *d1, const void *d2)
 }
 
 static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_source_ip,
-		zbx_ipc_message_t *message, zbx_vector_connector_data_point_t *connector_data_points,
-		zbx_uint64_t *processed_num)
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, zbx_ipc_message_t *message,
+		zbx_vector_connector_data_point_t *connector_data_points, zbx_uint64_t *processed_num)
 {
 	zbx_connector_t	connector;
 	int		i;
@@ -71,7 +72,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 			connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
 			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON,
-			HTTP_STORE_RAW, config_source_ip, &error)))
+			HTTP_STORE_RAW, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			config_ssl_key_location, &error)))
 	{
 		long		response_code;
 		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context);
@@ -235,8 +237,11 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_CONNECTOR_REQUEST:
-				worker_process_request(&socket, connector_worker_args_in->config_source_ip, &message,
-						&connector_data_points, &processed_num);
+				worker_process_request(&socket, connector_worker_args_in->config_source_ip,
+				connector_worker_args_in->config_ssl_ca_location,
+				connector_worker_args_in->config_ssl_cert_location,
+				connector_worker_args_in->config_ssl_key_location,
+				&message, &connector_data_points, &processed_num);
 				connections_num++;
 				break;
 		}

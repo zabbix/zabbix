@@ -342,7 +342,9 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 #ifdef HAVE_LIBCURL
-			res = get_value_http(item, config_comms->config_source_ip, result);
+			res = get_value_http(item, config_comms->config_source_ip, config_comms->config_ssl_ca_location,
+					config_comms->config_ssl_cert_location, config_comms->config_ssl_key_location,
+					result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP agent checks was not compiled in."));
 			res = CONFIG_ERROR;

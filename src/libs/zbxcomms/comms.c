@@ -52,7 +52,7 @@
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
-extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
+//extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
@@ -1289,7 +1289,8 @@ static int	tcp_err_in_use(void)
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout)
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,
+		int config_tcp_max_backlog_size)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[8], *ip, *ips, *delim;
@@ -1446,7 +1447,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					goto out;
 			}
 
-			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], CONFIG_TCP_MAX_BACKLOG_SIZE))
+			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], config_tcp_max_backlog_size))
 			{
 				zbx_set_socket_strerror("listen() for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,

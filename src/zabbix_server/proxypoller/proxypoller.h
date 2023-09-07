@@ -33,6 +33,9 @@ typedef struct
 	int				config_timeout;
 	int				config_trapper_timeout;
 	const char			*config_source_ip;
+	const char			*config_ssl_ca_location;
+	const char			*config_ssl_cert_location;
+	const char			*config_ssl_key_location;
 	const zbx_events_funcs_t	*events_cbs;
 	int				proxyconfig_frequency;
 	int				proxydata_frequency;

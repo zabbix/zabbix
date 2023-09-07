@@ -328,15 +328,18 @@ static int	config_log_slow_queries		= 0;	/* ms; 0 - disable */
 static int	config_proxyconfig_frequency	= 10;
 static int	config_proxydata_frequency	= 1;	/* 1s */
 
-char	*CONFIG_LOAD_MODULE_PATH	= NULL;
-char	**CONFIG_LOAD_MODULE		= NULL;
+static char	*CONFIG_LOAD_MODULE_PATH	= NULL;
+static char	**CONFIG_LOAD_MODULE	= NULL;
 
-char	*CONFIG_USER			= NULL;
+static char	*CONFIG_USER		= NULL;
 
 /* web monitoring */
-char	*CONFIG_SSL_CA_LOCATION		= NULL;
-char	*CONFIG_SSL_CERT_LOCATION	= NULL;
-char	*CONFIG_SSL_KEY_LOCATION	= NULL;
+/* char	*CONFIG_SSL_CA_LOCATION		= NULL; */
+/* char	*CONFIG_SSL_CERT_LOCATION	= NULL; */
+/* char	*CONFIG_SSL_KEY_LOCATION	= NULL; */
+static char	*config_ssl_ca_location = NULL;
+static char	*config_ssl_cert_location = NULL;
+static char	*config_ssl_key_location = NULL;
 
 static zbx_config_tls_t		*zbx_config_tls = NULL;
 static zbx_config_export_t	zbx_config_export = {NULL, NULL, ZBX_GIBIBYTE};
@@ -353,7 +356,7 @@ char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
+int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 static char	*zbx_config_webservice_url	= NULL;
 
@@ -616,11 +619,11 @@ static void	zbx_set_defaults(void)
 	if (NULL == CONFIG_EXTERNALSCRIPTS)
 		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 #ifdef HAVE_LIBCURL
-	if (NULL == CONFIG_SSL_CERT_LOCATION)
-		CONFIG_SSL_CERT_LOCATION = zbx_strdup(CONFIG_SSL_CERT_LOCATION, DEFAULT_SSL_CERT_LOCATION);
+	if (NULL == config_ssl_cert_location)
+		config_ssl_cert_location = zbx_strdup(config_ssl_cert_location, DEFAULT_SSL_CERT_LOCATION);
 
-	if (NULL == CONFIG_SSL_KEY_LOCATION)
-		CONFIG_SSL_KEY_LOCATION = zbx_strdup(CONFIG_SSL_KEY_LOCATION, DEFAULT_SSL_KEY_LOCATION);
+	if (NULL == config_ssl_key_location)
+		config_ssl_key_location = zbx_strdup(config_ssl_key_location, DEFAULT_SSL_KEY_LOCATION);
 
 	if (NULL == CONFIG_HISTORY_STORAGE_OPTS)
 		CONFIG_HISTORY_STORAGE_OPTS = zbx_strdup(CONFIG_HISTORY_STORAGE_OPTS, "uint,dbl,str,log,text");
@@ -957,11 +960,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"SSLCALocation",		&CONFIG_SSL_CA_LOCATION,		TYPE_STRING,
+		{"SSLCALocation",		&config_ssl_ca_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"SSLCertLocation",		&CONFIG_SSL_CERT_LOCATION,		TYPE_STRING,
+		{"SSLCertLocation",		&config_ssl_cert_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
+		{"SSLKeyLocation",		&config_ssl_key_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCAFile",			&(zbx_config_tls->ca_file),		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1015,7 +1018,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			3600},
 		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
 			PARM_OPT,	1,			3600},
-		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
+		{"ListenBacklog",		&config_tcp_max_backlog_size,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
 		{"HANodeName",			&CONFIG_HA_NODE_NAME,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1398,7 +1401,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	char				*error = NULL;
 
 	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, config_server, 0, zbx_config_timeout,
-							zbx_config_trapper_timeout, zbx_config_source_ip};
+							zbx_config_trapper_timeout, zbx_config_source_ip,
+							config_ssl_ca_location, config_ssl_cert_location,
+							config_ssl_key_location};
 
 	zbx_thread_args_t		thread_args;
 
@@ -1413,9 +1418,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							zbx_config_trapper_timeout, zbx_config_source_ip};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
-							zbx_config_source_ip, &events_cbs, config_proxyconfig_frequency,
+							zbx_config_source_ip, config_ssl_ca_location,
+							config_ssl_cert_location, config_ssl_key_location,
+							&events_cbs, config_proxyconfig_frequency,
 							config_proxydata_frequency};
-	zbx_thread_httppoller_args	httppoller_args = {zbx_config_source_ip};
+	zbx_thread_httppoller_args	httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
+							config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER], zbx_config_source_ip,
 							&events_cbs};
@@ -1427,8 +1435,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout,
 							config_proxyconfig_frequency, config_proxydata_frequency,
-							zbx_config_source_ip};
-	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip};
+							zbx_config_source_ip, config_ssl_ca_location,
+							config_ssl_cert_location, config_ssl_key_location};
+	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
 						.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
@@ -1438,7 +1447,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay};
 #endif
-	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip};
+	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip, config_ssl_ca_location,
+			config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
@@ -1501,7 +1511,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
-				zbx_config_timeout))
+				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			return FAIL;
@@ -2047,7 +2057,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 
 	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_config_dbhigh->config_dbuser,
-			&zbx_config_dbhigh->config_dbpassword, zbx_config_source_ip, &error))
+			&zbx_config_dbhigh->config_dbpassword, zbx_config_source_ip, config_ssl_ca_location,
+			config_ssl_cert_location, config_ssl_key_location, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
 		zbx_free(error);

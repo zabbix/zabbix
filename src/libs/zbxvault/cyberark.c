@@ -23,8 +23,9 @@
 #include "zbxhttp.h"
 
 int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, const char *path, long timeout, zbx_kvs_t *kvs,
-		char **error)
+		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
+		long timeout, zbx_kvs_t *kvs, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);
@@ -49,7 +50,8 @@ int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *s
 	url = zbx_dsprintf(NULL, "%s/AIMWebService/api/Accounts?%s", vault_url, path);
 
 	if (SUCCEED != zbx_http_get(url, "Content-Type: application/json", timeout, ssl_cert_file, ssl_key_file,
-			config_source_ip, &out, &response_code, error))
+			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
+			&out, &response_code, error))
 	{
 		goto fail;
 	}

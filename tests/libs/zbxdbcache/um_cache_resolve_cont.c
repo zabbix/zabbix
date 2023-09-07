@@ -164,7 +164,8 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		zbx_dbsync_t		gmacros, hmacros, htmpls;
 		struct zbx_json_parse	jp;
 		zbx_config_vault_t	config_vault = {NULL, NULL, NULL, NULL, NULL, NULL};
-		const char		*config_source_ip = "";
+		const char		*config_source_ip = "", config_ssl_ca_location = NULL,
+					*config_ssl_cert_location = NULL, *config_ssl_key_location = NULL;
 
 		step = (zbx_mock_step_t *)zbx_malloc(NULL, sizeof(zbx_mock_step_t));
 
@@ -187,7 +188,8 @@ static void	mock_read_steps(zbx_vector_mock_step_t *steps, zbx_mock_handle_t hst
 		if (FAIL == zbx_json_open(vault, &jp))
 			fail_msg("invalid vault json");
 
-		zbx_dc_sync_kvs_paths(&jp, &config_vault, config_source_ip);
+		zbx_dc_sync_kvs_paths(&jp, &config_vault, config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location);
 		step->cache->refcount++;
 
 		zbx_free(vault);
