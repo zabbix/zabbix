@@ -550,8 +550,9 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 #elif defined(HAVE_KSTAT_H)
 	/* Solaris */
 
-	long	cp_time[CPUSTATES], *cp_times = NULL;
-	size_t	nlen, nlen_alloc;
+	cpu_stat_t	*cpu;
+	zbx_uint64_t	total[ZBX_CPU_STATE_COUNT];
+	kid_t		id;
 
 	if (NULL == kc)
 	{
