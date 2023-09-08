@@ -77,7 +77,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		);
 
 		// Check filter layout and values.
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
 		$form->checkValue(['id:from' => 'now-1h', 'id:to' => 'now']);
 		$this->assertEquals('selected', $form->query('link:Last 1 hour')->one()->getAttribute('class'));
 		$buttons = [
@@ -160,7 +160,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 */
 	public function testPageMonitoringWebDetails_CheckFilters($data) {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
-		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
 
 		// Set custom time filter.
 		if (CTestArrayHelper::get($data, 'fields')) {
@@ -213,7 +213,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->assertTrue($this->query('class:list-table')->exists());
 	}
 
-	public function getDataDisplayData() {
+	public function getDisplayTableData() {
 		return [
 			[
 				[
