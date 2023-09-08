@@ -25,7 +25,7 @@ class CControllerDashboardPrint extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'dashboardid' =>	'required|db dashboard.dashboardid',
 			'from' =>			'range_time',
@@ -41,7 +41,7 @@ class CControllerDashboardPrint extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD);
 	}
 
@@ -56,7 +56,7 @@ class CControllerDashboardPrint extends CController {
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',
-			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
+			'profileIdx2' => $dashboard['dashboardid'] ?? 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		];
@@ -64,7 +64,7 @@ class CControllerDashboardPrint extends CController {
 		$data = [
 			'dashboard' => $dashboard,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
-			'time_period' => getTimeSelectorPeriod($time_selector_options)
+			'dashboard_time_period' => getTimeSelectorPeriod($time_selector_options)
 		];
 
 		$response = new CControllerResponseData($data);

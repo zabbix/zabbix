@@ -68,7 +68,7 @@ $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 	view.init('.json_encode([
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
-		'time_period' => $data['time_period']
+		'dashboard_time_period' => $data['dashboard_time_period']
 	]).');
 '))
 	->setOnDocumentReady()
