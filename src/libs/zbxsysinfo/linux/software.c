@@ -624,7 +624,8 @@ out:
 	zbx_free(l);
 }
 
-static void	print_packages(char **buffer, size_t *alloc_len, size_t *offset, zbx_vector_str_t *packages, const char *manager)
+static void	print_packages(char **buffer, size_t *alloc_len, size_t *offset, zbx_vector_str_t *packages,
+		const char *manager)
 {
 	int	i;
 
