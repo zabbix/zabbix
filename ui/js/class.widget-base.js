@@ -824,12 +824,12 @@ class CWidgetBase {
 	}
 
 	/**
-	 * Get widget name to be displayed in the header (either custom, if not empty, or the default one).
+	 * Get widget name displayed in the header.
 	 *
 	 * @returns {string}
 	 */
 	getHeaderName() {
-		return this._name !== '' ? this._name : this._defaults.name;
+		return this._header.querySelector('h4').textContent;
 	}
 
 	/**
@@ -838,9 +838,7 @@ class CWidgetBase {
 	 * @param {string} name
 	 */
 	_setHeaderName(name) {
-		if (this._state !== WIDGET_STATE_INITIAL) {
-			this._header.querySelector('h4').textContent = name;
-		}
+		this._header.querySelector('h4').textContent = name;
 	}
 
 	// Data interface methods.

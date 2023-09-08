@@ -26,9 +26,13 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldGraphDataSet,
+	CWidgetFieldReference
+};
 
-$form = (new CWidgetFormView($data));
+$form = (new CWidgetFormView($data))
+	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME]);
 
 $preview = (new CDiv())
 	->addClass(ZBX_STYLE_SVG_GRAPH_PREVIEW)

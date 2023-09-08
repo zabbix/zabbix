@@ -14,7 +14,12 @@
 			"time_period": {
 				"type": "_timeperiod"
 			}
-		}
+		},
+		"out": [
+			{
+				"type": "_timeperiod"
+			}
+		]
 	},
 	"actions": {
 		"widget.svggraph.view": {

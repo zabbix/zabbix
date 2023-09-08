@@ -313,7 +313,7 @@ jQuery(function($) {
 					$(event.target).data('zbx_sbox').prevent_refresh = true;
 					window.flickerfreeScreen.setElementProgressState(obj.id, true);
 
-					timeSelectorCalc({
+					calcTimeSelector({
 						method: 'zoomout',
 						from: obj.timeline.from,
 						to: obj.timeline.to
@@ -466,7 +466,7 @@ jQuery(function($) {
 			zbx_sbox.prevent_refresh = true;
 			window.flickerfreeScreen.setElementProgressState(obj.id, true);
 
-			timeSelectorCalc({
+			calcTimeSelector({
 				method: 'rangeoffset',
 				from: obj.timeline.from,
 				to: obj.timeline.to,
@@ -538,7 +538,7 @@ jQuery(function($) {
 		});
 	}
 
-	function timeSelectorCalc(data) {
+	function calcTimeSelector(data) {
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'timeselector.calc');

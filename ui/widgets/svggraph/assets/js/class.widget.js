@@ -43,6 +43,26 @@ class CWidgetSvgGraph extends CWidget {
 		this._deactivateGraph();
 	}
 
+	onFeedback({type, value, descriptor}) {
+		if (type === '_timeperiod' && this.getFieldsReferredData().has('time_period')) {
+			this._startUpdating();
+
+			this.feedback({time_period: value});
+
+			return true;
+		}
+
+		return super.onFeedback({type, value, descriptor});
+	}
+
+	promiseUpdate() {
+		if (!this.hasBroadcast('time_period') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		}
+
+		return super.promiseUpdate();
+	}
+
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),

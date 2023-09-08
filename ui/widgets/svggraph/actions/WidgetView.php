@@ -56,9 +56,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$has_custom_time_period = $this->hasInput('has_custom_time_period');
 		$preview = $this->hasInput('preview'); // Configuration preview.
 
-		$time_from = $this->fields_values['time_period']['from_ts'];
-		$time_to = $this->fields_values['time_period']['to_ts'];
-
 		$parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 		$percentile_left_value = $parser->parse($this->fields_values['percentile_left_value']) == CParser::PARSE_SUCCESS
@@ -98,8 +95,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'percentile_right_value' => $percentile_right_value
 			],
 			'time_period' => [
-				'time_from' => $time_from,
-				'time_to' => $time_to
+				'time_from' => $this->fields_values['time_period']['from_ts'],
+				'time_to' => $this->fields_values['time_period']['to_ts']
 			],
 			'axes' => [
 				'show_left_y_axis' => $this->fields_values['lefty'] == SVG_GRAPH_AXIS_ON,
@@ -148,7 +145,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'sbox' => !$has_custom_time_period && !$edit_mode,
 				'show_problems' => $graph_data['problems']['show_problems'],
 				'show_simple_triggers' => $graph_data['displaying']['show_simple_triggers'],
-				'time_from' => $graph_data['time_period']['time_from'],
+				'time_period' => $this->fields_values['time_period'],
 				'hint_max_rows' => ZBX_WIDGET_ROWS
 			]);
 		}
