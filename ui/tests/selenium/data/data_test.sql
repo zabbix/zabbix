@@ -19,30 +19,6 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (1
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (90278, 10053, 4);
 INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, dns, port) VALUES (10030,10084,1,4,1,'127.0.0.1','jmxagent.zabbix.com','10051');
 
--- Add regular expressions
-INSERT INTO regexps (regexpid, name, test_string) VALUES (20,'1_regexp_1','first test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (21,'1_regexp_2','first test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (22,'2_regexp_1','second test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (23,'2_regexp_2','second test string');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (24,'3_regexp_1','test');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (25,'3_regexp_2','test');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (26,'4_regexp_1','abcd');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (27,'4_regexp_2','abcd');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (28,'5_regexp_1','abcd');
-INSERT INTO regexps (regexpid, name, test_string) VALUES (29,'5_regexp_2','abcd');
-
--- Add expressions for regexps
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (20,20,'first test string',0,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (21,21,'first test string2',0,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (22,22,'second test string',1,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (23,23,'second string',1,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (24,24,'abcd test',2,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (25,25,'test',2,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (26,26,'abcd',3,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (27,27,'asdf',3,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (28,28,'abcd',4,',',1);
-INSERT INTO expressions (expressionid,regexpid,expression,expression_type,exp_delimiter,case_sensitive) VALUES (29,29,'asdf',4,',',1);
-
 -- trigger actions
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (10,'Simple action',0,0,0,'60s');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (11,'Trigger action 1',0,0,0,'1h');
