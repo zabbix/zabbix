@@ -610,7 +610,7 @@
 					fields[key] = fields[key].trim();
 				}
 				else if (key === 'tags') {
-					for (let tag of fields['tags'] ) {
+					for (let tag in fields['tags'] ) {
 						fields['tags'][tag].tag = fields['tags'][tag].tag.trim();
 						fields['tags'][tag].value = fields['tags'][tag].value.trim();
 					}
