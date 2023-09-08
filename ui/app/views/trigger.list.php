@@ -36,7 +36,7 @@ $hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_te
 $filter_column1 = (new CFormGrid())
 	->addItem([
 		new CLabel($data['context'] === 'host' ? _('Host groups') : _('Template groups'), 'filter_groupids__ms'),
-		(new CMultiSelect([
+		new CFormField((new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
 			'data' => $data['filter_groupids_ms'],
@@ -50,11 +50,11 @@ $filter_column1 = (new CFormGrid())
 					'enrich_parent_groups' => true
 				] + $hg_ms_params
 			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
 	])
 	->addItem([
 		(new CLabel(($data['context'] === 'host') ? _('Hosts') : _('Templates'), 'filter_hostids__ms')),
-		(new CMultiSelect([
+		new CFormField((new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
 			'data' => $data['filter_hostids_ms'],
@@ -71,44 +71,50 @@ $filter_column1 = (new CFormGrid())
 					'editable' => true
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH))
 	])
 	->addItem([new CLabel(_('Name'), 'filter_name'),
-		(new CTextBox('filter_name', $data['filter_name']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		new CFormField((new CTextBox('filter_name', $data['filter_name']))
+			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+		)
 	])
 	->addItem([new CLabel(_('Severity')),
-		(new CCheckBoxList('filter_priority'))
+		new CFormField((new CCheckBoxList('filter_priority'))
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['filter_priority'])
 			->setColumns(3)
 			->setVertical()
+		)
 	]);
 
 if ($data['context'] === 'host') {
 	$filter_column1->addItem([new CLabel(_('State')),
-		(new CRadioButtonList('filter_state', (int) $data['filter_state']))
+		new CFormField((new CRadioButtonList('filter_state', (int) $data['filter_state']))
 			->addValue(_('all'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
 			->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
 			->setModern()
+		)
 	]);
 }
 
 $filter_column1->addItem([new CLabel(_('Status')),
-	(new CRadioButtonList('filter_status', (int) $data['filter_status']))
+	new CFormField((new CRadioButtonList('filter_status', (int) $data['filter_status']))
 		->addValue(_('all'), -1)
 		->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
 		->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 		->setModern()
+	)
 ]);
 
 if ($data['context'] === 'host') {
 	$filter_column1->addItem([new CLabel(_('Value')),
-		(new CRadioButtonList('filter_value', (int) $data['filter_value']))
+		new CFormField((new CRadioButtonList('filter_value', (int) $data['filter_value']))
 			->addValue(_('all'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
 			->addValue(_('Problem'), TRIGGER_VALUE_TRUE)
 			->setModern()
+		)
 	]);
 }
 
@@ -123,31 +129,31 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 ]);
 
 $filter_column2 = (new CFormGrid())
-	->addItem([new CLabel(_('Tags')), $filter_tags_table])
+	->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
 	->addItem([new CLabel(_('Inherited')),
-		(new CRadioButtonList('filter_inherited', (int) $data['filter_inherited']))
+		new CFormField((new CRadioButtonList('filter_inherited', (int) $data['filter_inherited']))
 			->addValue(_('all'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
-			->setModern()
+			->setModern())
 	]);
 
 if ($data['context'] === 'host') {
 	$filter_column2->addItem([new CLabel(_('Discovered')),
-		(new CRadioButtonList('filter_discovered', (int) $data['filter_discovered']))
+		new CFormField((new CRadioButtonList('filter_discovered', (int) $data['filter_discovered']))
 			->addValue(_('all'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
-			->setModern()
+			->setModern())
 	]);
 }
 
 $filter_column2->addItem([new CLabel(_('With dependencies')),
-	(new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
+	new CFormField((new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
 		->addValue(_('all'), -1)
 		->addValue(_('Yes'), 1)
 		->addValue(_('No'), 0)
-		->setModern()
+		->setModern())
 ]);
 
 $filter = (new CFilter())
