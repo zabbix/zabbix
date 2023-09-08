@@ -1,8 +1,19 @@
 Changes for 7.0.0alpha5
 
 New features:
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
 
 Bug fixes:
+..F....... [ZBXNEXT-8658] improved Monitoring > Maps usability (agriscenko)
+..F.....S. [ZBX-21898] added escaping of backslashes in history function string parameters (epulke, kprutkovs)
+...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
+....I..... [ZBX-22779] replaced HTTP with HTTPS in Zabbix homepage address (mprihodko)
+.......PS. [ZBX-23298] fixed walk[oid] discovery rule not working as test item (vso)
+.......PS. [ZBX-23336] fixed items not to become unsupported if interface is not available (vso)
+.........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
+..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
+...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
 ...G...... [ZBX-21560] fixed default Zabbix agent 1 and 2 config file name and path for Windows; fixed logging to stderr in Zabbix agent 2 (mprihodko)
 ..F....... [ZBX-22991] resolved recommendations/issues regarding new icons style (ashubin)
 ..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
