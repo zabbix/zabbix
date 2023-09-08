@@ -114,9 +114,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->checkFieldsAttributes($fields, $form);
 
 		// Check Columns table.
-		$this->assertEquals(['', 'Name', 'Data', 'Action'],
-				$form->getFieldContainer('Columns')->query('id:list_columns')->asTable()->one()->getHeadersText()
-		);
+		$this->assertEquals(['', 'Name', 'Data', 'Action'], $form->getFieldContainer('Columns')->asTable()->getHeadersText());
 
 		// Check clickable buttons.
 		$dialog_buttons = [
@@ -164,11 +162,11 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$this->checkFieldsAttributes($column_default_fields, $column_form);
 
 		// Reassign new fields' values for comparing them in other 'Data' values.
-		foreach (['visible', 'enabled'] as $attribute) {
-			foreach (['Aggregation function', 'Item', 'Time shift', 'Display', 'History data', 'Min',
-					'Max', 'Decimal places','Thresholds' ] as $field) {
-				$column_default_fields[$field][$attribute] = false;
-			}
+		foreach (['Aggregation function', 'Item', 'Time shift', 'Display', 'History data', 'Min',
+				'Max', 'Decimal places','Thresholds' ] as $field) {
+			$column_default_fields[$field]['visible'] = false;
+			$column_default_fields[$field]['enabled'] = false;
+
 		}
 
 		foreach (['Host name', 'Text'] as $data) {
@@ -229,13 +227,10 @@ class testDashboardTopHostsWidget extends CWebTest {
 		}
 
 		// Check Thresholds table.
-		$this->assertEquals(['', 'Threshold', 'Action'],
-				$column_form->getFieldContainer('Thresholds')->query('id:thresholds_table')->asTable()->one()->getHeadersText()
-		);
-
+		$thresholds_container = $column_form->getFieldContainer('Thresholds');
+		$this->assertEquals(['', 'Threshold', 'Action'], $thresholds_container->asTable()->getHeadersText());
 		$thresholds_icon = $column_form->getLabel('Thresholds')->query('xpath:.//button[@data-hintbox]')->one();
 		$this->assertFalse($thresholds_icon->isVisible());
-		$thresholds_container = $column_form->getFieldContainer('Thresholds');
 		$thresholds_container->query('button:Add')->one()->waitUntilClickable()->click();
 
 		$this->checkFieldsAttributes([
@@ -243,6 +238,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				'id:thresholds_0_threshold' => ['value' => '', 'maxlength' => 255]
 				], $column_form
 		);
+
 		$this->assertEquals(2, $thresholds_container->query('button', ['Add', 'Remove'])->all()
 				->filter(CElementFilter::CLICKABLE)->count()
 		);
@@ -2518,6 +2514,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 				$this->trimArray($value);
 			}
 		}
+		unset($value);
 	}
 
 	/**
