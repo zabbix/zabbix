@@ -624,11 +624,14 @@
 			let form_fields = this.#getFormFields();
 
 			// Values are modified to match this.db_trigger values.
-			form_fields.tags = Object.values(form_fields.tags).map(obj => obj);
+			if (form_fields.tags) {
+				form_fields.tags = Object.values(form_fields.tags).map(obj => obj);
+			}
+
 			delete form_fields.context;
 			delete form_fields._csrf_token;
 
-			if (this.db_dependencies == []) {
+			if (this.db_dependencies !== []) {
 				// Dependencies are sorted alphabetically as in form to appear in the same order for JSON.stringify().
 				let dependencies = this.#prepareDependencies(this.db_dependencies);
 				this.db_trigger.dependencies = dependencies.map(obj => obj.triggerid);
