@@ -7205,6 +7205,7 @@ Changes for 4.0.49rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.48
