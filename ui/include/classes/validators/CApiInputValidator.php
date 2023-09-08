@@ -111,8 +111,8 @@ class CApiInputValidator {
 			case API_FILTER_VALUES:
 				return self::validateFilterValues($rule, $data, $path, $error);
 
-			case API_FILTER_VALUE:
-				return self::validateFilterValue($rule, $data, $path, $error);
+			case API_VALUE:
+				return self::validateValue($rule, $data, $path, $error);
 
 			case API_FLOAT:
 				return self::validateFloat($rule, $data, $path, $error);
@@ -301,7 +301,7 @@ class CApiInputValidator {
 			case API_UINTS64:
 			case API_FILTER:
 			case API_FILTER_VALUES:
-			case API_FILTER_VALUE:
+			case API_VALUE:
 			case API_FLOAT:
 			case API_FLOATS:
 			case API_ID:
@@ -906,7 +906,7 @@ class CApiInputValidator {
 			return true;
 		}
 
-		if (($flags & API_NORMALIZE) && self::validateFilterValue([], $data, '', $e)) {
+		if (($flags & API_NORMALIZE) && self::validateValue([], $data, '', $e)) {
 			$data = [$data];
 		}
 		unset($e);
@@ -917,7 +917,7 @@ class CApiInputValidator {
 		}
 
 		$data = array_values($data);
-		$rules = ['type' => API_FILTER_VALUE];
+		$rules = ['type' => API_VALUE];
 
 		foreach ($data as $index => &$value) {
 			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
@@ -931,7 +931,7 @@ class CApiInputValidator {
 	}
 
 	/**
-	 * Filter value validator.
+	 * Value validator.
 	 *
 	 * @param array  $rule
 	 * @param mixed  $data
@@ -940,8 +940,8 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateFilterValue($rule, &$data, $path, &$error) {
-		if (!is_string($data) && !is_double($data) && !is_int($data)) {
+	private static function validateValue($rule, &$data, $path, &$error) {
+		if (!is_string($data) && !is_int($data) && !is_float($data) ) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path,
 				_('a character string, integer or floating point value is expected')
 			);

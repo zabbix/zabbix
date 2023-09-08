@@ -74,7 +74,7 @@ class testBinaryValueTypeDataCollection extends CIntegrationTest {
 
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
-			'mode' => PROXY_MODE_ACTIVE
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 		]);
 
 		$proxyids = CDataHelper::getIds('name');

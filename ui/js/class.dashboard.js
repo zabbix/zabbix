@@ -1376,7 +1376,7 @@ class CDashboard {
 			}, {capture: true});
 
 			for (const fieldset of
-					form.querySelectorAll(`fieldset.${CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSIBLE}`)) {
+					form.querySelectorAll(`fieldset.${ZBX_STYLE_COLLAPSIBLE}`)) {
 				new CFormFieldsetCollapsible(fieldset);
 			}
 
@@ -1390,7 +1390,7 @@ class CDashboard {
 		if (!this._is_edit_widget_properties_cancel_subscribed) {
 			this._is_edit_widget_properties_cancel_subscribed = true;
 
-			overlay.$dialogue[0].addEventListener('overlay.close', this._events.editWidgetPropertiesCancel,
+			overlay.$dialogue[0].addEventListener('dialogue.close', this._events.editWidgetPropertiesCancel,
 				{once: true}
 			);
 		}

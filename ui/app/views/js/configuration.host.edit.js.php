@@ -31,8 +31,37 @@
 		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form = document.getElementById(form_name);
 			this.form.addEventListener('submit', this.events.submit);
+			this.form_name = form_name;
 
 			host_edit.init({form_name, host_interfaces, host_is_discovered});
+
+			this.form.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-linked-template')) {
+					this.editTemplate({templateid: e.target.dataset.templateid});
+				}
+			});
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
+				}
+
+				location.href = location.href;
+			});
 		},
 
 		submit(button) {

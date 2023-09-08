@@ -120,7 +120,7 @@ window.mediatype_edit_popup = new class {
 		this.#post(curl.getUrl(), {mediatypeids: [this.mediatypeid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

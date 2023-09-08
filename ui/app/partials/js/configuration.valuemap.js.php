@@ -21,13 +21,14 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 ?>
 
 <script type="text/javascript">
 (() => {
-	document.querySelectorAll('#valuemap-table .element-table-add').forEach((elm) => elm.addEventListener('click',
-		(event) => openAddPopup(event))
+	document.querySelectorAll(`#${'<?= $data['table_id'] ?>'} .element-table-add`).forEach((element) =>
+		element.addEventListener('click', (event) => openAddPopup(event))
 	);
 
 	function openAddPopup(event) {
@@ -70,7 +71,7 @@ var AddValueMap = class {
 		}
 
 		return document
-			.querySelector('#valuemap-table tbody')
+			.querySelector(`#${'<?= $data['table_id'] ?>'} tbody`)
 			.append(this.row);
 	}
 

@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha4');
+define('ZABBIX_VERSION',		'7.0.0alpha5');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050063);
+define('ZABBIX_DB_VERSION',		6050089);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -341,8 +341,8 @@ define('HOST_STATUS_MONITORED',		0);
 define('HOST_STATUS_NOT_MONITORED',	1);
 define('HOST_STATUS_TEMPLATE',		3);
 
-define('PROXY_MODE_ACTIVE',		0);
-define('PROXY_MODE_PASSIVE',	1);
+define('PROXY_OPERATING_MODE_ACTIVE',	0);
+define('PROXY_OPERATING_MODE_PASSIVE',	1);
 
 define('HOST_DISCOVER',		0);
 define('HOST_NO_DISCOVER',	1);
@@ -1475,7 +1475,7 @@ define('API_BOOLEAN',				4);
 define('API_FLAG',					5);
 define('API_FLOAT',					6);
 define('API_UINT64',				7);
-define('API_FILTER_VALUE',			60);
+define('API_VALUE',					60);
 // arrays
 define('API_OBJECT',				8);
 define('API_IDS',					9);
@@ -1807,7 +1807,9 @@ define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_IPMI', 'ipmi');
 define('TAB_INDICATOR_LLD_MACROS', 'lld-macros');
-define('TAB_INDICATOR_MACROS', 'macros');
+define('TAB_INDICATOR_HOST_MACROS', 'host-macros');
+define('TAB_INDICATOR_HOST_PROTOTYPE_MACROS', 'host-prototype-macros');
+define('TAB_INDICATOR_TEMPLATE_MACROS', 'template-macros');
 define('TAB_INDICATOR_MEDIATYPE_OPTIONS', 'mediatype-options');
 define('TAB_INDICATOR_MEDIA', 'media');
 define('TAB_INDICATOR_MESSAGE_TEMPLATE', 'message-template');
@@ -1823,6 +1825,7 @@ define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
+define('TAB_INDICATOR_TEMPLATE_VALUEMAPS', 'template-valuemaps');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
@@ -1886,6 +1889,7 @@ define('ZBX_STYLE_CLOCK_HAND', 'clock-hand');
 define('ZBX_STYLE_CLOCK_HAND_SEC', 'clock-hand-sec');
 define('ZBX_STYLE_CLOCK_LINES', 'clock-lines');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
+define('ZBX_STYLE_COLLAPSIBLE', 'collapsible');
 define('ZBX_STYLE_COLLAPSED', 'collapsed');
 define('ZBX_STYLE_COLOR_PREVIEW_BOX', 'color-preview-box');
 define('ZBX_STYLE_COLOR_ICON', 'color-icon');
