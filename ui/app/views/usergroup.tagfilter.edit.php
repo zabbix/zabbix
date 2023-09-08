@@ -77,7 +77,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		(new CLabel(_('Tags'), 'tag_filters')),
+		(new CLabel(_('Tags'), 'tag_filters'))->setAsteriskMark(),
 		(new CFormField(
 			(new CDiv($new_tag_filter_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		))
