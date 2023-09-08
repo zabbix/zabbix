@@ -303,7 +303,7 @@ function itemCompleteTest(overlay) {
 			<?php endif ?>
 
 			if ('not_supported' in ret && jQuery('[name="not_supported"]', $form).length) {
-				$('[name="not_supported"]', $form)
+				jQuery('[name="not_supported"]', $form)
 					.prop('checked', ret.not_supported != 0)
 					.trigger('change');
 			}
