@@ -795,7 +795,8 @@ next:
 
 		zbx_vector_str_clear_ext(&packages, zbx_str_free);
 	}
-	else if (0 != output_offset) {
+	else if (0 != output_offset)
+	{
 		output[--output_offset] = '\0';
 	}
 
