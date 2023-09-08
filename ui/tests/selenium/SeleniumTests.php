@@ -274,11 +274,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
 		$suite->addTestSuite('testPageNetworkDiscovery');
-		/*
-				$suite->addTestSuite('testPageQueueDetails');
-				$suite->addTestSuite('testPageQueueOverview');
-				$suite->addTestSuite('testPageQueueOverviewByProxy');
-		*/
+/*
+		$suite->addTestSuite('testPageQueueDetails');
+		$suite->addTestSuite('testPageQueueOverview');
+		$suite->addTestSuite('testPageQueueOverviewByProxy');
+*/
 		$suite->addTestSuite('testPageReportsActionLog');
 		$suite->addTestSuite('testPageReportsAudit');
 		$suite->addTestSuite('testPageReportsNotifications');
@@ -305,7 +305,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 		$suite->addTestSuite('testFormAdministrationGeneralHousekeeper');
 		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
-		//		$suite->addTestSuite('testFormAdministrationGeneralImages');
+//		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralMacros');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
