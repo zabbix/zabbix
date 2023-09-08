@@ -420,6 +420,7 @@ zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_
 #define ZBX_VMWARE_UNIT_TERABYTES		12
 #define ZBX_VMWARE_UNIT_WATT			13
 #define ZBX_VMWARE_UNIT_CELSIUS			14
+#define ZBX_VMWARE_UNIT_NANOSECOND		15
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

@@ -2301,6 +2301,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			unit = ZBX_VMWARE_UNIT_MEGABYTESPERSECOND;				\
 		else if (0 == strcmp("megaHertz",val))						\
 			unit = ZBX_VMWARE_UNIT_MEGAHERTZ;					\
+		else if (0 == strcmp("nanosecond",val))						\
+			unit = ZBX_VMWARE_UNIT_NANOSECOND;					\
 		else if (0 == strcmp("microsecond",val))					\
 			unit = ZBX_VMWARE_UNIT_MICROSECOND;					\
 		else if (0 == strcmp("millisecond",val))					\
