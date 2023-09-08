@@ -21,7 +21,7 @@
 
 /**
  * @var CPartial $this
- * @var array	 $data
+ * @var array    $data
  */
 
 $tag_filter_table = (new CTable())

@@ -82,9 +82,9 @@
 		 * Adds a new row to the permissions tables, either for template or host groups, with the specified permission.
 		 * Initializes the multiselect input with the provided groups and sets the permission radio button accordingly.
 		 *
-		 * @param {string}	group_type	The type of group, either 'templategroup' or 'hostgroup'.
-		 * @param {array}	groups		An array of groups for the row's multiselect.
-		 * @param {number}	permission	The permission level..
+		 * @param {string} group_type  The type of group, either 'templategroup' or 'hostgroup'.
+		 * @param {array}  groups      An array of groups for the row's multiselect.
+		 * @param {number} permission  The permission level.
 		 */
 		#addRightRow(group_type = '', groups = [], permission = <?= PERM_DENY ?>) {
 			const rowid = group_type === 'templategroup' ? this.template_counter++ : this.host_counter++;
@@ -135,9 +135,9 @@
 		/**
 		 * Sets up disabling of groups in the multiselect popup based on changes in related multiselect's row.
 		 *
-		 * @param {string}	group_type	The prefix to the ID of the multiselects to be observed and updated.
-		 *								Used to target the correct group (user, template, host) of multiselects.
-		 * @param {boolean}	is_single	Flag to indicate if only one multiselect is the target (e.g., users).
+		 * @param {string} group_type  The prefix to the ID of the multiselects to be observed and updated.
+		 *                             Used to target the correct group (user, template, host) of multiselects.
+		 * @param {bool}   is_single   Flag to indicate if only one multiselect is the target (e.g., users).
 		 */
 		#setMultiselectDisabling(group_type, is_single = false) {
 			let multiselects = [];
@@ -165,7 +165,7 @@
 		/**
 		 * Removes the table row and triggers an event to update the tab indicator.
 		 *
-		 * @param {HTMLElement} button	The button element whose closest table row should be removed.
+		 * @param {HTMLElement} button  The button element whose closest table row should be removed.
 		 */
 		#removeRow(button) {
 			button
@@ -179,7 +179,7 @@
 		 * Removes the tag filter table row and triggers an event to update the tab indicator.
 		 * Removes the respective tag filters from tag filters array.
 		 *
-		 * @param {HTMLElement} button	The button element whose closest table row should be removed.
+		 * @param {HTMLElement} button  The button element whose closest table row should be removed.
 		 */
 		#removeTagFilterRow(button) {
 			const groupid = button.querySelector('input[name^="tag_filters["][name$="[groupid]"]').value;
@@ -199,8 +199,8 @@
 		 * Opens a popup to add or edit a tag filter, pre-filling the form with existing data if provided.
 		 * After submission, the popup reloads the page with the new or updated tag filter data.
 		 *
-		 * @param {HTMLElement|null} row	An optional table row element containing the tag filter data to edit.
-		 * 									If null, the popup will be initialized for adding a new tag filter.
+		 * @param {HTMLElement|null} row  An optional table row element containing the tag filter data to edit.
+		 *                                If null, the popup will be initialized for adding a new tag filter.
 		 */
 		#openAddPopup(row = null) {
 			let popup_params = {
@@ -230,7 +230,7 @@
 		/**
 		 * Reloads the tag filters table partial with the new or updated tag filter data from the response.
 		 *
-		 * @param {object} response	An object containing the updated tag filter data.
+		 * @param {object} response  An object containing the updated tag filter data.
 		 */
 		#reload(response) {
 			this.tag_filters = response.tag_filters;

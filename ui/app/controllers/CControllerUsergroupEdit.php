@@ -161,8 +161,8 @@ class CControllerUsergroupEdit extends CController {
 	/**
 	 * Returns the sorted list of permissions to the host groups.
 	 *
-	 * @param array $host_groups	Optional array of host groups to process.
-	 * 								If not provided, will use the host groups from the input.
+	 * @param array $host_groups  Optional array of host groups to process.
+	 *                            If not provided, will use the host groups from the input.
 	 *
 	 * @return array
 	 */
@@ -216,9 +216,9 @@ class CControllerUsergroupEdit extends CController {
 	/**
 	 * Formats the new host or template group rights from the input suitable for providing in the response.
 	 *
-	 * @param array		$groups			An array of host or template groups.
-	 * @param string	$groupid_key	The key in the input for the group IDs.
-	 * @param string	$permission_key	The key in the input for the permissions.
+	 * @param array  $groups          An array of host or template groups.
+	 * @param string $groupid_key     The key in the input for the group IDs.
+	 * @param string $permission_key  The key in the input for the permissions.
 	 *
 	 * @return array
 	 */

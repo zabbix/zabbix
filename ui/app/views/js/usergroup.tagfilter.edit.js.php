@@ -91,7 +91,7 @@ window.tag_filter_edit = new class {
 	 * Adds a new row for the tag filter with the specified tag and value.
 	 * If no tag is provided, the row will be initialized with empty values.
 	 *
-	 * @param {array} tag	The tag and value information for the filter row.
+	 * @param {array} tag  The tag and value information for the filter row.
 	 */
 	#addTagFilterRow(tag = []) {
 		const rowid = this.tag_filter_counter++;
@@ -148,9 +148,9 @@ window.tag_filter_edit = new class {
 	 * Sends a POST request to the specified URL with the provided data.
 	 * Handles the response, destroys the overlay, and triggers a custom event to be used for reloading tag filters.
 	 *
-	 * @param {string}		url					The URL to send the POST request to.
-	 * @param {object}		data				The data to be sent in the POST request.
-	 * @param {function}	success_callback	The callback function to be executed after a successful response.
+	 * @param {string}   url               The URL to send the POST request to.
+	 * @param {object}   data              The data to be sent in the POST request.
+	 * @param {function} success_callback  The callback function to be executed after a successful response.
 	 */
 	#post(url, data, success_callback) {
 		this.overlay.setLoading();

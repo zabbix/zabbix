@@ -141,9 +141,7 @@ class CControllerUsergroupCreate extends CController {
 	 * Creates and sets an error response when creating a user group fails.
 	 * Redirects to the 'usergroup.edit' action and optionally adds a specific error message.
 	 *
-	 * @param bool	$add_message	Optional flag for adding a specific error message.
-	 *
-	 * @return void
+	 * @param bool $add_message  Optional flag for adding a specific error message.
 	 */
 	private function getErrorResponse(bool $add_message = false): void {
 		$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
