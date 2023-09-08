@@ -283,15 +283,13 @@ if ($data['test_type'] != CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD) {
 	$runtime_error_fields = (new CFormField([
 		$ns_checkbox,
 		(new CDiv([
-			(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error')
-				->addStyle('width: auto; padding:0 8px;'),
-			(new CMultilineInput('runtime_error', '', ['readonly' => false]))
-				->setWidth(250)
-				->addStyle('display: inline-flex;')
+			(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
+			(new CMultilineInput('runtime_error', '', ['readonly' => false]))->setWidth(250)
 		]))
 	]))
 		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; display: flex; justify-content: space-between;');
+		->addClass('runtime-error-fields')
+		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 }
 
 $form_grid->addItem([
