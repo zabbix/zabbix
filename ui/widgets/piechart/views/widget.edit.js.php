@@ -34,21 +34,22 @@ window.widget_pie_chart_form = new class {
 	#form;
 
 	/**
-	 * @type {String}
-	 */
-	#templateid;
-
-	/**
 	 * @type {HTMLElement}
 	 */
 	#dataset_wrapper;
+
+	/**
+	 * @type {String}
+	 */
+	#templateid;
 
 	init({form_tabs_id, color_palette, templateid}) {
 		colorPalette.setThemeColors(color_palette);
 
 		this.#form = document.getElementById('widget-dialogue-form');
-		this.#templateid = templateid;
 		this.#dataset_wrapper = document.getElementById('data_sets');
+
+		this.#templateid = templateid;
 
 		jQuery('.overlay-dialogue-body').off('scroll');
 
@@ -66,37 +67,6 @@ window.widget_pie_chart_form = new class {
 		this.#datasetTabInit();
 		this.#displayingOptionsTabInit();
 		this.#updateForm();
-	}
-
-	#updateVariableOrder(obj, row_selector, var_prefix) {
-		for (const k of [10000, 0]) {
-			jQuery(row_selector, obj).each(function(i) {
-				if (var_prefix === 'ds') {
-					jQuery(this).attr('data-set', i);
-					jQuery('.single-item-table', this).attr('data-set', i);
-				}
-
-				jQuery('.multiselect[data-params]', this).each(function() {
-					const name = jQuery(this).multiSelect('getOption', 'name');
-
-					if (name !== null) {
-						jQuery(this).multiSelect('modify', {
-							name: name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
-						});
-					}
-				});
-
-				jQuery(`[name^="${var_prefix}["]`, this)
-					.filter(function () {
-						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
-					})
-					.each(function () {
-						jQuery(this).attr('name',
-							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
-						);
-					});
-			});
-		}
 	}
 
 	#datasetTabInit() {
@@ -135,7 +105,7 @@ window.widget_pie_chart_form = new class {
 					}
 				}
 			})
-			.on('expand', function(event, data) {
+			.on('expand', (event, data) => {
 				jQuery(window).trigger('resize');
 				const dataset = data.section[0];
 
@@ -219,28 +189,12 @@ window.widget_pie_chart_form = new class {
 			}
 		}
 
-		const merge_color_set = (document.getElementById('merge_color').value != '');
+		const merge_color_set = document.getElementById('merge_color').value !== '';
 
 		if (!merge_color_set) {
 			const merge_color = colorPalette.getNextColor(used_colors);
 			$.colorpicker('set_color_by_id', 'merge_color', merge_color);
 		}
-	}
-
-	#updateDatasetsLabel() {
-		for (const dataset of this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')) {
-			this.#updateDatasetLabel(dataset);
-		}
-	}
-
-	#updateDatasetLabel(dataset) {
-		const placeholder_text = <?= json_encode(_('Data set')) ?> + ` #${parseInt(dataset.dataset.set) + 1}`;
-
-		const data_set_label = dataset.querySelector('.js-dataset-label');
-		const data_set_label_input = dataset.querySelector(`[name="ds[${dataset.dataset.set}][data_set_label]"]`);
-
-		data_set_label.textContent = data_set_label_input.value !== '' ? data_set_label_input.value : placeholder_text;
-		data_set_label_input.placeholder = placeholder_text;
 	}
 
 	#addDatasetMenu(e) {
@@ -396,6 +350,22 @@ window.widget_pie_chart_form = new class {
 
 	#getOpenedDataset() {
 		return this.#dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');
+	}
+
+	#updateDatasetsLabel() {
+		for (const dataset of this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')) {
+			this.#updateDatasetLabel(dataset);
+		}
+	}
+
+	#updateDatasetLabel(dataset) {
+		const placeholder_text = <?= json_encode(_('Data set')) ?> + ` #${parseInt(dataset.dataset.set) + 1}`;
+
+		const data_set_label = dataset.querySelector('.js-dataset-label');
+		const data_set_label_input = dataset.querySelector(`[name="ds[${dataset.dataset.set}][data_set_label]"]`);
+
+		data_set_label.textContent = data_set_label_input.value !== '' ? data_set_label_input.value : placeholder_text;
+		data_set_label_input.placeholder = placeholder_text;
 	}
 
 	#initDataSetSortable() {
@@ -608,27 +578,58 @@ window.widget_pie_chart_form = new class {
 		}
 	}
 
+	#updateVariableOrder(obj, row_selector, var_prefix) {
+		for (const k of [10000, 0]) {
+			jQuery(row_selector, obj).each(function(i) {
+				if (var_prefix === 'ds') {
+					jQuery(this).attr('data-set', i);
+					jQuery('.single-item-table', this).attr('data-set', i);
+				}
+
+				jQuery('.multiselect[data-params]', this).each(function() {
+					const name = jQuery(this).multiSelect('getOption', 'name');
+
+					if (name !== null) {
+						jQuery(this).multiSelect('modify', {
+							name: name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
+						});
+					}
+				});
+
+				jQuery(`[name^="${var_prefix}["]`, this)
+					.filter(function () {
+						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
+					})
+					.each(function () {
+						jQuery(this).attr('name',
+							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
+						);
+					});
+			});
+		}
+	}
+
 	#updateForm() {
 		// Data set tab changes.
 		const dataset = this.#getOpenedDataset();
-		const datasets = this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
-		let items_type = [];
-		let is_total = false;
 
 		if (dataset !== null) {
 			this.#updateDatasetLabel(dataset);
 		}
 
+		const datasets = this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
+		const items_type = [];
+		let is_total = false;
+
 		for (let i = 0; i < datasets.length; i++) {
-			const item_type_selector = `input[name="ds[${i}][type][]"]`;
-			const item_type_fields = document.querySelectorAll(item_type_selector);
+			const item_type_fields = document.querySelectorAll(`input[name="ds[${i}][type][]"]`);
 
 			if (item_type_fields) {
 				items_type.push(item_type_fields);
 			}
 		}
 
-		if (items_type !== null) {
+		if (items_type.length > 0) {
 			for (let i = 0; i < datasets.length; i++) {
 				for (let j = 0; j < items_type[i].length; j++) {
 					if (items_type[i][j].value == <?= CWidgetFieldDataSet::ITEM_TYPE_TOTAL ?>) {
@@ -643,19 +644,15 @@ window.widget_pie_chart_form = new class {
 		}
 
 		// Displaying options tab changes.
-		const draw_type = this.#form.querySelector('[name="draw_type"]:checked').value;
-		const doughnut_config_fields = this.#form.querySelectorAll('#width_label, #width_range, #show_total_fields');
-		const is_doughnut = draw_type == <?= WidgetForm::DRAW_TYPE_DOUGHNUT ?>;
-		const merge = document.getElementById('merge');
-		const value_size_type = this.#form.querySelector('[name="value_size_type"]:checked').value;
-		const custom_value_size_on = value_size_type == <?= WidgetForm::VALUE_SIZE_CUSTOM ?>;
-		const value_size_input = document.getElementById('value_size_custom_input');
-		const total_value_fields = this.#form.querySelectorAll(
-			'#value_size_type_0, #value_size_type_1, #value_size_custom_input, #decimal_places, #units_show, #units,' +
-			' #value_bold, #value_color'
-		);
+		const is_doughnut = this.#form
+			.querySelector('[name="draw_type"]:checked').value == <?= WidgetForm::DRAW_TYPE_DOUGHNUT ?>;
+		const do_merge_sectors = document.getElementById('merge').checked;
+		const is_total_value_visible = document.getElementById('total_show').checked;
+		const is_value_size_custom = this.#form
+			.querySelector('[name="value_size_type"]:checked').value == <?= WidgetForm::VALUE_SIZE_CUSTOM ?>;
+		const is_units_visible = document.getElementById('units_show').checked;
 
-		for (const element of doughnut_config_fields) {
+		for (const element of this.#form.querySelectorAll('#width_label, #width_range, #show_total_fields')) {
 			element.style.display = is_doughnut ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
@@ -665,40 +662,40 @@ window.widget_pie_chart_form = new class {
 
 		jQuery('#width').rangeControl(is_doughnut ? 'enable' : 'disable');
 
-		document.getElementById('merge_percent').disabled = !merge.checked;
-		document.getElementById('merge_color').disabled = !merge.checked;
+		document.getElementById('merge_percent').disabled = !do_merge_sectors;
+		document.getElementById('merge_color').disabled = !do_merge_sectors;
 
-		for (const field of total_value_fields) {
-			field.disabled = !document.getElementById('total_show').checked;
+		for (const field of this.#form.querySelectorAll('#value_size_type_0, #value_size_type_1,' +
+			'#value_size_custom_input, #decimal_places, #units_show, #units, #value_bold, #value_color'
+		)) {
+			field.disabled = !is_total_value_visible;
 		}
 
-		value_size_input.disabled = (!custom_value_size_on || !document.getElementById('total_show').checked);
-		value_size_input.style.display = custom_value_size_on ? '' : 'none';
-		value_size_input.nextSibling.nodeValue = custom_value_size_on ? ' %' : '';
+		const value_size_input = document.getElementById('value_size_custom_input');
+		value_size_input.disabled = !is_value_size_custom || !is_total_value_visible;
+		value_size_input.style.display = is_value_size_custom ? '' : 'none';
+		value_size_input.nextSibling.nodeValue = is_value_size_custom ? ' %' : '';
 
 		if (document.activeElement === document.getElementById('value_size_type_1')) {
 			value_size_input.focus();
 		}
 
-		document.getElementById('units').disabled = (!document.getElementById('units_show').checked
-			|| !document.getElementById('total_show').checked
-		);
+		document.getElementById('units').disabled = !is_units_visible || !is_total_value_visible;
 
 		// Time period tab changes.
-		const graph_time = document.getElementById('graph_time');
+		const is_time_period_custom = document.getElementById('graph_time').checked;
 
-		document.getElementById('time_from').disabled = !graph_time.checked;
-		document.getElementById('time_to').disabled = !graph_time.checked;
-		document.getElementById('time_from_calendar').disabled = !graph_time.checked;
-		document.getElementById('time_to_calendar').disabled = !graph_time.checked;
-
+		document.getElementById('time_from').disabled = !is_time_period_custom;
+		document.getElementById('time_to').disabled = !is_time_period_custom;
+		document.getElementById('time_from_calendar').disabled = !is_time_period_custom;
+		document.getElementById('time_to_calendar').disabled = !is_time_period_custom;
 
 		// Legend tab changes.
-		const legend = document.getElementById('legend');
+		const is_legend_visible = document.getElementById('legend').checked;
 
-		jQuery('#legend_lines').rangeControl(legend.checked ? 'enable' : 'disable');
-		jQuery('#legend_columns').rangeControl(legend.checked ? 'enable' : 'disable');
-		document.getElementById('legend_aggregation').disabled = !legend.checked;
+		jQuery('#legend_lines').rangeControl(is_legend_visible ? 'enable' : 'disable');
+		jQuery('#legend_columns').rangeControl(is_legend_visible ? 'enable' : 'disable');
+		document.getElementById('legend_aggregation').disabled = !is_legend_visible;
 
 		// Trigger event to update tab indicators.
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
