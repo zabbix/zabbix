@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../traits/TagTrait.php';
 
 /**
- * @backup dashboard, problem, events
+ * @backup dashboard
  *
  * @onBefore prepareData
  */
@@ -873,117 +873,39 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 	public static function getWidgetTableData() {
 		return [
-			// Check trigger urls.
-			[
-				[
-					'trigger_name' => 'First test trigger with tag priority',
-					'trigger_data' => [
-						[
-							'id' => '1007700',
-							'name' => 'First test trigger with tag priority',
-							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING
-						]
-					],
-					'menu' => [
-						'VIEW' => [
-							'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
-							'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
-						],
-						'CONFIGURATION' => [
-							'Trigger' => 'triggers.php?form=update&triggerid=99252&context=host'.
-								'&backurl=zabbix.php%3Faction%3Ddashboard.view',
-							'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
-								'&backurl=zabbix.php%3Faction%3Ddashboard.view'
-							]
-						]
-					]
-				]
-			],
-			// Check host urls.
-			[
-				[
-					'host_name' => 'ЗАББИКС Сервер',
-					'trigger_data' => [
-						[
-							'id' => '1007700',
-							'name' => 'First test trigger with tag priority',
-							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING
-						]
-					],
-					'menu' => [
-						'VIEW' => [
-							'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
-							'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D=10084&filter_set=1',
-							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D=10084&filter_set=1',
-							'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=10084&filter_set=1',
-							'Web' => 'menu-popup-item disabled',
-							'Inventory' => 'hostinventories.php?hostid=10084'
-						],
-						'CONFIGURATION' => [
-							'Host' => 'zabbix.php?action=host.edit&hostid=10084',
-							'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-							'Triggers' => 'triggers.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-							'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-							'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-							'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host'
-						],
-						'SCRIPTS' => [
-							'Detect operating system' => 'menu-popup-item',
-							'Ping' => 'menu-popup-item',
-							'Traceroute' => 'menu-popup-item'
-						]
-					]
-				]
-			],
 			// Check widget data with all possible severity types and different problems count.
 			[
 				[
 					'trigger_data' => [
 						[
-							'id' => '1007700',
 							'name' => 'Problem Not classified',
 							'time' => strtotime('now'),
-							'problem_count' => '6',
-							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+							'problem_count' => '6'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Problem Information',
 							'time' => strtotime('-2 minutes'),
-							'problem_count' => '5',
-							'severity' => TRIGGER_SEVERITY_INFORMATION
+							'problem_count' => '5'
 						],
 						[
-							'id' => '1007720',
 							'name' => 'Severity status: Warning⚠️',
 							'time' => strtotime('-3 minutes'),
-							'problem_count' => '4',
-							'severity' => TRIGGER_SEVERITY_WARNING
+							'problem_count' => '4'
 						],
 						[
-							'id' => '1007730',
 							'name' => 'Problem Average',
 							'time' => strtotime('-4 minutes'),
-							'problem_count' => '3',
-							'severity' => TRIGGER_SEVERITY_AVERAGE
+							'problem_count' => '3'
 						],
 						[
-							'id' => '1007740',
 							'name' => 'Problem High',
 							'time' => strtotime('-5 minutes'),
-							'problem_count' => '2',
-							'severity' => TRIGGER_SEVERITY_HIGH
+							'problem_count' => '2'
 						],
 						[
-							'id' => '1007745',
 							'name' => 'Problem Disaster',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_DISASTER
+							'problem_count' => '1'
 						]
 					],
 					'expected' => [
@@ -1034,38 +956,6 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					]
 				]
 			],
-			// Check filter results using time selector (From -> now-24h, To -> now).
-			[
-				[
-					'trigger_data' => [
-						[
-							'id' => '1007700',
-							'name' => 'Problem Information',
-							'time' => strtotime('now'),
-							'problem_count' => '11',
-							'severity' => TRIGGER_SEVERITY_INFORMATION
-						],
-						[
-							'id' => '1007720',
-							'name' => 'Problem Disaster',
-							'time' => strtotime('-2 days'),
-							'problem_count' => '2',
-							'severity' => TRIGGER_SEVERITY_DISASTER
-						]
-					],
-					'expected' => [
-						[
-							'Host' => 'Host with top triggers trapper',
-							'Trigger' => 'Problem Information',
-							'Severity' => 'Information',
-							'Number of problems' => '11'
-						]
-					],
-					'background_color' => [
-						'Problem Information' => 'info-bg'
-					]
-				]
-			],
 			// Check results from particular host group.
 			[
 				[
@@ -1074,18 +964,14 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					],
 					'trigger_data' => [
 						[
-							'id' => '1007700',
 							'name' => 'Problem Not classified',
 							'time' => strtotime('now'),
-							'problem_count' => '3',
-							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+							'problem_count' => '3'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Severity status: Warning⚠️',
 							'time' => strtotime('-5 minutes'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING
+							'problem_count' => '1'
 						]
 					],
 					'expected' => [
@@ -1110,25 +996,19 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					],
 					'trigger_data' => [
 						[
-							'id' => '1007700',
 							'name' => 'Problem Not classified',
 							'time' => strtotime('now'),
-							'problem_count' => '3',
-							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+							'problem_count' => '3'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Problem Average',
 							'time' => strtotime('-2 minutes'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_AVERAGE
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007720',
 							'name' => 'Severity status: High',
 							'time' => strtotime('-5 minutes'),
-							'problem_count' => '5',
-							'severity' => TRIGGER_SEVERITY_HIGH
+							'problem_count' => '5'
 						]
 					],
 					'expected' => [
@@ -1160,18 +1040,14 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					],
 					'trigger_data' => [
 						[
-							'id' => '1007700',
 							'name' => 'Problem Not classified',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Trigger from {HOST.HOST}',
 							'time' => strtotime('-2 minutes'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_INFORMATION
+							'problem_count' => '1'
 						]
 					],
 					'expected' => [
@@ -1196,25 +1072,19 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					],
 					'trigger_data' => [
 						[
-							'id' => '1007700',
 							'name' => 'Problem High',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_HIGH
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Severity status: High',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_HIGH
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007720',
 							'name' => 'Problem Information',
 							'time' => strtotime('-2 minutes'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_INFORMATION
+							'problem_count' => '1'
 						]
 					],
 					'expected' => [
@@ -1242,36 +1112,29 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'fields' => [
 						'Average' => true,
+						'High' => true,
 						'Disaster' => true
 					],
 					'trigger_data' => [
 						[
-							'id' => '1007700',
 							'name' => 'Problem Disaster',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_DISASTER
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Problem Average',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_AVERAGE
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007720',
 							'name' => 'Severity status: High',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_HIGH
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007730',
 							'name' => 'Problem Information',
 							'time' => strtotime('-2 minutes'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_INFORMATION
+							'problem_count' => '1'
 						]
 					],
 					'expected' => [
@@ -1312,46 +1175,34 @@ class testDashboardTopTriggersWidget extends CWebTest {
 //					],
 //					'trigger_data' => [
 //						[
-//							'id' => '1007700',
 //							'name' => 'Problem Disaster',
 //							'time' => strtotime('now'),
-//							'problem_count' => '1',
-//							'severity' => TRIGGER_SEVERITY_DISASTER
+//							'problem_count' => '1'
 //						],
 //						[
-//							'id' => '1007710',
 //							'name' => 'Severity status: High',
 //							'time' => strtotime('now'),
-//							'problem_count' => '1',
-//							'severity' => TRIGGER_SEVERITY_HIGH
+//							'problem_count' => '1'
 //						],
 //						[
-//							'id' => '1007720',
 //							'name' => 'Problem Average',
 //							'time' => strtotime('now'),
-//							'problem_count' => '1',
-//							'severity' => TRIGGER_SEVERITY_AVERAGE
+//							'problem_count' => '1'
 //						],
 //						[
-//							'id' => '1007730',
 //							'name' => 'Severity status: Warning⚠️',
 //							'time' => strtotime('now'),
-//							'problem_count' => '1',
-//							'severity' => TRIGGER_SEVERITY_WARNING
+//							'problem_count' => '1'
 //						],
 //						[
-//							'id' => '1007740',
 //							'name' => 'Problem Not classified',
 //							'time' => strtotime('now'),
-//							'problem_count' => '1',
-//							'severity' => TRIGGER_SEVERITY_NOT_CLASSIFIED
+//							'problem_count' => '1'
 //						],
 //						[
-//							'id' => '1007745',
 //							'name' => 'Problem Information',
 //							'time' => strtotime('now'),
-//							'problem_count' => '1',
-//							'severity' => TRIGGER_SEVERITY_INFORMATION
+//							'problem_count' => '1'
 //						]
 //					],
 //					'expected' => [
@@ -1386,29 +1237,23 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					],
 					'trigger_data' => [
 						[
-							'id' => '1007720',
 							'name' => 'Problem with tag',
 							'time' => strtotime('-2 minutes'),
 							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING,
 							'tag' => 'test1',
 							'value' => 'tag1'
 						],
 						[
-							'id' => '1007700',
 							'name' => 'Problem Warning',
 							'time' => strtotime('now'),
 							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING,
 							'tag' => 'test2',
 							'value' => 'tag2'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Issue: Warning',
 							'time' => strtotime('-1 minute'),
 							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING,
 							'tag' => 'test2',
 							'value' => 'tag2'
 						]
@@ -1437,39 +1282,29 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					],
 					'trigger_data' => [
 						[
-							'id' => '1007700',
 							'name' => 'Problem Warning',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007710',
 							'name' => 'Severity status: High',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_HIGH
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007720',
 							'name' => 'Severity status: Warning⚠️',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007730',
 							'name' => 'Issue: Warning',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_WARNING
+							'problem_count' => '1'
 						],
 						[
-							'id' => '1007740',
 							'name' => 'Problem Information',
 							'time' => strtotime('now'),
-							'problem_count' => '1',
-							'severity' => TRIGGER_SEVERITY_INFORMATION
+							'problem_count' => '1'
 						]
 					],
 					'expected' => [
@@ -1484,56 +1319,54 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						'Issue: Warning' => 'warning-bg'
 					]
 				]
+			],
+			// Check filter results using time selector (From -> now-24h, To -> now).
+			[
+				[
+					'fields' => [
+						'Information' => true,
+						'Host groups' => '',
+						'Problem' => ''
+					],
+					'trigger_data' => [
+						[
+							'name' => 'Problem Information',
+							'time' => strtotime('now'),
+							'problem_count' => '11'
+						],
+						[
+							'name' => 'Problem Warning',
+							'time' => strtotime('-2 days'),
+							'problem_count' => '2'
+						]
+					],
+					'expected' => [
+						[
+							'Host' => 'Host with top triggers trapper',
+							'Trigger' => 'Problem Information',
+							'Severity' => 'Information',
+							'Number of problems' => '11'
+						]
+					],
+					'background_color' => [
+						'Problem Information' => 'info-bg'
+					]
+				]
 			]
 		];
 	}
 
 	/**
+	 * @backup !problem, !events, !event_tag, !problem_tag, !alerts, !service_problem, !event_symptom, !acknowledges
+	 * @backup !event_recovery, !event_suppress
+	 *
 	 * @dataProvider getWidgetTableData
 	 */
-	public function  testDashboardTopTriggersWidget_WidgetTableData($data) {
-		// Delete entries from database if known ids are already in use.
-		$eventids = ('SELECT eventid FROM events WHERE eventid between 1007701 and 1007750');
-		if ($eventids !== null) {
-			DBexecute('DELETE FROM problem WHERE eventid between 1007701 and 1007750');
-			DBexecute('DELETE FROM events WHERE eventid between 1007701 and 1007750');
-		}
-
+	public function testDashboardTopTriggersWidget_WidgetTableData($data) {
 		foreach ($data['trigger_data'] as $params) {
-			$objectid = CDBHelper::getValue('SELECT triggerid FROM triggers WHERE description ='.zbx_dbstr($params['name']));
-			$i = 1;
-			do {
-				DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity)
-						VALUES ('.($params['id'] + $i).', 0, 0, '.zbx_dbstr($objectid).', '.$params['time'].', 0, 1,'.
-						zbx_dbstr($params['name']).', '.zbx_dbstr($params['severity']).')'
-				);
-
-				if (array_key_exists('tags', $data)) {
-					DBexecute('INSERT INTO event_tag (eventtagid, eventid, tag, value)
-							VALUES ('.($params['id'] + $i).', '.($params['id'] + $i).', '.
-							zbx_dbstr($params['tag']).', '.zbx_dbstr($params['value']).')'
-					);
-				}
-
-				$i++;
-			} while ($i <= $params['problem_count']);
-
-			$j = 1;
-			do {
-				DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity)
-						VALUES ('.($params['id'] + $j).', 0, 0, '.zbx_dbstr($objectid).', '.$params['time'].', 0, '.
-						zbx_dbstr($params['name']).', '.zbx_dbstr($params['severity']).')'
-				);
-
-				if (array_key_exists('tags', $data)) {
-					DBexecute('INSERT INTO problem_tag (problemtagid, eventid, tag, value)
-							VALUES ('.($params['id'] + $j).', '.($params['id'] + $j).', '.
-							zbx_dbstr($params['tag']).', '.zbx_dbstr($params['value']).')'
-					);
-				}
-
-				$j++;
-			} while ($j <= $params['problem_count']);
+			for ($i = 1; $i <= $params['problem_count']; $i++) {
+				CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
+			}
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
@@ -1541,9 +1374,9 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$dashboard->waitUntilReady();
 
 		// Set specific time selector in zoom filter.
-		$filter_element = CFilterElement::find()->one()->query('link', 'Last 1 day')->waitUntilPresent();
-		if ($filter_element->one()->isSelected(false)) {
-			$filter_element->one()->click();
+		$filter_element = CFilterElement::find()->one()->query('link', 'Last 1 day')->waitUntilPresent()->one();
+		if ($filter_element->isSelected(false)) {
+			$filter_element->click();
 			$dashboard->waitUntilReady();
 		}
 
@@ -1563,50 +1396,107 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 			foreach ($data['background_color'] as $trigger => $colors) {
 				$table = $dashboard->getWidget(self::DATA_WIDGET)->getContent()->asTable();
-				$this->assertEquals($data['background_color'][$trigger], $table->findRow('Trigger', $trigger)
-						->getColumn('Severity')->getAttribute('class')
+				$this->assertEquals($colors, $table->findRow('Trigger', $trigger)->getColumn('Severity')
+						->getAttribute('class')
 				);
 			}
 		}
+	}
 
-		if (array_key_exists('trigger_name', $data) || array_key_exists('host_name', $data)) {
-			$this->query('link', ((array_key_exists('host_name', $data))
-				? $data['host_name']
-				: $data['trigger_name']))->one()->waitUntilClickable()->click();
+	public function testDashboardTopTriggersWidget_ContextMenu() {
+		// Create problem.
+		CDBHelper::setTriggerProblem('First test trigger with tag priority', TRIGGER_VALUE_TRUE);
 
-			// Check popup menu.
-			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertTrue($popup->hasTitles(array_keys($data['menu'])));
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->waitUntilReady();
 
-			$menu_items = [];
-			foreach (array_values($data['menu']) as $links) {
-				foreach ($links as $menu_item => $link) {
-					$menu_items[] = $menu_item;
+		$data = [
+			'trigger_menu' => [
+				'VIEW' => [
+					'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=99252',
+					'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
+				],
+				'CONFIGURATION' => [
+					'Trigger' => 'triggers.php?form=update&triggerid=99252&context=host'.
+						'&backurl=zabbix.php%3Faction%3Ddashboard.view',
+					'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
+						'&backurl=zabbix.php%3Faction%3Ddashboard.view'
+					]
+				]
+			],
+			'host_menu' => [
+				'VIEW' => [
+					'Dashboards' => 'zabbix.php?action=host.dashboard.view&hostid=10084',
+					'Problems' => 'zabbix.php?action=problem.view&hostids%5B%5D=10084&filter_set=1',
+					'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D=10084&filter_set=1',
+					'Graphs' => 'zabbix.php?action=charts.view&filter_hostids%5B%5D=10084&filter_set=1',
+					'Web' => 'menu-popup-item disabled',
+					'Inventory' => 'hostinventories.php?hostid=10084'
+				],
+				'CONFIGURATION' => [
+					'Host' => 'zabbix.php?action=host.edit&hostid=10084',
+					'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Triggers' => 'triggers.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host'
+				],
+				'SCRIPTS' => [
+					'Detect operating system' => 'menu-popup-item',
+					'Ping' => 'menu-popup-item',
+					'Traceroute' => 'menu-popup-item'
+				]
+			]
+		];
 
-					if (is_array($link)) {
-						foreach ($link as $menu => $attribute) {
-							// Check 2-level menu links.
-							$xpath = ".//a[text()=".CXPathHelper::escapeQuotes($menu_item).
-									"]/..//a[text()=".CXPathHelper::escapeQuotes($menu).
-									" and contains(@href, ".CXPathHelper::escapeQuotes($attribute).")]";
-							$this->assertTrue($popup->query('xpath', $xpath)->exists());
-						}
+		// Check host context menu links.
+		$this->query('link', 'ЗАББИКС Сервер')->one()->waitUntilClickable()->click();
+		$this->checkContextMenuLinks($data['host_menu']);
+
+		// Check trigger context menu links.
+		$this->query('link', 'First test trigger with tag priority')->one()->waitUntilClickable()->click();
+		$this->checkContextMenuLinks($data['trigger_menu']);
+	}
+
+	/**
+	 * Check context menu links.
+	 *
+	 * @param array $data	data provider with fields values
+	 */
+	protected function checkContextMenuLinks($data) {
+		// Check popup menu.
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertTrue($popup->hasTitles(array_keys($data)));
+
+		$menu_level1_items = [];
+		foreach (array_values($data) as $menu_items) {
+			foreach ($menu_items as $menu_level1 => $link) {
+				$menu_level1_items[] = $menu_level1;
+
+				if (is_array($link)) {
+					foreach ($link as $menu_level2 => $attribute) {
+						// Check 2-level menu links.
+						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
+						$this->assertEquals($menu_level2, $item_link->getText());
+						$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
+					}
+				}
+				else {
+					// Check 1-level menu links.
+					if (str_contains($link, 'menu-popup-item')) {
+						$this->assertEquals($link, $popup->getItem($menu_level1)->getAttribute('class'));
 					}
 					else {
-						// Check 1-level menu links.
-						if (str_contains($link, 'menu-popup-item')) {
-							$this->assertEquals($link, $popup->getItem($menu_item)->getAttribute('class'));
-						}
-						else {
-							$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_item).
-									" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
-							);
-						}
+						$this->assertTrue($popup->query("xpath:.//a[text()=".CXPathHelper::escapeQuotes($menu_level1).
+								" and contains(@href, ".CXPathHelper::escapeQuotes($link).")]")->exists()
+						);
 					}
 				}
 			}
-
-			$this->assertTrue($popup->hasItems($menu_items));
 		}
+
+		$this->assertTrue($popup->hasItems($menu_level1_items));
+		$popup->close();
 	}
 }
