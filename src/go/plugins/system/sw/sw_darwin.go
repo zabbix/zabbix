@@ -26,11 +26,11 @@ import (
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
-func (p *Plugin) systemSwPackages(params []string) (result interface{}, err error) {
+func (p *Plugin) systemSwPackages(params []string, timeout int) (result interface{}, err error) {
 	return nil, plugin.UnsupportedMetricError
 }
 
-func (p *Plugin) systemSwPackagesGet(params []string) (result interface{}, err error) {
+func (p *Plugin) systemSwPackagesGet(params []string, timeout int) (result interface{}, err error) {
 	return nil, plugin.UnsupportedMetricError
 }
 
