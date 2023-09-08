@@ -22,8 +22,6 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 /**
  * @browsers chrome
- *
- * @dataSource Proxies
  */
 class testMultiselect extends CWebTest {
 
