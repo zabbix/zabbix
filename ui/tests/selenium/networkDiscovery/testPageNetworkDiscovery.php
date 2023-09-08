@@ -99,10 +99,11 @@ class testPageNetworkDiscovery extends CWebTest {
 		 * Check if counter displays correct number of rows and check if previously disabled buttons are enabled,
 		 * upon selecting discovery rules.
 		 */
-		$this->assertTableStats(12);
+		$rules_count = CDBHelper::getCount('SELECT * FROM drules');
+		$this->assertTableStats($rules_count);
 		$this->assertSelectedCount(0);
 		$this->query('id:all_drules')->asCheckbox()->one()->check();
-		$this->assertSelectedCount(12);
+		$this->assertSelectedCount($rules_count);
 
 		foreach (['Enable', 'Disable', 'Delete'] as $buttons) {
 			$this->assertTrue($this->query('button:'.$buttons)->one()->isEnabled());
