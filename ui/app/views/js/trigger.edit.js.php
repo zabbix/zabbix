@@ -602,8 +602,26 @@
 			reloadPopup(this.form, this.action);
 		}
 
+		#getFormFields() {
+			const fields = getFormFields(this.form);
+
+			for (let key in fields) {
+				if (typeof fields[key] === 'string' && key !== 'confirmation') {
+					fields[key] = fields[key].trim();
+				}
+				else if (key === 'tags') {
+					for (let tag of fields['tags'] ) {
+						fields['tags'][tag].tag = fields['tags'][tag].tag.trim();
+						fields['tags'][tag].value = fields['tags'][tag].value.trim();
+					}
+				}
+			}
+
+			return fields;
+		}
+
 		#isFormModified() {
-			let form_fields = getFormFields(this.form);
+			let form_fields = this.#getFormFields();
 
 			// Values are modified to match this.db_trigger values.
 			form_fields.tags = Object.values(form_fields.tags).map(obj => obj);
@@ -617,13 +635,16 @@
 			}
 
 			if (form_fields.show_inherited_tags === '1') {
-				delete form_fields.show_inherited_tags;
-				delete form_fields.tags;
-				delete this.db_trigger.tags;
+				form_fields.tags = form_fields.tags.filter((tag) => {
+					return tag.type !== '1';
+				});
+
+				for (const tag of form_fields.tags) {
+					delete tag.type;
+				}
 			}
-			else {
-				delete form_fields.show_inherited_tags;
-			}
+
+			delete form_fields.show_inherited_tags;
 
 			let db_trigger_modified = {...form_fields, ...this.db_trigger};
 			const diff = JSON.stringify(db_trigger_modified) === JSON.stringify(form_fields);
@@ -679,20 +700,7 @@
 		}
 
 		submit() {
-			const fields = getFormFields(this.form);
-
-			for (let key in fields) {
-				if (typeof fields[key] === 'string' && key !== 'confirmation') {
-					fields[key] = fields[key].trim();
-				}
-				else if (key === 'tags') {
-					for (let tag in fields['tags'] ) {
-						fields['tags'][tag].tag = fields['tags'][tag].tag.trim();
-						fields['tags'][tag].value = fields['tags'][tag].value.trim();
-					}
-				}
-			}
-
+			const fields = this.#getFormFields();
 			const curl = new Curl('zabbix.php');
 
 			if (this.action === 'trigger.edit') {
