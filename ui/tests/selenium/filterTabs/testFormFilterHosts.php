@@ -69,8 +69,7 @@ class testFormFilterHosts extends testFormFilter {
 					],
 					'filter' => [
 						'Show number of records' => true
-					],
-					'tab_id' => '1'
+					]
 				]
 			],
 			[
@@ -81,8 +80,7 @@ class testFormFilterHosts extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'simple_name'
-					],
-					'tab_id' => '2'
+					]
 				]
 			],
 			// Dataprovider with symbols instead of name.
@@ -95,8 +93,7 @@ class testFormFilterHosts extends testFormFilter {
 					'filter' => [
 						'Name' => '*;%№:?(',
 						'Show number of records' => true
-					],
-					'tab_id' => '3'
+					]
 				]
 			],
 			// Dataprovider with name as cyrillic.
@@ -108,8 +105,7 @@ class testFormFilterHosts extends testFormFilter {
 					],
 					'filter' => [
 						'Name' => 'кириллица'
-					],
-					'tab_id' => '4'
+					]
 				]
 			],
 			// Two dataproviders with same name and options.
@@ -118,8 +114,7 @@ class testFormFilterHosts extends testFormFilter {
 					'expected' => TEST_GOOD,
 					'filter' => [
 						'Name' => 'duplicated_name'
-					],
-					'tab_id' => '5'
+					]
 				]
 			],
 			[
@@ -128,7 +123,8 @@ class testFormFilterHosts extends testFormFilter {
 					'filter' => [
 						'Name' => 'duplicated_name'
 					],
-					'tab_id' => '6'
+					// Should be added previous 5 filter tabs from data provider.
+					'tab' => '6'
 				]
 			]
 		];

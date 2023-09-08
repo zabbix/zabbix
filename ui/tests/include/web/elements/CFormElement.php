@@ -408,7 +408,7 @@ class CFormElement extends CElement {
 
 				foreach ($values as $name => $value) {
 					$xpath = './/*[@id='.CXPathHelper::escapeQuotes($name).' or @name='.CXPathHelper::escapeQuotes($name).']';
-					$this->setUTFValue($container->query('xpath', $xpath)->one()->detect(), $value);
+					$container->query('xpath', $xpath)->one()->detect()->fill($value);
 				}
 			}
 
@@ -424,24 +424,9 @@ class CFormElement extends CElement {
 			return $this;
 		}
 
-		$this->setUTFValue($element, $values);
+		$element->fill($values);
 
 		return $this;
-	}
-
-	/**
-	 * Function for utf8mb4 values detection and filling.
-	 *
-	 * @param CElement $element   element to be filled
-	 * @param string   $value     value to be filled in
-	 */
-	protected function setUTFValue($element, $value) {
-		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
-		}
-		else {
-			$element->fill($value);
-		}
 	}
 
 	/**
@@ -565,6 +550,17 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Check if field is marked as required in form.
+	 *
+	 * @param string $label    field label text
+	 *
+	 * @return boolean
+	 */
+	public function isRequired($label) {
+		return $this->getLabel($label)->hasClass($this->required_label);
+	}
+
+	/**
 	 * Get the mandatory labels marked with an asterisk.
 	 *
 	 * @return array
@@ -574,17 +570,6 @@ class CFormElement extends CElement {
 				->filter(CElementFilter::VISIBLE)->asText();
 
 		return array_values($labels);
-	}
-
-	/**
-	 * Check if field is marked as required in form.
-	 *
-	 * @param string $label    field label text
-	 *
-	 * @return boolean
-	 */
-	public function isRequired($label) {
-		return $this->getLabel($label)->hasClass($this->required_label);
 	}
 
 	/**

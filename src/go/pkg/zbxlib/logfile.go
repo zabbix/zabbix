@@ -207,7 +207,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 
 static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, char **error)
+		int *mtime_sent, char **error, zbx_uint64_t itemid)
 {
 	int	ret;
 	zbx_vector_pre_persistent_t	vect;
@@ -223,7 +223,7 @@ static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_
 	zbx_vector_pre_persistent_create(&vect);
 
 	ret = process_log_check(NULL, agent2_result, regexps, metric, process_value_cb, lastlogsize_sent, mtime_sent, error,
-		&vect);
+		&vect, itemid);
 
 #if !defined(__MINGW32__)
 	sigaction(SIGSEGV, &sa_old, NULL);
@@ -300,6 +300,8 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	default:
 		return nil, errors.New("Unsupported item key.")
 	}
+
+	/* will be freed in FreeActiveMetric */
 	ckey := C.CString(itemutil.MakeKey(key, params))
 	log.Tracef("Calling C function \"new_metric()\"")
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
@@ -310,7 +312,7 @@ func FreeActiveMetric(data unsafe.Pointer) {
 	C.metric_free(C.ZBX_ACTIVE_METRIC_LP(data))
 }
 
-func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer) {
+func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsafe.Pointer, itemid uint64) {
 	log.Tracef("Calling C function \"metric_set_refresh()\"")
 	C.metric_set_refresh(C.ZBX_ACTIVE_METRIC_LP(data), C.int(refresh))
 
@@ -325,10 +327,12 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
 
 	var cerrmsg *C.char
-	log.Tracef("Calling C function \"process_log_check()\"")
+
+	log.Tracef("Calling C function \"invoke_process_log_check()\"")
+
 	ret := C.invoke_process_log_check(C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
-		&cmtimeSent, &cerrmsg)
+		&cmtimeSent, &cerrmsg, C.zbx_uint64_t(itemid))
 
 	// add cached results
 	var cvalue *C.char

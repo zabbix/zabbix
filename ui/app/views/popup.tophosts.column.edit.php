@@ -29,12 +29,9 @@ $form = (new CForm())
 	->setName('tophosts_column')
 	->addStyle('display: none;')
 	->addVar('action', $data['action'])
-	->addVar('update', 1)
-	->addItem(
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	);
+	->addVar('update', 1);
+
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = new CFormGrid();
 

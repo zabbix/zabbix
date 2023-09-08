@@ -50,6 +50,7 @@ class CSvgGraphHelper {
 		self::getMetrics($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['overrides']);
+		self::applyUnits($metrics, $options['left_y_axis'], $options['right_y_axis']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
@@ -74,10 +75,19 @@ class CSvgGraphHelper {
 
 		// Get problems to display in graph.
 		if ($options['problems']['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
-			$options['problems']['itemids'] =
-				($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-					? array_unique(zbx_objectValues($metrics, 'itemid'))
-					: null;
+			if ($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS) {
+				$options['problems']['itemids'] = [];
+
+				foreach ($metrics as $metric) {
+					$options['problems']['itemids'] += $metric['options']['aggregate_function'] != AGGREGATE_NONE
+						? array_column($metric['items'], 'itemid', 'itemid')
+						: [$metric['itemid'] => $metric['itemid']];
+				}
+				$options['problems']['itemids'] = array_values($options['problems']['itemids']);
+			}
+			else {
+				$options['problems']['itemids'] = null;
+			}
 
 			$problems = self::getProblems($options['problems'], $options['time_period']);
 			$graph->addProblems($problems);
@@ -680,6 +690,21 @@ class CSvgGraphHelper {
 				unset($metric);
 			}
 		}
+	}
+
+	/**
+	 * Apply static units for each metric if selected.
+	 */
+	private static function applyUnits(array &$metrics, array $left_y_axis_options, array $right_y_axis_options): void {
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT && $left_y_axis_options['units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $left_y_axis_options['units']));
+			}
+			elseif ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT && $right_y_axis_options['units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $right_y_axis_options['units']));
+			}
+		}
+		unset($metric);
 	}
 
 	/**

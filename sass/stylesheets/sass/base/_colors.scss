@@ -135,6 +135,7 @@ $form-disabled-bg-color: #ebebeb !default;
 $form-disabled-border-color: #ccd5d9 !default;
 
 $input-placeholder-color: #9d9d9d !default;
+$input-disabled-placeholder-color: lighten($input-placeholder-color, 15%) !default;
 
 // Error messages
 $msg-bad-color: darken(desaturate($red, 10%), 20%) !default;

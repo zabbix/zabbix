@@ -149,8 +149,6 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'http_proxy' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true
@@ -1038,7 +1036,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 			// Resolve macros in parameter fields before send data to Zabbix server.
 			foreach (['params', 'error_handler_params'] as $field) {
-				$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($step[$field], $macros_types);
+				$matched_macros = CMacrosResolverGeneral::getMacroPositions($step[$field], $macros_types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$macro_value = array_key_exists($macro, $macros_posted)
@@ -1141,6 +1139,11 @@ abstract class CControllerPopupItemTest extends CController {
 											);
 											$expression[] = CFilterParser::quoteString($string);
 											break;
+
+										case CFilterParser::TOKEN_TYPE_KEYWORD:
+										case CFilterParser::TOKEN_TYPE_OPERATOR:
+											$expression[] = $filter_token['match'];
+											break;
 									}
 								}
 								break;
@@ -1220,7 +1223,7 @@ abstract class CControllerPopupItemTest extends CController {
 					foreach (array_keys($inputs[$field][$key]) as $nr) {
 						$str = &$inputs[$field][$key][$nr];
 						if (strstr($str, '{') !== false) {
-							$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($str, $types);
+							$matched_macros = CMacrosResolverGeneral::getMacroPositions($str, $types);
 
 							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 								$macro_value = array_key_exists($macro, $macros_posted)
@@ -1240,7 +1243,7 @@ abstract class CControllerPopupItemTest extends CController {
 					$inputs[$field] = CMacrosResolverGeneral::resolveItemKeyMacros($inputs[$field], $macros_posted, $types);
 				}
 				else {
-					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($inputs[$field], $types);
+					$matched_macros = CMacrosResolverGeneral::getMacroPositions($inputs[$field], $types);
 
 					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 						$macro_value = array_key_exists($macro, $macros_posted)
@@ -1268,12 +1271,13 @@ abstract class CControllerPopupItemTest extends CController {
 		if (array_key_exists('interface', $inputs) && array_key_exists('details', $inputs['interface'])) {
 			foreach ($inputs['interface']['details'] as &$field) {
 				if (strstr($field, '{') !== false) {
-					$matched_macros = (new CMacrosResolverGeneral)->getMacroPositions($field, ['usermacros' => true]);
+					$matched_macros = CMacrosResolverGeneral::getMacroPositions($field, ['usermacros' => true]);
 
 					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+						// If matching macro is not found, return unresolved macro string.
 						$macro_value = array_key_exists($macro, $macros_posted)
 							? $macros_posted[$macro]
-							: '';
+							: $macro;
 
 						$field = substr_replace($field, $macro_value, $pos, strlen($macro));
 					}
