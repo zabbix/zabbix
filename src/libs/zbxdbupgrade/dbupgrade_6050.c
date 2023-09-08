@@ -939,7 +939,7 @@ static int	DBpatch_6050089(void)
 
 static int	DBpatch_6050090(void)
 {
-	const zbx_db_field_t	field = {"manualinput_validator", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput_validator", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
