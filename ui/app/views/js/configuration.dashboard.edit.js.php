@@ -29,7 +29,7 @@
 		is_busy: false,
 		is_busy_saving: false,
 
-		init({dashboard, widget_defaults, widget_last_type, time_period, page}) {
+		init({dashboard, widget_defaults, widget_last_type, dashboard_time_period, page}) {
 			this.dashboard = dashboard;
 			this.page = page;
 
@@ -64,8 +64,10 @@
 				is_edit_mode: true,
 				can_edit_dashboards: true,
 				is_kiosk_mode: false,
-				hostid: null,
-				time_period
+				broadcast_options: {
+					_hostid: {rebroadcast: false},
+					_timeperiod: {rebroadcast: true}
+				}
 			});
 
 			for (const page of dashboard.pages) {
@@ -75,6 +77,16 @@
 
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
+
+			ZABBIX.Dashboard.broadcast({
+				_hostid: null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
 
 			ZABBIX.Dashboard.activate();
 

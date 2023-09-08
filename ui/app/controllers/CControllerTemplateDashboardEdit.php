@@ -33,9 +33,7 @@ class CControllerTemplateDashboardEdit extends CController {
 			'dashboardid' => 'db dashboard.dashboardid'
 		];
 
-		$ret = $this->validateInput($fields);
-
-		$ret = $ret && ($this->hasInput('templateid') || $this->hasInput('dashboardid'));
+		$ret = $this->validateInput($fields) && ($this->hasInput('templateid') || $this->hasInput('dashboardid'));
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -93,10 +91,11 @@ class CControllerTemplateDashboardEdit extends CController {
 		}
 
 		$data = [
+			// The dashboard property shall only contain data used by the JavaScript framework.
 			'dashboard' => $dashboard,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
 			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
-			'time_period' => getTimeSelectorPeriod([]),
+			'dashboard_time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null)
 		];
 

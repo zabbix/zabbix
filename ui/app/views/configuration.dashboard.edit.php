@@ -127,7 +127,7 @@ $html_page
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
 		'widget_last_type' => $data['widget_last_type'],
-		'time_period' => $data['time_period'],
+		'dashboard_time_period' => $data['dashboard_time_period'],
 		'page' => $data['page']
 	]).');
 '))
