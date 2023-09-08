@@ -245,7 +245,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 						if ($errors) {
 							$errors[] = BR();
 						}
-						$errors[] = $expVal.':'.$errTxt;
+						$errors[] = $expVal.': '.$errTxt;
 					}
 				}
 

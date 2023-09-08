@@ -65,6 +65,7 @@ final class CMathFunctionData {
 		'histogram_quantile' =>	[['min' => 5, 'step' => 2], ['count' => 2]],
 		'in' =>					[['min' => 2]],
 		'insert' =>				[['count' => 4]],
+		'jsonpath' =>			[['min' => 2, 'max' => 3]],
 		'kurtosis' =>			[['min' => 1, 'max' => 2]],
 		'left' =>				[['count' => 2]],
 		'length' =>				[['count' => 1]],
@@ -100,7 +101,8 @@ final class CMathFunctionData {
 		'trim' =>				[['min' => 1, 'max' => 2]],
 		'truncate' =>			[['count' => 2]],
 		'varpop' =>				[['min' => 1, 'max' => 2]],
-		'varsamp' =>			[['min' => 1, 'max' => 2]]
+		'varsamp' =>			[['min' => 1, 'max' => 2]],
+		'xmlxpath' =>			[['min' => 2, 'max' => 3]]
 	];
 
 	/**
