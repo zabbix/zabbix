@@ -66,7 +66,7 @@ class NetworkDiscovery {
 			[
 				'name' => 'Disabled discovery rule for update',
 				'iprange' => '192.168.1.1-255',
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						'type' => SVC_IMAP,
@@ -201,7 +201,6 @@ class NetworkDiscovery {
 				'name' => 'External network',
 				'iprange' => '192.168.3.1-255',
 				'delay' => 600,
-				'status' => 0,
 				'dchecks' => [
 					[
 						'type' => SVC_AGENT,
@@ -314,7 +313,7 @@ class NetworkDiscovery {
 				'iprange' => '192.168.3.1-255',
 				'proxy_hostid' => 20000,
 				'delay' => 600,
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						'type' => SVC_ICMPPING,
@@ -329,7 +328,7 @@ class NetworkDiscovery {
 				'iprange' => '192.168.3.1-255',
 				'proxy_hostid' => 20000,
 				'delay' => 600,
-				'status' => 1,
+				'status' => DRULE_STATUS_DISABLED,
 				'dchecks' => [
 					[
 						'type' => SVC_ICMPPING,
@@ -340,6 +339,7 @@ class NetworkDiscovery {
 				]
 			]
 		]);
+
 		$discovery_ruleids = CDataHelper::getIds('name');
 		$check_id_delete = CDBHelper::getValue('SELECT dcheckid FROM dchecks WHERE druleid='
 				.zbx_dbstr($discovery_ruleids['Discovery rule for deleting, check used in Action'])
