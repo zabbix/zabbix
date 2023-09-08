@@ -1475,7 +1475,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 				];
 			}
 
-			if ($item['units'] === 's' && $decimals !== 0) {
+			if ($item['units'] === 's' && $decimals != 0) {
 				return [
 					'value' => convertUnitSWithDecimals($value, false, $decimals, true),
 					'units' => '',
