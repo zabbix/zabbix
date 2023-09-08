@@ -193,22 +193,51 @@ class testFormHostGroupSearchPage extends testFormGroups {
 				[
 					'apply_permissions' => 'Europe',
 					// Permission inheritance doesn't apply when changing the name of existing group.
-					'open_form' => 'Europe group for test on search page',
+					'open_form' => 'Europe/Test',
 					'create' => 'Streets/Dzelzavas',
 					'groups_after' => [
-						'Cities/Cesis' => 'Read',
-						'Europe (including subgroups)' => 'Deny',
-						'Streets' => 'Deny',
-						'Streets/Dzelzavas' => 'None'
+						[
+							'Streets/Dzelzavas',
+							'Permissions' => 'Read-write'
+						],
+						[
+							'Cities/Cesis',
+							'Permissions' => 'Read'
+						],
+						[
+							['Europe', 'Europe/Latvia',  'Europe/Test/Zabbix', 'Europe/Latvia/Riga/Zabbix','Streets'],
+							'Permissions' => 'Deny'
+						]
 					],
 					'tags_after' => [
-						['Host group' => 'Cities/Cesis', 'Tags' => 'city: Cesis'],
-						['Host group' => 'Europe', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia', 'Tags' => 'world'],
-						['Host group' => 'Europe/Latvia/Riga/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test', 'Tags' => 'world'],
-						['Host group' => 'Europe/Test/Zabbix', 'Tags' => 'world'],
-						['Host group' => 'Streets', 'Tags' => 'street']
+						[
+							'Host groups' => 'Cities/Cesis',
+							'Tags' => 'city: Cesis'
+						],
+						[
+							'Host groups' => 'Europe',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Latvia',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Latvia/Riga/Zabbix',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Test/Zabbix',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Streets',
+							'Tags' => 'street'
+						],
+						[
+							'Host groups' => 'Streets/Dzelzavas',
+							'Tags' => 'country: test'
+						]
 					]
 				]
 			]

@@ -760,17 +760,17 @@ class testFormTabIndicators extends CWebTest {
 		$data = [
 			[
 				'tab_name' => 'Host permissions',
-				'group_table' => 'group-right-table',
-				'multiselect' => 'new_group_right_groupids_',
-				'segmentedradio' => 'new_group_right_permission',
+				'group_table' => 'hostgroup-right-table',
+				'multiselect' => 'ms_hostgroup_right_groupids_0_',
+				'segmentedradio' => 'hostgroup_right_permission_0',
 				'add_group_table' => 'new-group-right-table',
 				'group_name' => 'Discovered hosts'
 			],
 			[
 				'tab_name' => 'Template permissions',
 				'group_table' => 'templategroup-right-table',
-				'multiselect' => 'new_templategroup_right_groupids_',
-				'segmentedradio' => 'new_templategroup_right_permission',
+				'multiselect' => 'ms_templategroup_right_groupids_0_',
+				'segmentedradio' => 'templategroup_right_permission_0',
 				'add_group_table' => 'new-templategroup-right-table',
 				'group_name' => 'Templates/Power'
 			]
@@ -788,21 +788,16 @@ class testFormTabIndicators extends CWebTest {
 			$this->assertTabIndicator($tab_selector, false);
 
 			// Add read permissions to Discovered hosts group and check indicator.
+			$permissions_table->query('button', 'Add')->one()->click();
 			$group_selector = $form->query('xpath:.//div[@id="'.$permissions['multiselect'].'"]/..')->asMultiselect()->one();
 			$group_selector->fill($permissions['group_name']);
 			$permission_level = $form->query('id', $permissions['segmentedradio'])->asSegmentedRadio()->one();
 			$permission_level->fill('Read');
-			$add_button = $form->query('id', $permissions['add_group_table'])->query('button:Add')->one();
-			$add_button->click();
-			$permissions_table->waitUntilReloaded();
 			$tab_selector->waitUntilReady();
 			$this->assertTabIndicator($tab_selector, true);
 
-			// Remove read permissions from Discovered hosts group and check indicator.
-			$group_selector->fill($permissions['group_name']);
-			$permission_level->fill('None');
-			$add_button->click();
-			$permissions_table->waitUntilReloaded();
+			// Remove 'Discovered hosts' group and check indicator.
+			$permissions_table->query('button', 'Remove')->one()->click();
 			$tab_selector->waitUntilReady();
 			$this->assertTabIndicator($tab_selector, false);
 		}
@@ -812,14 +807,19 @@ class testFormTabIndicators extends CWebTest {
 		$tab_selector = $form->query('xpath:.//a[text()="Problem tag filter"]')->one();
 		$this->assertTabIndicator($tab_selector, false);
 
-		// Add tag filter for Discovered hosts group and check indicator.
-		$form->query('xpath:.//div[@id="new_tag_filter_groupids_"]/..')->asMultiselect()->one()->fill('Discovered hosts');
-		$form->query('id:new-tag-filter-table')->query('button:Add')->one()->click();
+		// Add tag filter for 'Discovered hosts' group and check indicator.
+		$tags_table = $this->query('id:tag-filter-table');
+		$tags_table->query('button','Add')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button', 'Select')->one()->click();
+		$this->query('link', 'Discovered hosts')->waitUntilVisible()->one()->click();
+		$dialog->getFooter()->query('button', 'Add')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$tag_table->waitUntilReloaded();
 		$this->assertTabIndicator($tab_selector, true);
 
-		// Remove the tag filter for Discovered hosts group and check indicator.
-		$form->query('id:tag-filter-table')->query('button:Remove')->one()->click();
+		// Remove the tag filter for 'Discovered hosts' group and check indicator.
+		$this->query('button', 'Remove')->one()->click();
 		$this->assertTabIndicator($tab_selector, false);
 	}
 
