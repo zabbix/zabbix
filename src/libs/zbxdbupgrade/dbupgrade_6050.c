@@ -1118,6 +1118,14 @@ clean:
 	return ret;
 }
 
+static int	DBpatch_6050090(void)
+{
+	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_remote_command_result", &field, &old_field);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1214,5 +1222,6 @@ DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
 DBPATCH_ADD(6050088, 0, 1)
 DBPATCH_ADD(6050089, 0, 1)
+DBPATCH_ADD(6050090, 0, 1)
 
 DBPATCH_END()
