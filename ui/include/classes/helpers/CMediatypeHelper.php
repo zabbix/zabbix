@@ -410,4 +410,28 @@ class CMediatypeHelper {
 			'message' => $message_templates[$message_type]['template']['text']
 		];
 	}
+
+	/**
+	 * Formats a time period for display in the user's locale format.
+	 *
+	 * @param string $timeperiod  Time period in the format "weekday range,time range" (1-7,11:00-23:00).
+	 *
+	 * @return string
+	 */
+	public static function formatTimePeriod(string $timeperiod): string {
+		$period_parts = explode(',', $timeperiod);
+		$days = $period_parts[0];
+		$time_range = explode('-', $period_parts[1]);
+		$time_from = $time_range[0];
+		$time_to = $time_range[1];
+
+		if ($time_from == '00:00') {
+			$time_to = '24:00';
+		}
+
+		$time_from_str = (new DateTime(($time_from)))->format(TIME_FORMAT);
+		$time_to_str = (new DateTime(($time_to)))->format(TIME_FORMAT);
+
+		return $days.','.$time_from_str.'-'.$time_to_str;
+	}
 }

@@ -88,6 +88,7 @@ abstract class CControllerUserEditGeneral extends CController {
 			$media['send_to_sort_field'] = is_array($media['sendto'])
 				? implode(', ', $media['sendto'])
 				: $media['sendto'];
+			$media['formatted_period'] = CMediatypeHelper::formatTimePeriod($media['period']);
 		}
 		unset($media);
 
