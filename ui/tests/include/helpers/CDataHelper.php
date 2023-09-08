@@ -396,12 +396,21 @@ class CDataHelper extends CAPIHelper {
 			throw new Exception('Unsupported item value type: '.$value_type);
 		}
 
-		$history_table = 'history'.$suffixes[$value_type];
-
 		foreach (array_values($values) as $key => $value) {
-			$clock = is_array($time) ? $time[$key] : $time;
-			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
-					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
+			// If value is an array, it means that we are dealing with trend data, which is inserted in differently.
+			if (is_array($value)) {
+				$clock = is_array($time) ? $time[$key] : $time;
+				DBexecute('INSERT INTO trends'.$suffixes[$value_type].' (itemid, clock, num, value_min, value_avg,'.
+						' value_max) VALUES ('.zbx_dbstr($itemid).', '.zbx_dbstr($clock).', '.zbx_dbstr($value['num']).
+						', '.zbx_dbstr($value['min']).', '.zbx_dbstr($value['avg']).', '.zbx_dbstr($value['max']).')'
+				);
+			}
+			else {
+				$clock = is_array($time) ? $time[$key] : $time;
+				DBexecute('INSERT INTO history'.$suffixes[$value_type].' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).
+						', '.zbx_dbstr($clock).', '.zbx_dbstr($value).')'
+				);
+			}
 		}
 	}
 }
