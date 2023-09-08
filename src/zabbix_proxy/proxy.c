@@ -1188,7 +1188,7 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
