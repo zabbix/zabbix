@@ -984,7 +984,7 @@ class testSID extends CWebTest {
 				[
 					'db' => 'SELECT * FROM regexps',
 					'incorrect_request' => true,
-					'link' => 'zabbix.php?action=regex.edit&regexid=20'
+					'link' => 'zabbix.php?action=regex.edit&regexid=2'
 				]
 			],
 
