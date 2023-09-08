@@ -20,6 +20,8 @@
 package main
 
 import (
+	"fmt"
+
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
@@ -33,7 +35,7 @@ var impl Plugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
 
-	return "debug empty test response", nil
+	return fmt.Sprintf("debug empty test response with timeout:%d", ctx.Timeout()), nil
 }
 
 func init() {
