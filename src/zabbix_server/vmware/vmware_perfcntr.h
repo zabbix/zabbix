@@ -1,0 +1,104 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2023 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+#ifndef ZABBIX_VMWARE_PERFCNTR_H
+#define ZABBIX_VMWARE_PERFCNTR_H
+
+#include "config.h"
+
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
+
+#include "vmware.h"
+
+#include "zbxalgo.h"
+
+/* performance data for a performance collector entity */
+typedef struct
+{
+	/* entity type: HostSystem, Datastore or VirtualMachine */
+	char			*type;
+
+	/* entity id */
+	char			*id;
+
+	/* the performance counter values (see zbx_vmware_perfvalue_t) */
+	zbx_vector_ptr_t	values;
+
+	/* error information */
+	char			*error;
+}
+zbx_vmware_perf_data_t;
+
+/* VMware performance counters available per object (information cache) */
+ZBX_VECTOR_DECL(uint16, uint16_t)
+
+typedef struct
+{
+	char			*type;
+	char			*id;
+	zbx_vector_uint16_t	list;
+}
+zbx_vmware_perf_available_t;
+
+ZBX_PTR_VECTOR_DECL(perf_available, zbx_vmware_perf_available_t *)
+
+/* mapping of performance counter group/key[rollup type] to its id (net/transmitted[average] -> <id>) */
+typedef struct
+{
+	char		*path;
+	zbx_uint64_t	id;
+	int		unit;
+}
+zbx_vmware_counter_t;
+
+/* performance counter value for a specific instance */
+typedef struct
+{
+	zbx_uint64_t	counterid;
+	char		*instance;
+	zbx_uint64_t	value;
+}
+zbx_vmware_perf_value_t;
+
+zbx_hash_t	vmware_counter_hash_func(const void *data);
+int	vmware_counter_compare_func(const void *d1, const void *d2);
+zbx_hash_t	vmware_perf_entity_hash_func(const void *data);
+int	vmware_perf_entity_compare_func(const void *d1, const void *d2);
+void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr_t *src);
+void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pair_t *pairs);
+void	vmware_shared_perf_entity_clean(zbx_vmware_perf_entity_t *entity);
+void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter);
+void	vmware_counter_free(zbx_vmware_counter_t *counter);
+int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle, zbx_vector_ptr_t *counters, char **error);
+void	vmware_service_update_perf_entities(zbx_vmware_service_t *service);
+
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout);
+int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid,
+		int *unit);
+int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
+		zbx_uint64_t counterid, const char *instance);
+
+zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
+		const char *id);
+
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
+
+#endif	/* ZABBIX_VMWARE_PERFCNTR_H */
+
+

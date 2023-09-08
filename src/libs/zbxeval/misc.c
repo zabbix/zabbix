@@ -242,7 +242,7 @@ void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_u
 	}
 }
 
-static int	compare_tokens_by_loc(const void *d1, const void *d2)
+int	zbx_eval_compare_tokens_by_loc(const void *d1, const void *d2)
 {
 	const zbx_eval_token_t	*t1 = *(const zbx_eval_token_t * const *)d1;
 	const zbx_eval_token_t	*t2 = *(const zbx_eval_token_t * const *)d2;
@@ -370,7 +370,7 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
 			zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
 	}
 
-	zbx_vector_ptr_sort(&tokens, compare_tokens_by_loc);
+	zbx_vector_ptr_sort(&tokens, zbx_eval_compare_tokens_by_loc);
 
 	for (i = 0; i < tokens.values_num; i++)
 	{
@@ -786,7 +786,7 @@ void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64
 			zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
 	}
 
-	zbx_vector_ptr_sort(&tokens, compare_tokens_by_loc);
+	zbx_vector_ptr_sort(&tokens, zbx_eval_compare_tokens_by_loc);
 
 	for (i = 0; i < tokens.values_num; i++)
 	{

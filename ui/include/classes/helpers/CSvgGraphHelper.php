@@ -46,6 +46,7 @@ class CSvgGraphHelper {
 	 * @param int $height
 	 *
 	 * @throws Exception
+	 *
 	 * @return array
 	 */
 	public static function get(array $options, int $width, int $height): array {
@@ -58,6 +59,7 @@ class CSvgGraphHelper {
 		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['templateid'], $options['override_hostid'], $options['overrides']);
+		self::applyUnits($metrics, $options['axes']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
@@ -289,7 +291,7 @@ class CSvgGraphHelper {
 	}
 
 	/**
-	 * Apply overrides for each pattern matching metric.
+	 * Apply overrides for each metric.
 	 */
 	private static function applyOverrides(array &$metrics, string $templateid, string $override_hostid,
 			array $overrides = []): void {
@@ -410,6 +412,21 @@ class CSvgGraphHelper {
 				unset($metric);
 			}
 		}
+	}
+
+	/**
+	 * Apply static units for each metric if selected.
+	 */
+	private static function applyUnits(array &$metrics, array $axis_options): void {
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT && $axis_options['left_y_units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['left_y_units']));
+			}
+			elseif ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT && $axis_options['right_y_units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['right_y_units']));
+			}
+		}
+		unset($metric);
 	}
 
 	/**

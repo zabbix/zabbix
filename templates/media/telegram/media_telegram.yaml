@@ -35,6 +35,9 @@ zabbix_export:
         
                     case 'markdownv2':
                         return str.replace(/([_*\[\]()~`>#+\-=|{}.!])/g, '\\$&');
+
+                    case 'html':
+                        return str.replace(/<(\s|[^a-z\/])/g, '&lt;$1');
         
                     default:
                         return str;
@@ -110,7 +113,7 @@ zabbix_export:
             Telegram.to = params.To;
             Telegram.message = params.Subject + '\n' + params.Message;
         
-            if (['markdown', 'markdownv2'].indexOf(params.ParseMode) !== -1) {
+            if (['markdown', 'html', 'markdownv2'].indexOf(params.ParseMode) !== -1) {
                 Telegram.message = Telegram.escapeMarkup(Telegram.message, params.ParseMode);
             }
         
