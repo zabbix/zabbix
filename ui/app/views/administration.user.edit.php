@@ -21,7 +21,6 @@
 
 /**
  * @var CView $this
- * @var array $data
  */
 
 $this->includeJsFile('administration.user.edit.common.js.php');
@@ -398,7 +397,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			(new CRow([
 				$media_name,
 				$media['sendto'],
-				(new CDiv($media['formatted_period']))
+				(new CDiv($media['period']))
 					->setAttribute('style', 'max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 				(new CDiv($media_severity))->addClass(ZBX_STYLE_STATUS_CONTAINER),
