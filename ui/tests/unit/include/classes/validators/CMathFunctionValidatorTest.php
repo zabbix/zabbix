@@ -193,6 +193,11 @@ class CMathFunctionValidatorTest extends TestCase {
 			['jsonpath("a", "a", "a")', ['rc' => true, 'error' => null]],
 			['jsonpath("a", "a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
 
+			['kurtosis()', ['rc' => false, 'error' => 'invalid number of parameters in function "kurtosis"']],
+			['kurtosis(1)', ['rc' => true, 'error' => null]],
+			['kurtosis(1, 1)', ['rc' => true, 'error' => null]],
+			['kurtosis(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "kurtosis"']],
+
 			['left()', ['rc' => false, 'error' => 'invalid number of parameters in function "left"']],
 			['left("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "left"']],
 			['left("a", 1)', ['rc' => true, 'error' => null]],
@@ -214,6 +219,11 @@ class CMathFunctionValidatorTest extends TestCase {
 			['ltrim("a")', ['rc' => true, 'error' => null]],
 			['ltrim("a", "a")', ['rc' => true, 'error' => null]],
 			['ltrim("a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "ltrim"']],
+
+			['mad()', ['rc' => false, 'error' => 'invalid number of parameters in function "mad"']],
+			['mad(1)', ['rc' => true, 'error' => null]],
+			['mad(1, 1)', ['rc' => true, 'error' => null]],
+			['mad(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "mad"']],
 
 			['max()', ['rc' => false, 'error' => 'invalid number of parameters in function "max"']],
 			['max(1)', ['rc' => true, 'error' => null]],
