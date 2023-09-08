@@ -152,7 +152,8 @@ class CWidgetGraph extends CWidget {
 		if (this.getFieldsReferredData().has('time_period')) {
 			const descriptor = this.getFieldsReferredData().get('time_period').descriptor;
 
-			if (descriptor.sender_type === 'widget' && descriptor.widget_type === 'graphprototype') {
+			if (descriptor !== null && descriptor.sender_type === 'widget'
+					&& descriptor.widget_type === 'graphprototype') {
 				const graph_prototype_widget = ZABBIX.Dashboard.getSelectedDashboardPage().getWidget(
 					descriptor.sender_unique_id
 				);
