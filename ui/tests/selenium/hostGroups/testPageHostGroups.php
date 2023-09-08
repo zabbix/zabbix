@@ -239,7 +239,7 @@ class testPageHostGroups extends CWebTest {
 		// Check table headers.
 		$table = $this->getTable();
 		$this->assertEquals(['' , 'Name', 'Hosts', 'Templates', 'Members', 'Info'] , $table->getHeadersText());
-		$this->assertEquals(['Name'], $table->getSortableHeaders());
+		$this->assertEquals(['Name'], $table->getSortableHeaders()->asText());
 
 		// Check the displayed number of groups in the table.
 		$names = $this->getGroupNames();

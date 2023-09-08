@@ -1,3 +1,31 @@
+Changes for 6.0.22rc1
+
+New features:
+.........T [ZBXNEXT-8610] added MantisBT template (abiba)
+.......PS. [ZBXNEXT-8358] improved items configuration sync on PostgreSQL by selecting using equal condition instead of not equal (vso)
+.........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
+.........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
+
+Bug fixes:
+..F....... [ZBX-22685] fixed issue of error message details not being expanded by default in various forms (esekace)
+..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
+..F....... [ZBX-23035] fixed disappearing filter group in host, item, trigger, graph, discovery rule, web and template lists (dpetra)
+....I..... [ZBX-23105] added missing database indices (dimir)
+..F....... [ZBX-22640] fixed inability to add unique SNMPv3 checks in discovery rules (apoga)
+.D........ [ZBX-21952] fixed and improved documentation for Oracle by ODBC template (knaglis)
+..F....... [ZBX-22724] fixed inconsistencies in ordering of objects in template configuration export (jfreibergs)
+..F....... [ZBX-22980] fixed host prototype displaying inherited macros in a non-inherited macro tab (Ivo)
+..F....... [ZBX-17279] fixed graph widget loading (apoga)
+A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
+.........T [ZBX-22060] added notes about encryption in PostgreSQL templates, renamed database instance URI macro to connection string in PostgreSQL by Zabbix agent 2 template, updated PostgreSQL by ODBC template to use connection string (drasikhov)
+..F....... [ZBX-23246] fixed classic graph preview not working if more than 10 items are assigned to it (jfreibergs)
+...G...... [ZBX-22758] fixed Zabbix agent 2 startup error on domain controllers by increasing go-winio version (asestakovs)
+..F....... [ZBX-22451] fixed resolving of calculated item formula in test popup (miks)
+.........T [ZBX-22620] added header in items for Meraki template (egordymov)
+.........T [ZBX-23051] changed content of resolved alerts to be more compatible with Event Orchestration in PagerDuty (aiantsen)
+.........T [ZBX-23272] fixed naming for tenant item prototypes in OpenStack Nova by HTTP template (knaglis)
+
+--------------------------------------------------------------------------------
 Changes for 6.0.21
 
 6.0.21rc1 was released as 6.0.21 without any changes
@@ -2691,6 +2719,8 @@ Changes for 5.0.38rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-17279] fixed graph widget loading (apoga)
+A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.37
