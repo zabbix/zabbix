@@ -83,19 +83,19 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->assertTableHasData($expected_data);
 
 		// Check regexp counter and Delete button status.
-		$selected_counter = $this->query('id:selected_count')->one();
-		$this->assertEquals('0 selected', $selected_counter->getText());
+		$this->assertSelectedCount(0);
 		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 
 		$this->query('id:all-regexes')->asCheckbox()->one()->set(true);
-		$this->assertEquals(CDBHelper::getCount('SELECT NULL FROM regexps').' selected', $selected_counter->getText());
+		$selected_text = $this->query('id:selected_count')->one()->getText();
+		$this->assertEquals(CDBHelper::getCount('SELECT NULL FROM regexps').' selected', $selected_text);
 		$this->assertTrue($this->query('button:Delete')->one()->isEnabled());
 	}
 
 	/**
 	 * Test pressing mass delete button but then cancelling.
 	 */
-	public function testPageAdministrationGeneralRegexp_DeleteCancel() {
+	public function testPageAdministrationGeneralRegexp_CancelDelete() {
 		$hash_sql = 'SELECT * FROM expressions e INNER JOIN regexps r ON r.regexpid = e.regexpid';
 		$db_hash = CDBHelper::getHash($hash_sql);
 
@@ -103,6 +103,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 		$this->query('name:all-regexes')->one()->click();
 		$this->query('button:Delete')->one()->click();
+		$this->assertEquals('Delete selected regular expressions?', $this->page->getAlertText());
 		$this->page->dismissAlert();
 		$this->page->assertTitle('Configuration of regular expressions');
 
@@ -134,17 +135,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 
 		// Variables for checks after deletion.
-		$expected_regexps = $this->getTableColumnData('Name');
-		$regex_ids = [];
+		$all_regexps = $this->getTableColumnData('Name');
+		$ids = CDBHelper::getAll('SELECT regexpid FROM regexps WHERE name IN ('.CDBHelper::escape($data['regex_name']).')');
+		$regex_ids = array_column($ids, 'regexpid');
+		$expected_regexps = array_diff($all_regexps, $data['regex_name']);
 
-		foreach ($data['regex_name'] as $regex) {
-			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $regex);
-			$row->select();
-			$regex_ids[] = $row->query('tag:input')->one()->getAttribute('value');
-
-			// Remove this regexp from the expected values.
-			$expected_regexps = array_values(array_diff($expected_regexps, [$regex]));
-		}
+		$this->selectTableRows($data['regex_name']);
 
 		// Press Delete and confirm.
 		$this->query('button:Delete')->one()->click();
