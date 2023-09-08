@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-05T16:32:23Z'
+  date: '2023-09-07T13:14:26Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -83,7 +83,7 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
+                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
                     request.setProxy(params.httpproxy);
                 }
             
@@ -92,12 +92,14 @@ zabbix_export:
                 if (Array.isArray(organizations) && organizations.length > 0) {
                     for (i in organizations) {
                         if ('id' in organizations[i]) {
-                            organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices');
+                            organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/statuses');
             
                             if (Array.isArray(organization_devices) && organization_devices.length > 0) {
                                 for (j in organization_devices) {
                                     organization_devices[j].organizationId = organizations[i].id;
-            
+                                    if (!organization_devices[j].name) {
+                                        organization_devices[j].name = organization_devices[j].serial;
+                                    }
                                     devices.push(organization_devices[j]);
                                 }
                             }
@@ -110,9 +112,9 @@ zabbix_export:
             };
             
             return JSON.stringify({
-              'organizations': organizations,
-              'devices': devices,
-              'error': error_msg.toString()
+                'organizations': organizations,
+                'devices': devices,
+                'error': error_msg.toString()
             });
           description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: 60s
@@ -162,6 +164,7 @@ zabbix_export:
           key: meraki.devices.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$MERAKI.DEVICE.NAME.MATCHES}'
@@ -170,9 +173,16 @@ zabbix_export:
                 value: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#STATUS}'
+                value: '{$MERAKI.DEVICE.STATUS.MATCHES}'
+                formulaid: C
+              - macro: '{#STATUS}'
+                value: '{$MERAKI.DEVICE.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           host_prototypes:
             - uuid: 86d599f384d94b368508a170911213ec
-              host: '{#NAME}'
+              host: '{#SERIAL}'
               name: '[{#PRODUCT_TYPE}] {#NAME}'
               group_links:
                 - group:
@@ -215,6 +225,8 @@ zabbix_export:
               path: $.productType
             - lld_macro: '{#SERIAL}'
               path: $.serial
+            - lld_macro: '{#STATUS}'
+              path: $.status
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -276,6 +288,12 @@ zabbix_export:
           value: .+
           description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.DEVICE.STATUS.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.DEVICE.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.HTTP_PROXY}'
@@ -497,6 +515,7 @@ zabbix_export:
           key: meraki.device.uplinks.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#UPLINK}'
                 value: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
@@ -1265,6 +1284,23 @@ zabbix_export:
           type: DEPENDENT
           key: meraki.uplinks.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#UPLINK.ROLE}'
+                value: '{$MERAKI.LLD.UPLINK.ROLE.MATCHES}'
+                formulaid: C
+              - macro: '{#UPLINK.ROLE}'
+                value: '{$MERAKI.LLD.UPLINK.ROLE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           item_prototypes:
             - uuid: 7600f662dd044d1f857a6ffd9898277c
               name: 'Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: status'
@@ -1340,6 +1376,37 @@ zabbix_export:
           type: DEPENDENT
           key: meraki.vpn.stats.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.NETWORK.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.NETWORK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#PEER.NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#PEER.NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#SENDER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.MATCHES}'
+                formulaid: G
+              - macro: '{#SENDER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#RECEIVER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.MATCHES}'
+                formulaid: E
+              - macro: '{#RECEIVER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
           item_prototypes:
             - uuid: 6e38c9538ad4489ea08b6d21fc8a8bd3
               name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: jitter avg'
@@ -1655,6 +1722,42 @@ zabbix_export:
         - macro: '{$MERAKI.LICENSE.EXPIRE}'
           value: '86400'
           description: 'Time in seconds for license to expire.'
+        - macro: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.UPLINK.ROLE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.UPLINK.ROLE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.NETWORK.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.NETWORK.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.SENDER.UPLINK.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.SENDER.UPLINK.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
           description: 'Cisco Meraki Dashboard API Token.'

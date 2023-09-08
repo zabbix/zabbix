@@ -26,6 +26,8 @@ Create the token in the Meraki dashboard (see Meraki [documentation](https://dev
 
 Set your Meraki dashboard URl as {$MERAKI.API.URL} macro value in Zabbix (e.g., api.meraki.com/api/v1).
 
+Set filters with macros if you want to override default filter parameters.
+
 
 ### Macros used
 
@@ -37,6 +39,8 @@ Set your Meraki dashboard URl as {$MERAKI.API.URL} macro value in Zabbix (e.g., 
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.DEVICE.NAME.MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`.+`|
 |{$MERAKI.DEVICE.NAME.NOT_MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.DEVICE.STATUS.MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$MERAKI.DEVICE.STATUS.NOT_MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
 
 ### Items
@@ -75,6 +79,18 @@ Set your Meraki dashboard URl as {$MERAKI.API.URL} macro value in Zabbix (e.g., 
 |{$MERAKI.LICENSE.EXPIRE}|<p>Time in seconds for license to expire.</p>|`86400`|
 |{$MERAKI.CONFIG.CHANGE.TIMESPAN}|<p>Timespan for gathering config change log. Used in the metric config and in the URL query.</p>|`1200`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
+|{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.LLD.UPLINK.ROLE.MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$MERAKI.LLD.UPLINK.ROLE.NOT_MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.LLD.VPN.NETWORK.NAME.MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$MERAKI.LLD.VPN.NETWORK.NAME.NOT_MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.NOT_MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.LLD.VPN.SENDER.UPLINK.MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$MERAKI.LLD.VPN.SENDER.UPLINK.NOT_MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.LLD.VPN.RECEIVER.UPLINK.MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$MERAKI.LLD.VPN.RECEIVER.UPLINK.NOT_MATCHES}|<p>This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
