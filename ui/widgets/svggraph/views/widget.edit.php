@@ -46,7 +46,7 @@ $form_tabs = (new CTabView())
 		TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS
 	)
 	->addTab('time_period', _('Time period'), getTimePeriodTab($form, $data['fields']),
-		TAB_INDICATOR_GRAPH_TIME
+		TAB_INDICATOR_GRAPH_TIME_PERIOD
 	)
 	->addTab('axes', _('Axes'), getAxesTab($form, $data['fields']),
 		TAB_INDICATOR_GRAPH_AXES

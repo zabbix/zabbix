@@ -197,8 +197,8 @@ class TabIndicatorFactory {
 				return new GraphOverridesTabIndicatorItem;
 			case 'GraphProblems':
 				return new GraphProblemsTabIndicatorItem;
-			case 'GraphTime':
-				return new GraphTimeTabIndicatorItem;
+			case 'GraphTimePeriod':
+				return new GraphTimePeriodTabIndicatorItem;
 			case 'HostMacros':
 				return new HostMacrosTabIndicatorItem;
 			case 'HostPrototypeMacros':
@@ -1383,17 +1383,17 @@ class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class GraphTimeTabIndicatorItem extends TabIndicatorItem {
+class GraphTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.querySelector('#graph_time');
+		const element = document.querySelector('input[name="time_period[data_source]"]');
 
 		if (element !== null) {
-			return element.checked;
+			return !element.checked;
 		}
 
 		return false;
