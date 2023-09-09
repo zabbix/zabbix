@@ -53,11 +53,11 @@ class testMultiselect extends CWebTest {
 
 		// Cover proxy selection field, because it gets changed depending on proxy names' lengths in the dropdown.
 		$covered_region = ($query === 'host-form')
-			? ['x' => 193, 'y' => 317, 'width' => 452, 'height' => 22]
-			: null;
+			? [$element, ['x' => 193, 'y' => 317, 'width' => 452, 'height' => 22]]
+			: [$element];
 
 		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'table-forms'))
-				->one(), [$element, $covered_region], $string
+				->one(), $covered_region, $string
 		);
 	}
 
