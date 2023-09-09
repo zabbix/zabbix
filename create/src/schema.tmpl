@@ -1546,7 +1546,7 @@ TABLE|task_remote_command_result|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|parent_taskid	|t_id		|	|NOT NULL	|0			|-|task		|taskid
-FIELD		|info		|t_shorttext	|''	|NOT NULL	|0
+FIELD		|info		|t_longtext	|''	|NOT NULL	|0
 
 TABLE|task_data|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
@@ -2169,4 +2169,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050088	|6050088
+ROW		|1		|6050091	|6050091

@@ -1,8 +1,19 @@
 Changes for 7.0.0alpha5
 
 New features:
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
 
 Bug fixes:
+..F....... [ZBXNEXT-8658] improved Monitoring > Maps usability (agriscenko)
+..F.....S. [ZBX-21898] added escaping of backslashes in history function string parameters (epulke, kprutkovs)
+...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
+....I..... [ZBX-22779] replaced HTTP with HTTPS in Zabbix homepage address (mprihodko)
+.......PS. [ZBX-23298] fixed walk[oid] discovery rule not working as test item (vso)
+.......PS. [ZBX-23336] fixed items not to become unsupported if interface is not available (vso)
+.........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
+..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
+...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
 ...G...... [ZBX-21560] fixed default Zabbix agent 1 and 2 config file name and path for Windows; fixed logging to stderr in Zabbix agent 2 (mprihodko)
 ..F....... [ZBX-22991] resolved recommendations/issues regarding new icons style (ashubin)
 ..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
@@ -240,12 +251,21 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.7rc1
 
 New features:
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
 .........T [ZBXNEXT-8610] added MantisBT template (abiba)
 .......PS. [ZBXNEXT-8358] improved items configuration sync on PostgreSQL by selecting using equal condition instead of not equal (vso)
 .........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
+........S. [ZBX-21898] fixed wrong escaping in trigger expression during upgrade and escaping as a workaround for calculated items (asestakovs, kprutkovs)
+...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
+.......PS. [ZBX-23298] fixed walk[oid] sometimes not being collected when combined requests are enabled; fixed walk[oid] discovery rule not working as test item (vso)
+.........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
+..F....... [ZBX-22818] fixed some aggregation functions not working with last_foreach() (agriscenko)
+..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
+...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
 ..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
 ..F....... [ZBX-23035] fixed disappearing filter group in host, item, trigger, graph, discovery rule, web and template lists (dpetra)
 ....I..... [ZBX-23105] added missing database indices (dimir)
@@ -1642,12 +1662,20 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.22rc1
 
 New features:
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
 .........T [ZBXNEXT-8610] added MantisBT template (abiba)
 .......PS. [ZBXNEXT-8358] improved items configuration sync on PostgreSQL by selecting using equal condition instead of not equal (vso)
 .........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
+..F....... [ZBX-21898] fixed expression validation, history function parser to accept backslash without escaping (epulke)
+...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
+.........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
+..F....... [ZBX-22818] fixed some aggregation functions not working with last_foreach() (agriscenko)
+..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
+...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
 ..F....... [ZBX-22685] fixed issue of error message details not being expanded by default in various forms (esekace)
 ..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
 ..F....... [ZBX-23035] fixed disappearing filter group in host, item, trigger, graph, discovery rule, web and template lists (dpetra)
@@ -4360,6 +4388,9 @@ Changes for 5.0.38rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-23303] fixed syntax of message identifier in the In-Reply-To e-mail header field (asitals)
+...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
 ..F....... [ZBX-17279] fixed graph widget loading (apoga)
 A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
 
@@ -7205,6 +7236,7 @@ Changes for 4.0.49rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.48

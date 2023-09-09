@@ -501,11 +501,12 @@ class testPageAdministrationProxies extends CWebTest {
 					'action' => 'Delete',
 					'proxies' => [
 						'passive_proxy7',
-						'Proxy for Discovery rule'
+						'Delete Proxy used in Network discovery rule'
 					],
 					'alert' => 'Delete selected proxies?',
 					'title' => 'Cannot delete proxies',
-					'error' => "Proxy \"Proxy for Discovery rule\" is used by action \"Autoregistration action 1\"."
+					'error' => "Proxy \"Delete Proxy used in Network discovery rule\" is used by discovery rule ".
+							"\"Discovery rule for proxy delete test\"."
 				]
 			],
 			// Delete one proxy with host.
@@ -527,11 +528,12 @@ class testPageAdministrationProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'action' => 'Delete',
 					'proxies' => [
-						'Proxy for Discovery rule'
+						'Delete Proxy used in Network discovery rule'
 					],
 					'alert' => 'Delete selected proxy?',
 					'title' => 'Cannot delete proxy',
-					'error' => "Proxy \"Proxy for Discovery rule\" is used by action \"Autoregistration action 1\"."
+					'error' => "Proxy \"Delete Proxy used in Network discovery rule\" is used by discovery rule ".
+							"\"Discovery rule for proxy delete test\"."
 				]
 			]
 		];
