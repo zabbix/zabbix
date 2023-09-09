@@ -166,7 +166,6 @@ class testDashboardTopHostsWidget extends CWebTest {
 				'Max', 'Decimal places','Thresholds' ] as $field) {
 			$column_default_fields[$field]['visible'] = false;
 			$column_default_fields[$field]['enabled'] = false;
-
 		}
 
 		foreach (['Host name', 'Text'] as $data) {
