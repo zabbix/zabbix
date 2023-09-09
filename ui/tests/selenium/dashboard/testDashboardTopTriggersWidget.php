@@ -1377,6 +1377,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$filter_element = CFilterElement::find()->one()->query('link', 'Last 1 day')->waitUntilPresent()->one();
 		if ($filter_element->isSelected(false)) {
 			$filter_element->click();
+			$this->page->waitUntilReady();
 			$dashboard->waitUntilReady();
 		}
 
@@ -1391,15 +1392,13 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 		}
 
-		if (array_key_exists('expected', $data)) {
-			$this->assertTableData($data['expected']);
+		$this->assertTableData($data['expected']);
 
-			foreach ($data['background_color'] as $trigger => $colors) {
-				$table = $dashboard->getWidget(self::DATA_WIDGET)->getContent()->asTable();
-				$this->assertEquals($colors, $table->findRow('Trigger', $trigger)->getColumn('Severity')
-						->getAttribute('class')
-				);
-			}
+		foreach ($data['background_color'] as $trigger => $colors) {
+			$table = $dashboard->getWidget(self::DATA_WIDGET)->getContent()->asTable();
+			$this->assertEquals($colors, $table->findRow('Trigger', $trigger)->getColumn('Severity')
+					->getAttribute('class')
+			);
 		}
 	}
 
