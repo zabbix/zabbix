@@ -994,6 +994,10 @@ clean:
 	curl_easy_cleanup(easyhandle);
 #else
 	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
+	ZBX_UNUSED(config_ssl_cert_location);
+	ZBX_UNUSED(config_ssl_key_location);
+
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
 #endif	/* HAVE_LIBCURL */
 

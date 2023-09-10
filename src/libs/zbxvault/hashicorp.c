@@ -37,6 +37,9 @@ int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *
 	ZBX_UNUSED(path);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
+	ZBX_UNUSED(config_ssl_cert_location);
+	ZBX_UNUSED(config_ssl_key_location);
 	ZBX_UNUSED(kvs);
 	*error = zbx_dsprintf(*error, "missing cURL library");
 	return FAIL;

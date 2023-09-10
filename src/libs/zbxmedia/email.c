@@ -916,6 +916,7 @@ out:
 	ZBX_UNUSED(content_type);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
 
 	zbx_strlcpy(error, "Support for SMTP authentication was not compiled in", max_error_len);
 	return FAIL;
