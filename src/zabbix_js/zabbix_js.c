@@ -82,11 +82,6 @@ static char	shortopts[] = "s:i:p:hVl:t:";
 
 /* end of COMMAND LINE OPTIONS */
 
-/* not related with tls from libzbxcomms.a */
-char	*CONFIG_SSL_CA_LOCATION		= NULL;
-char	*CONFIG_SSL_CERT_LOCATION	= NULL;
-char	*CONFIG_SSL_KEY_LOCATION	= NULL;
-
 static char	*read_file(const char *filename, char **error)
 {
 	char	buffer[4096];

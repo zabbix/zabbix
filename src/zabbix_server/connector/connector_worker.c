@@ -43,7 +43,6 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		zbx_vector_connector_data_point_t *connector_data_points, zbx_uint64_t *processed_num)
 {
 	zbx_connector_t	connector;
-	int		i;
 	char		*str = NULL, *out = NULL, *error = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 
@@ -51,7 +50,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 			connector_data_points);
 
 	zbx_vector_connector_data_point_sort(connector_data_points, connector_object_compare_func);
-	for (i = 0; i < connector_data_points->values_num; i++)
+	for (int i = 0; i < connector_data_points->values_num; i++)
 	{
 		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, connector_data_points->values[i].str);
 		zbx_chrcpy_alloc(&str, &str_alloc, &str_offset, '\n');
@@ -129,6 +128,10 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	zbx_http_context_destroy(&context);
 #else
 	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
+	ZBX_UNUSED(config_ssl_cert_location);
+	ZBX_UNUSED(config_ssl_key_location);
+
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");
 #endif
 	zbx_free(str);
