@@ -246,7 +246,7 @@
 		#changeCorrelationMode() {
 			const recovery_mode = this.form.querySelector('input[name=recovery_mode]:checked').value;
 			const correlation_mode = this.form.querySelector('input[name=correlation_mode]:checked').value;
-			const correlation_tag = this.form.querySelector('#correlation-tag');
+			const correlation_tag = this.form.querySelector('#correlation_tag');
 
 			if ((recovery_mode == <?= ZBX_RECOVERY_MODE_EXPRESSION ?>
 					|| recovery_mode == <?= ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION ?>)

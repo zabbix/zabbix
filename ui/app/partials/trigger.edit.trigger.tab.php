@@ -244,11 +244,11 @@ $trigger_form_grid
 			->setId('ok-event-closes')
 			->setEnabled(!$readonly)
 	])
-	->addItem([(new CLabel(_('Tag for matching'), 'correlation-tag'))->setAsteriskMark(),
-		(new CTextBox('correlation-tag', $data['correlation_tag'], $readonly))
+	->addItem([(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),
+		(new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
-			->setId('correlation-tag')
+			->setId('correlation_tag')
 	])
 	->addItem([new CLabel(_('Allow manual close'), 'manual_close'),
 		new CFormField(
