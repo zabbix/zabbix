@@ -55,6 +55,8 @@ class Widget extends CWidget {
 	}
 
 	public function usesTimeSelector(array $fields_values): bool {
-		return !WidgetForm::hasOverrideTime($fields_values);
+		return (array_key_exists('aggregate_function', $fields_values)
+				&& $fields_values['aggregate_function'] != AGGREGATE_NONE)
+			&& !WidgetForm::hasOverrideTime($fields_values);
 	}
 }

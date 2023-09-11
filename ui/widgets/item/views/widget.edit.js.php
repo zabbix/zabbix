@@ -75,6 +75,12 @@ window.widget_item_form = new class {
 		this._units_show.addEventListener('change', () => this.updateForm());
 		this._item_time.addEventListener('change', () => this.updateForm());
 
+		this._aggregate_function.addEventListener('change', () => {
+			this._item_time.dispatchEvent(new Event('change'));
+		});
+
+		this._aggregate_function.dispatchEvent(new Event('change'));
+
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this.updateForm();
@@ -121,10 +127,30 @@ window.widget_item_form = new class {
 			}
 		}
 
-		this._item_time.value = (this._item_time.checked) ? 1 : 0;
+		this._item_time.value = this._aggregate_function.value != <?= AGGREGATE_NONE ?> && this._item_time.checked
+			? 1
+			: 0;
 
-		for (const element of document.querySelectorAll('#time_from, #time_from_calendar, #time_to, #time_to_calendar')) {
-			element.disabled = !this._item_time.checked;
+		const time_period_fields = [
+			'#time_from',
+			'#time_from_calendar',
+			'#time_to',
+			'#time_to_calendar'
+		];
+
+		if (this._aggregate_function.value == <?= AGGREGATE_NONE ?>) {
+			time_period_fields.push('#item_time');
+
+			for (const element of document.querySelectorAll(time_period_fields)) {
+				element.disabled = true;
+			}
+		}
+		else {
+			document.querySelector('#item_time').disabled = false;
+
+			for (const element of document.querySelectorAll(time_period_fields)) {
+				element.disabled = !this._item_time.checked;
+			}
 		}
 
 		aggregate_options.addEventListener('change', function() {

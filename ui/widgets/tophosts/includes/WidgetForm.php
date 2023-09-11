@@ -152,7 +152,7 @@ class WidgetForm extends CWidgetForm {
 		$item_time_count = 0;
 
 		foreach ($fields_values as $key => $field_value) {
-			if (strpos($key, 'columns.aggregate_function') === 0) {
+			if (strpos($key, 'columns.aggregate_function') === 0 && $field_value != AGGREGATE_NONE) {
 				$agg_function_count++;
 			}
 
