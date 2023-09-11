@@ -259,15 +259,15 @@ class CTriggerGeneralHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
 
+		if ($data['hostid'] == 0) {
+			$data['hostid'] = $data['hosts'][0]['hostid'];
+		}
+
 		if ($data['show_inherited_tags']) {
 			$data['tags'] = CTriggerGeneralHelper::getInheritedTags($data, $input_tags);
 		}
 
 		$data['limited'] = ($data['templateid'] != 0);
-
-		if ($data['hostid'] == 0) {
-			$data['hostid'] = $data['hosts'][0]['hostid'];
-		}
 
 		return $data;
 	}
