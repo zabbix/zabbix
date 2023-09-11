@@ -1357,8 +1357,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 	}
 
 	/**
-	 * @backup !problem, !events, !event_tag, !problem_tag, !alerts, !service_problem, !event_symptom, !acknowledges
-	 * @backup !event_recovery, !event_suppress
+	 * @backup !problem, !events, !event_tag, !problem_tag, !alerts, !service_problem, !event_symptom, !acknowledges, !event_recovery, !event_suppress
 	 *
 	 * @dataProvider getWidgetTableData
 	 */
