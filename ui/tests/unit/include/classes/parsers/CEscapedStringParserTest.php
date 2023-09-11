@@ -73,10 +73,10 @@ class CEscapedStringParserTest extends TestCase {
 				'match' => '',
 				'error' => 'value contains unescaped character at position 1'
 			]],
-			["\\\\\\\\\n\\\\\n\n\t\somewhere\\\\\n\nat the end\n\ ", 0, [
+			['\\\\\\\\\n\\\\\n\n\t\somewhere\\\\\n\nat the end\n\ ', 0, [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'error' => 'value contains unescaped character at position 36'
+				'error' => 'value contains unescaped character at position 43'
 			]]
 		];
 	}
