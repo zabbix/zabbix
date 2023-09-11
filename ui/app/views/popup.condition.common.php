@@ -639,7 +639,7 @@ switch ($data['type']) {
 				$inline_js .= $new_condition_value->getPostJS();
 
 				$help_icon = $condition_type == CONDITION_TYPE_EVENT_NAME
-					? makeHelpIcon(_('Event name matches Trigger name with all macros expanded unless it is overridden in trigger settings.'))
+					? makeHelpIcon(_('Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings.'))
 					: null;
 
 				$form_list
