@@ -20,7 +20,7 @@
 
 
 /**
- * Parser is meant to check and extract the string with all characters escaped.
+ * Parser is meant to check and extract the string with all backslases escaped.
  */
 class CEscapedStringParser extends CParser {
 
@@ -34,7 +34,7 @@ class CEscapedStringParser extends CParser {
 		$this->length = 0;
 		$this->match = '';
 
-		// Check if all escapable characters in given string are escaped.
+		// Check if all backslash characters in given string are escaped.
 		for ($pos = strpos($source, '\\', $offset); $pos !== false; $pos = strpos($source, '\\', $pos + 2)) {
 			if (!isset($source[$pos + 1]) || strpos('\\nrts', $source[$pos + 1]) === false) {
 				$this->errorPos($source, $pos);
@@ -56,7 +56,7 @@ class CEscapedStringParser extends CParser {
 	 */
 	public function getError(): string {
 		return $this->error_source !== false
-			? _s('value contains unescaped character at position %1$d', $this->error_pos + 1)
+			? _s('value contains unescaped backslash at position %1$d', $this->error_pos + 1)
 			: '';
 	}
 }
