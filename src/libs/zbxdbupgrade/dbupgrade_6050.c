@@ -923,7 +923,37 @@ static int	DBpatch_6050087(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050088(void)
+static int	DBpatch_6050090(void)
+{
+	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"info", "", NULL, NULL, 0, ZBX_TYPE_LONGTEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("task_remote_command_result", &field, &old_field);
+}
+
+static int	DBpatch_6050091(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set value_str=' '"
+			" where name like 'columns.name.%%'"
+			" and value_str like ''"
+			" and widgetid in ("
+				"select widgetid"
+				" from widget"
+				" where type='tophosts'"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050092(void)
 {
 	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -931,7 +961,7 @@ static int	DBpatch_6050088(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050089(void)
+static int	DBpatch_6050093(void)
 {
 	const zbx_db_field_t	field = {"timeout_simple_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -939,7 +969,7 @@ static int	DBpatch_6050089(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050090(void)
+static int	DBpatch_6050094(void)
 {
 	const zbx_db_field_t	field = {"timeout_snmp_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -947,7 +977,7 @@ static int	DBpatch_6050090(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050091(void)
+static int	DBpatch_6050095(void)
 {
 	const zbx_db_field_t	field = {"timeout_external_check", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -955,7 +985,7 @@ static int	DBpatch_6050091(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050092(void)
+static int	DBpatch_6050096(void)
 {
 	const zbx_db_field_t	field = {"timeout_db_monitor", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -963,7 +993,7 @@ static int	DBpatch_6050092(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050093(void)
+static int	DBpatch_6050097(void)
 {
 	const zbx_db_field_t	field = {"timeout_http_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -971,7 +1001,7 @@ static int	DBpatch_6050093(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050094(void)
+static int	DBpatch_6050098(void)
 {
 	const zbx_db_field_t	field = {"timeout_ssh_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -979,7 +1009,7 @@ static int	DBpatch_6050094(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050095(void)
+static int	DBpatch_6050099(void)
 {
 	const zbx_db_field_t	field = {"timeout_telnet_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -987,7 +1017,7 @@ static int	DBpatch_6050095(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050096(void)
+static int	DBpatch_6050100(void)
 {
 	const zbx_db_field_t	field = {"timeout_script", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -995,7 +1025,7 @@ static int	DBpatch_6050096(void)
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050097(void)
+static int	DBpatch_6050101(void)
 {
 	char	*ts;
 
@@ -1012,7 +1042,7 @@ static int	DBpatch_6050097(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050098(void)
+static int	DBpatch_6050102(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("update items set timeout='' where type not in (%d,%d)", ITEM_TYPE_HTTPAGENT,
 			ITEM_TYPE_SCRIPT))
@@ -1023,77 +1053,77 @@ static int	DBpatch_6050098(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050099(void)
+static int	DBpatch_6050103(void)
 {
 	const zbx_db_field_t	field = {"timeout", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBset_default("items", &field);
 }
 
-static int	DBpatch_6050100(void)
+static int	DBpatch_6050104(void)
 {
 	const zbx_db_field_t	field = {"custom_timeouts", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050101(void)
+static int	DBpatch_6050105(void)
 {
 	const zbx_db_field_t	field = {"timeout_zabbix_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050102(void)
+static int	DBpatch_6050106(void)
 {
 	const zbx_db_field_t	field = {"timeout_simple_check", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050103(void)
+static int	DBpatch_6050107(void)
 {
 	const zbx_db_field_t	field = {"timeout_snmp_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050104(void)
+static int	DBpatch_6050108(void)
 {
 	const zbx_db_field_t	field = {"timeout_external_check", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050105(void)
+static int	DBpatch_6050109(void)
 {
 	const zbx_db_field_t	field = {"timeout_db_monitor", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050106(void)
+static int	DBpatch_6050110(void)
 {
 	const zbx_db_field_t	field = {"timeout_http_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050107(void)
+static int	DBpatch_6050111(void)
 {
 	const zbx_db_field_t	field = {"timeout_ssh_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050108(void)
+static int	DBpatch_6050112(void)
 {
 	const zbx_db_field_t	field = {"timeout_telnet_agent", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
 
-static int	DBpatch_6050109(void)
+static int	DBpatch_6050113(void)
 {
 	const zbx_db_field_t	field = {"timeout_script", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -1194,8 +1224,6 @@ DBPATCH_ADD(6050084, 0, 1)
 DBPATCH_ADD(6050085, 0, 1)
 DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
-DBPATCH_ADD(6050088, 0, 1)
-DBPATCH_ADD(6050089, 0, 1)
 DBPATCH_ADD(6050090, 0, 1)
 DBPATCH_ADD(6050091, 0, 1)
 DBPATCH_ADD(6050092, 0, 1)
@@ -1216,5 +1244,9 @@ DBPATCH_ADD(6050106, 0, 1)
 DBPATCH_ADD(6050107, 0, 1)
 DBPATCH_ADD(6050108, 0, 1)
 DBPATCH_ADD(6050109, 0, 1)
+DBPATCH_ADD(6050110, 0, 1)
+DBPATCH_ADD(6050111, 0, 1)
+DBPATCH_ADD(6050112, 0, 1)
+DBPATCH_ADD(6050113, 0, 1)
 
 DBPATCH_END()
