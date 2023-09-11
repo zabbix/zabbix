@@ -931,6 +931,28 @@ static int	DBpatch_6050090(void)
 	return DBmodify_field_type("task_remote_command_result", &field, &old_field);
 }
 
+static int	DBpatch_6050091(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set value_str=' '"
+			" where name like 'columns.name.%%'"
+			" and value_str like ''"
+			" and widgetid in ("
+				"select widgetid"
+				" from widget"
+				" where type='tophosts'"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1026,5 +1048,6 @@ DBPATCH_ADD(6050085, 0, 1)
 DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
 DBPATCH_ADD(6050090, 0, 1)
+DBPATCH_ADD(6050091, 0, 1)
 
 DBPATCH_END()
