@@ -53,6 +53,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.hosts.graphs.filter.active':
 				case 'web.hosts.host_discovery.filter.active':
 				case 'web.hosts.httpconf.filter.active':
+				case 'web.host.items.list.filter.active':
 				case 'web.hosts.triggers.filter.active':
 				case 'web.hostsmon.filter.active':
 				case 'web.httpdetails.filter.active':
@@ -79,6 +80,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.graphs.filter.active':
 				case 'web.templates.host_discovery.filter.active':
 				case 'web.templates.httpconf.filter.active':
+				case 'web.template.items.list.filter.active':
 				case 'web.templates.triggers.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
@@ -88,8 +90,6 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
-				case 'web.host.items.list.filter.active':
-				case 'web.template.items.list.filter.active':
 					$ret = true;
 					break;
 
