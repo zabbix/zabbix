@@ -171,14 +171,14 @@ $trigger_form->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.prototype.massenable' => [
-				'content' => (new CSimpleButton(_('Enable')))
+				'content' => (new CSimpleButton(_('Create enabled')))
 					->setAttribute('data-status', TRIGGER_STATUS_ENABLED)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-no-chkbxrange')
 					->setId('js-massenable-trigger')
 			],
 			'trigger.prototype.massdisable' => [
-				'content' => (new CSimpleButton(_('Disable')))
+				'content' => (new CSimpleButton(_('Create disabled')))
 					->setAttribute('data-status', TRIGGER_STATUS_DISABLED)
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-no-chkbxrange')
