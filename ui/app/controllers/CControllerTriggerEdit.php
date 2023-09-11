@@ -111,9 +111,7 @@ class CControllerTriggerEdit extends CController {
 			'context' => '',
 			'expression' => '',
 			'recovery_expression' => '',
-			'manual_close' => $this->hasInput('form_refresh')
-				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
-				: ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
 			'correlation_tag' => '',
 			'opdata' => '',
@@ -137,6 +135,9 @@ class CControllerTriggerEdit extends CController {
 		$this->getInputs($data, array_keys($form_fields));
 
 		if ($this->hasInput('form_refresh')) {
+			$data['manual_close'] = (!array_key_exists('manual_close', $data) || !$data['manual_close'])
+				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
+				: ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
 			$data['status'] = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 		}
 

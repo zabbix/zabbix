@@ -118,7 +118,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'context' => '',
 			'expression' => '',
 			'recovery_expression' => '',
-			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED,
+			'manual_close' => ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED,
 			'correlation_mode' => ZBX_TRIGGER_CORRELATION_NONE,
 			'correlation_tag' => '',
 			'description' => '',
