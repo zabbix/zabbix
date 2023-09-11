@@ -4328,6 +4328,46 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			zbx_json_addarray(&json_data, "tags");
 			vmware_tags_uuid_json(&service->data_tags, vm->uuid, &json_data, NULL);
 			zbx_json_close(&json_data);
+			zbx_json_addarray(&json_data, "net_if");
+
+			for (i = 0; i < vm->devs.values_num; i++)
+			{
+				zbx_vmware_dev_t	*dev;
+
+				dev = (zbx_vmware_dev_t *)vm->devs.values[i];
+
+				if (ZBX_VMWARE_DEV_TYPE_NIC != dev->type)
+					continue;
+
+				zbx_json_addobject(&json_data, NULL);
+				zbx_json_addstring(&json_data, "ifname", ZBX_NULL2EMPTY_STR(dev->instance),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdesc", ZBX_NULL2EMPTY_STR(dev->label),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifmac", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFMAC]), ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifconnected", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFCONNECTED]), ZBX_JSON_TYPE_INT);
+				zbx_json_addstring(&json_data, "iftype", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFTYPE]), ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifbackingdevice", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdvswitch_uuid", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdvswitch_portgroup", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifdvswitch_port", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addraw(&json_data, "ifip", NULL == dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS] ?
+						"[]" : dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS]);
+				zbx_json_close(&json_data);
+			}
+
+			zbx_json_close(&json_data);
 			zbx_json_close(&json_data);
 		}
 	}
@@ -4650,6 +4690,8 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]), ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDVSWITCH.PORT}", ZBX_NULL2EMPTY_STR(
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT]), ZBX_JSON_TYPE_STRING);
+	zbx_json_addraw(j, "ifip", NULL == dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS] ? "[]" :
+			dev->props[ZBX_VMWARE_DEV_PROPS_IFIPS]);
 }
 
 static void	check_vcenter_vm_discovery_disk_props_cb(struct zbx_json *j, zbx_vmware_dev_t *dev)
