@@ -50,6 +50,9 @@ $form
 		: null
 	)
 	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
+	)
+	->addField(
 		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addField(
@@ -57,7 +60,7 @@ $form
 	)
 	->addItem([
 		$column->getLabel(),
-		(new CFormField($data['fields']['column']->getValues() ? $column->getView() : _('Add item column')))
+		(new CFormField($data['fields']['column']->getValues() ? $column->getView() : _('Add a column')))
 			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
 	])
 	->addField(array_key_exists('show_lines', $data['fields'])

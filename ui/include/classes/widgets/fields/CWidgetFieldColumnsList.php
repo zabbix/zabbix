@@ -57,7 +57,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
-				'name'					=> ['type' => API_STRING_UTF8, 'default' => '', 'length' => 255],
+				'name'					=> ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 255],
 				'data'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [self::DATA_ITEM_VALUE, self::DATA_HOST_NAME, self::DATA_TEXT])],
 				'item'					=> ['type' => API_MULTIPLE, 'rules' => [
 												['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],

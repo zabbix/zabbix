@@ -27,6 +27,7 @@ use Zabbix\Widgets\{
 };
 
 use Zabbix\Widgets\Fields\{
+	CWidgetFieldCheckBox,
 	CWidgetFieldColumnsList,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGroup,
@@ -88,8 +89,20 @@ class WidgetForm extends CWidgetForm {
 
 		if (array_key_exists('columns', $values)) {
 			foreach ($values['columns'] as $key => $value) {
-				if ($value['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
-					$this->field_column_values[$key] = ($value['name'] === '') ? $value['item'] : $value['name'];
+				$value['name'] = trim($value['name']);
+
+				switch ($value['data']) {
+					case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+						$this->field_column_values[$key] = $value['name'] === '' ? $value['item'] : $value['name'];
+						break;
+
+					case CWidgetFieldColumnsList::DATA_HOST_NAME:
+						$this->field_column_values[$key] = $value['name'] === '' ? _('Host name') : $value['name'];
+						break;
+
+					case CWidgetFieldColumnsList::DATA_TEXT:
+						$this->field_column_values[$key] = $value['name'] === '' ? $value['text'] : $value['name'];
+						break;
 				}
 			}
 		}
@@ -117,6 +130,11 @@ class WidgetForm extends CWidgetForm {
 			->addField($this->isTemplateDashboard()
 				? null
 				: new CWidgetFieldTags('tags')
+			)
+			->addField(
+				new CWidgetFieldCheckBox('maintenance',
+					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
+				)
 			)
 			->addField(
 				(new CWidgetFieldColumnsList('columns', _('Columns')))->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
