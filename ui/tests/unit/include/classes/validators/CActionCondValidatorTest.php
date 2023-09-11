@@ -132,7 +132,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			]],
 			[[], [
-				'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+				'conditiontype' => CONDITION_TYPE_EVENT_NAME,
 				'value' => 'abc'
 			]],
 			[[], [
@@ -366,7 +366,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 			],
 			[[],
 				[
-					'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+					'conditiontype' => CONDITION_TYPE_EVENT_NAME,
 					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'
