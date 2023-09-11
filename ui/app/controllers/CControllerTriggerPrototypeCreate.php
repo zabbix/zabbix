@@ -114,7 +114,6 @@ class CControllerTriggerPrototypeCreate extends CController {
 			'discover' => $this->getInput('discover', ZBX_PROTOTYPE_NO_DISCOVER)
 		];
 
-
 		switch ($trigger_prototype['recovery_mode']) {
 			case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
 				$trigger_prototype['recovery_expression'] = $this->getInput('recovery_expression', '');

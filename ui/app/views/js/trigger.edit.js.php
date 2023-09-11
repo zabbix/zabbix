@@ -17,9 +17,13 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+
+/**
+ * @var CView $this
+ */
+
 ?>
-
-
 	window.trigger_edit_popup = new class {
 
 		init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies, action,
@@ -665,7 +669,7 @@
 			fetch(url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(data)
+				body: JSON.stringify(dgiata)
 			})
 				.then((response) => response.json())
 				.then((response) => {

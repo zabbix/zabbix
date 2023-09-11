@@ -157,7 +157,7 @@ class CControllerTriggerList extends CController {
 
 		// Skip empty tags.
 		$filter_tags = array_filter($filter_tags, function ($v) {
-			return (bool) $v['tag'];
+			return (bool) strlen($v['tag']);
 		});
 
 		$sort = $this->getInput('sort', CProfile::get($prefix.'trigger.list.sort', 'description'));

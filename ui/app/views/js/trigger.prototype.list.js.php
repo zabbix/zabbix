@@ -26,10 +26,11 @@
 
 <script>
 	const view = new class {
-		init({context, hostid, parent_discoveryid}) {
+		init({context, hostid, parent_discoveryid, token}) {
 			this.context = context;
 			this.hostid = hostid;
 			this.parent_discoveryid = parent_discoveryid;
+			this.token = token;
 
 			this.#initActions();
 		}
@@ -161,10 +162,6 @@
 		}
 
 		#post(target, triggerids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
-			);
-
 			let fields = {
 				triggerids: triggerids
 			};
@@ -181,7 +178,7 @@
 			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify(fields)
+				body: JSON.stringify({...this.token, ...fields})
 			})
 				.then((response) => response.json())
 				.then((response) => {

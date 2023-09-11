@@ -208,7 +208,8 @@ $html_page
 	view.init('.json_encode([
 		'context' => $data['context'],
 		'hostid' => $data['hostid'],
-		'parent_discoveryid' => $data['parent_discoveryid']
+		'parent_discoveryid' => $data['parent_discoveryid'],
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
 	]).');
 '))
 	->setOnDocumentReady()

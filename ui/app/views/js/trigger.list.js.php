@@ -22,18 +22,19 @@
 /**
  * @var CView $this
  */
-?>
 
+?>
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
 	<?= CTagFilterFieldHelper::getTemplate(); ?>
 </script>
 
 <script>
 	const view = new class {
-		init({checkbox_hash, checkbox_object, context}) {
+		init({checkbox_hash, checkbox_object, context, token}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
+			this.token = token;
 
 			this.#initFilter();
 			this.#initActions();
@@ -213,16 +214,12 @@
 		}
 
 		#post(target, triggerids, url) {
-			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
-			);
-
 			target.classList.add('is-loading');
 
 			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({triggerids: triggerids})
+				body: JSON.stringify({...{triggerids: triggerids}, ...this.token})
 			})
 				.then((response) => response.json())
 				.then((response) => {
