@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup drules
  *
- * @dataSource NetworkDiscovery
+ * @dataSource NetworkDiscovery, Proxies
  */
 class testPageNetworkDiscovery extends CWebTest {
 
@@ -99,10 +99,11 @@ class testPageNetworkDiscovery extends CWebTest {
 		 * Check if counter displays correct number of rows and check if previously disabled buttons are enabled,
 		 * upon selecting discovery rules.
 		 */
-		$this->assertTableStats(12);
+		$rules_count = CDBHelper::getCount('SELECT * FROM drules');
+		$this->assertTableStats($rules_count);
 		$this->assertSelectedCount(0);
 		$this->query('id:all_drules')->asCheckbox()->one()->check();
-		$this->assertSelectedCount(12);
+		$this->assertSelectedCount($rules_count);
 
 		foreach (['Enable', 'Disable', 'Delete'] as $buttons) {
 			$this->assertTrue($this->query('button:'.$buttons)->one()->isEnabled());
@@ -146,6 +147,7 @@ class testPageNetworkDiscovery extends CWebTest {
 					'expected' => [
 						'External network',
 						'Discovery rule for update',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for cancelling scenario'
 					]
 				]
@@ -180,6 +182,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule to check delete',
 						'Discovery rule for update',
 						'Discovery rule for successful deleting',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
 						'Discovery rule for deleting, check used in Action',
 						'Discovery rule for clone',
@@ -199,6 +202,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule to check delete',
 						'Discovery rule for update',
 						'Discovery rule for successful deleting',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
 						'Discovery rule for deleting, check used in Action',
 						'Discovery rule for clone',
@@ -217,6 +221,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Discovery rule to check delete',
 						'Discovery rule for update',
 						'Discovery rule for successful deleting',
+						'Discovery rule for proxy delete test',
 						'Discovery rule for deleting, used in Action',
 						'Discovery rule for deleting, check used in Action',
 						'Discovery rule for clone',
@@ -522,7 +527,9 @@ class testPageNetworkDiscovery extends CWebTest {
 						: $count - count($data['name'])
 					);
 					if (CTestArrayHelper::get($data, 'single', false) === true) {
-						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.CDBHelper::escape($data['name']).')'));
+						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.
+								CDBHelper::escape($data['name']).')')
+						);
 					}
 					else {
 						$this->assertEquals($count - count($data['name']), CDBHelper::getCount('SELECT *FROM drules'));
