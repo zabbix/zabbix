@@ -36,6 +36,12 @@ const (
 	keyReplicationSlaveStatus = "mysql.replication.get_slave_status"
 	keyStatusVars             = "mysql.get_status_variables"
 	keyVersion                = "mysql.version"
+
+	uriParam        = "URI"
+	tlsConnectParam = "TLSConnect"
+	tlsCAParam      = "TLSCAFile"
+	tlsCertParam    = "TLSCertFile"
+	tlsKeyParam     = "TLSKeyFile"
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
@@ -75,10 +81,10 @@ var (
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	paramUsername    = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
 	paramPassword    = metric.NewConnParam("Password", "User's password.").WithDefault("")
-	paramTLSConnect  = metric.NewSessionOnlyParam("TLSConnect", "DB connection encryption type.").WithDefault("")
-	paramTLSCaFile   = metric.NewSessionOnlyParam("TLSCAFile", "TLS ca file path.").WithDefault("")
-	paramTLSCertFile = metric.NewSessionOnlyParam("TLSCertFile", "TLS cert file path.").WithDefault("")
-	paramTLSKeyFile  = metric.NewSessionOnlyParam("TLSKeyFile", "TLS key file path.").WithDefault("")
+	paramTLSConnect  = metric.NewSessionOnlyParam(tlsConnectParam, "DB connection encryption type.").WithDefault("")
+	paramTLSCaFile   = metric.NewSessionOnlyParam(tlsCAParam, "TLS ca file path.").WithDefault("")
+	paramTLSCertFile = metric.NewSessionOnlyParam(tlsCertParam, "TLS cert file path.").WithDefault("")
+	paramTLSKeyFile  = metric.NewSessionOnlyParam(tlsKeyParam, "TLS key file path.").WithDefault("")
 )
 
 var metrics = metric.MetricSet{

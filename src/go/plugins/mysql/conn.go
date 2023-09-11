@@ -31,11 +31,29 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"github.com/omeid/go-yarn"
 
+	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
 
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
+)
+
+const (
+	// pgx dns field names
+	password = "password"
+	mode     = "sslmode"
+	rootCA   = "sslrootcert"
+	cert     = "sslcert"
+	key      = "sslkey"
+
+	// connType
+	disable    = "disabled"
+	require    = "required"
+	verifyCa   = "verify-ca"
+	verifyFull = "verify-full"
+
+	MinSupportedPGVersion = 100000
 )
 
 type MyClient interface {
@@ -202,38 +220,35 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*MyConn, e
 	return c.connections[uri], nil
 }
 
-func registerTLSConfig(config *mysql.Config, details tlsconfig.Details) error {
+func registerTLSConfig(mysqlConf *mysql.Config, details tlsconfig.Details) error {
+	var tlsConf *tls.Config
+	var err error
+
 	switch details.TlsConnect {
 	case "required":
-		err := mysql.RegisterTLSConfig(details.SessionName, &tls.Config{InsecureSkipVerify: true})
-		if err != nil {
-			return err
-		}
+		tlsConf = &tls.Config{InsecureSkipVerify: true}
 	case "verify_ca":
-		conf, err := tlsconfig.CreateConfig(details, true)
+		tlsConf, err = details.GetTLSConfig(true)
 		if err != nil {
 			return err
 		}
 
-		err = mysql.RegisterTLSConfig(details.SessionName, conf)
-		if err != nil {
-			return err
-		}
 	case "verify_full":
-		conf, err := tlsconfig.CreateConfig(details, false)
+		tlsConf, err = details.GetTLSConfig(false)
 		if err != nil {
 			return err
 		}
 
-		err = mysql.RegisterTLSConfig(details.SessionName, conf)
-		if err != nil {
-			return err
-		}
 	default:
 		return nil
 	}
 
-	config.TLSConfig = details.SessionName
+	err = mysql.RegisterTLSConfig(details.SessionName, tlsConf)
+	if err != nil {
+		return err
+	}
+
+	mysqlConf.TLSConfig = details.SessionName
 
 	return nil
 }
@@ -252,19 +267,62 @@ func (c *ConnManager) get(uri uri.URI) *MyConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, details tlsconfig.Details) (conn *MyConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (conn *MyConn, err error) {
 	c.Lock()
 	defer c.Unlock()
 
 	conn = c.get(uri)
-
-	if conn == nil {
-		conn, err = c.create(uri, details)
+	if conn != nil {
+		return
 	}
 
+	details, err := getTlsDetails(params)
+	if err != nil {
+		return nil, err
+	}
+
+	conn, err = c.create(uri, details)
 	if err != nil {
 		err = zbxerr.ErrorConnectionFailed.Wrap(err)
 	}
 
 	return
+}
+
+func getTlsDetails(params map[string]string) (tlsconfig.Details, error) {
+	var details tlsconfig.Details
+	var err error
+
+	validateCA := true
+	validateClient := false
+	tlsType := params[tlsConnectParam]
+
+	if tlsType == "" {
+		tlsType = disable
+	}
+
+	details = tlsconfig.NewDetails(
+		params[metric.SessionParam],
+		tlsType,
+		params[tlsCAParam],
+		params[tlsCertParam],
+		params[tlsKeyParam],
+		params[uriParam],
+		disable,
+		require,
+		verifyCa,
+		verifyFull,
+	)
+
+	if tlsType == disable || tlsType == require {
+		validateCA = false
+	}
+
+	if details.TlsKeyFile != "" || details.TlsCaFile != "" {
+		validateClient = true
+	}
+
+	err = details.Validate(validateCA, validateClient, validateClient)
+
+	return details, err
 }

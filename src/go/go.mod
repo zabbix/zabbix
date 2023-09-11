@@ -2,6 +2,8 @@ module zabbix.com
 
 go 1.19
 
+replace git.zabbix.com/ap/plugin-support v1.2.2-0.20230830115115-9cfafb8e5ec2 => /home/erik/plugin-support
+
 require (
 	git.zabbix.com/ap/plugin-support v1.2.2-0.20230830115115-9cfafb8e5ec2
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
