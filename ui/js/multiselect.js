@@ -46,7 +46,9 @@
 		options.url = curl.getUrl();
 
 		return this.each(function() {
-			$(this).empty().multiSelect(options);
+			$(this).empty();
+			this.dataset.params = JSON.stringify(options);
+			$(this).multiSelect();
 		});
 	};
 
@@ -332,7 +334,7 @@
 	 */
 	$.fn.multiSelect = function(options) {
 		// Call a public method.
-		if (options !== undefined && methods[options]) {
+		if (methods[options]) {
 			return methods[options].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 
