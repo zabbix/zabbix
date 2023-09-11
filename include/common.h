@@ -1484,6 +1484,10 @@ int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t 
 		char *error, int max_error_len);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos);
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);
 

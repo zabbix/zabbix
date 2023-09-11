@@ -2986,6 +2986,109 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: parse function parameter                                          *
+ *                                                                            *
+ * Parameters: expr           - [IN] pre-validated function parameter list    *
+ *             allowed_macros - [IN] bitmask of macros allowed in function    *
+ *                                   parameters (seeZBX_TOKEN_* defines)      *
+ *             esc_bs         - [IN] 0 - don't escape backslashes in strings  *
+ *             param_pos      - [OUT] the parameter position, excluding       *
+ *                                    leading whitespace                      *
+ *             length         - [OUT] the parameter length including trailing *
+ *                                    whitespace for unquoted parameter       *
+ *             sep_pos        - [OUT] the parameter separator character       *
+ *                                    (',' or '\0' or ')') position           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos)
+{
+	const char	*ptr = expr;
+
+	/* skip the leading whitespace */
+	while (' ' == *ptr)
+		ptr++;
+
+	*param_pos = ptr - expr;
+
+	if ('"' == *ptr)	/* quoted parameter */
+	{
+		for (ptr++; '"' != *ptr; ptr++)
+		{
+			if ('\\' == *ptr)
+			{
+				if ('"' == ptr[1])
+				{
+					ptr++;
+					continue;
+				}
+
+				if (0 == esc_bs)
+					continue;
+
+				ptr++;
+			}
+
+			if ('\0' == *ptr)
+			{
+				*length = ptr - expr - *param_pos;
+				goto out;
+			}
+		}
+
+		*length = ++ptr - expr - *param_pos;
+
+		/* skip trailing whitespace to find the next parameter */
+		while (' ' == *ptr)
+			ptr++;
+	}
+	else	/* unquoted parameter */
+	{
+		zbx_token_t	token;
+
+		for (ptr = expr; ; ptr++)
+		{
+			switch (*ptr)
+			{
+				case '\0':
+				case ')':
+				case ',':
+					*length = ptr - expr - *param_pos;
+					goto out;
+				case '{':
+					if (SUCCEED == zbx_token_find(ptr, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+							0 == token.loc.l && 0 != (allowed_macros & token.type))
+					{
+						ptr += token.loc.r;
+					}
+					break;
+			}
+		}
+	}
+out:
+	*sep_pos = ptr - expr;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse trigger function parameter                                  *
+ *                                                                            *
+ * Parameters: expr      - [IN] pre-validated function parameter list         *
+ *             param_pos - [OUT] the parameter position, excluding leading    *
+ *                               whitespace                                   *
+ *             length    - [OUT] the parameter length including trailing      *
+ *                               whitespace for unquoted parameter            *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or '\0' or ')') position                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	return zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO, 1, param_pos, length, sep_pos);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: unquotes function parameter                                       *
  *                                                                            *
  * Parameters: param -  [IN] the parameter to unquote                         *
