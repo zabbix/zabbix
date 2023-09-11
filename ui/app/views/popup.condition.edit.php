@@ -647,8 +647,8 @@ switch ($data['type']) {
 
 				break;
 
-			// Trigger name form elements.
-			case CONDITION_TYPE_TRIGGER_NAME:
+			// Event name form elements.
+			case CONDITION_TYPE_EVENT_NAME:
 			// Host name form elements.
 			case CONDITION_TYPE_HOST_NAME:
 			// Host metadata form elements.
@@ -665,13 +665,17 @@ switch ($data['type']) {
 
 				$inline_js .= $new_condition_value->getPostJS();
 
+				$help_icon = $condition_type == CONDITION_TYPE_EVENT_NAME
+					? makeHelpIcon(_('Event name matches Trigger name with all macros expanded unless it is overridden in trigger settings.'))
+					: null;
+
 				$form_grid
 					->addItem([
 						new CLabel(_('Operator')),
 						new CFormField($operator)
 					])
 					->addItem([
-						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
+						(new CLabel([_('Value'), $help_icon], 'value'))->setAsteriskMark(),
 						new CFormField($new_condition_value)
 					]);
 
