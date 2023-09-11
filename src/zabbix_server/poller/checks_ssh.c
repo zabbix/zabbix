@@ -19,7 +19,6 @@
 
 #include "checks_ssh.h"
 #include "ssh_run.h"
-#include "../sysinfo.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 

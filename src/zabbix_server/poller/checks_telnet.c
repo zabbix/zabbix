@@ -19,7 +19,6 @@
 
 #include "checks_telnet.h"
 #include "telnet_run.h"
-#include "../sysinfo.h"
 
 #include "zbxsysinfo.h"
 
