@@ -1541,6 +1541,7 @@ define('API_PREPROC_PARAMS',		66);
 define('API_PROMETHEUS_PATTERN',	67);
 define('API_PROMETHEUS_LABEL',		68);
 define('API_HOST_ADDRESS',			69);
+define('API_ESCAPED_STRING_UTF8',	70);
 
 // flags
 define('API_REQUIRED',					0x00001);
@@ -1560,7 +1561,6 @@ define('API_ALLOW_GLOBAL_REGEX',		0x02000);
 define('API_ALLOW_UNEXPECTED',			0x04000);
 define('API_ALLOW_DNS',					0x08000);
 define('API_ALLOW_RANGE',				0x10000);
-define('API_ESCAPED_BACKSLASHES',		0x20000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

@@ -87,6 +87,9 @@ class CApiInputValidator {
 			case API_STRING_UTF8:
 				return self::validateStringUtf8($rule, $data, $path, $error);
 
+			case API_ESCAPED_STRING_UTF8:
+				return self::validateEscapedStringUtf8($rule, $data, $path, $error);
+
 			case API_STRINGS_UTF8:
 				return self::validateStringsUtf8($rule, $data, $path, $error);
 
@@ -295,6 +298,7 @@ class CApiInputValidator {
 			case API_COND_FORMULA:
 			case API_COND_FORMULAID:
 			case API_STRING_UTF8:
+			case API_ESCAPED_STRING_UTF8:
 			case API_INT32:
 			case API_INT32_RANGES:
 			case API_UINT64:
@@ -682,29 +686,33 @@ class CApiInputValidator {
 			return false;
 		}
 
-		// Check if all backslashe characters in given string are escaped.
-		if ($flags & API_ESCAPED_BACKSLASHES && mb_strpos($data, '\\') !== false) {
-			$pos_unescaped_backslash = (function ($string) {
-				$offset = 0;
+		return true;
+	}
 
-				while (($pos = mb_strpos($string, '\\', $offset)) !== false) {
-					if (mb_substr($string, $pos + 1, 1) !== '\\') {
-						return $pos;
-					}
+	/**
+	 * Escaped string validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
+	private static function validateEscapedStringUtf8($rule, &$data, $path, &$error) {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
 
-					$offset = $pos + 2;
-				}
+		if (self::checkStringUtf8($flags, $data, $path, $error) === false) {
+			return false;
+		}
 
-				return -1;
-			}) ($data);
+		$escaped_string_parser = new CEscapedStringParser();
 
-			if ($pos_unescaped_backslash != -1) {
-				$error = _s('Invalid parameter "%1$s": %2$s.', $path,
-					_s('value contains unescaped backslash at position %1$d', $pos_unescaped_backslash)
-				);
+		if ($escaped_string_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $escaped_string_parser->getError());
 
-				return false;
-			}
+			return false;
 		}
 
 		return true;
@@ -4173,8 +4181,8 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ESCAPED_BACKSLASHES],
-					'2' =>	['type' => API_STRING_UTF8, 'flags' => API_ESCAPED_BACKSLASHES, 'default' => '']
+					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '']
 				]];
 				break;
 
