@@ -134,7 +134,7 @@ switch ($data['type']) {
 							->setModern(true))
 					])
 					->addItem([
-						new CLabel(_('Triggers'), 'trigger_new_condition_ms'),
+						(new CLabel(_('Triggers'), 'trigger_new_condition_ms'))->setAsteriskMark(),
 						new CFormField($trigger_multiselect)
 					]);
 
@@ -189,7 +189,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Hosts'), 'host_new_condition_ms'),
+						(new CLabel(_('Hosts'), 'host_new_condition_ms'))->setAsteriskMark(),
 						new CFormField($host_multiselect)
 					]);
 
@@ -226,7 +226,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Host groups'), 'hostgroup_new_condition_ms'),
+						(new CLabel(_('Host groups'), 'hostgroup_new_condition_ms'))->setAsteriskMark(),
 						new CFormField($hostgroup_multiselect)
 					]);
 
@@ -334,7 +334,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Templates'), 'template_new_condition_ms'),
+						(new CLabel(_('Templates'), 'template_new_condition_ms'))->setAsteriskMark(),
 						new CFormField($template_multiselect)
 					]);
 
@@ -357,7 +357,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'value'),
+						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
 						new CFormField($new_condition_value)
 					]);
 
@@ -380,7 +380,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'value'),
+						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
 						new CFormField($new_condition_value)
 					]);
 
@@ -419,7 +419,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Discovery check')),
+						(new CLabel(_('Discovery check')))->setAsteriskMark(),
 						new CFormField($dcheck_popup_select)
 					]);
 
@@ -481,7 +481,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Discovery rules'), 'drule_new_condition_ms'),
+						(new CLabel(_('Discovery rules'), 'drule_new_condition_ms'))->setAsteriskMark(),
 						new CFormField($drule_multiselect)
 					]);
 
@@ -547,7 +547,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Proxy'), 'proxy_new_condition_ms'),
+						(new CLabel(_('Proxy'), 'proxy_new_condition_ms'))->setAsteriskMark(),
 						new CFormField($proxy_multiselect)
 					]);
 
@@ -564,10 +564,13 @@ switch ($data['type']) {
 				$form_grid
 					->addItem([
 						new CLabel(_('Operator'), 'label-operator'),
-						new CFormField((new CSelect('operator'))
-							->setValue(CONDITION_OPERATOR_EQUAL)
-							->setFocusableElementId('label-operator')
-							->addOptions(CSelect::createOptionsFromArray($operators_by_condition[CONDITION_TYPE_DVALUE]))
+						new CFormField(
+							(new CSelect('operator'))
+								->setValue(CONDITION_OPERATOR_EQUAL)
+								->setFocusableElementId('label-operator')
+								->addOptions(
+									CSelect::createOptionsFromArray($operators_by_condition[CONDITION_TYPE_DVALUE])
+								)
 						)
 					])
 					->addItem([
@@ -594,7 +597,7 @@ switch ($data['type']) {
 						new CFormField($operator)
 					])
 					->addItem([
-						new CLabel(_('Value'), 'value'),
+						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
 						new CFormField($new_condition_value)
 					]);
 
