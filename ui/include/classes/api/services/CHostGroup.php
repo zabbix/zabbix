@@ -458,7 +458,7 @@ class CHostGroup extends CApiService {
 		$db_actions = DBselect(
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
-			' WHERE c.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+			' WHERE c.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
 				' AND '.dbConditionString('c.value', $groupids)
 		);
 		while ($db_action = DBfetch($db_actions)) {
@@ -490,7 +490,7 @@ class CHostGroup extends CApiService {
 
 		// delete action conditions
 		DB::delete('conditions', [
-			'conditiontype' => CONDITION_TYPE_HOST_GROUP,
+			'conditiontype' => ZBX_CONDITION_TYPE_HOST_GROUP,
 			'value' => $groupids
 		]);
 

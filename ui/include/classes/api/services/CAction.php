@@ -42,25 +42,26 @@ class CAction extends CApiService {
 	 */
 	private const VALID_CONDITION_TYPES = [
 		EVENT_SOURCE_TRIGGERS => [
-			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_EVENT_NAME,
-			CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD, CONDITION_TYPE_TEMPLATE,
-			CONDITION_TYPE_SUPPRESSED, CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE
+			ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST, ZBX_CONDITION_TYPE_TRIGGER,
+			ZBX_CONDITION_TYPE_EVENT_NAME, ZBX_CONDITION_TYPE_TRIGGER_SEVERITY, ZBX_CONDITION_TYPE_TIME_PERIOD,
+			ZBX_CONDITION_TYPE_TEMPLATE, ZBX_CONDITION_TYPE_SUPPRESSED, ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE
 		],
 		EVENT_SOURCE_DISCOVERY => [
-			CONDITION_TYPE_DHOST_IP, CONDITION_TYPE_DSERVICE_TYPE, CONDITION_TYPE_DSERVICE_PORT, CONDITION_TYPE_DSTATUS,
-			CONDITION_TYPE_DUPTIME, CONDITION_TYPE_DVALUE, CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK,
-			CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT
+			ZBX_CONDITION_TYPE_DHOST_IP, ZBX_CONDITION_TYPE_DSERVICE_TYPE, ZBX_CONDITION_TYPE_DSERVICE_PORT,
+			ZBX_CONDITION_TYPE_DSTATUS, ZBX_CONDITION_TYPE_DUPTIME, ZBX_CONDITION_TYPE_DVALUE, ZBX_CONDITION_TYPE_DRULE,
+			ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_DOBJECT
 		],
 		EVENT_SOURCE_AUTOREGISTRATION => [
-			CONDITION_TYPE_PROXY, CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA
+			ZBX_CONDITION_TYPE_PROXY, ZBX_CONDITION_TYPE_HOST_NAME, ZBX_CONDITION_TYPE_HOST_METADATA
 		],
 		EVENT_SOURCE_INTERNAL => [
-			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TEMPLATE, CONDITION_TYPE_EVENT_TYPE,
-			CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE
+			ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST, ZBX_CONDITION_TYPE_TEMPLATE,
+			ZBX_CONDITION_TYPE_EVENT_TYPE, ZBX_CONDITION_TYPE_EVENT_TAG, ZBX_CONDITION_TYPE_EVENT_TAG_VALUE
 		],
 		EVENT_SOURCE_SERVICE => [
-			CONDITION_TYPE_SERVICE, CONDITION_TYPE_SERVICE_NAME, CONDITION_TYPE_EVENT_TAG,
-			CONDITION_TYPE_EVENT_TAG_VALUE
+			ZBX_CONDITION_TYPE_SERVICE, ZBX_CONDITION_TYPE_SERVICE_NAME, ZBX_CONDITION_TYPE_EVENT_TAG,
+			ZBX_CONDITION_TYPE_EVENT_TAG_VALUE
 		]
 	];
 
@@ -146,7 +147,7 @@ class CAction extends CApiService {
 							' ON r.id='.zbx_dbcast_2bigint('cc.value').
 								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE a.actionid=cc.actionid'.
-						' AND cc.conditiontype='.CONDITION_TYPE_HOST_GROUP.
+						' AND cc.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
@@ -162,7 +163,7 @@ class CAction extends CApiService {
 								' AND '.dbConditionInt('r.groupid', $userGroups).
 					' WHERE a.actionid=cc.actionid'.
 						' AND '.zbx_dbcast_2bigint('cc.value').'=hgg.hostid'.
-						' AND cc.conditiontype IN ('.CONDITION_TYPE_HOST.','.CONDITION_TYPE_TEMPLATE.')'.
+						' AND cc.conditiontype IN ('.ZBX_CONDITION_TYPE_HOST.','.ZBX_CONDITION_TYPE_TEMPLATE.')'.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
@@ -180,7 +181,7 @@ class CAction extends CApiService {
 						' AND '.zbx_dbcast_2bigint('cc.value').'=f.triggerid'.
 						' AND f.itemid=i.itemid'.
 						' AND i.hostid=hgg.hostid'.
-						' AND cc.conditiontype='.CONDITION_TYPE_TRIGGER.
+						' AND cc.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER.
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
@@ -201,7 +202,7 @@ class CAction extends CApiService {
 
 			$sqlParts['from']['conditions_groups'] = 'conditions cg';
 			$sqlParts['where'][] = dbConditionString('cg.value', $options['groupids']);
-			$sqlParts['where']['ctg'] = 'cg.conditiontype='.CONDITION_TYPE_HOST_GROUP;
+			$sqlParts['where']['ctg'] = 'cg.conditiontype='.ZBX_CONDITION_TYPE_HOST_GROUP;
 			$sqlParts['where']['acg'] = 'a.actionid=cg.actionid';
 		}
 
@@ -211,7 +212,7 @@ class CAction extends CApiService {
 
 			$sqlParts['from']['conditions_hosts'] = 'conditions ch';
 			$sqlParts['where'][] = dbConditionString('ch.value', $options['hostids']);
-			$sqlParts['where']['cth'] = 'ch.conditiontype='.CONDITION_TYPE_HOST;
+			$sqlParts['where']['cth'] = 'ch.conditiontype='.ZBX_CONDITION_TYPE_HOST;
 			$sqlParts['where']['ach'] = 'a.actionid=ch.actionid';
 		}
 
@@ -221,7 +222,7 @@ class CAction extends CApiService {
 
 			$sqlParts['from']['conditions_triggers'] = 'conditions ct';
 			$sqlParts['where'][] = dbConditionString('ct.value', $options['triggerids']);
-			$sqlParts['where']['ctt'] = 'ct.conditiontype='.CONDITION_TYPE_TRIGGER;
+			$sqlParts['where']['ctt'] = 'ct.conditiontype='.ZBX_CONDITION_TYPE_TRIGGER;
 			$sqlParts['where']['act'] = 'a.actionid=ct.actionid';
 		}
 
@@ -635,11 +636,11 @@ class CAction extends CApiService {
 			foreach ($action['filter']['conditions'] as &$condition) {
 				$db_condition = current(
 					array_filter($db_conditions, static function(array $db_condition) use ($condition): bool {
-						if ($condition['conditiontype'] == CONDITION_TYPE_SUPPRESSED) {
+						if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_SUPPRESSED) {
 							return $condition['conditiontype'] == $db_condition['conditiontype'];
 						}
 
-						if ($condition['conditiontype'] == CONDITION_TYPE_EVENT_TAG_VALUE) {
+						if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_EVENT_TAG_VALUE) {
 							return $condition['conditiontype'] == $db_condition['conditiontype']
 								&& $condition['value2'] === $db_condition['value2'];
 						}
@@ -2332,92 +2333,92 @@ class CAction extends CApiService {
 		switch ($eventsource) {
 			case EVENT_SOURCE_TRIGGERS:
 				$value_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_EVENT_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST, ZBX_CONDITION_TYPE_TRIGGER, ZBX_CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_EVENT_NAME, ZBX_CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TIME_PERIOD], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')],
 					['else' => true, 'type' => API_UNEXPECTED]
 				];
 				$operator_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_GROUP))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TEMPLATE], 'type' => API_INT32,'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TEMPLATE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_NAME))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER_SEVERITY))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TIME_PERIOD))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SUPPRESSED))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_GROUP))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TRIGGER], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TRIGGER))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TEMPLATE], 'type' => API_INT32,'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TEMPLATE))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TRIGGER_SEVERITY))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TIME_PERIOD))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SUPPRESSED))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG_VALUE))]
 				];
 				break;
 
 			case EVENT_SOURCE_DISCOVERY:
 				$value_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DHOST_IP], 'type' => API_IP_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_RANGE, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET])],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value'), 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST])],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.SEC_PER_MONTH],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DVALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY])], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE])]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DHOST_IP], 'type' => API_IP_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_RANGE, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_ICMPPING, SVC_SNMPv3, SVC_HTTPS, SVC_TELNET])],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32_RANGES, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value'), 'in' => ZBX_MIN_PORT_NUMBER.':'.ZBX_MAX_PORT_NUMBER],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN, DOBJECT_STATUS_DISCOVER, DOBJECT_STATUS_LOST])],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => '0:'.SEC_PER_MONTH],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DVALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_DRULE, ZBX_CONDITION_TYPE_DCHECK, ZBX_CONDITION_TYPE_PROXY])], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE])]
 				];
 				$operator_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DHOST_IP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DHOST_IP))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSERVICE_TYPE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSERVICE_PORT))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DSTATUS))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DUPTIME))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DVALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DVALUE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DRULE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DRULE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DCHECK], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DCHECK))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_PROXY))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_DOBJECT))]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DHOST_IP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DHOST_IP))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSERVICE_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DSERVICE_TYPE))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSERVICE_PORT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DSERVICE_PORT))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DSTATUS], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DSTATUS))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DUPTIME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DUPTIME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DVALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DVALUE))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DRULE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DRULE))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DCHECK], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DCHECK))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_PROXY))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_DOBJECT], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_DOBJECT))]
 				];
 				break;
 
 			case EVENT_SOURCE_AUTOREGISTRATION:
 				$value_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_HOST_METADATA])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_HOST_NAME, ZBX_CONDITION_TYPE_HOST_METADATA])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_PROXY))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_NAME))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_METADATA))]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_PROXY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_PROXY))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_METADATA], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_METADATA))]
 				];
 				break;
 
 			case EVENT_SOURCE_INTERNAL:
 				$value_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TYPE], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_TYPE_ITEM_NOTSUPPORTED, EVENT_TYPE_LLDRULE_NOTSUPPORTED, EVENT_TYPE_TRIGGER_UNKNOWN])],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST, ZBX_CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TYPE], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [EVENT_TYPE_ITEM_NOTSUPPORTED, EVENT_TYPE_LLDRULE_NOTSUPPORTED, EVENT_TYPE_TRIGGER_UNKNOWN])],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST_GROUP))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TEMPLATE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TEMPLATE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TYPE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST_GROUP], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST_GROUP))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_HOST))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_TEMPLATE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_TEMPLATE))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TYPE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TYPE))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG_VALUE))]
 				];
 				break;
 
 			case EVENT_SOURCE_SERVICE:
 				$value_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_SERVICE_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SERVICE], 'type' => API_ID, 'flags' => API_REQUIRED],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [ZBX_CONDITION_TYPE_SERVICE_NAME, ZBX_CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')]
 				];
 				$operator_rules = [
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SERVICE_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SERVICE_NAME))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_TAG_VALUE))]
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SERVICE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SERVICE))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_SERVICE_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_SERVICE_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG))],
+					['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(ZBX_CONDITION_TYPE_EVENT_TAG_VALUE))]
 				];
 				break;
 		}
@@ -2427,7 +2428,7 @@ class CAction extends CApiService {
 			'operator' =>		['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => $operator_rules],
 			'value' =>			['type' => API_MULTIPLE, 'rules' => $value_rules],
 			'value2' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value2')],
+									['if' => ['field' => 'conditiontype', 'in' => ZBX_CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value2')],
 									['else' => true, 'type' => API_UNEXPECTED]
 			]]
 		];
@@ -2533,7 +2534,7 @@ class CAction extends CApiService {
 						return $operationtype_field + $escalation_fields + [
 							'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR])],
 							'opconditions' =>	['type' => API_OBJECTS, 'uniq' => [['value']], 'fields' => [
-								'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => CONDITION_TYPE_EVENT_ACKNOWLEDGED],
+								'conditiontype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED],
 								'value' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]), 'length' => DB::getFieldLength('opconditions', 'value')],
 								'operator' =>		['type' => API_INT32, 'in' => CONDITION_OPERATOR_EQUAL]
 							]]
@@ -2858,14 +2859,14 @@ class CAction extends CApiService {
 
 			if (array_key_exists('conditions', $action['filter'])) {
 				foreach ($action['filter']['conditions'] as $j => $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_DHOST_IP) {
+					if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DHOST_IP) {
 						if (!$ip_range_parser->parse($condition['value'])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 								$path.'/conditions/'.($j + 1).'/value', $ip_range_parser->getError()
 							));
 						}
 					}
-					elseif ($condition['conditiontype'] == CONDITION_TYPE_DVALUE) {
+					elseif ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DVALUE) {
 						if ($condition['operator'] == CONDITION_OPERATOR_EQUAL
 								|| $condition['operator'] == CONDITION_OPERATOR_NOT_EQUAL) {
 							continue;
@@ -3088,7 +3089,7 @@ class CAction extends CApiService {
 		foreach ($actions as $action) {
 			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
 				foreach ($action['filter']['conditions'] as $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_HOST_GROUP) {
+					if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_HOST_GROUP) {
 						$groupids[] = $condition['value'];
 					}
 				}
@@ -3144,7 +3145,7 @@ class CAction extends CApiService {
 		foreach ($actions as $action) {
 			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
 				foreach ($action['filter']['conditions'] as $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_HOST) {
+					if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_HOST) {
 						$hostids[] = $condition['value'];
 					}
 				}
@@ -3289,7 +3290,7 @@ class CAction extends CApiService {
 		foreach ($actions as $action) {
 			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
 				foreach ($action['filter']['conditions'] as $condition) {
-					if ($condition['conditiontype'] == CONDITION_TYPE_TEMPLATE) {
+					if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_TEMPLATE) {
 						$templateids[] = $condition['value'];
 					}
 				}
@@ -3343,7 +3344,7 @@ class CAction extends CApiService {
 			}
 
 			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_TRIGGER) {
 					$triggerids[$condition['value']] = true;
 				}
 			}
@@ -3383,7 +3384,7 @@ class CAction extends CApiService {
 			}
 
 			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_DRULE) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DRULE) {
 					$druleids[$condition['value']] = true;
 				}
 			}
@@ -3423,7 +3424,7 @@ class CAction extends CApiService {
 			}
 
 			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_DCHECK) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_DCHECK) {
 					$druleids[$condition['value']] = true;
 				}
 			}
@@ -3463,7 +3464,7 @@ class CAction extends CApiService {
 			}
 
 			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_PROXY) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_PROXY) {
 					$proxyids[$condition['value']] = true;
 				}
 			}
@@ -3503,7 +3504,7 @@ class CAction extends CApiService {
 			}
 
 			foreach ($action['filter']['conditions'] as $condition) {
-				if ($condition['conditiontype'] == CONDITION_TYPE_SERVICE) {
+				if ($condition['conditiontype'] == ZBX_CONDITION_TYPE_SERVICE) {
 					$serviceids[$condition['value']] = true;
 				}
 			}

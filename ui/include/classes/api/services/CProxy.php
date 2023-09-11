@@ -389,7 +389,7 @@ class CProxy extends CApiService {
 			'SELECT a.name,c.value AS proxyid'.
 			' FROM actions a,conditions c'.
 			' WHERE a.actionid=c.actionid'.
-				' AND c.conditiontype='.CONDITION_TYPE_PROXY.
+				' AND c.conditiontype='.ZBX_CONDITION_TYPE_PROXY.
 				' AND '.dbConditionString('c.value', array_keys($proxies)),
 			1
 		));

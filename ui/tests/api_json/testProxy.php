@@ -290,7 +290,7 @@ class testProxy extends CAPITest {
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
 				'conditions' => [
 					[
-						'conditiontype' => CONDITION_TYPE_PROXY,
+						'conditiontype' => ZBX_CONDITION_TYPE_PROXY,
 						'operator' => CONDITION_OPERATOR_EQUAL,
 						'value' => self::$data['proxyids']['delete_used_in_action']
 					]
