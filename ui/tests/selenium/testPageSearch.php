@@ -667,7 +667,7 @@ class testPageSearch extends CWebTest {
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->fill(['id:search' => $data['search_string']]);
 
-		// Fill does not send a "keyup" event for non-standard strings, but it is needed here.
+		// Fill does not send a "keyup" event for non-standard strings, but it is needed to show the autocomplete window.
 		if (CTestArrayHelper::get($data, 'fire_keyup_event')) {
 			$form->getField('id:search')->fireEvent('keyup');
 		}
