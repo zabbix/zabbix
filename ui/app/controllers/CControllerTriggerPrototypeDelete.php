@@ -46,7 +46,8 @@ class CControllerTriggerPrototypeDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN || $this->getUserType() == USER_TYPE_SUPER_ADMIN;
+		return $this->getUserType() == USER_TYPE_ZABBIX_ADMIN
+			|| $this->getUserType() == USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function doAction(): void {
