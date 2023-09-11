@@ -177,14 +177,14 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		foreach (['graph_in', 'graph_time'] as $graph_id) {
 			$this->assertStringContainsString($data['expected'], $this->query('id', $graph_id)
-				->one()->getAttribute('src')
+					->one()->getAttribute('src')
 			);
 		}
 
 		// Check Zoom buttons.
 		foreach ($data['zoom_buttons'] as $button => $state) {
-			$this->assertTrue($this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($button).
-				')]')->one()->isEnabled($state)
+			$this->assertTrue($this->query('xpath://button[@class='.CXPathHelper::escapeQuotes($button).
+					']')->one()->isEnabled($state)
 			);
 		}
 	}
