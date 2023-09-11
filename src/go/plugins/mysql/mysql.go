@@ -26,7 +26,6 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/omeid/go-yarn"
@@ -60,12 +59,6 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
-	details, err := tlsconfig.CreateDetails(params["sessionName"], params["TLSConnect"],
-		params["TLSCAFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"])
-	if err != nil {
-		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
-	}
-
 	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
 		return nil, err
@@ -76,7 +69,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri, details)
+	conn, err := p.connMgr.GetConnection(*uri, params)
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.
