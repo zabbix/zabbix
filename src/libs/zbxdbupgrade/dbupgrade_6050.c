@@ -925,55 +925,44 @@ static int	DBpatch_6050087(void)
 
 static int	DBpatch_6050088(void)
 {
-	const char	*values[] = {
-			"web.hosts.triggers.filter.active", "web.hosts.trigger.list.filter.active",
-			"web.hosts.triggers.filter.evaltype", "web.hosts.trigger.list.filter.evaltype",
-			"web.hosts.triggers.filter.tags.operator", "web.hosts.trigger.list.filter.tags.operator",
-			"web.hosts.triggers.filter.tags.tag", "web.hosts.trigger.list.filter.tags.tag",
-			"web.hosts.triggers.filter.tags.value", "web.hosts.trigger.list.filter.tags.value",
-			"web.hosts.triggers.filter_dependent", "web.hosts.trigger.list.filter_dependent",
-			"web.hosts.triggers.filter_discovered", "web.hosts.trigger.list.filter_discovered",
-			"web.hosts.triggers.filter_groupids", "web.hosts.trigger.list.filter_groupids",
-			"web.hosts.triggers.filter_hostids", "web.hosts.trigger.list.filter_hostids",
-			"web.hosts.triggers.filter_inherited", "web.hosts.trigger.list.filter_inherited",
-			"web.hosts.triggers.filter_name", "web.hosts.trigger.list.filter_name",
-			"web.hosts.triggers.filter_priority", "web.hosts.trigger.list.filter_priority",
-			"web.hosts.triggers.filter_state", "web.hosts.trigger.list.filter_state",
-			"web.hosts.triggers.filter_status", "web.hosts.trigger.list.filter_status",
-			"web.hosts.triggers.filter_value", "web.hosts.trigger.list.filter_value",
-			"web.hosts.triggers.php.sort", "web.hosts.trigger.list.sort",
-			"web.hosts.triggers.php.sortorder", "web.hosts.trigger.list.sortorder",
-			"web.hosts.trigger_prototypes.php.sort", "web.hosts.trigger.prototype.list.sort",
-			"web.hosts.trigger_prototypes.php.sortorder", "web.hosts.trigger.prototype.list.sortorder",
-			"web.templates.triggers.filter.active", "web.templates.trigger.list.filter.active",
-			"web.templates.triggers.filter.evaltype", "web.templates.trigger.list.filter.evaltype",
-			"web.templates.triggers.filter.tags.operator", "web.templates.trigger.list.filter.tags.operator",
-			"web.templates.triggers.filter.tags.tag", "web.templates.trigger.list.filter.tags.tag",
-			"web.templates.triggers.filter.tags.value", "web.templates.trigger.list.filter.tags.value",
-			"web.templates.triggers.filter_dependent", "web.templates.trigger.list.filter_dependent",
-			"web.templates.triggers.filter_discovered", "web.templates.trigger.list.filter_discovered",
-			"web.templates.triggers.filter_groupids", "web.templates.trigger.list.filter_groupids",
-			"web.templates.triggers.filter_hostids", "web.templates.trigger.list.filter_hostids",
-			"web.templates.triggers.filter_inherited", "web.templates.trigger.list.filter_inherited",
-			"web.templates.triggers.filter_name", "web.templates.trigger.list.filter_name",
-			"web.templates.triggers.filter_priority", "web.templates.trigger.list.filter_priority",
-			"web.templates.triggers.filter_state", "web.templates.trigger.list.filter_state",
-			"web.templates.triggers.filter_status", "web.templates.trigger.list.filter_status",
-			"web.templates.triggers.filter_value", "web.templates.trigger.list.filter_value",
-			"web.templates.triggers.php.sort", "web.templates.trigger.list.sort",
-			"web.templates.triggers.php.sortorder", "web.templates.trigger.list.sortorder",
-			"web.templates.trigger_prototypes.php.sort", "web.templates.trigger.prototype.list.sort",
-			"web.templates.trigger_prototypes.php.sortorder", "web.templates.trigger.prototype.list.sortorder",
-		};
-
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (size_t i = 0; i < ARRSIZE(values); i += 2)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
-			return FAIL;
-	}
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050089(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.trigger_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050090(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050091(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.trigger_prototypes.php.%%'"))
+		return FAIL;
 
 	return SUCCEED;
 }
@@ -1073,5 +1062,8 @@ DBPATCH_ADD(6050085, 0, 1)
 DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
 DBPATCH_ADD(6050088, 0, 1)
+DBPATCH_ADD(6050089, 0, 1)
+DBPATCH_ADD(6050090, 0, 1)
+DBPATCH_ADD(6050091, 0, 1)
 
 DBPATCH_END()
