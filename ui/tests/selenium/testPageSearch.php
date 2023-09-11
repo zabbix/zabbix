@@ -98,7 +98,7 @@ class testPageSearch extends CWebTest {
 		$response = CDataHelper::createHosts([
 			[
 				'host' => 'emoji visible name',
-				'name' => '🙂🙃',
+				'name' => '🙂⭐️',
 				'groups' => ['groupid' => 6],
 				'interfaces' => [
 					'type' => 1,
@@ -378,15 +378,14 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				[
-					'search_string' => '🙃',
-					'hosts' => [['Host' => '🙂🙃']],
-					'fire_keyup_event' => true
+					'search_string' => '⭐️',
+					'hosts' => [['Host' => '🙂⭐️']]
 				]
 			],
 			[
 				[
 					'search_string' => 'emoji visible name',
-					'hosts' => [['Host' => "🙂🙃\n(emoji visible name)"]]
+					'hosts' => [['Host' => "🙂⭐️\n(emoji visible name)"]]
 				]
 			],
 			[
@@ -416,7 +415,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '99.99.99.99',
-					'hosts' => [['Host' => '🙂🙃', 'IP' => '99.99.99.99', 'DNS' => '']]
+					'hosts' => [['Host' => '🙂⭐️', 'IP' => '99.99.99.99', 'DNS' => '']]
 
 				]
 			],
@@ -466,7 +465,7 @@ class testPageSearch extends CWebTest {
 			}
 		}
 
-		$this->openSearchResults($data['search_string'], CTestArrayHelper::get($data, 'fire_keyup_event', false));
+		$this->openSearchResults($data['search_string']);
 
 		$this->page->assertHeader('Search: '.$data['search_string']);
 
@@ -646,9 +645,8 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				[
-					'search_string' => '🙃',
-					'expected_suggestions' => ['🙂🙃'],
-					'fire_keyup_event' => true
+					'search_string' => '⭐️',
+					'expected_suggestions' => ['🙂⭐️']
 				]
 			],
 			[
@@ -687,11 +685,6 @@ class testPageSearch extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->query('id:search')->one()->fill($data['search_string']);
-
-		// Fill does not send a "keyup" event for non-standard strings, but it is needed to show the autocomplete window.
-		if (CTestArrayHelper::get($data, 'fire_keyup_event')) {
-			$form->getField('id:search')->fireEvent('keyup');
-		}
 
 		$item_selector = 'xpath://ul[@class="search-suggest"]//li';
 
@@ -742,16 +735,10 @@ class testPageSearch extends CWebTest {
 	 *
 	 * @param string  $search_string    text that will be entered in the search field
 	 */
-	protected function openSearchResults($search_string, $send_keyup = false) {
+	protected function openSearchResults($search_string) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->query('id:search')->one()->fill($search_string);
-
-		// Fill does not send a "keyup" event for non-standard strings, but it is needed to enable the submit button.
-		if ($send_keyup) {
-			$form->getField('id:search')->fireEvent('keyup');
-		}
-
 		$form->submit();
 	}
 }
