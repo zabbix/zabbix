@@ -1,5 +1,3 @@
-//go:build linux && (amd64 || arm64)
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,32 +17,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package file
+package zbxtest
 
 import (
-	"reflect"
-	"testing"
-
-	"git.zabbix.com/ap/plugin-support/std"
-	"zabbix.com/pkg/zbxtest"
+	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
-var Md5File = "1234"
-
-func TestFileMd5sum(t *testing.T) {
-	var ctx zbxtest.MockEmptyCtx
-	stdOs = std.NewMockOs()
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte(Md5File))
-	if result, err := impl.Export("vfs.file.md5sum", []string{"text.txt"}, ctx); err != nil {
-		t.Errorf("vfs.file.md5sum returned error %s", err.Error())
-	} else {
-		if md5sum, ok := result.(string); !ok {
-			t.Errorf("vfs.file.md5sum returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if md5sum != "81dc9bdb52d04dc20036dbd8313ed055" {
-				t.Errorf("vfs.file.md5sum returned invalid result")
-			}
-		}
-	}
+type MockEmptyCtx struct {
+	resultWriter	emptyResultWriter
+	matcher		emptyMatcher
 }
+
+func (ctx MockEmptyCtx) ClientID() uint64 {
+	return 0
+}
+
+func (ctx MockEmptyCtx) ItemID() uint64 {
+	return 0
+}
+
+func (ctx MockEmptyCtx) Output() plugin.ResultWriter {
+	return nil
+}
+
+func (ctx MockEmptyCtx) Meta() *plugin.Meta {
+	return nil
+}
+
+func (ctx MockEmptyCtx) GlobalRegexp() plugin.RegexpMatcher {
+	return nil
+}
+
+func (ctx MockEmptyCtx) Timeout() int {
+	return 3
+}
+
+type emptyMatcher struct{}
+type emptyResultWriter struct{}
