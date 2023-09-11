@@ -90,8 +90,6 @@
 		}
 
 		editTrigger(trigger_data) {
-			clearMessages();		//TODO is this needed?
-
 			const overlay = PopUp('trigger.edit', trigger_data, {
 				dialogueid: 'trigger-edit',
 				dialogue_class: 'modal-popup-large',
