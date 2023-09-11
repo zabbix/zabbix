@@ -122,13 +122,12 @@
 					this.#delete(target, {itemids: itemids, context: this.context});
 				}
 			});
-			document.querySelector('.js-create-item')?.addEventListener('click', (e) => this.#edit(e.target));
+			document.querySelector('.js-create-item')?.addEventListener('click',
+				(e) => this.#edit(e.target, e.target.dataset)
+			);
 		}
 
 		#edit(target, parameters = {}) {
-			parameters.context = this.context;
-			parameters.hostid = this.hostids[0];
-
 			this.#popup('item.edit', parameters, {
 				dialogueid: 'item-edit',
 				dialogue_class: 'modal-popup-large',

@@ -79,7 +79,6 @@ class CControllerProfileUpdate extends CController {
 				case 'web.templates.graphs.filter.active':
 				case 'web.templates.host_discovery.filter.active':
 				case 'web.templates.httpconf.filter.active':
-				case 'web.templates.items.list.filter.active':
 				case 'web.templates.triggers.filter.active':
 				case 'web.token.filter.active':
 				case 'web.toptriggers.filter.active':
