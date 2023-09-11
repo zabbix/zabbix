@@ -36,6 +36,7 @@ func loadOSDependentItems() error {
 
 func createSigsChan() chan os.Signal {
 	sigs := make(chan os.Signal, 1)
+
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGCHLD)
 
 	return sigs
