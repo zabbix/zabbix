@@ -87,9 +87,9 @@ int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(section, "kthr"))
 	{
 		if (0 == strcmp(type, "r"))
-			SET_DBL_RESULT(result, get_collector->vmstat.kthr_r);
+			SET_DBL_RESULT(result, collector->vmstat.kthr_r);
 		else if (0 == strcmp(type, "b"))
-			SET_DBL_RESULT(result, get_collector->vmstat.kthr_b);
+			SET_DBL_RESULT(result, collector->vmstat.kthr_b);
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
