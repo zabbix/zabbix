@@ -323,17 +323,24 @@ class CSVGPie {
 					for (let i = 0; i < sectors.length; i++) {
 						const _this = d3.select(sectors[i]);
 
+						const popOut = () => {
+							const x = arc.centroid(_this.datum())[0] / 10;
+							const y = arc.centroid(_this.datum())[1] / 10;
+
+							_this
+								.transition()
+								.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
+								.attr('transform', `translate(${x}, ${y})`);
+						};
+
+						// If mouse was on any sector before/during animation, then pop that sector out again.
+						if (sectors[i].matches(':hover')) {
+							popOut();
+						}
+
 						_this
 							.on('mouseenter', () => {
-								const datum = _this.datum();
-
-								const x = arc.centroid(datum)[0] / 10;
-								const y = arc.centroid(datum)[1] / 10;
-
-								_this
-									.transition()
-									.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
-									.attr('transform', `translate(${x}, ${y})`);
+								popOut();
 							})
 							.on('mouseleave', () => {
 								_this
