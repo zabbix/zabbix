@@ -489,7 +489,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
  *               FAIL    - failed to request or read modbus data              *
  *                                                                            *
  ******************************************************************************/
-static int	modbus_read_data(zbx_modbus_endpoint_t *endpoint, unsigned char slaveid, unsigned char function,
+static int	modbus_read_data(const zbx_modbus_endpoint_t *endpoint, unsigned char slaveid, unsigned char function,
 		unsigned short address, unsigned short count, modbus_datatype_t type, modbus_endianness_t endianness,
 		unsigned short offset, unsigned short total_count, AGENT_RESULT *res, char **error)
 {

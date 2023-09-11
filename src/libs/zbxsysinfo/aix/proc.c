@@ -43,7 +43,7 @@ static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 
 static int	check_procargs(struct procentry64 *procentry, const char *proccomm)
 {
-	char		procargs[MAX_BUFFER_LEN];
+	char	procargs[MAX_BUFFER_LEN];
 
 	if (0 != getargs(procentry, (int)sizeof(*procentry), procargs, (int)sizeof(procargs)))
 		return FAIL;
