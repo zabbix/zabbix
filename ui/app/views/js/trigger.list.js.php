@@ -35,6 +35,11 @@
 			this.checkbox_object = checkbox_object;
 			this.context = context;
 
+			this.#initFilter();
+			this.#initActions();
+		}
+
+		#initFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -47,10 +52,6 @@
 				new CTagFilterItem(row);
 			});
 
-			this.#initActions();
-		}
-
-		#initActions() {
 			if (this.context === 'host') {
 				document.getElementById('filter_state').addEventListener('change', () => {
 					const filter_state = document.querySelector('input[name=filter_state]:checked').value;
@@ -62,6 +63,15 @@
 				})
 			}
 
+			const filter_fields = ['#filter_groupids_', '#filter_hostids_']
+
+			filter_fields.forEach(filter => {
+				$(filter).on('change', () => this.#updateMultiselect($(filter)));
+				this.#updateMultiselect($(filter));
+			})
+		}
+
+		#initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.id === 'js-create') {
 					this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context})
@@ -196,6 +206,10 @@
 				dialogue_class: 'modal-popup-static',
 				trigger_element: target
 			});
+		}
+
+		#updateMultiselect($ms) {
+			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
 		}
 
 		#post(target, triggerids, url) {
