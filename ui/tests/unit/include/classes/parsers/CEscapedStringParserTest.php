@@ -28,55 +28,95 @@ class CEscapedStringParserTest extends TestCase {
 	 */
 	public static function dataProvider() {
 		return [
-			['', 0, [
+			// CParser::PARSE_SUCCESS
+			['', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '',
 				'error' => ''
 			]],
-			['Simple text', 0, [
+			['Simple text', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => 'Simple text',
 				'error' => ''
 			]],
-			['\n\nZabbix', 0, [
+			['\n\nZabbix', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\n\nZabbix',
 				'error' => ''
 			]],
-			['\\\n', 0, [
+			['\\\n', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\\\n',
 				'error' => ''
 			]],
-			['\s', 0, [
+			['\s', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\s',
 				'error' => ''
 			]],
-			['\\\t', 0, [
+			['\\\t', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => '\\\t',
 				'error' => ''
 			]],
-			['\\\\t', 0, [
-				'rc' => CParser::PARSE_SUCCESS,
-				'match' => '\\\\t',
-				'error' => ''
-			]],
-			['\Here is another\n', 1, [
+			['\Here is another\n', 1, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS,
 				'match' => 'Here is another\n',
 				'error' => ''
 			]],
-			['\ ', 0, [
+			['\\\\', 0, ['characters' => '\\'], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '\\\\',
+				'error' => ''
+			]],
+			['\n\n\\\\', 4, ['characters' => '\\'], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '\\\\',
+				'error' => ''
+			]],
+			['\n\n\n\n\n', 0, ['characters' => 'n'], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '\n\n\n\n\n',
+				'error' => ''
+			]],
+
+			// CParser::PARSE_SUCCESS_CONT
+			['\\\\\n', 0, ['characters' => '\\'], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '\\\\',
+				'error' => 'value contains unescaped backslash at position 3'
+			]],
+			['\\\\valid\n\\\\till\\\\position 29\ and then failed', 0, ['characters' => '\\nrts'], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '\\\\valid\n\\\\till\\\\position 29',
+				'error' => 'value contains unescaped backslash at position 29'
+			]],
+			['\\\\valid\n\\\\in the middle\ ', 9, ['characters' => '\\nrts'], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '\\\\in the middle',
+				'error' => 'value contains unescaped backslash at position 16'
+			]],
+			['\n\n\n\\\n\n', 0, ['characters' => 'n'], [
+				'rc' => CParser::PARSE_SUCCESS_CONT,
+				'match' => '\n\n\n',
+				'error' => 'value contains unescaped backslash at position 7'
+			]],
+
+			// CParser::PARSE_FAIL
+			['\ ', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'error' => 'value contains unescaped backslash at position 1'
 			]],
-			['\\\\\\\\\n\\\\\n\n\t\somewhere\\\\\n\nat the end\n\ ', 0, [
+			['\n\\', 0, ['characters' => '\\'], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'error' => 'value contains unescaped backslash at position 43'
+				'error' => 'value contains unescaped backslash at position 1'
+			]],
+			['\\', 0, ['characters' => 'nrts'], [
+				'rc' => CParser::PARSE_FAIL,
+				'match' => '',
+				'error' => 'value contains unescaped backslash at position 1'
 			]]
 		];
 	}
@@ -85,14 +125,15 @@ class CEscapedStringParserTest extends TestCase {
 	 * @dataProvider dataProvider
 	 *
 	 * @param string $source
-	 * @param int    $pos
+	 * @param int    $offset
+	 * @param array  $options
 	 * @param array  $expected
 	 */
-	public function testParse(string $source, int $pos, array $expected) {
-		$escaped_string_parser = new CEscapedStringParser();
+	public function testParse(string $source, int $offset, array $options, array $expected) {
+		$escaped_string_parser = new CEscapedStringParser($options);
 
 		$this->assertSame($expected, [
-			'rc' => $escaped_string_parser->parse($source, $pos),
+			'rc' => $escaped_string_parser->parse($source, $offset),
 			'match' => $escaped_string_parser->getMatch(),
 			'error' => $escaped_string_parser->getError()
 		]);

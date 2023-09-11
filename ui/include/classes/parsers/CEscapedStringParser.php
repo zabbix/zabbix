@@ -25,6 +25,28 @@
 class CEscapedStringParser extends CParser {
 
 	/**
+	 * An error message if string is invalid.
+	 *
+	 * @var string
+	 */
+	private $error = '';
+
+	/**
+	 * Options for parser customization.
+	 *
+	 * @var array
+	 */
+	private $options = [
+		'characters' => ''
+	];
+
+	public function __construct($options = []) {
+		if (array_key_exists('characters', $options)) {
+			$this->options['characters'] = $options['characters'];
+		}
+	}
+
+	/**
 	 * @param string $source
 	 * @param int    $offset
 	 *
@@ -33,20 +55,37 @@ class CEscapedStringParser extends CParser {
 	public function parse($source, $offset = 0) {
 		$this->length = 0;
 		$this->match = '';
+		$this->error = '';
+
+		if ($offset >= strlen($source)) {
+			return self::PARSE_SUCCESS;
+		}
 
 		// Check if all backslash characters in given string are escaped.
 		for ($pos = strpos($source, '\\', $offset); $pos !== false; $pos = strpos($source, '\\', $pos + 2)) {
-			if (!isset($source[$pos + 1]) || strpos('\\nrts', $source[$pos + 1]) === false) {
-				$this->errorPos($source, $pos);
-
-				return self::PARSE_FAIL;
+			if (!isset($source[$pos + 1]) || strpos($this->options['characters'], $source[$pos + 1]) === false) {
+				break;
 			}
 		}
 
-		$this->length = strlen($source) - $offset;
-		$this->match = substr($source, $offset, $this->length);
+		// No backslash occurances or loop has been stopped.
+		if ($pos !== false) {
+			$result = $pos > $offset ? self::PARSE_SUCCESS_CONT : self::PARSE_FAIL;
+		}
+		else {
+			$result = self::PARSE_SUCCESS;
+		}
 
-		return self::PARSE_SUCCESS;
+		if ($result != self::PARSE_FAIL) {
+			$this->length = $result == self::PARSE_SUCCESS ? strlen($source) - $offset :  $pos - $offset;
+			$this->match = substr($source, $offset, $this->length);
+		}
+
+		if ($result != self::PARSE_SUCCESS) {
+			$this->error = _s('value contains unescaped backslash at position %1$d', $pos + 1 - $offset);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -55,8 +94,6 @@ class CEscapedStringParser extends CParser {
 	 * @return string
 	 */
 	public function getError(): string {
-		return $this->error_source !== false
-			? _s('value contains unescaped backslash at position %1$d', $this->error_pos + 1)
-			: '';
+		return $this->error;
 	}
 }

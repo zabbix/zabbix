@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+error_reporting(E_ALL ^ E_DEPRECATED);
 
 use PHPUnit\Framework\TestCase;
 
@@ -8486,6 +8487,24 @@ class CApiInputValidatorTest extends TestCase {
 				'{#MACRO1}',
 				'/1/address',
 				'{#MACRO1}'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'characters' => '\\nrts'],
+				'\\\n\r\t\s',
+				'/',
+				'\\\n\r\t\s'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8],
+				'\\',
+				'/',
+				'Invalid parameter "/": value contains unescaped backslash at position 1.'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'characters' => 'nrts'],
+				'\n\n\n\ ',
+				'/',
+				'Invalid parameter "/": value contains unescaped backslash at position 7.'
 			]
 		];
 	}

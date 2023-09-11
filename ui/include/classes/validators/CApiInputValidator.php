@@ -693,7 +693,8 @@ class CApiInputValidator {
 	 * Escaped string validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY
+	 * @param int    $rule['flags']       (optional) API_NOT_EMPTY
+	 * @param string $rule['characters']  (optional) 'characters' option for CEscapedStringParser.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -707,7 +708,7 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$escaped_string_parser = new CEscapedStringParser();
+		$escaped_string_parser = new CEscapedStringParser(array_intersect_key($rule, array_flip(['characters'])));
 
 		if ($escaped_string_parser->parse($data) != CParser::PARSE_SUCCESS) {
 			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $escaped_string_parser->getError());
@@ -4181,8 +4182,8 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '']
+					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'characters' => '\\nrts'],
+					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '', 'characters' => '\\nrts']
 				]];
 				break;
 
