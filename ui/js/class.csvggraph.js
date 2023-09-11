@@ -26,7 +26,7 @@
  *  - show_problems - show problems in hintbox when mouse is moved over the problem zone;
  *  - min_period - min period in seconds that must be s-boxed to change the data in dashboard timeselector.
  */
-jQuery(function ($) {
+(function ($) {
 	"use strict";
 
 	// Makes SBox selection cancelable pressing Esc.
@@ -682,4 +682,4 @@ jQuery(function ($) {
 
 		return methods.init.apply(this, arguments);
 	};
-});
+})(jQuery);
