@@ -8488,6 +8488,18 @@ class CApiInputValidatorTest extends TestCase {
 				'{#MACRO1}'
 			],
 			[
+				['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				'',
+				'/',
+				'Invalid parameter "/": cannot be empty.'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+				[],
+				'/',
+				'Invalid parameter "/": a character string is expected.'
+			],
+			[
 				['type' => API_ESCAPED_STRING_UTF8, 'characters' => '\\nrts'],
 				'\\\n\r\t\s',
 				'/',
