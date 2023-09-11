@@ -631,15 +631,15 @@
 			delete form_fields.context;
 			delete form_fields._csrf_token;
 
-			if (this.db_dependencies !== []) {
+			if (this.db_dependencies.length > 0) {
 				// Dependencies are sorted alphabetically as in form to appear in the same order for JSON.stringify().
 				let dependencies = this.#prepareDependencies(this.db_dependencies);
 				this.db_trigger.dependencies = dependencies.map(obj => obj.triggerid);
 			}
 
-			if (form_fields.show_inherited_tags === '1') {
+			if (form_fields.show_inherited_tags == 1) {
 				form_fields.tags = form_fields.tags.filter((tag) => {
-					return tag.type !== '1';
+					return tag.type !== '1'; // 'ZBX_PROPERTY_INHERITED'
 				});
 
 				for (const tag of form_fields.tags) {

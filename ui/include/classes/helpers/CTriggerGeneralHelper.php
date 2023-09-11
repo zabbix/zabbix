@@ -423,7 +423,6 @@ class CTriggerGeneralHelper {
 		$data = [
 			'description' => $trigger['comments'],
 			'name' => $trigger['description'],
-			'correlation-tag' => $trigger['correlation_tag'],
 			'status' => $trigger['status'] == TRIGGER_STATUS_ENABLED ? '1' : '0'
 		];
 
