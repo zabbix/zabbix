@@ -79,12 +79,6 @@ class CWidgetPieChart extends CWidget {
 			legend.data.push(total_item);
 		}
 
-		const value_data = {
-			sectors: response.sectors,
-			items: [...legend.data],
-			total_value: response.total_value
-		};
-
 		this.#setLegend(legend, total_item);
 
 		if (this.#pie_chart === null) {
@@ -93,11 +87,16 @@ class CWidgetPieChart extends CWidget {
 				horizontal: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
 			};
 
-			this.#pie_chart = new CSVGPie(this._body, padding, response.config);
+			this.#pie_chart = new CSVGPie(padding, response.config);
+			this._body.prepend(this.#pie_chart.getSVGElement());
 			this.#pie_chart.setSize(this.#getSize());
 		}
 
-		this.#pie_chart.setValue(value_data);
+		this.#pie_chart.setValue({
+			sectors: response.sectors,
+			items: [...legend.data],
+			total_value: response.total_value
+		});
 	}
 
 	#setLegend(legend, total_item) {

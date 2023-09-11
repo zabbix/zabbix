@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CSVGPie {
 
 	static ZBX_STYLE_CLASS =				'svg-pie-chart';
@@ -56,20 +57,15 @@ class CSVGPie {
 	 * Root SVG element.
 	 *
 	 * @type {SVGSVGElement}
+	 * @member {Selection}
 	 */
 	#svg;
-
-	/**
-	 * SVG group element implementing padding inside the root SVG element.
-	 *
-	 * @type {SVGGElement}
-	 */
-	#g;
 
 	/**
 	 * SVG group element implementing scaling and fitting of its contents inside the root SVG element.
 	 *
 	 * @type {SVGGElement}
+	 * @member {Selection}
 	 */
 	#g_scalable;
 
@@ -77,6 +73,7 @@ class CSVGPie {
 	 * SVG group element that contains all the sectors and empty circles.
 	 *
 	 * @type {SVGGElement}
+	 * @member {Selection}
 	 */
 	#arcs_container;
 
@@ -84,6 +81,7 @@ class CSVGPie {
 	 * SVG text element that contains total value and units.
 	 *
 	 * @type {SVGTextElement}
+	 * @member {Selection}
 	 */
 	#total_value_container;
 
@@ -91,6 +89,7 @@ class CSVGPie {
 	 * SVG text element that contains "No data" text.
 	 *
 	 * @type {SVGTextElement}
+	 * @member {Selection}
 	 */
 	#no_data_container;
 
@@ -111,14 +110,14 @@ class CSVGPie {
 	/**
 	 * Old sectors (for animation).
 	 *
-	 * @type {array}
+	 * @type {Array}
 	 */
 	#sectors_old = [];
 
 	/**
 	 * New sectors (for animation).
 	 *
-	 * @type {array}
+	 * @type {Array}
 	 */
 	#sectors_new = [];
 
@@ -138,36 +137,21 @@ class CSVGPie {
 	#radius_inner;
 
 	/**
-	 * @param {HTMLElement} container           HTML container to append the root SVG element to.
+	 * @param {Object} padding             Inner padding of the root SVG element.
+	 *        {number} padding.horizontal
+	 *        {number} padding.vertical
 	 *
-	 * @param {Object}      padding             Inner padding of the root SVG element.
-	 *        {number}      padding.horizontal
-	 *        {number}      padding.vertical
-	 *
-	 * @param {Object}      config              Widget configuration.
+	 * @param {Object} config              Widget configuration.
 	 */
-	constructor(container, padding, config) {
+	constructor(padding, config) {
 		this.#config = config;
 		this.#padding = padding;
-
-		this.#svg = d3.create('svg:svg')
-			.attr('class', CSVGPie.ZBX_STYLE_CLASS);
-
-		container.prepend(this.#svg.node());
-
-		this.#g = d3.create('svg:g')
-			.attr('transform',
-				`translate(${this.#padding.horizontal} ${this.#padding.vertical})`);
-
-		this.#svg.node().append(this.#g.node());
-
-		this.#g_scalable = d3.create('svg:g');
-
-		this.#g.node().append(this.#g_scalable.node());
 
 		this.#radius_inner = this.#config.draw_type === CSVGPie.DRAW_TYPE_PIE
 			? 0
 			: this.#radius_outer - this.#config.width * 10;
+
+		this.#svg = d3.create('svg:svg').attr('class', CSVGPie.ZBX_STYLE_CLASS);
 
 		this.#createContainers();
 	}
@@ -200,12 +184,12 @@ class CSVGPie {
 	/**
 	 * Set value of the pie chart.
 	 *
-	 * @param {array}	sectors		Array of sectors to show in pie chart.
-	 * @param {array}	items		Array of all possible items that can show up in pie chart.
-	 * @param {Object}	total_value	Object of total value and units.
+	 * @param {Array}  sectors      Array of sectors to show in pie chart.
+	 * @param {Array}  items        Array of all possible items that can show up in pie chart.
+	 * @param {Object} total_value  Object of total value and units.
 	 */
 	setValue({sectors, items, total_value}) {
-		sectors = this.#sortByRef(sectors, items);
+		sectors = this.#sortByReference(sectors, items);
 
 		if (sectors.length > 0) {
 			this.#arcs_container
@@ -240,12 +224,10 @@ class CSVGPie {
 
 					const scale = this.#radius_inner * 2 / text_width;
 
-					this.#total_value_container
-						.attr('transform', `scale(${scale})`);
+					this.#total_value_container.attr('transform', `scale(${scale})`);
 				}
 
-				this.#total_value_container
-					.style('display', '');
+				this.#total_value_container.style('display', '');
 			}
 		}
 		else {
@@ -267,17 +249,15 @@ class CSVGPie {
 
 					const scale = this.#radius_inner * 2 / text_width;
 
-					this.#no_data_container
-						.attr('transform', `scale(${scale})`);
+					this.#no_data_container.attr('transform', `scale(${scale})`);
 				}
 
-				this.#no_data_container
-					.style('display', '');
+				this.#no_data_container.style('display', '');
 			}
 			else {
 				this.#no_data_container
 					.attr('y', 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10 / 2 / CSVGPie.LINE_HEIGHT - 2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT)
-					.style('font-size', `${2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10}px`)
+					.style('font-size', `${2 * CSVGPie.TOTAL_VALUE_SIZE_DEFAULT * 10}px`);
 			}
 		}
 
@@ -350,10 +330,16 @@ class CSVGPie {
 								const x = arc.centroid(datum)[0] / 10;
 								const y = arc.centroid(datum)[1] / 10;
 
-								_this.transition().duration(CSVGPie.ANIMATE_DURATION_POP_OUT).attr('transform', `translate(${x}, ${y})`);
+								_this
+									.transition()
+									.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
+									.attr('transform', `translate(${x}, ${y})`);
 							})
 							.on('mouseleave', () => {
-								_this.transition().duration(CSVGPie.ANIMATE_DURATION_POP_IN).attr('transform', 'translate(0, 0)');
+								_this
+									.transition()
+									.duration(CSVGPie.ANIMATE_DURATION_POP_IN)
+									.attr('transform', 'translate(0, 0)');
 							});
 					}
 				}
@@ -377,8 +363,7 @@ class CSVGPie {
 						.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA_OUTER}, .${CSVGPie.ZBX_STYLE_ARC_NO_DATA_INNER}`)
 						.style('display', '');
 
-					this.#no_data_container
-						.style('display', '');
+					this.#no_data_container.style('display', '');
 				}
 			})
 			.catch(() => {});
@@ -404,7 +389,14 @@ class CSVGPie {
 	 * Create containers for elements (arcs, total value, no data text).
 	 */
 	#createContainers() {
-		const y = 3.5;
+		const y_offset = 3.5;
+
+		// SVG group element implementing padding inside the root SVG element.
+		const main = this.#svg
+			.append('svg:g')
+			.attr('transform', `translate(${this.#padding.horizontal} ${this.#padding.vertical})`);
+
+		this.#g_scalable = main.append('svg:g');
 
 		this.#arcs_container = this.#g_scalable
 			.append('svg:g')
@@ -425,7 +417,7 @@ class CSVGPie {
 				this.#total_value_container = this.#g_scalable
 					.append('svg:text')
 					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE)
-					.attr('y', y)
+					.attr('y', y_offset)
 					.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT}px`)
 					.style('font-weight', this.#config.total_value.is_bold ? 'bold' : '')
 					.style('fill', this.#config.total_value.color !== '' ? this.#config.total_value.color : '')
@@ -436,7 +428,7 @@ class CSVGPie {
 		this.#no_data_container = this.#g_scalable
 			.append('svg:text')
 			.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE_NO_DATA)
-			.attr('y', y)
+			.attr('y', y_offset)
 			.style('font-size', `${CSVGPie.TOTAL_VALUE_SIZE_DEFAULT}px`)
 			.style('font-weight', this.#config.total_value?.is_bold ? 'bold' : '')
 			.text(t('No data'));
@@ -445,7 +437,7 @@ class CSVGPie {
 	/**
 	 * Set hint for sector.
 	 *
-	 * @param {Object}	sector	All necessary information about sector.
+	 * @param {Object} sector  All necessary information about sector.
 	 *
 	 * @returns {string}
 	 */
@@ -477,49 +469,49 @@ class CSVGPie {
 	}
 
 	/**
-	 * Combine two arrays to use result for animation.
+	 * Combine two arrays of elements to use result for animation.
 	 *
-	 * @param {array}	arr_old
-	 * @param {array}	arr_new
-	 * @param {array}	items	Array to sort result by.
+	 * @param {Array} old_sectors
+	 * @param {Array} new_sectors
+	 * @param {Array} items    Array to sort result by.
 	 *
-	 * @returns {array}
+	 * @returns {Array}
 	 */
-	#prepareTransitionArray(arr_old, arr_new, items) {
-		const arr_new_set = new Set();
+	#prepareTransitionArray(old_sectors, new_sectors, items) {
+		const sectors_ids = new Set();
 
-		arr_new.forEach(element => arr_new_set.add(element.id));
+		new_sectors.forEach(sector => sectors_ids.add(sector.id));
 
-		const arr_old_only = arr_old
-			.filter(element => !arr_new_set.has(element.id))
-			.map(element => ({...element, percent_of_total: 0}));
+		old_sectors = old_sectors
+			.filter(sector => !sectors_ids.has(sector.id))
+			.map(sector => ({...sector, percent_of_total: 0}));
 
-		const merged = d3.merge([arr_new, arr_old_only]);
+		const sectors = d3.merge([new_sectors, old_sectors]);
 
-		return this.#sortByRef(merged, items);
+		return this.#sortByReference(sectors, items);
 	}
 
 	/**
-	 * Sort array of objects by another (reference) array of objects.
+	 * Sort array of elements by another (reference) array of objects.
 	 *
-	 * @param {array}	arr	Array to sort.
-	 * @param {array}	ref	Reference array.
+	 * @param {Array} sectors    Array to sort.
+	 * @param {Array} reference  Reference array.
 	 */
-	#sortByRef(arr, ref) {
-		return arr.sort((a, b) => {
-			const aIndex = ref.findIndex(i => i.id === a.id);
-			const bIndex = ref.findIndex(i => i.id === b.id);
+	#sortByReference(sectors, reference) {
+		return sectors.sort((a, b) => {
+			const a_index = reference.findIndex(i => i.id === a.id);
+			const b_index = reference.findIndex(i => i.id === b.id);
 
-			return aIndex - bIndex;
+			return a_index - b_index;
 		});
 	}
 
 	/**
 	 * Get text width using canvas measuring.
 	 *
-	 * @param {String}	text
-	 * @param {number}	size
-	 * @param {String}	font_family
+	 * @param {string} text
+	 * @param {number} size
+	 * @param {string} font_family
 	 *
 	 * @returns {number}
 	 */
