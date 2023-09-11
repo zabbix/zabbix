@@ -142,6 +142,43 @@ abstract class CControllerItemPrototype extends CController {
 
 		if (!$ret && $field !== '') {
 			error(_s('Incorrect value for "%1$s" field.', $field));
+
+			return false;
+		}
+
+		if ($this->hasInput('itemid')) {
+			$ret = (bool) API::ItemPrototype()->get([
+				'output' => ['itemid'],
+				'itemids' => [$this->getInput('itemid')]
+			]);
+		}
+
+		if ($ret && $this->hasInput('parent_discoveryid')) {
+			$ret = (bool) API::DiscoveryRule()->get([
+				'output' => ['itemid'],
+				'itemids' => [$this->getInput('parent_discoveryid')]
+			]);
+		}
+
+		if ($ret && $this->hasInput('hostid')) {
+			$check_host = $this->getInput('context', 'host') === 'host';
+
+			if ($check_host) {
+				$ret = (bool) API::Host()->get([
+					'output' => ['hostid'],
+					'hostids' => [$this->getInput('hostid')]
+				]);
+			}
+			else {
+				$ret = (bool) API::Template()->get([
+					'output' => ['hostid'],
+					'templateids' => [$this->getInput('hostid')]
+				]);
+			}
+		}
+
+		if (!$ret) {
+			error(_('No permissions to referred object or it does not exist!'));
 		}
 
 		return $ret;
