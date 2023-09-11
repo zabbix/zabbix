@@ -799,7 +799,7 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
-				$('#elementClose').click(function() {
+				$('.btn-overlay-close, #elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();
 				});

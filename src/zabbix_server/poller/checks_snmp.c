@@ -3094,32 +3094,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 	SNMP_MT_EXECLOCK;
 
-	if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
-	{
-		int	max_vars;
-		zbx_dc_item_t	*item = &items[j];
-		char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
-
-		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
-
-		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
-			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
-			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
-			config_timeout, config_source_ip)))
-		{
-			err = NETWORK_ERROR;
-			goto exit;
-		}
-
-		max_vars = zbx_dc_config_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
-
-		err = zbx_snmp_process_discovery(ssp, &items[j], &results[j], &errcodes[j], error, sizeof(error),
-				&max_succeed, &min_fail, max_vars, bulk);
-
-		zbx_snmp_close_session(ssp);
-	}
-	else if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
+	if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
 	{
 		struct evdns_base	*dnsbase;
 		zbx_snmp_result_t	snmp_result = {.result = &results[j]};
@@ -3161,6 +3136,31 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_unset_snmp_bulkwalk_options();
 		goto out;
+	}
+	else if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
+	{
+		int	max_vars;
+		zbx_dc_item_t	*item = &items[j];
+		char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
+
+		zbx_getip_by_host(item->interface.addr, ip_addr, sizeof(ip_addr));
+
+		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
+			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
+			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, error, sizeof(error),
+			config_timeout, config_source_ip)))
+		{
+			err = NETWORK_ERROR;
+			goto exit;
+		}
+
+		max_vars = zbx_dc_config_get_suggested_snmp_vars(items[j].interface.interfaceid, &bulk);
+
+		err = zbx_snmp_process_discovery(ssp, &items[j], &results[j], &errcodes[j], error, sizeof(error),
+				&max_succeed, &min_fail, max_vars, bulk);
+
+		zbx_snmp_close_session(ssp);
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{
