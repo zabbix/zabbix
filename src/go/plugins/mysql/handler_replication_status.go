@@ -30,8 +30,9 @@ import (
 
 const masterKey = "Master_Host"
 
-func replicationSlaveStatusHandler(ctx context.Context, conn MyClient, params map[string]string,
-	_ ...string) (interface{}, error) {
+func replicationSlaveStatusHandler(
+	ctx context.Context, conn MyClient, params map[string]string, _ ...string,
+) (any, error) {
 	rows, err := conn.Query(ctx, `SHOW SLAVE STATUS`)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
@@ -59,7 +60,7 @@ func replicationSlaveStatusHandler(ctx context.Context, conn MyClient, params ma
 	return parseResponse(data)
 }
 
-func parseResponse(data interface{}) (interface{}, error) {
+func parseResponse(data any) (any, error) {
 	jsonRes, err := json.Marshal(data)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
