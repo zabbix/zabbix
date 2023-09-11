@@ -1913,7 +1913,7 @@ class CDashboard {
 			reference = '';
 
 			for (let i = 0; i < 5; i++) {
-				reference += String.fromCharCode(65 + Math.floor(Math.random() * 26));
+				reference += String.fromCharCode(65 + Math.floor(Math.random() * 26 + 0.5));
 			}
 		}
 		while (references.has(reference));

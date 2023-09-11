@@ -817,10 +817,11 @@ window.widget_svggraph_form = new class {
 		const preview_container = preview.parentElement;
 		const preview_computed_style = getComputedStyle(preview);
 		const contents_width = Math.floor(parseFloat(preview_computed_style.width));
-		const contents_height = Math.floor(parseFloat(preview_computed_style.height));
+		const contents_height = Math.floor(parseFloat(preview_computed_style.height)) - 10;
 
 		const fields = getFormFields(this._form);
 
+		fields.override_hostid = this.#resolveOverrideHostId();
 		fields.time_period = this.#resolveTimePeriod(fields.time_period);
 
 		const data = {
@@ -937,5 +938,14 @@ window.widget_svggraph_form = new class {
 			from: time_period.from,
 			to: time_period.to
 		};
+	}
+
+	#resolveOverrideHostId() {
+		return ZABBIX.EventHub.getData({
+			context: 'dashboard',
+			event_type: 'broadcast',
+			reference: CDashboard.REFERENCE_DASHBOARD,
+			type: '_hostid'
+		});
 	}
 };

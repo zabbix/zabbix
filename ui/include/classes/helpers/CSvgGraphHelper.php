@@ -296,7 +296,7 @@ class CSvgGraphHelper {
 	private static function applyOverrides(array &$metrics, string $templateid, string $override_hostid,
 			array $overrides = []): void {
 		if ($templateid !== '' && $override_hostid !== '') {
-			$dynamic_host = API::Host()->get([
+			$override_host = API::Host()->get([
 				'output' => ['name'],
 				'hostids' => [$override_hostid]
 			]);
@@ -315,7 +315,7 @@ class CSvgGraphHelper {
 			}
 
 			if ($templateid !== '' && $override_hostid !== '') {
-				$override['hosts'] = [$dynamic_host[0]['name']];
+				$override['hosts'] = [$override_host[0]['name']];
 			}
 
 			// Convert timeshift to seconds.
@@ -843,11 +843,11 @@ class CSvgGraphHelper {
 		}
 
 		if ($templateid !== '' && $override_hostid !== '') {
-			$dynamic_host = API::Host()->get([
+			$override_host = API::Host()->get([
 				'output' => ['name'],
 				'hostids' => [$override_hostid]
 			]);
-			$problem_options['problemhosts'] = [$dynamic_host[0]['name']];
+			$problem_options['problemhosts'] = [$override_host[0]['name']];
 		}
 
 		$options = [
