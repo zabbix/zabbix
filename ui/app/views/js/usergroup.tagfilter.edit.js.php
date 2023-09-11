@@ -78,7 +78,7 @@ window.tag_filter_edit = new class {
 
 		const ms = document.getElementById('ms_new_tag_filter_groupids_');
 
-		$(ms).multiSelect($(ms).data('params'));
+		$(ms).multiSelect();
 
 		$(ms).on('change', () => {
 			$(ms).multiSelect('setDisabledEntries',
