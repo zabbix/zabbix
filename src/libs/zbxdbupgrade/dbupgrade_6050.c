@@ -923,16 +923,6 @@ static int	DBpatch_6050087(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050088(void)
-{
-	return SUCCEED;
-}
-
-static int	DBpatch_6050089(void)
-{
-	return SUCCEED;
-}
-
 static int	DBpatch_6050090(void)
 {
 	const zbx_db_field_t	old_field = {"info", "", NULL, NULL, 0, ZBX_TYPE_SHORTTEXT, ZBX_NOTNULL, 0};
@@ -1035,8 +1025,6 @@ DBPATCH_ADD(6050084, 0, 1)
 DBPATCH_ADD(6050085, 0, 1)
 DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
-DBPATCH_ADD(6050088, 0, 1)
-DBPATCH_ADD(6050089, 0, 1)
 DBPATCH_ADD(6050090, 0, 1)
 
 DBPATCH_END()
