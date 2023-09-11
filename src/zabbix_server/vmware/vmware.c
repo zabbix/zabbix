@@ -1741,10 +1741,10 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
 
 	zbx_vector_str_create(&ips);
 
-	zbx_snprintf(xpath, sizeof(xpath), ZBX_XNN("GuestNicInfo") "[*[local-name()='macAddress']/text()='%s']"
-			ZBX_XPATH_LN("ipAddress") , mac_addr);
+	zbx_snprintf(xpath, sizeof(xpath), "*[*[local-name()='macAddress']/text()='%s']" ZBX_XPATH_LN("ipAddress") ,
+			mac_addr);
 
-	if (FAIL == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
+	if (SUCCEED == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
 	{
 		zbx_json_initarray(&json_data, VMWARE_SHORT_STR_LEN);
 
