@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-error_reporting(E_ALL ^ E_DEPRECATED);
 
 use PHPUnit\Framework\TestCase;
 
