@@ -111,7 +111,7 @@ typedef struct
 }
 zbx_discoverer_manager_t;
 
-extern unsigned char			program_type;
+//extern unsigned char			program_type;
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 #define ZBX_DISCOVERER_STARTUP_TIMEOUT	30
@@ -955,7 +955,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 }
 
 static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_t *incomplete_druleids,
-		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts)
+		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts, unsigned char program_type)
 {
 	int				rule_count = 0, delay, i, k;
 	char				*delay_str = NULL;
@@ -1797,7 +1797,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					discoverer_check_count_compare);
 
 			rule_count = process_discovery(&nextcheck, discoverer_args_in->config_timeout,
-					&incomplete_druleids, &jobs, &check_counts);
+					&incomplete_druleids, &jobs, &check_counts, discoverer_args_in->zbx_get_program_type_cb_arg());
 
 			if (0 == nextcheck)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;

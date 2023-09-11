@@ -3,6 +3,7 @@
 noinst_LIBRARIES = libzbxcommon.a
 
 libzbxcommon_a_SOURCES = \
+	common_internal.c \
 	libc_wrappers.c \
 	misc.c \
 	setproctitle.c \

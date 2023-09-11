@@ -962,8 +962,8 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 	if ('\0' == *tmpfile_uniq)
 		zbx_snprintf(tmpfile_uniq, sizeof(tmpfile_uniq), "%li", zbx_get_thread_id());
 
-	zbx_snprintf(filename, sizeof(filename), "%s/%s_%s.pinger", config_icmpping->get_tmpdir(), progname,
-			tmpfile_uniq);
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_%s.pinger", config_icmpping->get_tmpdir(),
+			config_icmpping->get_progname(), tmpfile_uniq);
 
 #ifdef HAVE_IPV6
 	if (NULL != config_icmpping->get_source_ip())

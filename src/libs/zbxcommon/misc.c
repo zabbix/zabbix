@@ -18,6 +18,9 @@
 **/
 
 #include "zbxcommon.h"
+
+#include "common_internal.h"
+
 #include "zbxstr.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
@@ -232,16 +235,14 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  * Purpose: print application parameters on stdout with layout suitable for   *
  *          80-column terminal                                                *
  *                                                                            *
- * Comments:  usage_message - is global variable which must be initialized    *
- *                            in each zabbix application                      *
- *                                                                            *
+ * Comments:  p - IN usage_message                                            *
  ******************************************************************************/
-void	zbx_usage(void)
+void	zbx_usage(const char **p)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
 #define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
-	const char	**p = usage_message;
+  //const char	**p = usage_message;
 
 	if (NULL != *p)
 		printf("usage:\n");
@@ -250,8 +251,8 @@ void	zbx_usage(void)
 	{
 		size_t	pos;
 
-		printf("%s%s", ZBX_SPACE1, progname);
-		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(progname);
+		printf("%s%s", ZBX_SPACE1, common_get_progname()());
+		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(common_get_progname()());
 
 		while (NULL != *p)
 		{
@@ -298,16 +299,14 @@ static const char	help_message_footer[] =
  *          request with parameter '-h'                                       *
  *                                                                            *
  * Parameters: param - pointer to modification parameter                      *
- *                                                                            *
- * Comments:  help_message - is global variable which must be initialized     *
- *                            in each zabbix application                      *
+ *                 p - help_message                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_help(const char *param)
+void	zbx_help(const char *param, const char **p, const char **usage_message)
 {
-	const char	**p = help_message;
+  //	const char	**p = help_message;
 
-	zbx_usage();
+	zbx_usage(usage_message);
 	printf("\n");
 
 	while (NULL != *p)
@@ -334,11 +333,8 @@ void	zbx_help(const char *param)
  * Purpose: print version and compilation time of application on stdout       *
  *          by application request with parameter '-V'                        *
  *                                                                            *
- * Comments:  title_message - is global variable which must be initialized    *
- *                            in each zabbix application                      *
- *                                                                            *
  ******************************************************************************/
-void	zbx_version(void)
+void	zbx_version(const char *title_message)
 {
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
@@ -565,7 +561,7 @@ void	zbx_error(const char *fmt, ...)
 
 	va_start(args, fmt);
 
-	fprintf(stderr, "%s [%li]: ", progname, zbx_get_thread_id());
+	fprintf(stderr, "%s [%li]: ", common_get_progname()(), zbx_get_thread_id());
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 	fflush(stderr);

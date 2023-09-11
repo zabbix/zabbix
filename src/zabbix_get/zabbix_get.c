@@ -27,10 +27,11 @@
 #	include "zbxnix.h"
 #endif
 
-const char	*progname = NULL;
-const char	title_message[] = "zabbix_get";
-const char	syslog_app_name[] = "zabbix_get";
-const char	*usage_message[] = {
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
+//static const char	*progname = NULL;
+static const char	title_message[] = "zabbix_get";
+//static const char	syslog_app_name[] = "zabbix_get";
+static const char	*usage_message[] = {
 	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "[-t timeout]", "-k item-key", NULL,
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "[-t timeout]", "--tls-connect cert",
@@ -58,12 +59,7 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-unsigned char	program_type	= ZBX_PROGRAM_TYPE_GET;
-
-static unsigned char	get_program_type(void)
-{
-	return program_type;
-}
+ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_GET)
 
 #define CONFIG_GET_TIMEOUT_MIN		1
 #define CONFIG_GET_TIMEOUT_MAX		30
@@ -311,6 +307,8 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int		zbx_optind = 0;
 
+	zbx_init_library_common(NULL, get_zbx_progname);
+
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{
@@ -320,7 +318,7 @@ int	main(int argc, char **argv)
 #endif
 	zbx_config_tls = zbx_config_tls_new();
 
-	progname = get_program_name(argv[0]);
+	zbx_progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -356,10 +354,10 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				zbx_help(NULL);
+				zbx_help(NULL, help_message, usage_message);
 				exit(EXIT_SUCCESS);
 			case 'V':
-				zbx_version();
+				zbx_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
@@ -434,7 +432,7 @@ int	main(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_usage();
+				zbx_usage(usage_message);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -450,7 +448,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == host || NULL == key)
 	{
-		zbx_usage();
+		zbx_usage(usage_message);
 		ret = FAIL;
 	}
 
@@ -486,7 +484,7 @@ int	main(int argc, char **argv)
 
 	if (FAIL == ret)
 	{
-		printf("Try '%s --help' for more information.\n", progname);
+		printf("Try '%s --help' for more information.\n", zbx_progname);
 		goto out;
 	}
 
@@ -497,17 +495,17 @@ int	main(int argc, char **argv)
 			NULL != zbx_config_tls->cipher_cmd13 || NULL != zbx_config_tls->cipher_cmd)
 	{
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_program_type);
+		zbx_tls_validate_config(zbx_config_tls, 0, 0, get_zbx_program_type);
 
 		if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 		{
 #if defined(_WINDOWS)
-			zbx_tls_init_parent(get_program_type);
+			zbx_tls_init_parent(get_zbx_program_type);
 #endif
-			zbx_tls_init_child(zbx_config_tls, get_program_type);
+			zbx_tls_init_child(zbx_config_tls, get_zbx_program_type);
 		}
 #else
-		ZBX_UNUSED(get_program_type);
+		ZBX_UNUSED(get_zbx_program_type);
 #endif
 	}
 #if !defined(_WINDOWS)

@@ -23,10 +23,10 @@
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 
-const char	*progname;
-const char	title_message[] = "zabbix_js";
-const char	syslog_app_name[] = "zabbix_js";
-const char	*usage_message[] = {
+static const char	*progname;
+static const char	title_message[] = "zabbix_js";
+static const char	syslog_app_name[] = "zabbix_js";
+static const char	*usage_message[] = {
 	"-s script-file", "-p input-param", "[-l log-level]", "[-t timeout]", NULL,
 	"-s script-file", "-i input-file", "[-l log-level]", "[-t timeout]", NULL,
 	"-h", NULL,
@@ -34,7 +34,7 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-unsigned char	program_type;
+static unsigned char	program_type;
 
 #define JS_TIMEOUT_MIN		1
 #define JS_TIMEOUT_MAX		60
@@ -43,7 +43,7 @@ unsigned char	program_type;
 #define JS_TIMEOUT_MAX_STR	ZBX_STR(JS_TIMEOUT_MAX)
 #define JS_TIMEOUT_DEF_STR	ZBX_STR(JS_TIMEOUT_DEF)
 
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"Execute script using Zabbix embedded scripting engine.",
 	"",
 	"General options:",
@@ -136,7 +136,7 @@ int	main(int argc, char **argv)
 
 	progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -170,15 +170,15 @@ int	main(int argc, char **argv)
 
 				break;
 			case 'h':
-				zbx_help(NULL);
+				zbx_help(NULL, help_message, usage_message, progname);
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
-				zbx_version();
+				zbx_version(title_message);
 				ret = SUCCEED;
 				goto clean;
 			default:
-				zbx_usage();
+				zbx_usage(usage_message);
 				goto clean;
 		}
 	}
@@ -189,7 +189,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, syslog_app_name, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;
@@ -197,7 +197,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		zbx_usage();
+		zbx_usage(usage_message, progname);
 		goto close;
 	}
 

@@ -72,10 +72,12 @@
 #include "../zabbix_server/ipmi/ipmi_poller.h"
 #endif
 
-const char	*progname = NULL;
-const char	title_message[] = "zabbix_proxy";
-const char	syslog_app_name[] = "zabbix_proxy";
-const char	*usage_message[] = {
+//static const char	*progname = NULL;
+ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
+
+static const char	title_message[] = "zabbix_proxy";
+static const char	syslog_app_name[] = "zabbix_proxy";
+static const char	*usage_message[] = {
 	"[-c config-file]", NULL,
 	"[-c config-file]", "-R runtime-option", NULL,
 	"-h", NULL,
@@ -83,7 +85,7 @@ const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"A Zabbix daemon that collects monitoring data from devices and sends it to",
 	"Zabbix server.",
 	"",
@@ -1156,7 +1158,8 @@ int	main(int argc, char **argv)
 		get_zbx_config_source_ip,
 		get_zbx_config_fping_location,
 		get_zbx_config_fping6_location,
-		get_zbx_config_tmpdir};
+		get_zbx_config_tmpdir,
+		get_zbx_progname};
 
 	ZBX_TASK_EX			t = {ZBX_TASK_START};
 	char				ch;
@@ -1191,11 +1194,11 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				zbx_help(NULL);
+				zbx_help(NULL, help_message);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				zbx_version();
+				zbx_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
@@ -1206,7 +1209,7 @@ int	main(int argc, char **argv)
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				zbx_usage();
+				zbx_usage(usage_message);
 				exit(EXIT_FAILURE);
 				break;
 		}
@@ -1253,7 +1256,7 @@ int	main(int argc, char **argv)
 			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
-	zbx_init_library_preproc(preproc_flush_value_proxy);
+	zbx_init_library_preproc(preproc_flush_value_proxy, get_zbx_progname);
 	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
@@ -1372,9 +1375,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_ssl_ca_location, config_ssl_cert_location,
 								config_ssl_key_location};
 	zbx_thread_args_t			thread_args;
-	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
-								config_startup_time, config_unavailable_delay,
-								config_unreachable_period, config_unreachable_delay,
+	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, get_zbx_progname,
+								ZBX_NO_POLLER, config_startup_time,
+								config_unavailable_delay, config_unreachable_period,
+								config_unreachable_delay,
 								config_max_concurrent_checks_per_poller};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, zbx_config_timeout,
@@ -1434,7 +1438,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
 	{
 		zbx_error("cannot open log:%s", error);
 		zbx_free(error);

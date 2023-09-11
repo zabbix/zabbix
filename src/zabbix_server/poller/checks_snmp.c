@@ -2990,7 +2990,7 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
-	init_snmp(progname);
+	init_snmp(poller_get_progname()());
 	zbx_snmp_init_done = 1;
 
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
@@ -3007,7 +3007,7 @@ static void	zbx_shutdown_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
-	snmp_shutdown(progname);
+	snmp_shutdown(poller_get_progname()());
 	zbx_snmp_init_done = 0;
 
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);

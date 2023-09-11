@@ -38,8 +38,11 @@ static int	parent_pid = -1;
 /* pointer to function for getting caller's PID file location */
 static zbx_get_pid_file_pathname_f	get_pid_file_pathname_cb = NULL;
 
-extern pid_t	*threads;
-extern int	threads_num;
+//extern pid_t	*threads;
+static zbx_get_threads_f	get_threads_func_cb;
+static zbx_get_config_int_f	get_threads_num_func_cb;
+
+//extern int	threads_num;
 
 extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num);
@@ -86,7 +89,7 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	s.sival_ptr = NULL;
 	s.ZBX_SIVAL_INT = flags;
 
-	for (i = 0; i < threads_num; i++)
+	for (i = 0; i < get_threads_num_func_cb(); i++)
 	{
 		if (FAIL == get_process_info_by_thread(i + 1, &process_type, &process_num))
 			break;
@@ -105,10 +108,10 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 
 		found = 1;
 
-		if (-1 != sigqueue(threads[i], SIGUSR1, s))
+		if (-1 != sigqueue((get_threads_func_cb())[i], SIGUSR1, s))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to \"%s\" process"
-					" pid:%d", get_process_type_string(process_type), threads[i]);
+					" pid:%d", get_process_type_string(process_type), (get_threads_func_cb())[i]);
 		}
 		else
 		{
@@ -148,16 +151,17 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	s.sival_ptr = NULL;
 	s.ZBX_SIVAL_INT = flags;
 
-	for (i = 0; i < threads_num; i++)
+	for (i = 0; i < get_threads_num_func_cb(); i++)
 	{
-		if ((0 != pid && threads[i] != pid) || 0 == threads[i])
+		if ((0 != pid && (get_threads_func_cb())[i] != pid) || 0 == (get_threads_func_cb())[i])
 			continue;
 
 		found = 1;
 
-		if (-1 != sigqueue(threads[i], SIGUSR1, s))
+		if (-1 != sigqueue((get_threads_func_cb())[i], SIGUSR1, s))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d", threads[i]);
+			zabbix_log(LOG_LEVEL_DEBUG, "the signal was redirected to process pid:%d",
+					(get_threads_func_cb())[i]);
 		}
 		else
 		{
@@ -196,9 +200,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	ZBX_UNUSED(context);
 
 #ifdef HAVE_SIGQUEUE
-	int	flags;
-
-	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
+	int	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
 
 	if (!SIG_PARENT_PROCESS)
 	{
@@ -206,10 +208,10 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 		return;
 	}
 
-	if (NULL == threads)
+	if (NULL == (get_threads_func_cb()))
 		return;
 
-	if(signal_redirect_handler != NULL)
+	if (signal_redirect_handler != NULL)
 		signal_redirect_handler(flags, sigusr_handler);
 #endif
 }
@@ -258,11 +260,14 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
  ******************************************************************************/
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
-		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb)
+		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb,
+		zbx_get_threads_f get_threads_cb, zbx_get_config_int_f get_threads_num_cb)
 {
 	struct passwd	*pwd;
 
 	get_pid_file_pathname_cb = get_pid_file_cb;
+	get_threads_func_cb = get_threads_cb;
+	get_threads_num_func_cb = get_threads_num_cb;
 
 	if (0 == allow_root && 0 == getuid())	/* running as root? */
 	{

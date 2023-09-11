@@ -19,6 +19,8 @@
 
 #include "item_preproc.h"
 #include "preproc_snmp.h"
+#include "pp_manager.h"
+
 #include "zbxjson.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
@@ -998,7 +1000,7 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
-	init_snmp(progname);
+	init_snmp(preproc_get_progname_cb()());
 	netsnmp_init_mib();
 	zbx_snmp_init_done = 1;
 
@@ -1024,7 +1026,7 @@ void	preproc_shutdown_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
-	snmp_shutdown(progname);
+	snmp_shutdown(preproc_get_progname_cb()());
 	zbx_snmp_init_done = 0;
 
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);

@@ -19,6 +19,8 @@
 
 #include "zbxcommon.h"
 
+#include "common_internal.h"
+
 #define LOG_LEVEL_DEC_FAIL	-2
 #define LOG_LEVEL_DEC_SUCCEED	-1
 #define LOG_LEVEL_UNCHANGED	0
@@ -27,24 +29,18 @@
 
 static int			log_level = LOG_LEVEL_WARNING;
 static ZBX_THREAD_LOCAL int	*plog_level = &log_level;
-static zbx_log_func_t		log_func_callback = NULL;
 
 #define LOG_COMPONENT_NAME_LEN	64
 static ZBX_THREAD_LOCAL int	log_level_change = LOG_LEVEL_UNCHANGED;
 static ZBX_THREAD_LOCAL char	log_component_name[LOG_COMPONENT_NAME_LEN + 1];
 #undef LOG_COMPONENT_NAME_LEN
 
-void	zbx_init_library_common(zbx_log_func_t log_func)
-{
-	log_func_callback = log_func;
-}
-
 void	zbx_log_handle(int level, const char *fmt, ...)
 {
 	va_list args;
 
 	va_start(args, fmt);
-	log_func_callback(level, fmt, args);
+	common_get_log_func()(level, fmt, args);
 	va_end(args);
 }
 
