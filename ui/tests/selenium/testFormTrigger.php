@@ -614,7 +614,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process.',
 					'url_name' => 'Trigger context menu name for trigger URL.',
-					'url' => 'http://www.zabbix.com',
+					'url' => 'https://www.zabbix.com',
 					'severity' => 'High',
 					'status' => false
 				]
