@@ -118,6 +118,13 @@ window.tophosts_column_edit_form = new class {
 				this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
 		}
 
+		// Displays or hides override time period fields based on 'Data' value change.
+		document.querySelector('[name="data"]').onchange = () => (
+			data_item_value
+				? aggregate_options.dispatchEvent(new Event('change'))
+				: override_fields.forEach(element => element.style.display = 'none')
+		);
+
 		// Toggle visibility of disabled form elements.
 		$('.form-grid > label', this._$widget_form).each((i, elm) => {
 			const except_fields = 'override-time';
