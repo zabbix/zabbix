@@ -1162,7 +1162,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 #ifdef _AIX
 int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode)
 {
-	ZBX_CPUS_UTIL_DATA_AIX	*p = &collector->cpus_phys_util;
+	ZBX_CPUS_UTIL_DATA_AIX	*p = &(get_collector())->cpus_phys_util;
 	int			time_interval, offset;
 
 	if (ZBX_CPUNUM_ALL != cpu_num && p->column_num - 2 < cpu_num)
@@ -1186,7 +1186,7 @@ int	get_cpustat_physical(AGENT_RESULT *result, int cpu_num, int state, int mode)
 			return SYSINFO_RET_FAIL;
 	}
 
-	if (0 == cpu_collector_started(collector))
+	if (0 == cpu_collector_started())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;

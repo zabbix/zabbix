@@ -27,7 +27,7 @@ int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_MAX_WAIT_VMSTAT	2	/* maximum seconds to wait for vmstat data on the first call */
 	int	wait = ZBX_MAX_WAIT_VMSTAT;
 #undef ZBX_MAX_WAIT_VMSTAT
-	const zbx_collector_data	*collector = get_collector();
+	zbx_collector_data	*collector = get_collector();
 
 	if (!VMSTAT_COLLECTOR_STARTED(collector))
 	{

@@ -236,7 +236,7 @@ static const char	*zbx_get_vfs_name_by_type(int type)
 
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int		rc, sz, ret = SYSINFO_RET_FAIL;
+	int		rc, sz, i, ret = SYSINFO_RET_FAIL;
 	struct vmount	*vms = NULL, *vm;
 	struct zbx_json	j;
 
@@ -262,7 +262,7 @@ int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (int i = 0, vm = vms; i < rc; i++)
+	for (i = 0, vm = vms; i < rc; i++)
 	{
 		zbx_json_addobject(&j, NULL);
 		zbx_json_addstring(&j, ZBX_LLD_MACRO_FSNAME, (char *)vm + vm->vmt_data[VMT_STUB].vmt_off,
@@ -292,7 +292,7 @@ error:
 
 static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			rc, sz, ret = SYSINFO_RET_FAIL;
+	int			rc, sz, i, ret = SYSINFO_RET_FAIL;
 	struct vmount		*vms = NULL, *vm;
 	struct zbx_json		j;
 	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
@@ -323,7 +323,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
 		goto out;
 	}
-	for (int i = 0, vm = vms; i < rc; i++)
+	for (i = 0, vm = vms; i < rc; i++)
 	{
 		char	*mntopts;
 
@@ -371,7 +371,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	for (int i = 0, vm = vms; i < rc; i++)
+	for (i = 0, vm = vms; i < rc; i++)
 	{
 		int	idx;
 		char	type[MAX_STRING_LEN];
