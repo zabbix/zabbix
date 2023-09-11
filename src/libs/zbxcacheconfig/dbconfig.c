@@ -15101,6 +15101,13 @@ out:
 	return ret;
 }
 
+static void	dc_um_cache_wrap(zbx_um_cache_t *um_cache, unsigned char env, zbx_dc_um_handle_t *um_handle)
+{
+	um_handle->macro_env = env;
+	um_handle->cache = &um_cache;
+	um_handle->prev = NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: expand user macros in the specified text value                    *
@@ -15116,7 +15123,9 @@ int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, 
 		int hostids_num, char **error)
 {
 	/* wrap the passed user macro cache into user macro handle structure */
-	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache};
+	zbx_dc_um_handle_t	um_handle;
+
+	dc_um_cache_wrap(um_cache, ZBX_MACRO_ENV_SECURE, &um_handle);
 
 	return zbx_dc_expand_user_macros(&um_handle, text, hostids, hostids_num, error);
 }
