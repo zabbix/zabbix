@@ -1260,9 +1260,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
  ******************************************************************************/
 void	zbx_free_service_resources(int ret)
 {
-#ifdef _WINDOWS
-	zbx_locks_disable();
-#endif
 	if (NULL != threads)
 	{
 		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */

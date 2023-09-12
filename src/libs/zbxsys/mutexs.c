@@ -21,10 +21,6 @@
 
 #include "log.h"
 
-#if defined(HAVE_PTHREAD_PROCESS_SHARED) || defined(_WINDOWS)
-static int	locks_disabled;
-#endif
-
 #ifdef _WINDOWS
 #	include "sysinfo.h"
 #else
@@ -37,7 +33,7 @@ typedef struct
 zbx_shared_lock_t;
 
 static zbx_shared_lock_t	*shared_lock;
-static int			shm_id;
+static int			shm_id, locks_disabled;
 #else
 #	if !HAVE_SEMUN
 		union semun
@@ -338,10 +334,6 @@ void	zbx_rwlock_destroy(zbx_rwlock_t *rwlock)
 	*rwlock = ZBX_RWLOCK_NULL;
 }
 
-#endif
-#endif	/* _WINDOWS */
-
-#if defined(HAVE_PTHREAD_PROCESS_SHARED) || defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Purpose:  disable locks                                                    *
@@ -363,74 +355,9 @@ void	zbx_locks_enable(void)
 	/* attempting to destroy a locked pthread mutex results in undefined behavior */
 	locks_disabled = 0;
 }
+
 #endif
-
-#ifdef _WINDOWS
-
-static ZBX_THREAD_LOCAL int	zbx_mutex_glob_couner;	/* required for recursive locking */
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Create the semaphore                                              *
- *                                                                            *
- * Parameters:  mutex - handle of semaphore                                   *
- *              name - name of semaphore                                      *
- *                                                                            *
- * Return value: If the function succeeds, then return SUCCEED,               *
- *               FAIL on an error                                             *
- *                                                                            *
- ******************************************************************************/
-int	zbx_mutex_glob_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
-{
-	if (NULL == (*mutex = CreateSemaphore(NULL, 1, 1, name)))
-	{
-		*error = zbx_dsprintf(*error, "error on semaphore creating: %s", strerror_from_system(GetLastError()));
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Waits until semaphore to become positive                          *
- *                                                                            *
- * Parameters: mutex - handle of mutex                                        *
- *                                                                            *
- ******************************************************************************/
-void	__zbx_mutex_glob_lock(const char *filename, int line, zbx_mutex_t mutex)
-{
-	if (0 == zbx_mutex_glob_couner)
-		__zbx_mutex_lock(filename, line, mutex);
-
-	zbx_mutex_glob_couner++;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Release the semaphore                                             *
- *                                                                            *
- * Parameters: mutex - handle of semaphore                                    *
- *                                                                            *
- ******************************************************************************/
-void	__zbx_mutex_glob_unlock(const char *filename, int line, zbx_mutex_t mutex)
-{
-	zbx_mutex_glob_couner--;
-
-	if (ZBX_MUTEX_NULL == mutex)
-		return;
-
-	if (0 != locks_disabled)
-		return;
-
-	if (0 == zbx_mutex_glob_couner && 0 == ReleaseSemaphore(mutex, 1, NULL))
-	{
-		zbx_error("[file:'%s',line:%d] unlock semaphore failed: %s",
-				filename, line, strerror_from_system(GetLastError()));
-		exit(EXIT_FAILURE);
-	}
-}
-#endif
+#endif	/* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
@@ -492,14 +419,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (0 != locks_disabled)
-		return;
-
-	while (WAIT_TIMEOUT == (dwWaitResult = WaitForSingleObject(mutex, 1000)))
-	{
-		if (0 != locks_disabled)
-			return;
-	}
+	dwWaitResult = WaitForSingleObject(mutex, INFINITE);
 
 	switch (dwWaitResult)
 	{
@@ -559,9 +479,6 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 		return;
 
 #ifdef _WINDOWS
-	if (0 != locks_disabled)
-		return;
-
 	if (0 == ReleaseMutex(mutex))
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s",

@@ -45,28 +45,12 @@ ZBX_PERF_STAT_DATA;
 
 static ZBX_PERF_STAT_DATA	ppsd;
 static zbx_mutex_t		perfstat_access = ZBX_MUTEX_NULL;
-static CRITICAL_SECTION		perfstat_worker_cs;
-static int			perfstat_worker_counter;
 
 static struct object_name_ref	*object_names = NULL;
 static int			object_num = 0;
 
-#define LOCK_PERFCOUNTERS	zbx_mutex_glob_lock(perfstat_access)
-#define UNLOCK_PERFCOUNTERS	zbx_mutex_glob_unlock(perfstat_access)
-
-#define LOCK_PERFCOUNTERS_RO					\
-		EnterCriticalSection(&perfstat_worker_cs);	\
-		perfstat_worker_counter++;			\
-		if (1 == perfstat_worker_counter)		\
-			LOCK_PERFCOUNTERS;			\
-		LeaveCriticalSection(&perfstat_worker_cs)
-
-#define UNLOCK_PERFCOUNTERS_RO					\
-		EnterCriticalSection(&perfstat_worker_cs);	\
-		perfstat_worker_counter--;			\
-		if (0 == perfstat_worker_counter)		\
-			UNLOCK_PERFCOUNTERS;			\
-		LeaveCriticalSection(&perfstat_worker_cs)
+#define LOCK_PERFCOUNTERS	zbx_mutex_lock(perfstat_access)
+#define UNLOCK_PERFCOUNTERS	zbx_mutex_unlock(perfstat_access)
 
 static int	perf_collector_started(void)
 {
@@ -446,9 +430,8 @@ int	init_perf_collector(zbx_threadedness_t threadedness, char **error)
 		case ZBX_SINGLE_THREADED:
 			break;
 		case ZBX_MULTI_THREADED:
-			if (SUCCEED != zbx_mutex_glob_create(&perfstat_access, ZBX_MUTEX_PERFSTAT, error))
+			if (SUCCEED != zbx_mutex_create(&perfstat_access, ZBX_MUTEX_PERFSTAT, error))
 				goto out;
-			InitializeCriticalSection(&perfstat_worker_cs);
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -507,8 +490,7 @@ void	free_perf_collector(void)
 
 	UNLOCK_PERFCOUNTERS;
 
-	zbx_mutex_glob_destroy(&perfstat_access);
-	DeleteCriticalSection(&perfstat_worker_cs);
+	zbx_mutex_destroy(&perfstat_access);
 }
 
 void	collect_perfstat(void)
@@ -697,14 +679,8 @@ out:
 
 	if (NULL != counterpath)
 	{
-		PDH_STATUS	pdh_status;
-
-		LOCK_PERFCOUNTERS_RO;
-
 		/* request counter value directly from Windows performance counters */
-		pdh_status = calculate_counter_value(__func__, counterpath, perfs->lang, value);
-
-		UNLOCK_PERFCOUNTERS_RO;
+		PDH_STATUS pdh_status = calculate_counter_value(__func__, counterpath, perfs->lang, value);
 
 		if (PDH_NOT_IMPLEMENTED == pdh_status)
 			*error = zbx_strdup(*error, "Counter is not supported for this Microsoft Windows version");
@@ -779,13 +755,9 @@ out:
 
 	if (SUCCEED != ret && NULL != perfs)
 	{
-		LOCK_PERFCOUNTERS_RO;
-
 		/* request counter value directly from Windows performance counters */
 		if (ERROR_SUCCESS == calculate_counter_value(__func__, counterpath, lang, value))
 			ret = SUCCEED;
-
-		UNLOCK_PERFCOUNTERS_RO;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
