@@ -376,7 +376,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'columns.name.0',
-										'value' => ''
+										'value' => 'Column 1'
 									],
 									[
 										'type' => 1,
