@@ -471,7 +471,7 @@ out:
  ******************************************************************************/
 void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
-	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO, ZBX_BACKSLASH_ESC_OFF, param_pos, length, sep_pos);
+	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO, ZBX_BACKSLASH_ESC_ON, param_pos, length, sep_pos);
 }
 
 /******************************************************************************
@@ -490,7 +490,7 @@ void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_
 void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
 	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO | ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
-			ZBX_BACKSLASH_ESC_OFF, param_pos, length, sep_pos);
+			ZBX_BACKSLASH_ESC_ON, param_pos, length, sep_pos);
 }
 
 /******************************************************************************
