@@ -94,12 +94,12 @@ class CControllerHostGroupEdit extends CController{
 					'preservekeys' => true
 				]);
 
-				foreach ($data['discoveryRules'] as &$discoveryRule) {
-					$discoveryRule['is_discovery_rule_editable'] = array_key_exists($discoveryRule['itemid'],
+				foreach ($data['discoveryRules'] as &$discovery_rule) {
+					$discovery_rule['is_discovery_rule_editable'] = array_key_exists($discovery_rule['itemid'],
 						$editable_discovery_ruleids
 					);
 				}
-				unset($discoveryRule);
+				unset($discovery_rule);
 
 				$host_prototypes_itemids = API::HostPrototype()->get([
 					'output' => ['hostid'],
