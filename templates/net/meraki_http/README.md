@@ -24,7 +24,7 @@ You must set {$MERAKI.TOKEN} and {$MERAKI.API.URL} macros.
 
 Create the token in the Meraki dashboard (see Meraki [documentation](https://developer.cisco.com/meraki/api-latest/#!authorization/authorization) for instructions). Set this token as {$MERAKI.TOKEN} macro value in Zabbix.
 
-Set your Meraki dashboard URl as {$MERAKI.API.URL} macro value in Zabbix (e.g., api.meraki.com/api/v1).
+Set your Meraki dashboard URL as {$MERAKI.API.URL} macro value in Zabbix (e.g., api.meraki.com/api/v1).
 
 Set filters with macros if you want to override default filter parameters.
 
@@ -33,8 +33,8 @@ Set filters with macros if you want to override default filter parameters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MERAKI.TOKEN}|<p>Cisco Meraki Dashboard API Token.</p>||
-|{$MERAKI.API.URL}|<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
+|{$MERAKI.TOKEN}|<p>Cisco Meraki dashboard API token.</p>||
+|{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
 |{$MERAKI.ORGANIZATION.NAME.MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`.+`|
 |{$MERAKI.ORGANIZATION.NAME.NOT_MATCHES}|<p>This macro is used in organizations discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.DEVICE.NAME.MATCHES}|<p>This macro is used in devices discovery. Can be overridden on the host or linked template level.</p>|`.+`|
@@ -74,10 +74,10 @@ Set filters with macros if you want to override default filter parameters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MERAKI.TOKEN}|<p>Cisco Meraki Dashboard API Token.</p>||
-|{$MERAKI.API.URL}|<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
+|{$MERAKI.TOKEN}|<p>Cisco Meraki dashboard API token.</p>||
+|{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
 |{$MERAKI.LICENSE.EXPIRE}|<p>Time in seconds for license to expire.</p>|`86400`|
-|{$MERAKI.CONFIG.CHANGE.TIMESPAN}|<p>Timespan for gathering config change log. Used in the metric config and in the URL query.</p>|`1200`|
+|{$MERAKI.CONFIG.CHANGE.TIMESPAN}|<p>Timespan for gathering configuration change log. Used in the metric configuration and in the URL query.</p>|`1200`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
@@ -98,9 +98,9 @@ Set filters with macros if you want to override default filter parameters.
 |----|-----------|----|-----------------------|
 |Meraki: Get list of the networks|<p>Item for gathering all the networks of organization from Meraki API.</p>|Script|meraki.get.networks|
 |Meraki: Networks item errors|<p>Item for gathering all the networks item errors.</p>|Dependent item|meraki.get.networks.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Meraki: Get list of the vpn stats|<p>Item for gathering all the vpn stats of the organization.</p>|Script|meraki.get.vpn.stats|
-|Meraki: VPN item errors|<p>Item for gathering all the vpn item errors.</p>|Dependent item|meraki.get.vpn.stats.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Meraki: Get list of configuration changes|<p>Item for viewing the Change Log for your organization.\nGathering once per 20m by default.</p>|HTTP agent|meraki.get.configuration.changes<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
+|Meraki: Get list of the VPN stats|<p>Item for gathering all the VPN stats of the organization.</p>|Script|meraki.get.vpn.stats|
+|Meraki: VPN item errors|<p>Item for gathering all the VPN item errors.</p>|Dependent item|meraki.get.vpn.stats.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Meraki: Get list of configuration changes|<p>Item for viewing the change log for your organization. Gathering once per 20m by default.</p>|HTTP agent|meraki.get.configuration.changes<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `2h`</p></li></ul>|
 |Meraki: Get list of adaptive policy aggregate statistics|<p>Item for adaptive policy aggregate statistics for an organization.</p>|HTTP agent|meraki.get.adaptive.policy|
 |Meraki: Groups|<p>Meraki adaptive policy groups count.</p>|Dependent item|meraki.policies.groups<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.groups`</p></li></ul>|
 |Meraki: Custom ACLs|<p>Meraki adaptive policy custom ACLs count.</p>|Dependent item|meraki.policies.custom.acls<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.customAcls`</p></li></ul>|
@@ -109,7 +109,7 @@ Set filters with macros if you want to override default filter parameters.
 |Meraki: Deny policies|<p>Meraki adaptive deny policies count.</p>|Dependent item|meraki.policies.deny<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.denyPolicies`</p></li></ul>|
 |Meraki: Get licenses info|<p>Return an overview of the license state for an organization.</p>|HTTP agent|meraki.get.licenses|
 |Meraki: License status|<p>Meraki license status.</p>|Dependent item|meraki.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Meraki: License expire|<p>Meraki license expire time in seconds left.</p>|Dependent item|meraki.license.expire<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expirationDate`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Meraki: License expire|<p>Meraki license expire time, in seconds left.</p>|Dependent item|meraki.license.expire<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expirationDate`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
@@ -169,10 +169,10 @@ Set filters with macros if you want to override default filter parameters.
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$MERAKI.TOKEN}|<p>Cisco Meraki Dashboard API Token.</p>||
-|{$MERAKI.API.URL}|<p>Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
-|{$MERAKI.DEVICE.LOSS}|<p>Devices uplink loss threshold in percents.</p>|`15`|
-|{$MERAKI.DEVICE.LATENCY}|<p>Devices uplink latency threshold in seconds.</p>|`0.15`|
+|{$MERAKI.TOKEN}|<p>Cisco Meraki dashboard API token.</p>||
+|{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
+|{$MERAKI.DEVICE.LOSS}|<p>Devices uplink loss threshold, in percents.</p>|`15`|
+|{$MERAKI.DEVICE.LATENCY}|<p>Devices uplink latency threshold, in seconds.</p>|`0.15`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
 |{$MERAKI.DEVICE.UPLINK.MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}|<p>This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.</p>|`^null$`|
@@ -186,7 +186,7 @@ Set filters with macros if you want to override default filter parameters.
 |Meraki: Get device data|<p>Item for gathering device data from Meraki API.</p>|Script|meraki.get.device|
 |Meraki: Device data item errors|<p>Item for gathering errors of the device item.</p>|Dependent item|meraki.get.device.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Meraki: status|<p>Device operational status</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.device[0].status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Meraki: public ip|<p>Device public ip</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.device[0].publicIp`</p></li></ul>|
+|Meraki: public IP|<p>Device public IP</p><p>Network: {$NETWORK.ID} </p><p>MAC: {$MAC}</p>|Dependent item|meraki.device.public.ip<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.device[0].publicIp`</p></li></ul>|
 
 ### Triggers
 

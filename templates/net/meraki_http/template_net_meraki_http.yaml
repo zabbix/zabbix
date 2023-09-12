@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-07T13:14:26Z'
+  date: '2023-09-12T11:56:19Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -72,7 +72,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -283,7 +283,7 @@ zabbix_export:
       macros:
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
-          description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
+          description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
         - macro: '{$MERAKI.DEVICE.NAME.MATCHES}'
           value: .+
           description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
@@ -306,7 +306,7 @@ zabbix_export:
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
-          description: 'Cisco Meraki Dashboard API Token.'
+          description: 'Cisco Meraki dashboard API token.'
     - uuid: 2cae7d2eeca04e6fa7419759ac9ad814
       template: 'Cisco Meraki device by HTTP'
       name: 'Cisco Meraki device by HTTP'
@@ -316,7 +316,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 2280b9212c474d99835ec1334ff780eb
-          name: 'Meraki: public ip'
+          name: 'Meraki: public IP'
           type: DEPENDENT
           key: meraki.device.public.ip
           delay: '0'
@@ -324,7 +324,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            Device public ip
+            Device public IP
             Network: {$NETWORK.ID} 
             MAC: {$MAC}
           preprocessing:
@@ -430,7 +430,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -654,13 +654,13 @@ zabbix_export:
       macros:
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
-          description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
+          description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
         - macro: '{$MERAKI.DEVICE.LATENCY}'
           value: '0.15'
-          description: 'Devices uplink latency threshold in seconds.'
+          description: 'Devices uplink latency threshold, in seconds.'
         - macro: '{$MERAKI.DEVICE.LOSS}'
           value: '15'
-          description: 'Devices uplink loss threshold in percents.'
+          description: 'Devices uplink loss threshold, in percents.'
         - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
           value: '^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$'
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
@@ -677,7 +677,7 @@ zabbix_export:
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
-          description: 'Cisco Meraki Dashboard API Token.'
+          description: 'Cisco Meraki dashboard API token.'
       dashboards:
         - uuid: 76c4525eacc64f268572fefd76accc2f
           name: 'Meraki: General'
@@ -765,7 +765,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'Item for viewing the Change Log for your organization.\nGathering once per 20m by default.'
+          description: 'Item for viewing the change log for your organization. Gathering once per 20m by default.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -861,7 +861,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -961,7 +961,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: bb653e6dba3f489494a7143b74fe8f4f
-          name: 'Meraki: Get list of the vpn stats'
+          name: 'Meraki: Get list of the VPN stats'
           type: SCRIPT
           key: meraki.get.vpn.stats
           delay: 3m
@@ -1012,7 +1012,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -1071,7 +1071,7 @@ zabbix_export:
                 'vpnStats': result,
                 'error': error_msg.toString()
             });
-          description: 'Item for gathering all the vpn stats of the organization.'
+          description: 'Item for gathering all the VPN stats of the organization.'
           timeout: 30s
           parameters:
             - name: token
@@ -1093,7 +1093,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'Item for gathering all the vpn item errors.'
+          description: 'Item for gathering all the VPN item errors.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1122,7 +1122,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Meraki license expire time in seconds left.'
+          description: 'Meraki license expire time, in seconds left.'
           valuemap:
             name: 'License status'
           preprocessing:
@@ -1713,10 +1713,10 @@ zabbix_export:
       macros:
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
-          description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
+          description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
         - macro: '{$MERAKI.CONFIG.CHANGE.TIMESPAN}'
           value: '1200'
-          description: 'Timespan for gathering config change log. Used in the metric config and in the URL query.'
+          description: 'Timespan for gathering configuration change log. Used in the metric configuration and in the URL query.'
         - macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.LICENSE.EXPIRE}'
@@ -1760,7 +1760,7 @@ zabbix_export:
           description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
-          description: 'Cisco Meraki Dashboard API Token.'
+          description: 'Cisco Meraki dashboard API token.'
       dashboards:
         - uuid: 2d10effbfff447f6937877f25d12646a
           name: 'Meraki: General'
@@ -1822,7 +1822,7 @@ zabbix_export:
           name: 'License status'
           mappings:
             - value: '0'
-              newvalue: 'License Required'
+              newvalue: 'License required'
             - value: '1'
               newvalue: OK
             - value: '10'
