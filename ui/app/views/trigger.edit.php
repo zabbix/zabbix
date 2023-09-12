@@ -108,7 +108,7 @@ else {
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
+			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'trigger_edit_popup.clone();'
