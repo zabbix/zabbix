@@ -60,7 +60,7 @@ if ($readonly) {
 
 $triggers_tab = (new CTabView())
 	->addTab('triggersTab', _('Trigger'),
-		new CPartial('trigger.edit.trigger.tab', $data += [
+		new CPartial('trigger.edit.trigger.tab', $data + [
 			'discovered_trigger' => $discovered_trigger,
 			'readonly' => $readonly,
 			'form_name' => $trigger_form->getName()
@@ -79,7 +79,7 @@ $triggers_tab = (new CTabView())
 		TAB_INDICATOR_TAGS
 	)
 	->addTab('dependenciesTab', _('Dependencies'),
-		new CPartial('trigger.edit.dependencies.tab', $data += [
+		new CPartial('trigger.edit.dependencies.tab', $data + [
 			'discovered_trigger' => $discovered_trigger
 		]),
 		TAB_INDICATOR_DEPENDENCY);
