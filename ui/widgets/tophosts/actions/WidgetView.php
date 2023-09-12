@@ -67,11 +67,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getData(): array {
+	private function getData(): array
+	{
 		$dashboard_time = false;
+		$from = null;
+		$to = null;
 
 		foreach ($this->fields_values['columns'] as $column) {
-			if (!array_key_exists('item_time', $column)) {
+			if ($column['aggregate_function'] != AGGREGATE_NONE && !array_key_exists('item_time', $column)) {
 				$dashboard_time = true;
 			}
 		}
@@ -79,28 +82,28 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($dashboard_time) {
 			$from = $this->getInput('from');
 			$to = $this->getInput('to');
+
+			foreach ($this->fields_values['columns'] as $key => $column) {
+				$this->fields_values['columns'][$key]['time_from'] = $from;
+				$this->fields_values['columns'][$key]['time_to'] = $to;
+			}
 		}
-		else {
+		else if ($column['aggregate_function'] != AGGREGATE_NONE) {
 			foreach ($this->fields_values['columns'] as $column) {
 				$from = $column['time_from'];
 				$to = $column['time_to'];
 			}
 		}
 
-		foreach ($this->fields_values['columns'] as $key => $column) {
-			if (!isset($column['item_time'])) {
-				$this->fields_values['columns'][$key]['time_from'] = $from;
-				$this->fields_values['columns'][$key]['time_to'] = $to;
-			}
+		if ($from !== null && $to !== null) {
+			$range_time_parser = new CRangeTimeParser();
+
+			$range_time_parser->parse($from);
+			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+			$range_time_parser->parse($to);
+			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 		}
-
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($from);
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($to);
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$configuration = $this->fields_values['columns'];
 
@@ -116,7 +119,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		if (array_key_exists('tags', $this->fields_values)) {
-			$hosts = API::Host()->get([
+			$options = [
 				'output' => ['name'],
 				'groupids' => $groupids,
 				'hostids' => $hostids,
@@ -124,12 +127,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'tags' => $this->fields_values['tags'],
 				'monitored_hosts' => true,
 				'preservekeys' => true,
-				'dashboard_time' => $dashboard_time,
-				'time_period' => [
+				'dashboard_time' => $dashboard_time
+			];
+
+			if ($from !== null && $to !== null) {
+				$options['time_period'] = [
 					'time_from' => $time_from,
 					'time_to' => $time_to
-				]
-			]);
+				];
+			}
+
+			$hosts = API::Host()->get($options);
 
 			$hostids = array_keys($hosts);
 		}
@@ -403,6 +411,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private static function getItemValues(array $items, array $column, int $time_now): array {
 		static $history_period;
+		$result = [];
 
 		if ($history_period === null) {
 			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
@@ -412,15 +421,30 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$column += [
 				'itemid' => $itemid,
 				'value_type' => $item['value_type']
-				];
+			];
 		}
 
-		if (!array_key_exists('value_type', $column)) {
-			$result = [];
-		}
-		else {
-			$value_type = $column['value_type'];
+		if (array_key_exists('value_type', $column)) {
 			$aggregate_function = $column['aggregate_function'];
+
+			if ($aggregate_function == AGGREGATE_NONE) {
+				$time_to = $time_now;
+				$time_from = $time_to - $history_period;
+
+				self::addDataSource($items, $time_from, $time_now, $column['history']);
+
+				$items_by_source = ['history' => [], 'trends' => []];
+
+				foreach ($items as $itemid => $item) {
+					$items_by_source[$item['source']][$itemid] = $item;
+				}
+
+				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
+
+				return array_column(array_column($values, 0), 'value', 'itemid');
+			}
+
+			$value_type = $column['value_type'];
 			$time_from = $column['time_from'];
 			$time_to = $column['time_to'];
 
@@ -437,8 +461,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			self::addDataSource($items, $from, $time_now, $column['history']);
 
 			$function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
-
-			$result = [];
 
 			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
 				$values = Manager::History()->getAggregationByInterval(

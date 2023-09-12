@@ -297,7 +297,6 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldDatePicker('time_to', _('To')))
 					->setDefault('now')
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK | CWidgetField::FLAG_NOT_EMPTY)
-
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('history', _('History data'), [

@@ -61,6 +61,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$decimals = null;
 		$last_value = null;
 		$is_binary_units = true;
+		$from = null;
+		$to = null;
 
 		$options = [
 			'output' => ['value_type'],
@@ -70,24 +72,28 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'preservekeys' => true
 		];
 
-		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
+		$dashboard_time = $this->fields_values['aggregate_function'] != AGGREGATE_NONE
+			&& !WidgetForm::hasOverrideTime($this->fields_values);
 
 		if ($dashboard_time) {
 			$from = $this->getInput('from');
 			$to = $this->getInput('to');
 		}
-		else {
+
+		if (!$dashboard_time && $this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
 			$from = $this->fields_values['time_from'];
 			$to = $this->fields_values['time_to'];
 		}
 
-		$range_time_parser = new CRangeTimeParser();
+		if ($from !== null && $to !== null) {
+			$range_time_parser = new CRangeTimeParser();
 
-		$range_time_parser->parse($from);
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+			$range_time_parser->parse($from);
+			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
 
-		$range_time_parser->parse($to);
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+			$range_time_parser->parse($to);
+			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+		}
 
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
 			&& ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
@@ -118,10 +124,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$options['dashboard_time'] = $dashboard_time;
 
-		$options['time_period'] = [
-			'time_from' => $time_from,
-			'time_to' => $time_to
-		];
+		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
+			$options['time_period'] = [
+				'time_from' => $time_from,
+				'time_to' => $time_to
+			];
+		}
 
 		$show = array_flip($this->fields_values['show']);
 
@@ -179,18 +187,32 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 
 			$history = [];
-			$history_period = $time_to - $time_from;
 			$value_type = $item['value_type'];
 			$aggregate_function = $this->fields_values['aggregate_function'];
+
+			if ($aggregate_function == AGGREGATE_NONE) {
+				$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+			}
+			else {
+				$history_period = $time_to - $time_from;
+			}
 
 			$aggregate_function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
 
 			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
-				$history = Manager::History()->getAggregationByInterval(
-					$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
-				);
+				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
+					$item = $items[$itemid];
 
-				if ($this->fields_values['item_time'] != 0) {
+					$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
+					$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
+				}
+				else {
+					$history = Manager::History()->getAggregationByInterval(
+						$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
+					);
+				}
+
+				if ($this->fields_values['item_time'] == 1) {
 					$from = $this->fields_values['time_from'];
 					$to = $this->fields_values['time_to'];
 
@@ -208,11 +230,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$aggregate_interval = $history_period;
 				}
 
-				$last_results = Manager::History()->getAggregationByInterval(
-					$items, $time_from, $time_to, $aggregate_function, $time_to
-				);
+				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
+					$last_results = [];
+				}
+				else {
+					$last_results = Manager::History()->getAggregationByInterval(
+						$items, $time_from, $time_to, $aggregate_function, $time_to
+					);
+				}
 
-				if (!empty($last_results)) {
+				if (count($last_results) > 0) {
 					$aggregate_data = $last_results[$items[$itemid]['itemid']]['data'];
 
 					$prev_results = Manager::History()->getAggregationByInterval(
@@ -227,12 +254,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 				}
 
-				if (!empty($last_results)) {
+				if (count($last_results) > 0) {
 					$history[$items[$itemid]['itemid']] = $aggregate_data;
 					$history[$itemid][0]['clock'] = $time_to;
-				}
-				else {
-					$history = $last_results;
 				}
 
 				if ($aggregate_function === AGGREGATE_COUNT && !empty($history)) {
@@ -613,7 +637,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function makeWidgetInfo(): array {
 		$info = [];
 
-		if (WidgetForm::hasOverrideTime($this->fields_values)) {
+		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE
+				&& WidgetForm::hasOverrideTime($this->fields_values)) {
 			$info[] = [
 				'icon' => ZBX_ICON_TIME_PERIOD,
 				'hint' => relativeDateToText($this->fields_values['time_from'], $this->fields_values['time_to'])
