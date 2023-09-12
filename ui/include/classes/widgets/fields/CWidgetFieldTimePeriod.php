@@ -143,8 +143,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					continue;
 				}
 
-				if ($value === self::DEFAULT_VALUE[$name]) {
-					$value_ts = self::DEFAULT_VALUE[$name_ts];
+				if ($value === '') {
+					$value_ts = 0;
 					continue;
 				}
 
