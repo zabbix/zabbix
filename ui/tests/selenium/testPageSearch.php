@@ -98,7 +98,7 @@ class testPageSearch extends CWebTest {
 		$response = CDataHelper::createHosts([
 			[
 				'host' => 'emoji visible name',
-				'name' => '🙂⭐️',
+				'name' => '♥⭐️',
 				'groups' => ['groupid' => 6],
 				'interfaces' => [
 					'type' => 1,
@@ -379,13 +379,13 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '⭐️',
-					'hosts' => [['Host' => '🙂⭐️']]
+					'hosts' => [['Host' => '♥⭐️']]
 				]
 			],
 			[
 				[
 					'search_string' => 'emoji visible name',
-					'hosts' => [['Host' => "🙂⭐️\n(emoji visible name)"]]
+					'hosts' => [['Host' => "♥⭐️\n(emoji visible name)"]]
 				]
 			],
 			[
@@ -415,7 +415,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '99.99.99.99',
-					'hosts' => [['Host' => '🙂⭐️', 'IP' => '99.99.99.99', 'DNS' => '']]
+					'hosts' => [['Host' => '♥⭐️', 'IP' => '99.99.99.99', 'DNS' => '']]
 
 				]
 			],
@@ -646,7 +646,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '⭐️',
-					'expected_suggestions' => ['🙂⭐️']
+					'expected_suggestions' => ['♥⭐️']
 				]
 			],
 			[
