@@ -88,7 +88,6 @@ class ColumnEdit extends CController {
 			$ts['now'] = time();
 			$range_time_parser = new CRangeTimeParser();
 
-
 			$from = $column['time_from'];
 			$to = $column['time_to'];
 

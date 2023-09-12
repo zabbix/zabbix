@@ -67,8 +67,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
-	private function getData(): array
-	{
+	private function getData(): array {
 		$dashboard_time = false;
 		$from = null;
 		$to = null;
