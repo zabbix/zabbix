@@ -166,6 +166,7 @@ class testDataCollection extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
 
 		$this->reloadConfigurationCache();
+		sleep(5);
 
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],

@@ -1475,6 +1475,14 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 				];
 			}
 
+			if ($item['units'] === 's' && $decimals != 0) {
+				return [
+					'value' => convertUnitSWithDecimals($value, false, $decimals, true),
+					'units' => '',
+					'is_mapped' => false
+				];
+			}
+
 			$convert_options = [
 				'value' => $value,
 				'units' => $item['units']
@@ -1520,6 +1528,49 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, int $deci
 				'is_mapped' => false
 			];
 	}
+}
+
+/**
+ * Converts seconds to the biggest unit of measure with decimals.
+ *
+ * @param int|float|string  $value            Time period in seconds
+ * @param bool              $ignore_millisec  Ignores milliseconds
+ * @param int               $decimals         Max number of first non-zero decimals to display
+ * @param bool              $decimals_exact   Display exactly this number of decimals instead of first non-zeros
+ *
+ * @return string
+ */
+function convertUnitSWithDecimals($value, bool $ignore_millisec = false, int $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		bool $decimals_exact = false): string {
+	$value = (float)$value;
+	$part = '';
+	$result = 0;
+
+	foreach ([
+		'y' => SEC_PER_YEAR,
+		'M' => SEC_PER_MONTH,
+		'd' => SEC_PER_DAY,
+		'h' => SEC_PER_HOUR,
+		'm' => SEC_PER_MIN,
+		's' => 1
+	] as $key => $sec_per_part) {
+		if (floor($value / $sec_per_part) > 0) {
+			$part = $key;
+			$result = $value / $sec_per_part;
+			break;
+		}
+	}
+
+	if ($part === '' && $ignore_millisec) {
+		$part = 's';
+		$result = $value;
+	}
+	elseif ($part === '') {
+		$part = 'ms';
+		$result = $value * 1000;
+	}
+
+	return formatFloat($result, ['decimals' => $decimals, 'decimals_exact' => $decimals_exact]).$part;
 }
 
 /**
@@ -2280,4 +2331,51 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 	unset($step);
 
 	return $preprocessing;
+}
+
+/**
+ * Apply sorting for discovery rule filter or override filter conditions, if appropriate.
+ * Prioritization by non/exist operator applied between matching macros.
+ *
+ * @param array $conditions
+ * @param int   $evaltype
+ *
+ * @return array
+ */
+function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
+	switch ($evaltype) {
+		case CONDITION_EVAL_TYPE_AND_OR:
+		case CONDITION_EVAL_TYPE_AND:
+		case CONDITION_EVAL_TYPE_OR:
+			usort($conditions, static function(array $condition_a, array $condition_b): int {
+				$comparison = strnatcasecmp($condition_a['macro'], $condition_b['macro']);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				$exist_operators = [CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_EXISTS];
+
+				$comparison = (int) in_array($condition_b['operator'], $exist_operators)
+					- (int) in_array($condition_a['operator'], $exist_operators);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				return strnatcasecmp($condition_a['value'], $condition_b['value']);
+			});
+
+			foreach ($conditions as $i => &$condition) {
+				$condition['formulaid'] = num2letter($i);
+			}
+			unset($condition);
+			break;
+
+		case CONDITION_EVAL_TYPE_EXPRESSION:
+			CArrayHelper::sort($conditions, ['formulaid']);
+			break;
+	}
+
+	return array_values($conditions);
 }

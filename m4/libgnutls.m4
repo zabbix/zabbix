@@ -19,14 +19,11 @@
 
 AC_DEFUN([LIBGNUTLS_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <gnutls/gnutls.h>
-],
-[
+]], [[
 	gnutls_global_init();
-],
-found_gnutls="yes",)
+]])],[found_gnutls="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBGNUTLS_ACCEPT_VERSION],
@@ -60,7 +57,7 @@ AC_DEFUN([LIBGNUTLS_CHECK_CONFIG],
 [
   AC_ARG_WITH(gnutls,[
 If you want to use encryption provided by GnuTLS library:
-AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>@, DIR is the libgnutls install directory.])],
+AS_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>@, DIR is the libgnutls install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_gnutls="no"

@@ -453,13 +453,14 @@ static zbx_rm_session_t	*rm_session_start(zbx_rm_t *manager, zbx_uint64_t userid
 	session->sid = zbx_create_token(0);
 	session->cookie = report_create_cookie(manager, session->sid);
 
-	zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", NULL);
+	zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", (char *)NULL);
 	zbx_db_insert_add_values(&db_insert, session->sid, userid, (int)time(NULL), ZBX_SESSION_ACTIVE);
 	if (SUCCEED != zbx_db_insert_execute(&db_insert))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Report manager failed to write web session to database, user ID = "
 				ZBX_FS_UI64 ".", session->userid);
 	}
+
 	zbx_db_insert_clean(&db_insert);
 
 	return session;

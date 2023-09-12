@@ -50,6 +50,7 @@ class CSvgGraphHelper {
 		self::getMetrics($metrics, $options['data_sets']);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['overrides']);
+		self::applyUnits($metrics, $options['left_y_axis'], $options['right_y_axis']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level timeshifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
@@ -689,6 +690,21 @@ class CSvgGraphHelper {
 				unset($metric);
 			}
 		}
+	}
+
+	/**
+	 * Apply static units for each metric if selected.
+	 */
+	private static function applyUnits(array &$metrics, array $left_y_axis_options, array $right_y_axis_options): void {
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT && $left_y_axis_options['units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $left_y_axis_options['units']));
+			}
+			elseif ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT && $right_y_axis_options['units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $right_y_axis_options['units']));
+			}
+		}
+		unset($metric);
 	}
 
 	/**
