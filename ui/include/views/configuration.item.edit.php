@@ -1028,10 +1028,11 @@ $item_tabs = (new CTabView())
 			->addItem([
 				new CLabel([
 					_('Preprocessing steps'),
-					makeHelpIcon([_s(
-						'The "%1$s" steps are always executed as the first preprocessing steps (with "%2$s" as the last of them).',
-						_('Check for not supported value'), _('any error')
-					), BR(), 'If such steps are configured, they will be placed above all others.'])
+					makeHelpIcon([
+						_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
+						BR(), BR(),
+						_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (ones with "any error" being the last of them).')
+					])
 				]),
 				new CFormField(
 					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'], $data['type'])
