@@ -786,6 +786,11 @@ function getItemFormData(array $item = [], array $options = []) {
 		'backurl' => getRequest('backurl')
 	];
 
+	if (!$data['is_discovery_rule']) {
+		CArrayHelper::sort($data['preprocessing'], ['sortorder']);
+		$data['preprocessing'] = sortPreprocessingStepsByCheckUnsupported($data['preprocessing']);
+	}
+
 	// Unset empty and inherited tags.
 	foreach ($data['tags'] as $key => $tag) {
 		if ($tag['tag'] === '' && $tag['value'] === '') {
@@ -1618,8 +1623,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
 					(new CDiv($params))
-						->addClass('step-parameters')
-						->addClass($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 'js-parameters-toggle' : null),
+						->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
 					(new CDiv([
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))

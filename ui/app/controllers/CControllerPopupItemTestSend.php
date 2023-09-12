@@ -166,17 +166,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				switch ($this->test_type) {
 					case self::ZBX_TEST_TYPE_ITEM:
 						$api_input_rules = CItem::getPreprocessingValidationRules();
-						$flags = ZBX_FLAG_DISCOVERY_NORMAL;
 						break;
 
 					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
 						$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
-						$flags = ZBX_FLAG_DISCOVERY_PROTOTYPE;
 						break;
 
 					case self::ZBX_TEST_TYPE_LLD:
 						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
-						$flags = ZBX_FLAG_DISCOVERY_RULE;
 						break;
 				}
 
@@ -184,20 +181,33 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					error($error);
 					$ret = false;
 				}
-				else {
-					try {
-						$item = [
-							'type' => $this->item_type,
-							'flags' => $flags,
-							'preprocessing' => $steps
-						];
 
-						CItemGeneral::validatePreprocessingStepsByType($item, '/steps');
+				if ($this->test_type != self::ZBX_TEST_TYPE_LLD) {
+					$step_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED,
+						'uniq' => [['type', 'params']], 'fields' => [
+							'type' =>	['type' => API_ANY],
+							'params' =>	['type' => API_ANY]
+					]];
 
-						$steps = $item['preprocessing'];
+					foreach ($steps as $i => $step) {
+						if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+							unset($steps[$i]);
+							continue;
+						}
+
+						$match_type = ZBX_PREPROC_MATCH_ERROR_ANY;
+
+						if (array_key_exists('params', $step)) {
+							[$match_type] = explode("\n", $step['params']) + [ZBX_PREPROC_MATCH_ERROR_ANY];
+						}
+
+						if ($match_type != ZBX_PREPROC_MATCH_ERROR_ANY) {
+							unset($steps[$i]);
+						}
 					}
-					catch (Exception $e) {
-						error($e->getMessage());
+
+					if ($steps && !CApiInputValidator::validate($step_rules, $steps, '/', $error)) {
+						error($error);
 						$ret = false;
 					}
 				}

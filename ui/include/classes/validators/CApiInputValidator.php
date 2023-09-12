@@ -4155,8 +4155,11 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-					'2' =>	['type' => API_STRING_UTF8, 'default' => '']
+					'1' =>	['type' => API_STRING_UTF8, 'default' => ZBX_PREPROC_MATCH_ERROR_ANY, 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])],
+					'2' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => '1', 'in' => implode(',', [ZBX_PREPROC_MATCH_ERROR_REGEX, ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])], 'type' => API_REGEX, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+								['else' => true, 'type' => API_STRING_UTF8]
+					]]
 				]];
 				break;
 

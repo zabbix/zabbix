@@ -445,12 +445,7 @@
 				}));
 				const type = $('z-select[name*="type"]', $row).val();
 
-				$('.step-parameters', $row)
-					.html(makeParameterInput(step_index, type))
-					.toggleClass('js-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>);
-				$('.js-parameters-toggle', $row)
-					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
-
+				$('.step-parameters', $row).html(makeParameterInput(step_index, type));
 				$(this).closest('.preprocessing-list-foot').before($row);
 
 				$('.preprocessing-list-head').show();
@@ -518,11 +513,7 @@
 					type = $(this).val(),
 					$on_fail = $row.find('[name*="on_fail"]');
 
-				$('.step-parameters', $row)
-					.html(makeParameterInput($row.data('step'), type))
-					.toggleClass('js-parameters-toggle', type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED?>);
-				$('.js-parameters-toggle', $row)
-					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', $('#type').val() != <?= ITEM_TYPE_SSH ?>);
+				$('.step-parameters', $row).html(makeParameterInput($row.data('step'), type));
 
 				// Disable "Custom on fail" for some of the preprocessing types.
 				switch (type) {
@@ -629,20 +620,6 @@
 				container
 					.querySelector('tbody')
 					.insertAdjacentHTML('beforeend', template.evaluate({rowNum: row_numb}));
-			})
-			.on('item.type.change', function (e) {
-				const $preproc_steps = $('z-select[name^="preprocessing["][name$="[type]"]'),
-					no_parameters = $('#type').val() != <?= ITEM_TYPE_SSH ?>;
-
-				for (let select of $preproc_steps) {
-					for (let option of select.getOptions()) {
-						if (option.value == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
-							$(select).closest('.preprocessing-step').find('.js-parameters-toggle')
-								.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', no_parameters);
-							break;
-						}
-					}
-				}
 			});
 	});
 </script>

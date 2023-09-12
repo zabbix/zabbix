@@ -1909,13 +1909,11 @@ function normalizeItemPreprocessingSteps(array $preprocessing, int $item_type): 
 				break;
 
 			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
-				if (array_key_exists('params', $step)) {
-					if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
-						unset($step['params'][1]);
-					}
-
-					$step['params'] = $item_type == ITEM_TYPE_SSH ? implode("\n", $step['params']) : '';
+				if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+					unset($step['params'][1]);
 				}
+
+				$step['params'] = implode("\n", $step['params']);
 				break;
 
 			case ZBX_PREPROC_CSV_TO_JSON:
@@ -1947,7 +1945,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing, int $item_type): 
 	}
 	unset($step);
 
-	return sortPreprocessingSteps($preprocessing);
+	return $preprocessing;
 }
 
 /**
@@ -2539,30 +2537,24 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
  *
  * @return array
  */
-function sortPreprocessingSteps(array $steps): array {
-	usort($steps, static function (array $step_a, array $step_b): int {
-		if ($step_a['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-			if ($step_b['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-				if (!array_key_exists('params', $step_a)) {
-					return 0;
-				}
+function sortPreprocessingStepsByCheckUnsupported(array $steps): array {
+	$preproc_regex = [];
+	$preproc_any = [];
 
-				$params_a = explode("\n", $step_a['params']);
-
-				if ($params_a[0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
-					return 1;
-				}
-
-				$params_b = explode("\n", $step_b['params']);
-
-				return $params_b[0] == ZBX_PREPROC_MATCH_ERROR_ANY ? -1 : 0;
-			}
-
-			return -1;
+	foreach ($steps as $i => $step) {
+		if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+			continue;
 		}
 
-		return $step_b['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ? 1 : 0;
-	});
+		if ($step['params'][0] != ZBX_PREPROC_MATCH_ERROR_ANY) {
+			$preproc_regex[] = $step;
+		}
+		else {
+			$preproc_any[] = $step;
+		}
 
-	return $steps;
+		unset($steps[$i]);
+	}
+
+	return array_merge($preproc_regex, array_values($steps), $preproc_any);
 }
