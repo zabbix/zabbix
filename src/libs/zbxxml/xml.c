@@ -266,19 +266,18 @@ static int	xpath_nodeset_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathOb
 	xmlNodeSetPtr	nodeset;
 	xmlBufferPtr	xmlBufferLocal;
 
+	ZBX_UNUSED(is_empty);
+
 	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
 		return FAIL;
 
 	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
 		nodeset = xpathObj->nodesetval;
-		*is_empty = (0 == nodeset->nodeNr) ? SUCCEED : FAIL;
 
 		for (int i = 0; i < nodeset->nodeNr; i++)
 			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
 	}
-	else
-		*is_empty = SUCCEED;
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
@@ -299,11 +298,14 @@ static int	xpath_nodeset_contents_to_string(zbx_variant_t *value, xmlDoc *doc, x
 
 	result = (char *)zbx_malloc(NULL, 1 * sizeof(char));
 	*result = '\0';
+	*is_empty = FAIL;
 
 	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
 	{
 		nodeset = xpathObj->nodesetval;
-		*is_empty = (0 == nodeset->nodeNr) ? SUCCEED : FAIL;
+
+		if (0 == nodeset->nodeNr)
+			*is_empty = SUCCEED;
 
 		for (int i = 0; i < nodeset->nodeNr; i++)
 		{
@@ -340,8 +342,6 @@ static int	query_xpath(zbx_variant_t *value, const char *params, store_xpath_nod
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlErrorPtr	pErr;
-
-	*is_empty = FAIL;
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
 	{
@@ -422,9 +422,7 @@ out:
  ******************************************************************************/
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	int	is_empty;
-
-	return query_xpath(value, params, xpath_nodeset_to_string, &is_empty, errmsg);
+	return query_xpath(value, params, xpath_nodeset_to_string, NULL, errmsg);
 }
 
 /******************************************************************************

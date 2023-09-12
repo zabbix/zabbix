@@ -2836,25 +2836,23 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 		return FAIL;
 	}
 
-	if (FAIL != zbx_jsonobj_query(&obj, path->data.str, &ret_value))
+	if (FAIL == zbx_jsonobj_query(&obj, path->data.str, &ret_value))
 	{
-		zbx_variant_set_str(&value, ret_value);
-	}
-	else {
 		*error = zbx_strdup(*error, zbx_json_strerror());
 		return FAIL;
 	}
 
+	zbx_variant_set_str(&value, ret_value);
+
 	if (NULL == ret_value)
 	{
-		if (NULL != default_value)
+		if (NULL == default_value)
 		{
-			zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
-		}
-		else {
 			*error = zbx_strdup(*error, "jsonpath returned no value");
 			return FAIL;
 		}
+
+		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
 	}
 
 	zbx_jsonobj_clear(&obj);
@@ -2880,7 +2878,6 @@ static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const z
 		zbx_vector_var_t *output, char **error)
 {
 	int		ret, is_empty;
-	char		*ret_value = NULL;
 	zbx_variant_t	*xml_value, *path, value, *default_value = NULL;
 
 	if (2 > token->opt || 3 < token->opt)
@@ -2929,16 +2926,14 @@ static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const z
 
 	if (SUCCEED == is_empty)
 	{
-		if (NULL != default_value)
-		{
-			zbx_variant_clear(&value);
-			zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
-		}
-		else
+		if (NULL == default_value)
 		{
 			*error = zbx_strdup(*error, "XML xpath returned empty nodeset");
 			return FAIL;
 		}
+
+		zbx_variant_clear(&value);
+		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
 	}
 
 	eval_function_return(token->opt, &value, output);
