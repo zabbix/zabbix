@@ -24,8 +24,6 @@ import (
 )
 
 type MockEmptyCtx struct {
-	resultWriter	emptyResultWriter
-	matcher		emptyMatcher
 }
 
 func (ctx MockEmptyCtx) ClientID() uint64 {
@@ -49,8 +47,7 @@ func (ctx MockEmptyCtx) GlobalRegexp() plugin.RegexpMatcher {
 }
 
 func (ctx MockEmptyCtx) Timeout() int {
-	return 3
-}
+	const defaultTimeout = 3
 
-type emptyMatcher struct{}
-type emptyResultWriter struct{}
+	return defaultTimeout
+}
