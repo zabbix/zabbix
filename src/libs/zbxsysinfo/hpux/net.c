@@ -21,6 +21,7 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
+#include "zbxstr.h"
 
 #include <unistd.h>
 #include <stropts.h>
