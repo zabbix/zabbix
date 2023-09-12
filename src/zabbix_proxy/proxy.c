@@ -72,7 +72,6 @@
 #include "../zabbix_server/ipmi/ipmi_poller.h"
 #endif
 
-//static const char	*progname = NULL;
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 static const char	title_message[] = "zabbix_proxy";

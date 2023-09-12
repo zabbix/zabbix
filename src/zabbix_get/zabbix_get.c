@@ -28,9 +28,7 @@
 #endif
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
-//static const char	*progname = NULL;
 static const char	title_message[] = "zabbix_get";
-//static const char	syslog_app_name[] = "zabbix_get";
 static const char	*usage_message[] = {
 	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "[-t timeout]", "-k item-key", NULL,
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)

@@ -34,7 +34,6 @@
 #	include "zbxnix.h"
 #endif
 
-//static const char	*progname = NULL;
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
 static const char	title_message[] = "zabbix_sender";
 static const char	syslog_app_name[] = "zabbix_sender";
@@ -132,13 +131,7 @@ static const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-//unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
-
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-/* static unsigned char	get_program_type(void) */
-/* { */
-/* 	return program_type; */
-/* } */
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_SENDER)
 #endif
 

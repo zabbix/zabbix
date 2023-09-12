@@ -20,7 +20,7 @@
 #include "common_internal.h"
 
 static zbx_log_func_t		log_func_callback = NULL;
-static zbx_get_progname_f       get_progname_cb = NULL;
+static zbx_get_progname_f	get_progname_cb = NULL;
 
 zbx_log_func_t	common_get_log_func(void)
 {

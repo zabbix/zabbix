@@ -23,7 +23,6 @@
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 
-//static const char	*progname;
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
 static const char	title_message[] = "zabbix_js";
 static const char	syslog_app_name[] = "zabbix_js";
@@ -34,8 +33,6 @@ static const char	*usage_message[] = {
 	"-V", NULL,
 	NULL	/* end of text */
 };
-
-//static unsigned char	program_type;
 
 #define JS_TIMEOUT_MIN		1
 #define JS_TIMEOUT_MAX		60
