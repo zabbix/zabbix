@@ -253,8 +253,8 @@ function itemCompleteTest(overlay) {
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
 		value: form_data['value'],
-		not_supported: form_data['not_supported'] || 0,
-		runtime_error: form_data['runtime_error'] || ''
+		not_supported: form_data['not_supported'],
+		runtime_error: form_data['runtime_error']
 	});
 
 	<?php if ($data['show_prev']): ?>

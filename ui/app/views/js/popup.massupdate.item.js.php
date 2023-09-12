@@ -47,8 +47,6 @@
 			item_type = <?= json_encode($data['initial_item_type']) ?>;
 		}
 
-		$('#preprocessing').trigger('item.type.change');
-
 		return organizeInterfaces(interface_ids_by_types, item_interface_types, item_type);
 	};
 

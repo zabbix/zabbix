@@ -1622,8 +1622,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types, int
 					(new CDiv($preproc_types_select))
 						->addClass('list-numbered-item')
 						->addClass('step-name'),
-					(new CDiv($params))
-						->addClass('step-parameters'),
+					(new CDiv($params))->addClass('step-parameters'),
 					(new CDiv($on_fail))->addClass('step-on-fail'),
 					(new CDiv([
 						(new CButton('preprocessing['.$i.'][test]', _('Test')))

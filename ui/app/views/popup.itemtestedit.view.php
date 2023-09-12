@@ -271,27 +271,6 @@ if ($data['is_item_testable']) {
 	]);
 }
 
-$runtime_error_fields = null;
-
-if ($data['test_type'] != CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD) {
-	$ns_checkbox = (new CCheckBox('not_supported'))->setLabel(_('Not supported'));
-
-	if ($data['not_supported'] != 0 ) {
-		$ns_checkbox->setAttribute('checked', 'checked');
-	}
-
-	$runtime_error_fields = (new CFormField([
-		$ns_checkbox,
-		(new CDiv([
-			(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
-			(new CMultilineInput('runtime_error', '', ['readonly' => false]))->setWidth(250)
-		]))
-	]))
-		->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-		->addClass('runtime-error-fields')
-		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
-}
-
 $form_grid->addItem([
 	new CLabel(_('Value'), 'value'),
 	new CFormField(
@@ -308,7 +287,18 @@ $form_grid->addItem([
 			->setId('time')
 	),
 
-	$runtime_error_fields,
+	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
+		? null
+		: (new CFormField([
+			(new CCheckBox('not_supported'))->setLabel(_('Not supported'))->setChecked((bool) $data['not_supported']),
+			(new CDiv([
+				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
+				(new CMultilineInput('runtime_error', '', ['readonly' => false]))
+			]))
+		]))
+			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+			->addClass('runtime-error-fields')
+			->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(

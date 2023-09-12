@@ -6505,6 +6505,8 @@ svg {
     padding-inline-end: 8px; }
   #preprocessing-test-form .runtime-error-fields > div {
     display: inline-flex; }
+  #preprocessing-test-form .runtime-error-fields .multilineinput-control {
+    width: 250px; }
 
 .totals-list:not(.list-table) {
   display: flex;
