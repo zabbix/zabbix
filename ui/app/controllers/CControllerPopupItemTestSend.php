@@ -206,7 +206,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						}
 					}
 
-					if ($steps && !CApiInputValidator::validate($step_rules, $steps, '/', $error)) {
+					if ($steps && !CApiInputValidator::validate($step_rules, $steps, '/1/preprocessing', $error)) {
 						error($error);
 						$ret = false;
 					}

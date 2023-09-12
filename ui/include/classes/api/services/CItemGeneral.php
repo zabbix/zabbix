@@ -275,12 +275,12 @@ abstract class CItemGeneral extends CApiService {
 					'params' =>	['type' => API_ANY]
 				]];
 
-				foreach ($steps as $i => $step) {
+				foreach ($steps as $_index => $step) {
 					if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-						unset($steps[$i]);
+						unset($steps[$_index]);
 						continue;
 					}
-
+					$preproc_path = '/'.($i + 1).'/preprocessing';
 					$match_type = ZBX_PREPROC_MATCH_ERROR_ANY;
 
 					if (array_key_exists('params', $step)) {
@@ -288,11 +288,11 @@ abstract class CItemGeneral extends CApiService {
 					}
 
 					if ($match_type != ZBX_PREPROC_MATCH_ERROR_ANY) {
-						unset($steps[$i]);
+						unset($steps[$_index]);
 					}
 				}
 
-				if ($steps && !CApiInputValidator::validate($step_rules, $steps, '/', $error)) {
+				if ($steps && !CApiInputValidator::validate($step_rules, $steps, $preproc_path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
 			}
