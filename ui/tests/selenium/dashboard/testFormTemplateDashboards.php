@@ -27,7 +27,7 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 /**
  * @backup dashboard, hosts
  *
- * @dataSource Services, Sla
+ * @dataSource Services, Sla, Proxies
  *
  * @onBefore prepareTemplateDashboardsData
  */
