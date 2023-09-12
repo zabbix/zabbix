@@ -38,6 +38,8 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
+void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb);
+
 typedef void	(*zbx_on_exit_t)(int);
 typedef void	(*zbx_signal_handler_f)(int flags);
 typedef void	(*zbx_signal_redirect_f)(int flags, zbx_signal_handler_f signal_handler_cb);

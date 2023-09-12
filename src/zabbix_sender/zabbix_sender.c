@@ -1494,6 +1494,7 @@ int	main(int argc, char **argv)
 	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_nix(&get_zbx_progname);
 	zbx_config_tls = zbx_config_tls_new();
 
 	zbx_progname = get_program_name(argv[0]);

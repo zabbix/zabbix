@@ -111,8 +111,6 @@ typedef struct
 }
 zbx_discoverer_manager_t;
 
-//extern unsigned char			program_type;
-
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 #define ZBX_DISCOVERER_STARTUP_TIMEOUT	30
 

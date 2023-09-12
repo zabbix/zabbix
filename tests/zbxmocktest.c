@@ -22,6 +22,7 @@
 #include "zbxnum.h"
 #include "zbxtypes.h"
 #include "zbxlog.h"
+#include "zbxnix.h"
 
 /* unresolved symbols needed for linking */
 
@@ -126,11 +127,11 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 /* not used in tests, defined for linking with comms.c */
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-const char	title_message[] = "mock_title_message";
-const char	*usage_message[] = {"mock_usage_message", NULL};
-const char	*help_message[] = {"mock_help_message", NULL};
-const char	*progname = "mock_progname";
-const char	syslog_app_name[] = "mock_syslog_app_name";
+static const char	title_message[] = "mock_title_message";
+static const char	*usage_message[] = {"mock_usage_message", NULL};
+static const char	*help_message[] = {"mock_help_message", NULL};
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
+static const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
@@ -161,8 +162,10 @@ int	main (void)
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
 
+	zbx_progname = "mock_progname";
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
-	zbx_init_library_common(zbx_mock_log_impl, NULL);
+	zbx_init_library_common(zbx_mock_log_impl, &get_zbx_progname);
+	zbx_init_library_nix(&get_zbx_progname);
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

@@ -19,11 +19,9 @@
 
 #include "checks_agent.h"
 
-#include "zbxsysinfo.h"
+#include "poller.h"
 
-//#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-//extern unsigned char	program_type;
-//#endif
+#include "zbxsysinfo.h"
 
 void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
 {
@@ -103,7 +101,7 @@ int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_s
 		case ZBX_TCP_SEC_TLS_PSK:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent"
 					" but support for TLS was not compiled into %s.",
-					get_program_type_string(program_type)));
+					get_program_type_string(poller_get_program_type()())));
 			ret = CONFIG_ERROR;
 			goto out;
 #endif

@@ -1182,6 +1182,7 @@ int	main(int argc, char **argv)
 	int				zbx_optind = 0;
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
+	zbx_init_library_nix(&get_zbx_progname);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 	argv = zbx_setproctitle_init(argc, argv);

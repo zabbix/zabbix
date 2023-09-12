@@ -1446,6 +1446,7 @@ int	main(int argc, char **argv)
 	int		ret;
 #endif
 	zbx_init_library_common(zbx_log_impl, &get_zbx_progname);
+	zbx_init_library_nix(&get_zbx_progname);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,

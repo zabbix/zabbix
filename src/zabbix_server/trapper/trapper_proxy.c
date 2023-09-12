@@ -19,6 +19,8 @@
 
 #include "trapper_request.h"
 
+#include "trapper.h"
+
 #include "zbxcommshigh.h"
 #include "proxyconfigwrite/proxyconfig_write.h"
 #include "zbxtasks.h"
@@ -29,8 +31,6 @@
 #include "zbxcompress.h"
 #include "zbxcachehistory.h"
 
-extern unsigned char	program_type;
-
 #define	LOCK_PROXY_HISTORY	zbx_mutex_lock(proxy_lock)
 #define	UNLOCK_PROXY_HISTORY	zbx_mutex_unlock(proxy_lock)
 
@@ -38,7 +38,7 @@ static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 
 int	init_proxy_history_lock(char **error)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
 
 	return SUCCEED;
@@ -46,7 +46,7 @@ int	init_proxy_history_lock(char **error)
 
 void	free_proxy_history_lock(void)
 {
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		zbx_mutex_destroy(&proxy_lock);
 }
 
