@@ -78,25 +78,36 @@ class CControllerHostGroupEdit extends CController{
 			$data = array_merge($data, $groups[0]);
 			CArrayHelper::sort($data['discoveryRules'], ['name']);
 
+			$data['discoveryRules'] = array_values($data['discoveryRules']);
+
 			$discovery_ruleids = $data['discoveryRules']
 				? array_column($data['discoveryRules'], 'itemid')
 				: [];
 
-			$data['is_discovery_rule_editable'] = $discovery_ruleids
-				&& API::DiscoveryRule()->get([
+			$host_prototypes_itemids = [];
+
+			if ($discovery_ruleids) {
+				$editable_discovery_ruleids = API::DiscoveryRule()->get([
 					'output' => [],
 					'itemids' => $discovery_ruleids,
-					'editable' => true
+					'editable' => true,
+					'preservekeys' => true
 				]);
 
-			$host_prototypes_itemids = $discovery_ruleids
-				? API::HostPrototype()->get([
+				foreach ($data['discoveryRules'] as &$discoveryRule) {
+					$discoveryRule['is_discovery_rule_editable'] = array_key_exists($discoveryRule['itemid'],
+						$editable_discovery_ruleids
+					);
+				}
+				unset($discoveryRule);
+
+				$host_prototypes_itemids = API::HostPrototype()->get([
 					'output' => ['hostid'],
 					'selectDiscoveryRule' => ['itemid'],
 					'hostids' => array_column($data['hostPrototypes'], 'hostid'),
 					'editable' => true
-				])
-				: [];
+				]);
+			}
 
 			$data['ldd_rule_to_host_prototype'] = [];
 

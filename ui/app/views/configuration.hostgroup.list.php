@@ -127,7 +127,7 @@ foreach ($data['groups'] as $group) {
 			}
 
 			foreach ($group['discoveryRules'] as $key => $ldd_rule) {
-				if ($data['allowed_ui_conf_hosts'] && $group['is_discovery_rule_editable']
+				if ($data['allowed_ui_conf_hosts'] && $ldd_rule['is_discovery_rule_editable']
 						&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
 					$lld_name = (new CLink($ldd_rule['name'],
 						(new CUrl('host_prototypes.php'))
@@ -145,10 +145,10 @@ foreach ($data['groups'] as $group) {
 
 				if ($key == 0) {
 					if ($ldd_rule_count > 2) {
-						$name[] = (new CSpan(', ..., '));
+						$name[] = ', ..., ';
 					}
 					elseif ($ldd_rule_count === 2) {
-						$name[] = (new CSpan(', '));
+						$name[] = ', ';
 					}
 				}
 			}
