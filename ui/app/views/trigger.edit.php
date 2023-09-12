@@ -32,21 +32,13 @@ $trigger_form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('context', $data['context'])
 	->addVar('expression_full', $data['expression_full'], 'expression-full')
-	->addVar('recovery_expression_full', $data['recovery_expression_full'], 'recovery-expression-full');
+	->addVar('recovery_expression_full', $data['recovery_expression_full'], 'recovery-expression-full')
+	->addVar('triggerid', $data['triggerid']);
 
 // Enable form submitting on Enter.
 $trigger_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
-$discovered_trigger = false;
-
-if ($data['triggerid'] !== null) {
-	$trigger_form->addVar('triggerid', $data['triggerid']);
-
-	if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-		$discovered_trigger = true;
-	}
-}
-
+$discovered_trigger = ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $readonly = ($data['limited'] || $discovered_trigger);
 
 if ($readonly) {
