@@ -129,7 +129,7 @@ class CControllerHostGroupList extends CController {
 				]);
 
 				foreach ($group['discoveryRules'] as &$discovery_rule) {
-					$discovery_rule['is_discovery_rule_editable'] = array_key_exists($discovery_rule['itemid'],
+					$discovery_rule['is_editable'] = array_key_exists($discovery_rule['itemid'],
 						$editable_discovery_ruleids
 					);
 				}

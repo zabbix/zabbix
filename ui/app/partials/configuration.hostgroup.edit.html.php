@@ -37,32 +37,32 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$discovery_rules = [];
 
 	if ($data['discoveryRules']) {
-		$ldd_rule_count = count($data['discoveryRules']);
+		$lld_rule_count = count($data['discoveryRules']);
+		$data['discoveryRules'] = array_slice($data['discoveryRules'], 0, 5);
 
-		foreach ($data['discoveryRules'] as $key => $ldd_rule) {
-			if ($data['allowed_ui_conf_hosts'] && $ldd_rule['is_discovery_rule_editable']
-					&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
-				$discovery_rules[] = (new CLink($ldd_rule['name'],
+		foreach ($data['discoveryRules'] as $lld_rule) {
+			if ($data['allowed_ui_conf_hosts'] && $lld_rule['is_editable']
+					&& array_key_exists($lld_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
+				$discovery_rules[] = (new CLink($lld_rule['name'],
 					(new CUrl('host_prototypes.php'))
 						->setArgument('form', 'update')
-						->setArgument('parent_discoveryid', $ldd_rule['itemid'])
-						->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$ldd_rule['itemid']]))
+						->setArgument('parent_discoveryid', $lld_rule['itemid'])
+						->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$lld_rule['itemid']]))
 						->setArgument('context', 'host')
 				));
 			}
 			else {
-				$discovery_rules[] = new CSpan($ldd_rule['name']);
+				$discovery_rules[] = new CSpan($lld_rule['name']);
 			}
 
-			if ($ldd_rule_count > 5 && $key === 4) {
-				$discovery_rules[] = ', ...';
+			$discovery_rules[] = ', ';
+		}
 
-				break;
-			}
-
-			if ($key + 1 < $ldd_rule_count) {
-				$discovery_rules[] = ', ';
-			}
+		if ($lld_rule_count > 5) {
+			$discovery_rules[] = '...';
+		}
+		else {
+			array_pop($discovery_rules);
 		}
 	}
 	else {

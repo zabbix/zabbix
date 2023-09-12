@@ -55,7 +55,7 @@ class CHostGroup extends CApiService {
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
 			'maintenance_from', 'maintenance_status', 'flags'
 		];
-		$group_discovery_fields = ['groupid', 'lastcheck', 'name', 'parent_group_prototypeid', 'ts_delete'];
+		$group_discovery_fields = ['groupid', 'parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete'];
 		$discovery_rule_fields = ['itemid', 'hostid', 'name', 'type', 'key_', 'url', 'query_fields', 'request_method',
 			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
 			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
@@ -1583,7 +1583,7 @@ class CHostGroup extends CApiService {
 		// adding group discovery
 		if ($options['selectGroupDiscoveries'] !== null) {
 			$output = $options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND
-				? ['lastcheck', 'name', 'parent_group_prototypeid', 'ts_delete']
+				? ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete']
 				: $options['selectGroupDiscoveries'];
 
 			$groupDiscoveries = API::getApiService()->select('group_discovery', [

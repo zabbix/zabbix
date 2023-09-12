@@ -117,41 +117,41 @@ foreach ($data['groups'] as $group) {
 
 	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 		if ($group['discoveryRules']) {
-			$ldd_rule_count = count($group['discoveryRules']);
+			$lld_rule_count = count($group['discoveryRules']);
 
-			if ($ldd_rule_count > 1) {
+			if ($lld_rule_count > 1) {
 				$group['discoveryRules'] = [
 					reset($group['discoveryRules']),
 					end($group['discoveryRules'])
 				];
 			}
 
-			foreach ($group['discoveryRules'] as $key => $ldd_rule) {
-				if ($data['allowed_ui_conf_hosts'] && $ldd_rule['is_discovery_rule_editable']
-						&& array_key_exists($ldd_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
-					$lld_name = (new CLink($ldd_rule['name'],
+			foreach ($group['discoveryRules'] as $lld_rule) {
+				if ($data['allowed_ui_conf_hosts'] && $lld_rule['is_editable']
+						&& array_key_exists($lld_rule['itemid'], $data['ldd_rule_to_host_prototype'])) {
+					$lld_name = (new CLink($lld_rule['name'],
 						(new CUrl('host_prototypes.php'))
 							->setArgument('form', 'update')
-							->setArgument('parent_discoveryid', $ldd_rule['itemid'])
-							->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$ldd_rule['itemid']]))
+							->setArgument('parent_discoveryid', $lld_rule['itemid'])
+							->setArgument('hostid', reset($data['ldd_rule_to_host_prototype'][$lld_rule['itemid']]))
 							->setArgument('context', 'host')
 					))->addClass(ZBX_STYLE_LINK_ALT);
 				}
 				else {
-					$lld_name = new CSpan($ldd_rule['name']);
+					$lld_name = new CSpan($lld_rule['name']);
 				}
 
 				$name[] = $lld_name->addClass(ZBX_STYLE_ORANGE);
 
-				if ($key == 0) {
-					if ($ldd_rule_count > 2) {
-						$name[] = ', ..., ';
-					}
-					elseif ($ldd_rule_count === 2) {
-						$name[] = ', ';
-					}
+				if ($lld_rule_count > 2) {
+					$name[] = ', ..., ';
+				}
+				else {
+					$name[] = ', ';
 				}
 			}
+
+			array_pop($name);
 		}
 		else {
 			$name[] = (new CSpan(_('Inaccessible discovery rule')))->addClass(ZBX_STYLE_ORANGE);
