@@ -1494,8 +1494,8 @@ class CHostGroup extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$groupIds = array_keys($result);
-		sort($groupIds);
+		$groupids = array_keys($result);
+		sort($groupids);
 
 		// adding hosts
 		if ($options['selectHosts'] !== null) {
@@ -1519,7 +1519,7 @@ class CHostGroup extends CApiService {
 			}
 			else {
 				$hosts = API::Host()->get([
-					'groupids' => $groupIds,
+					'groupids' => $groupids,
 					'countOutput' => true,
 					'groupCount' => true
 				]);
@@ -1535,22 +1535,22 @@ class CHostGroup extends CApiService {
 		// adding discovery rule
 		if ($options['selectDiscoveryRules'] !== null) {
 			// discovered items
-			$discoveryRules = DBFetchArray(DBselect(
+			$discovery_rules = DBFetchArray(DBselect(
 				'SELECT gd.groupid,hd.parent_itemid'.
 					' FROM group_discovery gd,group_prototype gp,host_discovery hd'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' WHERE '.dbConditionInt('gd.groupid', $groupids).
 					' AND gd.parent_group_prototypeid=gp.group_prototypeid'.
 					' AND gp.hostid=hd.hostid'
 			));
-			$relationMap = $this->createRelationMap($discoveryRules, 'groupid', 'parent_itemid');
+			$relation_map = $this->createRelationMap($discovery_rules, 'groupid', 'parent_itemid');
 
-			$discoveryRules = API::DiscoveryRule()->get([
+			$discovery_rules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRules'],
-				'itemids' => $relationMap->getRelatedIds(),
+				'itemids' => $relation_map->getRelatedIds(),
 				'preservekeys' => true
 			]);
 
-			$result = $relationMap->mapMany($result, $discoveryRules, 'discoveryRules');
+			$result = $relation_map->mapMany($result, $discovery_rules, 'discoveryRules');
 		}
 
 		// adding host prototype
@@ -1558,7 +1558,7 @@ class CHostGroup extends CApiService {
 			$db_links = DBFetchArray(DBselect(
 				'SELECT gd.groupid,gp.hostid'.
 					' FROM group_discovery gd,group_prototype gp'.
-					' WHERE '.dbConditionInt('gd.groupid', $groupIds).
+					' WHERE '.dbConditionInt('gd.groupid', $groupids).
 					' AND gd.parent_group_prototypeid=gp.group_prototypeid'
 			));
 
@@ -1586,16 +1586,16 @@ class CHostGroup extends CApiService {
 				? ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete']
 				: $options['selectGroupDiscoveries'];
 
-			$groupDiscoveries = API::getApiService()->select('group_discovery', [
+			$group_discoveries = API::getApiService()->select('group_discovery', [
 				'output' => $this->outputExtend($output, ['groupid', 'groupdiscoveryid']),
-				'filter' => ['groupid' => $groupIds],
+				'filter' => ['groupid' => $groupids],
 				'preservekeys' => true
 			]);
-			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupdiscoveryid');
+			$relation_map = $this->createRelationMap($group_discoveries, 'groupid', 'groupdiscoveryid');
 
-			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, ['groupid', 'groupdiscoveryid'], $output);
+			$group_discoveries = $this->unsetExtraFields($group_discoveries, ['groupid', 'groupdiscoveryid'], $output);
 
-			$result = $relationMap->mapMany($result, $groupDiscoveries, 'groupDiscoveries');
+			$result = $relation_map->mapMany($result, $group_discoveries, 'groupDiscoveries');
 		}
 
 		return $result;
