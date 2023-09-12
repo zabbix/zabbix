@@ -56,6 +56,13 @@ zbx_get_progname_f	poller_get_progname(void)
 	return zbx_get_progname_cb;
 }
 
+static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
+
+zbx_get_program_type_f	poller_get_program_type(void)
+{
+	return zbx_get_program_type_cb;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: write interface availability changes into database                *
@@ -1001,6 +1008,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	scriptitem_es_engine_init();
 
+	zbx_get_program_type_cb = poller_args_in->zbx_get_program_type_cb_arg;
 	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,

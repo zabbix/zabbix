@@ -21,9 +21,9 @@
 
 #include "zbxsysinfo.h"
 
-#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-extern unsigned char	program_type;
-#endif
+//#if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+//extern unsigned char	program_type;
+//#endif
 
 void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
 {

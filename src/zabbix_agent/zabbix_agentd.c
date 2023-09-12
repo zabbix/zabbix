@@ -1649,8 +1649,8 @@ int	main(int argc, char **argv)
 	zbx_service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
 	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
-			 log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,
-			 get_zbx_threads_num);
+			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,
+			get_zbx_threads_num);
 #endif
 	exit(EXIT_SUCCESS);
 }

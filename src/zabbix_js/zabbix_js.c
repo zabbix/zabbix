@@ -23,7 +23,8 @@
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 
-static const char	*progname;
+//static const char	*progname;
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
 static const char	title_message[] = "zabbix_js";
 static const char	syslog_app_name[] = "zabbix_js";
 static const char	*usage_message[] = {
@@ -34,7 +35,7 @@ static const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-static unsigned char	program_type;
+//static unsigned char	program_type;
 
 #define JS_TIMEOUT_MIN		1
 #define JS_TIMEOUT_MAX		60
@@ -134,7 +135,7 @@ int	main(int argc, char **argv)
 
 	const char		*config_source_ip = NULL;
 
-	progname = get_program_name(argv[0]);
+	zbx_progname = get_program_name(argv[0]);
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 
@@ -170,7 +171,7 @@ int	main(int argc, char **argv)
 
 				break;
 			case 'h':
-				zbx_help(NULL, help_message, usage_message, progname);
+				zbx_help(NULL, help_message, usage_message);
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
@@ -197,7 +198,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		zbx_usage(usage_message, progname);
+		zbx_usage(usage_message);
 		goto close;
 	}
 

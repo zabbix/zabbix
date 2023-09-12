@@ -242,7 +242,6 @@ void	zbx_usage(const char **p)
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
 #define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
-  //const char	**p = usage_message;
 
 	if (NULL != *p)
 		printf("usage:\n");
@@ -304,8 +303,6 @@ static const char	help_message_footer[] =
  ******************************************************************************/
 void	zbx_help(const char *param, const char **p, const char **usage_message)
 {
-  //	const char	**p = help_message;
-
 	zbx_usage(usage_message);
 	printf("\n");
 
