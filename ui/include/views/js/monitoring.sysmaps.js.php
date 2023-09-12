@@ -80,7 +80,10 @@ function createFontSelect(string $name): CSelect {
 				->addClass(ZBX_STYLE_BTN_ICON)
 				->addClass(ZBX_ICON_HELP_SMALL)
 				->setTitle(_('Help'))
-				->setTarget('_blank')
+				->setTarget('_blank'),
+			(new CSimpleButton())
+				->addCLass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
+				->setTitle(_('Close'))
 		]))
 			->addClass(ZBX_STYLE_DASHBOARD_WIDGET_HEAD)
 			->setId('formDragHandler')
