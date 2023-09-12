@@ -24,6 +24,7 @@ namespace Zabbix\Widgets\Fields;
 use CAbsoluteTimeParser,
 	CApiInputValidator,
 	CParser,
+	CRangeTimeParser,
 	CRelativeTimeParser;
 
 use Zabbix\Widgets\CWidgetField;
@@ -31,7 +32,7 @@ use Zabbix\Widgets\CWidgetField;
 class CWidgetFieldTimePeriod extends CWidgetField {
 
 	public const DEFAULT_VIEW = \CWidgetFieldTimePeriodView::class;
-	public const DEFAULT_VALUE = ['from' => '', 'from_ts' => 0, 'to' => '', 'to_ts' => 0];
+	public const DEFAULT_VALUE = ['from' => '', 'to' => ''];
 
 	public const DATA_SOURCE_DEFAULT = 0;
 	public const DATA_SOURCE_WIDGET = 1;
@@ -42,7 +43,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	private ?string $from_label = null;
 	private ?string $to_label = null;
 
-	private array $default_period = [];
+	private array $default_period = ['from' => '', 'to' => ''];
 
 	private bool $is_date_only;
 
@@ -53,7 +54,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setDefaultPeriod(['from' => self::DEFAULT_VALUE['from'], 'to' => self::DEFAULT_VALUE['to']])
 			->setMaxLength(255)
 			->setValidationRules(['type' => API_OBJECT, 'fields' => [
 				'from' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()],
@@ -185,14 +185,21 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		}
 
 		if ($errors) {
-			$this->setValue($this->getDefault());
+			$field_value = $this->getDefault();
 
-			return $errors;
+			if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $field_value)) {
+				$range_time_parser = new CRangeTimeParser();
+
+				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
+					$range_time_parser->parse($field_value[$name]);
+					$field_value[$name_ts] = $range_time_parser->getDateTime($name === 'from')->getTimestamp();
+				}
+			}
 		}
 
 		$this->setValue($field_value);
 
-		return [];
+		return $errors;
 	}
 
 	public function toApi(array &$widget_fields = []): void {
