@@ -57,6 +57,13 @@ class CWidgetPieChart extends CWidget {
 			this.#pie_chart = null;
 		}
 
+		let legend = this._body.querySelector('.svg-pie-chart-legend');
+
+		if (legend !== null) {
+			// Hide legend while widget is loading
+			legend.style.display = 'none';
+		}
+
 		super.updateProperties({name, view_mode, fields});
 	}
 
@@ -140,6 +147,8 @@ class CWidgetPieChart extends CWidget {
 
 				container.append(item);
 			}
+
+			container.style.display = '';
 		}
 	}
 
