@@ -1725,9 +1725,9 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
  *                                                                            *
  * Purpose: gets list of ip for virtual machine network interface             *
  *                                                                            *
- * Parameters: details       - [IN] an xml document containing vm data        *
- *             guestnet_node - [IN] an xml node containing list of guest ips  *
- *             mac_addr      - [IN] an mac address of network interface       *
+ * Parameters: details       - [IN] xml document containing vm data           *
+ *             guestnet_node - [IN] xml node containing list of guest ips     *
+ *             mac_addr      - [IN] mac address of network interface          *
  *                                                                            *
  * Return value: json with array of ip                                        *
  *                                                                            *
@@ -1736,8 +1736,6 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
 {
 	char			xpath[VMWARE_SHORT_STR_LEN], *val = NULL;
 	zbx_vector_str_t	ips;
-	struct zbx_json		json_data;
-	int			i;
 
 	zbx_vector_str_create(&ips);
 
@@ -1746,13 +1744,15 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
 
 	if (SUCCEED == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
 	{
+		struct zbx_json	json_data;
+		int		i;
+
 		zbx_json_initarray(&json_data, VMWARE_SHORT_STR_LEN);
 
 		for (i = 0; i < ips.values_num; i++)
 			zbx_json_addstring(&json_data, NULL, ips.values[i], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json_data);
-
 		val = zbx_strdup(val, json_data.buffer);
 		zbx_json_free(&json_data);
 	}
