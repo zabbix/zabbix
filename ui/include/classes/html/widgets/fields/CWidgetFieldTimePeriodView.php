@@ -37,6 +37,12 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 		$this->field = $field;
 	}
 
+	public function getLabel(): ?CLabel {
+		$label = parent::getLabel();
+
+		return $label !== null ? $label->setAsteriskMark(false) : null;
+	}
+
 	public function getViewCollection(): array {
 		$view_collection = [];
 		$source_selector_values = [];
