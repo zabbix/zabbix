@@ -53,14 +53,22 @@ class CMaintenanceHelper {
 	}
 
 	public static function getTimePeriodSchedule(array $timeperiod): string {
-		$time_formatted = zbx_date2str(TIME_FORMAT, ($timeperiod['start_time'] - 3 * SEC_PER_HOUR));
+		$hours = sprintf('%02d', floor($timeperiod['start_time'] / SEC_PER_HOUR));
+		$minutes = sprintf('%02d', floor(($timeperiod['start_time'] % SEC_PER_HOUR) / SEC_PER_MIN));
+		$start_time = $hours.':'.$minutes;
+
+		if ($start_time == '00:00') {
+			$start_time = '24:00';
+		}
+
+		$formatted_start_time = (new DateTime(($start_time)))->format(TIME_FORMAT);
 
 		switch ($timeperiod['timeperiod_type']) {
 			case TIMEPERIOD_TYPE_ONETIME:
 				return zbx_date2str(DATE_TIME_FORMAT, $timeperiod['start_date']);
 
 			case TIMEPERIOD_TYPE_DAILY:
-				return _n('At %1$s every day', 'At %1$s every %2$s days', $time_formatted, $timeperiod['every']);
+				return _n('At %1$s every day', 'At %1$s every %2$s days', $formatted_start_time, $timeperiod['every']);
 
 			case TIMEPERIOD_TYPE_WEEKLY:
 				$week_days = '';
@@ -74,7 +82,7 @@ class CMaintenanceHelper {
 					}
 				}
 
-				return _n('At %1$s %2$s of every week', 'At %1$s %2$s of every %3$s weeks', $time_formatted,
+				return _n('At %1$s %2$s of every week', 'At %1$s %2$s of every %3$s weeks', $formatted_start_time,
 					$week_days, $timeperiod['every']
 				);
 
@@ -102,12 +110,12 @@ class CMaintenanceHelper {
 						}
 					}
 
-					return _s('At %1$s on %2$s %3$s of every %4$s', $time_formatted,
+					return _s('At %1$s on %2$s %3$s of every %4$s', $formatted_start_time,
 						self::getTimePeriodEveryNames()[$timeperiod['every']], $week_days, $months
 					);
 				}
 				else {
-					return _s('At %1$s on day %2$s of every %3$s', $time_formatted, $timeperiod['day'], $months);
+					return _s('At %1$s on day %2$s of every %3$s', $formatted_start_time, $timeperiod['day'], $months);
 				}
 		}
 
