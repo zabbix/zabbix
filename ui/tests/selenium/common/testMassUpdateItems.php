@@ -701,7 +701,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Timeout' => ['id' => 'timeout', 'value' => '0']
 					],
-					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
 			// #33.
@@ -715,7 +715,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Timeout' => ['id' => 'timeout', 'value' => '61']
 					],
-					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
 			// #34.
