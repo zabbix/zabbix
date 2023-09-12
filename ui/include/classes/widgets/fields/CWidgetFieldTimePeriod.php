@@ -53,7 +53,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setDefault(['from' => self::DEFAULT_VALUE['from'], 'to' => self::DEFAULT_VALUE['to']])
+			->setDefaultPeriod(['from' => self::DEFAULT_VALUE['from'], 'to' => self::DEFAULT_VALUE['to']])
 			->setMaxLength(255)
 			->setValidationRules(['type' => API_OBJECT, 'fields' => [
 				'from' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()],
