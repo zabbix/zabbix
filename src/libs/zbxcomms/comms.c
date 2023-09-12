@@ -52,8 +52,6 @@
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
 
-//extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
-
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size, short *events);
@@ -1283,10 +1281,10 @@ static int	tcp_err_in_use(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create socket for listening                                       *
+ * Purpose: creates socket for listening                                      *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
- *               FAIL - an error occurred                                     *
+ *               FAIL - error occurred                                        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,

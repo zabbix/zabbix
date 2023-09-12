@@ -232,10 +232,10 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: print application parameters on stdout with layout suitable for   *
+ * Purpose: prints application parameters on stdout with layout suitable for  *
  *          80-column terminal                                                *
  *                                                                            *
- * Comments:  p - IN usage_message                                            *
+ * Comments:  p - [IN] usage_message                                          *
  ******************************************************************************/
 void	zbx_usage(const char **p)
 {
@@ -294,7 +294,7 @@ static const char	help_message_footer[] =
 
 /******************************************************************************
  *                                                                            *
- * Purpose: print help of application parameters on stdout by application     *
+ * Purpose: prints help of application parameters on stdout by application    *
  *          request with parameter '-h'                                       *
  *                                                                            *
  * Parameters: param - pointer to modification parameter                      *

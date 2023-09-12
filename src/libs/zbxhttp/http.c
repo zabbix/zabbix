@@ -25,10 +25,6 @@
 
 #ifdef HAVE_LIBCURL
 
-/* extern char	*CONFIG_SSL_CA_LOCATION; */
-/* extern char	*CONFIG_SSL_CERT_LOCATION; */
-/* extern char	*CONFIG_SSL_KEY_LOCATION; */
-
 size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
 	size_t			r_size = size * nmemb;

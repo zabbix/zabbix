@@ -38,8 +38,6 @@
 
 #define OK_250	"250"
 
-//extern char	*CONFIG_SSL_CA_LOCATION;
-
 /* SMTP security options */
 #define SMTP_SECURITY_NONE	0
 #define SMTP_SECURITY_STARTTLS	1

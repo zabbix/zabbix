@@ -17,32 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_MANAGER_H
-#define ZABBIX_PP_MANAGER_H
+#ifndef ZABBIX_COMMON_INTERNAL_H
+#define ZABBIX_COMMON_INTERNAL_H
 
-#include "pp_worker.h"
-#include "pp_queue.h"
-#include "zbxpreproc.h"
-#include "zbxalgo.h"
-#include "zbxtimekeeper.h"
-#include "zbxcacheconfig.h"
+#include "zbxcommon.h"
 
-struct zbx_pp_manager
-{
-	zbx_pp_worker_t			*workers;
-	int				workers_num;
-	int				program_type;
-
-	zbx_hashset_t			items;
-	zbx_uint64_t			revision;
-
-	zbx_pp_queue_t			queue;
-
-	zbx_timekeeper_t		*timekeeper;
-
-	zbx_dc_um_shared_handle_t	*um_handle;
-};
-
-zbx_get_progname_f	preproc_get_progname_cb(void);
-
+zbx_log_func_t		common_get_log_func(void);
+zbx_get_progname_f	common_get_progname(void);
+void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname);
 #endif

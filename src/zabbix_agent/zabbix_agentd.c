@@ -95,8 +95,6 @@ int	zbx_config_heartbeat_frequency	= 60;
 
 #include "zbxcrypto.h"
 
-//const char	*progname = NULL;
-
 /* application TITLE */
 static const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)
@@ -227,30 +225,11 @@ static char	shortopts[] =
 /* end of COMMAND LINE OPTIONS */
 
 static char			*TEST_METRIC = NULL;
-//static int			threads_num = 0;
-//static ZBX_THREAD_HANDLE	*threads = NULL;
 ZBX_GET_CONFIG_VAR(int, zbx_threads_num, 0)
 ZBX_GET_CONFIG_VAR(ZBX_THREAD_HANDLE*, zbx_threads, NULL)
 static int			*threads_flags;
-
-/* unsigned char  program_type = ZBX_PROGRAM_TYPE_AGENTD; */
-
-
-/* static unsigned char	get_program_type(void) */
-/* { */
-/* 	return program_type; */
-/* } */
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_AGENTD)
-
-
-//#if defined(_WINDOWS) || defined(__MINGW32__)
-/* static const char	*get_progname(void) */
-/* { */
-/* 	return progname; */
-/* } */
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
-//#endif
-
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
@@ -302,8 +281,6 @@ static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 
 static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
-
-//static char	*opt = NULL;
 
 #ifdef _WINDOWS
 void	zbx_co_uninitialize();
@@ -364,7 +341,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
 			&zbx_optind)))
 	{
-	opt_count[(unsigned char)ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -931,7 +908,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1024},
 		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
-		{"ListenPort",			&zbx_config_listen_port,	       	TYPE_INT,
+		{"ListenPort",			&zbx_config_listen_port,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},

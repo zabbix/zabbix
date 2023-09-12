@@ -457,12 +457,6 @@ while (0)
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
 			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
-//extern const char	*progname;
-//extern const char	title_message[];
-//extern const char	syslog_app_name[];
-//extern const char	*usage_message[];
-//extern const char	*help_message[];
-
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
 void	zbx_help(const char *param, const char **p, const char **usage_message);

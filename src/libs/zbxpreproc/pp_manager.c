@@ -48,7 +48,7 @@
 #endif
 
 static zbx_flush_value_func_t	flush_value_func_cb = NULL;
-static zbx_get_progname_f       get_progname_func_cb = NULL;
+static zbx_get_progname_f	get_progname_func_cb = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -104,7 +104,7 @@ void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb, zbx_get_pro
 	get_progname_func_cb = get_progname_cb;
 }
 
-zbx_get_progname_f       preproc_get_progname_cb(void)
+zbx_get_progname_f	preproc_get_progname_cb(void)
 {
 	return get_progname_func_cb;
 }

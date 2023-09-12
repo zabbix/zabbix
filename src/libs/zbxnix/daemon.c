@@ -37,12 +37,8 @@ static int	parent_pid = -1;
 
 /* pointer to function for getting caller's PID file location */
 static zbx_get_pid_file_pathname_f	get_pid_file_pathname_cb = NULL;
-
-//extern pid_t	*threads;
-static zbx_get_threads_f	get_threads_func_cb;
-static zbx_get_config_int_f	get_threads_num_func_cb;
-
-//extern int	threads_num;
+static zbx_get_threads_f		get_threads_func_cb;
+static zbx_get_config_int_f		get_threads_num_func_cb;
 
 extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num);
@@ -254,6 +250,8 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
  *             config_log_type    - [IN]                                      *
  *             config_log_file    - [IN]                                      *
  *             signal_redirect_cb - [IN] USR1 handling callback               *
+ *                 get_threads_cb - [IN]                                      *
+ *             get_threads_num_cb - [IN]                                      *
  *                                                                            *
  * Comments: it doesn't allow running under 'root' if allow_root is zero      *
  *                                                                            *
