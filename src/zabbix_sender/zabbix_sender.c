@@ -131,7 +131,13 @@ static const char	*usage_message[] = {
 	NULL	/* end of text */
 };
 
-ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_SENDER)
+unsigned char	zbx_program_type = ZBX_PROGRAM_TYPE_SENDER;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+static unsigned char	get_zbx_program_type(void)
+{
+	return zbx_program_type;
+}
+#endif
 
 static int	config_timeout = 3;
 
