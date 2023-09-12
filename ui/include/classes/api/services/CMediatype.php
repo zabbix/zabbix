@@ -75,6 +75,7 @@ class CMediatype extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
+			'selectActions'				=> null,
 			'selectMessageTemplates'	=> null,
 			'selectUsers'				=> null,
 			'countOutput'				=> false,
@@ -959,6 +960,34 @@ class CMediatype extends CApiService {
 				}
 			}
 			unset($mediatype);
+		}
+
+		if ($options['selectActions'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+			$actions = API::Action()->get([
+				'output' => $options['selectActions'],
+				'selectOperations' => ['operationtype', 'opmessage']
+			]);
+
+			if ($actions) {
+				foreach ($result as $mediatypeid => $mediatype) {
+					$result[$mediatypeid]['actions'] = [];
+
+					foreach ($actions as $action) {
+						foreach ($action['operations'] as $operation) {
+							if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
+								&& ($operation['opmessage']['mediatypeid'] == $mediatypeid
+									|| $operation['opmessage']['mediatypeid'] == 0)) {
+								unset($action['operations']);
+								$result[$mediatypeid]['actions'][$action['actionid']] = $action;
+
+								break;
+							}
+						}
+					}
+
+					CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
+				}
+			}
 		}
 
 		return $result;
