@@ -2285,20 +2285,28 @@ in:
   expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status", "unknown status")'
 out:
   result: SUCCEED
-  value: ''
+  value: '<status/>'
 ---
-test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status><status>xyz</status></error></response>", "/response/error/status", "unknown status")'
+test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status></error></response>", "/response/error/status/text()")'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
-  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status><status>xyz</status></error></response>", "/response/error/status", "unknown status")'
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status>abc</status></error></response>", "/response/error/status/text()")'
 out:
   result: SUCCEED
-  value: 'abcxyz'
+  value: 'abc'
+---
+test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "string(/response/error/status)", "unknown status")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "string(/response/error/status)", "unknown status")'
+out:
+  result: SUCCEED
+  value: ''
 ---
 test case: Expression 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status/text()")'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
-  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error<status>abc</status><status>xyz</status></error></response>", "/response/error/status")'
+  expression: 'xmlxpath("<?xml version=\"1.0\" encoding=\"UTF-8\"?><response><error><status></status></error></response>", "/response/error/status/text()")'
 out:
   result: FAIL
   value: ''

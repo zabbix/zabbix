@@ -255,9 +255,6 @@ void zbx_xml_escape_xpath(char **data)
 	*data = buffer;
 }
 
-typedef int(*store_xpath_nodeset_t)(zbx_variant_t *value, xmlDoc *doc, xmlXPathObject *xpathObj,
-		int *is_empty, char **errmsg);
-
 static int	xpath_nodeset_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathObject *xpathObj,
 		int *is_empty, char **errmsg)
 {
@@ -266,8 +263,6 @@ static int	xpath_nodeset_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathOb
 	xmlNodeSetPtr	nodeset;
 	xmlBufferPtr	xmlBufferLocal;
 
-	ZBX_UNUSED(is_empty);
-
 	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
 		return FAIL;
 
@@ -275,8 +270,15 @@ static int	xpath_nodeset_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathOb
 	{
 		nodeset = xpathObj->nodesetval;
 
+		if (0 == nodeset->nodeNr && NULL != is_empty)
+			*is_empty = SUCCEED;
+
 		for (int i = 0; i < nodeset->nodeNr; i++)
 			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
+	}
+	else if (NULL != is_empty)
+	{
+		*is_empty = SUCCEED;
 	}
 
 	zbx_variant_clear(value);
@@ -288,46 +290,7 @@ static int	xpath_nodeset_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathOb
 	return SUCCEED;
 }
 
-static int	xpath_nodeset_contents_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathObject *xpathObj,
-		int *is_empty, char **errmsg)
-{
-#ifdef HAVE_LIBXML2
-	char 		*result;
-	xmlNodeSetPtr	nodeset;
-	xmlChar		*buf;
-
-	result = (char *)zbx_malloc(NULL, 1 * sizeof(char));
-	*result = '\0';
-	*is_empty = FAIL;
-
-	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		nodeset = xpathObj->nodesetval;
-
-		if (0 == nodeset->nodeNr)
-			*is_empty = SUCCEED;
-
-		for (int i = 0; i < nodeset->nodeNr; i++)
-		{
-			if (NULL != (buf = (char *)xmlNodeListGetString(doc, nodeset->nodeTab[i]->xmlChildrenNode, 1)))
-			{
-				result = zbx_dsprintf(result, "%s%s", result, buf);
-				xmlFree((xmlChar *)buf);
-			}
-		}
-	}
-	else
-		*is_empty = SUCCEED;
-
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, result);
-#endif
-
-	return SUCCEED;
-}
-
-static int	query_xpath(zbx_variant_t *value, const char *params, store_xpath_nodeset_t process_nodeset,
-		int *is_empty, char **errmsg)
+static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(value);
@@ -363,10 +326,14 @@ static int	query_xpath(zbx_variant_t *value, const char *params, store_xpath_nod
 		goto out;
 	}
 
+	/* set is_empty before switch because of different possible XPATH types */
+	if (NULL != is_empty)
+		*is_empty = FAIL;
+
 	switch (xpathObj->type)
 	{
 		case XPATH_NODESET:
-			ret = process_nodeset(value, doc, xpathObj, is_empty, errmsg);
+			ret = xpath_nodeset_to_string(value, doc, xpathObj, is_empty, errmsg);
 			break;
 		case XPATH_STRING:
 			zbx_variant_clear(value);
@@ -422,7 +389,7 @@ out:
  ******************************************************************************/
 int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 {
-	return query_xpath(value, params, xpath_nodeset_to_string, NULL, errmsg);
+	return query_xpath(value, params, NULL, errmsg);
 }
 
 /******************************************************************************
@@ -440,7 +407,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
  ******************************************************************************/
 int	zbx_query_xpath_contents(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
 {
-	return query_xpath(value, params, xpath_nodeset_contents_to_string, is_empty, errmsg);
+	return query_xpath(value, params, is_empty, errmsg);
 }
 
 #ifdef HAVE_LIBXML2

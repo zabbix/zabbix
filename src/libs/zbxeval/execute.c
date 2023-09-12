@@ -28,7 +28,10 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
-#include "zbxxml.h"
+
+#ifdef HAVE_LIBXML2
+#	include "zbxxml.h"
+#endif
 
 /* exit code in addition to SUCCEED/FAIL */
 #define UNKNOWN		1
@@ -2861,6 +2864,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	return SUCCEED;
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluates xmlxpath() function                                     *
@@ -2877,6 +2881,14 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
+#ifndef HAVE_LIBXML2
+	ZBX_UNUSED(ctx);
+	ZBX_UNUSED(token);
+	ZBX_UNUSED(output);
+
+	*error = zbx_strdup(*error, "Support for XML was not compiled in.");
+	return FAIL;
+#else
 	int		ret, is_empty;
 	zbx_variant_t	*xml_value, *path, value, *default_value = NULL;
 
@@ -2939,6 +2951,7 @@ static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const z
 	eval_function_return(token->opt, &value, output);
 
 	return SUCCEED;
+#endif
 }
 
 /******************************************************************************
