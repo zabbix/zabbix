@@ -30,7 +30,6 @@
  * Purpose: retrieve data from database                                       *
  *                                                                            *
  * Parameters: item           - [IN] item we are interested in                *
- *             config_timeout - [IN]                                          *
  *             result         - [OUT] check result                            *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *

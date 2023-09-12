@@ -47,9 +47,8 @@
 #define ZBX_DBSYNC_OBJ_CONNECTOR	17
 #define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
 #define ZBX_DBSYNC_OBJ_PROXY		19
-#define ZBX_DBSYNC_OBJ_ITEM_TYPE_TIMEOUT	20
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		20
+#define ZBX_DBSYNC_OBJ_COUNT		19
 
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 

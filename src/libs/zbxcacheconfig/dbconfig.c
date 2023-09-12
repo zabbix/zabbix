@@ -1141,7 +1141,8 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->revision.config_table = revision;
 	}
 
-	if (NULL == config->config->item_timeouts.external || 0 != strcmp(config->config->item_timeouts.external, row[37]))
+	if (NULL == config->config->item_timeouts.external || 0 != strcmp(config->config->item_timeouts.external,
+			row[37]))
 	{
 		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.external, row[37]);
 		config->revision.config_table = revision;
@@ -2759,7 +2760,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		item->value_type = value_type;
 		item->interfaceid = interfaceid;
 
-
 		/* update items_hk index using new data, if not done already */
 
 		if (1 == update_index)
@@ -2914,7 +2914,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			dc_strpool_replace(found, &dbitem->params, row[11]);
 			dc_strpool_replace(found, &dbitem->username, row[14]);
 			dc_strpool_replace(found, &dbitem->password, row[15]);
-
 		}
 		else if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &itemid)))
 		{
@@ -6886,7 +6885,6 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			zbx_hashset_insert(&config->proxies_p, &proxy_p_local, sizeof(zbx_dc_proxy_name_t));
 		}
 
-
 		if (0 == found)
 		{
 			proxy->location = ZBX_LOC_NOWHERE;
@@ -6955,7 +6953,6 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
 
 /******************************************************************************
  *                                                                            *

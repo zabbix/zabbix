@@ -61,7 +61,6 @@ void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, 
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
  * Parameters: item             - [IN] item we are interested in              *
- *             timeout          - [IN]                                        *
  *             config_source_ip - [IN]                                        *
  *             result           - [OUT]                                       *
  *                                                                            *

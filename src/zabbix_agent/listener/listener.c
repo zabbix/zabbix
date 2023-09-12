@@ -54,11 +54,11 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 		if (0 != s->reserved_payload)
 			timeout = s->reserved_payload;
 		else
-			timeout = config_timeout;
+			timeout = (zbx_uint32_t)config_timeout;
 
 		zbx_init_agent_result(&result);
 
-		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
+		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result, (int)timeout))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
