@@ -27,6 +27,8 @@ use CAbsoluteTimeParser,
 	CRangeTimeParser,
 	CRelativeTimeParser;
 
+use DateTimeZone;
+
 use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldTimePeriod extends CWidgetField {
@@ -43,14 +45,13 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	private ?string $from_label = null;
 	private ?string $to_label = null;
 
+	private ?DateTimeZone $timezone = null;
 	private array $default_period = ['from' => '', 'to' => ''];
 
-	private bool $is_date_only;
+	private bool $is_date_only = false;
 
 	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
 		parent::__construct($name, $label);
-
-		$this->is_date_only = $is_date_only;
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
@@ -90,7 +91,13 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function validate(bool $strict = false): array {
 		$validation_rules = $this->getValidationRules($strict);
 
-		$field_label = $this->full_name ?? $this->label ?? $this->name;
+		$field_label = $this->full_name ?? $this->label;
+		$period_labels_prefix = ($field_label !== null ? $field_label.'/' : '');
+		$period_labels = [
+			'from' => $this->getFromLabel(),
+			'to' => $this->getToLabel()
+		];
+
 		$field_value = $this->getValue();
 
 		$default = $this->getDefault();
@@ -105,7 +112,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				: '';
 
 			if (!CApiInputValidator::validate($validation_rules['fields'][CWidgetField::FOREIGN_REFERENCE_KEY],
-					$reference_value, $field_label.'/'.$data_source_label, $error)) {
+					$reference_value, $period_labels_prefix.$data_source_label, $error)) {
 				$errors[] = $error;
 			}
 		}
@@ -115,16 +122,11 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			$default_period = $this->getDefaultPeriod();
 
-			$name_labels = [
-				'from' => $this->getFromLabel(),
-				'to' => $this->getToLabel()
-			];
-
 			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
 				if (!array_key_exists($name, $field_value)) {
 					if ($strict) {
-						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label,
-							_s('the parameter "%1$s" is missing', $name_labels[$name])
+						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label ?? $this->name,
+							_s('the parameter "%1$s" is missing', $period_labels[$name])
 						);
 						continue;
 					}
@@ -136,7 +138,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 				$value = &$field_value[$name];
 				$value_ts = &$field_value[$name_ts];
-				$label = $field_label.'/'.$name_labels[$name];
+				$label = $period_labels_prefix.$period_labels[$name];
 
 				if (!CApiInputValidator::validate($validation_rules['fields'][$name], $value, $label, $error)) {
 					$errors[] = $error;
@@ -149,7 +151,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				}
 
 				if ($absolute_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
-					$datetime = $absolute_time_parser->getDateTime($name === 'from');
+					$datetime = $absolute_time_parser->getDateTime($name === 'from', $this->timezone);
 					$time_range = $name === 'from' ? '00:00:00' : '23:59:59';
 
 					if (!$this->is_date_only || $datetime->format('H:i:s') === $time_range) {
@@ -159,7 +161,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				}
 
 				if ($relative_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
-					$datetime = $relative_time_parser->getDateTime($name === 'from');
+					$datetime = $relative_time_parser->getDateTime($name === 'from', $this->timezone);
 					$has_errors = false;
 
 					if ($this->is_date_only) {
@@ -187,8 +189,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			if (!$errors) {
 				if ($field_value['from'] !== '' && $field_value['to'] !== ''
 						&& $field_value['from_ts'] >= $field_value['to_ts']) {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label.'/'.$name_labels['to'],
-						_s('value must be greater than "%1$s"', $field_label.'/'.$name_labels['from'])
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $period_labels_prefix.$period_labels['to'],
+						_s('value must be greater than "%1$s"', $period_labels_prefix.$period_labels['from'])
 					);
 				}
 			}
@@ -202,7 +204,9 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
 					$range_time_parser->parse($field_value[$name]);
-					$field_value[$name_ts] = $range_time_parser->getDateTime($name === 'from')->getTimestamp();
+					$field_value[$name_ts] = $range_time_parser
+						->getDateTime($name === 'from', $this->timezone)
+						->getTimestamp();
 				}
 			}
 		}
@@ -264,6 +268,18 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	public function setToLabel(string $label): self {
 		$this->to_label = $label;
+
+		return $this;
+	}
+
+	public function setTimeZone(?DateTimeZone $timezone): self {
+		$this->timezone = $timezone;
+
+		return $this;
+	}
+
+	public function setDateOnly(bool $is_date_only = true): self {
+		$this->is_date_only = $is_date_only;
 
 		return $this;
 	}

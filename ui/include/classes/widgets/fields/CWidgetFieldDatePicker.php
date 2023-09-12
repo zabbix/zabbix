@@ -32,12 +32,10 @@ class CWidgetFieldDatePicker extends CWidgetField {
 	public const DEFAULT_VIEW = \CWidgetFieldDatePickerView::class;
 	public const DEFAULT_VALUE = '';
 
-	private bool $is_date_only;
+	private bool $is_date_only = false;
 
-	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
-
-		$this->is_date_only = $is_date_only;
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
@@ -93,6 +91,12 @@ class CWidgetFieldDatePicker extends CWidgetField {
 				$this->is_date_only ? _('a date is expected') : _('a time is expected')
 			)
 		];
+	}
+
+	public function setDateOnly(bool $is_date_only = true): self {
+		$this->is_date_only = $is_date_only;
+
+		return $this;
 	}
 
 	protected function getValidationRules(bool $strict = false): array {
