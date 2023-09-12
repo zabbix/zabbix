@@ -214,12 +214,7 @@ static char	*CONFIG_PID_FILE = NULL;
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, problems_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, history_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, trends_export, NULL)
-
-static unsigned char	program_type = ZBX_PROGRAM_TYPE_SERVER;
-static unsigned char	get_program_type(void)
-{
-	return program_type;
-}
+ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_SERVER)
 
 int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
@@ -788,7 +783,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 			"IPMI support"));
 #endif
 
-	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
+	err |= (FAIL == zbx_db_validate_config_features(zbx_program_type, zbx_config_dbhigh));
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == zbx_config_webservice_url)
 	{
@@ -1057,7 +1052,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 #endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_validate_config(zbx_config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
-			CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER], get_program_type);
+			CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER], get_zbx_program_type);
 #endif
 }
 
@@ -1254,15 +1249,15 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	zbx_init_metrics();
-	zbx_init_library_cfg(program_type, config_file);
+	zbx_init_library_cfg(zbx_program_type, config_file);
 
 	zbx_load_config(&t);
 
-	zbx_init_library_dbupgrade(get_program_type);
+	zbx_init_library_dbupgrade(get_zbx_program_type);
 	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
-	zbx_init_library_ipcservice(program_type);
-	zbx_init_library_stats(get_program_type);
+	zbx_init_library_ipcservice(zbx_program_type);
+	zbx_init_library_stats(get_zbx_program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
@@ -1301,7 +1296,7 @@ static void	zbx_check_db(void)
 	int		result = SUCCEED;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
-	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
+	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, zbx_program_type);
 
 	if (SUCCEED == result)
 		zbx_db_extract_dbextension_info(&db_version_info);
@@ -1414,16 +1409,16 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_args_t		thread_args;
 
-	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, get_zbx_progname, ZBX_NO_POLLER,
+	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, get_zbx_progname, ZBX_NO_POLLER,
 							config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller};
-	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
+	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							&events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency};
-	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip};
-	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
+	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_zbx_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
 							zbx_config_source_ip, config_ssl_ca_location,
 							config_ssl_cert_location, config_ssl_key_location,
@@ -1431,7 +1426,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_proxydata_frequency};
 	zbx_thread_httppoller_args	httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 							config_ssl_cert_location, config_ssl_key_location};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER], zbx_config_source_ip,
 							&events_cbs};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
@@ -1466,7 +1461,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 
-	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_server_history, config_history_cache_size,
+	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
@@ -1474,7 +1469,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_init_configuration_cache(get_program_type, get_config_forks, config_conf_cache_size, &error))
+	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
+			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
 		zbx_free(error);
@@ -1552,7 +1548,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_set_exit_on_terminate();
 
-	thread_args.info.program_type = program_type;
+	thread_args.info.program_type = zbx_program_type;
 
 	for (i = 0; i < zbx_threads_num; i++)
 	{
@@ -2092,7 +2088,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_server_history, config_history_cache_size,
+	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
