@@ -952,7 +952,7 @@ static int	DBpatch_6050091(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050090(void)
+static int	DBpatch_6050092(void)
 {
 	const zbx_db_field_t	field = {"manualinput", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -960,28 +960,28 @@ static int	DBpatch_6050090(void)
 }
 
 
-static int	DBpatch_6050091(void)
+static int	DBpatch_6050093(void)
 {
 	const zbx_db_field_t	field = {"manualinput_prompt", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
-static int	DBpatch_6050092(void)
+static int	DBpatch_6050094(void)
 {
 	const zbx_db_field_t	field = {"manualinput_validator", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
-static int	DBpatch_6050093(void)
+static int	DBpatch_6050095(void)
 {
 	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("scripts", &field);
 }
 
-static int	DBpatch_6050094(void)
+static int	DBpatch_6050096(void)
 {
 	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
