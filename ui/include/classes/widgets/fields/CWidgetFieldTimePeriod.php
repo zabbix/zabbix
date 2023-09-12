@@ -194,13 +194,15 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
-
-		if ($value === $this->getDefault()) {
-			return;
-		}
+		$default = $this->getDefault();
 
 		switch ($this->data_source) {
 			case self::DATA_SOURCE_DEFAULT:
+				if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
+						&& $value['from'] === $default['from'] && $value['to'] === $default['to']) {
+					return;
+				}
+
 				array_push($widget_fields,
 					[
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -213,16 +215,20 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 						'value' => $value['to']
 					]
 				);
-				break;
+				return;
 
 			case self::DATA_SOURCE_WIDGET:
 			case self::DATA_SOURCE_DASHBOARD:
+				if ($value === $default) {
+					return;
+				}
+
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 					'name' => $this->name.'['.self::FOREIGN_REFERENCE_KEY.']',
 					'value' => $value[self::FOREIGN_REFERENCE_KEY]
 				];
-				break;
+				return;
 		}
 	}
 
