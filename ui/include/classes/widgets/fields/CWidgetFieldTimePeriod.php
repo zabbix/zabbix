@@ -93,6 +93,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		$field_label = $this->full_name ?? $this->label ?? $this->name;
 		$field_value = $this->getValue();
 
+		$default = $this->getDefault();
+
 		$errors = [];
 
 		if ($this->data_source !== self::DATA_SOURCE_DEFAULT) {
@@ -111,6 +113,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			$absolute_time_parser = new CAbsoluteTimeParser();
 			$relative_time_parser = new CRelativeTimeParser();
 
+			$default_period = $this->getDefaultPeriod();
+
 			$name_labels = [
 				'from' => $this->getFromLabel(),
 				'to' => $this->getToLabel()
@@ -118,10 +122,16 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
 				if (!array_key_exists($name, $field_value)) {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label,
-						_s('the parameter "%1$s" is missing', $name_labels[$name])
-					);
-					continue;
+					if ($strict) {
+						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label,
+							_s('the parameter "%1$s" is missing', $name_labels[$name])
+						);
+						continue;
+					}
+
+					$field_value[$name] = array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
+						? $default_period[$name]
+						: $default[$name];
 				}
 
 				$value = &$field_value[$name];
@@ -185,7 +195,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		}
 
 		if ($errors) {
-			$field_value = $this->getDefault();
+			$field_value = $default;
 
 			if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $field_value)) {
 				$range_time_parser = new CRangeTimeParser();
@@ -208,23 +218,15 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 		switch ($this->data_source) {
 			case self::DATA_SOURCE_DEFAULT:
-				if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
-						&& $value['from'] === $default['from'] && $value['to'] === $default['to']) {
-					return;
+				foreach (['from', 'to'] as $name) {
+					if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $default) || $value[$name] !== $default[$name]) {
+						$widget_fields[] = [
+							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+							'name' => $this->name.'['.$name.']',
+							'value' => $value[$name]
+						];
+					}
 				}
-
-				array_push($widget_fields,
-					[
-						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-						'name' => $this->name.'[from]',
-						'value' => $value['from']
-					],
-					[
-						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-						'name' => $this->name.'[to]',
-						'value' => $value['to']
-					]
-				);
 				return;
 
 			case self::DATA_SOURCE_WIDGET:
