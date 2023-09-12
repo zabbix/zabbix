@@ -60,7 +60,7 @@ int	zbx_redirect_stdio(const char *filename)
 
 void	log_init(void)
 {
-	zbx_init_library_common(zbx_log_go_impl);
+	zbx_init_library_common(zbx_log_go_impl, NULL);
 }
 
 */
