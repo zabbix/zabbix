@@ -98,6 +98,8 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertItems(array $items): array {
 		foreach ($items as &$item) {
+			$item += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
+
 			if ($item['type'] !== CXmlConstantName::HTTP_AGENT && $item['type'] !== CXmlConstantName::SCRIPT) {
 				unset($item['timeout']);
 			}
@@ -116,6 +118,8 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertDiscoveryRules(array $discovery_rules): array {
 		foreach ($discovery_rules as &$discovery_rule) {
+			$discovery_rule += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
+
 			if ($discovery_rule['type'] !== CXmlConstantName::HTTP_AGENT
 					&& $discovery_rule['type'] !== CXmlConstantName::SCRIPT) {
 				unset($discovery_rule['timeout']);
@@ -139,6 +143,8 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertItemPrototypes(array $item_prototypes): array {
 		foreach ($item_prototypes as &$item_prototype) {
+			$item_prototype += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
+
 			if ($item_prototype['type'] !== CXmlConstantName::HTTP_AGENT
 					&& $item_prototype['type'] !== CXmlConstantName::SCRIPT) {
 				unset($item_prototype['timeout']);
