@@ -141,9 +141,7 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 	$time_period_field = (new CWidgetFieldTimePeriodView($fields['time_period']))
 		->setDateFormat(ZBX_FULL_DATE_TIME)
 		->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-		->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-		->setDefaultFromValue('now-1h')
-		->setDefaultToValue('now');
+		->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'));
 
 	$form->registerField($time_period_field);
 

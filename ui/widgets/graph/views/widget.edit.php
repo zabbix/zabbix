@@ -55,8 +55,6 @@ else {
 			->setDateFormat(ZBX_FULL_DATE_TIME)
 			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-			->setDefaultFromValue('now-1h')
-			->setDefaultToValue('now')
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_legend'])

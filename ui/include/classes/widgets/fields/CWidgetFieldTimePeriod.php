@@ -42,6 +42,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	private ?string $from_label = null;
 	private ?string $to_label = null;
 
+	private array $default_period = [];
+
 	private bool $is_date_only;
 
 	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
@@ -51,6 +53,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
+			->setDefault(['from' => self::DEFAULT_VALUE['from'], 'to' => self::DEFAULT_VALUE['to']])
 			->setMaxLength(255)
 			->setValidationRules(['type' => API_OBJECT, 'fields' => [
 				'from' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => $this->getMaxLength()],
@@ -252,6 +255,23 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	public function setToLabel(string $label): self {
 		$this->to_label = $label;
+
+		return $this;
+	}
+
+	public function getDefaultPeriod(): array {
+		return $this->default_period;
+	}
+
+	/**
+	 * @param array  $period
+	 *        string $period['from']
+	 *        string $period['to']
+	 *
+	 * @return $this
+	 */
+	public function setDefaultPeriod(array $period): self {
+		$this->default_period = $period;
 
 		return $this;
 	}

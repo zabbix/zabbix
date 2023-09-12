@@ -284,6 +284,7 @@ class WidgetForm extends CWidgetForm {
 							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
 						)
 					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 	}
