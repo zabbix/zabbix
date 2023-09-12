@@ -61,7 +61,7 @@ class CMaintenanceHelper {
 			$start_time = '24:00';
 		}
 
-		$formatted_start_time = (new DateTime(($start_time)))->format(TIME_FORMAT);
+		$formatted_start_time = (new DateTime($start_time))->format(TIME_FORMAT);
 
 		switch ($timeperiod['timeperiod_type']) {
 			case TIMEPERIOD_TYPE_ONETIME:
