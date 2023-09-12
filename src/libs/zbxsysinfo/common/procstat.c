@@ -197,9 +197,9 @@ static int			procstat_snapshot_num;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	procstat_dshm_has_enough_space(void *base, size_t size)
+static int	procstat_dshm_has_enough_space(const void *base, size_t size)
 {
-	zbx_procstat_header_t	*header = (zbx_procstat_header_t *)base;
+	const zbx_procstat_header_t	*header = (const zbx_procstat_header_t *)base;
 
 	if (header->size >= size + header->size_allocated)
 		return SUCCEED;
@@ -733,7 +733,7 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
  *                                                                            *
  ******************************************************************************/
 static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_t *stats,
-		zbx_vector_uint64_t *pids)
+		const zbx_vector_uint64_t *pids)
 {
 	zbx_timespec_t	snapshot_timestamp;
 
@@ -775,7 +775,7 @@ static int	procstat_util_compare(const void *d1, const void *d2)
  *                                                                            *
  ******************************************************************************/
 static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
-			zbx_vector_uint64_t *pids, const zbx_procstat_util_t *stats)
+			const zbx_vector_uint64_t *pids, const zbx_procstat_util_t *stats)
 {
 	for (int j = 0; j < queries->values_num; j++)
 	{
