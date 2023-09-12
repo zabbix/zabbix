@@ -51,7 +51,7 @@ class CSVGGauge {
 	static UNITS_POSITION_AFTER = 2;
 	static UNITS_POSITION_BELOW = 3;
 
-	static SCALE_SIZE_DEFAULT = 10;
+	static SCALE_SIZE_DEFAULT = 15;
 
 	static ARCS_GAP = 2;
 

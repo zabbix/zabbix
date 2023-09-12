@@ -62,7 +62,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_SCALE_SHOW = 1;
 	private const DEFAULT_SCALE_DECIMAL_PLACES = 0;
 	private const DEFAULT_SCALE_SHOW_UNITS = 1;
-	private const DEFAULT_SCALE_SIZE_PERCENT = 10;
+	private const DEFAULT_SCALE_SIZE_PERCENT = 15;
 
 	// Description defaults.
 	private const DEFAULT_DESCRIPTION_SIZE_PERCENT = 15;
@@ -92,7 +92,7 @@ class WidgetForm extends CWidgetForm {
 	// Threshold defaults.
 	private const DEFAULT_TH_SHOW_LABELS = 0;
 	private const DEFAULT_TH_SHOW_ARC = 0;
-	private const DEFAULT_TH_ARC_SIZE_PERCENT = 10;
+	private const DEFAULT_TH_ARC_SIZE_PERCENT = 5;
 
 	private bool $is_binary_units = false;
 
