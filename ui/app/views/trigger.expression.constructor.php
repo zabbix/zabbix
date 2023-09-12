@@ -30,7 +30,6 @@ if (array_key_exists('error', $data)) {
 }
 else {
 	$expression_table = (new CTable())
-		->setAttribute('style', 'width: 100%;')
 		->setHeader([
 			$data['readonly'] ? null : _('Target'),
 			_('Expression'),
