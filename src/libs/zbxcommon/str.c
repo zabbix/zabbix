@@ -2948,40 +2948,7 @@ static int	function_parse_name(const char *expr, size_t *length)
  ******************************************************************************/
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
-	const char	*ptr = expr;
-
-	/* skip the leading whitespace */
-	while (' ' == *ptr)
-		ptr++;
-
-	*param_pos = ptr - expr;
-
-	if ('"' == *ptr)	/* quoted parameter */
-	{
-		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
-		{
-			if ('\0' == *ptr)
-			{
-				*length = ptr - expr - *param_pos;
-				goto out;
-			}
-		}
-
-		*length = ++ptr - expr - *param_pos;
-
-		/* skip trailing whitespace to find the next parameter */
-		while (' ' == *ptr)
-			ptr++;
-	}
-	else	/* unquoted parameter */
-	{
-		for (ptr = expr; '\0' != *ptr && ')' != *ptr && ',' != *ptr; ptr++)
-			;
-
-		*length = ptr - expr - *param_pos;
-	}
-out:
-	*sep_pos = ptr - expr;
+	zbx_function_param_parse_ext(expr, 0, 0, param_pos, length, sep_pos);
 }
 
 /******************************************************************************
@@ -3023,7 +2990,7 @@ void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros,
 					continue;
 				}
 
-				if (0 == esc_bs)
+				if (ZBX_BACKSLASH_ESC_OFF == esc_bs)
 					continue;
 
 				ptr++;
@@ -3084,8 +3051,28 @@ out:
  ******************************************************************************/
 void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
-	return zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO, 1, param_pos, length, sep_pos);
+	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO, ZBX_BACKSLASH_ESC_OFF, param_pos, length, sep_pos);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse trigger prototype function parameter                        *
+ *                                                                            *
+ * Parameters: expr      - [IN] pre-validated function parameter list         *
+ *             param_pos - [OUT] the parameter position, excluding leading    *
+ *                               whitespace                                   *
+ *             length    - [OUT] the parameter length including trailing      *
+ *                               whitespace for unquoted parameter            *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or '\0' or ')') position                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
+{
+	zbx_function_param_parse_ext(expr, ZBX_TOKEN_USER_MACRO | ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO,
+			ZBX_BACKSLASH_ESC_OFF, param_pos, length, sep_pos);
+}
+
 
 /******************************************************************************
  *                                                                            *
