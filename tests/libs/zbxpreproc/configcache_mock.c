@@ -30,9 +30,9 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-        ZBX_UNUSED(flags);
+	ZBX_UNUSED(flags);
 
-        return 0;
+	return 0;
 }
 
 int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,

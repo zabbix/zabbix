@@ -39,9 +39,9 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-        ZBX_UNUSED(flags);
+	ZBX_UNUSED(flags);
 
-        return 0;
+	return 0;
 }
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
