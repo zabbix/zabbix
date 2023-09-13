@@ -22,7 +22,9 @@
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
-
+#ifdef _WINDOWS
+#include "zbxparam.h"
+#endif
 /******************************************************************************
  *                                                                            *
  * Purpose: loads aliases from configuration                                  *
