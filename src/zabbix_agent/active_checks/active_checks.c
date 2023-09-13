@@ -1534,7 +1534,13 @@ static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC 
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result, metric->timeout)))
+	if (ZBX_CHECK_TIMEOUT_UNDEFINED == metric->timeout)
+	{
+		SET_MSG_RESULT(&result, zbx_strdup(NULL, "Unsupported timeout value."));
+		*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
+		ret = NOTSUPPORTED;
+	}
+	else if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result, metric->timeout)))
 	{
 		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);

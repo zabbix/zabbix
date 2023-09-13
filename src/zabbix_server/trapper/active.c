@@ -633,10 +633,9 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 						"on hostid " ZBX_FS_UI64, dc_items[i].timeout, dc_items[i].key, hostid);
 			}
 			else
-			{
 				zbx_is_time_suffix(dc_items[i].timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMEOUT, timeout_sec);
-			}
+
+			zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMEOUT, timeout_sec);
 
 			zbx_json_close(&json);
 
