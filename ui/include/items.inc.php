@@ -2539,21 +2539,19 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
 function sortPreprocessingStepsByCheckUnsupported(array $steps): array {
 	$preproc_regex = [];
 	$preproc_any = [];
+	$sorted_steps = [];
 
-	foreach ($steps as $i => $step) {
+	foreach ($steps as $step) {
 		if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-			continue;
+			$sorted_steps[] = $step;
 		}
-
-		if ($step['params'][0] != ZBX_PREPROC_MATCH_ERROR_ANY) {
+		elseif ($step['params'][0] != ZBX_PREPROC_MATCH_ERROR_ANY) {
 			$preproc_regex[] = $step;
 		}
 		else {
 			$preproc_any[] = $step;
 		}
-
-		unset($steps[$i]);
 	}
 
-	return array_merge($preproc_regex, array_values($steps), $preproc_any);
+	return array_merge($preproc_regex, $preproc_any, $sorted_steps);
 }
