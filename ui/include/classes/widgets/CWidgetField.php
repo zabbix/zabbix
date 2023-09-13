@@ -301,7 +301,7 @@ abstract class CWidgetField {
 				foreach ($value as $index => $each_value) {
 					$widget_fields[] = [
 						'type' => $this->save_type,
-						'name' => $this->name . '.' . $index,
+						'name' => $this->name.'.'.$index,
 						'value' => $each_value
 					];
 				}
