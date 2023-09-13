@@ -487,6 +487,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
  *             endianness  - [IN] endianness                                  *
  *             offset      - [IN] number of registers to be discarded         *
  *             total_count - [IN] total number bits/registers with offset     *
+ *             timeout     - [IN] check execution timeout                     *
  *             res         - [OUT] retrieved modbus data                      *
  *             error       - [OUT] error message in case of failure           *
  *                                                                            *

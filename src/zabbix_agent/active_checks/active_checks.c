@@ -436,6 +436,8 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *     host                  - [IN] address of host                             *
  *     port                  - [IN] port number on host                         *
  *     config_revision_local - [IN/OUT] revision of processed configuration     *
+ *     config_timeout        - [IN] global timeout value for checks without     *
+ *                                  timeouts                                    *
  *                                                                              *
  * Comments:                                                                    *
  *    String is represented as "ZBX_EOF" termination list, with '\n'            *

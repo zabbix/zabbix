@@ -71,10 +71,11 @@ static int	check_response(const char *response, AGENT_RESULT *result)
  *                                                                            *
  * Purpose: send Zabbix stats request and receive the result data             *
  *                                                                            *
- * Parameters: json   - [IN] the request                                      *
- *             ip     - [IN] external Zabbix instance hostname                *
- *             port   - [IN] external Zabbix instance port                    *
- *             result - [OUT] check result                                    *
+ * Parameters: json    - [IN] the request                                     *
+ *             ip      - [IN] external Zabbix instance hostname               *
+ *             port    - [IN] external Zabbix instance port                   *
+ *             timeout - [IN] timeout value for comms                         *
+ *             result  - [OUT] check result                                   *
  *                                                                            *
  ******************************************************************************/
 static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip, unsigned short port, int timeout,
@@ -122,9 +123,10 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
  *                                                                            *
  * Purpose: create Zabbix stats request                                       *
  *                                                                            *
- * Parameters: ip     - [IN] external Zabbix instance hostname                *
- *             port   - [IN] external Zabbix instance port                    *
- *             result - [OUT] check result                                    *
+ * Parameters: ip      - [IN] external Zabbix instance hostname               *
+ *             port    - [IN] external Zabbix instance port                   *
+ *             timeout - [IN] timeout value for comms                         *
+ *             result  - [OUT] check result                                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
@@ -148,11 +150,12 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout
  *                                                                            *
  * Purpose: create Zabbix stats queue request                                 *
  *                                                                            *
- * Parameters: ip     - [IN] external Zabbix instance hostname                *
- *             port   - [IN] external Zabbix instance port                    *
- *             from   - [IN] lower limit for delay                            *
- *             to     - [IN] upper limit for delay                            *
- *             result - [OUT] check result                                    *
+ * Parameters: ip      - [IN] external Zabbix instance hostname               *
+ *             port    - [IN] external Zabbix instance port                   *
+ *             from    - [IN] lower limit for delay                           *
+ *             to      - [IN] upper limit for delay                           *
+ *             timeout - [IN] timeout value for comms                         *
+ *             result  - [OUT] check result                                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occurred                                    *
