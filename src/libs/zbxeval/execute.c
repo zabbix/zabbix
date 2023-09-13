@@ -2938,7 +2938,10 @@ static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const z
 	ret = zbx_query_xpath_contents(&value, path->data.str, &is_empty, error);
 
 	if (FAIL == ret)
+	{
+		zbx_variant_clear(&value);
 		return FAIL;
+	}
 
 	if (SUCCEED == is_empty)
 	{
