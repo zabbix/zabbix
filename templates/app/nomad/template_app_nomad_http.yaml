@@ -63,7 +63,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Client nodes API connection has failed.
-                Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
+                Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -157,7 +157,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Server-related API connection has failed.
-                Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
+                Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1107,7 +1107,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Monitoring API connection has failed.
-                Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
+                Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1180,7 +1180,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Allocations API connection has failed.
-                Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
+                Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               dependencies:
                 - name: 'HashiCorp Nomad Client: Monitoring API connection has failed'
@@ -1364,7 +1364,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Nodes API connection has failed.
-                Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
+                Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               dependencies:
                 - name: 'HashiCorp Nomad Client: Monitoring API connection has failed'
@@ -3577,7 +3577,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Monitoring API connection has failed.
-                Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
+                Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -5618,7 +5618,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Internal stats API connection has failed.
-                Ensure, that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
+                Ensure that Nomad API URL and the necessary permissions have been defined correctly, check the service state and network connectivity between Nomad and Zabbix.
               manual_close: 'YES'
               dependencies:
                 - name: 'HashiCorp Nomad Server: Monitoring API connection has failed'

@@ -41,6 +41,7 @@ define('STRING_2200', substr(STRING_6000, 0, 2200));
 define('STRING_2048', substr(STRING_6000, 0, 2048));
 define('STRING_2000', substr(STRING_6000, 0, 2000));
 define('STRING_1024', substr(STRING_6000, 0, 1024));
+define('STRING_512', substr(STRING_6000, 0, 512));
 define('STRING_255', substr(STRING_6000, 0, 255));
 define('STRING_128', substr(STRING_6000, 0, 128));
 define('STRING_64', substr(STRING_6000, 0, 64));

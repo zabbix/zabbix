@@ -134,7 +134,7 @@ class Proxies {
 				'status' => HOST_STATUS_NOT_MONITORED
 			];
 		}
-		$disabled_hosts = CDataHelper::call('host.create', $disabled_hosts_data);
+		CDataHelper::call('host.create', $disabled_hosts_data);
 		$disabled_hostids = CDataHelper::getIds('host');
 
 		// Create active proxies.
@@ -143,11 +143,11 @@ class Proxies {
 		foreach (self::$active_proxies as $proxy) {
 			$active_proxy_data[] = [
 				'name' => $proxy,
-				'mode' => PROXY_MODE_ACTIVE
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 			];
 		}
 
-		$active_proxies = CDataHelper::call('proxy.create', $active_proxy_data);
+		CDataHelper::call('proxy.create', $active_proxy_data);
 		$active_proxyids = CDataHelper::getIds('name');
 
 		// Create passive proxies.
@@ -156,13 +156,13 @@ class Proxies {
 		foreach (self::$passive_proxies as $proxy) {
 			$passive_proxy_data[] = [
 				'name' => $proxy,
-				'mode' => PROXY_MODE_PASSIVE,
+				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 				'address' => '127.0.0.1',
 				'port' => '10051'
 			];
 		}
 
-		$passive_proxies = CDataHelper::call('proxy.create', $passive_proxy_data);
+		CDataHelper::call('proxy.create', $passive_proxy_data);
 		$passive_proxyids = CDataHelper::getIds('name');
 
 		// Add hosts to proxies.
@@ -240,6 +240,20 @@ class Proxies {
 				'hosts' => [
 					['hostid' => $filter_hostids['Host_2 with proxy']]
 				]
+			]
+		]);
+
+		$proxies = CDataHelper::call('proxy.create',
+			[['name' => 'Delete Proxy used in Network discovery rule', 'operating_mode' => 0]]
+		);
+		$delete_proxy = $proxies['proxyids'][0];
+
+		CDataHelper::call('drule.create', [
+			[
+				'name' => 'Discovery rule for proxy delete test',
+				'iprange' => '192.168.1.1-255',
+				'proxyid' => $delete_proxy,
+				'dchecks' => [['type' => SVC_IMAP, 'ports' => 10050]]
 			]
 		]);
 

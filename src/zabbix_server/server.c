@@ -84,7 +84,7 @@
 #include "zbxdbwrap.h"
 #include "lld/lld_protocol.h"
 #include "zbxdiscovery.h"
-#include "scripts/scripts.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -276,14 +276,14 @@ ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_alert_scripts_path, NULL)
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
+int	zbx_config_trapper_timeout = 300;
 
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
 static int	config_histsyncer_frequency	= 1;
 
-int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
-char	*CONFIG_LISTEN_IP		= NULL;
-int	CONFIG_TRAPPER_TIMEOUT		= 300;
+static int	zbx_config_listen_port		= ZBX_DEFAULT_SERVER_PORT;
+static char	*zbx_config_listen_ip		= NULL;
 static char	*config_server		= NULL;		/* not used in zabbix_server, required for linking */
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
@@ -355,7 +355,7 @@ int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 char	*CONFIG_STATS_ALLOWED_IP	= NULL;
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-char	*CONFIG_WEBSERVICE_URL	= NULL;
+static char	*zbx_config_webservice_url	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
@@ -782,7 +782,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == CONFIG_WEBSERVICE_URL)
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == zbx_config_webservice_url)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
 				" setting \"StartReportWriters\" configuration parameter");
@@ -861,7 +861,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
-		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
+		{"TrapperTimeout",		&zbx_config_trapper_timeout,		TYPE_INT,
 			PARM_OPT,	1,			300},
 		{"UnreachablePeriod",		&config_unreachable_period,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
@@ -869,9 +869,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"UnavailableDelay",		&config_unavailable_delay,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
+		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"ListenPort",			&CONFIG_LISTEN_PORT,			TYPE_INT,
+		{"ListenPort",			&zbx_config_listen_port,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1009,7 +1009,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartReportWriters",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],		TYPE_INT,
 			PARM_OPT,	0,			100},
-		{"WebServiceURL",		&CONFIG_WEBSERVICE_URL,			TYPE_STRING,
+		{"WebServiceURL",		&zbx_config_webservice_url,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"ProblemHousekeepingFrequency",	&CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY,	TYPE_INT,
 			PARM_OPT,	1,			3600},
@@ -1195,7 +1195,7 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -1249,7 +1249,7 @@ int	main(int argc, char **argv)
 	zbx_load_config(&t);
 
 	zbx_init_library_dbupgrade(get_program_type);
-	zbx_init_library_dbwrap(zbx_lld_process_agent_result);
+	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_stats(get_program_type);
@@ -1398,7 +1398,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	char				*error = NULL;
 
 	zbx_config_comms_args_t		config_comms = {zbx_config_tls, NULL, config_server, 0, zbx_config_timeout,
-							zbx_config_source_ip};
+							zbx_config_trapper_timeout, zbx_config_source_ip};
 
 	zbx_thread_args_t		thread_args;
 
@@ -1410,17 +1410,18 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							&events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
-							zbx_config_source_ip};
+							zbx_config_trapper_timeout, zbx_config_source_ip};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_program_type,
-							zbx_config_timeout, zbx_config_source_ip, &events_cbs,
-							config_proxyconfig_frequency, config_proxydata_frequency};
+							zbx_config_timeout, zbx_config_trapper_timeout,
+							zbx_config_source_ip, &events_cbs, config_proxyconfig_frequency,
+							config_proxydata_frequency};
 	zbx_thread_httppoller_args	httppoller_args = {zbx_config_source_ip};
 	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER], zbx_config_source_ip,
 							&events_cbs};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
-							zbx_config_tls->key_file, zbx_config_source_ip};
-
+							zbx_config_tls->key_file, zbx_config_source_ip,
+							zbx_config_webservice_url};
 	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout};
 	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout};
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
@@ -1438,6 +1439,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_unreachable_period, config_unreachable_delay};
 #endif
 	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip};
+	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
 	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
 			zbx_config_dbhigh, zbx_config_source_ip};
@@ -1498,7 +1500,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER])
 	{
-		if (FAIL == zbx_tcp_listen(listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT,
+		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
@@ -1708,6 +1710,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(connector_worker_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTMANAGER:
+				thread_args.args = &report_manager_args;
 				zbx_thread_start(report_manager_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_REPORTWRITER:
@@ -1836,8 +1839,8 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #endif
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_STANDBY;
 
 	if (SUCCEED != zbx_ha_start(rtc, ha_config, &error))
@@ -1883,8 +1886,8 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_STANDBY;
 
 	if (SUCCEED != zbx_ha_start(rtc, ha_config, &error))
@@ -2104,8 +2107,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	ha_config->ha_node_name =	CONFIG_HA_NODE_NAME;
 	ha_config->ha_node_address =	CONFIG_NODE_ADDRESS;
-	ha_config->default_node_ip =	CONFIG_LISTEN_IP;
-	ha_config->default_node_port =	CONFIG_LISTEN_PORT;
+	ha_config->default_node_ip =	zbx_config_listen_ip;
+	ha_config->default_node_port =	zbx_config_listen_port;
 	ha_config->ha_status =		ZBX_NODE_STATUS_UNKNOWN;
 
 	if (SUCCEED != zbx_ha_start(&rtc, ha_config, &error))

@@ -341,7 +341,7 @@ $filter_groupids = CProfile::getArray($prefix.'host_discovery.filter.groupids', 
 $filter_hostids = CProfile::getArray($prefix.'host_discovery.filter.hostids', []);
 
 // Get host groups.
-$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {
@@ -642,9 +642,9 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($item, ['form' => getRequest('form'), 'is_discovery_rule' => true]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
-	$data['evaltype'] = getRequest('evaltype');
+	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
-	$data['conditions'] = getRequest('conditions', []);
+	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $hosts[0];
@@ -674,7 +674,7 @@ if (hasRequest('form')) {
 		$data['lifetime'] = $item['lifetime'];
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
-		$data['conditions'] = $item['filter']['conditions'];
+		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
@@ -684,6 +684,15 @@ if (hasRequest('form')) {
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
 		$data['form'] = 'clone';
+	}
+
+	if (!$data['conditions']) {
+		$data['conditions'] = [[
+			'macro' => '',
+			'operator' => CONDITION_OPERATOR_REGEXP,
+			'value' => '',
+			'formulaid' => num2letter(0)
+		]];
 	}
 
 	if ($data['type'] != ITEM_TYPE_JMX) {

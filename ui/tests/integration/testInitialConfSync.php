@@ -1523,7 +1523,7 @@ class testInitialConfSync extends CIntegrationTest
 	{
 		$response = $this->call('proxy.create', [
 			'name' => 'ProxyA',
-			'mode' => PROXY_MODE_ACTIVE,
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 			'allowed_addresses' => '10.0.2.15,zabbix.test',
 			'tls_connect' => HOST_ENCRYPTION_NONE,
 			'tls_accept' => HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE,
@@ -1538,7 +1538,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$response = $this->call('proxy.create', [
 			'name' => 'ProxyP',
-			'mode' => PROXY_MODE_PASSIVE,
+			'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 			'hosts' => [],
 			'address' => '127.0.0.1',
 			'port' => '10099',

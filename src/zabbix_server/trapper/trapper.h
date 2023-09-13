@@ -26,7 +26,6 @@
 #include "zbxcomms.h"
 #include "zbxvault.h"
 
-extern int	CONFIG_TRAPPER_TIMEOUT;
 extern char	*CONFIG_STATS_ALLOWED_IP;
 
 #define ZBX_IPC_SERVICE_TRAPPER	"trapper"

@@ -291,6 +291,27 @@ class CHostImporter extends CImporter {
 	 * @throws Exception
 	 */
 	protected function resolveHostReferences(array $host): array {
+		$hostid = $this->referencer->findHostidByHost($host['host']);
+
+		if ($hostid !== null) {
+			$host['hostid'] = $hostid;
+
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as &$macro) {
+					$hostmacroid = $this->referencer->findHostMacroid($hostid, $macro['macro']);
+
+					if ($hostmacroid !== null) {
+						$macro['hostmacroid'] = $hostmacroid;
+					}
+				}
+				unset($macro);
+			}
+		}
+
+		if (!$this->options['hosts']['createMissing'] && !$this->options['hosts']['updateExisting']) {
+			return $host;
+		}
+
 		foreach ($host['groups'] as $index => $group) {
 			$groupid = $this->referencer->findHostGroupidByName($group['name']);
 
@@ -314,23 +335,6 @@ class CHostImporter extends CImporter {
 			}
 
 			$host['proxyid'] = $proxyid;
-		}
-
-		$hostid = $this->referencer->findHostidByHost($host['host']);
-
-		if ($hostid !== null) {
-			$host['hostid'] = $hostid;
-
-			if (array_key_exists('macros', $host)) {
-				foreach ($host['macros'] as &$macro) {
-					$hostmacroid = $this->referencer->findHostMacroid($hostid, $macro['macro']);
-
-					if ($hostmacroid !== null) {
-						$macro['hostmacroid'] = $hostmacroid;
-					}
-				}
-				unset($macro);
-			}
 		}
 
 		return $host;

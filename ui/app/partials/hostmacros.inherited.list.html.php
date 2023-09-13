@@ -76,21 +76,19 @@ else {
 				->disableSpellcheck()
 		];
 
-		if (!$data['readonly']) {
-			$macro_cell[] = new CVar('macros['.$i.'][discovery_state]', $macro['discovery_state']);
+		$macro_cell[] = new CVar('macros['.$i.'][discovery_state]', $macro['discovery_state']);
 
-			if (array_key_exists('hostmacroid', $macro)) {
-				$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
-			}
+		if (array_key_exists('hostmacroid', $macro)) {
+			$macro_cell[] = new CVar('macros['.$i.'][hostmacroid]', $macro['hostmacroid']);
+		}
 
-			$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
+		$macro_cell[] = new CVar('macros['.$i.'][inherited_type]', $macro['inherited_type']);
 
-			if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
-				$inherited_macro = $macro[$macro['inherited_level']];
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
-				$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
-			}
+		if ($macro['inherited_type'] & ZBX_PROPERTY_INHERITED) {
+			$inherited_macro = $macro[$macro['inherited_level']];
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][value]', $inherited_macro['value']);
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][description]', $inherited_macro['description']);
+			$macro_cell[] = new CVar('macros['.$i.'][inherited][macro_type]', $inherited_macro['type']);
 
 			if ($macro['discovery_state'] != CControllerHostMacrosList::DISCOVERY_STATE_MANUAL) {
 				$macro_cell[] = new CVar('macros['.$i.'][original_value]', $macro['original']['value']);
@@ -105,7 +103,7 @@ else {
 					|| array_key_exists('value', $macro)
 				);
 
-				$macro_cell[] = new CVar('macros[' . $i . '][allow_revert]', '1');
+				$macro_cell[] = new CVar('macros['.$i.'][allow_revert]', '1');
 			}
 		}
 

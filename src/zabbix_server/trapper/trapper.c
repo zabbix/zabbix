@@ -44,7 +44,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "version.h"
-#include "../scripts/scripts.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -1150,7 +1150,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
-						config_comms->config_source_ip);
+						config_comms->config_trapper_timeout, config_comms->config_source_ip);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1276,7 +1276,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 {
 	ssize_t	bytes_received;
 
-	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
+	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, config_comms->config_trapper_timeout, ZBX_TCP_LARGE)))
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,

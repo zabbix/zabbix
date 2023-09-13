@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-09 08:26+0000\n"
+"PO-Revision-Date: 2023-08-28 06:51+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -1403,6 +1403,10 @@ msgstr "Každoročně"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Jakýkoliv"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -5945,7 +5949,7 @@ msgstr[2] "Dashboardy byl smazány"
 
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
-msgstr ""
+msgstr "Seznam dashboardů"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -8269,7 +8273,7 @@ msgstr "Seznam událostí [posledních 20]"
 
 #: include/classes/data/CItemData.php:946
 msgid "Event log monitoring. Returns count of entries"
-msgstr ""
+msgstr "Monitoring logu událostí. Vráti počet záznamů"
 
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
@@ -9736,7 +9740,7 @@ msgstr "Počet hostů"
 
 #: app/views/monitoring.host.dashboard.view.php:71
 msgid "Host dashboards"
-msgstr ""
+msgstr "Dashboard hosta"
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14501,6 +14505,10 @@ msgstr "Nový krok webového scénáře"
 msgid "New tag name"
 msgstr "Nový název tagu"
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14516,7 +14524,7 @@ msgstr "Nové mapování uživatelských skupin"
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Next dashboard"
-msgstr ""
+msgstr "Další dashboard"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16609,7 +16617,7 @@ msgstr "Náhled"
 
 #: app/views/monitoring.host.dashboard.view.php:133
 msgid "Previous dashboard"
-msgstr ""
+msgstr "Předchozí dashboard"
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -16990,6 +16998,10 @@ msgstr "Veřejný klíč"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Soubor s veřejným klíčem"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -24190,7 +24202,7 @@ msgstr "očekává se IP adresa"
 
 #: include/classes/validators/CApiInputValidator.php:2773
 msgid "an IP or DNS is expected"
-msgstr ""
+msgstr "očekává se IP adresa nebo DNS záznam"
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481

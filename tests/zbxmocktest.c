@@ -88,10 +88,6 @@ void	set_config_forks(unsigned char process_type, int forks)
 	CONFIG_FORKS[process_type] = forks;
 }
 
-int	CONFIG_LISTEN_PORT		= 0;
-char	*CONFIG_LISTEN_IP		= NULL;
-int	CONFIG_TRAPPER_TIMEOUT		= 300;
-
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
@@ -140,19 +136,7 @@ const char	*help_message[] = {"mock_help_message", NULL};
 const char	*progname = "mock_progname";
 const char	syslog_app_name[] = "mock_syslog_app_name";
 
-char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-
-int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
-
-int	CONFIG_MAX_LINES_PER_SECOND	= 20;
-
-char	**CONFIG_ALIASES		= NULL;
-char	**CONFIG_USER_PARAMETERS	= NULL;
-#if defined(_WINDOWS)
-char	**CONFIG_PERF_COUNTERS		= NULL;
-char	**CONFIG_PERF_COUNTERS_EN	= NULL;
-#endif
 
 static ZBX_THREAD_LOCAL int	zbx_config_timeout = 3;
 int	get_zbx_config_timeout(void)

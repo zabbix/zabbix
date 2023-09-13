@@ -942,7 +942,7 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#define PROXY_MODE_ACTIVE	0
-#define PROXY_MODE_PASSIVE	1
+#define PROXY_OPERATING_MODE_ACTIVE	0
+#define PROXY_OPERATING_MODE_PASSIVE	1
 
 #endif

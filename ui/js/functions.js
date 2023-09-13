@@ -720,55 +720,39 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	const classes = {
-		good: 'msg-good',
-		bad: 'msg-bad',
-		warning: 'msg-warning'
-	};
+	const classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'};
+	const aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';
 	}
 
-	var	$list = jQuery('<ul>')
-			.addClass('list-dashed'),
-		$msg_details = jQuery('<div>')
-			.addClass('msg-details')
-			.append($list),
-		aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')},
+	var	$list = jQuery('<ul>', {class: 'list-dashed'}),
+		$msg_details = jQuery('<div>', {class: 'msg-details'}).append($list),
 		$msg_box = jQuery('<output>')
-			.addClass(classes[type]).attr('role', 'contentinfo')
+			.addClass(classes[type])
+			.attr('role', 'contentinfo')
 			.attr('aria-label', aria_labels[type]),
-		$details_arrow = jQuery('<span>')
-			.attr('id', 'details-arrow')
-			.addClass(show_details ? 'arrow-up' : 'arrow-down'),
 		$link_details = jQuery('<a>')
-			.text(t('Details') + ' ')
 			.addClass('link-action')
-			.attr('href', 'javascript:void(0)')
+			.attr('aria-expanded', show_details ? 'true' : 'false')
 			.attr('role', 'button')
-			.append($details_arrow)
-			.attr('aria-expanded', show_details ? 'true' : 'false');
+			.attr('href', 'javascript:void(0)')
+			.append(t('Details'), jQuery('<span>', {class: show_details ? 'arrow-up' : 'arrow-down'}));
 
-		$link_details.click(function() {
-			showHide(jQuery(this).siblings('.msg-details'));
-			jQuery('#details-arrow', jQuery(this)).toggleClass('arrow-up arrow-down');
-			jQuery(this).attr('aria-expanded', jQuery(this)
-				.find('.arrow-down')
-				.length == 0
-			);
-		});
+		$link_details.click((e) => toggleMessageBoxDetails(e.target));
 
 	if (title !== null) {
 		if (Array.isArray(messages) && messages.length > 0) {
 			$msg_box.prepend($link_details);
+			$msg_box.addClass(ZBX_STYLE_COLLAPSIBLE);
 		}
 		jQuery('<span>')
 			.text(title)
 			.appendTo($msg_box);
 
 		if (!show_details) {
-			$msg_details.hide();
+			$msg_box.addClass(ZBX_STYLE_COLLAPSED);
 		}
 	}
 
@@ -784,19 +768,30 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 	}
 
 	if (show_close_box) {
-		var $button = jQuery('<button>')
-			.addClass('btn-overlay-close')
-			.attr('type', 'button')
-			.attr('title', t('Close'))
-			.click(function() {
-				jQuery(this)
-					.closest('.' + classes[type])
-					.remove();
-			});
-		$msg_box.append($button);
+		$msg_box.append(
+			jQuery('<button>')
+				.addClass('btn-overlay-close')
+				.attr('type', 'button')
+				.attr('title', t('Close'))
+				.click(function() {
+					jQuery(this)
+						.closest(`.${classes[type]}`)
+						.remove();
+				})
+		);
 	}
 
 	return $msg_box;
+}
+
+function toggleMessageBoxDetails(element) {
+	const parent = element.parentElement;
+	const arrow = element.querySelector('span');
+
+	parent.classList.toggle(ZBX_STYLE_COLLAPSED);
+	element.setAttribute('aria-expanded', !parent.classList.contains(ZBX_STYLE_COLLAPSED));
+	arrow.classList.toggle('arrow-down');
+	arrow.classList.toggle('arrow-up');
 }
 
 /**

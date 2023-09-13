@@ -54,6 +54,7 @@ class CSvgGraphHelper {
 		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
 		self::applyOverrides($metrics, $options['templateid'], $options['dynamic_hostid'], $options['overrides']);
+		self::applyUnits($metrics, $options['axes']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
 		// Find what data source (history or trends) will be used for each metric.
@@ -286,7 +287,7 @@ class CSvgGraphHelper {
 	}
 
 	/**
-	 * Apply overrides for each pattern matching metric.
+	 * Apply overrides for each metric.
 	 */
 	private static function applyOverrides(array &$metrics, string $templateid, string $dynamic_hostid,
 			array $overrides = []): void {
@@ -410,6 +411,21 @@ class CSvgGraphHelper {
 	}
 
 	/**
+	 * Apply static units for each metric if selected.
+	 */
+	private static function applyUnits(array &$metrics, array $axis_options): void {
+		foreach ($metrics as &$metric) {
+			if ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_LEFT && $axis_options['left_y_units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['left_y_units']));
+			}
+			elseif ($metric['options']['axisy'] == GRAPH_YAXIS_SIDE_RIGHT && $axis_options['right_y_units'] !== null) {
+				$metric['units'] = trim(preg_replace('/\s+/', ' ', $axis_options['right_y_units']));
+			}
+		}
+		unset($metric);
+	}
+
+	/**
 	 * Apply time period for each metric.
 	 */
 	private static function getTimePeriods(array &$metrics, array $options): void {
@@ -445,7 +461,11 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+					if ($metric['history'] != 0) {
+						$metric['history'] = timeUnitToSeconds(
+							CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
+						);
+					}
 				}
 				unset($metric);
 			}
@@ -455,7 +475,9 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					if ($metric['trends'] != 0) {
+						$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					}
 				}
 				unset($metric);
 			}

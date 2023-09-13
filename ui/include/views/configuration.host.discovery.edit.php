@@ -751,8 +751,7 @@ $condition_tab->addItem([
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
-			(new CSpan(''))
-				->setId('expression'),
+			(new CSpan(''))->setId('expression'),
 			(new CTextBox('formula', $data['formula']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
@@ -769,20 +768,6 @@ $condition_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
-$conditions = $data['conditions'];
-
-if (!$conditions) {
-	$conditions = [[
-		'macro' => '',
-		'operator' => CONDITION_OPERATOR_REGEXP,
-		'value' => '',
-		'formulaid' => num2letter(0)
-	]];
-}
-else {
-	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
-}
-
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
@@ -790,8 +775,7 @@ $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
 ]);
 
-// fields
-foreach ($conditions as $i => $condition) {
+foreach ($data['conditions'] as $i => $condition) {
 	// formula id
 	$formulaid = [
 		new CSpan($condition['formulaid']),
