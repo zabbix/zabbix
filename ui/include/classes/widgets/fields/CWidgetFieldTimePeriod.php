@@ -25,9 +25,8 @@ use CAbsoluteTimeParser,
 	CApiInputValidator,
 	CParser,
 	CRangeTimeParser,
-	CRelativeTimeParser;
-
-use DateTimeZone;
+	CRelativeTimeParser,
+	DateTimeZone;
 
 use Zabbix\Widgets\CWidgetField;
 
@@ -45,12 +44,12 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	private ?string $from_label = null;
 	private ?string $to_label = null;
 
-	private ?DateTimeZone $timezone = null;
 	private array $default_period = ['from' => '', 'to' => ''];
 
+	private ?DateTimeZone $timezone = null;
 	private bool $is_date_only = false;
 
-	public function __construct(string $name, string $label = null, bool $is_date_only = false) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this
@@ -92,7 +91,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		$validation_rules = $this->getValidationRules($strict);
 
 		$field_label = $this->full_name ?? $this->label;
-		$period_labels_prefix = ($field_label !== null ? $field_label.'/' : '');
+		$period_labels_prefix = $field_label !== null ? $field_label.'/' : '';
 		$period_labels = [
 			'from' => $this->getFromLabel(),
 			'to' => $this->getToLabel()
@@ -125,8 +124,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
 				if (!array_key_exists($name, $field_value)) {
 					if ($strict) {
-						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_label ?? $this->name,
-							_s('the parameter "%1$s" is missing', $period_labels[$name])
+						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name,
+							_s('the parameter "%1$s" is missing', $name)
 						);
 						continue;
 					}
@@ -272,6 +271,10 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		return $this;
 	}
 
+	public function getDefaultPeriod(): array {
+		return $this->default_period;
+	}
+
 	public function setTimeZone(?DateTimeZone $timezone): self {
 		$this->timezone = $timezone;
 
@@ -282,10 +285,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		$this->is_date_only = $is_date_only;
 
 		return $this;
-	}
-
-	public function getDefaultPeriod(): array {
-		return $this->default_period;
 	}
 
 	/**
