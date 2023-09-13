@@ -306,8 +306,9 @@ int	main(int argc, char **argv)
 	int		zbx_optind = 0;
 
 	zbx_init_library_common(NULL, get_zbx_progname);
+#ifndef _WINDOWS
 	zbx_init_library_nix(&get_zbx_progname);
-
+#endif
 #if !defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (SUCCEED != zbx_coredump_disable())
 	{

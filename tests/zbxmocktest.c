@@ -20,9 +20,9 @@
 #include "zbxmockdata.h"
 
 #include "zbxtypes.h"
-
-#include "zbxnix.h"
-
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#endif
 /* unresolved symbols needed for linking */
 
 static unsigned char	program_type	= 0;
@@ -156,7 +156,8 @@ int	main (void)
 
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
 	zbx_init_library_common(zbx_mock_log_impl, &get_zbx_progname);
+#ifndef _WINDOWS
 	zbx_init_library_nix(&get_zbx_progname);
-
+#endif
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }
