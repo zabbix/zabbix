@@ -432,7 +432,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				self::addDataSource($items, $time_from, $time_now, $column['history']);
 
-				$items_by_source = ['history' => [], 'trends' => []];
+				$items_by_source = ['history' => []];
 
 				foreach ($items as $itemid => $item) {
 					$items_by_source[$item['source']][$itemid] = $item;
@@ -493,6 +493,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$non_numeric_history = Manager::History()->getAggregatedValue(
 						$item, $function, $time_from, $time_to
 					);
+
+					if ($aggregate_function == AGGREGATE_COUNT) {
+						$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
+
+						$formatted_value = formatHistoryValueRaw($non_numeric_history, $item, false, [
+							'decimals' => $column['decimal_places'],
+							'decimals_exact' => true,
+							'small_scientific' => false,
+							'zero_as_zero' => false
+						]);
+
+						$non_numeric_history = $formatted_value['value'];
+					}
 
 					if ($non_numeric_history) {
 						$result += [

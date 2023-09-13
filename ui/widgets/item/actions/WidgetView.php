@@ -273,6 +273,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 			else {
+				$non_numeric_history = [];
+
 				if ($aggregate_function === AGGREGATE_LAST
 						|| $aggregate_function === AGGREGATE_FIRST
 						|| $aggregate_function === AGGREGATE_COUNT) {
@@ -290,9 +292,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 							break;
 					}
 
-					$non_numeric_history = Manager::History()->getAggregatedValue(
-						$item, $aggregate_function, $time_from, $time_to
-					);
+					if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
+						$non_numeric_history = Manager::History()->getAggregatedValue(
+							$item, $aggregate_function, $time_from, $time_to
+						);
+					}
+					else {
+						$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
+						$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
+					}
 
 					if ($non_numeric_history) {
 						$history = [
@@ -392,13 +400,28 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_TEXT:
 					case ITEM_VALUE_TYPE_LOG:
 					case ITEM_VALUE_TYPE_BINARY:
-						$value = $value_type == ITEM_VALUE_TYPE_BINARY
-							? italic(_('binary value'))
-							: formatHistoryValue($last_value, $items[$itemid], false);
+						if ($aggregate_function == 'count') {
+							$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
 
-						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
+							$formatted_value = formatHistoryValueRaw($last_value, $item, false, [
+								'decimals' => $this->fields_values['decimal_places'],
+								'decimals_exact' => true,
+								'small_scientific' => false,
+								'zero_as_zero' => false
+							]);
+
+							$value = $formatted_value['value'];
+							$units = $formatted_value['units'];
+						}
+						else {
+							$value = $value_type == ITEM_VALUE_TYPE_BINARY
+								? italic(_('binary value'))
+								: formatHistoryValue($last_value, $items[$itemid], false);
+
+							if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
 								&& $last_value !== $prev_value) {
-							$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+							}
 						}
 						break;
 				}
