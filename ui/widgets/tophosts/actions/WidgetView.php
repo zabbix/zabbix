@@ -149,7 +149,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$master_column = $configuration[$this->fields_values['column']];
 		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
 
-		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
+		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids,
+			$master_column['aggregate_function'] == AGGREGATE_COUNT);
 		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
 
 		if (!$master_item_values) {
@@ -166,7 +167,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		);
 
 		if ($this->fields_values['order'] == Widget::ORDER_TOP_N) {
-			if ($master_items_only_numeric_present) {
+			if ($master_items_only_numeric_present || $column['aggregate_function'] == AGGREGATE_COUNT) {
 				arsort($master_item_values, SORT_NUMERIC);
 
 				$master_items_min = end($master_item_values);
@@ -226,9 +227,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
+
 				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
-					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
-					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
+					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids),
+						$column['aggregate_function'] == AGGREGATE_COUNT)
+					: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids,
+						$column['aggregate_function'] == AGGREGATE_COUNT);
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 			}
@@ -378,8 +382,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			|| array_key_exists('thresholds', $column);
 	}
 
-	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
-		$items = API::Item()->get([
+	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids,
+			bool $count = false): array {
+		$options = [
 			'output' => ['itemid', 'hostid', 'key_', 'history', 'trends', 'value_type', 'units'],
 			'selectValueMap' => ['mappings'],
 			'groupids' => $groupids,
@@ -388,12 +393,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true,
 			'filter' => [
 				'name' => $name,
-				'status' => ITEM_STATUS_ACTIVE,
-				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null
+				'status' => ITEM_STATUS_ACTIVE
 			],
 			'sortfield' => 'key_',
 			'preservekeys' => true
-		]);
+		];
+
+		if (!$count) {
+			$options['filter']['value_type'] = $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null;
+		}
+
+		$items = API::Item()->get($options);
 
 		if ($items) {
 			$single_key = reset($items)['key_'];
