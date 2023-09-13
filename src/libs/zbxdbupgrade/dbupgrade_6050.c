@@ -22,7 +22,6 @@
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
-#include "zbxtime.h"
 
 /*
  * 7.0 development database patches
