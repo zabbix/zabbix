@@ -79,7 +79,7 @@ static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
  *           added, a pointer to that counter is returned, NULL otherwise     *
  *                                                                            *
  ******************************************************************************/
-zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
+static zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
 		zbx_perf_counter_lang_t lang, char **error)
 {
 	zbx_perf_counter_data_t	*cptr = NULL;
@@ -87,8 +87,6 @@ zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterp
 	int			added = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() counter:'%s' interval:%d", __func__, counterpath, interval);
-
-	LOCK_PERFCOUNTERS;
 
 	if (SUCCEED != perf_collector_started())
 	{
@@ -155,11 +153,23 @@ zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterp
 		zbx_free(alias_name);
 	}
 out:
-	UNLOCK_PERFCOUNTERS;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, NULL == cptr ? "FAIL" : "SUCCEED");
 
 	return cptr;
+}
+
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
+		zbx_perf_counter_lang_t lang, char **error)
+{
+	zbx_perf_counter_data_t	*v;
+
+	LOCK_PERFCOUNTERS;
+
+	v = add_perf_counter(name, counterpath, interval, lang, error);
+
+	UNLOCK_PERFCOUNTERS;
+
+	return v;
 }
 
 /******************************************************************************
@@ -340,7 +350,7 @@ out:
  *           the memory is freed - do not use it again                        *
  *                                                                            *
  ******************************************************************************/
-void	remove_perf_counter(zbx_perf_counter_data_t *counter)
+void	zbx_remove_perf_counter(zbx_perf_counter_data_t *counter)
 {
 	zbx_perf_counter_data_t	*cptr;
 
