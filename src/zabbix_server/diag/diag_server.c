@@ -368,9 +368,9 @@ static void	diag_add_alerting_mediatypes(struct zbx_json *json, const char *fiel
  *                                                                            *
  * Purpose: add alert source top list to output json                          *
  *                                                                            *
- * Parameters: json  - [OUT] the output json                                  *
- *             field - [IN] the field name                                    *
- *             items - [IN] a top alert source list consisting of             *
+ * Parameters: json  - [OUT] output json                                      *
+ *             field - [IN] field name                                        *
+ *             items - [IN] top alert source list consisting of               *
  *                          zbx_am_source_stats_t structures                  *
  *                                                                            *
  ******************************************************************************/
