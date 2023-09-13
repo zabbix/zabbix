@@ -34,8 +34,11 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
-#include "zbxjson.h"
 #include "zbxstr.h"
+
+#ifdef HAVE_POSTGRESQL
+#include "zbxjson.h"
+#endif
 
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS		4

@@ -19,11 +19,12 @@
 
 #include "history_compress.h"
 
-#include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 
 #if defined(HAVE_POSTGRESQL)
+
+#include "zbxdb.h"
 
 #define ZBX_TS_UNIX_NOW		"zbx_ts_unix_now"
 #define ZBX_TS_UNIX_NOW_CREATE	"create or replace function "ZBX_TS_UNIX_NOW"() returns integer language sql" \
