@@ -1158,6 +1158,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
  *                     ZBX_PROCESS_LOCAL_COMMAND, allow execution of system.run   *
  *                     ZBX_PROCESS_MODULE_COMMAND, execute item from a module     *
  *                     ZBX_PROCESS_WITH_ALIAS, substitute agent Alias             *
+ *             timeout    - [IN] check execution timeout                          *
  *             result     - [OUT]                                                 *
  *                                                                                *
  * Return value: SUCCEED - successful execution                                   *
@@ -2154,5 +2155,4 @@ int	zbx_validate_item_timeout(const char *timeout_str, char *error, size_t error
 	return SUCCEED;
 #undef ZBX_ITEM_TIMEOUT_MAX
 }
-
 #endif

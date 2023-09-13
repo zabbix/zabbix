@@ -76,9 +76,9 @@ static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (NULL != sysinfo_get_config_host_metadata_item())
 	{
-		if (SUCCEED != zbx_execute_agent_check(sysinfo_get_config_host_metadata_item(), ZBX_PROCESS_LOCAL_COMMAND |
-				ZBX_PROCESS_WITH_ALIAS, result, ZBX_CHECK_TIMEOUT_UNDEFINED) ||
-				NULL == ZBX_GET_STR_RESULT(result))
+		if (SUCCEED != zbx_execute_agent_check(sysinfo_get_config_host_metadata_item(),
+				ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, result,
+				ZBX_CHECK_TIMEOUT_UNDEFINED) || NULL == ZBX_GET_STR_RESULT(result))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
 					sysinfo_get_config_host_metadata_item()));

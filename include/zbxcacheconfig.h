@@ -1277,15 +1277,15 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group);
 
 typedef struct
 {
-	const char *	agent;
-	const char *	simple;
-	const char *	snmp;
-	const char *	external;
-	const char *	odbc;
-	const char *	http;
-	const char *	ssh;
-	const char *	telnet;
-	const char *	script;
+	const char	*agent;
+	const char	*simple;
+	const char	*snmp;
+	const char	*external;
+	const char	*odbc;
+	const char	*http;
+	const char	*ssh;
+	const char	*telnet;
+	const char	*script;
 }
 zbx_config_item_type_timeouts_t;
 
@@ -1294,15 +1294,15 @@ zbx_config_item_type_timeouts_t;
 
 typedef struct
 {
-	char agent[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char simple[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char snmp[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char external[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char odbc[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char http[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char ssh[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
-	char script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	agent[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	simple[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	snmp[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	external[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	odbc[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	http[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	ssh[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 }
 zbx_dc_item_type_timeouts_t;
 

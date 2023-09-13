@@ -843,9 +843,9 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
 					"compression_status", "compress_older", "instanceid",
 					"default_timezone", "hk_events_service", "auditlog_enabled",
-					"timeout_zabbix_agent","timeout_simple_check","timeout_snmp_agent",
-					"timeout_external_check","timeout_db_monitor","timeout_http_agent",
-					"timeout_ssh_agent","timeout_telnet_agent","timeout_script"};
+					"timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent",
+					"timeout_external_check", "timeout_db_monitor", "timeout_http_agent",
+					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script"};
 
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;

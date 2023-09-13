@@ -4055,8 +4055,8 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 			"select p.proxyid,p.name,p.operating_mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
 				"p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,pr.lastaccess,"
 				"p.timeout_zabbix_agent,p.timeout_simple_check,p.timeout_snmp_agent,"
-				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,p.timeout_ssh_agent"
-				",p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts"
+				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,"
+				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts"
 			" from proxy p"
 			" join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");

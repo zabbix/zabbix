@@ -154,6 +154,7 @@ ZBX_THREAD_ENTRY(collector_thread, args);
 
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
+
 #if defined(_WINDOWS)
 /* perfstat */
 #include "zbxwin32.h"

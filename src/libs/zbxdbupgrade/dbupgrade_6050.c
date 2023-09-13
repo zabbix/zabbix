@@ -1028,14 +1028,21 @@ static int	DBpatch_6050100(void)
 
 static int	DBpatch_6050101(void)
 {
-	char	*ts;
+	int	timeout;
 
-	ts = zbx_age2str((time_t)DBget_config_timeout());
+	timeout = DBget_config_timeout();
 
-	if (ZBX_DB_OK > zbx_db_execute("update config set timeout_zabbix_agent='%s',timeout_simple_check='%s',"
-		"timeout_snmp_agent='%s',timeout_external_check='%s',timeout_db_monitor='%s',timeout_http_agent='%s',"
-		"timeout_ssh_agent='%s',timeout_telnet_agent='%s',timeout_script='%s'", ts, ts, ts, ts, ts, ts, ts, ts,
-		ts))
+	if (ZBX_DB_OK > zbx_db_execute("update config"
+			" set timeout_zabbix_agent='%ds',"
+				"timeout_simple_check='%ds',"
+				"timeout_snmp_agent='%ds',"
+				"timeout_external_check='%ds',"
+				"timeout_db_monitor='%ds',"
+				"timeout_http_agent='%ds',"
+				"timeout_ssh_agent='%ds',"
+				"timeout_telnet_agent='%ds',"
+				"timeout_script='%ds'",
+			timeout, timeout, timeout, timeout, timeout, timeout, timeout, timeout, timeout))
 	{
 		return FAIL;
 	}
