@@ -1242,11 +1242,10 @@ function getItemFormData(array $item = [], array $options = []) {
  * @param string $preprocessing[]['error_handler_params']  Error handler parameters.
  * @param bool   $readonly                                 True if fields should be read only.
  * @param array  $types                                    Supported pre-processing types.
- * @param int    $item_type
  *
  * @return CList
  */
-function getItemPreprocessing(array $preprocessing, $readonly, array $types, int $item_type) {
+function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$script_maxlength = DB::getFieldLength('item_preproc', 'params');
 	$preprocessing_list = (new CList())
 		->setId('preprocessing')

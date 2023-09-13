@@ -211,8 +211,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (ones with "any error" being the last of them).')
 				])
 			]),
-		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'], -1)))
-			->setId('preprocessing_div')
+		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))->setId('preprocessing_div')
 	);
 
 $custom_intervals = (new CTable())

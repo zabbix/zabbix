@@ -902,9 +902,7 @@ $item_tabs = (new CTabView())
 						_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (ones with "any error" being the last of them).')
 					])
 				]),
-				new CFormField(
-					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'], $data['type'])
-				)
+				new CFormField(getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types']))
 			])
 			->addItem([
 				(new CLabel(_('Type of information'), 'label-value-type-steps'))
