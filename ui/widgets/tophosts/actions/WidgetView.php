@@ -360,7 +360,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$data = [
 							'value' => $hosts[$hostid]['name'],
 							'hostid' => $hostid,
-							'maintenance_status' => $hosts[$hostid]['maintenance_status'],
+							'maintenance_status' => $hosts[$hostid]['maintenance_status']
 						];
 
 						if ($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
