@@ -108,7 +108,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			 */
 			$steps = $this->getInput('steps', []);
 			if ($ret && $steps) {
-				$steps = normalizeItemPreprocessingSteps($steps, $this->item_type);
+				$steps = normalizeItemPreprocessingSteps($steps);
 
 				switch ($this->test_type) {
 					case self::ZBX_TEST_TYPE_ITEM:
@@ -162,7 +162,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		// Work with preprocessing steps.
 		$preprocessing_steps = sortPreprocessingStepsByCheckUnsupported($this->getInput('steps', []));
-		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps, $this->item_type);
+		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps);
 		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
 		$support_lldmacros = ($this->test_type == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE);

@@ -340,7 +340,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			'discover' => getRequest('discover', DB::getDefault('items', 'discover')),
 			'tags' => prepareItemTags(getRequest('tags', [])),
-			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', []), $type),
+			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
 
 			// Type fields.
 			// The fields used for multiple item types.

@@ -195,7 +195,7 @@ class CControllerPopupMassupdateItem extends CController {
 
 			if (array_key_exists('preprocessing', $input)) {
 				$input['preprocessing'] =
-					normalizeItemPreprocessingSteps($input['preprocessing'], (int) $input['type']);
+					normalizeItemPreprocessingSteps($input['preprocessing']);
 			}
 
 			if (array_key_exists('delay', $input)) {

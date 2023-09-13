@@ -423,7 +423,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
 			'description' => getRequest('description', DB::getDefault('items', 'description')),
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
-			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', []), $type),
+			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
 			'lld_macro_paths' => prepareLldMacroPaths(getRequest('lld_macro_paths', [])),
 			'filter' => prepareLldFilter([
 				'evaltype' => getRequest('evaltype', DB::getDefault('items', 'evaltype')),
