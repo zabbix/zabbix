@@ -118,17 +118,24 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 
 	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
 
-	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout_sec + 1,
-			item->host.tls_connect, tls_arg1, tls_arg2))
+	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
+			timeout_sec + 1, item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
 
-		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)timeout_sec, ZBX_TCP_PROTOCOL, 0))
+		if (SUCCEED != zbx_tcp_send_ext(&s, item->key, strlen(item->key), (zbx_uint32_t)timeout_sec,
+				ZBX_TCP_PROTOCOL, 0))
+		{
 			ret = NETWORK_ERROR;
+		}
 		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, 0, 0)))
+		{
 			ret = SUCCEED;
+		}
 		else if (SUCCEED != zbx_socket_check_deadline(&s))
+		{
 			ret = TIMEOUT_ERROR;
+		}
 		else
 			ret = NETWORK_ERROR;
 	}
