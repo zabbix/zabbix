@@ -104,9 +104,7 @@ static int	housekeep_problems_without_triggers(void)
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to delete a problem without a trigger");
 		}
 		else
-		{
 			deleted = ids.values_num;
-		}
 
 		housekeep_service_problems(&ids);
 	}
@@ -118,12 +116,10 @@ fail:
 
 ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 {
-	int			deleted;
-	double			sec;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int			server_num = ((zbx_thread_args_t *)args)->info.server_num,
+				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE};
 
@@ -168,8 +164,8 @@ ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args)
 
 		zbx_setproctitle("%s [removing deleted triggers problems]", get_process_type_string(process_type));
 
-		sec = zbx_time();
-		deleted = housekeep_problems_without_triggers();
+		double	sec = zbx_time();
+		int	deleted = housekeep_problems_without_triggers();
 
 		zbx_setproctitle("%s [deleted %d problems records in " ZBX_FS_DBL " sec, idle for %d second(s)]",
 				get_process_type_string(process_type), deleted, zbx_time() - sec,

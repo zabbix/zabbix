@@ -133,7 +133,8 @@ static int	hk_get_table_compression_age(const char *table_name)
 	{
 		result = zbx_db_select("select extract(epoch from (config::json->>'compress_after')::interval) from"
 				" timescaledb_information.jobs where application_name like 'Compression%%' and"
-				" hypertable_schema='%s' and hypertable_name='%s'", zbx_db_get_schema_esc(), table_name);
+				" hypertable_schema='%s' and hypertable_name='%s'", zbx_db_get_schema_esc(),
+				table_name);
 	}
 
 	if (NULL != (row = zbx_db_fetch(result)))
@@ -281,14 +282,10 @@ void	hk_history_compression_init(void)
 			}
 		}
 		else
-		{
 			hk_history_disable_compression();
-		}
 	}
 	else if (ON == cfg.db.history_compression_status)
-	{
 		disable_compression = 1;
-	}
 
 	if (0 != disable_compression && ZBX_DB_OK > zbx_db_execute("update config set compression_status=0"))
 		zabbix_log(LOG_LEVEL_ERR, "failed to set database compression status");
@@ -329,9 +326,7 @@ void	hk_history_compression_update(zbx_config_db_t *cfg)
 		}
 	}
 	else if (cfg->history_compression_status != compression_status_cache)
-	{
 		hk_history_disable_compression();
-	}
 
 	compression_status_cache = cfg->history_compression_status;
 	compress_older_cache = cfg->history_compress_older;

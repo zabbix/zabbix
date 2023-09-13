@@ -147,7 +147,7 @@ zbx_hk_history_rule_t;
 static struct zbx_db_version_info_t	*db_version_info;
 
 #if defined(HAVE_POSTGRESQL)
-static int				tsdb_version = 0;
+static int	tsdb_version = 0;
 #endif
 
 static int	hk_period;
@@ -402,7 +402,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t		itemid, hostid;
-		int			history, trends, value_type;
+		int			trends, value_type;
 		zbx_hk_history_rule_t	*rule, *rule_add;
 
 		ZBX_STR2UINT64(itemid, row[0]);
@@ -412,6 +412,8 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		if (value_type <= ITEM_VALUE_TYPE_BIN &&
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
+			int	history;
+
 			tmp = zbx_strdup(tmp, row[2]);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,
 					NULL, NULL, &tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
@@ -604,14 +606,14 @@ out:
 #if defined(HAVE_POSTGRESQL)
 static void	hk_tsdb_check_config(void)
 {
-	if (cfg.hk.history_global == ZBX_HK_OPTION_DISABLED && cfg.hk.history_mode == ZBX_HK_OPTION_ENABLED &&
+	if (ZBX_HK_OPTION_DISABLED == cfg.hk.history_global && ZBX_HK_OPTION_ENABLED == cfg.hk.history_mode &&
 			1 == db_version_info->history_compressed_chunks)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Incorrect configuration. Override item history period is disabled, but "
 				"historical data is compressed. Housekeeper may skip deleting this data.");
 	}
 
-	if (cfg.hk.trends_global == ZBX_HK_OPTION_DISABLED && cfg.hk.trends_mode == ZBX_HK_OPTION_ENABLED &&
+	if (ZBX_HK_OPTION_DISABLED == cfg.hk.trends_global && ZBX_HK_OPTION_ENABLED == cfg.hk.trends_mode &&
 			1 == db_version_info->trends_compressed_chunks)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Incorrect configuration. Override item trends period is disabled, but "
@@ -643,7 +645,7 @@ static void 	hk_update_dbversion_status(void)
  ******************************************************************************/
 static int	housekeeping_history_and_trends(int now)
 {
-	int			deleted = 0, rc;
+	int			deleted = 0;
 	zbx_hk_history_rule_t	*rule;
 #if defined(HAVE_POSTGRESQL)
 	int			ignore_history = 0, ignore_trends = 0;
@@ -655,10 +657,8 @@ static int	housekeeping_history_and_trends(int now)
 	hk_history_delete_queue_prepare_all(hk_history_rules, now);
 
 #if defined(HAVE_POSTGRESQL)
-	if (tsdb_version > 0)
-	{
+	if (0 < tsdb_version)
 		hk_update_dbversion_status();
-	}
 #endif
 
 	/* Loop through the history rules. Each rule is a history table (such as history_log, trends_uint, etc) */
@@ -679,7 +679,7 @@ static int	housekeeping_history_and_trends(int now)
 		}
 
 #if defined(HAVE_POSTGRESQL)
-		if (tsdb_version > 0)
+		if (0 < tsdb_version)
 		{
 			if (0 == strcmp(rule->history, "history"))
 			{
@@ -720,9 +720,9 @@ static int	housekeeping_history_and_trends(int now)
 		for (int i = 0; i < rule->delete_queue.values_num; i++)
 		{
 			zbx_hk_delete_queue_t	*item_record = (zbx_hk_delete_queue_t *)rule->delete_queue.values[i];
-
-			rc = zbx_db_execute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
+			int	rc = zbx_db_execute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 					rule->table, item_record->itemid, item_record->min_clock);
+
 			if (ZBX_DB_OK < rc)
 				deleted += rc;
 		}
@@ -788,8 +788,7 @@ static int	housekeeping_process_rule(int now,  int config_max_hk_delete, zbx_hk_
 	keep_from = now - *rule->phistory;
 	if (keep_from > min_clock)
 	{
-		char			buffer[MAX_STRING_LEN];
-		char			*sql = NULL;
+		char			buffer[MAX_STRING_LEN], *sql = NULL;
 		size_t			sql_alloc = 0, sql_offset;
 		zbx_vector_uint64_t	ids_uint64;
 		zbx_vector_str_t	ids_str;
@@ -983,7 +982,7 @@ static int	hk_problem_cleanup(const char *table, int source, int object, zbx_uin
  *                                                                            *
  * Parameters: table                - [IN]                                    *
  *             field                - [IN]                                    *
- *             objectid             - [IN]                                    *
+ *             fieldid              - [IN]                                    *
  *             config_max_hk_delete - [IN]                                    *
  *             more                 - [OUT] 1 if there might be more data to  *
  *                     remove, otherwise the value is not changed             *
@@ -991,13 +990,13 @@ static int	hk_problem_cleanup(const char *table, int source, int object, zbx_uin
  * Return value: number of rows deleted                                       *
  *                                                                            *
  ******************************************************************************/
-static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t id, int config_max_hk_delete,
+static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t fieldid, int config_max_hk_delete,
 		int *more)
 {
 	char	filter[MAX_STRING_LEN];
 	int	ret;
 
-	zbx_snprintf(filter, sizeof(filter), "%s=" ZBX_FS_UI64, field, id);
+	zbx_snprintf(filter, sizeof(filter), "%s=" ZBX_FS_UI64, field, fieldid);
 
 	ret = DBdelete_from_table(table, filter, config_max_hk_delete);
 
@@ -1024,9 +1023,8 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 	zbx_db_row_t		row;
 	int			deleted = 0;
 	zbx_vector_uint64_t	housekeeperids;
-	char			*sql = NULL, *table_name_esc;
+	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		housekeeperid, objectid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1043,7 +1041,7 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 		if (ZBX_HK_MODE_REGULAR != *table->poption_mode)
 			continue;
 
-		table_name_esc = zbx_db_dyn_escape_string(table->name);
+		char	*table_name_esc = zbx_db_dyn_escape_string(table->name);
 
 		zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, table_name_esc);
@@ -1060,7 +1058,8 @@ static int	housekeeping_cleanup(int config_max_hk_delete)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		int	more = 0;
+		int		more = 0;
+		zbx_uint64_t	housekeeperid, objectid;
 
 		ZBX_STR2UINT64(housekeeperid, row[0]);
 		ZBX_STR2UINT64(objectid, row[3]);
@@ -1294,13 +1293,10 @@ static int	housekeeping_events(int now, int config_max_hk_delete)
 
 static int	housekeeping_problems(int now, int config_max_hk_delete)
 {
-	int			deleted = 0, rc;
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
+	int			deleted = 0;
 	zbx_vector_uint64_t	ids_uint64;
 	size_t			sql_alloc = 0, sql_offset;
-	char			*sql = NULL;
-	char			buffer[MAX_STRING_LEN];
+	char			buffer[MAX_STRING_LEN], *sql = NULL;;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
@@ -1316,6 +1312,9 @@ static int	housekeeping_problems(int now, int config_max_hk_delete)
 
 	while (1)
 	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
 		if (0 == config_max_hk_delete)
 			result = zbx_db_select("%s", buffer);
 		else
@@ -1339,7 +1338,7 @@ static int	housekeeping_problems(int now, int config_max_hk_delete)
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", ids_uint64.values,
 				ids_uint64.values_num);
 
-		rc = zbx_db_execute("%s", sql);
+		int	rc = zbx_db_execute("%s", sql);
 
 		zbx_vector_uint64_clear(&ids_uint64);
 
@@ -1388,16 +1387,14 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	zbx_thread_housekeeper_args	*housekeeper_args_in = (zbx_thread_housekeeper_args *)
 							(((zbx_thread_args_t *)args)->args);
-	int				now, d_history_and_trends, d_cleanup, d_events, d_problems, d_sessions,
-					d_services, d_autoreg_host, d_audit, sleeptime, records;
 	double				sec, time_slept, time_now;
 	char				sleeptext[25];
 	zbx_ipc_async_socket_t		rtc;
-	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_HOUSEKEEPER_EXECUTE, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE};
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				sleeptime, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_HOUSEKEEPER_EXECUTE, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE};
 
 	db_version_info = housekeeper_args_in->db_version_info;
 
@@ -1431,7 +1428,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	tsdb_version = zbx_tsdb_get_version();
 	zbx_db_close();
 
-	if (tsdb_version > 0)
+	if (0 < tsdb_version)
 	{
 		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
 		hk_tsdb_check_config();
@@ -1442,7 +1439,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		int		hk_execute = 0;
+		int		now, hk_execute = 0;
 
 		sec = zbx_time();
 
@@ -1502,31 +1499,31 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old history and trends]",
 				get_process_type_string(process_type));
 		sec = zbx_time();
-		d_history_and_trends = housekeeping_history_and_trends(now);
+		int	d_history_and_trends = housekeeping_history_and_trends(now);
 
 		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
-		d_problems = housekeeping_problems(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_problems = housekeeping_problems(now, housekeeper_args_in->config_housekeeping_frequency);
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
-		d_events = housekeeping_events(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_events = housekeeping_events(now, housekeeper_args_in->config_housekeeping_frequency);
 
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
-		d_sessions = housekeeping_sessions(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_sessions = housekeeping_sessions(now, housekeeper_args_in->config_housekeeping_frequency);
 
 		zbx_setproctitle("%s [removing old service alarms]", get_process_type_string(process_type));
-		d_services = housekeeping_services(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_services = housekeeping_services(now, housekeeper_args_in->config_housekeeping_frequency);
 
 		zbx_setproctitle("%s [removing old audit log items]", get_process_type_string(process_type));
-		d_audit = housekeeping_audit(now, housekeeper_args_in->config_housekeeping_frequency);
+		int	d_audit = housekeeping_audit(now, housekeeper_args_in->config_housekeeping_frequency);
 
 		zbx_setproctitle("%s [removing old autoreg_hosts]", get_process_type_string(process_type));
-		d_autoreg_host = housekeeping_autoreg_host(housekeeper_args_in->config_max_housekeeper_delete);
+		int	d_autoreg_host = housekeeping_autoreg_host(housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old records]", get_process_type_string(process_type));
-		records = housekeeping_proxy_dhistory(now);
+		int	records = housekeeping_proxy_dhistory(now);
 
 		zbx_setproctitle("%s [removing deleted items data]", get_process_type_string(process_type));
-		d_cleanup = housekeeping_cleanup(housekeeper_args_in->config_housekeeping_frequency);
+		int	d_cleanup = housekeeping_cleanup(housekeeper_args_in->config_housekeeping_frequency);
 		sec = zbx_time() - sec;
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s [deleted %d hist/trends, %d items/triggers, %d events, %d problems,"
