@@ -38,7 +38,7 @@ $trigger_form = (new CForm())
 // Enable form submitting on Enter.
 $trigger_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
-$discovered_trigger = ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
+$discovered_trigger = ($data['triggerid'] && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED);
 $readonly = ($data['limited'] || $discovered_trigger);
 
 if ($readonly) {
@@ -118,7 +118,7 @@ else {
 }
 
 $popup_parameters = [
-	'dstfrm' => $data['form_name'],
+	'dstfrm' => $trigger_form->getName(),
 	'context' => $data['context']
 ];
 

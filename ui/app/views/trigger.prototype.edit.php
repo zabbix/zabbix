@@ -114,7 +114,7 @@ else {
 }
 
 $popup_parameters = [
-	'dstfrm' => $data['form_name'],
+	'dstfrm' => $trigger_form->getName(),
 	'context' => $data['context']
 ];
 
