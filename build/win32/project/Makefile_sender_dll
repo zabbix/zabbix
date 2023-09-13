@@ -42,6 +42,7 @@ OBJS = \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
 	..\..\..\src\libs\zbxcommon\common_log.o \
+	..\..\..\src\libs\zbxcommon\common_internal.o \
 	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
 	..\..\..\src\libs\zbxcommon\libc_wrappers.o \

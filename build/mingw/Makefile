@@ -19,6 +19,7 @@ OBJS = \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\common_str.o \
 	$(OUTPUTDIR)\common_log.o \
+	$(OUTPUTDIR)\common_internal.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\libc_wrappers.o \
 	$(OUTPUTDIR)\param.o \
