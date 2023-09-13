@@ -2805,6 +2805,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		return ret;
 
+	ret = SUCCEED;
 	json_value = &output->values[output->values_num - token->opt];
 
 	if (ZBX_VARIANT_NONE != json_value->type && SUCCEED != zbx_variant_convert(json_value, ZBX_VARIANT_STR))
@@ -2842,26 +2843,29 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	if (FAIL == zbx_jsonobj_query(&obj, path->data.str, &ret_value))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
-		return FAIL;
+		ret = FAIL;
+		goto clean;
 	}
-
-	zbx_variant_set_str(&value, ret_value);
 
 	if (NULL == ret_value)
 	{
 		if (NULL == default_value)
 		{
 			*error = zbx_strdup(*error, "jsonpath returned no value");
-			return FAIL;
+			ret = FAIL;
+			goto clean;
 		}
 
 		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
 	}
+	else
+		zbx_variant_set_str(&value, zbx_strdup(NULL, ret_value));
 
-	zbx_jsonobj_clear(&obj);
 	eval_function_return(token->opt, &value, output);
+clean:
+	zbx_jsonobj_clear(&obj);
 
-	return SUCCEED;
+	return ret;
 }
 
 

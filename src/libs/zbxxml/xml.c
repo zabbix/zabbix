@@ -255,41 +255,6 @@ void zbx_xml_escape_xpath(char **data)
 	*data = buffer;
 }
 
-static int	xpath_nodeset_to_string(zbx_variant_t *value, xmlDoc *doc, xmlXPathObject *xpathObj,
-		int *is_empty, char **errmsg)
-{
-#ifdef HAVE_LIBXML2
-	char 		*tmp;
-	xmlNodeSetPtr	nodeset;
-	xmlBufferPtr	xmlBufferLocal;
-
-	if (NULL == (xmlBufferLocal = xmlBufferCreate()))
-		return FAIL;
-
-	if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
-	{
-		nodeset = xpathObj->nodesetval;
-
-		if (0 == nodeset->nodeNr && NULL != is_empty)
-			*is_empty = SUCCEED;
-
-		for (int i = 0; i < nodeset->nodeNr; i++)
-			xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
-	}
-	else if (NULL != is_empty)
-	{
-		*is_empty = SUCCEED;
-	}
-
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
-
-	xmlBufferFree(xmlBufferLocal);
-#endif
-
-	return SUCCEED;
-}
-
 static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, char **errmsg)
 {
 #ifndef HAVE_LIBXML2
@@ -305,6 +270,7 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlErrorPtr	pErr;
+	xmlBufferPtr	xmlBufferLocal;
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
 	{
@@ -333,7 +299,29 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 	switch (xpathObj->type)
 	{
 		case XPATH_NODESET:
-			ret = xpath_nodeset_to_string(value, doc, xpathObj, is_empty, errmsg);
+			if (NULL == (xmlBufferLocal = xmlBufferCreate()))
+				break;
+
+			if (0 == xmlXPathNodeSetIsEmpty(xpathObj->nodesetval))
+			{
+				nodeset = xpathObj->nodesetval;
+
+				if (0 == nodeset->nodeNr && NULL != is_empty)
+					*is_empty = SUCCEED;
+
+				for (int i = 0; i < nodeset->nodeNr; i++)
+					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
+			}
+			else if (NULL != is_empty)
+			{
+				*is_empty = SUCCEED;
+			}
+
+			zbx_variant_clear(value);
+			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));
+
+			xmlBufferFree(xmlBufferLocal);
+			ret = SUCCEED;
 			break;
 		case XPATH_STRING:
 			zbx_variant_clear(value);
