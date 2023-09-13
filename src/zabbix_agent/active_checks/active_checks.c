@@ -936,7 +936,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 				}
 
 				if (SUCCEED != parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, config_revision_local, config_timeout))
+						((zbx_addr_t *)addrs->values[0])->port, config_revision_local,
+						config_timeout))
 				{
 						zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
 								zbx_json_strerror());
