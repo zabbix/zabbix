@@ -55,6 +55,7 @@ int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_NORMAL	0
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
+#define ZBX_SNMP_OID_TYPE_WALK		3
 
 /* trigger is functional unless its expression contains disabled or not monitored items */
 #define TRIGGER_FUNCTIONAL_TRUE		0
@@ -249,7 +250,7 @@ static int	cmp_key_id(const char *key_1, const char *key_2)
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
-static unsigned char	poller_by_item(unsigned char type, const char *key, const char *snmp_oid)
+static unsigned char	poller_by_item(unsigned char type, const char *key, unsigned char snmp_oid_type)
 {
 	switch (type)
 	{
@@ -304,10 +305,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, const c
 
 			return ZBX_POLLER_TYPE_AGENT;
 		case ITEM_TYPE_SNMP:
-			if (NULL == snmp_oid)
-				break;
-
-			if (0 == strncmp(snmp_oid, "walk[", 5))
+			if (ZBX_SNMP_OID_TYPE_WALK == snmp_oid_type)
 			{
 				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
 					break;
@@ -379,10 +377,8 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 
 		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
-			if (0 == strncmp(snmpitem->snmp_oid, "walk[", 5))
-			{
+			if (ZBX_SNMP_OID_TYPE_WALK == snmpitem->snmp_oid_type)
 				return itemid;
-			}
 		}
 
 		if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &interfaceid))
@@ -533,7 +529,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int flags)
 {
 	unsigned char	poller_type;
-	const char	*snmp_oid = NULL;
+	unsigned char	snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO; /* oid type is only used by ITEM_TYPE_SNMP*/
 
 	if (0 != dc_host->proxyid && SUCCEED != zbx_is_item_processed_by_server(dc_item->type, dc_item->key))
 	{
@@ -546,10 +542,10 @@ static void	DCitem_poller_type_update(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *d
 		ZBX_DC_SNMPITEM	*snmpitem;
 
 		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid)))
-			snmp_oid = snmpitem->snmp_oid;
+			snmp_oid_type = snmpitem->snmp_oid_type;
 	}
 
-	poller_type = poller_by_item(dc_item->type, dc_item->key, snmp_oid);
+	poller_type = poller_by_item(dc_item->type, dc_item->key, snmp_oid_type);
 
 	if (0 != (flags & ZBX_HOST_UNREACHABLE))
 	{
@@ -2708,7 +2704,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 			if (SUCCEED == dc_strpool_replace(found, &snmpitem->snmp_oid, row[6]))
 			{
-				if (NULL != strchr(snmpitem->snmp_oid, '{'))
+				if (0 == strncmp(snmpitem->snmp_oid, "walk[", 5))
+					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+				else if (NULL != strchr(snmpitem->snmp_oid, '{'))
 					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
 				else if (NULL != strchr(snmpitem->snmp_oid, '['))
 					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
