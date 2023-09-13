@@ -141,13 +141,16 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 							[$match_type] = explode("\n", $step['params']);
 
 							if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
-								$step_any_error[$i] = $step;
+								$step_any_error[$i] = [
+									'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+									'params' => ZBX_PREPROC_MATCH_ERROR_ANY
+								];
 							}
 						}
 					}
 
 					$ret = !$step_any_error
-						|| CApiInputValidator::validateUniqueness($rules, $step_any_error, '/1/preprocessing', $error);
+						|| CApiInputValidator::validateUniqueness($rules, $step_any_error, '', $error);
 
 					if (!$ret) {
 						error($error);
