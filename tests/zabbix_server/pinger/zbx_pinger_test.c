@@ -33,9 +33,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	ZBX_UNUSED(local_process_num);
 }
 
-int     MAIN_ZABBIX_ENTRY(int flags)
+int	MAIN_ZABBIX_ENTRY(int flags)
 {
         ZBX_UNUSED(flags);
+
         return 0;
 }
 
@@ -74,4 +75,3 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_free(returned_addr);
 }
-

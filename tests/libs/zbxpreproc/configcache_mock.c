@@ -28,9 +28,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	return 0;
 }
 
-int     MAIN_ZABBIX_ENTRY(int flags)
+int	MAIN_ZABBIX_ENTRY(int flags)
 {
         ZBX_UNUSED(flags);
+
         return 0;
 }
 
