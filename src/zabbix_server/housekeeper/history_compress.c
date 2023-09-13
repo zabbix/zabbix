@@ -19,11 +19,10 @@
 
 #include "history_compress.h"
 
-#include "zbxdbhigh.h"
-#include "zbxstr.h"
-
 #if defined(HAVE_POSTGRESQL)
 
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 #include "zbxdb.h"
 
 #define ZBX_TS_UNIX_NOW		"zbx_ts_unix_now"
