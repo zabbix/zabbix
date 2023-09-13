@@ -181,36 +181,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					error($error);
 					$ret = false;
 				}
-
-				if ($this->test_type != self::ZBX_TEST_TYPE_LLD) {
-					$step_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED,
-						'uniq' => [['type', 'params']], 'fields' => [
-							'type' =>	['type' => API_ANY],
-							'params' =>	['type' => API_ANY]
-					]];
-
-					foreach ($steps as $i => $step) {
-						if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-							unset($steps[$i]);
-							continue;
-						}
-
-						$match_type = ZBX_PREPROC_MATCH_ERROR_ANY;
-
-						if (array_key_exists('params', $step)) {
-							[$match_type] = explode("\n", $step['params']) + [ZBX_PREPROC_MATCH_ERROR_ANY];
-						}
-
-						if ($match_type != ZBX_PREPROC_MATCH_ERROR_ANY) {
-							unset($steps[$i]);
-						}
-					}
-
-					if ($steps && !CApiInputValidator::validate($step_rules, $steps, '/1/preprocessing', $error)) {
-						error($error);
-						$ret = false;
-					}
-				}
 			}
 
 			// Check previous time.

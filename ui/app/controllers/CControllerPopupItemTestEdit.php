@@ -128,6 +128,32 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					error($error);
 					$ret = false;
 				}
+
+				if ($ret && $this->test_type != self::ZBX_TEST_TYPE_LLD) {
+					$step_any_error = [];
+					$rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
+						'type' =>	['type' => API_ANY],
+						'params' =>	['type' => API_ANY]
+					]];
+
+					foreach ($steps as $i => $step) {
+						if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+							[$match_type] = explode("\n", $step['params']);
+
+							if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+								$step_any_error[$i] = $step;
+							}
+						}
+					}
+
+					$ret = !$step_any_error
+						|| CApiInputValidator::validateUniqueness($rules, $step_any_error, '/1/preprocessing', $error);
+
+					if (!$ret) {
+						error($error);
+						$ret = false;
+					}
+				}
 			}
 			elseif ($ret && !$this->is_item_testable) {
 				error(_s('Test of "%1$s" items is not supported.', item_type2str($this->item_type)));
