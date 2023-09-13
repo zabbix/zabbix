@@ -285,7 +285,8 @@ static char	*find_port_sep(char *host, size_t len)
 	return NULL;
 }
 
-static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer, char **error)
+static int	get_http_page(const char *host, const char *path, const char *port, int timeout, char **buffer,
+		char **error)
 {
 	char		*url = NULL, *hostname = NULL, *path_loc = NULL;
 	int		ret = SYSINFO_RET_OK, ipv6_host_found = 0;
