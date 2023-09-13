@@ -19,8 +19,6 @@
 
 #include "checks_agent.h"
 
-#include "poller.h"
-
 #include "zbxsysinfo.h"
 
 void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)

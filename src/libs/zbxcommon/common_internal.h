@@ -24,5 +24,4 @@
 
 zbx_log_func_t		common_get_log_func(void);
 zbx_get_progname_f	common_get_progname(void);
-void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname);
 #endif
