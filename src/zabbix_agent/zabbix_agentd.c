@@ -229,7 +229,7 @@ ZBX_GET_CONFIG_VAR(int, zbx_threads_num, 0)
 ZBX_GET_CONFIG_VAR(ZBX_THREAD_HANDLE*, zbx_threads, NULL)
 static int			*threads_flags;
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_AGENTD)
-ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_progname, NULL)
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
@@ -1352,7 +1352,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_set_parent_signal_handler(zbx_on_exit);	/* must be called after all threads are created */
 
 	/* wait for an exiting thread */
-	res = WaitForMultipleObjectsEx(threads_num, zbx_threads, FALSE, INFINITE, FALSE);
+	res = WaitForMultipleObjectsEx(zbx_threads_num, zbx_threads, FALSE, INFINITE, FALSE);
 
 	if (ZBX_IS_RUNNING())
 	{
@@ -1446,13 +1446,14 @@ int	main(int argc, char **argv)
 	int		ret;
 #endif
 	zbx_init_library_common(zbx_log_impl, &get_zbx_progname);
-	zbx_init_library_nix(&get_zbx_progname);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
 			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_zbx_progname);
+#else
+	zbx_init_library_nix(&get_zbx_progname);
 #endif
 #ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */

@@ -1175,7 +1175,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send configuration tables to the proxy from server                *
+ * Purpose: sends configuration tables to proxy from server                   *
  *          (for active proxies)                                              *
  *                                                                            *
  ******************************************************************************/

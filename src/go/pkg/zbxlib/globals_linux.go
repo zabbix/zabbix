@@ -63,13 +63,6 @@ typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-//const char	*progname = NULL;
-//const char	title_message[] = "agent";
-//const char	syslog_app_name[] = "agent";
-//const char	*usage_message[] = {};
-//unsigned char	program_type	= 0x80;
-//const char	*help_message[] = {};
-
 zbx_metric_t	parameters_agent[] = {NULL};
 zbx_metric_t	parameters_specific[] = {NULL};
 
