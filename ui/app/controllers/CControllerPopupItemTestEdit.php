@@ -88,7 +88,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		if ($ret) {
 			$testable_item_types = self::getTestableItemTypes($this->getInput('hostid', '0'));
-			$this->item_type = (int) $this->getInput('item_type', -1);
+			$this->item_type = $this->getInput('item_type', -1);
 			$this->test_type = $this->getInput('test_type');
 			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
 
