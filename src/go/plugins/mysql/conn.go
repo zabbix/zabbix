@@ -40,18 +40,11 @@ import (
 )
 
 const (
-	// pgx dns field names
-	password = "password"
-	mode     = "sslmode"
-	rootCA   = "sslrootcert"
-	cert     = "sslcert"
-	key      = "sslkey"
-
 	// connType
 	disable    = "disabled"
 	require    = "required"
-	verifyCa   = "verify-ca"
-	verifyFull = "verify-full"
+	verifyCa   = "verify_ca"
+	verifyFull = "verify_full"
 
 	MinSupportedPGVersion = 100000
 )
@@ -197,7 +190,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*MyConn, e
 	config.ReadTimeout = c.callTimeout
 	config.InterpolateParams = true
 
-	if err := registerTLSConfig(config, details); err != nil {
+	if err := registerTLSConfig(uri.String(), config, details); err != nil {
 		return nil, err
 	}
 
@@ -220,7 +213,7 @@ func (c *ConnManager) create(uri uri.URI, details tlsconfig.Details) (*MyConn, e
 	return c.connections[uri], nil
 }
 
-func registerTLSConfig(mysqlConf *mysql.Config, details tlsconfig.Details) error {
+func registerTLSConfig(uri string, mysqlConf *mysql.Config, details tlsconfig.Details) error {
 	var tlsConf *tls.Config
 	var err error
 
@@ -233,22 +226,24 @@ func registerTLSConfig(mysqlConf *mysql.Config, details tlsconfig.Details) error
 			return err
 		}
 
+		tlsConf.VerifyPeerCertificate = tlsconfig.GetCertificateVerification("", tlsConf.RootCAs)
 	case "verify_full":
 		tlsConf, err = details.GetTLSConfig(false)
 		if err != nil {
 			return err
 		}
 
+		tlsConf.VerifyPeerCertificate = tlsconfig.GetCertificateVerification(tlsConf.ServerName, tlsConf.RootCAs)
 	default:
 		return nil
 	}
 
-	err = mysql.RegisterTLSConfig(details.SessionName, tlsConf)
+	err = mysql.RegisterTLSConfig(uri, tlsConf)
 	if err != nil {
 		return err
 	}
 
-	mysqlConf.TLSConfig = details.SessionName
+	mysqlConf.TLSConfig = uri
 
 	return nil
 }
@@ -318,7 +313,7 @@ func getTlsDetails(params map[string]string) (tlsconfig.Details, error) {
 		validateCA = false
 	}
 
-	if details.TlsKeyFile != "" || details.TlsCaFile != "" {
+	if details.TlsKeyFile != "" || details.TlsCertFile != "" {
 		validateClient = true
 	}
 
