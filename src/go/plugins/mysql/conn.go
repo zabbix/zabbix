@@ -45,8 +45,6 @@ const (
 	require    = "required"
 	verifyCa   = "verify_ca"
 	verifyFull = "verify_full"
-
-	MinSupportedPGVersion = 100000
 )
 
 type MyClient interface {
