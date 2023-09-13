@@ -491,7 +491,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$bg_color = $this->fields_values['bg_color'];
 
-		if ($last_value !== null) {
+		if ($last_value !== null && $item['value_type'] != ITEM_VALUE_TYPE_STR
+				&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT) {
 			$number_parser = new CNumberParser([
 				'with_size_suffix' => true,
 				'with_time_suffix' => true,
