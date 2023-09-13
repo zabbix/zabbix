@@ -268,35 +268,6 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			if (array_key_exists('preprocessing', $item)) {
-				$steps = $item['preprocessing'];
-				$step_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'uniq' => [['type', 'params']], 'fields' => [
-					'type' =>	['type' => API_ANY],
-					'params' =>	['type' => API_ANY]
-				]];
-
-				foreach ($steps as $_index => $step) {
-					if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-						unset($steps[$_index]);
-						continue;
-					}
-					$preproc_path = '/'.($i + 1).'/preprocessing';
-					$match_type = ZBX_PREPROC_MATCH_ERROR_ANY;
-
-					if (array_key_exists('params', $step)) {
-						[$match_type] = explode("\n", $step['params']) + [ZBX_PREPROC_MATCH_ERROR_ANY];
-					}
-
-					if ($match_type != ZBX_PREPROC_MATCH_ERROR_ANY) {
-						unset($steps[$_index]);
-					}
-				}
-
-				if ($steps && !CApiInputValidator::validate($step_rules, $steps, $preproc_path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-			}
-
 			if (array_key_exists('query_fields', $item)) {
 				foreach ($item['query_fields'] as $query_field) {
 					if (count($query_field) != 1 || key($query_field) === '') {
@@ -334,6 +305,52 @@ abstract class CItemGeneral extends CApiService {
 			}
 		}
 		unset($item);
+	}
+
+	/**
+	 * Check preprocessing steps do not have duplicates with "Check for not supported item" with "error any".
+	 *
+	 * @param array $items
+	 *
+	 * @throws APIException
+	 */
+	protected function checkPreprocessingStepsDuplicates(array $items): void {
+		$uniq_rules = ['type' => API_OBJECTS, 'fields' => [
+			'preprocessing' => ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
+				'type' =>	['type' => API_ANY],
+				'params' =>	['type' => API_ANY]
+			]]
+		]];
+		$items_steps = [];
+
+		foreach ($items as $item_index => $item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			$step_any_error = [];
+
+			foreach ($item['preprocessing'] as $step_index => $step) {
+				if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+					[$match_type] = explode("\n", $step['params']);
+
+					if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+						$step_any_error[$step_index] = [
+							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+							'params' => ZBX_PREPROC_MATCH_ERROR_ANY
+						];
+					}
+				}
+			}
+
+			if ($step_any_error) {
+				$items_steps[$item_index] = ['preprocessing' => $step_any_error];
+			}
+		}
+
+		if ($items_steps && !CApiInputValidator::validateUniqueness($uniq_rules, $items_steps, '', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**

@@ -417,6 +417,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::addUuid($items);
 
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkDiscoveryRules($items);
@@ -562,6 +563,7 @@ class CItemPrototype extends CItemGeneral {
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
