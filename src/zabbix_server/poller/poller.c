@@ -56,7 +56,7 @@ zbx_get_progname_f	poller_get_progname(void)
 	return zbx_get_progname_cb;
 }
 
-static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
 
 zbx_get_program_type_f	poller_get_program_type(void)
 {

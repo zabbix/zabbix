@@ -296,9 +296,6 @@ static char	**config_load_module	= NULL;
 static char	*config_user		= NULL;
 
 /* web monitoring */
-/* char	*CONFIG_SSL_CA_LOCATION		= NULL; */
-/* char	*CONFIG_SSL_CERT_LOCATION	= NULL; */
-/* char	*CONFIG_SSL_KEY_LOCATION	= NULL; */
 static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
 static char	*config_ssl_key_location = NULL;

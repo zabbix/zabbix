@@ -35,8 +35,6 @@
 #include "zbxautoreg.h"
 #include "zbxscripts.h"
 
-//extern unsigned char	program_type;
-
 /**********************************************************************************
  *                                                                                *
  * Purpose: perform active agent auto registration                                *

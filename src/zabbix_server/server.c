@@ -91,7 +91,6 @@
 #include "ipmi/ipmi_poller.h"
 #endif
 
-//static const char	*progname = NULL;
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 static const char	title_message[] = "zabbix_server";
@@ -200,8 +199,6 @@ static char	shortopts[] = "c:hVR:f";
 
 /* end of COMMAND LINE OPTIONS */
 
-//int		threads_num = 0;
-//pid_t		*threads = NULL;
 ZBX_GET_CONFIG_VAR(int, zbx_threads_num, 0)
 ZBX_GET_CONFIG_VAR(pid_t*, zbx_threads, NULL)
 
@@ -334,9 +331,6 @@ static char	**CONFIG_LOAD_MODULE	= NULL;
 static char	*CONFIG_USER		= NULL;
 
 /* web monitoring */
-/* char	*CONFIG_SSL_CA_LOCATION		= NULL; */
-/* char	*CONFIG_SSL_CERT_LOCATION	= NULL; */
-/* char	*CONFIG_SSL_KEY_LOCATION	= NULL; */
 static char	*config_ssl_ca_location = NULL;
 static char	*config_ssl_cert_location = NULL;
 static char	*config_ssl_key_location = NULL;
@@ -1409,8 +1403,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_args_t		thread_args;
 
-	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, get_zbx_progname, ZBX_NO_POLLER,
-							config_startup_time, config_unavailable_delay,
+	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, get_zbx_progname,
+							ZBX_NO_POLLER, config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,

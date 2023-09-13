@@ -1795,7 +1795,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					discoverer_check_count_compare);
 
 			rule_count = process_discovery(&nextcheck, discoverer_args_in->config_timeout,
-					&incomplete_druleids, &jobs, &check_counts, discoverer_args_in->zbx_get_program_type_cb_arg());
+					&incomplete_druleids, &jobs, &check_counts,
+					discoverer_args_in->zbx_get_program_type_cb_arg());
 
 			if (0 == nextcheck)
 				nextcheck = time(NULL) + DISCOVERER_DELAY;

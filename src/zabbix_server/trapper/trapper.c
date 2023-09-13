@@ -53,7 +53,7 @@
 #define ZBX_MAX_SECTION_ENTRIES		4
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
-static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
 
 zbx_get_program_type_f	trapper_get_program_type(void)
 {

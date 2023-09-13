@@ -234,10 +234,13 @@ out:
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy                  - [IN/OUT] proxy data                   *
- *             config_vault           - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
+ * Parameters: proxy                    - [IN/OUT] proxy data                 *
+ *             config_vault             - [IN]                                *
+ *             config_trapper_timeout   - [IN]                                *
+ *             config_source_ip         - [IN]                                *
+ *             config_ssl_ca_location   - [IN]                                *
+ *             config_ssl_cert_location - [IN]                                *
+ *             config_ssl_key_location  - [IN]                                *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               other code - an error occurred                               *
