@@ -94,7 +94,12 @@ int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
+		/* failures are handled there */
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
 
 	if (NULL != (data_source = zbx_odbc_connect(dsn, connection, item->username, item->password, timeout_sec,
 			&error)))

@@ -116,7 +116,12 @@ int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGE
 			goto out;
 	}
 
-	zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED);
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
+		/* failures are handled there */
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
 
 	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port,
 			timeout_sec + 1, item->host.tls_connect, tls_arg1, tls_arg2))
