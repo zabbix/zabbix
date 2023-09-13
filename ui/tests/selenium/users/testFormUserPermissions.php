@@ -421,9 +421,7 @@ class testFormUserPermissions extends CWebTest {
 
 		$this->page->open('zabbix.php?action=usergroup.edit&usrgrpid=8')->waitUntilReady();
 		$this->query('link:Host permissions')->one()->click();
-		$permission_table = $this->query('id:hostgroup-right-table')->asTable()->one();
-
-		$data = [
+		$this->query('id:hostgroup-right-table')->asMultifieldTable()->one()->fill([
 			[
 				'Host groups' => 'Empty group',
 				'Permissions' => 'Deny'
@@ -436,12 +434,7 @@ class testFormUserPermissions extends CWebTest {
 				'Host groups' => 'Group to check Overview',
 				'Permissions' => 'Read-write'
 			]
-		];
-		foreach ($data as $parameters) {
-			$permission_table->asMultifieldTable()->fill($parameters);
-			$this->page->waitUntilReady();
-		}
-
+		]);
 		$this->query('button:Update')->one()->click();
 
 		$this->page->open('zabbix.php?action=user.edit&userid=2')->waitUntilReady();

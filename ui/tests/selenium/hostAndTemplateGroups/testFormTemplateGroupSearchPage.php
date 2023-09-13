@@ -126,21 +126,63 @@ class testFormTemplateGroupSearchPage extends testFormGroups {
 		return [
 			[
 				[
-					'apply_permissions' => 'Europe',
-					// Permission inheritance doesn't apply when changing the name of existing group.
-					'open_form' => 'Europe/Test',
+					'apply_permissions' => 'Europe/Test',
+					// Permission inheritance doesn't apply from first level group e.x. 'Streets'
+					// when changing the name of existing group to new subgroup name.
+					'open_form' => 'Europe group for test on search page',
 					'create' => 'Streets/Dzelzavas',
 					'groups_after' => [
 						[
-							'Streets/Dzelzavas',
+							'groups' => ['Europe/Test', 'Europe/Test/Zabbix'],
 							'Permissions' => 'Read-write'
 						],
 						[
-							'Cities/Cesis',
+							'groups' => ['Cities/Cesis', 'Europe/Latvia'],
 							'Permissions' => 'Read'
 						],
 						[
-							['Europe', 'Europe/Latvia', 'Europe/Test/Zabbix', 'Europe/Latvia/Riga/Zabbix', 'Streets'],
+							'groups' => ['Europe', 'Streets'],
+							'Permissions' => 'Deny'
+						]
+					],
+					'tags_before' => [
+						[
+							'Host groups' => 'Cities/Cesis',
+							'Tags' => 'city: Cesis'
+						],
+						[
+							'Host groups' => 'Europe',
+							'Tags' => 'world'
+						],
+						[
+							'Host groups' => 'Europe/Test',
+							'Tags' => 'country: test'
+						],
+						[
+							'Host groups' => 'Streets',
+							'Tags' => 'street'
+						]
+					]
+				]
+			],
+			[
+				[
+					'apply_permissions' => 'Europe',
+					// After renaming a subgroup, all permissions remain the same.
+					'open_form' => 'Europe/Test',
+					'create' => 'Streets/Terbatas',
+					'groups_after' => [
+						[
+							'groups' => 'Streets/Terbatas',
+							'Permissions' => 'Read-write'
+						],
+						[
+							'groups' => 'Cities/Cesis',
+							'Permissions' => 'Read'
+						],
+						[
+							'groups' => ['Europe', 'Europe/Latvia', 'Europe/Test/Zabbix', 'Europe/Latvia/Riga/Zabbix',
+								'Streets'],
 							'Permissions' => 'Deny'
 						]
 					],

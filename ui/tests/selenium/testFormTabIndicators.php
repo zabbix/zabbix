@@ -763,7 +763,6 @@ class testFormTabIndicators extends CWebTest {
 				'group_table' => 'hostgroup-right-table',
 				'multiselect' => 'ms_hostgroup_right_groupids_0_',
 				'segmentedradio' => 'hostgroup_right_permission_0',
-				'add_group_table' => 'new-group-right-table',
 				'group_name' => 'Discovered hosts'
 			],
 			[
@@ -771,7 +770,6 @@ class testFormTabIndicators extends CWebTest {
 				'group_table' => 'templategroup-right-table',
 				'multiselect' => 'ms_templategroup_right_groupids_0_',
 				'segmentedradio' => 'templategroup_right_permission_0',
-				'add_group_table' => 'new-templategroup-right-table',
 				'group_name' => 'Templates/Power'
 			]
 		];
@@ -808,18 +806,16 @@ class testFormTabIndicators extends CWebTest {
 		$this->assertTabIndicator($tab_selector, false);
 
 		// Add tag filter for 'Discovered hosts' group and check indicator.
-		$tags_table = $this->query('id:tag-filter-table');
-		$tags_table->query('button','Add')->one()->click();
+		$tag_table->query('button','Add')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-		$dialog->query('button', 'Select')->one()->click();
-		$this->query('link', 'Discovered hosts')->waitUntilVisible()->one()->click();
+		$dialog->asForm()->fill(['Host groups' => 'Discovered hosts']);
 		$dialog->getFooter()->query('button', 'Add')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
 		$tag_table->waitUntilReloaded();
 		$this->assertTabIndicator($tab_selector, true);
 
 		// Remove the tag filter for 'Discovered hosts' group and check indicator.
-		$this->query('button', 'Remove')->one()->click();
+		$tag_table->query('button', 'Remove')->one()->click();
 		$this->assertTabIndicator($tab_selector, false);
 	}
 

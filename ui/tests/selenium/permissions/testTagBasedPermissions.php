@@ -45,6 +45,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Problem tag filter');
 
 			// Add tag permissions
+			$i = 1;
 			foreach ($hostgroups as $hostgroup => $tags) {
 				if (empty($tags)) {
 					$tags = ['' => ''];
@@ -59,9 +60,8 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						$values = [''];
 					}
 
-					foreach ($values as $i => $value) {
-						$tags_table = $this->query('id:tag-filter-table');
-						$tags_table->query('button', 'Add')->one()->click();
+					foreach ($values as $value) {
+						$this->query('id:tag-filter-table')->query('button', 'Add')->one()->click();
 						$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 						$form = $dialog->asForm();
 						$dialog->query('button', 'Select')->one()->click();
@@ -74,10 +74,13 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						}
 
 						$form->submit();
-						$xpath = '//table[@id="tag-filter-table"]//tbody//tr[1]//td/button[text()="Remove"]';
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+						COverlayDialogElement::ensureNotPresent();
 					}
 				}
+
+				$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+				$i++;
 			}
 
 			$this->zbxTestClick('update');
