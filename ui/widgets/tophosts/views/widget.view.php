@@ -74,7 +74,9 @@ else {
 
 			$color = $column_config['base_color'];
 
-			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+			if ($column['item']['value_type'] != ITEM_VALUE_TYPE_STR
+					&& $column['item']['value_type'] != ITEM_VALUE_TYPE_TEXT
+					&& $column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
 					&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
 					&& array_key_exists('thresholds', $column_config)) {
 				foreach ($column_config['thresholds'] as $threshold) {

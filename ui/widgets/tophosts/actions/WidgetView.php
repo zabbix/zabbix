@@ -375,8 +375,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			&& $column['aggregate_function'] != AGGREGATE_LAST
 			&& $column['aggregate_function'] != AGGREGATE_FIRST
 			&& $column['aggregate_function'] != AGGREGATE_COUNT)
-			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
-			|| array_key_exists('thresholds', $column);
+			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS;
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids,
