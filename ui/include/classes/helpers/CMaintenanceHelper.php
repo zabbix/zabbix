@@ -57,7 +57,7 @@ class CMaintenanceHelper {
 		$minutes = sprintf('%02d', floor(($timeperiod['start_time'] % SEC_PER_HOUR) / SEC_PER_MIN));
 		$start_time = $hours.':'.$minutes;
 
-		if ($start_time == '00:00') {
+		if ($start_time === '00:00') {
 			$start_time = '24:00';
 		}
 
