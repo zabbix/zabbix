@@ -104,12 +104,12 @@ class CWidgetFieldThresholds extends CWidgetField {
 		foreach ($this->getValue() as $index => $value) {
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.color.'.$index,
+				'name' => $this->name.'.'.$index.'.color',
 				'value' => $value['color']
 			];
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.threshold.'.$index,
+				'name' => $this->name.'.'.$index.'.threshold',
 				'value' => $value['threshold']
 			];
 		}

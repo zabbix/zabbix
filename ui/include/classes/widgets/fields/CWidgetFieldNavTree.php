@@ -94,7 +94,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 		foreach ($this->getValue() as $index => $value) {
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.name.'.$index,
+				'name' => $this->name.'.'.$index.'.name',
 				'value' => $value['name']
 			];
 
@@ -103,7 +103,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 			if ($value['order'] != 1) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.order.'.$index,
+					'name' => $this->name.'.'.$index.'.order',
 					'value' => $value['order']
 				];
 			}
@@ -111,7 +111,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 			if ($value['parent'] != 0) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-					'name' => $this->name.'.parent.'.$index,
+					'name' => $this->name.'.'.$index.'.parent',
 					'value' => $value['parent']
 				];
 			}
@@ -119,7 +119,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 			if ($value['sysmapid'] != 0) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_MAP,
-					'name' => $this->name.'.sysmapid.'.$index,
+					'name' => $this->name.'.'.$index.'.sysmapid',
 					'value' => $value['sysmapid']
 				];
 			}

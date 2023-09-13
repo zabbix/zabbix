@@ -76,7 +76,7 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 		if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'['.self::FOREIGN_REFERENCE_KEY.']',
+				'name' => $this->name.'.'.self::FOREIGN_REFERENCE_KEY,
 				'value' => $value[self::FOREIGN_REFERENCE_KEY]
 			];
 		}

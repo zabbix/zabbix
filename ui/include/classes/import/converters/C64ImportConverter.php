@@ -103,7 +103,8 @@ class C64ImportConverter extends CConverter {
 					if ($widget['type'] === 'item' && array_key_exists('fields', $widget)) {
 						foreach ($widget['fields'] as &$field) {
 							$field['name'] = preg_replace('/^thresholds\.(threshold|color)\.(\d+)$/',
-								'thresholds.$2.$1', $field['name']);
+								'thresholds.$2.$1', $field['name']
+							);
 						}
 						unset($field);
 					}

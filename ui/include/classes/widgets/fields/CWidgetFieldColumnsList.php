@@ -129,7 +129,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			foreach (array_intersect_key($fields, $value) as $field => $field_type) {
 				$widget_fields[] = [
 					'type' => $field_type,
-					'name' => implode('.', [$this->name, $field, $column_index]),
+					'name' => $this->name.'.'.$column_index.'.'.$field,
 					'value' => $value[$field]
 				];
 			}
@@ -141,12 +141,12 @@ class CWidgetFieldColumnsList extends CWidgetField {
 			foreach ($value['thresholds'] as $threshold_index => $threshold) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => implode('.', [$this->name.'thresholds.color', $column_index, $threshold_index]),
+					'name' => $this->name.'thresholds.'.$column_index.'.color.'.$threshold_index,
 					'value' => $threshold['color']
 				];
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => implode('.', [$this->name.'thresholds.threshold', $column_index, $threshold_index]),
+					'name' => $this->name.'thresholds.'.$column_index.'.threshold.'.$threshold_index,
 					'value' => $threshold['threshold']
 				];
 			}

@@ -35,14 +35,4 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_STRINGS_UTF8]);
 	}
-
-	public function toApi(array &$widget_fields = []): void {
-		foreach ($this->getValue() as $index => $value) {
-			$widget_fields[] = [
-				'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-				'name' => $this->name.'.'.$index,
-				'value' => $value
-			];
-		}
-	}
 }

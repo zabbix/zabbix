@@ -434,94 +434,19 @@ class CDashboardHelper {
 			}
 		}
 
-		$fields_new = self::constructWidgetFieldsFromDottedNames($fields_new);
 		$fields_new = self::constructWidgetFieldsFromArrayNames($fields_new);
 
 		return $fields_new;
 	}
 
 	/**
-	 * Construct widget fields from dot-styled widget field names.
+	 * Construct widget fields from destructured arrays back into arrays.
 	 *
 	 * Example:
 	 *     In: [
-	 *         'tags.tag.0'     => 'tag1',
-	 *         'tags.value.0'   => 'value1',
-	 *         'tags.tag.1'     => 'tag2',
-	 *         'tags.value.1'   => 'value2',
-	 *         'ds.hosts.0.0'   => 'host1',
-	 *         'ds.hosts.1.0'   => 'host2',
-	 *         'ds.hosts.1.1'   => 'host3',
-	 *         'ds.color.0'     => 'AB43C5',
-	 *         'ds.color.1'     => 'CCCCCC',
-	 *         'problemhosts.0' => 'ph1',
-	 *         'problemhosts.1' => 'ph2'
-	 *    ]
-	 *
-	 *    Out: [
-	 *       'tags' => [
-	 *           ['tag' => 'tag1', 'value' => 'value1'],
-	 *           ['tag' => 'tag2', 'value' => 'value2']
-	 *       ],
-	 *       'ds' => [
-	 *           [
-	 *               'hosts' => ['host1'],
-	 *               'color' => 'AB43C5'
-	 *           ],
-	 *           [
-	 *               'hosts => ['host2', 'host3'],
-	 *               'color' => 'CCCCCC'
-	 *           ],
-	 *        ],
-	 *       'problemhosts' => ['ph1', 'ph2']
-	 *    ]
-	 *
-	 * @param array $fields
-	 *
-	 * @return array
-	 */
-	public static function constructWidgetFieldsFromDottedNames(array $fields): array {
-		// API doesn't guarantee fields to be retrieved in same order as stored. Sorting by key...
-		uksort($fields, static function ($key1, $key2) {
-			foreach (['key1', 'key2'] as $var) {
-				if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $$var, $matches) === 1) {
-					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2].'.'.$matches[4];
-				}
-				elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $$var, $matches) === 1) {
-					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2];
-				}
-			}
-
-			return strnatcmp((string) $key1, (string) $key2);
-		});
-
-		// Converting dot-delimited keys to the arrays.
-		foreach ($fields as $key => $value) {
-			if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $key, $matches) === 1) {
-				$fields[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
-				unset($fields[$key]);
-			}
-			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $key, $matches) === 1) {
-				$fields[$matches[1]][$matches[3]][$matches[2]] = $value;
-				unset($fields[$key]);
-			}
-			elseif (preg_match('/^([a-z]+)\.(\d+)$/', (string) $key, $matches) === 1) {
-				$fields[$matches[1]][$matches[2]] = $value;
-				unset($fields[$key]);
-			}
-		}
-
-		return $fields;
-	}
-
-	/**
-	 * Construct widget fields from array-styled widget field names.
-	 *
-	 * Example:
-	 *     In: [
-	 *         'a[0]'          => 'value_1',
-	 *         'a[1]'          => 'value_2',
-	 *         'b[0][c][0][d]' => 'value_3'
+	 *         'a.0'       => 'value_1',
+	 *         'a.1'       => 'value_2',
+	 *         'b.0.c.0.d' => 'value_3'
 	 *     ]
 	 *
 	 *     Out: [
@@ -533,7 +458,7 @@ class CDashboardHelper {
 	 *
 	 * @return array
 	 */
-	public static function constructWidgetFieldsFromArrayNames(array $fields): array {
+	private static function constructWidgetFieldsFromArrayNames(array $fields): array {
 		$fields_new = [];
 
 		uksort($fields,
@@ -541,7 +466,7 @@ class CDashboardHelper {
 		);
 
 		foreach ($fields as $key => $value) {
-			if (preg_match('/^([a-z_]+)((\\[([a-z_]+|[0-9]+)\\])+)$/', $key, $matches) === 0) {
+			if (preg_match('/^([a-z_]+)((\\.([a-z_]+|[0-9]+))+)$/', $key, $matches) === 0) {
 				$fields_new[$key] = $value;
 
 				continue;
@@ -550,7 +475,7 @@ class CDashboardHelper {
 			$field_name = $matches[1];
 			$field_path = $matches[2];
 
-			preg_match_all('/\\[([a-z_]+|[0-9]+)\\]/', $field_path, $matches);
+			preg_match_all('/\\.([a-z_]+|[0-9]+)/', $field_path, $matches);
 
 			$field_path_keys = array_merge([$field_name], $matches[1]);
 

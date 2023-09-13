@@ -97,7 +97,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			foreach ($value['hosts'] as $host_index => $pattern_item) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.hosts.'.$index.'.'.$host_index,
+					'name' => $this->name.'.'.$index.'.hosts.'.$host_index,
 					'value' => $pattern_item
 				];
 			}
@@ -105,7 +105,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 			foreach ($value['items'] as $item_index => $pattern_item) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.items.'.$index.'.'.$item_index,
+					'name' => $this->name.'.'.$index.'.items.'.$item_index,
 					'value' => $pattern_item
 				];
 			}
@@ -116,7 +116,7 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 						'type' => ($option === 'color' || $option === 'timeshift')
 							? ZBX_WIDGET_FIELD_TYPE_STR
 							: ZBX_WIDGET_FIELD_TYPE_INT32,
-						'name' => $this->name.'.'.$option.'.'.$index,
+						'name' => $this->name.'.'.$index.'.'.$option,
 						'value' => $value[$option]
 					];
 				}

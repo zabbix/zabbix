@@ -213,7 +213,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			foreach ($value['hosts'] as $host_index => $pattern_host) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.hosts.'.$index.'.'.$host_index,
+					'name' => $this->name.'.'.$index.'.hosts.'.$host_index,
 					'value' => $pattern_host
 				];
 			}
@@ -221,7 +221,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			foreach ($value['items'] as $item_index => $pattern_item) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.items.'.$index.'.'.$item_index,
+					'name' => $this->name.'.'.$index.'.items.'.$item_index,
 					'value' => $pattern_item
 				];
 			}
@@ -229,7 +229,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			foreach ($value['itemids'] as $item_index => $itemid) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
-					'name' => $this->name.'.itemids.'.$index.'.'.$item_index,
+					'name' => $this->name.'.'.$index.'.itemids.'.$item_index,
 					'value' => $itemid
 				];
 			}
@@ -239,7 +239,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				foreach ($value['color'] as $color_index => $color) {
 					$widget_fields[] = [
 						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-						'name' => $this->name.'.color.'.$index.'.'.$color_index,
+						'name' => $this->name.'.'.$index.'.color.'.$color_index,
 						'value' => $color
 					];
 				}
@@ -247,7 +247,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 			else {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.color.'.$index,
+					'name' => $this->name.'.'.$index.'.color',
 					'value' => $value['color']
 				];
 			}
@@ -257,7 +257,7 @@ class CWidgetFieldGraphDataSet extends CWidgetField {
 				if ($value[$name] !== null && $value[$name] != $dataset_defaults[$name]) {
 					$widget_fields[] = [
 						'type' => $type,
-						'name' => $this->name.'.'.$name.'.'.$index,
+						'name' => $this->name.'.'.$index.'.'.$name,
 						'value' => $value[$name]
 					];
 				}

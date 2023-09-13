@@ -66,17 +66,17 @@ class CWidgetFieldTags extends CWidgetField {
 		foreach ($this->getValue() as $index => $value) {
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.tag.'.$index,
+				'name' => $this->name.'.'.$index.'.'.'tag',
 				'value' => $value['tag']
 			];
 			$widget_fields[] = [
 				'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-				'name' => $this->name.'.operator.'.$index,
+				'name' => $this->name.'.'.$index.'.'.'operator',
 				'value' => $value['operator']
 			];
 			$widget_fields[] = [
 				'type' => $this->save_type,
-				'name' => $this->name.'.value.'.$index,
+				'name' => $this->name.'.'.$index.'.'.'value',
 				'value' => $value['value']
 			];
 		}

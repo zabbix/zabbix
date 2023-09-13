@@ -290,22 +290,29 @@ abstract class CWidgetField {
 	public function toApi(array &$widget_fields = []): void {
 		$value = $this->getValue();
 
-		if ($value !== null && $value !== $this->getDefault()) {
-			$widget_field = [
-				'type' => $this->save_type,
-				'name' => $this->name
-			];
+		if ($value === null) {
+			return;
+		}
 
-			if (is_array($value)) {
-				foreach ($value as $val) {
-					$widget_field['value'] = $val;
-					$widget_fields[] = $widget_field;
+		if (is_array($value)) {
+			$value = array_values($value);
+
+			if ($value !== $this->getDefault()) {
+				foreach ($value as $index => $each_value) {
+					$widget_fields[] = [
+						'type' => $this->save_type,
+						'name' => $this->name . '.' . $index,
+						'value' => $each_value
+					];
 				}
 			}
-			else {
-				$widget_field['value'] = $value;
-				$widget_fields[] = $widget_field;
-			}
+		}
+		elseif ($value !== $this->getDefault()) {
+			$widget_fields[] = [
+				'type' => $this->save_type,
+				'name' => $this->name,
+				'value' => $value
+			];
 		}
 	}
 

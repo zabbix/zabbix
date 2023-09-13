@@ -225,7 +225,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $default) || $value[$name] !== $default[$name]) {
 						$widget_fields[] = [
 							'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-							'name' => $this->name.'['.$name.']',
+							'name' => $this->name.'.'.$name,
 							'value' => $value[$name]
 						];
 					}
@@ -240,7 +240,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'['.self::FOREIGN_REFERENCE_KEY.']',
+					'name' => $this->name.'.'.self::FOREIGN_REFERENCE_KEY,
 					'value' => $value[self::FOREIGN_REFERENCE_KEY]
 				];
 				return;
