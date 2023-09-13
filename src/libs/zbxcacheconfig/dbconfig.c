@@ -15109,14 +15109,15 @@ out:
  *             text        - [IN/OUT] the text value with macros to expand    *
  *             hostids     - [IN] an array of host identifiers                *
  *             hostids_num - [IN] the number of host identifiers              *
+ *             env         - [IN] security environment                        *
  *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error)
+		int hostids_num, unsigned char env, char **error)
 {
 	/* wrap the passed user macro cache into user macro handle structure */
-	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache, .macro_env = ZBX_MACRO_ENV_SECURE, .prev = NULL};
+	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache, .macro_env = env, .prev = NULL};
 
 	return zbx_dc_expand_user_macros(&um_handle, text, hostids, hostids_num, error);
 }
