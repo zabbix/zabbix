@@ -174,7 +174,7 @@ void	zbx_free_perf_collector(void);
 #endif
 
 #define ZBX_CHECK_TIMEOUT_UNDEFINED	0
-int	zbx_validate_item_timeout(const char *timeout_str, char *error, size_t error_len);
+int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len);
 
 int	sysinfo_get_config_timeout(void);
 

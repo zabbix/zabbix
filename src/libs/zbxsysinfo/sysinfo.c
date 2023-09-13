@@ -2135,13 +2135,16 @@ char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
 	return dst_string;
 }
 
-int	zbx_validate_item_timeout(const char *timeout_str, char *error, size_t error_len)
+int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len)
 {
 #define ZBX_ITEM_TIMEOUT_MAX	600
 	int	sec;
 
 	if ('\0' == *timeout_str)
 	{
+		if (NULL != sec_out)
+			*sec_out = 0;
+
 		return SUCCEED;
 	}
 
@@ -2151,6 +2154,9 @@ int	zbx_validate_item_timeout(const char *timeout_str, char *error, size_t error
 		zbx_strlcpy(error, "Unsupported timeout value.", error_len);
 		return FAIL;
 	}
+
+	if (NULL != sec_out)
+		*sec_out = sec;
 
 	return SUCCEED;
 #undef ZBX_ITEM_TIMEOUT_MAX
