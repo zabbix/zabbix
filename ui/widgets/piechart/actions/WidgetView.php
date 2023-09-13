@@ -771,16 +771,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($sector);
 
 		if ($has_total_item) {
-			if ($sector_total_value <= $total_value['value']) {
+			if ($sector_total_value === $total_value['value']) {
 				// Sectors use the full total value, no remaining space for the total sector.
-				if ($sector_total_value == $total_value['value']) {
-					array_pop($svg_sectors);
-				}
+				array_pop($svg_sectors);
+			}
+			elseif ($sector_total_value < $total_value['value']) {
 				// Sectors use less than total value, the remaining of the total sector will be displayed.
-				else {
-					$svg_sectors[count($svg_sectors) - 1]['percent_of_total'] =
-						($total_value['value']-$sector_total_value)*100/$total_value['value'];
-				}
+				$svg_sectors[count($svg_sectors) - 1]['percent_of_total'] =
+					($total_value['value'] - $sector_total_value) * 100 / $total_value['value'];
 			}
 			else {
 				// Sectors use more than total value.
