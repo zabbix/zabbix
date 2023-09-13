@@ -68,27 +68,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getData(): array {
-		$dashboard_time = false;
 		$from = null;
 		$to = null;
 
-		foreach ($this->fields_values['columns'] as $column) {
+		foreach ($this->fields_values['columns'] as $key => $column) {
+			$dashboard_time = false;
+
 			if ($column['aggregate_function'] != AGGREGATE_NONE && !array_key_exists('item_time', $column)) {
 				$dashboard_time = true;
 			}
-		}
 
-		if ($dashboard_time) {
-			$from = $this->getInput('from');
-			$to = $this->getInput('to');
+			if ($dashboard_time) {
+				$from = $this->getInput('from');
+				$to = $this->getInput('to');
 
-			foreach ($this->fields_values['columns'] as $key => $column) {
 				$this->fields_values['columns'][$key]['time_from'] = $from;
 				$this->fields_values['columns'][$key]['time_to'] = $to;
 			}
-		}
-		else if ($column['aggregate_function'] != AGGREGATE_NONE) {
-			foreach ($this->fields_values['columns'] as $column) {
+			else if ($column['aggregate_function'] != AGGREGATE_NONE) {
 				$from = $column['time_from'];
 				$to = $column['time_to'];
 			}
