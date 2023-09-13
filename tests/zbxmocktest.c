@@ -130,7 +130,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 //static const char	title_message[] = "mock_title_message";
 //static const char	*usage_message[] = {"mock_usage_message", NULL};
 //static const char	*help_message[] = {"mock_help_message", NULL};
-ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "mock_progname")
 //static const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
@@ -162,7 +162,6 @@ int	main (void)
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
 
-	zbx_progname = "mock_progname";
 	zbx_set_log_level(LOG_LEVEL_INFORMATION);
 	zbx_init_library_common(zbx_mock_log_impl, &get_zbx_progname);
 	zbx_init_library_nix(&get_zbx_progname);
