@@ -857,8 +857,11 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 				zbx_json_free(&json);
 			}
-			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number, sysinfo_get_config_timeout(), result))
+			else if (SUCCEED != zbx_get_remote_zabbix_stats(ip, port_number, sysinfo_get_config_timeout(),
+					result))
+			{
 				goto out;
+			}
 		}
 		else
 		{
