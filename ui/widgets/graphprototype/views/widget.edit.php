@@ -26,8 +26,6 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldReference;
-
 if (array_key_exists('itemid', $data['fields'])) {
 	$field_itemid = (new CWidgetFieldMultiSelectItemPrototypeView($data['fields']['itemid']))
 		->setPopupParameter('numeric', true);
@@ -41,7 +39,6 @@ else {
 }
 
 (new CWidgetFormView($data))
-	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME])
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)

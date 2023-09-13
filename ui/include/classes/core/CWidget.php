@@ -21,16 +21,19 @@
 
 namespace Zabbix\Core;
 
-use CWidgetsData,
-	CControllerDashboardWidgetEdit,
-	CControllerDashboardWidgetView;
+use CControllerDashboardWidgetEdit,
+	CControllerDashboardWidgetView,
+	CWidgetsData;
 
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
 };
 
-use Zabbix\Widgets\Fields\CWidgetFieldSelect;
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldReference,
+	CWidgetFieldSelect
+};
 
 /**
  * Base class for user widgets. If Widget.php is not provided by user widget, this class will be instantiated instead.
@@ -91,6 +94,12 @@ class CWidget extends CModule {
 					$field->preventDefault();
 				}
 			}
+		}
+
+		if ($this->getOut()) {
+			$form->addField(
+				new CWidgetFieldReference()
+			);
 		}
 
 		$form->setFieldsValues();

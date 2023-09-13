@@ -33,7 +33,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectItemPrototype,
 	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
-	CWidgetFieldReference,
 	CWidgetFieldTimePeriod
 };
 
@@ -49,9 +48,6 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldReference()
-			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('source_type', _('Source'), [
 					ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),

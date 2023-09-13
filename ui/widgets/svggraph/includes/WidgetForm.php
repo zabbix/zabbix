@@ -39,7 +39,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldNumericBox,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldRangeControl,
-	CWidgetFieldReference,
 	CWidgetFieldSelect,
 	CWidgetFieldSeverities,
 	CWidgetFieldTags,
@@ -223,9 +222,6 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldReference()
-			)
 			->initDataSetFields()
 			->initDisplayingOptionsFields()
 			->initTimePeriodFields()

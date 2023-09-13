@@ -21,6 +21,8 @@
 
 use Zabbix\Widgets\CWidgetField;
 
+use Zabbix\Widgets\Fields\CWidgetFieldReference;
+
 class CWidgetFormView {
 
 	private array $data;
@@ -37,6 +39,10 @@ class CWidgetFormView {
 	public function __construct(array $data, string $name = 'widget_dialogue_form') {
 		$this->data = $data;
 		$this->name = $name;
+
+		if (array_key_exists(CWidgetFieldReference::FIELD_NAME, $data['fields'])) {
+			$this->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME]);
+		}
 
 		$this->makeFormGrid();
 	}

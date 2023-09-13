@@ -26,10 +26,7 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldReference;
-
-$form = (new CWidgetFormView($data))
-	->addFieldVar($data['fields'][CWidgetFieldReference::FIELD_NAME]);
+$form = new CWidgetFormView($data);
 
 foreach ($data['fields']['navtree']->getValue() as $i => $navtree_item) {
 	$form->addVar($data['fields']['navtree']->getName().'['.$i.'][name]', $navtree_item['name']);
