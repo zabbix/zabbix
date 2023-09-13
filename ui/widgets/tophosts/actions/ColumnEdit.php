@@ -58,24 +58,24 @@ class ColumnEdit extends CController {
 	protected function checkInput(): bool {
 		// Validation is done by CWidgetFieldColumnsList
 		$fields = [
-			'name' => 'string',
-			'data' => 'int32',
-			'item' => 'string',
-			'aggregate_function' => 'int32',
-			'item_time' => 'string',
-			'time_from' => 'string',
-			'time_to' => 'string',
-			'display' => 'int32',
-			'history' => 'int32',
-			'min' => 'string',
-			'max' => 'string',
-			'decimal_places' => 'string',
-			'base_color' => 'string',
-			'thresholds' => 'array',
-			'text' => 'string',
-			'edit' => 'in 1',
-			'update' => 'in 1',
-			'templateid' => 'string'
+			'name' =>				'string',
+			'data' =>				'int32',
+			'item' =>				'string',
+			'aggregate_function' =>	'int32',
+			'item_time' =>			'string',
+			'time_from' =>			'range_time',
+			'time_to' =>			'range_time',
+			'display' =>			'int32',
+			'history' =>			'int32',
+			'min' =>				'string',
+			'max' =>				'string',
+			'decimal_places' =>		'string',
+			'base_color' =>			'string',
+			'thresholds' =>			'array',
+			'text' =>				'string',
+			'edit' =>				'in 1',
+			'update' =>				'in 1',
+			'templateid' =>			'string'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateFields($this->getInputAll());
