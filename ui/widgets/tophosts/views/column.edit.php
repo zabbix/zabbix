@@ -206,7 +206,7 @@ $thresholds->addItem(
 $form_grid->addItem([
 	new CLabel([
 		_('Thresholds'),
-		$numeric_only_warning->setId('tophosts-column-thresholds-warning')
+		new CSpan(makeWarningIcon(_('This setting applies only to numeric data.')))
 	], 'thresholds_table'),
 	new CFormField($thresholds)
 ]);

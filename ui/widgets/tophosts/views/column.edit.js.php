@@ -114,8 +114,6 @@ window.tophosts_column_edit_form = new class {
 			document.getElementById('tophosts-column-history-data-warning').style.display = history_data_trends
 				? ''
 				: 'none';
-			document.getElementById('tophosts-column-thresholds-warning').style.display =
-				this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
 		}
 
 		// Displays or hides override time period fields based on 'Data' value change.
