@@ -524,7 +524,9 @@ class testPageNetworkDiscovery extends CWebTest {
 						: $count - count($data['name'])
 					);
 					if (CTestArrayHelper::get($data, 'single', false) === true) {
-						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.CDBHelper::escape($data['name']).')'));
+						$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name IN ('.
+								CDBHelper::escape($data['name']).')')
+						);
 					}
 					else {
 						$this->assertEquals($count - count($data['name']), CDBHelper::getCount('SELECT *FROM drules'));
