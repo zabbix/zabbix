@@ -962,7 +962,7 @@ class CMediatype extends CApiService {
 			unset($mediatype);
 		}
 
-		if ($options['selectActions'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
+		if ($options['selectActions'] !== null && $options['selectActions'] != API_OUTPUT_COUNT) {
 			$actions = API::Action()->get([
 				'output' => $options['selectActions'],
 				'selectOperations' => ['operationtype', 'opmessage']
