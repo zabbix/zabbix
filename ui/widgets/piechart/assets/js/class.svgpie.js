@@ -343,10 +343,12 @@ class CSVGPie {
 								popOut();
 							})
 							.on('mouseleave', () => {
-								_this
-									.transition()
-									.duration(CSVGPie.ANIMATE_DURATION_POP_IN)
-									.attr('transform', 'translate(0, 0)');
+								if (!sectors[i].dataset.expanded) {
+									_this
+										.transition()
+										.duration(CSVGPie.ANIMATE_DURATION_POP_IN)
+										.attr('transform', 'translate(0, 0)');
+								}
 							});
 					}
 				}
