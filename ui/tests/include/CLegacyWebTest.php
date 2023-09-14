@@ -247,7 +247,7 @@ class CLegacyWebTest extends CWebTest {
 	 */
 	public function zbxTestClickButtonMultiselect($id) {
 		$this->zbxTestClickXpathWait(
-			"//div[contains(@class, 'multiselect') and @id='$id']//button[contains(@class, 'multiselect-button')]"
+			"//div[contains(@class, 'multiselect') and @id='$id']/..//button[contains(@class, 'multiselect-button')]"
 		);
 	}
 
