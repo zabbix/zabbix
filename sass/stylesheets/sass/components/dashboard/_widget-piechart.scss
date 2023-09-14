@@ -194,4 +194,10 @@ form.dashboard-widget-piechart {
 
 div.dashboard-widget-piechart {
 	overflow-x: hidden;
+
+	.dashboard-grid-widget-body {
+		svg {
+			display: block;
+		}
+	}
 }

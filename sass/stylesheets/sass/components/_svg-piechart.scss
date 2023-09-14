@@ -31,9 +31,6 @@
 .svg-pie-chart-legend {
 	$legend-line-height: 18px;
 
-	position: relative;
-	bottom: 4px;
-	left: 0;
 	box-sizing: border-box;
 	display: grid;
 	grid-template-columns: repeat(var(--columns, 4), auto);

@@ -164,10 +164,6 @@ class CWidgetPieChart extends CWidget {
 			size.height -= box.height + CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V;
 		}
 
-		const offset = 5;
-
-		size.height -= offset;
-
 		if (size.height < 0) {
 			size.height = 0;
 		}

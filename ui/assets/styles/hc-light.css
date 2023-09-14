@@ -3305,9 +3305,6 @@ section {
     fill: #333333; }
 
 .svg-pie-chart-legend {
-  position: relative;
-  bottom: 4px;
-  left: 0;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(var(--columns, 4), auto);
@@ -4286,6 +4283,8 @@ form.dashboard-widget-piechart {
 
 div.dashboard-widget-piechart {
   overflow-x: hidden; }
+  div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
+    display: block; }
 
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;

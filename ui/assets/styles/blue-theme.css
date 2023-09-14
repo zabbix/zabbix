@@ -3349,9 +3349,6 @@ section {
     fill: #768d99; }
 
 .svg-pie-chart-legend {
-  position: relative;
-  bottom: 4px;
-  left: 0;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(var(--columns, 4), auto);
@@ -4311,6 +4308,8 @@ form.dashboard-widget-piechart {
 
 div.dashboard-widget-piechart {
   overflow-x: hidden; }
+  div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
+    display: block; }
 
 div.dashboard-widget-slareport .date-vertical {
   writing-mode: vertical-lr;
