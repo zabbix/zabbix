@@ -533,7 +533,7 @@ var hintBox = {
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = jQuery(target).data('hintbox-contents');
+				hintText = target.dataset.hintboxContents;
 			}
 
 			target.isStatic = true;
