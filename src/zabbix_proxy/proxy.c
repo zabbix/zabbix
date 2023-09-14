@@ -1378,21 +1378,22 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location,
 								config_proxyconfig_frequency};
-	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
-								&config_server_addrs, zbx_config_source_ip,
-								config_hostname, config_proxydata_frequency};
+	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_zbx_program_type,
+								zbx_config_timeout, &config_server_addrs,
+								zbx_config_source_ip, config_hostname,
+								config_proxydata_frequency};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_zbx_program_type, zbx_progname,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type, get_zbx_progname,
-								zbx_config_timeout,
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
+								get_zbx_progname, zbx_config_timeout,
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
 								zbx_config_source_ip, &events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
-								&events_cbs, &listen_sock, config_startup_time,
-								config_proxydata_frequency};
+								zbx_progname, &events_cbs, &listen_sock,
+								config_startup_time, config_proxydata_frequency};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
