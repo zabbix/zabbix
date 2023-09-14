@@ -36,13 +36,20 @@ void	zbx_mock_test_entry(void **state)
 	zbx_variant_t		value;
 	zbx_mock_handle_t	htime;
 	zbx_timespec_t		ts, *pts = NULL;
+	const char		*expression;
 
 	ZBX_UNUSED(state);
 
 	rules = mock_eval_read_rules("in.rules");
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
 
-	if (SUCCEED != zbx_eval_parse_expression(&ctx, zbx_mock_get_parameter_string("in.expression"), rules, &error))
+	expression = zbx_mock_get_parameter_string("in.expression");
+#ifndef HAVE_LIBXML2
+	if (NULL != strstr(expression, "xmlxpath"))
+		_skip(__FILE__, __LINE__);
+#endif
+
+	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, rules, &error))
 	{
 		if (SUCCEED != expected_ret)
 			goto out;
