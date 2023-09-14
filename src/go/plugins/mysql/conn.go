@@ -260,13 +260,13 @@ func (c *ConnManager) get(uri uri.URI) *MyConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (conn *MyConn, err error) {
+func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyConn, error) {
 	c.Lock()
 	defer c.Unlock()
 
-	conn = c.get(uri)
+	conn := c.get(uri)
 	if conn != nil {
-		return
+		return conn, nil
 	}
 
 	details, err := getTlsDetails(params)
@@ -274,12 +274,7 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (conn
 		return nil, err
 	}
 
-	conn, err = c.create(uri, details)
-	if err != nil {
-		err = zbxerr.ErrorConnectionFailed.Wrap(err)
-	}
-
-	return
+	return c.create(uri, details)
 }
 
 func getTlsDetails(params map[string]string) (tlsconfig.Details, error) {
@@ -316,6 +311,9 @@ func getTlsDetails(params map[string]string) (tlsconfig.Details, error) {
 	}
 
 	err = details.Validate(validateCA, validateClient, validateClient)
+	if err != nil {
+		return details, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+	}
 
-	return details, err
+	return details, nil
 }
