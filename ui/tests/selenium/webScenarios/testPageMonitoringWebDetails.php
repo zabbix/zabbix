@@ -102,6 +102,12 @@ class testPageMonitoringWebDetails extends CWebTest {
 		foreach ($buttons as $selector => $enabled) {
 			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
 		}
+
+		// Check filter collapse/expand.
+		foreach (['true', 'false'] as $status) {
+			$this->query('xpath://li[contains(@class, "ui-tabs-tab") and @aria-expanded="'.$status.'"]')
+					->waitUntilClickable()->one()->click();
+		}
 	}
 
 	public function getCheckFiltersData() {
