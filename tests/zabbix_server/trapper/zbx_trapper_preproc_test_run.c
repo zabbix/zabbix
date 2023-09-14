@@ -27,6 +27,7 @@
 #include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
@@ -176,7 +177,8 @@ void	__wrap_zbx_free_agent_result(AGENT_RESULT *result)
 {
 	ZBX_UNUSED(result);
 }
-
+int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, char **error);
 int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
 		int hostids_num, char **error)
 {

@@ -49,7 +49,7 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 
-static zbx_get_progname_f		zbx_get_progname_cb = NULL;
+static zbx_get_progname_f	zbx_get_progname_cb = NULL;
 
 zbx_get_progname_f	poller_get_progname(void)
 {
