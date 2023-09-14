@@ -260,12 +260,8 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel()]));
 
-$web_layout_mode = CViewHelper::loadLayoutMode();
-
 (new CHtmlPage())
 	->setTitle(_('Host inventory'))
-	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem(
 		(new CForm())
 			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
