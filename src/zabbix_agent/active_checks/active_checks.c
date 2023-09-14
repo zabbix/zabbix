@@ -21,7 +21,6 @@
 
 #include "../agent_conf/agent_conf.h"
 #include "../logfiles/logfiles.h"
-#include "../logfiles/persistent_state.h"
 
 #include "cfg.h"
 #include "zbxlog.h"
@@ -1629,7 +1628,7 @@ static void	process_active_commands(zbx_vector_addr_ptr_t *addrs, const zbx_conf
 
 static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		int config_timeout, const char *config_source_ip, const char *config_hostname, int config_buffer_send,
-		int config_buffer_size, int config_eventlog_max_lines_per_second)
+		int config_buffer_size, int config_eventlog_max_lines_per_second, int config_max_lines_per_second)
 {
 	char	*error = NULL;
 	int	i, now;
@@ -1666,7 +1665,8 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		{
 			ret = process_log_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
 					&mtime_sent, &error, &pre_persistent_vec, config_tls, config_timeout,
-					config_source_ip, config_hostname, 0, config_buffer_send, config_buffer_size);
+					config_source_ip, config_hostname, 0, config_buffer_send, config_buffer_size,
+					config_max_lines_per_second);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
@@ -1954,7 +1954,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 					activechks_args_in->config_timeout, activechks_args_in->config_source_ip,
 					config_hostname, activechks_args_in->config_buffer_send,
 					activechks_args_in->config_buffer_size,
-					activechks_args_in->config_eventlog_max_lines_per_second);
+					activechks_args_in->config_eventlog_max_lines_per_second,
+					activechks_args_in->config_max_lines_per_second);
 
 			if (activechks_args_in->config_buffer_size / 2 <= buffer.pcount)
 			{

@@ -44,7 +44,7 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 	}
 	filelen := f.Size()
 
-	bnum := 64 * 1024
+	bnum := 16 * 1024 * 1024
 	if filelen > int64(bnum) {
 		return nil, errors.New("File is too large for this check")
 	}

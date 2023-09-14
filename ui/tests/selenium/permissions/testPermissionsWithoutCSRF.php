@@ -365,7 +365,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexid=20',
+					'link' => 'zabbix.php?action=regex.edit&regexid=2',
 					'return_button' => true
 				]
 			],
