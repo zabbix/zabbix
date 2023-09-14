@@ -208,7 +208,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 				else {
 					$history = Manager::History()->getAggregationByInterval(
-						$items, $time_from, $time_to, AGGREGATE_LAST, $time_to
+						$items, $time_from, $time_to, $aggregate_function, $time_to
 					);
 				}
 
@@ -235,7 +235,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 				else {
 					$last_results = Manager::History()->getAggregationByInterval(
-						$items, $time_from, $time_to, $aggregate_function, $time_to
+						$items, $time_from, $time_to, $aggregate_function, $time_from
 					);
 				}
 
@@ -275,23 +275,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			else {
 				$non_numeric_history = [];
 
-				if ($aggregate_function === AGGREGATE_LAST
-						|| $aggregate_function === AGGREGATE_FIRST
-						|| $aggregate_function === AGGREGATE_COUNT) {
-					switch ($aggregate_function) {
-						case AGGREGATE_LAST:
-							$aggregate_function = 'max';
-							break;
-
-						case AGGREGATE_FIRST:
-							$aggregate_function = 'min';
-							break;
-
-						case AGGREGATE_COUNT:
-							$aggregate_function = 'count';
-							break;
-					}
-
+				if ($aggregate_function == AGGREGATE_LAST
+						|| $aggregate_function == AGGREGATE_FIRST
+						|| $aggregate_function == AGGREGATE_COUNT) {
 					if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
 						$non_numeric_history = Manager::History()->getAggregatedValue(
 							$item, $aggregate_function, $time_from, $time_to

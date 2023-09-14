@@ -469,7 +469,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
 				$values = Manager::History()->getAggregationByInterval(
-					$items, $time_from, $time_to, $function, $time_to
+					$items, $time_from, $time_to, $function, $time_from
 				);
 
 				if ($values) {
@@ -481,20 +481,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 			else {
-				switch ($function) {
-					case AGGREGATE_LAST:
-						$function = 'max';
-						break;
-
-					case AGGREGATE_FIRST:
-						$function = 'min';
-						break;
-
-					case AGGREGATE_COUNT:
-						$function = 'count';
-						break;
-				}
-
 				foreach ($items as $item) {
 					$non_numeric_history = Manager::History()->getAggregatedValue(
 						$item, $function, $time_from, $time_to

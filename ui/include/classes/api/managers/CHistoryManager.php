@@ -1259,14 +1259,30 @@ class CHistoryManager {
 			$time_from = max($time_from, time() - $hk_history);
 		}
 
-		$result = DBselect(
-			'SELECT '.$aggregation.'(value) AS value'.
-			' FROM '.self::getTableName($item['value_type']).
-			' WHERE itemid='.zbx_dbstr($item['itemid']).
-			' AND clock>='.zbx_dbstr($time_from).
-			' AND clock<='.zbx_dbstr($time_to).
-			' HAVING COUNT(*)>0' // Necessary because DBselect() return 0 if empty data set, for graph templates.
-		);
+		if ($item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_STR) {
+			$sql = 'SELECT '.($aggregation == AGGREGATE_COUNT ? 'COUNT(*) AS value' : 'value').
+				' FROM '.self::getTableName($item['value_type']).
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' AND clock>='.zbx_dbstr($time_from).
+				' AND clock<='.zbx_dbstr($time_to);
+
+			if ($aggregation == AGGREGATE_LAST) {
+				$sql .= ' ORDER BY clock DESC LIMIT 1';
+			}
+			elseif ($aggregation == AGGREGATE_FIRST) {
+				$sql .= ' ORDER BY clock ASC LIMIT 1';
+			}
+		}
+		else {
+			$sql = 'SELECT '.$aggregation.' (value) AS value'.
+				' FROM '.self::getTableName($item['value_type']).
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' AND clock>='.zbx_dbstr($time_from).
+				' AND clock<='.zbx_dbstr($time_to).
+				' HAVING COUNT(*)>0'; // Necessary because DBselect() return 0 if empty data set, for graph templates.
+		}
+
+		$result = DBselect($sql);
 
 		if (($row = DBfetch($result)) !== false) {
 			return $row['value'];
