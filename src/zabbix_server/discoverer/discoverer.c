@@ -44,6 +44,8 @@
 #	include <ldap.h>
 #endif
 
+static zbx_get_progname_f		zbx_get_progname_cb = NULL;
+
 typedef struct
 {
 	zbx_uint64_t	dcheckid;
@@ -193,6 +195,7 @@ static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint
  *             ip               - [IN]                                        *
  *             port             - [IN]                                        *
  *             config_timeout   - [IN]                                        *
+ *             progname         - [IN]                                        *
  *             value            - [OUT]                                       *
  *             value_alloc      - [IN/OUT]                                    *
  *                                                                            *
@@ -354,7 +357,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, config_timeout,
-							source_ip) && NULL !=
+							source_ip, zbx_get_progname_cb()) && NULL !=
 							(pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -1296,8 +1299,8 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 		zbx_discoverer_dservice_t	*service;
 
 		service = result_dservice_create(task, dcheck);
-		service->status = (SUCCEED == discover_service(dcheck, task->ip, task->port, config_timeout, &value,
-				&value_alloc)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
+		service->status = (SUCCEED == discover_service(dcheck, task->ip, task->port, config_timeout,
+				&value, &value_alloc)) ? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
 
 		zbx_vector_discoverer_services_ptr_append(&services, service);
@@ -1498,7 +1501,7 @@ static void	discoverer_worker_stop(zbx_discoverer_worker_t *worker)
 static void	discoverer_libs_init(void)
 {
 #ifdef HAVE_NETSNMP
-	zbx_init_library_mt_snmp();
+	zbx_init_library_mt_snmp(zbx_get_progname_cb());
 #endif
 #ifdef HAVE_LIBCURL
 	curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -1552,7 +1555,6 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	zbx_vector_discoverer_jobs_ptr_create(&manager->job_refs);
 
 	manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
-
 	manager->workers_num = workers_num;
 	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)workers_num,
 			sizeof(zbx_discoverer_worker_t));
@@ -1560,7 +1562,6 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	for (i = 0; i < workers_num; i++)
 	{
 		manager->workers[i].worker_id = i + 1;
-
 		if (SUCCEED != discoverer_worker_init(&manager->workers[i], &manager->queue, manager->timekeeper,
 				discoverer_worker_entry, error))
 		{
@@ -1704,7 +1705,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg);
 #endif
 	source_ip = discoverer_args_in->config_source_ip;
-
+	zbx_get_progname_cb = discoverer_args_in->zbx_get_progname_cb_arg;
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -1867,7 +1868,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					break;
 #ifdef HAVE_NETSNMP
 				case ZBX_RTC_SNMP_CACHE_RELOAD:
-					zbx_clear_cache_snmp(process_type, process_num);
+					zbx_clear_cache_snmp(process_type, process_num, zbx_get_progname_cb());
 					break;
 #endif
 				case ZBX_RTC_SHUTDOWN:

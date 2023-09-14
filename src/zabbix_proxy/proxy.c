@@ -1163,7 +1163,7 @@ int	main(int argc, char **argv)
 	int				zbx_optind = 0;
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
-	zbx_init_library_nix(&get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 	argv = zbx_setproctitle_init(argc, argv);
@@ -1381,12 +1381,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, zbx_config_source_ip,
 								config_hostname, config_proxydata_frequency};
-	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_zbx_program_type,
+	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_zbx_program_type, zbx_progname,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
-	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
+	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type, get_zbx_progname,
 								zbx_config_timeout,
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
 								zbx_config_source_ip, &events_cbs};

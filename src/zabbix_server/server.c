@@ -1171,7 +1171,7 @@ int	main(int argc, char **argv)
 	int				zbx_optind = 0;
 
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
-	zbx_init_library_nix(&get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 	argv = zbx_setproctitle_init(argc, argv);
@@ -1408,7 +1408,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
-							&events_cbs, listen_sock, config_startup_time,
+							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip};
@@ -1420,9 +1420,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_proxydata_frequency};
 	zbx_thread_httppoller_args	httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 							config_ssl_cert_location, config_ssl_key_location};
-	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
-							CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER], zbx_config_source_ip,
-							&events_cbs};
+	zbx_thread_discoverer_args	discoverer_args = {zbx_config_tls, get_zbx_program_type, get_zbx_progname,
+							zbx_config_timeout, CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
+							zbx_config_source_ip, &events_cbs};
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, zbx_config_source_ip,
 							zbx_config_webservice_url};

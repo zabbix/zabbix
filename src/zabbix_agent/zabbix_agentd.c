@@ -1445,15 +1445,15 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
-	zbx_init_library_common(zbx_log_impl, &get_zbx_progname);
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
 			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	zbx_init_library_win32(&get_zbx_progname);
+	zbx_init_library_win32(get_zbx_progname);
 #else
-	zbx_init_library_nix(&get_zbx_progname);
+	zbx_init_library_nix(get_zbx_progname);
 #endif
 #ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */

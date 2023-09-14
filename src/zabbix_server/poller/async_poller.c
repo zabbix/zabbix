@@ -233,8 +233,9 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 		else
 		{
 			zbx_unset_snmp_bulkwalk_options();
-			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
-			zbx_set_snmp_bulkwalk_options();
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num,
+					poller_get_progname()());
+			zbx_set_snmp_bulkwalk_options(poller_get_progname()());
 			poller_config->clear_cache = 0;
 		}
 	}
@@ -283,7 +284,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 			else
 			{
 	#ifdef HAVE_NETSNMP
-				zbx_set_snmp_bulkwalk_options();
+				zbx_set_snmp_bulkwalk_options(poller_get_progname()());
 
 				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 						poller_config, poller_config, poller_config->base, poller_config->dnsbase,

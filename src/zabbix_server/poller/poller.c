@@ -741,7 +741,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 #else
 		/* SNMP checks use their own timeouts */
 		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout,
-				config_comms->config_source_ip);
+				config_comms->config_source_ip, poller_get_progname()());
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -1075,7 +1075,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
 			{
 				if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
-					zbx_clear_cache_snmp(process_type, process_num);
+					zbx_clear_cache_snmp(process_type, process_num, poller_get_progname()());
 			}
 #endif
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
