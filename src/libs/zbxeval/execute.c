@@ -2863,6 +2863,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 
 	eval_function_return(token->opt, &value, output);
 clean:
+	zbx_free(ret_value);
 	zbx_jsonobj_clear(&obj);
 
 	return ret;
@@ -2945,13 +2946,14 @@ static int	eval_execute_function_xmlxpath(const zbx_eval_context_t *ctx, const z
 
 	if (SUCCEED == is_empty)
 	{
+		zbx_variant_clear(&value);
+
 		if (NULL == default_value)
 		{
 			*error = zbx_strdup(*error, "XML xpath returned empty nodeset");
 			return FAIL;
 		}
 
-		zbx_variant_clear(&value);
 		zbx_variant_set_str(&value, zbx_strdup(NULL, default_value->data.str));
 	}
 
