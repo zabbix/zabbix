@@ -2790,7 +2790,7 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
 		zbx_vector_var_t *output, char **error)
 {
-	int		ret;
+	int		ret = FAIL;
 	char		*ret_value = NULL;
 	zbx_variant_t	*json_value, *path, value, *default_value = NULL;
 	zbx_jsonobj_t	obj;
@@ -2799,19 +2799,19 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	{
 		*error = zbx_dsprintf(*error, "invalid number of arguments for function at \"%s\"",
 				ctx->expression + token->loc.l);
-		return FAIL;
+		return ret;
 	}
 
 	if (UNKNOWN != (ret = eval_validate_function_args(ctx, token, output, error)))
 		return ret;
 
-	ret = SUCCEED;
+	ret = FAIL;
 	json_value = &output->values[output->values_num - token->opt];
 
 	if (ZBX_VARIANT_NONE != json_value->type && SUCCEED != zbx_variant_convert(json_value, ZBX_VARIANT_STR))
 	{
 		*error = zbx_strdup(*error, "invalid first parameter");
-		return FAIL;
+		return ret;
 	}
 
 	path = &output->values[output->values_num - token->opt + 1];
@@ -2819,7 +2819,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 	if (ZBX_VARIANT_NONE != path->type && SUCCEED != zbx_variant_convert(path, ZBX_VARIANT_STR))
 	{
 		*error = zbx_strdup(*error, "invalid second parameter");
-		return FAIL;
+		return ret;
 	}
 
 	if (2 < token->opt)
@@ -2830,20 +2830,19 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 				SUCCEED != zbx_variant_convert(default_value, ZBX_VARIANT_STR))
 		{
 			*error = zbx_strdup(*error, "invalid third parameter");
-			return FAIL;
+			return ret;
 		}
 	}
 
 	if (FAIL == zbx_jsonobj_open(json_value->data.str, &obj))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
-		return FAIL;
+		return ret;
 	}
 
 	if (FAIL == zbx_jsonobj_query(&obj, path->data.str, &ret_value))
 	{
 		*error = zbx_strdup(*error, zbx_json_strerror());
-		ret = FAIL;
 		goto clean;
 	}
 
@@ -2852,7 +2851,6 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 		if (NULL == default_value)
 		{
 			*error = zbx_strdup(*error, "jsonpath returned no value");
-			ret = FAIL;
 			goto clean;
 		}
 
@@ -2862,6 +2860,7 @@ static int	eval_execute_function_jsonpath(const zbx_eval_context_t *ctx, const z
 		zbx_variant_set_str(&value, zbx_strdup(NULL, ret_value));
 
 	eval_function_return(token->opt, &value, output);
+	ret = SUCCEED;
 clean:
 	zbx_free(ret_value);
 	zbx_jsonobj_clear(&obj);

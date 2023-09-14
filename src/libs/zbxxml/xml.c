@@ -315,9 +315,7 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 					xmlNodeDump(xmlBufferLocal, doc, nodeset->nodeTab[i], 0, 0);
 			}
 			else if (NULL != is_empty)
-			{
 				*is_empty = SUCCEED;
-			}
 
 			zbx_variant_clear(value);
 			zbx_variant_set_str(value, zbx_strdup(NULL, (const char *)xmlBufferLocal->content));

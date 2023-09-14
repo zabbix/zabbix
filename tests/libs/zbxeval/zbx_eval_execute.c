@@ -46,7 +46,7 @@ void	zbx_mock_test_entry(void **state)
 	expression = zbx_mock_get_parameter_string("in.expression");
 #ifndef HAVE_LIBXML2
 	if (NULL != strstr(expression, "xmlxpath"))
-		_skip(__FILE__, __LINE__);
+		skip();
 #endif
 
 	if (SUCCEED != zbx_eval_parse_expression(&ctx, expression, rules, &error))
