@@ -42,6 +42,9 @@ $form
 	->addFieldsGroup(
 		getColorsFieldsGroupView($data['fields'])->addRowClass('fields-group-colors')
 	)
+	->addField(
+		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(2)
+	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addField(
@@ -54,7 +57,9 @@ $form
 				getValueFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value')
 			)
 			->addFieldsGroup(
-				getNeedleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-needle')
+				(new CWidgetFieldsGroupView(_('Needle')))
+					->addField((new CWidgetFieldColorView($data['fields']['needle_color']))->addClass('needle-show'))
+					->addRowClass('fields-group-needle')
 			)
 			->addFieldsGroup(
 				getScaleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-scale')
@@ -94,6 +99,7 @@ function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CW
 	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
 	return (new CWidgetFieldsGroupView(_('Description')))
+		->addLabelClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
 		->setFieldHint(
 			makeHelpIcon([
 				_('Supported macros:'),
@@ -179,25 +185,13 @@ function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetF
 		);
 }
 
-function getNeedleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$needle_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['needle_show']));
-	$needle_color_field = $form->registerField(new CWidgetFieldColorView($fields['needle_color']));
-
-	return (new CWidgetFieldsGroupView(_('Needle')))
-		->addItem([
-			(new CDiv([$needle_show_field->getView(), $needle_color_field->getLabel()]))->addClass('needle-show'),
-			new CFormField($needle_color_field->getView())
-		]);
-}
-
 function getScaleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$scale_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['scale_show']));
 	$scale_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['scale_size']));
 	$scale_show_units_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['scale_show_units']));
 
 	return (new CWidgetFieldsGroupView(_('Scale')))
 		->addItem([
-			(new CDiv([$scale_show_field->getView(), $scale_show_units_field->getLabel()]))->addClass('scale-show'),
+			(new CDiv([$scale_show_units_field->getLabel()]))->addClass('scale-show'),
 			(new CFormField($scale_show_units_field->getView()))
 		])
 		->addItem([

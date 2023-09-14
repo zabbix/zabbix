@@ -28,6 +28,7 @@ use Zabbix\Widgets\{
 
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
+	CWidgetFieldCheckBoxList,
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
@@ -59,7 +60,6 @@ class WidgetForm extends CWidgetForm {
 	// Scale defaults.
 	private const DEFAULT_MIN = 0;
 	private const DEFAULT_MAX = 100;
-	private const DEFAULT_SCALE_SHOW = 1;
 	private const DEFAULT_SCALE_DECIMAL_PLACES = 0;
 	private const DEFAULT_SCALE_SHOW_UNITS = 1;
 	private const DEFAULT_SCALE_SIZE_PERCENT = 15;
@@ -85,9 +85,6 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_UNITS_SHOW = 1;
 	private const DEFAULT_UNITS_SIZE_PERCENT = 25;
 	private const DEFAULT_UNITS_BOLD = 0;
-
-	// Needle defaults.
-	private const DEFAULT_NEEDLE_SHOW = 0;
 
 	// Threshold defaults.
 	private const DEFAULT_TH_SHOW_LABELS = 0;
@@ -186,9 +183,19 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				(new CWidgetFieldTextArea('description', _('Description')))
+				(new CWidgetFieldCheckBoxList('show', _('Show'), [
+					Widget::SHOW_DESCRIPTION => _('Description'),
+					Widget::SHOW_VALUE => _('Value'),
+					Widget::SHOW_NEEDLE => _('Needle'),
+					Widget::SHOW_SCALE => _('Scale')
+				]))
+					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_SCALE])
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				(new CWidgetFieldTextArea('description'))
 					->setDefault('{ITEM.NAME}')
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('desc_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
@@ -268,13 +275,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('units_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('needle_show', _('Needle')))->setDefault(self::DEFAULT_NEEDLE_SHOW)
-			)
-			->addField(
 				new CWidgetFieldColor('needle_color', _('Color'))
-			)
-			->addField(
-				(new CWidgetFieldCheckBox('scale_show', _('Scale')))->setDefault(self::DEFAULT_SCALE_SHOW)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('scale_decimal_places', _('Decimal places'),
