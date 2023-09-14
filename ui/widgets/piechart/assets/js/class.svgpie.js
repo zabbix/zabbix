@@ -184,12 +184,12 @@ class CSVGPie {
 	/**
 	 * Set value of the pie chart.
 	 *
-	 * @param {Array}  sectors      Array of sectors to show in pie chart.
-	 * @param {Array}  items        Array of all possible items that can show up in pie chart.
-	 * @param {Object} total_value  Object of total value and units.
+	 * @param {Array}  sectors        Array of sectors to show in pie chart.
+	 * @param {Array}  all_sectorids  Array of all possible ids of sectors that can show up in pie chart.
+	 * @param {Object} total_value    Object of total value and units.
 	 */
-	setValue({sectors, items, total_value}) {
-		sectors = this.#sortByReference(sectors, items);
+	setValue({sectors, all_sectorids, total_value}) {
+		sectors = this.#sortByReference(sectors, all_sectorids);
 
 		if (sectors.length > 0) {
 			this.#arcs_container
@@ -264,11 +264,11 @@ class CSVGPie {
 		this.#sectors_old = this.#sectors_new;
 		this.#sectors_new = sectors;
 
+		const was = this.#prepareTransitionArray(this.#sectors_new, this.#sectors_old, all_sectorids);
+		const is = this.#prepareTransitionArray(this.#sectors_old, this.#sectors_new, all_sectorids);
+
 		const pie = d3.pie().sort(null).value(d => d.percent_of_total);
 		const arc = d3.arc().innerRadius(this.#radius_inner).outerRadius(this.#radius_outer);
-
-		const was = this.#prepareTransitionArray(this.#sectors_new, this.#sectors_old, items);
-		const is = this.#prepareTransitionArray(this.#sectors_old, this.#sectors_new, items);
 
 		const key = d => d.data.id;
 
@@ -480,11 +480,11 @@ class CSVGPie {
 	 *
 	 * @param {Array} old_sectors
 	 * @param {Array} new_sectors
-	 * @param {Array} items    Array to sort result by.
+	 * @param {Array} all_sectorids  Array of ids of sectors to sort result by.
 	 *
 	 * @returns {Array}
 	 */
-	#prepareTransitionArray(old_sectors, new_sectors, items) {
+	#prepareTransitionArray(old_sectors, new_sectors, all_sectorids) {
 		const sectors_ids = new Set();
 
 		new_sectors.forEach(sector => sectors_ids.add(sector.id));
@@ -495,21 +495,18 @@ class CSVGPie {
 
 		const sectors = d3.merge([new_sectors, old_sectors]);
 
-		return this.#sortByReference(sectors, items);
+		return this.#sortByReference(sectors, all_sectorids);
 	}
 
 	/**
-	 * Sort array of elements by another (reference) array of objects.
+	 * Sort array of elements by another (reference) array of ids.
 	 *
-	 * @param {Array} sectors    Array to sort.
-	 * @param {Array} reference  Reference array.
+	 * @param {Array} sectors        Array to sort.
+	 * @param {Array} all_sectorids  Reference array.
 	 */
-	#sortByReference(sectors, reference) {
+	#sortByReference(sectors, all_sectorids) {
 		return sectors.sort((a, b) => {
-			const a_index = reference.findIndex(i => i.id === a.id);
-			const b_index = reference.findIndex(i => i.id === b.id);
-
-			return a_index - b_index;
+			return all_sectorids.indexOf(a.id) - all_sectorids.indexOf(b.id);
 		});
 	}
 

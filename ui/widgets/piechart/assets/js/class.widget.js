@@ -96,12 +96,13 @@ class CWidgetPieChart extends CWidget {
 
 			this.#pie_chart = new CSVGPie(padding, response.config);
 			this._body.prepend(this.#pie_chart.getSVGElement());
-			this.#pie_chart.setSize(this.#getSize());
 		}
+
+		this.#pie_chart.setSize(this.#getSize());
 
 		this.#pie_chart.setValue({
 			sectors: response.sectors,
-			items: [...legend.data],
+			all_sectorids: response.all_sectorids,
 			total_value: response.total_value
 		});
 	}
