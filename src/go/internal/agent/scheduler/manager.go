@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strconv"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -48,6 +49,15 @@ const (
 	shutdownInactive = -1
 )
 
+type Request struct {
+	Itemid      uint64  `json:"itemid"`
+	Key         string  `json:"key"`
+	Delay       string  `json:"delay"`
+	LastLogsize *uint64 `json:"lastlogsize"`
+	Mtime       *int    `json:"mtime"`
+	Timeout     any     `json:"timeout"`
+}
+
 // Manager implements Scheduler interface and manages plugin interface usage.
 type Manager struct {
 	input       chan interface{}
@@ -66,7 +76,7 @@ type updateRequest struct {
 	clientID                   uint64
 	sink                       resultcache.Writer
 	firstActiveChecksRefreshed bool
-	requests                   []*plugin.Request
+	requests                   []*Request
 	expressions                []*glexpr.Expression
 	now                        time.Time
 }
@@ -92,7 +102,7 @@ type queryRequestUserParams struct {
 
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer resultcache.Writer, firstActiveChecksRefreshed bool,
-		expressions []*glexpr.Expression, requests []*plugin.Request, now time.Time)
+		expressions []*glexpr.Expression, requests []*Request, now time.Time)
 	UpdateCommands(clientID uint64, writer resultcache.Writer, commands []*agent.RemoteCommand, now time.Time)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
@@ -185,7 +195,24 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				err = c.addRequest(p, r, update.sink, update.now, update.firstActiveChecksRefreshed)
+				var timeout int64
+
+				switch v := r.Timeout.(type) {
+				case nil:
+					timeout = int64(agent.Options.Timeout)
+				case float64:
+					timeout = int64(v)
+				case int:
+					timeout = int64(v)
+				case string:
+					timeout, err = strconv.ParseInt(v, 10, 32)
+				default:
+					err = fmt.Errorf("unexpected timeout %q of type %T", r.Timeout, r.Timeout)
+				}
+
+				if err == nil {
+					err = c.addRequest(p, r, int(timeout), update.sink, update.now, update.firstActiveChecksRefreshed)
+				}
 			}
 		}
 
@@ -628,7 +655,7 @@ func (m *Manager) Stop() {
 }
 
 func (m *Manager) UpdateTasks(clientID uint64, writer resultcache.Writer, firstActiveChecksRefreshed bool,
-	expressions []*glexpr.Expression, requests []*plugin.Request, now time.Time) {
+	expressions []*glexpr.Expression, requests []*Request, now time.Time) {
 	m.input <- &updateRequest{clientID: clientID,
 		sink:                       writer,
 		requests:                   requests,
@@ -675,7 +702,7 @@ func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{
+	m.UpdateTasks(clientID, w, false, nil, []*Request{{
 		Key:         key,
 		LastLogsize: &lastLogsize,
 		Mtime:       &mtime,

@@ -422,15 +422,15 @@ func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 // stopperTask provides access to plugin Watcher interaface.
 type watcherTask struct {
 	taskBase
-	requests []*plugin.Request
-	client   ClientAccessor
+	items  []*plugin.Item
+	client ClientAccessor
 }
 
 func (t *watcherTask) perform(s Scheduler) {
 	log.Debugf("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
-		watcher.Watch(t.requests, t)
+		watcher.Watch(t.items, t)
 		s.FinishTask(t)
 	}()
 }

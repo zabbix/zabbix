@@ -104,7 +104,7 @@ func (c *client) Output() plugin.ResultWriter {
 
 // addRequest requests client to start monitoring/update item described by request 'r' using plugin 'p' (*pluginAgent)
 // with output writer 'sink'
-func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.ResultWriter, now time.Time,
+func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin.ResultWriter, now time.Time,
 	firstActiveChecksRefreshed bool) (err error) {
 	var info *pluginInfo
 	var ok bool
@@ -168,7 +168,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				// create and register new exporter task
 				task = &exporterTask{
 					taskBase: taskBase{plugin: p, active: true, recurring: true},
-					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: r.Timeout},
+					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: timeout},
 					updated:  now,
 					client:   c,
 					output:   sink,
@@ -188,7 +188,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				task = tacc.task()
 				task.updated = now
 				task.item.key = r.Key
-				task.item.timeout = r.Timeout
+				task.item.timeout = timeout
 
 				if task.item.delay != r.Delay {
 					task.item.delay = r.Delay
@@ -207,7 +207,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			// handle single passive check or internal request
 			task := &directExporterTask{
 				taskBase: taskBase{plugin: p, active: true, recurring: true},
-				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: r.Timeout},
+				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: timeout},
 				expire:   now.Add(time.Duration(agent.Options.Timeout) * time.Second),
 				client:   c,
 				output:   sink,
@@ -242,7 +242,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 		if info.watcher == nil {
 			info.watcher = &watcherTask{
 				taskBase: taskBase{plugin: p, active: true},
-				requests: make([]*plugin.Request, 0, 1),
+				items:    make([]*plugin.Item, 0, 1),
 				client:   c,
 			}
 			if err = info.watcher.reschedule(now); err != nil {
@@ -252,7 +252,17 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 
 			log.Debugf("[%d] created watcher task for plugin %s", c.id, p.name())
 		}
-		info.watcher.requests = append(info.watcher.requests, r)
+
+		item := plugin.Item{
+			Itemid:      r.Itemid,
+			Key:         r.Key,
+			Delay:       r.Delay,
+			LastLogsize: r.LastLogsize,
+			Mtime:       r.Mtime,
+			Timeout:     timeout,
+		}
+
+		info.watcher.items = append(info.watcher.items, &item)
 	}
 
 	// handle configurator interface for inactive plugins
@@ -378,7 +388,7 @@ func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (releas
 				if _, ok := p.impl.(plugin.Watcher); ok && c.id > agent.MaxBuiltinClientID {
 					task := &watcherTask{
 						taskBase: taskBase{plugin: p, active: true},
-						requests: make([]*plugin.Request, 0),
+						items:    make([]*plugin.Item, 0),
 						client:   c,
 					}
 					if err := task.reschedule(now); err == nil {
