@@ -296,8 +296,9 @@ abstract class CWidgetField {
 
 		if (is_array($value)) {
 			$value = array_values($value);
+			$default = $this->getDefault();
 
-			if ($value !== $this->getDefault()) {
+			if (!is_array($default) || $value !== array_values($default)) {
 				foreach ($value as $index => $each_value) {
 					$widget_fields[] = [
 						'type' => $this->save_type,

@@ -100,10 +100,13 @@ class C64ImportConverter extends CConverter {
 						);
 					}
 
-					if ($widget['type'] === 'item' && array_key_exists('fields', $widget)) {
+					if (array_key_exists('fields', $widget)) {
 						foreach ($widget['fields'] as &$field) {
-							$field['name'] = preg_replace('/^thresholds\.(threshold|color)\.(\d+)$/',
-								'thresholds.$2.$1', $field['name']
+							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/',
+								'$1.$3.$2.$4', $field['name']
+							);
+							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)$/',
+								'$1.$3.$2', $field['name']
 							);
 						}
 						unset($field);
@@ -126,16 +129,11 @@ class C64ImportConverter extends CConverter {
 	 * @return string
 	 */
 	private static function createWidgetReference(int $index): string {
-		$pow_base = 26;
-
-		$num_reference_ABCDE = ($pow_base ** 3) + ($pow_base ** 2) * 2 + ($pow_base ** 1) * 3 + 4;
-		$num_reference = $num_reference_ABCDE + $index;
-
 		$reference = '';
 
 		for ($i = 0; $i < 5; $i++) {
-			$reference = chr(65 + $num_reference % $pow_base).$reference;
-			$num_reference = floor($num_reference / $pow_base);
+			$reference = chr(65 + $index % 26).$reference;
+			$index = floor($index / 26);
 		}
 
 		return $reference;

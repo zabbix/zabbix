@@ -434,13 +434,11 @@ class CDashboardHelper {
 			}
 		}
 
-		$fields_new = self::constructWidgetFieldsFromArrayNames($fields_new);
-
-		return $fields_new;
+		return self::constructWidgetFieldsIntoObjects($fields_new);
 	}
 
 	/**
-	 * Construct widget fields from destructured arrays back into arrays.
+	 * Construct widget fields from destructured objects back into objects.
 	 *
 	 * Example:
 	 *     In: [
@@ -458,7 +456,7 @@ class CDashboardHelper {
 	 *
 	 * @return array
 	 */
-	private static function constructWidgetFieldsFromArrayNames(array $fields): array {
+	private static function constructWidgetFieldsIntoObjects(array $fields): array {
 		$fields_new = [];
 
 		uksort($fields,
