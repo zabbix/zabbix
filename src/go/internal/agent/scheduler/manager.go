@@ -26,6 +26,7 @@ import (
 	"math"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -162,6 +163,44 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 	}
 }
 
+func parseItemTimeout(s string) (seconds int, e error) {
+	const invalidTimeoutError = "Unsupported timeout value."
+	const maxTimeout = 600
+
+	if s == "" {
+		e = errors.New(invalidTimeoutError)
+		return
+	}
+
+	if intVal, err := strconv.Atoi(s); err != nil {
+		var mult int
+
+		if strings.HasSuffix(s, "m") {
+			mult = 60
+		} else if strings.HasSuffix(s, "s") {
+			mult = 1
+		} else {
+			e = errors.New(invalidTimeoutError)
+			return
+		}
+
+		if val, err := strconv.Atoi(s[:len(s)-1]); err != nil {
+			e = errors.New(invalidTimeoutError)
+			return
+		} else {
+			seconds = val * mult
+		}
+	} else {
+		seconds = intVal
+	}
+
+	if seconds > maxTimeout {
+		e = errors.New(invalidTimeoutError)
+	}
+
+	return
+}
+
 // processUpdateRequest processes client update request. It's being used for multiple requests
 // (active checks on a server) and also for direct requets (single passive and internal checks).
 func (m *Manager) processUpdateRequestRun(update *updateRequest) {
@@ -195,23 +234,23 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				var timeout int64
+				var timeout int
 
 				switch v := r.Timeout.(type) {
 				case nil:
-					timeout = int64(agent.Options.Timeout)
+					timeout = agent.Options.Timeout
 				case float64:
-					timeout = int64(v)
+					timeout = int(v)
 				case int:
-					timeout = int64(v)
+					timeout = v
 				case string:
-					timeout, err = strconv.ParseInt(v, 10, 32)
+					timeout, err = parseItemTimeout(v)
 				default:
 					err = fmt.Errorf("unexpected timeout %q of type %T", r.Timeout, r.Timeout)
 				}
 
 				if err == nil {
-					err = c.addRequest(p, r, int(timeout), update.sink, update.now, update.firstActiveChecksRefreshed)
+					err = c.addRequest(p, r, timeout, update.sink, update.now, update.firstActiveChecksRefreshed)
 				}
 			}
 		}
