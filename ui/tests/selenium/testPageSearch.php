@@ -79,7 +79,7 @@ class testPageSearch extends CWebTest {
 			'title' => 'Templates',
 			'column_groups' => ['Template', 'Configuration'],
 			'columns' => [
-				['text' => 'Test object Template', 'href' => 'templates.php?form=update&templateid={id}'],
+				['text' => 'Test object Template', 'href' => 'javascript:void(0)'],
 				['text' => 'Items', 'href' => 'items.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Triggers', 'href' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
 				['text' => 'Graphs', 'href' => 'graphs.php?filter_set=1&filter_hostids%5B0%5D={id}&context=template'],
@@ -96,7 +96,7 @@ class testPageSearch extends CWebTest {
 			'column_groups' => ['Template group','Configuration'],
 			'columns' => [
 				['text' => 'Test object Templategroup', 'href' => 'zabbix.php?action=templategroup.edit&groupid={id}'],
-				['text' => 'Templates 1', 'href' => 'templates.php?filter_set=1&filter_groups%5B0%5D={id}']
+				['text' => 'Templates 1', 'href' => 'zabbix.php?action=template.list&filter_set=1&filter_groups%5B0%5D={id}']
 			]
 		]
 	];
