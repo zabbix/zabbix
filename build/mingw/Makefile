@@ -137,6 +137,9 @@ $(OUTPUTDIR)\common_str.o: $(TOPDIR)\src\libs\zbxcommon\common_str.c
 $(OUTPUTDIR)\common_log.o: $(TOPDIR)\src\libs\zbxcommon\common_log.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
+$(OUTPUTDIR)\common_internal.o: $(TOPDIR)\src\libs\zbxcommon\common_internal.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxfile\file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
