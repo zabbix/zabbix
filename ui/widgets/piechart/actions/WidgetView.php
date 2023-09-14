@@ -127,6 +127,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$svg_data = $this->getSVGData($metrics['sectors'], $metrics['total_value']);
 
 		$data['vars']['sectors'] = $svg_data['svg_sectors'];
+		$data['vars']['all_sectorids'] = $metrics['all_sectorids'];
 		$data['vars']['total_value'] = $svg_data['svg_total_value'];
 		$data['vars']['legend'] = $this->getLegend($metrics['sectors']);
 		if ($this->hasInput('with_config')) {
@@ -140,16 +141,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$metrics = [];
 		$errors = [];
 		$total_value = [];
+		$all_sectorids = [];
 
 		self::getItems($metrics, $options['data_sets'], $options['templateid'], $options['dynamic_hostid']);
 		self::getChartDataSource($metrics, $errors, $options['data_source'], $options['time_period']);
 		self::getMetricsData($metrics, $options['time_period'], $options['legend_aggregation_show'],
 			$options['templateid'], $options['dynamic_hostid']);
 		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
-			$options['units'], $options['templateid'], $options['dynamic_hostid']);
+			$options['units'], $options['templateid'], $options['dynamic_hostid'], $all_sectorids);
 
 		return [
 			'sectors' => $metrics,
+			'all_sectorids' => $all_sectorids,
 			'total_value' => $total_value,
 			'errors' => $errors
 		];
@@ -520,7 +523,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getSectorsData(array &$metrics, array &$total_value, array $merge_sectors,
-			array $total_config, array $units_config, string $templateid, string $dynamic_hostid): void {
+			array $total_config, array $units_config, string $templateid, string $dynamic_hostid,
+			array &$all_sectorids): void {
 		$has_total = false;
 		$chart_units = null;
 		$raw_total_value = null;
@@ -534,12 +538,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 					&& $metric['options']['type'] == CWidgetFieldDataSet::ITEM_TYPE_TOTAL);
 
 				$sectors[] = [
+					'id' => $metric['data_set'].'_'.$metric['itemid'],
 					'name' => $metric['name'],
 					'color' => $metric['options']['color'],
 					'value' => null,
 					'units' => '',
 					'is_total' => $is_total
 				];
+
+				$all_sectorids[] = $metric['data_set'].'_'.$metric['itemid'];
 			}
 		}
 		else {
@@ -567,12 +574,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				$sectors[] = [
+					'id' => $metric['data_set'].'_'.$metric['itemid'],
 					'name' => $metric['name'],
 					'color' => $metric['options']['color'],
 					'value' => $metric['value'],
 					'units' => $metric['units'],
 					'is_total' => $is_total
 				];
+
+				$all_sectorids[] = $metric['data_set'].'_'.$metric['itemid'];
 			}
 			unset($metric);
 
@@ -598,16 +608,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 
 				$sectors[] = [
+					'id' => 'other',
 					'name' => _('Other'),
 					'color' => $merge_sectors['color'],
 					'value' => $others_value,
 					'units' => $chart_units,
 					'is_total' => false
 				];
+
+				$all_sectorids[] = 'other';
 			}
 		}
 
-		foreach ($sectors as $key => &$sector) {
+		foreach ($sectors as &$sector) {
 			$formatted_value = convertUnitsRaw([
 				'value' => $sector['value'],
 				'units' => $sector['units'],
@@ -617,7 +630,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($formatted_value['is_numeric']);
 			unset($sector['units']);
 
-			$sector['id'] = $key + 1;
 			$sector['formatted_value'] = $formatted_value;
 		}
 		unset($sector);
@@ -740,7 +752,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$sector_total_value = 0;
-		$total_percentage_used = 0;
 		$non_total_sectors = [];
 		$has_total_item = false;
 
