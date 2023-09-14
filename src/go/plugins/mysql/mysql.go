@@ -48,20 +48,20 @@ type Plugin struct {
 var impl Plugin
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
 	params, extraParams, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
-		return nil, err
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	err = metric.SetDefaults(params, hc, p.options.Default)
 	if err != nil {
-		return nil, err
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
-		return nil, err
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	handleMetric := getHandlerFunc(key)
@@ -79,18 +79,19 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		p.Errf(err.Error())
 
-		return nil, err
+		return nil, zbxerr.ErrorConnectionFailed.Wrap(err)
 	}
 
 	ctx := context.Background()
 
-	result, err = handleMetric(ctx, conn, params, extraParams...)
-
+	result, err := handleMetric(ctx, conn, params, extraParams...)
 	if err != nil {
 		p.Errf(err.Error())
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return result, err
+	return result, nil
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
