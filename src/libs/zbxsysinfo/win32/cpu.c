@@ -80,9 +80,11 @@ int	get_cpu_num_win32(void)
 
 		if (get_lpiex(RelationProcessorCore, buffer, &buffer_length))
 		{
+			PSYS_LPI_EX	ptr;
+
 			for (unsigned int i = 0; i < buffer_length; i += (unsigned int)ptr->Size)
 			{
-				PSYS_LPI_EX	ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
+				ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 
 				for (WORD group = 0; group < ptr->Processor.GroupCount; group++)
 				{
