@@ -44,7 +44,7 @@
 #	include <ldap.h>
 #endif
 
-static zbx_get_progname_f		zbx_get_progname_cb = NULL;
+static zbx_get_progname_f	zbx_get_progname_cb = NULL;
 
 typedef struct
 {
@@ -195,7 +195,6 @@ static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint
  *             ip               - [IN]                                        *
  *             port             - [IN]                                        *
  *             config_timeout   - [IN]                                        *
- *             progname         - [IN]                                        *
  *             value            - [OUT]                                       *
  *             value_alloc      - [IN/OUT]                                    *
  *                                                                            *

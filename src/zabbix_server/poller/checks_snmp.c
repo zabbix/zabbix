@@ -3017,7 +3017,7 @@ static void	zbx_shutdown_snmp(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Initialize snmp and load mibs files for multithread environment   *
+ * Purpose: initializes snmp and loads mibs files for multithread environment *
  *                                                                            *
  ******************************************************************************/
 void	zbx_init_library_mt_snmp(const char *progname)
@@ -3236,10 +3236,11 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clear snmpv3 user authentication cache                            *
+ * Purpose: clears snmpv3 user authentication cache                           *
  *                                                                            *
  * Parameters: process_type - [IN] type of process                            *
  *             process_num  - [IN] unique id of process                       *
+ *                 progname - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname)

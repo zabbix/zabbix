@@ -23,7 +23,7 @@
 #include "zbxstr.h"
 #include "zbxexpr.h"
 #ifdef _WINDOWS
-#include "zbxparam.h"
+#include	"zbxparam.h"
 #endif
 /******************************************************************************
  *                                                                            *

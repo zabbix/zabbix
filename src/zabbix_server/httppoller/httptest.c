@@ -1038,9 +1038,12 @@ httptest_error:
  *                                                                            *
  * Purpose: process httptests                                                 *
  *                                                                            *
- * Parameters: now              - [IN] current timestamp                      *
- *             config_source_ip - [IN]                                        *
- *             nextcheck        - [OUT]                                       *
+ * Parameters: now                      - [IN] current timestamp              *
+ *             config_source_ip         - [IN]                                *
+ *             config_ssl_ca_location   - [IN]                                *
+ *             config_ssl_cert_location - [IN]                                *
+ *             config_ssl_key_location  - [IN]                                *
+ *             nextcheck                - [OUT]                               *
  *                                                                            *
  * Return value: number of processed httptests                                *
  *                                                                            *
