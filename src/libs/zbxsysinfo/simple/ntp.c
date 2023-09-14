@@ -54,18 +54,17 @@ static void	pack_ntp(const ntp_data *data, unsigned char *request, int length)
 	/* Pack the essential data into an NTP packet, bypassing struct layout  */
 	/* and endian problems. Note that it ignores fields irrelevant to SNTP. */
 
-	int	k;
-	double	d;
-
 	memset(request, 0, length);
 
 	request[0] = (data->version << 3) | data->mode;
 
-	d = data->transmit / NTP_SCALE;
+	double	d = data->transmit / NTP_SCALE;
 
 	for (int i = 0; i < 8; i++)
 	{
-		if ((k = (int)(d *= 256.0)) >= 256)
+		int	k = (int)(d *= 256.0);
+
+		if (k >= 256)
 			k = 255;
 
 		request[NTP_OFFSET_TRANSMIT + i] = k;

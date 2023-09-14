@@ -39,7 +39,7 @@ static zbx_collector_data	*collector = NULL;
 int	cpu_collector_started(void)
 {
 #ifdef _WINDOWS
-	return ((NULL != collector) && (collector)->cpus.queue_counter);
+	return ((NULL != collector) && (NULL != collector->cpus.queue_counter));
 #else /* not _WINDOWS */
 	return (NULL != collector);
 #endif
@@ -53,11 +53,11 @@ zbx_collector_data	*get_collector(void)
 #ifndef _WINDOWS
 int	diskdevice_collector_started(void)
 {
-	return ((NULL != collector) && (collector)->diskstat_shmid != ZBX_NONEXISTENT_SHMID);
+	return ((NULL != collector) && (collector->diskstat_shmid != ZBX_NONEXISTENT_SHMID));
 }
 
 static int			shm_id;
-int				my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
+static int			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 static zbx_diskdevices_data	*diskdevices = NULL;
 zbx_diskdevices_data	*get_diskdevices(void)
 {

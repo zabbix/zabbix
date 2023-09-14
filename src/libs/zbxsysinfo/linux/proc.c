@@ -1304,7 +1304,7 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
  * Purpose: creates process object with specified properties                  *
  *                                                                            *
  * Parameters: pid   - [IN]                                                   *
- *             flags - [IN] flags specifying properties to set            *
+ *             flags - [IN] flags specifying properties to set                *
  *                                                                            *
  * Return value: The created process object or NULL if property reading       *
  *               failed.                                                      *

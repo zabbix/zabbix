@@ -667,7 +667,8 @@ out:
  * Purpose: For every query gets the pids of processes matching query         *
  *          attributes.                                                       *
  *                                                                            *
- * Parameters: queries - [IN/OUT] fills pids and error for each query         *
+ * Parameters: queries   - [IN/OUT] fills pids and error for each query       *
+ *             processes - [IN]                                               *
  *                                                                            *
  * Return value: total number of pids saved in all queries                    *
  *                                                                            *
@@ -952,16 +953,15 @@ void	zbx_procstat_destroy(void)
  *                                                                            *
  * Purpose: gets process cpu utilization                                      *
  *                                                                            *
- * Parameters: procname       - [IN] NULL - all                               *
- *             username       - [IN] ...                                      *
- *             cmdline        - [IN] ...                                      *
- *             collector_func - [IN] callback function to use for process     *
- *                                   statistics gathering                     *
- *             period         - [IN] time period                              *
- *             type           - [IN] cpu utilization type, see                *
- *                                   ZBX_PROCSTAT_CPU_* defines               *
- *             value          - [OUT] utilization in %                        *
- *             errmsg         - [OUT]                                         *
+ * Parameters: procname - [IN] NULL - all                                     *
+ *             username - [IN] ...                                            *
+ *             cmdline  - [IN] ...                                            *
+ *             flags    - [IN]                                                *
+ *             period   - [IN] time period                                    *
+ *             type     - [IN] cpu utilization type, see                      *
+ *                             ZBX_PROCSTAT_CPU_* defines                     *
+ *             value    - [OUT] utilization in %                              *
+ *             errmsg   - [OUT]                                               *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - utime value was retrieved successfully                       *

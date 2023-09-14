@@ -852,10 +852,8 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
  *             procname    - [IN] NULL - all                                  *
  *             username    - [IN] ...                                         *
  *             cmdline     - [IN] ...                                         *
+ *             flags       - [IN]                                             *
  *             pids        - [OUT] vector of matching pids                    *
- *                                                                            *
- * Return value: SUCCEED   - pids were read successfully                      *
- *               -errno    - failed to read pids                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,

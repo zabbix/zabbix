@@ -159,7 +159,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct prpsinfo	psinfo;
 	char		filename[MAX_STRING_LEN];
 	char		*procname, *proccomm, *param;
-	int		zbx_proc_stat, proc, proccount = 0, invalid_user = 0, ;
+	int		zbx_proc_stat, proc, proccount = 0, invalid_user = 0;
 	pid_t		curr_pid = getpid();
 
 	if (4 < request->nparam)

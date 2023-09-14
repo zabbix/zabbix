@@ -216,8 +216,10 @@ static char	*get_commandline(struct kinfo_proc *proc)
 		return NULL;
 #endif
 	for (int i = 0; i < (int)(sz - 1); i++)
+	{
 		if (args[i] == '\0')
 			args[i] = ' ';
+	}
 
 	if (0 == sz)
 		zbx_strlcpy(args, proc->ZBX_PROC_COMM, args_alloc);

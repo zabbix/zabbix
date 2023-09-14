@@ -275,7 +275,7 @@ static char	*zbx_ifrow_get_utf8_description(const zbx_ifrow_t *pIfRow)
 	else
 	{
 		static wchar_t *(*mb_to_unicode)(const char *) = NULL;
-		wchar_t	*wdescr;
+		wchar_t		*wdescr;
 		char		*utf8_descr;
 
 		if (NULL == mb_to_unicode)
