@@ -260,7 +260,9 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 #ifndef HAVE_LIBXML2
 	ZBX_UNUSED(value);
 	ZBX_UNUSED(params);
+	ZBX_UNUSED(is_empty);
 	*errmsg = zbx_dsprintf(*errmsg, "Zabbix was compiled without libxml2 support");
+
 	return FAIL;
 #else
 	int		ret = FAIL;
