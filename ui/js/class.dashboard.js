@@ -203,7 +203,7 @@ class CDashboard {
 				}
 			});
 
-			this.#broadcast_cache.set(type, {value: {...value}});
+			this.#broadcast_cache.set(type, value);
 		}
 	}
 
