@@ -312,7 +312,7 @@ func getTlsDetails(params map[string]string) (tlsconfig.Details, error) {
 
 	err = details.Validate(validateCA, validateClient, validateClient)
 	if err != nil {
-		return details, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+		return tlsconfig.Details{}, zbxerr.ErrorInvalidConfiguration.Wrap(err)
 	}
 
 	return details, nil
