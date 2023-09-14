@@ -300,6 +300,7 @@ var hintBox = {
 				}
 
 				if (e.type === 'mouseleave') {
+					hintBox.hideHint($target[0], false);
 					$target.blur();
 
 					return false;
@@ -429,7 +430,7 @@ var hintBox = {
 				}
 			}
 
-			$target.data('hintbox-contents', hintbox_contents);
+			$target[0].dataset.hintboxContents = hintbox_contents;
 
 			hintBox.displayHint(e, $target);
 		});
