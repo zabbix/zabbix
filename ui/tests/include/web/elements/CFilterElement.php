@@ -249,11 +249,12 @@ class CFilterElement extends CElement {
 		$tab = $this->getTab($name);
 		$tab->click();
 		$container = $tab->parents('tag:li')->one();
-		$container->waitUntilClassesPresent(['selected']);
+		$multitab = $this->query('xpath:./nav')->one(false)->isValid();
+		$container->waitUntilClassesPresent([$multitab ? 'selected' : 'ui-tabs-active']);
 
 		if ($this->isExpanded()) {
-			$attribute = $this->query('xpath:./nav')->one(false)->isValid() ? 'data-target' : 'aria-controls';
-			CElementQuery::waitUntil($this->query('id', $container->getAttribute($attribute)), CElementFilter::VISIBLE);
+			CElementQuery::waitUntil($this->query('id',
+					$container->getAttribute($multitab ? 'data-target' : 'aria-controls')), CElementFilter::VISIBLE);
 		}
 
 		return $this;
