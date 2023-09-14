@@ -22,6 +22,7 @@
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
+#include "zbxregexp.h"
 
 /*
  * 7.0 development database patches
@@ -953,6 +954,333 @@ static int	DBpatch_6050091(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050092(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name='source_type'"
+				" and widget_fieldid in ("
+					"select widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='map'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050093(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='sysmapid._reference'"
+			" where name='filter_widget_reference'"
+				" and widget_fieldid in ("
+					"select widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='map'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050094(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update	widget_field"
+			" set type='1',name='override_hostid._reference',value_int=0,value_str='DASHBOARD._hostid'"
+			" where name='filter_widget_reference'"
+				" and widget_fieldid in ("
+					"select widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='map'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050095(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	zbx_db_insert_t	db_insert;
+	int		ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select(
+			"select w.widgetid,wf_from.value_str,wf_to.value_str"
+			" from widget w"
+			" left join widget_field wf_from"
+				" on w.widgetid=wf_from.widgetid"
+					" and (wf_from.name='time_from' or wf_from.name is null)"
+			" left join widget_field wf_to"
+				" on w.widgetid=wf_to.widgetid"
+					" and (wf_to.name='time_to' or wf_to.name is null)"
+			" where w.type='svggraph' and exists ("
+				"select null"
+				" from widget_field wf2"
+				" where wf2.widgetid=w.widgetid"
+					" and wf2.name='graph_time'"
+			")");
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
+			NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		if (SUCCEED == zbx_db_is_null(row[1]))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "time_period.from", "now-1h");
+
+		if (SUCCEED == zbx_db_is_null(row[2]))
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "time_period.to", "now");
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_6050096(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='time_period.from'"
+			" where name='time_from'"
+				" and widget_fieldid in ("
+					"select wf.widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='svggraph'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050097(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='time_period.to'"
+			" where name='time_to'"
+				" and widget_fieldid in ("
+					"select wf.widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='svggraph'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050098(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name='graph_time'"
+				" and widget_fieldid in ("
+					"select widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='svggraph'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050099(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='date_period.from'"
+			" where name='date_from'"
+				" and widget_fieldid in ("
+					"select widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='slareport'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050100(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='date_period.to'"
+			" where name='date_to'"
+				" and widget_fieldid in ("
+					"select widget_fieldid"
+					" from widget_field wf"
+					" join widget w"
+						" on wf.widgetid=w.widgetid"
+					" where w.type='slareport'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050101(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	zbx_regexp_t	*regex1 = NULL, *regex2 = NULL;
+	char		*error = NULL, *replace_to = NULL, *sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = FAIL;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (FAIL == zbx_regexp_compile_ext("^([a-z]+)\\.([a-z_]+)\\.(\\d+)\\.(\\d+)$", &regex1, 0, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "internal error, invalid regular expression: %s", error);
+		goto out;
+	}
+
+	if (FAIL == zbx_regexp_compile_ext("^([a-z]+)\\.([a-z_]+)\\.(\\d+)$", &regex2, 0, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "internal error, invalid regular expression: %s", error);
+		goto out;
+	}
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	result = zbx_db_select("select widget_fieldid,name from widget_field where name like '%%.%%.%%'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widget_fieldid;
+		char		*replace_from;
+
+		ZBX_STR2UINT64(widget_fieldid, row[0]);
+		replace_from = row[1];
+
+		if (SUCCEED != zbx_mregexp_sub_precompiled(
+						replace_from,
+						regex1,
+						"\\1.\\3.\\2.\\4",
+						0, /* no output limit */
+						&replace_to)
+				&& SUCCEED != zbx_mregexp_sub_precompiled(
+						replace_from,
+						regex2,
+						"\\1.\\3.\\2",
+						0, /* no output limit */
+						&replace_to))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zabbix_log(LOG_LEVEL_CRIT, "internal error, unexpected widget_field.name value: \"%s\"",
+					replace_from);
+			zbx_db_free_result(result);
+
+			goto out;
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update widget_field"
+				" set name='%s'"
+				" where widget_fieldid=" ZBX_FS_UI64 ";\n",
+				replace_to, widget_fieldid);
+
+		zbx_free(replace_to);
+
+		if (SUCCEED != zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "internal error, cannot execute multiple SQL \"update\" operations");
+			zbx_db_free_result(result);
+
+			goto out;
+		}
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)    /* in ORACLE always present begin..end; */
+		zbx_db_execute("%s", sql);
+
+	ret = SUCCEED;
+out:
+	if (NULL != regex1)
+		zbx_regexp_free(regex1);
+	if (NULL != regex2)
+		zbx_regexp_free(regex2);
+
+	zbx_free(sql);
+	zbx_free(error);
+	zbx_free(replace_to);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1049,5 +1377,15 @@ DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
 DBPATCH_ADD(6050090, 0, 1)
 DBPATCH_ADD(6050091, 0, 1)
+DBPATCH_ADD(6050092, 0, 1)
+DBPATCH_ADD(6050093, 0, 1)
+DBPATCH_ADD(6050094, 0, 1)
+DBPATCH_ADD(6050095, 0, 1)
+DBPATCH_ADD(6050096, 0, 1)
+DBPATCH_ADD(6050097, 0, 1)
+DBPATCH_ADD(6050098, 0, 1)
+DBPATCH_ADD(6050099, 0, 1)
+DBPATCH_ADD(6050100, 0, 1)
+DBPATCH_ADD(6050101, 0, 1)
 
 DBPATCH_END()
