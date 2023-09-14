@@ -176,7 +176,7 @@ func (t *exporterTask) perform(s Scheduler) {
 			select {
 			case <-tc:
 			case <-time.After(time.Second * time.Duration(t.item.timeout)):
-				err = fmt.Errorf("timed out")
+				err = fmt.Errorf("timed out while gathering data")
 			}
 
 			if err == nil {

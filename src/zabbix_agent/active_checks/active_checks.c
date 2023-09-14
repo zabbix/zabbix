@@ -118,6 +118,10 @@ zbx_cmd_hash_t;
 static volatile sig_atomic_t	need_update_userparam;
 #endif
 
+void	send_back_unsupported_item(char *key, char *error, const char *config_hostname, zbx_vector_addr_ptr_t *addrs,
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		int config_buffer_send, int config_buffer_size);
+
 static void	init_active_metrics(int config_buffer_size)
 {
 	size_t	sz;
@@ -392,7 +396,6 @@ static void	add_command(const char *key, zbx_uint64_t id)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: tests log[] or log.count[] item key if <mode> parameter is set to *
@@ -427,6 +430,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	return ret;
 }
 
+
 /********************************************************************************
  *                                                                              *
  * Purpose: parses list of active checks received from server                   *
@@ -447,12 +451,13 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                                                              *
  ********************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
-		zbx_uint32_t *config_revision_local, int config_timeout)
+		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_hostname, zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, const char *config_source_ip,
+		int config_buffer_send, int config_buffer_size)
 {
 	const char		*p;
 	size_t			name_alloc = 0, key_orig_alloc = 0;
-	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
-				tmp[MAX_STRING_LEN] = {0}, exp_delimiter;
+	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN] = {0},
+				exp_delimiter, error[MAX_STRING_LEN];
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
@@ -574,8 +579,13 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		{
 			timeout = config_timeout;
 		}
-		else
-			timeout = atoi(tmp);
+		else if (FAIL == zbx_validate_item_timeout(tmp, &timeout, error, sizeof(error)))
+		{
+			send_back_unsupported_item(key_orig, error, config_hostname, addrs, config_tls, config_timeout,
+					config_source_ip, config_buffer_send, config_buffer_size);
+
+			continue;
+		}
 
 		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime, timeout);
 
@@ -857,7 +867,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
 		const char *config_listen_ip, int config_listen_port, const char *config_hostname,
 		const char *config_host_metadata, const char *config_host_metadata_item,
-		const char *config_host_interface, const char *config_host_interface_item)
+		const char *config_host_interface, const char *config_host_interface_item, int config_buffer_send, int config_buffer_size)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -937,7 +947,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 				if (SUCCEED != parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
 						((zbx_addr_t *)addrs->values[0])->port, config_revision_local,
-						config_timeout))
+						config_timeout, config_hostname, addrs, config_tls, config_source_ip, config_buffer_send, config_buffer_size))
 				{
 						zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
 								zbx_json_strerror());
@@ -1945,7 +1955,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 					activechks_args_in->config_host_metadata,
 					activechks_args_in->config_host_metadata_item,
 					activechks_args_in->config_host_interface,
-					activechks_args_in->config_host_interface_item))
+					activechks_args_in->config_host_interface_item, activechks_args_in->config_buffer_send, activechks_args_in->config_buffer_size))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
@@ -2032,4 +2042,26 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 #endif
+}
+
+void	send_back_unsupported_item(char *key, char *error, const char *config_hostname, zbx_vector_addr_ptr_t *addrs,
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		int config_buffer_send, int config_buffer_size)
+{
+	ZBX_ACTIVE_METRIC	metric;
+
+	metric.key = key;
+	metric.key_orig = key;
+	metric.state = ITEM_STATE_NOTSUPPORTED;
+	metric.flags = 0;
+	metric.lastlogsize = 0;
+	metric.error_count = 0;
+	metric.processed_bytes = 0;
+
+	zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", key, error);
+
+	process_value(addrs, NULL, config_hostname, metric.key_orig, error, ITEM_STATE_NOTSUPPORTED,
+			&metric.lastlogsize, &metric.mtime, NULL, NULL, NULL, NULL, metric.flags,
+			config_tls, config_timeout, config_source_ip, config_buffer_send,
+			config_buffer_size);
 }

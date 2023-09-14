@@ -556,7 +556,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 		zbx_dc_item_t		*dc_items;
 		int			*errcodes, delay;
 		zbx_dc_um_handle_t	*um_handle;
-		char			error_val[ZBX_ITEM_ERROR_LEN_MAX];
 
 		dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, sizeof(zbx_dc_item_t) * num);
 		errcodes = (int *)zbx_malloc(NULL, sizeof(int) * num);
@@ -566,8 +565,6 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 		for (i = 0; i < num; i++)
 		{
-			int	timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
-
 			if (SUCCEED != errcodes[i])
 			{
 				/* items or host removed between checking item count and retrieving items */
@@ -627,13 +624,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 						NULL, NULL, NULL, NULL, NULL, &dc_items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
 
-			if (FAIL == zbx_validate_item_timeout(dc_items[i].timeout, &timeout_sec, error_val, sizeof(error_val)))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "failed to parse timeout value '%s' for active check '%s' "
-						"on hostid " ZBX_FS_UI64, dc_items[i].timeout, dc_items[i].key, hostid);
-			}
-
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_TIMEOUT, timeout_sec);
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TIMEOUT, dc_items[i].timeout, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json);
 
