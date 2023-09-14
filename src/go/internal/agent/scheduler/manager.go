@@ -169,6 +169,7 @@ func parseItemTimeout(s string) (seconds int, e error) {
 
 	if s == "" {
 		e = errors.New(invalidTimeoutError)
+
 		return
 	}
 
@@ -181,11 +182,13 @@ func parseItemTimeout(s string) (seconds int, e error) {
 			mult = 1
 		} else {
 			e = errors.New(invalidTimeoutError)
+
 			return
 		}
 
 		if val, err := strconv.Atoi(s[:len(s)-1]); err != nil {
 			e = errors.New(invalidTimeoutError)
+
 			return
 		} else {
 			seconds = val * mult
