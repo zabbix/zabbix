@@ -449,7 +449,7 @@ class testPageSearch extends CWebTest {
 			}
 		}
 
-		$this->openSearchResults($data['search_string'], CTestArrayHelper::get($data, 'fire_keyup_event', false));
+		$this->openSearchResults($data['search_string'], CTestArrayHelper::get($data, 'fire_keyup_event'));
 
 		$this->page->assertHeader('Search: '.$data['search_string']);
 
