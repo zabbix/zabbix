@@ -77,7 +77,7 @@ static void	deactivate_perf_counter(zbx_perf_counter_data_t *counter)
  *           added, a pointer to that counter is returned, NULL otherwise.    *
  *                                                                            *
  ******************************************************************************/
-zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
+static zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
 		zbx_perf_counter_lang_t lang, char **error)
 {
 	zbx_perf_counter_data_t	*cptr = NULL;
@@ -85,8 +85,6 @@ zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *coun
 	int			added = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() counter:'%s' interval:%d", __func__, counterpath, interval);
-
-	LOCK_PERFCOUNTERS;
 
 	if (SUCCEED != perf_collector_started())
 	{
@@ -153,11 +151,23 @@ zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *coun
 		zbx_free(alias_name);
 	}
 out:
-	UNLOCK_PERFCOUNTERS;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, NULL == cptr ? "FAIL" : "SUCCEED");
 
 	return cptr;
+}
+
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
+		zbx_perf_counter_lang_t lang, char **error)
+{
+	zbx_perf_counter_data_t	*v;
+
+	LOCK_PERFCOUNTERS;
+
+	v = add_perf_counter(name, counterpath, interval, lang, error);
+
+	UNLOCK_PERFCOUNTERS;
+
+	return v;
 }
 
 /******************************************************************************
@@ -668,8 +678,6 @@ int	get_perf_counter_value_by_name(const char *name, double *value, char **error
 
 	counterpath = zbx_strdup(counterpath, perfs->counterpath);
 out:
-	UNLOCK_PERFCOUNTERS;
-
 	if (NULL != counterpath)
 	{
 		/* request counter value directly from Windows performance counters */
@@ -682,6 +690,8 @@ out:
 
 		zbx_free(counterpath);
 	}
+
+	UNLOCK_PERFCOUNTERS;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -744,14 +754,14 @@ int	get_perf_counter_value_by_path(const char *counterpath, int interval, zbx_pe
 	if (NULL == perfs)
 		perfs = zbx_add_perf_counter(NULL, counterpath, interval, lang, error);
 out:
-	UNLOCK_PERFCOUNTERS;
-
 	if (SUCCEED != ret && NULL != perfs)
 	{
 		/* request counter value directly from Windows performance counters */
 		if (ERROR_SUCCESS == zbx_calculate_counter_value(__func__, counterpath, lang, value))
 			ret = SUCCEED;
 	}
+
+	UNLOCK_PERFCOUNTERS;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
