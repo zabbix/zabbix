@@ -2536,7 +2536,7 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
  *
  * @return array
  */
-function sortPreprocessingStepsByCheckUnsupported(array $steps): array {
+function sortPreprocessingSteps(array $steps): array {
 	$preproc_regex = [];
 	$preproc_any = [];
 	$sorted_steps = [];

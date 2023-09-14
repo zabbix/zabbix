@@ -788,7 +788,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	if (!$data['is_discovery_rule']) {
 		CArrayHelper::sort($data['preprocessing'], ['sortorder']);
-		$data['preprocessing'] = sortPreprocessingStepsByCheckUnsupported($data['preprocessing']);
+		$data['preprocessing'] = sortPreprocessingSteps($data['preprocessing']);
 	}
 
 	// Unset empty and inherited tags.

@@ -395,7 +395,6 @@ abstract class CItemGeneral extends CApiService {
 			'fields' => [
 				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
 				'params' =>					['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'type', 'in' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED], 'type' => API_PREPROC_PARAMS, 'flags' => API_ALLOW_USER_MACRO | ($flags & API_ALLOW_LLD_MACRO), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params'), 'default' => (string) ZBX_PREPROC_MATCH_ERROR_ANY],
 												['if' => ['field' => 'type', 'in' => implode(',', static::PREPROC_TYPES_WITH_PARAMS)], 'type' => API_PREPROC_PARAMS, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($flags & API_ALLOW_LLD_MACRO), 'preproc_type' => ['field' => 'type'], 'length' => DB::getFieldLength('item_preproc', 'params')],
 												['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('item_preproc', 'params')]
 				]],
@@ -1564,9 +1563,8 @@ abstract class CItemGeneral extends CApiService {
 				? array_column($db_items[$item['itemid']]['preprocessing'], null, 'step')
 				: [];
 
-			$item['preprocessing'] = self::sortPreprocessingStepsByCheckUnsupported($item['preprocessing']);
-
 			$step = 1;
+			$item['preprocessing'] = self::sortPreprocessingSteps($item['preprocessing']);
 
 			foreach ($item['preprocessing'] as &$item_preproc) {
 				$item_preproc['step'] = $step++;
@@ -2696,8 +2694,7 @@ abstract class CItemGeneral extends CApiService {
 			'output' => [
 				'item_preprocid', 'itemid', 'step', 'type', 'params', 'error_handler', 'error_handler_params'
 			],
-			'filter' => ['itemid' => $itemids],
-			'sortfield' => ['step']
+			'filter' => ['itemid' => $itemids]
 		];
 		$db_item_preprocs = DBselect(DB::makeSql('item_preproc', $options));
 
@@ -2834,7 +2831,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	private static function sortPreprocessingStepsByCheckUnsupported(array $steps): array {
+	private static function sortPreprocessingSteps(array $steps): array {
 		$preproc_regex = [];
 		$preproc_any = [];
 		$sorted_steps = [];
@@ -2845,11 +2842,7 @@ abstract class CItemGeneral extends CApiService {
 				continue;
 			}
 
-			$match_type = ZBX_PREPROC_MATCH_ERROR_ANY;
-
-			if (array_key_exists('params', $step)) {
-				[$match_type] = explode("\n", $step['params']);
-			}
+			[$match_type] = explode("\n", $step['params']);
 
 			if ($match_type != ZBX_PREPROC_MATCH_ERROR_ANY) {
 				$preproc_regex[] = $step;
