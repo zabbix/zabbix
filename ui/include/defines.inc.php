@@ -1953,6 +1953,7 @@ define('ZBX_STYLE_FLH_NA_BG', 'flh-na-bg');
 define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
+define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');

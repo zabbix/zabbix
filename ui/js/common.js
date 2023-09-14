@@ -794,6 +794,8 @@ function validate_trigger_expression(overlay) {
 			}
 
 			overlayDialogueDestroy(overlay.dialogueid);
+
+			obj.dispatchEvent(new Event('change'));
 		},
 		dataType: 'json',
 		type: 'POST'

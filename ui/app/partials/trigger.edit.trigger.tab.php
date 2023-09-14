@@ -131,6 +131,7 @@ $input_method_toggle = (new CButtonLink( _('Expression constructor')))->setId('e
 $expression_row[] = [
 	(new CDiv($expression_constructor_buttons))
 		->setId('expression-constructor-buttons')
+		->addClass(ZBX_STYLE_FORM_SUBFIELD)
 		->addStyle('display: none'),
 	new CDiv($input_method_toggle)
 ];
@@ -206,6 +207,7 @@ $input_method_toggle = (new CButtonLink(_('Expression constructor')))
 $recovery_expression_row[] = [
 	(new CDiv($recovery_constructor_buttons))
 		->setId('recovery-constructor-buttons')
+		->addClass(ZBX_STYLE_FORM_SUBFIELD)
 		->addStyle('display: none'),
 	new CDiv($input_method_toggle)
 ];

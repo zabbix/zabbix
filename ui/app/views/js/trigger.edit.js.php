@@ -155,6 +155,20 @@
 					this.editTemplate(e, e.target.dataset.templateid);
 				}
 			});
+
+			this.expression.addEventListener('change', (e) => {
+				const button_ids = ['#add_expression', '#and_expression', '#or_expression', '#replace_expression'];
+
+				this.#disableExpressionConstructorButtons(button_ids, e.target);
+			})
+
+			this.form.querySelector('#recovery_expression').addEventListener('change', (e) => {
+				const button_ids = ['#add_expression_recovery', '#and_expression_recovery', '#or_expression_recovery',
+					'#replace_expression_recovery'
+				];
+
+				this.#disableExpressionConstructorButtons(button_ids, e.target);
+			})
 		}
 
 		#addDepTrigger(button) {
@@ -486,6 +500,8 @@
 						table.innerHTML = response.body;
 						this.expression_full.value = response.expression;
 
+						this.expression.dispatchEvent(new Event('change'));
+
 						if (table.querySelector('tbody').innerHTML !== '') {
 							this.#showConstructorAddButton(false);
 						}
@@ -497,6 +513,8 @@
 						const table = this.form.querySelector('#recovery-expression-table');
 						table.innerHTML = response.body;
 						this.form.querySelector('#recovery-expression-full').value = response.expression;
+
+						this.form.querySelector('#recovery_expression').dispatchEvent(new Event('change'));
 
 						if (table.querySelector('tbody').innerHTML !== '') {
 							this.#showRecoveryConstructorAddButton(false);
@@ -663,6 +681,19 @@
 			}
 
 			return true;
+		}
+
+		#disableExpressionConstructorButtons(buttons, target) {
+			if (target.value != '') {
+				buttons.forEach((button) => {
+					this.form.querySelector(button).disabled = false;
+				});
+			}
+			else {
+				buttons.forEach((button) => {
+					this.form.querySelector(button).disabled = true;
+				});
+			}
 		}
 
 		#post(url, data) {

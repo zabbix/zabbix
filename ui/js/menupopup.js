@@ -1423,6 +1423,7 @@ function getMenuPopupTriggerMacro(options) {
 				expressionInput.val(expression.string);
 
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+				document.getElementById('expression').dispatchEvent(new Event('change'));
 			}
 		};
 	});
