@@ -53,7 +53,7 @@ zbx_collector_data	*get_collector(void)
 #ifndef _WINDOWS
 int	diskdevice_collector_started(void)
 {
-	return ((NULL != collector) && (collector->diskstat_shmid != ZBX_NONEXISTENT_SHMID));
+	return ((NULL != collector) && (ZBX_NONEXISTENT_SHMID != collector->diskstat_shmid));
 }
 
 static int			shm_id;
