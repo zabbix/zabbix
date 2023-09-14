@@ -50,6 +50,7 @@ require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
 require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/testPageHosts.php';
@@ -223,6 +224,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
+		$suite->addTestSuite('testPageMonitoringWebDetails');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 		$suite->addTestSuite('testPageOverview');
 		/*
