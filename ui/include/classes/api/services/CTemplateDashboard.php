@@ -125,14 +125,14 @@ class CTemplateDashboard extends CDashboardGeneral {
 							' AND '.dbConditionId('r.groupid', $user_groups).
 							' AND r.permission>='.PERM_READ.
 					' WHERE NOT EXISTS ('.
-							'SELECT NULL'.
-							' FROM hosts_groups hgg'.
-								' JOIN rights r2'.
-									' ON hgg.groupid=r2.id'.
-										' AND '.dbConditionId('r2.groupid', $user_groups).
-										' AND r2.permission='.PERM_DENY.
-							' WHERE h.hostid=hgg.hostid'.
-						')'
+						'SELECT NULL'.
+						' FROM hosts_groups hgg'.
+							' JOIN rights r2'.
+								' ON hgg.groupid=r2.id'.
+									' AND '.dbConditionId('r2.groupid', $user_groups).
+									' AND r2.permission='.PERM_DENY.
+						' WHERE h.hostid=hgg.hostid'.
+					')'
 				);
 
 				$templateids = [];
