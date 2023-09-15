@@ -815,6 +815,7 @@ int	modbus_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 			(unsigned short)total_count, result, &err))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot read modbus data: %s.", err));
+		zbx_free(err);
 		goto err;
 	}
 
