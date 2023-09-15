@@ -2049,20 +2049,9 @@ void	send_back_unsupported_item(char *key, char *error, const char *config_hostn
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		int config_buffer_send, int config_buffer_size)
 {
-	ZBX_ACTIVE_METRIC	metric;
-
-	metric.key = key;
-	metric.key_orig = key;
-	metric.state = ITEM_STATE_NOTSUPPORTED;
-	metric.flags = 0;
-	metric.lastlogsize = 0;
-	metric.error_count = 0;
-	metric.processed_bytes = 0;
-
 	zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", key, error);
 
-	process_value(addrs, NULL, config_hostname, metric.key_orig, error, ITEM_STATE_NOTSUPPORTED,
-			&metric.lastlogsize, &metric.mtime, NULL, NULL, NULL, NULL, metric.flags,
-			config_tls, config_timeout, config_source_ip, config_buffer_send,
-			config_buffer_size);
+	process_value(addrs, NULL, config_hostname, key, error, ITEM_STATE_NOTSUPPORTED,
+			NULL, NULL, NULL, NULL, NULL, NULL, 0, config_tls, config_timeout, config_source_ip,
+			config_buffer_send, config_buffer_size);
 }
