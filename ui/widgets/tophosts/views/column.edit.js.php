@@ -116,12 +116,14 @@ window.tophosts_column_edit_form = new class {
 				: 'none';
 		}
 
+		const data_type = document.querySelector('[name="data"]');
+
 		// Displays or hides override time period fields based on 'Data' value change.
-		document.querySelector('[name="data"]').onchange = () => (
+		data_type.onchange = () => {
 			data_item_value
 				? aggregate_options.dispatchEvent(new Event('change'))
 				: override_fields.forEach(element => element.style.display = 'none')
-		);
+		};
 
 		// Toggle visibility of disabled form elements.
 		$('.form-grid > label', this._$widget_form).each((i, elm) => {
@@ -143,7 +145,8 @@ window.tophosts_column_edit_form = new class {
 			'#time_to_calendar'
 		];
 
-		if (this._aggregate_function.value == <?= AGGREGATE_NONE ?>) {
+		if (this._aggregate_function.value == <?= AGGREGATE_NONE ?>
+				|| data_type.value != <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>) {
 			time_period_fields.push('#item_time');
 
 			for (const element of document.querySelectorAll(time_period_fields)) {
