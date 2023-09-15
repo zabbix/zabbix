@@ -836,12 +836,6 @@ window.widget_svggraph_form = new class {
 
 		curl.setArgument('action', 'widget.svggraph.view');
 
-		for (const element of this._form.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
-			}
-		}
-
 		this.#update_preview_loading_timeout = setTimeout(() => {
 			this.#update_preview_loading_timeout = null;
 			preview_container.classList.add('is-loading');
@@ -863,6 +857,12 @@ window.widget_svggraph_form = new class {
 					throw {error: response.error};
 				}
 
+				for (const element of this._form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
 				if (this.#update_preview_loading_timeout !== null) {
 					clearTimeout(this.#update_preview_loading_timeout);
 					this.#update_preview_loading_timeout = null;
@@ -879,6 +879,12 @@ window.widget_svggraph_form = new class {
 			.catch((exception) => {
 				if (abort_controller.signal.aborted) {
 					return;
+				}
+
+				for (const element of this._form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
 				}
 
 				if (this.#update_preview_loading_timeout !== null) {
