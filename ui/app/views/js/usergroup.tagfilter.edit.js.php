@@ -80,11 +80,11 @@ window.tag_filter_edit = new class {
 
 		$(ms).multiSelect();
 
-		$(ms).on('change', () => {
+		$(ms).on('change', () =>
 			$(ms).multiSelect('setDisabledEntries',
 				[...this.form.querySelectorAll('input[name^="ms_new_tag_filter[groupids]"]')].map(input => input.value)
-			);
-		});
+			)
+		);
 	}
 
 	/**
@@ -97,8 +97,8 @@ window.tag_filter_edit = new class {
 		const rowid = this.tag_filter_counter++;
 		const data = {
 			'rowid': rowid,
-			'tag': tag.length === 0 ? '' : tag.tag,
-			'value': tag.length === 0 ? '' : tag.value
+			'tag': tag.length == 0 ? '' : tag.tag,
+			'value': tag.length == 0 ? '' : tag.value
 		};
 
 		const new_row = this.tag_filter_template.evaluate(data);

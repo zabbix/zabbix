@@ -237,12 +237,9 @@ class CControllerUsergroupEdit extends CController {
 				$permission = $permissions[$index] ?? PERM_DENY;
 
 				if ($groupid != 0 && in_array($groupid, array_column($groups, 'groupid'))) {
-					if (!array_key_exists($groupid, $unique_rights)) {
-						$unique_rights[$groupid] = $permission;
-					}
-					else {
-						$unique_rights[$groupid] = min($unique_rights[$groupid], $permission);
-					}
+					$unique_rights[$groupid] = array_key_exists($groupid, $unique_rights)
+						? min($unique_rights[$groupid], $permission)
+						: $permission;
 				}
 			}
 		}

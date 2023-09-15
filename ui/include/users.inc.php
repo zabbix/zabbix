@@ -380,21 +380,25 @@ function collapseTagFilters(array $tag_filters) {
 /**
  * Get textual representation of given permission.
  *
- * @param string $perm			Numerical value of permission.
- *									Possible values are:
- *									 3 - PERM_READ_WRITE,
- *									 2 - PERM_READ,
- *									 0 - PERM_DENY,
- *									-1 - PERM_NONE;
+ * @param string $perm  Numerical value of permission.
+ *                          Possible values are:
+ *                           3 - PERM_READ_WRITE,
+ *                           2 - PERM_READ,
+ *                           0 - PERM_DENY,
+ *                          -1 - PERM_NONE;
  *
  * @return string
  */
 function permissionText($perm) {
 	switch ($perm) {
-		case PERM_READ_WRITE: return _('Read-write');
-		case PERM_READ: return _('Read');
-		case PERM_DENY: return _('Deny');
-		case PERM_NONE: return _('None');
+		case PERM_READ_WRITE:
+			return _('Read-write');
+		case PERM_READ:
+			return _('Read');
+		case PERM_DENY:
+			return _('Deny');
+		case PERM_NONE:
+			return _('None');
 	}
 }
 
@@ -402,9 +406,9 @@ function permissionText($perm) {
  * Formats host or template group rights for writing in the database.
  * Filters out duplicates, and applies the most strict permission type for duplicates.
  *
- * @param array		$rights			An array of host or template group rights.
- * @param string	$groupid_key	The key in the rights array for the group IDs.
- * @param string	$permission_key	The key in the rights array for the permissions.
+ * @param array  $rights          An array of host or template group rights.
+ * @param string $groupid_key     The key in the rights array for the group IDs.
+ * @param string $permission_key  The key in the rights array for the permissions.
  *
  * @return array
  */
@@ -421,12 +425,9 @@ function processRights(array $rights, string $groupid_key, string $permission_ke
 
 			if ($groupid != 0) {
 				// If duplicates submitted, saves the one with most strict permission type.
-				if (!array_key_exists($groupid, $unique_rights)) {
-					$unique_rights[$groupid] = $permission;
-				}
-				else {
-					$unique_rights[$groupid] = min($unique_rights[$groupid], $permission);
-				}
+				$unique_rights[$groupid] = array_key_exists($groupid, $unique_rights)
+					? min($unique_rights[$groupid], $permission)
+					: $permission;
 			}
 		}
 	}
@@ -444,10 +445,10 @@ function processRights(array $rights, string $groupid_key, string $permission_ke
 /**
  * Checks if the groups specified in the $rights parameter exist in the provided $db_groups.
  *
- * @param array		$rights		Host or template groups submitted for permission update/creation.
- * @param array		$db_groups	Array of host or template groups fetched from the database.
- * @param string	$group_name	Key in the $rights array for the list of groupids
- * 								('ms_hostgroup_right' or 'ms_templategroup_right').
+ * @param array  $rights      Host or template groups submitted for permission update/creation.
+ * @param array  $db_groups   Array of host or template groups fetched from the database.
+ * @param string $group_name  Key in the $rights array for the list of groupids
+ *                            ('ms_hostgroup_right' or 'ms_templategroup_right').
  *
  * @return bool
  */

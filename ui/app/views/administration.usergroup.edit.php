@@ -308,10 +308,10 @@ $form
 	->addItem($tabs)
 	->addItem(
 		(new CScriptTag('view.init('.json_encode([
-				'templategroup_rights' => $data['templategroup_rights'],
-				'hostgroup_rights' => $data['hostgroup_rights'],
-				'tag_filters' => $data['tag_filters']
-			]).');'))->setOnDocumentReady()
+			'templategroup_rights' => $data['templategroup_rights'],
+			'hostgroup_rights' => $data['hostgroup_rights'],
+			'tag_filters' => $data['tag_filters']
+		]).');'))->setOnDocumentReady()
 	);
 
 $html_page

@@ -140,19 +140,14 @@
 		 * @param {bool}   is_single   Flag to indicate if only one multiselect is the target (e.g., users).
 		 */
 		#setMultiselectDisabling(group_type, is_single = false) {
-			let multiselects = [];
-
-			if (is_single) {
-				multiselects = [document.getElementById(`${group_type}_`)];
-			}
-			else {
-				multiselects = [...document.querySelectorAll(`[id^="${group_type}_right_groupids_"]`)];
-			}
+			const multiselects = is_single
+				? [document.getElementById(`${group_type}_`)]
+				: [...document.querySelectorAll(`[id^="${group_type}_right_groupids_"]`)];
 
 			multiselects.forEach(ms => {
 				$(ms).on('change', (event) => {
 					// Get all groupids to disable in the multiselect.
-					let input_name = is_single
+					const input_name = is_single
 						? `input[name^="${group_type}"]`
 						: `input[name^="${group_type}_right[groupids]"]`;
 					const groupids = [...event.target.querySelectorAll(input_name)].map(input => input.value);
@@ -211,10 +206,10 @@
 				const groupid = row.querySelector('input[name*="[groupid]"]').value;
 
 				popup_params = {
+					...popup_params,
 					edit: '1',
 					groupid: groupid,
-					name: this.tag_filters[groupid]['name'],
-					tag_filters: this.tag_filters
+					name: this.tag_filters[groupid]['name']
 				};
 			}
 

@@ -121,7 +121,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => $data['edit'] ? _('Update') : _('Add'),
+			'title' => $data['edit'] == 0 ? _('Add') : _('Update'),
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'tag_filter_edit.submit();'

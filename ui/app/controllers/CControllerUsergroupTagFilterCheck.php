@@ -116,7 +116,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 				if (array_key_exists($tag, $unique_tag_filters) && $unique_tag_filters[$tag] === $value) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'),
-							_s('value "%1$s" already exists', '(tag, value)=('.$tag.', '.$value.')'))
+						_s('value "%1$s" already exists', '(tag, value)=('.$tag.', '.$value.')'))
 					);
 
 					return false;

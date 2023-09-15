@@ -88,7 +88,7 @@ class CControllerUsergroupCreate extends CController {
 		$this->getInputs($templategroup_rigts, ['ms_templategroup_right', 'templategroup_right']);
 
 		if (!checkGroupsExist($hostgroup_rights, $db_hostgroups, 'ms_hostgroup_right')
-			|| !checkGroupsExist($templategroup_rigts, $db_templategroups, 'ms_templategroup_right')) {
+				|| !checkGroupsExist($templategroup_rigts, $db_templategroups, 'ms_templategroup_right')) {
 			$this->getErrorResponse(true);
 
 			return;
