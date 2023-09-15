@@ -264,7 +264,7 @@ class CTriggerGeneralHelper {
 		}
 
 		if ($data['show_inherited_tags']) {
-			$data['tags'] = CTriggerGeneralHelper::getInheritedTags($data, $input_tags);
+			$data['tags'] = self::getInheritedTags($data, $input_tags);
 		}
 
 		$data['limited'] = ($data['templateid'] != 0);
@@ -413,7 +413,7 @@ class CTriggerGeneralHelper {
 		);
 		$trigger = reset($triggers);
 
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE ) {
+		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 			unset($trigger['hostid']);
 		}
 		else {

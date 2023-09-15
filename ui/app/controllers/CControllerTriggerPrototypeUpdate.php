@@ -152,16 +152,13 @@ class CControllerTriggerPrototypeUpdate extends CController {
 
 		CArrayHelper::sort($tags, ['tag', 'value']);
 
-		$dependencies = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
-		CArrayHelper::sort($dependencies, ['triggerid']);
-
 		$trigger_prototype += [
 			'type' => $this->getInput('type', 0),
 			'url_name' => $this->getInput('url_name', ''),
 			'url' => $this->getInput('url', ''),
 			'priority' => $this->getInput('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
 			'comments' => $this->getInput('description', ''),
-			'dependencies' => $dependencies,
+			'dependencies' => zbx_toObject($this->getInput('dependencies', []), 'triggerid'),
 			'tags' => $tags,
 			'status' => $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED,
 			'triggerid' => $this->getInput('triggerid'),
