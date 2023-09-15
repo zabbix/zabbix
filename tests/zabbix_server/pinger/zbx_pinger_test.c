@@ -25,12 +25,15 @@
 #include "../../../src/zabbix_server/pinger/pinger.c"
 
 #define MAX_ERR_LEN 256
+int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)
 {
 	ZBX_UNUSED(local_server_num);
 	ZBX_UNUSED(local_process_type);
 	ZBX_UNUSED(local_process_num);
+
+	return 0;
 }
 
 int	MAIN_ZABBIX_ENTRY(int flags)
