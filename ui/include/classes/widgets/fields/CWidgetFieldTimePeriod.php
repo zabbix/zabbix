@@ -202,10 +202,15 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				$range_time_parser = new CRangeTimeParser();
 
 				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
-					$range_time_parser->parse($field_value[$name]);
-					$field_value[$name_ts] = $range_time_parser
-						->getDateTime($name === 'from', $this->timezone)
-						->getTimestamp();
+					if ($field_value[$name] !== '') {
+						$range_time_parser->parse($field_value[$name]);
+						$field_value[$name_ts] = $range_time_parser
+							->getDateTime($name === 'from', $this->timezone)
+							->getTimestamp();
+					}
+					else {
+						$field_value[$name_ts] = 0;
+					}
 				}
 			}
 		}
