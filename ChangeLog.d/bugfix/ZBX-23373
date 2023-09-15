@@ -1,0 +1,1 @@
+A......... [ZBX-23373] fixed result for script.get API call, when using with selectActions option (epulke)
