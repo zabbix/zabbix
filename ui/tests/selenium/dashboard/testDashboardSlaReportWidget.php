@@ -147,11 +147,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'maxlength' => 3,
 				'value' => 20
 			],
-			'id:date_from' => [
+			'id:date_period_from' => [
 				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			],
-			'id:date_to' => [
+			'id:date_period_to' => [
 				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			]
@@ -164,7 +164,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 
 		// Check that the date pickers are present.
-		foreach (['id:date_from_calendar', 'id:date_to_calendar'] as $selector) {
+		foreach (['id:date_period_from_calendar', 'id:date_period_to_calendar'] as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isVisible());
 		}
 
