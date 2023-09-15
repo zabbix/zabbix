@@ -311,7 +311,6 @@ class CSVGPie {
 			.attr('data-hintbox-static', 1)
 			.attr('data-hintbox-track-mouse', 1)
 			.attr('data-hintbox-delay', 0)
-			.style('fill', d => d.data.color)
 			.style('stroke-width', this.#config.space)
 			.each((d, index, nodes) => nodes[index]._current = d);
 
@@ -321,6 +320,7 @@ class CSVGPie {
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
+			.style('fill', d => d.data.color)
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_WHOLE)
 			.attrTween('d', (d, index, nodes) => {
