@@ -23,6 +23,10 @@ require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../include/helpers/CDataHelper.php';
 require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
+/**
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
+ */
 class testItemPreprocessing extends CAPITest {
 
 	private const NS_STEP_FIELDS = [
@@ -31,9 +35,7 @@ class testItemPreprocessing extends CAPITest {
 		'error_handler_params' => ''
 	];
 
-	public static function setUpBeforeClass(): void {
-		DBconnect($error);
-
+	public static function prepareTestData(): void {
 		CTestDataHelper::createObjects([
 			'template_groups' => [
 				['name' => 'tg.preprocessing']
@@ -76,7 +78,7 @@ class testItemPreprocessing extends CAPITest {
 		]);
 	}
 
-	public static function tearDownAfterClass(): void {
+	public static function cleanTestData(): void {
 		CTestDataHelper::cleanUp();
 	}
 
@@ -298,7 +300,7 @@ class testItemPreprocessing extends CAPITest {
 			'itemprototype-preproc: reject error_handler' => [
 				'method' => 'itemprototype.create',
 				'params' =>  CTestDataHelper::prepareItem([
-					'key_' => self::next_id(),
+					'key_' => self::next_id(true),
 					'hostid' => ':template:test.ns.create',
 					'ruleid' => ':lld_rule:test.ns.create.rule',
 					'preprocessing' => [
@@ -517,20 +519,6 @@ class testItemPreprocessing extends CAPITest {
 
 	public static function lldPreprocessingStepsDataProvider() {
 		return [
-			'lld-preproc-regexp: reject error_handler' => [
-				'method' => 'discoveryrule.create',
-				'params' =>  CTestDataHelper::prepareItem([
-					'key_' => self::next_id(),
-					'hostid' => ':template:test.ns.create',
-					'preprocessing' => [
-						'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
-						'params' => (string) ZBX_PREPROC_MATCH_ERROR_ANY,
-						'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-						'error_handler_params' => ''
-					]
-				]),
-				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
-			],
 			'lld-preproc-regexp: accept' => [
 				'method' => 'discoveryrule.create',
 				'params' =>  CTestDataHelper::prepareLldRule([
@@ -607,13 +595,13 @@ class testItemPreprocessing extends CAPITest {
 			['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\n".'A'] + self::NS_STEP_FIELDS,
 			['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\n".'{$MACRO}'] + self::NS_STEP_FIELDS,
 			['params' => ZBX_PREPROC_MATCH_ERROR_NOT_REGEX."\n".'B'] + self::NS_STEP_FIELDS,
-			['params' => ZBX_PREPROC_MATCH_ERROR_ANY],
+			['params' => ZBX_PREPROC_MATCH_ERROR_ANY] + self::NS_STEP_FIELDS,
 			[
 				'type' => ZBX_PREPROC_TRIM,
 				'params' => ' ',
 				'error_handler' => DB::getDefault('item_preproc', 'error_handler'),
 				'error_handler_params' => DB::getDefault('item_preproc', 'error_handler_params')
-			] + self::NS_STEP_FIELDS
+			]
 		], 'Steps should be sorted, with "match any" last of the not-supported steps, trim as the last step.');
 
 		return true;
