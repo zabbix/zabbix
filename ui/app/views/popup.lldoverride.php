@@ -80,9 +80,7 @@ $override_evaltype = (new CDiv([
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 	]))->addClass(ZBX_STYLE_CELL),
 	(new CDiv([
-		(new CSpan(''))
-			->addStyle('white-space: normal;')
-			->setId('overrides_expression'),
+		(new CSpan(''))->setId('overrides_expression'),
 		(new CTextBox('overrides_formula', $options['overrides_formula'], $options['templated'],
 				DB::getFieldLength('lld_override', 'formula')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

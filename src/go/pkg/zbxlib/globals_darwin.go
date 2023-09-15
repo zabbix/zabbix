@@ -58,8 +58,6 @@ typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 
-int CONFIG_MAX_LINES_PER_SECOND = 20;
-
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
 const char	*progname = NULL;

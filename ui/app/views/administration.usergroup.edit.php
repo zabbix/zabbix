@@ -185,7 +185,7 @@ $new_templategroup_right_table = (new CTable())
 			->setLabel(_('Include subgroups'))
 	)
 	->addRow(
-		(new CSimpleButton(_('Add')))
+		(new CButtonLink(_('Add')))
 			->onClick('javascript: usergroups.submitNewTemplateGroupRight("usergroup.templategroupright.add");')
 	);
 
