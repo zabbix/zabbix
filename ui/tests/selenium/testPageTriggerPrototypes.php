@@ -41,7 +41,7 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 	*/
 	public function testPageTriggerPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
-		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context=host');
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
@@ -76,12 +76,12 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 	public function testPageTriggerPrototypes_SimpleDelete($data) {
 		$triggerid = $data['triggerid'];
 
-		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$data['hostid'].'&parent_discoveryid='.
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context=host');
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('g_triggerid_'.$triggerid);
-		$this->zbxTestClickButton('triggerprototype.massdelete');
+		$this->query('button:Delete')->one()->click();
 
 		$this->zbxTestAcceptAlert();
 
@@ -121,10 +121,10 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 		);
 		$triggerids = zbx_objectValues($triggerids, 'itemid');
 
-		$this->zbxTestLogin('trigger_prototypes.php?hostid='.$rule['hostid'].'&parent_discoveryid='.$druleid.'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$druleid.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckboxSelect('all_triggers');
-		$this->zbxTestClickButton('triggerprototype.massdelete');
+		$this->query('button:Delete')->one()->click();
 
 		$this->zbxTestAcceptAlert();
 
