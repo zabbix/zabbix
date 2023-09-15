@@ -1,0 +1,1 @@
+..F....... [ZBX-21094] fixed graphs not displaying values when items do not have trends and trend storage period is overridden in configuration (Ivo)
