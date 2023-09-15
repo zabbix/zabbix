@@ -962,7 +962,7 @@ static int	DBpatch_6050092(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from widget_field"
 			" where name='source_type'"
-				" and widget_fieldid in (select widgetid from widget where type='map')"))
+				" and widgetid in (select widgetid from widget where type='map')"))
 	{
 		return FAIL;
 	}
@@ -979,7 +979,7 @@ static int	DBpatch_6050093(void)
 			"update widget_field"
 			" set name='sysmapid._reference'"
 			" where name='filter_widget_reference'"
-				" and widget_fieldid in (select widgetid from widget where type='map')"))
+				" and widgetid in (select widgetid from widget where type='map')"))
 	{
 		return FAIL;
 	}
@@ -996,7 +996,7 @@ static int	DBpatch_6050094(void)
 			"update widget_field"
 			" set type='1',name='override_hostid._reference',value_int=0,value_str='DASHBOARD._hostid'"
 			" where name='filter_widget_reference'"
-				" and widget_fieldid in (select widgetid from widget where type='map')"))
+				" and widgetid in (select widgetid from widget where type='map')"))
 	{
 		return FAIL;
 	}
@@ -1064,7 +1064,7 @@ static int	DBpatch_6050096(void)
 			"update widget_field"
 			" set name='time_period.from'"
 			" where name='time_from'"
-				" and widget_fieldid in (select widgetid from widget where type='svggraph')"))
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
 	{
 		return FAIL;
 	}
@@ -1081,7 +1081,7 @@ static int	DBpatch_6050097(void)
 			"update widget_field"
 			" set name='time_period.to'"
 			" where name='time_to'"
-				" and widget_fieldid in (select widgetid from widget where type='svggraph')"))
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
 	{
 		return FAIL;
 	}
@@ -1097,7 +1097,7 @@ static int	DBpatch_6050098(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from widget_field"
 			" where name='graph_time'"
-				" and widget_fieldid in (select widgetid from widget where type='svggraph')"))
+				" and widgetid in (select widgetid from widget where type='svggraph')"))
 	{
 		return FAIL;
 	}
@@ -1114,7 +1114,7 @@ static int	DBpatch_6050099(void)
 			"update widget_field"
 			" set name='date_period.from'"
 			" where name='date_from'"
-				" and widget_fieldid in (select widgetid from widget where type='slareport')"))
+				" and widgetid in (select widgetid from widget where type='slareport')"))
 	{
 		return FAIL;
 	}
@@ -1131,7 +1131,7 @@ static int	DBpatch_6050100(void)
 			"update widget_field"
 			" set name='date_period.to'"
 			" where name='date_to'"
-				" and widget_fieldid in (select widgetid from widget where type='slareport')"))
+				" and widgetid in (select widgetid from widget where type='slareport')"))
 	{
 		return FAIL;
 	}
