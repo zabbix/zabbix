@@ -76,8 +76,9 @@ else {
 			$color = $column_config['base_color'];
 
 			if (array_key_exists('item', $column)) {
-				$use_thresholds = $column['item']['value_type'] != ITEM_VALUE_TYPE_STR
-					&& $column['item']['value_type'] != ITEM_VALUE_TYPE_TEXT;
+				$use_thresholds = ($column['item']['value_type'] != ITEM_VALUE_TYPE_STR
+					&& $column['item']['value_type'] != ITEM_VALUE_TYPE_TEXT)
+					|| $column_config['aggregate_function'] == AGGREGATE_COUNT;
 			}
 
 			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
