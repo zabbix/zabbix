@@ -322,7 +322,7 @@ class testFormTemplateDashboards extends CWebTest {
 									],
 									[
 										'type' => 1,
-										'name' => 'date_from',
+										'name' => 'date_period.from',
 										'value' => '2023-09-01'
 									]
 								]

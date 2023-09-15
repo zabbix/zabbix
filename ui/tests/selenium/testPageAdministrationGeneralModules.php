@@ -136,13 +136,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'source_type',
-										'value' => 2
-									],
-									[
 										'type' => 1,
-										'name' => 'filter_widget_reference',
+										'name' => 'sysmapid._reference',
 										'value' => 'GZCSV'
 									]
 								]

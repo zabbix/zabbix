@@ -114,9 +114,9 @@ class testDashboardPlainTextWidget extends CWebTest {
 										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => '1'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							],
@@ -204,9 +204,9 @@ class testDashboardPlainTextWidget extends CWebTest {
 										'value' => '99142' // item name in widget 'Test item host: Master item'.
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => '1'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							]

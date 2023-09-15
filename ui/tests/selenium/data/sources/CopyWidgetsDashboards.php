@@ -237,9 +237,9 @@ class CopyWidgetsDashboards {
 										'value' => 2
 									],
 									[
-										'type' => '0',
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => '0',
@@ -340,13 +340,8 @@ class CopyWidgetsDashboards {
 										'value' => '120'
 									],
 									[
-										'type' => 0,
-										'name' => 'source_type',
-										'value' => 2
-									],
-									[
 										'type' => 1,
-										'name' => 'filter_widget_reference',
+										'name' => 'sysmapid._reference',
 										'value' => 'STZDI'
 									],
 									[
@@ -837,9 +832,9 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => 0,
@@ -863,9 +858,9 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => 0,
@@ -1172,9 +1167,9 @@ class CopyWidgetsDashboards {
 										'value' => 5
 									],
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 0
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => 0,
@@ -1288,9 +1283,9 @@ class CopyWidgetsDashboards {
 										'value' => 0
 									],
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							],
@@ -1660,9 +1655,9 @@ class CopyWidgetsDashboards {
 										'value' => 56
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							]
@@ -1965,9 +1960,9 @@ class CopyWidgetsDashboards {
 										'value' => 52
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							]

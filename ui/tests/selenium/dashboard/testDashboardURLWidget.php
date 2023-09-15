@@ -82,9 +82,9 @@ class testDashboardURLWidget extends CWebTest {
 										'value' => 'http://zabbix.com'
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => '1'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							],
