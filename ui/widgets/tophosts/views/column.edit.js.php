@@ -156,6 +156,16 @@ window.tophosts_column_edit_form = new class {
 			for (const element of document.querySelectorAll(time_period_fields)) {
 				element.disabled = !this._item_time.checked;
 			}
+
+			['#time_from', '#time_to'].forEach(field => {
+				const element = document.querySelector(field);
+
+				if (element) {
+					element.addEventListener('focusout', () => {
+						element.value = element.value.trim();
+					});
+				}
+			});
 		}
 
 		aggregate_options.addEventListener('change', function() {

@@ -82,7 +82,7 @@ class ColumnEdit extends CController {
 
 		$column = $this->getInputAll();
 
-		if (array_key_exists('aggregate_function', $column) && $column['aggregate_function'] != AGGREGATE_NONE
+		if ($ret && array_key_exists('aggregate_function', $column) && $column['aggregate_function'] != AGGREGATE_NONE
 				&& array_key_exists('item_time', $column) && $column['time_from'] != '' && $column['time_to'] != '') {
 			$ts = [];
 			$ts['now'] = time();
