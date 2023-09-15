@@ -65,11 +65,15 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	 */
 	public function testInheritanceTrigger_SimpleUpdate($data) {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
+		$description = CDBHelper::getValue('SELECT description FROM triggers WHERE triggerid='.$data['triggerid']);
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('triggers.php?form=update&triggerid='.$data['triggerid'].'&context=host');
+		$this->zbxTestLogin('zabbix.php?action=trigger.list&context=host&filter_rst=1&filter_hostids[0]='.$this->hostid);
+		$this->zbxTestClickLinkTextWait($description);
+
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->zbxTestCheckTitle('Configuration of triggers');
-		$this->zbxTestClickWait('update');
+		$this->query('button:Update')->one()->click();
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger updated');
 
 		$this->assertEquals($oldHashTriggers, CDBHelper::getHash($sqlTriggers));
@@ -90,6 +94,7 @@ class testInheritanceTrigger extends CLegacyWebTest {
 					'description' => 'testInheritanceTrigger1',
 					'expression' => 'last(/Inheritance test template/key-item-inheritance-test)=0',
 					'errors' => [
+						'Cannot add trigger',
 						'Trigger "testInheritanceTrigger1" already exists on "Inheritance test template".'
 					]
 				]
@@ -101,16 +106,16 @@ class testInheritanceTrigger extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testInheritanceTrigger_SimpleCreate($data) {
-		$this->zbxTestLogin('triggers.php?filter_set=1&context=template&filter_hostids[0]='.$this->templateid);
+		$this->zbxTestLogin('zabbix.php?action=trigger.list&context=template&filter_rst=1&filter_hostids[0]='.$this->templateid);
 		$this->zbxTestContentControlButtonClickTextWait('Create trigger');
-
-		$this->zbxTestInputType('description', $data['description']);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->zbxTestInputType('name', $data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);
-
-		$this->zbxTestClickWait('add');
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$dialog->ensureNotPresent();
 				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestCheckHeader('Triggers');
 				$this->zbxTestTextPresent('Trigger added');
@@ -119,7 +124,6 @@ class testInheritanceTrigger extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of triggers');
 				$this->zbxTestCheckHeader('Triggers');
-				$this->zbxTestTextPresent('Cannot add trigger');
 				$this->zbxTestTextPresent($data['errors']);
 				break;
 		}

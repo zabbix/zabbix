@@ -60,11 +60,14 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceTriggerPrototype_SimpleUpdate($data) {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
+		$description = CDBHelper::getValue('SELECT description FROM triggers WHERE triggerid='.$data['triggerid']);
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('trigger_prototypes.php?form=update&context=host&triggerid='.$data['triggerid'].
-				'&parent_discoveryid='.$data['parent_itemid']);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestClickLinkTextWait($description);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->query('button:Update')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('Trigger prototype updated');
 
@@ -100,16 +103,17 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceTriggerPrototype_SimpleCreate($data) {
 
-		$this->zbxTestLogin('trigger_prototypes.php?form=Create+trigger+prototype&context=host&parent_discoveryid='.
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.
 				$this->discoveryRuleId);
-
-		$this->zbxTestInputTypeByXpath("//input[@name='description']", $data['description']);
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->zbxTestInputTypeByXpath("//input[@name='name']", $data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);
-
-		$this->zbxTestClickWait('add');
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$dialog->ensureNotPresent();
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 				$this->zbxTestCheckHeader('Trigger prototypes');
 				$this->zbxTestTextPresent('Trigger prototype added');

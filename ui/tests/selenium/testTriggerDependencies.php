@@ -81,27 +81,31 @@ class testTriggerDependencies extends CLegacyWebTest {
 		];
 		$update_id = ($data['template'] === self::TEMPLATE_APACHE) ? $ids[self::TEMPLATE_APACHE] : $ids[self::TEMPLATE_AGENT];
 
-		$this->zbxTestLogin('triggers.php?filter_set=1&context=template&filter_hostids[0]='.$update_id);
+		$this->zbxTestLogin('zabbix.php?action=trigger.list&filter_set=1&context=template&filter_hostids[0]='.$update_id);
 		$this->zbxTestCheckTitle('Configuration of triggers');
 
 		$this->zbxTestClickLinkTextWait($data['trigger']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->zbxTestClickWait('tab_dependenciesTab');
 
-		$this->zbxTestClick('add_dep_trigger');
-		$this->zbxTestLaunchOverlayDialog('Triggers');
-		$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
+		$this->zbxTestClick('add-dep-template-trigger');
+		$host = COverlayDialogElement::find()->waitUntilReady()->all()->last()->query('class:multiselect-control')->
+				asMultiselect()->one();
 		$host->fill([
 			'values' => $data['template'],
 			'context' => 'Templates'
 		]);
-		$this->zbxTestClickLinkTextWait($data['dependency']);
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add_dep_trigger'));
-		$this->zbxTestClickWait('update');
+		$second_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$second_dialog->query('link:'.$data['dependency'])->one()->click();
+		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add-dep-template-trigger'));
+		$this->query('button:Update')->one()->click();
 		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, 'Cannot update trigger', $data['error_message']);
+			COverlayDialogElement::find()->one()->close();
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Trigger updated');
+			COverlayDialogElement::ensureNotPresent();
 		}
 	}
 
