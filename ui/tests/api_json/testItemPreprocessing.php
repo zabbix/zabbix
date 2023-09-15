@@ -93,6 +93,20 @@ class testItemPreprocessing extends CAPITest {
 
 	public static function itemPreprocessingStepsDataProvider() {
 		return [
+			'item-preproc: reject error_handler' => [
+				'method' => 'item.create',
+				'params' =>  CTestDataHelper::prepareItem([
+					'key_' => self::next_id(),
+					'hostid' => ':template:test.ns.create',
+					'preprocessing' => [
+						'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+						'params' => (string) ZBX_PREPROC_MATCH_ERROR_ANY,
+						'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params' => ''
+					]
+				]),
+				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
+			],
 			'item-preproc: reject no params' => [
 				'method' => 'item.create',
 				'params' =>  CTestDataHelper::prepareItem([
@@ -281,6 +295,21 @@ class testItemPreprocessing extends CAPITest {
 
 	public static function itemPrototypeStepsPreprocessingDataProvider() {
 		return [
+			'itemprototype-preproc: reject error_handler' => [
+				'method' => 'itemprototype.create',
+				'params' =>  CTestDataHelper::prepareItem([
+					'key_' => self::next_id(),
+					'hostid' => ':template:test.ns.create',
+					'ruleid' => ':lld_rule:test.ns.create.rule',
+					'preprocessing' => [
+						'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+						'params' => (string) ZBX_PREPROC_MATCH_ERROR_ANY,
+						'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params' => ''
+					]
+				]),
+				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
+			],
 			'itemprototype-preproc: reject no params' => [
 				'method' => 'itemprototype.create',
 				'params' =>  CTestDataHelper::prepareItem([
@@ -488,6 +517,20 @@ class testItemPreprocessing extends CAPITest {
 
 	public static function lldPreprocessingStepsDataProvider() {
 		return [
+			'lld-preproc-regexp: reject error_handler' => [
+				'method' => 'discoveryrule.create',
+				'params' =>  CTestDataHelper::prepareItem([
+					'key_' => self::next_id(),
+					'hostid' => ':template:test.ns.create',
+					'preprocessing' => [
+						'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+						'params' => (string) ZBX_PREPROC_MATCH_ERROR_ANY,
+						'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params' => ''
+					]
+				]),
+				'error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
+			],
 			'lld-preproc-regexp: accept' => [
 				'method' => 'discoveryrule.create',
 				'params' =>  CTestDataHelper::prepareLldRule([
