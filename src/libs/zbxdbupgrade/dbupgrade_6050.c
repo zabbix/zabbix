@@ -1188,12 +1188,7 @@ static int	DBpatch_6050101(void)
 						0, /* no output limit */
 						&replace_to))
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			zabbix_log(LOG_LEVEL_CRIT, "internal error, unexpected widget_field.name value: \"%s\"",
-					replace_from);
-			zbx_db_free_result(result);
-
-			goto out;
+			continue;
 		}
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
