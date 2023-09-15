@@ -137,7 +137,8 @@ class WidgetForm extends CWidgetForm {
 				)
 			)
 			->addField(
-				(new CWidgetFieldColumnsList('columns', _('Columns')))->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				(new CWidgetFieldColumnsList('columns', _('Columns')))
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('order', _('Order'), [
