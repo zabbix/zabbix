@@ -3763,13 +3763,13 @@ div.dashboard-widget-hostavail .host-avail-widget tr td {
 div.dashboard-widget-hostavail .host-avail-widget th, div.dashboard-widget-hostavail .host-avail-widget div {
   color: #ffffff; }
   div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-true), div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-true) {
-    background: #86cc89; }
+    background: #34af67; }
   div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-mixed), div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-mixed) {
-    background: #ffc859; }
+    background: #f1a50b; }
   div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-false), div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-false) {
-    background: #e45959; }
+    background: #d64e4e; }
   div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-unknown), div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-unknown) {
-    background: #97aab3; }
+    background: #000000; }
   div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-total), div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-total) {
     background: transparent; }
 
