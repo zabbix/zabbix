@@ -32,7 +32,7 @@
 		: null
 	)
 	->addField(
-		new CWidgetFieldCheckBoxListView($data['fields']['interface_type'])
+		(new CWidgetFieldCheckBoxListView($data['fields']['interface_type']))->addClass('interface_type')
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
@@ -40,4 +40,9 @@
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
 	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['only_totals'])
+	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_host_availability_form.init()')
 	->show();

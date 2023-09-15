@@ -27,33 +27,55 @@
  */
 
 $type_field_names = [
-	INTERFACE_TYPE_AGENT => _('Zabbix agent'),
+	'total_hosts' => _('Total Hosts'),
+	INTERFACE_TYPE_AGENT_ACTIVE => _('Agent (active)'),
+	INTERFACE_TYPE_AGENT => _('Agent (passive)'),
 	INTERFACE_TYPE_SNMP => _('SNMP'),
 	INTERFACE_TYPE_JMX => _('JMX'),
 	INTERFACE_TYPE_IPMI => _('IPMI')
 ];
 
-$header = [
-	STYLE_HORIZONTAL => [
-		'',
-		_x('Available', 'compact table header'),
-		_x('Not available', 'compact table header'),
-		_x('Unknown', 'compact table header'),
-		_x('Total', 'compact table header')
+$interface_states = [INTERFACE_AVAILABLE_TRUE, INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_MIXED,
+	INTERFACE_AVAILABLE_UNKNOWN
+];
+
+$interface_states_fields = [
+	INTERFACE_AVAILABLE_TRUE => ['name' => _('Available'), 'style' => ZBX_STYLE_HOST_AVAIL_TRUE,
+		'context' => _x('Available', 'compact table header')
 	],
+	INTERFACE_AVAILABLE_FALSE => ['name' => _('Not available'), 'style' => ZBX_STYLE_HOST_AVAIL_FALSE,
+		'context' => _x('Not available', 'compact table header')
+	],
+	INTERFACE_AVAILABLE_MIXED => ['name' => _('Mixed'), 'style' => ZBX_STYLE_HOST_AVAIL_MIXED,
+		'context' => _x('Mixed', 'compact table header')
+	],
+	INTERFACE_AVAILABLE_UNKNOWN => ['name' => _('Unknown'), 'style' => ZBX_STYLE_HOST_AVAIL_UNKNOWN,
+		'context' => _x('Unknown', 'compact table header')
+	],
+	'total' => ['name' => _('Total'), 'style' => ZBX_STYLE_HOST_AVAIL_TOTAL,
+		'context' => _x('Total', 'compact table header')
+	]
+];
+
+$header = [
+	STYLE_HORIZONTAL => [''],
 	STYLE_VERTICAL => ['']
 ];
 
-foreach ($type_field_names as $key => $value) {
-	if (!in_array($key, $data['hosts_types'])) {
+foreach ($interface_states_fields as $field) {
+	$header[STYLE_HORIZONTAL][] = (new CSpan($field['context']))->addClass($field['style']);
+}
+
+foreach ($type_field_names as $type => $interface_name) {
+	if (!in_array($type, $data['interface_types']) && $type !== 'total_hosts') {
 		continue;
 	}
 
-	$header[STYLE_VERTICAL][] = $value;
+	$header[STYLE_VERTICAL][] = $interface_name;
 }
 
-if (count($data['hosts_types']) == 1) {
-	$counts = $data['hosts_count'][$data['hosts_types'][0]];
+if (count($data['interface_types']) == 1 || $data['only_totals'] == 1) {
+	$counts = $data['total_hosts'];
 
 	$table = (new CDiv())
 		->addClass(ZBX_STYLE_HOST_AVAIL_WIDGET)
@@ -63,21 +85,14 @@ if (count($data['hosts_types']) == 1) {
 			: ZBX_STYLE_TOTALS_LIST_VERTICAL
 		);
 
-	$table->addItem((new CDiv([
-		(new CSpan($counts[INTERFACE_AVAILABLE_TRUE]))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT), _('Available')
-	]))->addClass(ZBX_STYLE_HOST_AVAIL_TRUE));
-
-	$table->addItem((new CDiv([
-		(new CSpan($counts[INTERFACE_AVAILABLE_FALSE]))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT), _('Not available')
-	]))->addClass(ZBX_STYLE_HOST_AVAIL_FALSE));
-
-	$table->addItem((new CDiv([
-		(new CSpan($counts[INTERFACE_AVAILABLE_UNKNOWN]))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT), _('Unknown')
-	]))->addClass(ZBX_STYLE_HOST_AVAIL_UNKNOWN));
-
-	$table->addItem((new CDiv([
-		(new CSpan($data['hosts_total'][$data['hosts_types'][0]]))->addClass(ZBX_STYLE_TOTALS_LIST_COUNT), _('Total')
-	]))->addClass(ZBX_STYLE_HOST_AVAIL_TOTAL));
+	foreach ($interface_states_fields as $state => $field) {
+		$table->addItem((new CDiv([
+			(new CSpan($state != 'total' ? $counts[$state] : $data['total_hosts_sum']))
+				->addClass(ZBX_STYLE_TOTALS_LIST_COUNT)
+				->addClass($field['style']),
+			$field['name']
+		])));
+	}
 }
 else {
 	$table = (new CTableInfo)
@@ -85,33 +100,49 @@ else {
 		->setHeadingColumn(0)
 		->addClass(ZBX_STYLE_HOST_AVAIL_WIDGET);
 
-	foreach ($type_field_names as $key => $value) {
-		if (in_array($key, $data['hosts_types'])) {
-			$counts = $data['hosts_count'][$key];
+	foreach ($type_field_names as $type => $interface_name) {
+		if (!in_array($type, $data['interface_types']) && $type !== 'total_hosts') {
+			continue;
+		}
 
-			$available_row = (new CCol($counts[INTERFACE_AVAILABLE_TRUE]))->addClass(ZBX_STYLE_HOST_AVAIL_TRUE);
-			$not_available_row = (new CCol($counts[INTERFACE_AVAILABLE_FALSE]))->addClass(ZBX_STYLE_HOST_AVAIL_FALSE);
-			$unknown_row = (new CCol($counts[INTERFACE_AVAILABLE_UNKNOWN]))->addClass(ZBX_STYLE_HOST_AVAIL_UNKNOWN);
-			$total_row = (new CCol($data['hosts_total'][$key]))->addClass(ZBX_STYLE_HOST_AVAIL_TOTAL);
+		$interface_data = [];
+		$interface_data['name'] = $interface_name;
 
-			if ($data['layout'] == STYLE_HORIZONTAL) {
-				$table->addRow([$value, $available_row, $not_available_row, $unknown_row, $total_row]);
+		$counts = $type !== 'total_hosts' ? $data['interface_type_count'][$type] : $data['total_hosts'];
+
+		foreach ($interface_states as $state) {
+			if ($type == INTERFACE_TYPE_AGENT_ACTIVE && $state == INTERFACE_AVAILABLE_MIXED) {
+				$interface_data[$state] = (new CCol(''));
 			}
 			else {
-				$rows[INTERFACE_AVAILABLE_TRUE][] = $available_row;
-				$rows[INTERFACE_AVAILABLE_FALSE][] = $not_available_row;
-				$rows[INTERFACE_AVAILABLE_UNKNOWN][] = $unknown_row;
-				$rows['hosts_total'][] = $total_row;
+				$interface_data[$state] = (new CCol($counts[$state]));
+			}
+		}
+
+		$interface_data['total'] = (new CCol($type == 'total_hosts'
+			? $data['total_hosts_sum']
+			: $data['interface_totals'][$type]
+		));
+
+		if ($data['layout'] == STYLE_HORIZONTAL) {
+			$table->addRow($interface_data);
+		}
+		else {
+			unset($interface_data['name']);
+
+			foreach ($interface_data as $key => $field) {
+				$rows[$key][] = $field;
 			}
 		}
 	}
 
 	if ($data['layout'] == STYLE_VERTICAL) {
-		$table
-			->addRow(array_merge([_('Available')], $rows[INTERFACE_AVAILABLE_TRUE]))
-			->addRow(array_merge([_('Not available')], $rows[INTERFACE_AVAILABLE_FALSE]))
-			->addRow(array_merge([_('Unknown')], $rows[INTERFACE_AVAILABLE_UNKNOWN]))
-			->addRow(array_merge([_('Total')], $rows['hosts_total']));
+		foreach ($interface_states_fields as $state => $field) {
+			$table->addRow(array_merge(
+				[(new CSpan($field['name']))->addClass($field['style'])],
+				$rows[$state]
+			));
+		}
 	}
 }
 

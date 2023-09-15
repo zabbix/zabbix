@@ -6,21 +6,42 @@ div.dashboard-widget-hostavail {
 			border-left: 1px dotted $table-border-color;
 		}
 
-		.host-avail-true {
-			background: $host-avail-true-bg-color;
+		tr {
+			th {
+				min-width: 120px;
+				width: 120px;
+			}
+
+			td {
+				min-width: 80px;
+			}
 		}
 
-		.host-avail-false {
-			background: $host-avail-false-bg-color;
+		th, div {
+			color: $font-color;
+
+			&:has(.host-avail-true) {
+				background: $host-avail-true-bg-color;
+			}
+
+			&:has(.host-avail-mixed) {
+				background: $host-avail-mixed-bg-color;
+			}
+
+			&:has(.host-avail-false) {
+				background: $host-avail-false-bg-color;
+			}
+
+			&:has(.host-avail-unknown) {
+				background: $host-avail-unknown-bg-color;
+			}
+
+			&:has(.host-avail-total) {
+				background: $host-avail-total-bg-color;
+			}
 		}
 
-		.host-avail-unknown {
-			background: $host-avail-unknown-bg-color;
-		}
 
-		.host-avail-total {
-			background: $host-avail-total-bg-color;
-		}
 	}
 }
 
@@ -33,11 +54,15 @@ div.dashboard-widget-hostavail {
 				border-left: 1px solid $ui-border-color;
 			}
 
-			.host-avail-true,
-			.host-avail-false,
-			.host-avail-unknown,
-			.host-avail-total {
+			th, div {
 				background: transparent;
+
+				.host-avail-true,
+				.host-avail-false,
+				.host-avail-unknown,
+				.host-avail-total {
+					background: transparent;
+				}
 			}
 		}
 	}

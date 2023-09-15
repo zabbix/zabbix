@@ -2174,6 +2174,7 @@ define('ZBX_STYLE_COLUMN_MIDDLE', 'column-middle');
 // Widget "Host availability" styles.
 define('ZBX_STYLE_HOST_AVAIL_WIDGET', 'host-avail-widget');
 define('ZBX_STYLE_HOST_AVAIL_TRUE', 'host-avail-true');
+define('ZBX_STYLE_HOST_AVAIL_MIXED', 'host-avail-mixed');
 define('ZBX_STYLE_HOST_AVAIL_FALSE', 'host-avail-false');
 define('ZBX_STYLE_HOST_AVAIL_UNKNOWN', 'host-avail-unknown');
 define('ZBX_STYLE_HOST_AVAIL_TOTAL', 'host-avail-total');
