@@ -17,7 +17,8 @@ div.dashboard-widget-hostavail {
 			}
 		}
 
-		th, div {
+		th,
+		div {
 			color: $font-color;
 
 			&:has(.host-avail-true) {
@@ -54,7 +55,8 @@ div.dashboard-widget-hostavail {
 				border-left: 1px solid $ui-border-color;
 			}
 
-			th, div {
+			th,
+			div {
 				background: transparent;
 
 				.host-avail-true,
