@@ -87,7 +87,7 @@
 					this.#expressionConstructor({'remove_expression': e.target.dataset.id});
 				}
 				else if (e.target.classList.contains('js-expression')) {
-					copy_expression(e.target.id, <?= json_encode(TRIGGER_EXPRESSION) ?>);
+					this.#copy_expression(e.target, <?= json_encode(TRIGGER_EXPRESSION) ?>);
 				}
 				else if (e.target.id === 'test-expression') {
 					return PopUp('popup.testtriggerexpr',
@@ -128,7 +128,7 @@
 						});
 				}
 				else if (e.target.classList.contains('js-recovery-expression')) {
-					copy_expression(e.target.id, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
+					this.#copy_expression(e.target, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
 				}
 				else if (e.target.id === 'add-dep-trigger' || e.target.id === 'add-dep-template-trigger'
 						|| e.target.id === 'add-dep-host-trigger' || e.target.id === 'add-dep-trigger-prototype') {
@@ -694,6 +694,25 @@
 					this.form.querySelector(button).disabled = true;
 				});
 			}
+		}
+
+		#copy_expression(target, type) {
+			const element = (type == <?= json_encode(TRIGGER_EXPRESSION) ?>)
+				? this.expression
+				: this.form.querySelector('#recovery_expression');
+
+			if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
+				return null;
+			}
+
+			if (typeof target.textContent != 'undefined') {
+				element.value = target.textContent;
+			}
+			else {
+				element.value = target.innerText;
+			}
+
+			element.dispatchEvent(new Event('change'))
 		}
 
 		#post(url, data) {

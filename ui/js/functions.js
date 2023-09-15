@@ -50,30 +50,6 @@ function delete_expression(id, type) {
 	}
 }
 
-/**
- * Insert expression part into input field.
- *
- * @param string id		Expression temporary ID.
- * @param number type	Expression (type = 0) or recovery expression (type = 1).
- */
-function copy_expression(id, type) {
-	const element = (type == 0)
-		? document.getElementById('expression')
-		: document.getElementById('recovery_expression');
-
-	if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
-		return null;
-	}
-
-	const src = document.getElementById(id);
-	if (typeof src.textContent != 'undefined') {
-		element.value = src.textContent;
-	}
-	else {
-		element.value = src.innerText;
-	}
-}
-
 function testUserSound(idx) {
 	var element = document.getElementById(idx);
 	var sound = element.options[element.selectedIndex].value;
