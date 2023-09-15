@@ -1179,13 +1179,13 @@ static int	DBpatch_6050101(void)
 						replace_from,
 						regex1,
 						"\\1.\\3.\\2.\\4",
-						0, /* no output limit */
+						0,	/* no output limit */
 						&replace_to)
 				&& SUCCEED != zbx_mregexp_sub_precompiled(
 						replace_from,
 						regex2,
 						"\\1.\\3.\\2",
-						0, /* no output limit */
+						0,	/* no output limit */
 						&replace_to))
 		{
 			continue;
@@ -1211,7 +1211,7 @@ static int	DBpatch_6050101(void)
 
 	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (16 < sql_offset)    /* in ORACLE always present begin..end; */
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
 		zbx_db_execute("%s", sql);
 
 	ret = SUCCEED;
