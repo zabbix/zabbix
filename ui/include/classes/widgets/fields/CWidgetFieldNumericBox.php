@@ -44,7 +44,7 @@ class CWidgetFieldNumericBox extends CWidgetField {
 	protected function getValidationRules(bool $strict = false): array {
 		$validation_rules = parent::getValidationRules($strict);
 
-		if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
 			self::setValidationRuleFlag($validation_rules, API_NOT_EMPTY);
 		}
 

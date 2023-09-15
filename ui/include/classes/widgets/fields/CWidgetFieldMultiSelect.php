@@ -93,7 +93,7 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 				self::FOREIGN_REFERENCE_KEY => ['type' => API_STRING_UTF8]
 			]];
 
-			if ($strict && ($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
 				self::setValidationRuleFlag($validation_rules['fields'][self::FOREIGN_REFERENCE_KEY], API_NOT_EMPTY);
 			}
 		}

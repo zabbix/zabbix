@@ -45,10 +45,6 @@ class CWidgetFieldSelect extends CWidgetField {
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
-	public function setValue($value): self {
-		return parent::setValue((int) $value);
-	}
-
 	public function getValues(): array {
 		return $this->values;
 	}

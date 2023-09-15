@@ -923,7 +923,7 @@ class CWidgetBase {
 
 			for (const {container, path} of traverse) {
 				for (const key in container) {
-					if (typeof container[key] !== 'object') {
+					if (typeof container[key] !== 'object' || container[key] === null) {
 						continue;
 					}
 
