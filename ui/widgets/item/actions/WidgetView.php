@@ -386,7 +386,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_TEXT:
 					case ITEM_VALUE_TYPE_LOG:
 					case ITEM_VALUE_TYPE_BINARY:
-						if ($aggregate_function == 'count') {
+						if ($aggregate_function == AGGREGATE_COUNT) {
 							$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
 
 							$formatted_value = formatHistoryValueRaw($last_value, $item, false, [
