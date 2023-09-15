@@ -271,8 +271,9 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger configuration form tab data.
 			[
 				[
-					'url' => 'triggers.php?hostid=40001&context=host&form=create',
-					'form' => 'name:triggersForm',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'create_button' => 'Create trigger',
+					'form' => 'id:trigger-edit',
 					'tabs' => [
 						[
 							'name' => 'Tags',
@@ -305,8 +306,9 @@ class testFormTabIndicators extends CWebTest {
 			// Trigger prototype configuration form tab data.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host&form=create',
-					'form' => 'name:triggersForm',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
+					'create_button' => 'Create trigger prototype',
+					'form' => 'id:trigger-edit',
 					'tabs' => [
 						[
 							'name' => 'Tags',
@@ -679,9 +681,6 @@ class testFormTabIndicators extends CWebTest {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		}
-		elseif ($data['form'] === 'name:triggersForm') {
-			$form = $this->query($data['form'])->asForm(['normalized' => true])->one()->waitUntilVisible();
-		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 		}
@@ -956,10 +955,6 @@ class testFormTabIndicators extends CWebTest {
 						}
 						$overlay->submit();
 						$overlay->waitUntilNotVisible();
-					}
-
-					if (CTestArrayHelper::get($tab, 'name') !== 'Message templates') {
-						COverlayDialogElement::ensureNotPresent();
 					}
 				}
 				break;
