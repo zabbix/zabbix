@@ -24,9 +24,6 @@
 
 ZBX_VECTOR_IMPL(eval_token, zbx_eval_token_t)
 
-#define HIST_STR_V64_COMPAT_ENABLED	1
-#define HIST_STR_V64_COMPAT_DISABLED	0
-
 static int	is_whitespace(char c)
 {
 	return 0 != isspace((unsigned char)c) ? SUCCEED : FAIL;
@@ -393,11 +390,10 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
  *                                                                            *
  * Purpose: parses string variable token                                      *
  *                                                                            *
- * Parameters: ctx                 - [IN] evaluation context                  *
- *             pos                 - [IN] starting position                   *
- *             hist_str_v64_compat - [IN] allow old style strings             *
- *             token               - [OUT] parsed token                       *
- *             error               - [OUT] error message in case of failure   *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
+ *             token - [OUT] parsed token                                     *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
@@ -405,8 +401,7 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
  * Comments: String variable token is token starting with '"'.                *
  *                                                                            *
  ******************************************************************************/
-static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, int hist_str_v64_compat,
-		zbx_eval_token_t *token, char **error)
+static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
 	const char	*ptr = ctx->expression + pos + 1;
 
@@ -423,14 +418,14 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, int hist
 
 		if ('\\' == *ptr)
 		{
-			if (HIST_STR_V64_COMPAT_DISABLED == hist_str_v64_compat && '"' != ptr[1] && '\\' != ptr[1])
+			if (0 == (ZBX_EVAL_PARSE_STR_V64_COMPAT & ctx->rules) && '"' != ptr[1] && '\\' != ptr[1])
 			{
 				*error = zbx_dsprintf(*error, "invalid escape sequence in string starting with \"%s\"",
 						ptr);
 				return FAIL;
 			}
 
-			if (HIST_STR_V64_COMPAT_ENABLED == hist_str_v64_compat && '"' != ptr[1])
+			if (0 != (ZBX_EVAL_PARSE_STR_V64_COMPAT & ctx->rules) && '"' != ptr[1])
 				continue;
 			else
 				ptr++;
@@ -829,18 +824,16 @@ static int	eval_parse_property_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
  *                                                                            *
  * Purpose: parse token                                                       *
  *                                                                            *
- * Parameters: ctx                 - [IN] evaluation context                  *
- *             pos                 - [IN] starting position                   *
- *             hist_str_v64_compat - [IN] allow old style strings             *
- *             token               - [OUT] parsed token                       *
- *             error               - [OUT] error message in case of failure   *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
+ *             token - [OUT] parsed token                                     *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, int hist_str_v64_compat,
-		zbx_eval_token_t *token, char **error)
+static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
 {
 	size_t	skip;
 
@@ -956,7 +949,7 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, int hist_str_v6
 			break;
 		case '"':
 			if (0 != (ctx->rules & ZBX_EVAL_PARSE_VAR_STR))
-				return eval_parse_string_token(ctx, pos, hist_str_v64_compat, token, error);
+				return eval_parse_string_token(ctx, pos, token, error);
 			break;
 		case '0':
 		case '1':
@@ -1039,16 +1032,70 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 {
 	if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
 	{
-		int	i, params = 0;
+		int			i, params = 0, is_hist_function;
+		zbx_vector_ptr_t	hist_func_params;
+
+		is_hist_function = ZBX_EVAL_TOKEN_HIST_FUNCTION == (token->type & ZBX_EVAL_TOKEN_HIST_FUNCTION) &&
+			0 != (ZBX_EVAL_PARSE_STR_V64_COMPAT & ctx->rules);
+
+		if (is_hist_function)
+			zbx_vector_ptr_create(&hist_func_params);
 
 		for (i = (int)token->opt; i < ctx->stack.values_num; i++)
 		{
 			if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_FUNCTION))
+			{
 				params -= (int)ctx->stack.values[i].opt - 1;
+				if (is_hist_function)
+				{
+					for (int j = (int)ctx->stack.values[i].opt; j > 0; j--)
+						zbx_vector_ptr_remove_noorder(&hist_func_params,
+								hist_func_params.values_num - 1);
+				}
+			}
 			else if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_OPERAND))
+			{
 				params++;
+			}
 			else if (0 != (ctx->stack.values[i].type & ZBX_EVAL_CLASS_OPERATOR2))
+			{
 				params--;
+				if (is_hist_function)
+					zbx_vector_ptr_remove_noorder(&hist_func_params,
+							hist_func_params.values_num - 1);
+			}
+
+			if (is_hist_function)
+				zbx_vector_ptr_append(&hist_func_params, &(ctx->stack.values[i]));
+		}
+
+		if (is_hist_function)
+		{
+			for (i = 0; i < hist_func_params.values_num; i++)
+			{
+				if (ZBX_EVAL_TOKEN_VAR_STR != ((zbx_eval_token_t *)hist_func_params.values[i])->type)
+					zbx_vector_ptr_remove_noorder(&hist_func_params, i--);
+			}
+
+			for (i = 0; i < hist_func_params.values_num; i++)
+			{
+				char			*str = NULL, *substitute;
+				int			quoted, str_len;
+				size_t			str_alloc = 0, str_offset = 0;
+				zbx_eval_token_t	*hist_param;
+
+				hist_param = (zbx_eval_token_t *)hist_func_params.values[i];
+				str_len = hist_param->loc.r - hist_param->loc.l + 1;
+				zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ctx->expression + hist_param->loc.l,
+						str_len);
+
+				substitute = zbx_function_param_unquote_dyn(str, str_len, &quoted);
+				zbx_variant_set_str(&(hist_param->value), substitute);
+
+				zbx_free(str);
+			}
+
+			zbx_vector_ptr_destroy(&hist_func_params);
 		}
 
 		token->opt = params;
@@ -1109,7 +1156,6 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 	}
 
 	zbx_vector_eval_token_append_ptr(&ctx->stack, token);
-
 	return SUCCEED;
 }
 
@@ -1210,18 +1256,16 @@ static void	eval_clear(zbx_eval_context_t *ctx)
  *                                                                            *
  * Purpose: parses expression into tokens in postfix notation order           *
  *                                                                            *
- * Parameters: ctx                 - [OUT] evaluation context                 *
- *             expression          - [IN] expression to parse                 *
- *             rules               - [IN] parsing rules                       *
- *             hist_str_v64_compat - [IN] allow old style strings             *
- *             error               - [OUT] error message in case of failure   *
+ * Parameters: ctx        - [OUT] evaluation context                          *
+ *             expression - [IN] expression to parse                          *
+ *             rules      - [IN] parsing rules                                *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - expression was parsed successfully                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
-		int hist_str_v64_compat, char **error)
+static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error)
 {
 	size_t			pos = 0;
 	int			ret = FAIL;
@@ -1241,7 +1285,7 @@ static int	eval_parse_expression(zbx_eval_context_t *ctx, const char *expression
 	{
 		zbx_eval_token_t	token = {0};
 
-		if (SUCCEED != eval_parse_token(ctx, pos, hist_str_v64_compat, &token, error))
+		if (SUCCEED != eval_parse_token(ctx, pos, &token, error))
 			goto out;
 
 		if (0 == token.type)
@@ -1486,19 +1530,7 @@ out:
  ******************************************************************************/
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error)
 {
-	return eval_parse_expression(ctx, expression, rules, HIST_STR_V64_COMPAT_DISABLED, error);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: parse expression into tokens in postfix notation order without    *
- *          failing on old style history function string parameters           *
- *                                                                            *
- ******************************************************************************/
-int	zbx_eval_parse_expression_str_v64_compat(zbx_eval_context_t *ctx, const char *expression,
-		zbx_uint64_t rules, char **error)
-{
-	return eval_parse_expression(ctx, expression, rules, HIST_STR_V64_COMPAT_ENABLED, error);
+	return eval_parse_expression(ctx, expression, rules, error);
 }
 
 /******************************************************************************

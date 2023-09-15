@@ -962,6 +962,11 @@ static char	*fix_hist_param_escaping(const char *param, size_t left, size_t righ
 	/* resulting string cannot be more than 2 times longer than original string */
 	char *escaped = zbx_malloc(NULL, 2 * (right - left + 1) * sizeof(char) + 1);
 
+	char	*str = NULL;
+	size_t	str_alloc = 0, str_offset = 0;
+	zbx_strncpy_alloc(&str, &str_alloc, &str_offset, param + left, right - left + 1);
+	zbx_free(str);
+
 	for (size_t i = left; i <= right; i++)
 	{
 		escaped[escaped_len++] = param[i];
@@ -984,7 +989,7 @@ static int	DBpatch_6050092(void)
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* functions table contains history functions used in trigger expressions */
-	result = zbx_db_select("select functionid,parameter from functions where length(parameter) > 1");
+	result = zbx_db_select("select functionid,parameter from functions where " ZBX_DB_CHAR_LENGTH(parameter) ">1");
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1034,95 +1039,49 @@ static int	DBpatch_6050092(void)
 	return ret;
 }
 
-typedef struct {
-	zbx_uint32_t	op_num;
-	char		is_hist;
-} expr_fun_call;
-
-ZBX_VECTOR_DECL(fun_stack, expr_fun_call)
-ZBX_VECTOR_IMPL(fun_stack, expr_fun_call)
-
 static int	DBpatch_6050093(void)
 {
 	int			ret = SUCCEED;
 	zbx_eval_context_t	ctx;
-	int			token_num;
-	const zbx_eval_token_t	*token;
-	zbx_vector_fun_stack_t	fun_stack;
-	zbx_vector_ptr_t	hist_param_tokens;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	char			*tmp, *substitute = NULL, *sql = NULL, *error = NULL;
+	char			*sql = NULL, *error = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-
-	zbx_vector_fun_stack_create(&fun_stack);
-	zbx_vector_ptr_create(&hist_param_tokens);
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (NULL == (result = zbx_db_select("select itemid,params from items where type = 15")))
+	if (NULL == (result = zbx_db_select("select itemid,params from items where type=15")))
 		goto clean;
 
-	while (NULL != (row = zbx_db_fetch(result)))
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
-		ret = zbx_eval_parse_expression_str_v64_compat(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error);
-		if (FAIL == ret)
+		char	*tmp, *substitute = NULL;
+		int	parse_ret;
+
+		parse_ret = zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION |
+				ZBX_EVAL_PARSE_STR_V64_COMPAT | ZBX_EVAL_PARSE_LLDMACRO, &error);
+
+		if (FAIL == parse_ret)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Failed to parse calculated item expression \"%s\" for"
+			zabbix_log(LOG_LEVEL_WARNING, "Failed to parse calculated item expression \"%s\" for"
 					" item with id %s, error: %s", row[1], row[0], error);
-			goto clean;
+			zbx_free(error);
+			error = NULL;
+
+			continue;
 		}
+
 		zbx_free(error);
+		error = NULL;
+		ctx.rules ^= ZBX_EVAL_PARSE_STR_V64_COMPAT;
 
-		zbx_vector_fun_stack_clear(&fun_stack);
-		zbx_vector_ptr_clear(&hist_param_tokens);
-		substitute = zbx_strdup(NULL, ctx.expression);
-
-		/* finding string parameters of history functions */
-		for (token_num = ctx.stack.values_num - 1; token_num >= 0; token_num--)
-		{
-			token = &ctx.stack.values[token_num];
-
-			if (0 < fun_stack.values_num) {
-				expr_fun_call	*cur_call = &(fun_stack.values[fun_stack.values_num - 1]);
-
-				if (ZBX_EVAL_TOKEN_VAR_STR == token->type && cur_call->is_hist)
-					zbx_vector_ptr_append(&hist_param_tokens, (void *)token);
-
-				if (0 == --(cur_call->op_num))
-					fun_stack.values_num--;
-			}
-
-			if (0 < token->opt)
-			{
-				expr_fun_call	call = {token->opt, ZBX_EVAL_TOKEN_HIST_FUNCTION == token->type};
-
-				zbx_vector_fun_stack_append(&fun_stack, call);
-			}
-		}
-
-		/* Substitution logic relies on replacing further-most tokens first */
-		zbx_vector_ptr_sort(&hist_param_tokens, zbx_eval_compare_tokens_by_loc);
-
-		/* adding necessary escaping to the the string parameters of history functions */
-		for (token_num = 0; token_num < hist_param_tokens.values_num; token_num++)
-		{
-			size_t	right_pos;
-
-			token = hist_param_tokens.values[token_num];
-			right_pos = token->loc.r;
-			tmp = fix_hist_param_escaping(substitute, token->loc.l, right_pos);
-			zbx_replace_string(&substitute, token->loc.l, &right_pos, tmp);
-
-			zbx_free(tmp);
-		}
+		zbx_eval_compose_expression(&ctx, &substitute);
 
 		tmp = zbx_db_dyn_escape_string(substitute);
+		zbx_free(substitute);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set params='%s' where itemid=%s;\n",
 				tmp, row[0]);
 		zbx_free(tmp);
-		zbx_free(substitute);
-		zbx_eval_clear(&ctx);
 
 		if (SUCCEED == ret)
 			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
@@ -1139,10 +1098,6 @@ static int	DBpatch_6050093(void)
 
 clean:
 	zbx_free(error);
-	zbx_free(substitute);
-
-	zbx_vector_fun_stack_destroy(&fun_stack);
-	zbx_vector_ptr_destroy(&hist_param_tokens);
 	zbx_free(sql);
 
 	return ret;
@@ -1244,5 +1199,7 @@ DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
 DBPATCH_ADD(6050090, 0, 1)
 DBPATCH_ADD(6050091, 0, 1)
+DBPATCH_ADD(6050092, 0, 1)
+DBPATCH_ADD(6050093, 0, 1)
 
 DBPATCH_END()

@@ -97,6 +97,7 @@
 #define ZBX_EVAL_PARSE_FUNCTION_NAME	__UINT64_C(0x00008000)
 #define ZBX_EVAL_PARSE_PROP_TAG		__UINT64_C(0x00010000)	/* 'tag' keyword in item query filter */
 #define ZBX_EVAL_PARSE_PROP_GROUP	__UINT64_C(0x00020000)	/* 'group' keyword in item query filter */
+#define ZBX_EVAL_PARSE_STR_V64_COMPAT	__UINT64_C(0x00040000)	/* no backslash escaping for history functions */
 
 #define ZBX_EVAL_PARSE_FUNCTION		(ZBX_EVAL_PARSE_FUNCTION_NAME | ZBX_EVAL_PARSE_FUNCTION_ARGS	|\
 					ZBX_EVAL_PARSE_GROUP)
@@ -218,8 +219,6 @@ typedef void	(*zbx_get_expressions_by_name_f)(zbx_vector_expression_t *expressio
 void	zbx_init_library_eval(zbx_get_expressions_by_name_f get_expressions_by_name_func);
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
-int	zbx_eval_parse_expression_str_v64_compat(zbx_eval_context_t *ctx, const char *expression,
-		zbx_uint64_t rules, char **error);
 void	zbx_eval_init(zbx_eval_context_t *ctx);
 void	zbx_eval_clear(zbx_eval_context_t *ctx);
 int	zbx_eval_status(const zbx_eval_context_t *ctx);
