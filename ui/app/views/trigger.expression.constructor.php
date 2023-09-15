@@ -126,19 +126,15 @@ else {
 		)
 	);
 
-	$wrapOutline = new CSpan([$data['expression_formula']]);
-
-	$table = new CDiv([
-		$wrapOutline,
-		BR(),
-		(new CDiv($expression_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	]);
-
-	$output = ['body' => $table->toString()];
-
-	$output['expression'] = $data['expression'];
+	$output = [
+		'body' => implode('', [
+			$data['expression_formula'] ? new CDiv([$data['expression_formula']]) : '',
+			(new CDiv($expression_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		]),
+		'expression' => $data['expression']
+	];
 }
 
 echo json_encode($output);
