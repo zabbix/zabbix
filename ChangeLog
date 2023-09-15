@@ -1662,6 +1662,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.22rc1
 
 New features:
+.........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
 ..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
 .........T [ZBXNEXT-8610] added MantisBT template (abiba)
 .......PS. [ZBXNEXT-8358] improved items configuration sync on PostgreSQL by selecting using equal condition instead of not equal (vso)
@@ -1669,6 +1670,14 @@ New features:
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
+A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
+...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)
+A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)
+..F....... [ZBX-21094] fixed graphs not displaying values when items do not have trends and trend storage period is overridden in configuration (Ivo)
+.........T [ZBX-23162] fixed variable in JavaScript for Cisco Meraki template (egordymov)
+..F....... [ZBX-23066] expanded ui/composer.json to describe the project (jxl)
+..F....... [ZBX-23261] removed kiosk mode button from host inventory form (apoga)
+..F....... [ZBX-23253] added static units support to graph widget legend and hint box (ashubin)
 ..F....... [ZBX-21898] fixed expression validation, history function parser to accept backslash without escaping (epulke)
 ...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
 .........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
