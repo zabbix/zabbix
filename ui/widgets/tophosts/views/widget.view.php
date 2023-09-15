@@ -56,6 +56,7 @@ else {
 
 	foreach ($data['rows'] as $columns) {
 		$row = [];
+		$use_thresholds = false;
 
 		foreach ($columns as $i => $column) {
 			$column_config = $data['configuration'][$i];
@@ -74,11 +75,15 @@ else {
 
 			$color = $column_config['base_color'];
 
-			if ($column['item']['value_type'] != ITEM_VALUE_TYPE_STR
-					&& $column['item']['value_type'] != ITEM_VALUE_TYPE_TEXT
-					&& $column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+			if (array_key_exists('item', $column)) {
+				$use_thresholds = $column['item']['value_type'] != ITEM_VALUE_TYPE_STR
+					&& $column['item']['value_type'] != ITEM_VALUE_TYPE_TEXT;
+			}
+
+			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
 					&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
-					&& array_key_exists('thresholds', $column_config)) {
+					&& array_key_exists('thresholds', $column_config)
+					&& $use_thresholds) {
 				foreach ($column_config['thresholds'] as $threshold) {
 					$threshold_value = $column['is_binary_units']
 						? $threshold['threshold_binary']
