@@ -451,7 +451,8 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                                                              *
  ********************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
-		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_hostname, zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, const char *config_source_ip,
+		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_hostname,
+		zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, const char *config_source_ip,
 		int config_buffer_send, int config_buffer_size)
 {
 	const char		*p;
