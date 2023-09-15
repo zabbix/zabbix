@@ -613,7 +613,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 						'Name' => 'Widget without columns'
 					],
 					'main_error' => [
-						'Invalid parameter "Columns": an array is expected.',
+						'Invalid parameter "Columns": cannot be empty.',
 						'Invalid parameter "Order column": an integer is expected.'
 					]
 				]
