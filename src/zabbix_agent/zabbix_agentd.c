@@ -63,11 +63,6 @@ static char	**config_perf_counters_en = NULL;
 
 static char	*config_user = NULL;
 
-/* /\* SSL parameters *\/ */
-/* static char	*config_ssl_ca_location; */
-/* static char	*config_ssl_cert_location; */
-/* static char	*config_ssl_key_location; */
-
 static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
