@@ -96,11 +96,11 @@
 			});
 
 			if (this.group_prototypes.length === 0) {
-				this.addGroupPrototypeRow({'name': ''});
+				this.addGroupPrototypeRow({});
 			}
 
 			this.group_prototypes.forEach((group_prototype) => {
-				this.addGroupPrototypeRow({name: group_prototype.name});
+				this.addGroupPrototypeRow(group_prototype);
 			});
 
 			if (this.prototype_templateid != 0) {
