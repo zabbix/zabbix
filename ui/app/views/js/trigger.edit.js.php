@@ -90,8 +90,7 @@
 					this.#copy_expression(e.target, <?= json_encode(TRIGGER_EXPRESSION) ?>);
 				}
 				else if (e.target.id === 'test-expression') {
-					return PopUp('popup.testtriggerexpr',
-						{expression: this.expression_full.value},
+					return PopUp('popup.testtriggerexpr', {expression: this.expression_full.value},
 						{dialogue_class: 'modal-popup-generic'}
 					);
 				}
@@ -434,8 +433,8 @@
 				: this.recovery_popup_parameters;
 
 			const expression = type_expression
-				? this.form.querySelector('[name="expression"]').value
-				: this.form.querySelector('[name="recovery_expression"]').value;
+				? this.expression.value
+				: this.form.querySelector('#recovery_expression').value;
 
 			PopUp('popup.triggerexpr', {...popup_parameters, expression: expression},
 				{dialogueid: 'trigger-expr', dialogue_class: 'modal-popup-generic'}

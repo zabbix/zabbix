@@ -786,7 +786,7 @@ function validate_trigger_expression(overlay) {
 				? jQuery(form).find('#' + ret.dstfld1).get(0)
 				: document.getElementById(ret.dstfld1);
 
-			if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
+			if (obj.name === 'expression' || obj.name === 'recovery_expression') {
 				jQuery(obj).val(jQuery(obj).val() + ret.expression);
 			}
 			else {
