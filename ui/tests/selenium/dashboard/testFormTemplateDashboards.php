@@ -190,12 +190,12 @@ class testFormTemplateDashboards extends CWebTest {
 									],
 									[
 										'type' => 1,
-										'name' => 'ds.items.0.0',
+										'name' => 'ds.0.items.0',
 										'value' => self::TEMPLATE_ITEM
 									],
 									[
 										'type' => 1,
-										'name' => 'ds.color.0',
+										'name' => 'ds.0.color',
 										'value' => 'FF465C'
 									]
 								]
@@ -360,47 +360,47 @@ class testFormTemplateDashboards extends CWebTest {
 								'fields' => [
 									[
 										'type' => 0,
-										'name' => 'columns.decimal_places.0',
+										'name' => 'columns.0.decimal_places',
 										'value' => 2
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.name.0',
+										'name' => 'columns.0.name',
 										'value' => 'Column 1'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.item.0',
+										'name' => 'columns.0.item',
 										'value' => self::TEMPLATE_ITEM
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.timeshift.0',
+										'name' => 'columns.0.timeshift',
 										'value' => ''
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.display.0',
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.history.0',
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.0',
+										'name' => 'columns.0.data',
 										'value' => 1
 									]
 								]

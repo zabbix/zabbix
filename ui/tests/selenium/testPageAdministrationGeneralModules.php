@@ -117,12 +117,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 									],
 									[
 										'type' => 1,
-										'name' => 'navtree.name.1',
+										'name' => 'navtree.1.name',
 										'value' => 'Awesome map'
 									],
 									[
 										'type' => 8,
-										'name' => 'navtree.sysmapid.1',
+										'name' => 'navtree.1.sysmapid',
 										'value' => 1
 									]
 								]

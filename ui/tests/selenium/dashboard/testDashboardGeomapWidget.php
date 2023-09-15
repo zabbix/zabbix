@@ -99,17 +99,17 @@ class testDashboardGeomapWidget extends CWebTest {
 								],
 								[
 									'type' => '1',
-									'name' => 'tags.tag.0',
+									'name' => 'tags.0.tag',
 									'value' => 'tag1'
 								],
 								[
 									'type' => '0',
-									'name' => 'tags.operator.0',
+									'name' => 'tags.0.operator',
 									'value' => '0'
 								],
 								[
 									'type' => '1',
-									'name' => 'tags.value.0',
+									'name' => 'tags.0.value',
 									'value' => 'value1'
 								],
 								[

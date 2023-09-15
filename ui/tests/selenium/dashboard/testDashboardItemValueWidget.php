@@ -165,22 +165,22 @@ class testDashboardItemValueWidget extends CWebTest {
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.color.0',
+										'name' => 'thresholds.0.color',
 										'value' => 'BF00FF'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.threshold.0',
+										'name' => 'thresholds.0.threshold',
 										'value' => '0'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.color.1',
+										'name' => 'thresholds.1.color',
 										'value' => 'FF0080'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.threshold.1',
+										'name' => 'thresholds.1.threshold',
 										'value' => '0.01'
 									]
 								]
