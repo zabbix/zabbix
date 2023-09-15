@@ -36,17 +36,17 @@
 
 static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
 
-int	init_proxy_history_lock(char **error)
+int	init_proxy_history_lock(unsigned char program_type, char **error)
 {
-	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
 
 	return SUCCEED;
 }
 
-void	free_proxy_history_lock(void)
+void	free_proxy_history_lock(unsigned char program_type)
 {
-	if (0 != (trapper_get_program_type()() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		zbx_mutex_destroy(&proxy_lock);
 }
 

@@ -1119,7 +1119,7 @@ static void	zbx_on_exit(int ret)
 	zbx_vmware_destroy();
 
 	zbx_free_selfmon_collector();
-	free_proxy_history_lock();
+	free_proxy_history_lock(zbx_program_type);
 
 	zbx_unload_modules();
 
@@ -1532,7 +1532,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_proxy_history_lock(&error))
+	if (SUCCEED != init_proxy_history_lock(zbx_program_type, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize lock for passive proxy history: %s", error);
 		zbx_free(error);
