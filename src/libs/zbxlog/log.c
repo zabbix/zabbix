@@ -658,19 +658,28 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 {
 	va_list	args;
 	size_t	len;
+	int	rv;
 	char	*buf;
 
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level) && NULL == out)
 		return;
 
 	va_start(args, format);
-	len = (size_t)vsnprintf(NULL, 0, format, args) + 2;
+
+	if (0 > (rv = vsnprintf(NULL, 0, format, args)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	len = rv + 2;
+
 	va_end(args);
 
 	buf = (char *)zbx_malloc(NULL, len);
 
 	va_start(args, format);
-	len = (size_t)vsnprintf(buf, len, format, args);
+	len = zbx_vsnprintf(buf, len, format, args);
 	va_end(args);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))
