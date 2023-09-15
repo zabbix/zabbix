@@ -2027,14 +2027,13 @@ void	zbx_events_update_itservices(void)
 static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uint64_t *maintenanceids)
 {
 	zbx_vector_event_suppress_query_ptr_t		event_queries;
-	int						i, j;
 	zbx_event_suppress_query_t			*query;
 
 	/* prepare query data  */
 
 	zbx_vector_event_suppress_query_ptr_create(&event_queries);
 
-	for (i = 0; i < event_refs->values_num; i++)
+	for (int i = 0; i < event_refs->values_num; i++)
 	{
 		zbx_db_event	*event = (zbx_db_event *)event_refs->values[i];
 
@@ -2064,11 +2063,11 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
 					"maintenanceid", "suppress_until", (char *)NULL);
 
-			for (j = 0; j < event_queries.values_num; j++)
+			for (int j = 0; j < event_queries.values_num; j++)
 			{
 				query = event_queries.values[j];
 
-				for (i = 0; i < query->maintenances.values_num; i++)
+				for (int i = 0; i < query->maintenances.values_num; i++)
 				{
 					/* when locking maintenances not-locked (deleted) maintenance ids */
 					/* are removed from the maintenanceids vector                   */
@@ -2093,7 +2092,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 			zbx_db_insert_clean(&db_insert);
 		}
 
-		for (j = 0; j < event_queries.values_num; j++)
+		for (int j = 0; j < event_queries.values_num; j++)
 		{
 			query = event_queries.values[j];
 			/* reset tags vector to avoid double freeing copied tag name/value pointers */

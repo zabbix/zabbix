@@ -1058,6 +1058,7 @@ typedef struct
 #define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS	0x0004
 }
 zbx_host_maintenance_diff_t;
+/* NOTE: Do not forget to sync changes with zbx_host_maintenance_diff_free(). */
 
 ZBX_PTR_VECTOR_DECL(host_maintenance_diff_ptr, zbx_host_maintenance_diff_t*)
 void	zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd);
