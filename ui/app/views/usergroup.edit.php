@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->includeJsFile('administration.usergroup.edit.js.php');
+$this->includeJsFile('usergroup.edit.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('User groups'))
