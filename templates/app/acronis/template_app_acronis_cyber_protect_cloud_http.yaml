@@ -55,6 +55,8 @@ zabbix_export:
           headers:
             - name: Content-Type
               value: application/x-www-form-urlencoded
+            - name: X-Application-Secret
+              value: 5619386d-de56-49ec-8508-f5c399d3b9bd
           request_method: POST
           tags:
             - tag: component
@@ -95,7 +97,7 @@ zabbix_export:
         - tag: target
           value: acronis
         - tag: target
-          value: 'cyber protect cloud'
+          value: cyber-protect-cloud
       macros:
         - macro: '{$ACRONIS.CPC.AUTH.CLIENT.ID}'
           description: 'Client ID for API user access.'
@@ -153,6 +155,8 @@ zabbix_export:
               value: application/json
             - name: Authorization
               value: 'Bearer {$ACRONIS.CPC.ACCESS_TOKEN}'
+            - name: X-Application-Secret
+              value: 5619386d-de56-49ec-8508-f5c399d3b9bd
           tags:
             - tag: component
               value: raw
@@ -209,6 +213,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$..[?(@.severity == ''information'')].length()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: acronis.cpc.alerts.get
           tags:
@@ -283,6 +290,8 @@ zabbix_export:
               value: application/json
             - name: Authorization
               value: 'Bearer {$ACRONIS.CPC.ACCESS_TOKEN}'
+            - name: X-Application-Secret
+              value: 5619386d-de56-49ec-8508-f5c399d3b9bd
           tags:
             - tag: component
               value: raw
@@ -302,9 +311,7 @@ zabbix_export:
           url: '{$ACRONIS.CPC.DATACENTER.URL}{$ACRONIS.CPC.PATH.RESOURCE.MANAGEMENT}/resources'
           query_fields:
             - name: type
-              value: resource.machine
-            - name: include_attributes
-              value: '1'
+              value: '{$ACRONIS.CPC.DEVICE.RESOURCE.TYPE}'
           status_codes: ''
           http_proxy: '{$ACRONIS.CPC.HTTP.PROXY}'
           headers:
@@ -312,6 +319,139 @@ zabbix_export:
               value: application/json
             - name: Authorization
               value: 'Bearer {$ACRONIS.CPC.ACCESS_TOKEN}'
+            - name: X-Application-Secret
+              value: 5619386d-de56-49ec-8508-f5c399d3b9bd
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 3697d34ebbb74b90aa7318321ecc27e5
+          name: 'Acronis CPC: Register integration'
+          type: SCRIPT
+          key: acronis.cpc.register.integration
+          delay: 24h
+          history: '0'
+          trends: '0'
+          params: |
+            // Script for activating integration on Acronis, if it is not activated.
+            
+            const request_path = '/api/integration_management/v2/status';
+            const app_id = '5619386d-de56-49ec-8508-f5c399d3b9bd';
+            
+            function checkParams(params) {
+                ['api_url', 'api_token', 'tenant_uuid'].forEach(function (field) {
+                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                        throw 'Required param is not set: ' + field + '.';
+                    }
+                });
+                return params;
+            }
+            
+            function getHttpData(url, register, params, api_token, tenant_uuid) {
+                const request = new HttpRequest();
+            
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('Authorization: Bearer ' + api_token);
+                request.addHeader('X-Application-Secret: ' + app_id);
+            
+                // set proxy if needed
+                if (params['http_proxy']) {
+                    request.setProxy(params['http_proxy'])
+                    Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] Using http proxy: ' + params['http_proxy']);
+                }
+            
+                if (!register){
+                    // Code executed if action != to register. Only queries current activation status
+                    const response = request.get(url + '?tenantID=' + encodeURIComponent(tenant_uuid));
+                    Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                
+                    // check if response status is OK
+                    if (request.getStatus() !== 200) {
+                        if (typeof (response.error && response.error.message) !== 'undefined') {
+                            throw response.error.message;
+                        } else {
+                            throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                        }
+                    }
+            
+                    // return response object
+                    return response;
+            
+                } else {
+                    // Code executed if action == register. Activated integration with POST request
+            
+                    // Use correct format for registering integration on Acronis services
+                    const request_body = {
+                        "application_id": app_id,
+                        "module": {
+                            "name": "Zabbix integration with Acronis Cyber Protect Cloud",
+                            "version": "1.0.0"
+                        },
+                        "vendor_system": {
+                            "name": "Product integrated with Acronis",
+                            "version": "23.07"
+                        },
+                        "events": [
+                            {
+                                "category": "activation",
+                                "action": "activated integration",
+                                "activation_event": true
+                            }
+                        ]
+                    };
+            
+                    const response = request.post(url + '?tenantID=' + encodeURIComponent(tenant_uuid), JSON.stringify(request_body));
+                    Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                
+                    // check if response status is OK
+                    if (request.getStatus() !== 204) {
+                        if (typeof (response.error && response.error.message) !== 'undefined') {
+                            throw response.error.message;
+                        } else {
+                            throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                        }
+                    }
+            
+                    return 1;
+                }
+            }
+            
+            function parseGetStatusData(http_response) {
+                // parse the response body and return active status if it exists
+                const data = JSON.parse(http_response);
+                // check if active key exists
+                if (data['items']) {
+                    data['items'].forEach(function (app) {
+                        if (app['application_id'] && app['application_id'] === app_id){
+                            return app['active'];
+                        }
+                    })
+                    return false;
+                } else {
+                    throw 'Unexpected data structure in HTTP response.'
+                }
+            }
+            
+            const params = checkParams(JSON.parse(value)),
+                url = params.api_url,
+                api_token = params.api_token
+                tenant_uuid = params.tenant_uuid
+            
+            const current_activation_status = parseGetStatusData(getHttpData(url + request_path, false, params, api_token, tenant_uuid));
+            
+            if (!current_activation_status){
+                return getHttpData(url + request_path, true, params, api_token, tenant_uuid)
+            } else {
+                return 0; // Something needs to be returned even if not using value anywhere
+            }
+          description: 'Registers integration on Acronis services.'
+          timeout: 30s
+          parameters:
+            - name: api_token
+              value: '{$ACRONIS.CPC.ACCESS_TOKEN}'
+            - name: api_url
+              value: '{$ACRONIS.CPC.DATACENTER.URL}'
+            - name: tenant_uuid
+              value: '{$ACRONIS.CPC.MSP.TENANT.UUID}'
           tags:
             - tag: component
               value: raw
@@ -345,7 +485,7 @@ zabbix_export:
                 value: '{$ACRONIS.CPC.ALERT.DISCOVERY.SEVERITY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
-          lifetime: 1d
+          lifetime: '0'
           description: 'Discovers alerts.'
           item_prototypes:
             - uuid: b298e768dc0447b4b5c29c99a5852453
@@ -539,14 +679,14 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.attributes.[?(@.name == "agent")].kvs.[?(@.key == "enabled")].value.first()'
+                    - '$.context.attributes.[?(@.name == "agent")].kvs.[?(@.key == "enabled")].value.first()'
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse agent status'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'acronis.cpc.device.res.raw[{#NAME}]'
+                key: 'acronis.cpc.device.res.status.raw[{#NAME}]'
               tags:
                 - tag: component
                   value: application
@@ -579,14 +719,14 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.attributes.[?(@.name == "agent")].kvs.[?(@.key == "is_online")].value.first()'
+                    - '$.context.attributes.[?(@.name == "agent")].kvs.[?(@.key == "is_online")].value.first()'
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse agent reachability status'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'acronis.cpc.device.res.raw[{#NAME}]'
+                key: 'acronis.cpc.device.res.status.raw[{#NAME}]'
               tags:
                 - tag: component
                   value: application
@@ -608,14 +748,14 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.attributes.[?(@.name == "agent")].kvs.[?(@.key == "version")].value.first()'
+                    - '$.context.attributes.[?(@.name == "agent")].kvs.[?(@.key == "version")].value.first()'
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse agent version'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'acronis.cpc.device.res.raw[{#NAME}]'
+                key: 'acronis.cpc.device.res.status.raw[{#NAME}]'
               tags:
                 - tag: component
                   value: application
@@ -636,7 +776,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.backup.machine")].next_run.first()'
+                    - '$.policies.[?(@.type == "policy.backup.machine")].next_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -677,7 +817,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.backup.machine")].last_success_run.first()'
+                    - '$.policies.[?(@.type == "policy.backup.machine")].last_success_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -707,7 +847,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.backup.machine")].last_run.first()'
+                    - '$.policies.[?(@.type == "policy.backup.machine")].last_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -739,14 +879,14 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.attributes.[?(@.name == "cyberfit")].details.[?(@.key == "cyberfit_score_value")].value.first()'
+                    - '$.context.attributes.[?(@.name == "cyberfit")].details.[?(@.key == "cyberfit_score_value")].value.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '-1'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: 'acronis.cpc.device.res.raw[{#NAME}]'
+                key: 'acronis.cpc.device.res.status.raw[{#NAME}]'
               tags:
                 - tag: component
                   value: application
@@ -800,7 +940,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.patch_management")].next_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.patch_management")].next_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -841,7 +981,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.patch_management")].last_success_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.patch_management")].last_success_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -871,7 +1011,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.patch_management")].last_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.patch_management")].last_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -902,7 +1042,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $..aggregate.names.first()
+                    - $.aggregate.names
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse protection plan name'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -930,7 +1070,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.antimalware_protection")].next_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.antimalware_protection")].next_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -971,7 +1111,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.antimalware_protection")].last_success_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.antimalware_protection")].last_success_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1001,7 +1141,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.antimalware_protection")].last_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.antimalware_protection")].last_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1032,7 +1172,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $..aggregate.status.first()
+                    - $.aggregate.status
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse protection status'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1073,26 +1213,6 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
-            - uuid: 70abd1e7291a4e51aca2e4094b10d89e
-              name: 'Device [{#NAME}]:[{#ID}]: Raw data resource'
-              type: DEPENDENT
-              key: 'acronis.cpc.device.res.raw[{#NAME}]'
-              delay: '0'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              description: 'Gets resource information for the device.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - '$.[?(@.name == "{#NAME}")].first()'
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Could not parse resource data'
-              master_item:
-                key: acronis.cpc.devices.get
-              tags:
-                - tag: component
-                  value: raw
             - uuid: 20d93972ca2f47af96aed7ee9aa642af
               name: 'Device [{#NAME}]:[{#ID}]: Raw data resources status'
               type: HTTP_AGENT
@@ -1104,14 +1224,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.items
+                    - '$.items[0]'
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse resource status data'
               timeout: 15s
               url: '{$ACRONIS.CPC.DATACENTER.URL}{$ACRONIS.CPC.PATH.RESOURCE.MANAGEMENT}/resource_statuses'
               query_fields:
-                - name: agent_id
-                  value: '{#AGENT_ID}'
+                - name: resource_id
+                  value: '{#ID}'
+                - name: include_attributes
+                  value: '1'
               status_codes: ''
               http_proxy: '{$ACRONIS.CPC.HTTP.PROXY}'
               headers:
@@ -1119,6 +1241,8 @@ zabbix_export:
                   value: application/json
                 - name: Authorization
                   value: 'Bearer {$ACRONIS.CPC.ACCESS_TOKEN}'
+                - name: X-Application-Secret
+                  value: 5619386d-de56-49ec-8508-f5c399d3b9bd
               tags:
                 - tag: component
                   value: raw
@@ -1133,7 +1257,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.vulnerability_assessment")].next_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.vulnerability_assessment")].next_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1174,7 +1298,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.vulnerability_assessment")].last_success_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.vulnerability_assessment")].last_success_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1204,7 +1328,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$..policies.[?(@.type == "policy.security.vulnerability_assessment")].last_run.first()'
+                    - '$.policies.[?(@.type == "policy.security.vulnerability_assessment")].last_run.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1275,8 +1399,6 @@ zabbix_export:
           master_item:
             key: acronis.cpc.devices.get
           lld_macro_paths:
-            - lld_macro: '{#AGENT_ID}'
-              path: $.agent_id
             - lld_macro: '{#ID}'
               path: $.id
             - lld_macro: '{#NAME}'
@@ -1293,7 +1415,7 @@ zabbix_export:
         - tag: target
           value: acronis
         - tag: target
-          value: 'cyber protect cloud'
+          value: cyber-protect-cloud
       macros:
         - macro: '{$ACRONIS.CPC.ACCESS_TOKEN}'
           type: SECRET_TEXT
@@ -1339,6 +1461,9 @@ zabbix_export:
         - macro: '{$ACRONIS.CPC.DEVICE.DISCOVERY.TENANT.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the tenant name regex filter to use in device discovery for excluding.'
+        - macro: '{$ACRONIS.CPC.DEVICE.RESOURCE.TYPE}'
+          value: resource.machine
+          description: 'Comma separated list of resource types for devices retrieval.'
         - macro: '{$ACRONIS.CPC.HTTP.PROXY}'
           description: 'Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.'
         - macro: '{$ACRONIS.CPC.MSP.TENANT.UUID}'
