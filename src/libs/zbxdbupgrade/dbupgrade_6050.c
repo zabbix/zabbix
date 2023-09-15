@@ -979,39 +979,18 @@ static int	DBpatch_6050093(void)
 
 static int	DBpatch_6050094(void)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_db_insert_t		db_insert;
-	int			ret = SUCCEED;
-
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = zbx_db_select("select groupid,parent_group_prototypeid,name,lastcheck,ts_delete"
-					" from group_discovery_tmp");
-
-	zbx_db_insert_prepare(&db_insert, "group_discovery", "groupdiscoveryid", "groupid", "parent_group_prototypeid",
-			"name", "lastcheck", "ts_delete", NULL);
-
-	while (NULL != (row = zbx_db_fetch(result)))
+	if (ZBX_DB_OK > zbx_db_execute("insert into group_discovery "
+				"(groupdiscoveryid,groupid,parent_group_prototypeid,name,lastcheck,ts_delete)"
+			" select groupid,groupid,parent_group_prototypeid,name,lastcheck,ts_delete"
+				" from group_discovery_tmp"))
 	{
-		zbx_uint64_t	groupid, parent_group_prototypeid;
-
-		ZBX_DBROW2UINT64(groupid, row[0]);
-		ZBX_DBROW2UINT64(parent_group_prototypeid, row[1]);
-
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), groupid, parent_group_prototypeid, row[2],
-				atoi(row[3]), atoi(row[4]));
+		return FAIL;
 	}
 
-	zbx_db_free_result(result);
-
-	zbx_db_insert_autoincrement(&db_insert, "groupdiscoveryid");
-
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
+	return SUCCEED;
 }
 
 static int	DBpatch_6050095(void)
