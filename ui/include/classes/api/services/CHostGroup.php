@@ -39,6 +39,8 @@ class CHostGroup extends CApiService {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['groupid', 'name'];
 
+	protected $group_discovery_fields = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete'];
+
 	/**
 	 * Get host groups.
 	 *
@@ -55,7 +57,6 @@ class CHostGroup extends CApiService {
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
 			'maintenance_from', 'maintenance_status', 'flags'
 		];
-		$group_discovery_fields = ['groupid', 'parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete'];
 		$discovery_rule_fields = ['itemid', 'hostid', 'name', 'type', 'key_', 'url', 'query_fields', 'request_method',
 			'timeout', 'post_type', 'posts', 'headers', 'status_codes', 'follow_redirects', 'retrieve_mode',
 			'http_proxy', 'authtype', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
@@ -98,7 +99,7 @@ class CHostGroup extends CApiService {
 			// output
 			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $group_discovery_fields), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $this->group_discovery_fields), 'default' => null],
 			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
@@ -1583,7 +1584,7 @@ class CHostGroup extends CApiService {
 		// adding group discovery
 		if ($options['selectGroupDiscoveries'] !== null) {
 			$output = $options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND
-				? ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete']
+				? $this->group_discovery_fields
 				: $options['selectGroupDiscoveries'];
 
 			$group_discoveries = API::getApiService()->select('group_discovery', [
