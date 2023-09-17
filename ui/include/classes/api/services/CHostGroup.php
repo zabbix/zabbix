@@ -39,7 +39,9 @@ class CHostGroup extends CApiService {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['groupid', 'name'];
 
-	protected $group_discovery_fields = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete'];
+	public const OUTPUT_FIELDS = ['groupid', 'name', 'flags', 'uuid'];
+
+	private const GROUP_DISCOVERY_FIELDS = ['parent_group_prototypeid', 'name', 'lastcheck', 'ts_delete'];
 
 	/**
 	 * Get host groups.
@@ -51,7 +53,6 @@ class CHostGroup extends CApiService {
 	public function get(array $options) {
 		$result = [];
 
-		$output_fields = ['groupid', 'name', 'flags', 'uuid'];
 		$host_fields = ['hostid', 'host', 'name', 'description', 'proxyid', 'status', 'ipmi_authtype',
 			'ipmi_privilege', 'ipmi_password', 'ipmi_username', 'inventory_mode', 'tls_connect', 'tls_accept',
 			'tls_psk_identity', 'tls_psk', 'tls_issuer', 'tls_subject', 'maintenanceid', 'maintenance_type',
@@ -97,9 +98,9 @@ class CHostGroup extends CApiService {
 			'excludeSearch' =>						['type' => API_BOOLEAN, 'default' => false],
 			'searchWildcardsEnabled' =>				['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>								['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'selectHosts' =>						['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $host_fields), 'default' => null],
-			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $this->group_discovery_fields), 'default' => null],
+			'selectGroupDiscoveries' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', self::GROUP_DISCOVERY_FIELDS), 'default' => null],
 			'selectDiscoveryRules' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_fields), 'default' => null],
 			'selectHostPrototypes' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_prototype_fields), 'default' => null],
 			'countOutput' =>						['type' => API_BOOLEAN, 'default' => false],
@@ -126,7 +127,7 @@ class CHostGroup extends CApiService {
 		];
 
 		if (!$options['countOutput'] && $options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $output_fields;
+			$options['output'] = self::OUTPUT_FIELDS;
 		}
 
 		// editable + PERMISSION CHECK
@@ -1584,7 +1585,7 @@ class CHostGroup extends CApiService {
 		// adding group discovery
 		if ($options['selectGroupDiscoveries'] !== null) {
 			$output = $options['selectGroupDiscoveries'] === API_OUTPUT_EXTEND
-				? $this->group_discovery_fields
+				? self::GROUP_DISCOVERY_FIELDS
 				: $options['selectGroupDiscoveries'];
 
 			$group_discoveries = API::getApiService()->select('group_discovery', [
