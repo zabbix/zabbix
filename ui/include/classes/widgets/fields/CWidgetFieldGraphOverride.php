@@ -73,18 +73,20 @@ class CWidgetFieldGraphOverride extends CWidgetField {
 	}
 
 	public function validate(bool $strict = false): array {
+		if (!$strict) {
+			return [];
+		}
+
 		if ($errors = parent::validate($strict)) {
 			return $errors;
 		}
 
-		if ($strict) {
-			foreach ($this->getValue() as $index => $overrides) {
-				if (!array_intersect($this->getOverrideOptions(), array_keys($overrides))) {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->label ?? $this->name.'/'.($index + 1),
-						_('at least one override option must be specified')
-					);
-					break;
-				}
+		foreach ($this->getValue() as $index => $overrides) {
+			if (!array_intersect($this->getOverrideOptions(), array_keys($overrides))) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->label ?? $this->name.'/'.($index + 1),
+					_('at least one override option must be specified')
+				);
+				break;
 			}
 		}
 
