@@ -422,52 +422,44 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		}
 
-		foreach ($items as $itemid => $item) {
-			$column += [
-				'itemid' => $itemid,
-				'value_type' => $item['value_type']
-			];
-		}
+		$aggregate_function = $column['aggregate_function'];
 
-		if (array_key_exists('value_type', $column)) {
-			$aggregate_function = $column['aggregate_function'];
+		if ($aggregate_function == AGGREGATE_NONE) {
+			$time_to = $time_now;
+			$time_from = $time_to - $history_period;
 
-			if ($aggregate_function == AGGREGATE_NONE) {
-				$time_to = $time_now;
-				$time_from = $time_to - $history_period;
+			self::addDataSource($items, $time_from, $time_now, $column['history']);
 
-				self::addDataSource($items, $time_from, $time_now, $column['history']);
+			$items_by_source = ['history' => []];
 
-				$items_by_source = ['history' => []];
-
-				foreach ($items as $itemid => $item) {
-					$items_by_source[$item['source']][$itemid] = $item;
-				}
-
-				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
-
-				return array_column(array_column($values, 0), 'value', 'itemid');
+			foreach ($items as $itemid => $item) {
+				$items_by_source[$item['source']][$itemid] = $item;
 			}
 
-			$value_type = $column['value_type'];
-			$time_from = $column['time_from'];
-			$time_to = $column['time_to'];
+			$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
 
+			return array_column(array_column($values, 0), 'value', 'itemid');
+		}
+		else {
 			$range_time_parser = new CRangeTimeParser();
 
+			$time_from = $column['time_from'];
 			$range_time_parser->parse($time_from);
 			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
 
+			$time_to = $column['time_to'];
 			$range_time_parser->parse($time_to);
 			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
 			$from = time() - $history_period;
 
 			self::addDataSource($items, $from, $time_now, $column['history']);
+		}
 
-			$function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
+		$function = $aggregate_function == AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
 
-			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
+		foreach ($items as $item) {
+			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 				$values = Manager::History()->getAggregationByInterval(
 					$items, $time_from, $time_to, $function, $time_from
 				);
@@ -481,29 +473,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 			else {
-				foreach ($items as $item) {
-					$non_numeric_history = Manager::History()->getAggregatedValue(
-						$item, $function, $time_from, $time_to
-					);
+				$non_numeric_history = Manager::History()->getAggregatedValue(
+					$item, $function, $time_from, $time_to
+				);
 
-					if ($aggregate_function == AGGREGATE_COUNT) {
-						$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
+				if ($aggregate_function == AGGREGATE_COUNT) {
+					$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
 
-						$formatted_value = formatHistoryValueRaw($non_numeric_history, $item, false, [
-							'decimals' => $column['decimal_places'],
-							'decimals_exact' => true,
-							'small_scientific' => false,
-							'zero_as_zero' => false
-						]);
+					$formatted_value = formatHistoryValueRaw($non_numeric_history, $item, false, [
+						'decimals' => $column['decimal_places'],
+						'decimals_exact' => true,
+						'small_scientific' => false,
+						'zero_as_zero' => false
+					]);
 
-						$non_numeric_history = $formatted_value['value'];
-					}
+					$non_numeric_history = $formatted_value['value'];
+				}
 
-					if ($non_numeric_history) {
-						$result += [
-							$item['itemid'] => $non_numeric_history
-						];
-					}
+				if ($non_numeric_history) {
+					$result += [
+						$item['itemid'] => $non_numeric_history
+					];
 				}
 			}
 		}

@@ -1264,10 +1264,12 @@ class CHistoryManager {
 				' FROM '.self::getTableName($item['value_type']).
 				' WHERE itemid='.zbx_dbstr($item['itemid']).
 				' AND clock>='.zbx_dbstr($time_from).
-				' AND clock<='.zbx_dbstr($time_to).
-				' HAVING COUNT(*)>0';
+				' AND clock<='.zbx_dbstr($time_to);
 
-			if ($aggregation == AGGREGATE_LAST) {
+			if ($aggregation == AGGREGATE_COUNT) {
+				$sql .= ' HAVING COUNT(*)>0';
+			}
+			elseif ($aggregation == AGGREGATE_LAST) {
 				$sql .= ' ORDER BY clock DESC LIMIT 1';
 			}
 			elseif ($aggregation == AGGREGATE_FIRST) {
