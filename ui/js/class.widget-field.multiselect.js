@@ -280,7 +280,7 @@ class CWidgetFieldMultiselect {
 	}
 
 	#modifySuggestedList(entities) {
-		const search = this.#multiselect.multiSelect('getSearch');
+		const search = this.#multiselect.multiSelect('getSearch').toLowerCase();
 
 		const result_entities = new Map();
 

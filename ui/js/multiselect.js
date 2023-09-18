@@ -1154,6 +1154,10 @@
 		var found = 0,
 			preselected = '';
 
+		if (ms.options.suggest_list_modifier !== null) {
+			ms.values.available = ms.options.suggest_list_modifier(ms.values.available);
+		}
+
 		if (ms.values.available.size === 0) {
 			var div = $('<div>', {
 				'class': 'multiselect-matches',
@@ -1170,10 +1174,6 @@
 				'class': 'multiselect-suggest',
 				'aria-hidden': true
 			}));
-
-			if (ms.options.suggest_list_modifier !== null) {
-				ms.values.available = ms.options.suggest_list_modifier(ms.values.available);
-			}
 
 			for (const item of ms.values.available.values()) {
 				if ('group_label' in item) {
