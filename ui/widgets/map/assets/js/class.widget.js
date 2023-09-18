@@ -57,11 +57,11 @@ class CWidgetMap extends CWidget {
 
 		if (this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
-			this.#sysmapid = fields_data.sysmapid[0];
+			this.#sysmapid = fields_data.sysmapid;
 			this.#map_svg = null;
 		}
 
-		if (this.#map_svg === null || this.#sysmapid !== fields_data.sysmapid[0]) {
+		if (this.#map_svg === null || this.#sysmapid !== fields_data.sysmapid) {
 			return super.promiseUpdate();
 		}
 
@@ -110,7 +110,7 @@ class CWidgetMap extends CWidget {
 				this.#makeSvgMap(sysmap_data.map_options);
 				this.#activateContentEvents();
 
-				this.feedback({'sysmapid': [this.#sysmapid]});
+				this.feedback({'sysmapid': this.#sysmapid});
 			}
 
 			if (sysmap_data.error_msg !== undefined) {
