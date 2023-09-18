@@ -624,7 +624,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$formatted_value = convertUnitsRaw([
 				'value' => $sector['value'],
 				'units' => $sector['units'],
-				'small_scientific' => false,
+				'small_scientific' => true,
 				'zero_as_zero' => false
 			]);
 			unset($formatted_value['is_numeric']);
@@ -642,7 +642,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'power' => $units_config['units_show'] == self::SHOW_UNITS_ON ? null : 0,
 			'decimals' => $total_config['decimal_places'],
 			'decimals_exact' => true,
-			'small_scientific' => false,
+			'small_scientific' => true,
 			'zero_as_zero' => false
 		]);
 		unset($formatted_total_value['is_numeric']);
