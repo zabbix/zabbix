@@ -164,6 +164,7 @@ int	zbx_init_collector_data(char **error)
 
 #ifdef _WINDOWS
 	ZBX_UNUSED(error);
+	ZBX_UNUSED(sz_cpu_phys_util);
 
 	sz_cpu = sizeof(zbx_perf_counter_data_t *) * (cpu_count + 1);
 	collector = zbx_malloc(collector, sz + sz_cpu);
@@ -477,6 +478,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	}
 
 #ifdef _WINDOWS
+	ZBX_UNUSED(process_num);
+
 	if (0 != cpu_collector_started())
 		free_cpu_collector(&(collector->cpus));
 
