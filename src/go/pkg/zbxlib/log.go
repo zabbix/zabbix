@@ -50,7 +50,7 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 		va_end(tmp);
 
 		char	*message = (char *)zbx_malloc(NULL, size);
-		vsnprintf(message, size, fmt, args);
+		zbx_vsnprintf(message, size, fmt, args);
 
 		handleZabbixLog(level, message);
 		zbx_free(message);
