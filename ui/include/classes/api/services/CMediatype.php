@@ -1023,54 +1023,46 @@ class CMediatype extends CApiService {
 	 * @param array $result
 	 */
 	private static function addRelatedActions(array $options, array &$result): void {
-		if ($options['selectActions'] === null) {
+		if (!is_array($options['selectActions'])) {
 			return;
 		}
 
-		if ($options['selectActions'] != API_OUTPUT_COUNT) {
-			$db_action_mediatypes = DBselect(
-				'SELECT DISTINCT om.mediatypeid,o.actionid'.
-				' FROM opmessage om,operations o'.
-				' WHERE om.operationid=o.operationid'.
-				' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
-			);
+		$db_action_mediatypes = DBselect(
+			'SELECT DISTINCT om.mediatypeid,o.actionid'.
+			' FROM opmessage om,operations o'.
+			' WHERE om.operationid=o.operationid'.
+			' AND ('.dbConditionId('om.mediatypeid', array_keys($result)).' OR om.mediatypeid IS NULL)'
+		);
 
-			$action_mediatypeids = [];
+		$action_mediatypeids = [];
 
-			while ($action_mediatype = DBfetch($db_action_mediatypes)) {
-				$mediatypeid = $action_mediatype['mediatypeid'];
-				$actionid = $action_mediatype['actionid'];
-				$action_mediatypeids[$actionid] = [];
-
-				if ($mediatypeid == 0) {
-					foreach ($result as $mediatypeid => $mediatype) {
-						$action_mediatypeids[$actionid][] = $mediatypeid;
-					}
-				}
-				else {
-					if (!in_array($mediatypeid, $action_mediatypeids[$actionid])) {
-						$action_mediatypeids[$actionid][] = $mediatypeid;
-					}
+		while ($row = DBfetch($db_action_mediatypes)) {
+			if ($row['mediatypeid'] == 0) {
+				foreach ($result as $mediatypeid => $mediatype) {
+					$action_mediatypeids[$row['actionid']][$mediatypeid] = true;
 				}
 			}
-
-			$action_options = [
-				'output' => $options['selectActions'],
-				'actionids' => array_keys($action_mediatypeids)
-			];
-
-			$db_actions = DBselect(DB::makeSql('actions', $action_options));
-
-			foreach ($result as $mediatypeid => $mediatype){
-				$result[$mediatypeid]['actions'] = [];
+			else {
+				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = true;
 			}
+		}
 
-			while ($action = DBfetch($db_actions)) {
-				foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid) {
-					$result[$mediatypeid]['actions'][] = $action;
+		$action_options = [
+			'output' => $options['selectActions'],
+			'actionids' => array_keys($action_mediatypeids)
+		];
 
-					CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
-				}
+		$db_actions = DBselect(DB::makeSql('actions', $action_options));
+
+		foreach ($result as $mediatypeid => $mediatype){
+			$result[$mediatypeid]['actions'] = [];
+		}
+
+		while ($action = DBfetch($db_actions)) {
+			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid => $foo) {
+				$result[$mediatypeid]['actions'][] = $action;
+
+				CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
 			}
 		}
 	}
