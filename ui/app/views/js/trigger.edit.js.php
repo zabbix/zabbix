@@ -51,6 +51,7 @@ window.trigger_edit_popup = new class {
 		}
 
 		this.#initActions();
+		this.#initTriggersTab();
 		this.#changeRecoveryMode();
 		this.#changeCorrelationMode();
 
@@ -170,6 +171,27 @@ window.trigger_edit_popup = new class {
 
 			this.#disableExpressionConstructorButtons(button_ids, e.target);
 		})
+	}
+
+	#initTriggersTab() {
+		let triggers_initialized = false;
+
+		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
+			const panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+
+			if (panel.attr('id') === 'triggersTab') {
+				console.log(triggers_initialized);
+				if (triggers_initialized) {
+					return;
+				}
+
+				$('#triggersTab')
+					.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
+					.textareaFlexible();
+
+				triggers_initialized = true;
+			}
+		});
 	}
 
 	#addDepTrigger(button) {
