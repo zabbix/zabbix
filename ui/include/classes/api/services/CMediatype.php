@@ -1040,6 +1040,7 @@ class CMediatype extends CApiService {
 			while ($action_mediatype = DBfetch($db_action_mediatypes)) {
 				$mediatypeid = $action_mediatype['mediatypeid'];
 				$actionid = $action_mediatype['actionid'];
+				$action_mediatypeids[$actionid] = [];
 
 				if ($mediatypeid == 0) {
 					foreach ($result as $mediatypeid => $mediatype) {
