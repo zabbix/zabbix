@@ -314,7 +314,7 @@ abstract class CItemGeneral extends CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkPreprocessingStepsDuplicates(array $items): void {
+	protected static function checkPreprocessingStepsDuplicates(array $items): void {
 		$uniq_rules = ['type' => API_OBJECTS, 'fields' => [
 			'preprocessing' => ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
 				'type' =>	['type' => API_ANY],
