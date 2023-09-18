@@ -995,8 +995,9 @@ static int	DBpatch_6050094(void)
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update widget_field"
 			" set type='1',name='override_hostid._reference',value_int=0,value_str='DASHBOARD._hostid'"
-			" where name='filter_widget_reference'"
-				" and widgetid in (select widgetid from widget where type='map')"))
+			" where type=0"
+				" and name='dynamic'"
+				" and value_int=1"))
 	{
 		return FAIL;
 	}
