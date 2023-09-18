@@ -89,7 +89,7 @@ class TopHostsWidget {
 									[
 										'type' => 1,
 										'name' => 'columns.name.0',
-										'value' => ''
+										'value' => 'test update column 1'
 									],
 									[
 										'type' => 0,
@@ -139,7 +139,7 @@ class TopHostsWidget {
 									[
 										'type' => 1,
 										'name' => 'columns.name.1',
-										'value' => ''
+										'value' => 'test update column 2'
 									],
 									[
 										'type' => 0,
@@ -253,7 +253,7 @@ class TopHostsWidget {
 									[
 										'type' => 1,
 										'name' => 'columns.name.0',
-										'value' => ''
+										'value' => 'delete widget column 1'
 									],
 									[
 										'type' => 0,
@@ -321,7 +321,7 @@ class TopHostsWidget {
 									[
 										'type' => 1,
 										'name' => 'columns.name.0',
-										'value' => ''
+										'value' => 'remove top hosts column 1'
 									],
 									[
 										'type' => 0,
@@ -366,7 +366,7 @@ class TopHostsWidget {
 									[
 										'type' => 1,
 										'name' => 'columns.name.1',
-										'value' => ''
+										'value' => 'remove top hosts column 2'
 									],
 									[
 										'type' => 0,
