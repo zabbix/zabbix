@@ -128,13 +128,6 @@ abstract class CControllerItemPrototype extends CController {
 			$field = 'headers';
 		}
 
-		$delay_flex = $this->getInput('delay_flex', []);
-
-		if ($ret && $delay_flex) {
-			$ret = isValidCustomIntervals($delay_flex);
-			$field = 'delay_flex';
-		}
-
 		if ($ret) {
 			$ret = $this->hasInput('parent_discoveryid') || $this->hasInput('itemid');
 			$field = $this->hasInput('parent_discoveryid') ? 'itemid' : 'parent_discoveryid';

@@ -130,13 +130,6 @@ abstract class CControllerItem extends CController {
 			$field = 'headers';
 		}
 
-		$delay_flex = $this->getInput('delay_flex', []);
-
-		if ($ret && $delay_flex) {
-			$ret = isValidCustomIntervals($delay_flex);
-			$field = 'delay_flex';
-		}
-
 		if ($ret) {
 			$ret = $this->hasInput('itemid') || $this->hasInput('hostid');
 			$field = $this->hasInput('hostid') ? 'itemid' : 'hostid';
@@ -156,9 +149,7 @@ abstract class CControllerItem extends CController {
 		}
 
 		if ($ret && $this->hasInput('hostid')) {
-			$check_host = $this->getInput('context', 'host') === 'host';
-
-			if ($check_host) {
+			if ($this->getInput('context') === 'host') {
 				$ret = (bool) API::Host()->get([
 					'output' => ['hostid'],
 					'hostids' => [$this->getInput('hostid')]

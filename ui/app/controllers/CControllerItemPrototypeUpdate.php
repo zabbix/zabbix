@@ -32,6 +32,12 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			$ret = !isItemExampleKey($this->getInput('type'), $this->getInput('key'));
 		}
 
+		$delay_flex = $this->getInput('delay_flex', []);
+
+		if ($ret && $delay_flex) {
+			$ret = isValidCustomIntervals($delay_flex);
+		}
+
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
