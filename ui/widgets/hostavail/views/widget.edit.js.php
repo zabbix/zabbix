@@ -24,5 +24,22 @@
 window.widget_host_availability_form = new class {
 	init() {
 		this._form = document.getElementById('widget-dialogue-form');
+		this._only_totals_checkbox = document.getElementById('only_totals');
+		this._interface_type_checkbox_list = this._form.querySelector('.interface-type');
+
+		this._interface_type_checkbox_list.addEventListener("change",
+			(e) => this._updateOnlyTotalsCheckboxState(e.currentTarget, this._only_totals_checkbox)
+		);
+
+		this._updateOnlyTotalsCheckboxState(this._interface_type_checkbox_list, this._only_totals_checkbox);
+	}
+
+	_updateOnlyTotalsCheckboxState(checkbox_list, only_totals) {
+		if (checkbox_list.querySelectorAll('input[type=checkbox]:checked').length === 1) {
+			only_totals.setAttribute('disabled', 'disabled');
+		}
+		else {
+			only_totals.removeAttribute('disabled');
+		}
 	}
 }

@@ -32,7 +32,7 @@
 		: null
 	)
 	->addField(
-		(new CWidgetFieldCheckBoxListView($data['fields']['interface_type']))->addClass('interface_type')
+		(new CWidgetFieldCheckBoxListView($data['fields']['interface_type']))->addClass('interface-type')
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
