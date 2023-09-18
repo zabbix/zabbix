@@ -35,25 +35,25 @@ $type_field_names = [
 	INTERFACE_TYPE_IPMI => _('IPMI')
 ];
 
-$interface_states = [INTERFACE_AVAILABLE_TRUE, INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_MIXED,
+$interface_states_order = [INTERFACE_AVAILABLE_TRUE, INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_MIXED,
 	INTERFACE_AVAILABLE_UNKNOWN
 ];
 
 $interface_states_fields = [
 	INTERFACE_AVAILABLE_TRUE => ['name' => _('Available'), 'style' => ZBX_STYLE_HOST_AVAIL_TRUE,
-		'context' => _x('Available', 'compact table header')
+		'name_in_context' => _x('Available', 'compact table header')
 	],
 	INTERFACE_AVAILABLE_FALSE => ['name' => _('Not available'), 'style' => ZBX_STYLE_HOST_AVAIL_FALSE,
-		'context' => _x('Not available', 'compact table header')
+		'name_in_context' => _x('Not available', 'compact table header')
 	],
 	INTERFACE_AVAILABLE_MIXED => ['name' => _('Mixed'), 'style' => ZBX_STYLE_HOST_AVAIL_MIXED,
-		'context' => _x('Mixed', 'compact table header')
+		'name_in_context' => _x('Mixed', 'compact table header')
 	],
 	INTERFACE_AVAILABLE_UNKNOWN => ['name' => _('Unknown'), 'style' => ZBX_STYLE_HOST_AVAIL_UNKNOWN,
-		'context' => _x('Unknown', 'compact table header')
+		'name_in_context' => _x('Unknown', 'compact table header')
 	],
 	'total' => ['name' => _('Total'), 'style' => ZBX_STYLE_HOST_AVAIL_TOTAL,
-		'context' => _x('Total', 'compact table header')
+		'name_in_context' => _x('Total', 'compact table header')
 	]
 ];
 
@@ -63,7 +63,7 @@ $header = [
 ];
 
 foreach ($interface_states_fields as $field) {
-	$header[STYLE_HORIZONTAL][] = (new CSpan($field['context']))->addClass($field['style']);
+	$header[STYLE_HORIZONTAL][] = (new CSpan($field['name_in_context']))->addClass($field['style']);
 }
 
 foreach ($type_field_names as $type => $interface_name) {
@@ -110,7 +110,7 @@ else {
 
 		$counts = $type !== 'total_hosts' ? $data['interface_type_count'][$type] : $data['total_hosts'];
 
-		foreach ($interface_states as $state) {
+		foreach ($interface_states_order as $state) {
 			if ($type == INTERFACE_TYPE_AGENT_ACTIVE && $state == INTERFACE_AVAILABLE_MIXED) {
 				$interface_data[$state] = (new CCol(''));
 			}
