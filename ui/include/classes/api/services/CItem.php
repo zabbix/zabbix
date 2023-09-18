@@ -554,9 +554,9 @@ class CItem extends CItemGeneral {
 
 		self::addUuid($items);
 
-		self::checkPreprocessingStepsDuplicates($items);
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkValueMaps($items);
 		self::checkInventoryLinks($items);
 		self::checkHostInterfaces($items);
@@ -697,9 +697,9 @@ class CItem extends CItemGeneral {
 
 		self::addAffectedObjects($items, $db_items);
 
-		self::checkPreprocessingStepsDuplicates($items);
 		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkValueMaps($items, $db_items);
 		self::checkInventoryLinks($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);

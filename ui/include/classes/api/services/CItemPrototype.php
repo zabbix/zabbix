@@ -417,9 +417,9 @@ class CItemPrototype extends CItemGeneral {
 
 		self::addUuid($items);
 
-		self::checkPreprocessingStepsDuplicates($items);
 		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
@@ -563,9 +563,9 @@ class CItemPrototype extends CItemGeneral {
 
 		self::addAffectedObjects($items, $db_items);
 
-		self::checkPreprocessingStepsDuplicates($items);
 		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
+		self::checkPreprocessingStepsDuplicates($items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
