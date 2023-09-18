@@ -480,14 +480,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 				if ($aggregate_function == AGGREGATE_COUNT) {
 					$item['value_type'] = ITEM_VALUE_TYPE_UINT64;
 
-					$formatted_value = formatHistoryValueRaw($non_numeric_history, $item, false, [
-						'decimals' => $column['decimal_places'],
-						'decimals_exact' => true,
-						'small_scientific' => false,
-						'zero_as_zero' => false
-					]);
+					if ($non_numeric_history) {
+						$formatted_value = formatHistoryValueRaw($non_numeric_history, $item, false, [
+							'decimals' => $column['decimal_places'],
+							'decimals_exact' => true,
+							'small_scientific' => false,
+							'zero_as_zero' => false
+						]);
 
-					$non_numeric_history = $formatted_value['value'];
+						$non_numeric_history = $formatted_value['value'];
+					}
 				}
 
 				if ($non_numeric_history) {
