@@ -55,7 +55,7 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args)
 {
 	int	rv;
 
-	if (INT_MAX > (rv = vsnprintf(NULL, 0, fmt, args)))
+	if (0 > (rv = vsnprintf(NULL, 0, fmt, args)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
