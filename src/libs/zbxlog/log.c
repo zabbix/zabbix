@@ -672,7 +672,7 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 		exit(EXIT_FAILURE);
 	}
 
-	len = rv + 2;
+	len = (size_t)rv + 2;
 
 	va_end(args);
 

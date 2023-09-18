@@ -261,7 +261,7 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 		exit(EXIT_FAILURE);
 	}
 
-	len = rv + 1;
+	len = (size_t)rv + 1;
 
 	va_end(args);
 
