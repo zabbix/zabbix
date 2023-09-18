@@ -22,10 +22,13 @@
 require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
-
+/**
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
+ */
 class testDependentItems extends CAPITest {
 
-	public static function setUpBeforeClass(): void {
+	public static function prepareTestData(): void {
 		// Do nothing if test will be skipped.
 		if (ZBX_DEPENDENT_ITEM_MAX_COUNT > 299) {
 			return;
@@ -258,7 +261,7 @@ class testDependentItems extends CAPITest {
 		]);
 	}
 
-	public static function tearDownAfterClass(): void {
+	public static function cleanTestData(): void {
 		CTestDataHelper::cleanUp();
 	}
 
