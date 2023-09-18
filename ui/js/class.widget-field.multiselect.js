@@ -291,7 +291,7 @@ class CWidgetFieldMultiselect {
 			});
 
 			result_entities.set(id, {
-				id: id,
+				id,
 				name: t('Dashboard'),
 				source: 'dashboard'
 			})
