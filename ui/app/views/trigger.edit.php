@@ -31,8 +31,8 @@ $trigger_form = (new CForm())
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('hostid', $data['hostid'])
 	->addVar('context', $data['context'])
-	->addVar('expression_full', $data['expression_full'], 'expression-full')
-	->addVar('recovery_expression_full', $data['recovery_expression_full'], 'recovery-expression-full')
+	->addVar('expr_temp', $data['expr_temp'], 'expr_temp')
+	->addVar('recovery_expr_temp', $data['recovery_expr_temp'], 'recovery_expr_temp')
 	->addVar('triggerid', $data['triggerid']);
 
 // Enable form submitting on Enter.
@@ -131,8 +131,7 @@ $trigger_form
 	->addItem($triggers_tab)
 	->addItem((new CScriptTag('trigger_edit_popup.init('.json_encode([
 			'triggerid' => $data['triggerid'],
-			'expression_popup_parameters' => $popup_parameters + ['dstfld1' => 'expression'],
-			'recovery_popup_parameters' => $popup_parameters + ['dstfld1' => 'recovery_expression'],
+			'expression_popup_parameters' => $popup_parameters,
 			'readonly' => $readonly,
 			'db_dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.edit',

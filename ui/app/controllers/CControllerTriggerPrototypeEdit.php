@@ -219,8 +219,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 
-		$data['expression_full'] = $data['expression'];
-		$data['recovery_expression_full'] = $data['recovery_expression'];
+		$data['expr_temp'] = $data['expression'];
+		$data['recovery_expr_temp'] = $data['recovery_expression'];
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 		$data['db_trigger'] = $this->trigger_prototype
 			? CTriggerGeneralHelper::convertApiInputForForm($this->trigger_prototype)

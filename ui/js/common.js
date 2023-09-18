@@ -786,11 +786,11 @@ function validate_trigger_expression(overlay) {
 				? jQuery(form).find('#' + ret.dstfld1).get(0)
 				: document.getElementById(ret.dstfld1);
 
-			if (obj.name === 'expression' || obj.name === 'recovery_expression') {
-				jQuery(obj).val(jQuery(obj).val() + ret.expression);
+			if ((ret.dstfld1 === 'expr_temp' || ret.dstfld1 === 'recovery_expr_temp')) {
+				jQuery(obj).val(ret.expression);
 			}
 			else {
-				jQuery(obj).val(ret.expression);
+				jQuery(obj).val(jQuery(obj).val() + ret.expression);
 			}
 
 			overlayDialogueDestroy(overlay.dialogueid);
