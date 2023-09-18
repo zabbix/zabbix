@@ -79,22 +79,22 @@ class testDashboardGeomapWidget extends CWebTest {
 							'fields' => [
 								[
 									'type' => '2',
-									'name' => 'groupids',
+									'name' => 'groupids.0',
 									'value' => '4'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.0',
 									'value' => '15001'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.1',
 									'value' => '99136'
 								],
 								[
 									'type' => '3',
-									'name' => 'hostids',
+									'name' => 'hostids.2',
 									'value' => '15003'
 								],
 								[
