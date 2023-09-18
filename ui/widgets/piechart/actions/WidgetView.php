@@ -641,6 +641,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'power' => $units_config['units_show'] == self::SHOW_UNITS_ON ? null : 0,
 			'decimals' => $total_config['decimal_places'],
 			'decimals_exact' => true,
+			'small_scientific' => false,
 			'zero_as_zero' => false
 		]);
 		unset($formatted_total_value['is_numeric']);
