@@ -1,1 +1,0 @@
-...G...... [ZBX-23417] fixed possible memory leak when checking modbus.get[] item (Andris)
