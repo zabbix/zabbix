@@ -422,10 +422,7 @@ class testDashboardGeomapWidget extends CWebTest {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		COverlayDialogElement::find()->one()->waitUntilReady();
-		$form->fill(['Type' => 'Geomap']);
-
-		// After changing "Source", the overlay is reloaded.
-		$form->invalidate();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Geomap')]);
 		$form->fill($data['fields']);
 
 		if (array_key_exists('show_header', $data)) {

@@ -342,7 +342,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => 1,
 										'name' => 'sysmapid._reference',
-										'value' => 'STZDI'
+										'value' => 'STZDI._mapid'
 									],
 									[
 										'type' => 1,

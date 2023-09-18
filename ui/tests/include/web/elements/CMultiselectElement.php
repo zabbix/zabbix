@@ -238,7 +238,7 @@ class CMultiselectElement extends CElement {
 			}
 
 			$content = CXPathHelper::escapeQuotes($value);
-			$prefix = '//div[@data-opener='.$id.']/ul[@class="multiselect-suggest"]/li';
+			$prefix = '//div[@data-opener='.$id.']/ul[contains(@class, "multiselect-suggest")]/li';
 			$query = $this->query('xpath', implode('|', [
 				$prefix.'[@data-label='.$content.']',
 				$prefix.'[contains(@data-label,'.$content.')]/span[contains(@class, "suggest-found") and text()='.$content.']',
