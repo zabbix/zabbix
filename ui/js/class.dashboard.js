@@ -744,6 +744,10 @@ class CDashboard {
 		const references = this._getReferences({dashboard_page});
 
 		for (const accessor of CWidgetBase.getFieldsReferencesAccessors(new_widget_data.fields).values()) {
+			if (accessor.getTypedReference() === '') {
+				continue;
+			}
+
 			const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
 			if (reference === CDashboard.REFERENCE_DASHBOARD) {
@@ -1948,6 +1952,10 @@ class CDashboard {
 			let has_updates = false;
 
 			for (const accessor of CWidgetBase.getFieldsReferencesAccessors(fields).values()) {
+				if (accessor.getTypedReference() === '') {
+					continue;
+				}
+
 				const {reference} = CWidgetBase.parseTypedReference(accessor.getTypedReference());
 
 				if (reference === CDashboard.REFERENCE_DASHBOARD) {
