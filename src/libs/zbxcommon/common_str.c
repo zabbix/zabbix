@@ -191,7 +191,7 @@ retry:
 			exit(EXIT_FAILURE);
 		}
 
-		*alloc_len = rv + 2;	/* '\0' + one byte to prevent the operation retry */
+		*alloc_len = (size_t)rv + 2;	/* '\0' + one byte to prevent the operation retry */
 
 		va_end(args);
 		*offset = 0;
