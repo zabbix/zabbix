@@ -191,7 +191,9 @@ int	get_numa_node_num_win32(void)
 
 		if (get_lpiex(RelationNumaNode, buffer, &buffer_length))
 		{
-			for (unsigned int i = 0, numa_node_count = 0; i < buffer_length; numa_node_count++)
+			numa_node_count = 0;
+
+			for (unsigned int i = 0; i < buffer_length; numa_node_count++)
 			{
 				PSYS_LPI_EX ptr = (PSYS_LPI_EX)((PBYTE)buffer + i);
 				i += (unsigned)ptr->Size;
