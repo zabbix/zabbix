@@ -2089,7 +2089,7 @@ class CDashboard {
 				this.editWidgetProperties();
 			},
 
-			dashboardPageWidgetDelete: (e) => {
+			dashboardPageWidgetDelete: () => {
 				this._clearWarnings();
 
 				this.#validateFieldsReferences({dashboard_page: this._selected_dashboard_page});
