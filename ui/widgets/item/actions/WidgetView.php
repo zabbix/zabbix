@@ -197,7 +197,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$history_period = $time_to - $time_from;
 			}
 
-			$aggregate_function = $aggregate_function === AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
+			$aggregate_function = $aggregate_function == AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
 
 			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
 				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
@@ -241,10 +241,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if (count($last_results) > 0) {
 					$aggregate_data = $last_results[$items[$itemid]['itemid']]['data'];
+					$previous_time_to = $time_to - 1 - $aggregate_interval;
+					$previous_time_from = $previous_time_to - $aggregate_interval;
 
 					$prev_results = Manager::History()->getAggregationByInterval(
-						$items, $time_from - $aggregate_interval, time() - $aggregate_interval,
-						$aggregate_function, $time_to
+						$items, $previous_time_from, $previous_time_to, $aggregate_function, $aggregate_interval
 					);
 
 					if (!empty($prev_results)) {
@@ -300,18 +301,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 						];
 					}
 
-					if ($aggregate_function === 'count') {
+					if ($aggregate_function == AGGREGATE_COUNT) {
 						$interval = $time_to - $time_from;
+						$previous_time_to = $time_to - 1 - $interval;
+						$previous_time_from = $previous_time_to - $interval;
 
-						$prev_non_numeric_history = Manager::History()->getAggregatedValue(
-							$item, $aggregate_function, $time_from - $interval, $time_from
+						$prev_value = Manager::History()->getAggregatedValue(
+							$item, $aggregate_function, $previous_time_from, $previous_time_to
 						);
 
-						if ($non_numeric_history && $prev_non_numeric_history) {
+						if ($non_numeric_history && $prev_value) {
 							$history[$item['itemid']] += [
 								1 => [
 									'itemid' => $item['itemid'],
-									'value' => $prev_non_numeric_history,
+									'value' => $prev_value,
 									'clock' => $time_to
 								]
 							];
@@ -322,16 +325,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($history) {
 				$last_value = $history[$itemid][0]['value'];
-				$prev_value = array_key_exists(1, $history[$itemid]) ? $history[$itemid][1]['value'] : null;
 
 				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = $aggregate_function === AGGREGATE_NONE ? date(ZBX_FULL_DATE_TIME):
-						date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
+					$time = $aggregate_function === AGGREGATE_NONE
+						? date(ZBX_FULL_DATE_TIME)
+						: date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
 				}
 
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
+						$prev_value = array_key_exists(1, $history[$itemid]) ? $history[$itemid][1]['value'] : null;
+
 						$item_units = $this->fields_values['units_show'] == 1 && $this->fields_values['units'] !== ''
 							? $this->fields_values['units']
 							: $item['units'];
@@ -405,11 +410,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 								: formatHistoryValue($last_value, $items[$itemid], false);
 						}
 
-						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
-								&& $last_value !== $prev_value) {
-							$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
+							if ($aggregate_function == AGGREGATE_COUNT) {
+								if ($last_value > (int)$prev_value) {
+									$change_indicator = Widget::CHANGE_INDICATOR_UP;
+								}
+								elseif ($last_value < (int)$prev_value) {
+									$change_indicator = Widget::CHANGE_INDICATOR_DOWN;
+								}
+							}
+							else {
+								if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
+									&& $last_value !== $prev_value) {
+									$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
+								}
+							}
 						}
-						break;
+
+					break;
 				}
 			}
 			else {
