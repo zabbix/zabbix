@@ -1817,6 +1817,7 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 					->setArgument('action', 'trigger.list')
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('filter_set', 1)
+					->setArgument('uncheck', 1)
 					->setArgument('context', 'template');
 			}
 
