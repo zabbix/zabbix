@@ -85,7 +85,7 @@ class CWidgetFieldMultiselect {
 	/**
 	 * @type {int}
 	 */
-	#selected_limit = 1;
+	#selected_limit = 0;
 
 	/**
 	 * @type {boolean}
