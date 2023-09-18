@@ -753,13 +753,14 @@ class CHttpTestManager {
 
 								$field['httptest_fieldid'] = $db_field['httptest_fieldid'];
 							}
-						} else {
+						}
+						else {
 							$ins_fields[] = [
-									'httptestid' => $httptest['httptestid'],
-									'type' => ($httptest_field === 'variables')
-										? ZBX_HTTPFIELD_VARIABLE
-										: ZBX_HTTPFIELD_HEADER
-								] + $field;
+								'httptestid' => $httptest['httptestid'],
+								'type' => ($httptest_field === 'variables')
+									? ZBX_HTTPFIELD_VARIABLE
+									: ZBX_HTTPFIELD_HEADER
+							] + $field;
 						}
 					}
 					unset($field);
@@ -1129,7 +1130,8 @@ class CHttpTestManager {
 
 									$field['httpstep_fieldid'] = $db_field['httpstep_fieldid'];
 								}
-							} else {
+							}
+							else {
 								$type = '';
 
 								switch ($step_field) {
@@ -1145,9 +1147,9 @@ class CHttpTestManager {
 								}
 
 								$ins_fields[] = [
-										'httpstepid' => $step['httpstepid'],
-										'type' => $type
-									] + $field;
+									'httpstepid' => $step['httpstepid'],
+									'type' => $type
+								] + $field;
 							}
 						}
 						unset($field);
@@ -1176,7 +1178,8 @@ class CHttpTestManager {
 
 									$post['httpstep_fieldid'] = $db_post['httpstep_fieldid'];
 								}
-							} else {
+							}
+							else {
 								$ins_fields[] = [
 										'httpstepid' => $step['httpstepid'],
 										'type' => ZBX_HTTPFIELD_POST_FIELD
@@ -1188,7 +1191,8 @@ class CHttpTestManager {
 						foreach ($db_posts as $old_db_post) {
 							$del_fieldids[] = $old_db_post['httpstep_fieldid'];
 						}
-					} elseif ($db_step !== null && is_array($db_step['posts'])) {
+					}
+					elseif ($db_step !== null && is_array($db_step['posts'])) {
 						$del_fieldids = array_merge($del_fieldids, array_keys($db_step['posts']));
 					}
 				}
