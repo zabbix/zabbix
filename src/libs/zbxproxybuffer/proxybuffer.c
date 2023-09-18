@@ -712,6 +712,8 @@ int	zbx_pb_create(int mode, zbx_uint64_t size, int age, int offline_buffer, char
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(*error));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -724,7 +726,7 @@ void	zbx_pb_init(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pb_init_state(pb_data);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): state:%d", __func__, pb_data->state);
 }
 
