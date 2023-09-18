@@ -44,8 +44,7 @@ $form = (new CForm('post', $url))
 	->setName('itemForm')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('form', $data['form'])
-	->addVar('parent_discoveryid', $data['parent_discoveryid'])
-	->addVar('has_custom_timeout', $data['has_custom_timeout']);
+	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
 if (!empty($data['itemid'])) {
 	$form->addVar('itemid', $data['itemid']);
@@ -779,7 +778,8 @@ $item_tab->addItem([
  */
 $edit_source_timeouts_link = null;
 
-if ($data['can_edit_source_timeouts'] && (($readonly && !$data['has_custom_timeout']) || !$readonly)) {
+if ($data['can_edit_source_timeouts']
+		&& (($readonly && $data['has_custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) || !$readonly)) {
 	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
 		? (new CLink(_('Timeouts')))
 			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
@@ -794,12 +794,17 @@ $item_tab->addItem([
 		->setAsteriskMark()
 		->setId('js-item-timeout-label'),
 	(new CFormField([
-		(new CTextBox('timeout', $data['timeout'], $readonly || !$data['has_custom_timeout']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CRadioButtonList('has_custom_timeout', $data['has_custom_timeout']))
+			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+			->setReadonly($readonly)
+			->setModern(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('timeout', $data['timeout'],
+			$readonly || $data['has_custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),
-		!$readonly
-			? (new CButtonLink($data['has_custom_timeout'] ? _('Remove') : _('Change')))->addClass('js-change-timeout')
-			: null,
 		$edit_source_timeouts_link
 	]))->setId('js-item-timeout-field')
 ]);

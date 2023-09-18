@@ -68,8 +68,10 @@
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
 			this.discovered_item = discovered_item === undefined ? false : discovered_item;
+			this.type = document.getElementById('type');
 			this.has_custom_timeout = document.getElementById('has_custom_timeout');
 			this.timeout = document.getElementById('timeout');
+			this.custom_timeout = this.timeout.value;
 			this.inherited_timeouts = inherited_timeouts;
 
 			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
@@ -127,17 +129,15 @@
 		if (type in item_form.inherited_timeouts) {
 			item_form.timeout.disabled = false;
 
-			if (item_form.timeout.readOnly && item_form.has_custom_timeout.value == 0) {
+			if (item_form.has_custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
 				item_form.timeout.value = item_form.inherited_timeouts[type];
-			}
-			else {
-				item_form.has_custom_timeout.value = 1;
 			}
 		}
 		else {
-			item_form.has_custom_timeout.value = 0;
 			item_form.timeout.disabled = true;
 		}
+
+		item_form.custom_timeout = item_form.timeout.value;
 
 		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !interface_optional);
 		$('input[name=interfaceid]').prop('aria-required', !interface_optional);
@@ -221,21 +221,20 @@
 			})
 			.trigger('change');
 
-		const change_timeout_button = document.querySelector('.js-change-timeout');
+		item_form.has_custom_timeout.addEventListener('change', () => {
+			const show_inherited_timeout =
+				item_form.has_custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>;
 
-		if (change_timeout_button !== null) {
-			change_timeout_button.addEventListener('click', () => {
-				item_form.timeout.toggleAttribute('readonly', !item_form.timeout.readOnly);
-				change_timeout_button.innerText = item_form.timeout.readOnly
-					? <?= json_encode(_('Change')) ?>
-					: <?= json_encode(_('Remove')) ?>;
-				item_form.has_custom_timeout.value = item_form.timeout.readOnly ? 0 : 1;
+			item_form.timeout.toggleAttribute('readonly', show_inherited_timeout);
 
-				if (item_form.timeout.readOnly) {
-					item_form.timeout.value = item_form.inherited_timeouts[document.getElementById('type').value] || '';
-				}
-			});
-		}
+			if (show_inherited_timeout) {
+				item_form.custom_timeout = item_form.timeout.value;
+				item_form.timeout.value = item_form.inherited_timeouts[item_form.type.value] || '';
+			}
+			else {
+				item_form.timeout.value = item_form.custom_timeout;
+			}
+		});
 
 		$('#test_item').on('click', function() {
 			var step_nums = [];

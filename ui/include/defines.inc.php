@@ -647,6 +647,9 @@ define('ITEM_LOGTYPE_VERBOSE',			10);
 define('ITEM_DELAY_FLEXIBLE',	0);
 define('ITEM_DELAY_SCHEDULING',	1);
 
+define('ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED',	0);
+define('ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED',	1);
+
 // Item pre-processing types.
 define('ZBX_PREPROC_MULTIPLIER',				1);
 define('ZBX_PREPROC_RTRIM',						2);

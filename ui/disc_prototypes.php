@@ -146,7 +146,10 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'has_custom_timeout' =>			[T_ZBX_INT, O_OPT, null,	IN([0, 1]),	null],
+	'has_custom_timeout' =>			[T_ZBX_INT, O_OPT, null,
+										IN([ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
+										null
+									],
 	'timeout' =>					[T_ZBX_TU, O_OPT, P_ALLOW_USER_MACRO,	null,
 										'(isset({add}) || isset({update})) && isset({type})'.
 										' && '.IN([ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE,
@@ -360,7 +363,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				: getRequest('password', DB::getDefault('items', 'password')),
 			'params' => getRequest('params', DB::getDefault('items', 'params')),
 			'delay' => getDelayWithCustomIntervals(getRequest('delay', DB::getDefault('items', 'delay')), $delay_flex),
-			'timeout' => getRequest('has_custom_timeout') == 1
+			'timeout' => getRequest('has_custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
 				? getRequest('timeout', DB::getDefault('items', 'timeout'))
 				: DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
@@ -612,7 +615,7 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$data['inherited_timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
 		? $data['inherited_timeouts']['timeouts'][$data['type']]
 		: $default_timeout;
-	$data['has_custom_timeout'] = getRequest('has_custom_timeout', (int) ($data['timeout'] !== $default_timeout));
+	$data['has_custom_timeout'] = (int) getRequest('has_custom_timeout', $data['timeout'] !== $default_timeout);
 	$data['timeout'] = $data['has_custom_timeout'] ? $data['timeout'] : $data['inherited_timeout'];
 	$data['can_edit_source_timeouts'] = $data['inherited_timeouts']['source'] === 'proxy'
 		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
