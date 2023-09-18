@@ -19,10 +19,10 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+
 #include "../common/zbxsysinfo_common.h"
 
 #include "zbxnum.h"
-#include "zbxlog.h"
 
 static struct ifmibdata	ifmd;
 
@@ -181,7 +181,7 @@ int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return SYSINFO_RET_OK;
 }
 
-int     net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char		*port_str, command[64];
 	unsigned short	port;

@@ -20,7 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxlog.h"
 #include "zbxwin32.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
@@ -39,16 +38,16 @@
 
 #define ZBX_REGKEY_VERSION	"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion"
 
-/******************************************************************************
- *                                                                            *
- * Purpose: join strings into one, placing separator in between them,         *
- *          skipping empty strings                                            *
- *                                                                            *
- * Parameters: separator - separator to place in between strings              *
- *             count     - number of strings                                  *
- *             ...       - strings to join (strings can be empty  or NULL)    *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: joins strings into one, placing separator in between them,          *
+ *          skipping empty strings                                              *
+ *                                                                              *
+ * Parameters: separator - [IN] separator to place in between strings           *
+ *             count     - [IN] number of strings                               *
+ *             ...       - [IN] strings to join (strings can be empty  or NULL) *
+ *                                                                              *
+ ********************************************************************************/
 static char	*join_nonempty_strs(const char *separator, size_t count, ...)
 {
 	char	*arg;
@@ -195,8 +194,7 @@ static char	*get_build_string(HKEY handle, int include_descriptor)
 
 static char	*get_full_os_info(HKEY handle)
 {
-	char	*res = NULL;
-	char	*name, *lab, *build;
+	char	*name, *lab, *build, *res = NULL;
 
 	name = get_registry_value(handle, TEXT(ZBX_REGVALUE_PRODUCTNAME), REG_MULTI_SZ);
 	lab = get_registry_value(handle, TEXT(ZBX_REGVALUE_BUILDLABEX), REG_MULTI_SZ);
