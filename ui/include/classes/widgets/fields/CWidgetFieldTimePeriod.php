@@ -186,6 +186,18 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			}
 
 			if (!$errors) {
+				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
+					$label = $period_labels_prefix.$period_labels[$name];
+
+					if ($field_value[$name_ts] < 0 || $field_value[$name_ts] > ZBX_MAX_DATE) {
+						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $label,
+							$this->is_date_only ? _('a date is expected') : _('a time is expected')
+						);
+					}
+				}
+			}
+
+			if (!$errors) {
 				if ($field_value['from'] !== '' && $field_value['to'] !== ''
 						&& $field_value['from_ts'] >= $field_value['to_ts']) {
 					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $period_labels_prefix.$period_labels['to'],
