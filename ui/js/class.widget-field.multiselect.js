@@ -285,8 +285,13 @@ class CWidgetFieldMultiselect {
 		const result_entities = new Map();
 
 		if (this.#dashboard_accepted && t('Dashboard').toLowerCase().includes(search)) {
-			result_entities.set('DASHBOARD', {
-				id: CWidgetBase.createTypedReference({reference: CDashboard.REFERENCE_DASHBOARD, type: this.#in_type}),
+			const id = CWidgetBase.createTypedReference({
+				reference: CDashboard.REFERENCE_DASHBOARD,
+				type: this.#in_type
+			});
+
+			result_entities.set(id, {
+				id: id,
 				name: t('Dashboard'),
 				source: 'dashboard'
 			})
