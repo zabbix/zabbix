@@ -666,10 +666,11 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 
 	va_start(args, format);
 
-	if (0 > (rv = vsnprintf(NULL, 0, format, args)))
+	if (0 > (rv = zbx_vsnprintf_check_len(format, args)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		va_end(args);
+
+		return;
 	}
 
 	len = (size_t)rv + 2;

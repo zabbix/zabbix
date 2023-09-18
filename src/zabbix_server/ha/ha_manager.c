@@ -255,10 +255,10 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 
 	va_start(args, fmt);
 
-	if (0 > (rv = vsnprintf(NULL, 0, fmt, args)))
+	if (0 > (rv = zbx_vsnprintf_check_len(fmt, args)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		va_end(args);
+		return;
 	}
 
 	len = (size_t)rv + 1;

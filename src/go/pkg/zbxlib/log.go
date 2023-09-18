@@ -39,10 +39,11 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 
 		va_copy(tmp, args);
 
-		if (0 > (rv = vsnprintf(NULL, 0, fmt, tmp)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+                if (0 > (rv = zbx_vsnprintf_check_len(fmt, tmp)))
+                {
+			va_end(tmp);
+
+			return;
 		}
 
 		size = (size_t)rv + 2;
