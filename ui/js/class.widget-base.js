@@ -97,14 +97,14 @@ class CWidgetBase {
 	 * @param {number}      view_mode           One of ZBX_WIDGET_VIEW_MODE_NORMAL, ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER.
 	 * @param {Object}      fields              Widget field values (widget configuration data).
 	 *
-	 * @param {Object}      defaults            Widget type defaults.
-	 *        {string}      defaults.name           Default name to display in the header, if no custom name given.
-	 *        {Object}      defaults.size           Default size to use when creating new widgets.
-	 *        {number}      defaults.size.width     Default width.
-	 *        {number}      defaults.size.height    Default height
-	 *        {string}      defaults.js_class       JavaScript class name.
-	 *        {Object}      defaults.in             Fields able to receive data from the event hub.
-	 *        {Array}       defaults.out            Fields able to broadcast data to the event hub.
+	 * @param {Object}           defaults       Widget type defaults.
+	 *        {string}           defaults.name         Default name to display in the header, if no custom name given.
+	 *        {Object|undefined} defaults.size         Default size to use when creating new widgets.
+	 *        {number|undefined} defaults.size.width   Default width.
+	 *        {number|undefined} defaults.size.height  Default height
+	 *        {string|undefined} defaults.js_class     JavaScript class name.
+	 *        {Object|undefined} defaults.in           Fields able to receive data from the event hub.
+	 *        {Array|undefined}  defaults.out          Fields able to broadcast data to the event hub.
 	 *
 	 * @param {string|null} widgetid            Widget ID stored in the database, or null for new widgets.
 	 *
@@ -118,8 +118,8 @@ class CWidgetBase {
 	 * @param {number}      rf_rate             Update cycle rate (refresh rate) in seconds. Supported values: 0 (no
 	 *                                          refresh), 10, 30, 60, 120, 600 or 900 seconds.
 	 * @param {Object}      dashboard           Essential data of the dashboard object.
-	 *        {string|null} dashboard.dashboardid   Dashboard ID.
-	 *        {string|null} dashboard.templateid    Template ID (used for template and host dashboards).
+	 *        {string|null} dashboard.dashboardid  Dashboard ID.
+	 *        {string|null} dashboard.templateid   Template ID (used for template and host dashboards).
 	 *
 	 * @param {Object}      dashboard_page      Essential data of the dashboard page object.
 	 *        {string}      dashboard_page.unique_id  Run-time, unique ID of the dashboard page.
@@ -163,8 +163,8 @@ class CWidgetBase {
 			name: defaults.name,
 			size: defaults.size,
 			js_class: defaults.js_class,
-			in: {...defaults.in},
-			out: defaults.out
+			in: 'in' in defaults ? {...defaults.in} : {},
+			out: 'out' in defaults ? defaults.out : []
 		};
 
 		this._widgetid = widgetid;

@@ -110,19 +110,6 @@ class CDashboardHelper {
 			CArrayHelper::sort($page['widgets'], ['y', 'x']);
 
 			foreach ($page['widgets'] as $widget_data) {
-				if (!array_key_exists($widget_data['widgetid'], $widgets_and_forms)) {
-					continue;
-				}
-
-				/** @var CWidget $widget */
-				/** @var CWidgetForm $form */
-				[
-					'widget' => $widget,
-					'form' => $form
-				] = $widgets_and_forms[$widget_data['widgetid']];
-
-				$form->validate();
-
 				$prepared_widget = [
 					'widgetid' => $widget_data['widgetid'],
 					'type' => $widget_data['type'],
@@ -135,19 +122,35 @@ class CDashboardHelper {
 						'height' => (int) $widget_data['height']
 					],
 					'rf_rate' => 0,
-					'fields' => $form->getFieldsValues()
+					'fields' => []
 				];
 
-				if ($with_rf_rate) {
-					$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
+				if (array_key_exists($widget_data['widgetid'], $widgets_and_forms)) {
+					/** @var CWidget $widget */
+					/** @var CWidgetForm $form */
+					[
+						'widget' => $widget,
+						'form' => $form
+					] = $widgets_and_forms[$widget_data['widgetid']];
 
-					if ($rf_rate == -1) {
-						$rf_rate = $prepared_widget['fields']['rf_rate'] == -1
-							? $widget->getDefaultRefreshRate()
-							: $prepared_widget['fields']['rf_rate'];
+					$form->validate();
+
+					$prepared_widget['fields'] = $form->getFieldsValues();
+
+					if ($with_rf_rate) {
+						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
+
+						if ($rf_rate == -1) {
+							$rf_rate = $prepared_widget['fields']['rf_rate'] == -1
+								? $widget->getDefaultRefreshRate()
+								: $prepared_widget['fields']['rf_rate'];
+						}
+
+						$prepared_widget['rf_rate'] = $rf_rate;
 					}
-
-					$prepared_widget['rf_rate'] = $rf_rate;
+				}
+				else {
+					$prepared_widget['type'] = '';
 				}
 
 				$prepared_widgets[] = $prepared_widget;

@@ -298,7 +298,7 @@ class CDashboardPage {
 	addWidgetFromData({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id}) {
 		let widget;
 
-		if (type in this._widget_defaults) {
+		if (type !== '') {
 			widget = this._createWidget(eval(this._widget_defaults[type].js_class), {
 				type,
 				name,
