@@ -258,6 +258,7 @@ static void	ha_set_error(zbx_ha_info_t *info, const char *fmt, ...)
 	if (0 > (rv = zbx_vsnprintf_check_len(fmt, args)))
 	{
 		va_end(args);
+
 		return;
 	}
 

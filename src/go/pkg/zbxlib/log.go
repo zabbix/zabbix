@@ -39,8 +39,8 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 
 		va_copy(tmp, args);
 
-                if (0 > (rv = zbx_vsnprintf_check_len(fmt, tmp)))
-                {
+		if (0 > (rv = zbx_vsnprintf_check_len(fmt, tmp)))
+		{
 			va_end(tmp);
 
 			return;
