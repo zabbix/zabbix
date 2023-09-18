@@ -35,8 +35,8 @@ window.tophosts_column_edit_form = new class {
 			element.style.display = Number(this._aggregate_function.value) === 0 ? 'none' : '';
 		}
 
-		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"], [name="item_time"]', this._$widget_form)
-			.on('change', () => this._update());
+		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"], [name="item_time"]',
+			this._$widget_form).on('change', () => this._update());
 
 		colorPalette.setThemeColors(thresholds_colors);
 

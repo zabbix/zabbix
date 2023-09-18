@@ -316,12 +316,25 @@ class WidgetForm extends CWidgetForm {
 
 	/**
 	 * Check if widget configuration is set to use overridden time.
+	 *
+	 * @param array $fields_values An array of field values.
+	 *
+	 * @return bool Returns true if custom item time has to be used; otherwise, returns false.
 	 */
 	public static function hasOverrideTime(array $fields_values): bool {
 		return array_key_exists('item_time', $fields_values)
 			&& $fields_values['item_time'] == self::ITEM_VALUE_CUSTOM_TIME_ON;
 	}
 
+	/**
+	 * Validates the time period selector from and to values and returns any validation errors.
+	 *
+	 * @param string $from The 'from' timestamp - the start of the selected period.
+	 * @param string $to   The 'to' timestamp - the end of the selected period.
+	 *
+	 * @return array An array containing validation error messages, or an empty array if data is valid.
+	 *
+	 */
 	private static function validateTimeSelectorPeriod(string $from, string $to): array {
 		$errors = [];
 		$ts = [];

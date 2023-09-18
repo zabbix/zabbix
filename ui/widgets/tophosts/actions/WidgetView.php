@@ -85,7 +85,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$this->fields_values['columns'][$key]['time_from'] = $from;
 				$this->fields_values['columns'][$key]['time_to'] = $to;
 			}
-			else if ($column['aggregate_function'] != AGGREGATE_NONE) {
+			elseif ($column['aggregate_function'] != AGGREGATE_NONE) {
 				$from = $column['time_from'];
 				$to = $column['time_to'];
 			}
@@ -372,10 +372,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private static function isNumericOnlyColumn(array $column): bool {
 		return ($column['aggregate_function'] != AGGREGATE_NONE
-			&& $column['aggregate_function'] != AGGREGATE_LAST
-			&& $column['aggregate_function'] != AGGREGATE_FIRST
-			&& $column['aggregate_function'] != AGGREGATE_COUNT)
-			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS;
+				&& $column['aggregate_function'] != AGGREGATE_LAST
+				&& $column['aggregate_function'] != AGGREGATE_FIRST
+				&& $column['aggregate_function'] != AGGREGATE_COUNT
+			) || $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS;
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids,
@@ -466,16 +466,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($values) {
 					foreach ($values as $value) {
-						$result += $aggregate_function !== AGGREGATE_COUNT
+						$result += $aggregate_function != AGGREGATE_COUNT
 							? [$value['data'][0]['itemid'] => $value['data'][0]['value']]
 							: [$value['data'][0]['itemid'] => $value['data'][0]['count']];
 					}
 				}
 			}
 			else {
-				$non_numeric_history = Manager::History()->getAggregatedValue(
-					$item, $function, $time_from, $time_to
-				);
+				$non_numeric_history = Manager::History()->getAggregatedValue($item, $function, $time_from, $time_to);
 
 				if ($aggregate_function == AGGREGATE_COUNT) {
 					$item['value_type'] = ITEM_VALUE_TYPE_UINT64;

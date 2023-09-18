@@ -2520,3 +2520,24 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
 
 	return array_values($conditions);
 }
+
+function item_aggr_fnc2str($calc_fnc) {
+	switch ($calc_fnc) {
+		case AGGREGATE_NONE:
+			return _('not used');
+		case AGGREGATE_MIN:
+			return _('min');
+		case AGGREGATE_MAX:
+			return _('max');
+		case AGGREGATE_AVG:
+			return _('avg');
+		case AGGREGATE_COUNT:
+			return _('count');
+		case AGGREGATE_SUM:
+			return _('sum');
+		case AGGREGATE_FIRST:
+			return _('first');
+		case AGGREGATE_LAST:
+			return _('last');
+	}
+}

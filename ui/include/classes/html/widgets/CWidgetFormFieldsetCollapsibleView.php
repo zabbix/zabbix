@@ -72,12 +72,6 @@ class CWidgetFormFieldsetCollapsibleView extends CFormFieldsetCollapsible {
 		return $this;
 	}
 
-	public function setFieldHint(CTag $hint): self {
-		$this->field_hint = $hint;
-
-		return $this;
-	}
-
 	protected function bodyToString(): string {
 		foreach ($this->fields as &$field) {
 			if ($field instanceof CWidgetFieldsGroupView) {

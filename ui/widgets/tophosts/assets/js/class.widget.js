@@ -19,6 +19,7 @@
 
 
 class CWidgetTopHosts extends CWidget {
+
 	setTimePeriod(time_period) {
 		super.setTimePeriod(time_period);
 

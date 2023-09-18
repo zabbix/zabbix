@@ -200,7 +200,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$aggregate_function = $aggregate_function == AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
 
-			if ((int)$value_type === ITEM_VALUE_TYPE_FLOAT || (int)$value_type === ITEM_VALUE_TYPE_UINT64) {
+			if ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64) {
 				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
 					$item = $items[$itemid];
 
@@ -240,7 +240,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					);
 				}
 
-				if (count($last_results) > 0) {
+				if ($last_results) {
 					$aggregate_data = $last_results[$items[$itemid]['itemid']]['data'];
 					$previous_time_to = $time_to - 1 - $aggregate_interval;
 					$previous_time_from = $previous_time_to - $aggregate_interval;
@@ -249,29 +249,29 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$items, $previous_time_from, $previous_time_to, $aggregate_function, $aggregate_interval
 					);
 
-					if (!empty($prev_results)) {
+					if ($prev_results) {
 						$aggregate_data += [
 							'1' => $prev_results[$items[$itemid]['itemid']]['data'][0]
 						];
 					}
 				}
 
-				if (count($last_results) > 0) {
+				if ($last_results) {
 					$history[$items[$itemid]['itemid']] = $aggregate_data;
 					$history[$itemid][0]['clock'] = $time_to;
 				}
 
-				if ($aggregate_function === AGGREGATE_COUNT && !empty($history)) {
-					foreach ($history as $itemid => &$datas) {
-						foreach ($datas as &$data) {
-							$data['value'] = $data['count'];
-							unset($data['count']);
+				if ($aggregate_function == AGGREGATE_COUNT && $history) {
+					foreach ($history as $itemid => &$data) {
+						foreach ($data as &$data_) {
+							$data_['value'] = $data_['count'];
+							unset($data_['count']);
 						}
 
-						unset($data);
+						unset($data_);
 					}
 
-					unset($datas);
+					unset($data);
 				}
 			}
 			else {
@@ -281,9 +281,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						|| $aggregate_function == AGGREGATE_FIRST
 						|| $aggregate_function == AGGREGATE_COUNT) {
 					if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
-						$non_numeric_history = Manager::History()->getAggregatedValue(
-							$item, $aggregate_function, $time_from, $time_to
-						);
+						$non_numeric_history = Manager::History()->getAggregatedValue($item, $aggregate_function,
+							$time_from, $time_to);
 					}
 					else {
 						$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
@@ -328,7 +327,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$last_value = $history[$itemid][0]['value'];
 
 				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = $aggregate_function === AGGREGATE_NONE
+					$time = $aggregate_function == AGGREGATE_NONE
 						? date(ZBX_FULL_DATE_TIME)
 						: date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
 				}
@@ -662,6 +661,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	/**
 	 * Make widget specific info to show in widget's header.
+	 *
+	 * @return array Returns an array containing icon data, or an empty array if the conditions are not met.
 	 */
 	private function makeWidgetInfo(): array {
 		$info = [];

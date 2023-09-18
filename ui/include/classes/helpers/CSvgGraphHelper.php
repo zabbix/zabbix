@@ -618,7 +618,7 @@ class CSvgGraphHelper {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
-				$name = graph_item_aggr_fnc2str($metric['options']['aggregate_function']).
+				$name = item_aggr_fnc2str($metric['options']['aggregate_function']).
 					'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
 			}
 			else {

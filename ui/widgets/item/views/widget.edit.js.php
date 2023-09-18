@@ -63,13 +63,17 @@ window.widget_item_form = new class {
 			});
 		}
 
-		this._aggregate_warning.style.display = Number(this._aggregate_function.value) === <?= AGGREGATE_AVG ?>
-			|| Number(this._aggregate_function.value) === <?= AGGREGATE_MIN ?>
-			|| Number(this._aggregate_function.value) === <?= AGGREGATE_MAX ?>
-			|| Number(this._aggregate_function.value) === <?= AGGREGATE_SUM ?> ? '' : 'none';
+		this.aggregate_function = Number(this._aggregate_function.value);
+
+		this._aggregate_warning.style.display = this.aggregate_function == <?= AGGREGATE_AVG ?>
+				|| this.aggregate_function == <?= AGGREGATE_MIN ?>
+				|| this.aggregate_function == <?= AGGREGATE_MAX ?>
+				|| this.aggregate_function == <?= AGGREGATE_SUM ?>
+			? ''
+			: 'none';
 
 		for (const element of this._form.querySelectorAll('.js-row-override-time')) {
-			element.style.display = Number(this._aggregate_function.value) === 0 ? 'none' : '';
+			element.style.display = this.aggregate_function == <?= AGGREGATE_NONE ?> ? 'none' : '';
 		}
 
 		this._units_show.addEventListener('change', () => this.updateForm());
@@ -127,7 +131,7 @@ window.widget_item_form = new class {
 			}
 		}
 
-		this._item_time.value = this._aggregate_function.value != <?= AGGREGATE_NONE ?> && this._item_time.checked
+		this._item_time.value = this.aggregate_function != <?= AGGREGATE_NONE ?> && this._item_time.checked
 			? 1
 			: 0;
 
@@ -138,7 +142,7 @@ window.widget_item_form = new class {
 			'#time_to_calendar'
 		];
 
-		if (this._aggregate_function.value == <?= AGGREGATE_NONE ?>) {
+		if (this.aggregate_function == <?= AGGREGATE_NONE ?>) {
 			time_period_fields.push('#item_time');
 
 			for (const element of document.querySelectorAll(time_period_fields)) {
@@ -153,14 +157,14 @@ window.widget_item_form = new class {
 			}
 		}
 
-		aggregate_options.addEventListener('change', function() {
+		aggregate_options.addEventListener('change', (e) => {
 			for (const element of override_fields) {
-				element.style.display = (Number(this.value) === <?= AGGREGATE_NONE ?>) ? 'none' : 'block';
+				element.style.display = e.target.value == <?= AGGREGATE_NONE ?> ? 'none' : 'block';
 			}
 
-			aggregate_warning.style.display = Number(this.value) === <?= AGGREGATE_AVG ?>
-				|| Number(this.value) === <?= AGGREGATE_MIN ?> || Number(this.value) === <?= AGGREGATE_MAX ?>
-				|| Number(this.value) === <?= AGGREGATE_SUM ?> ? '' : 'none';
+			aggregate_warning.style.display = e.target.value == <?= AGGREGATE_AVG ?>
+				|| e.target.value == <?= AGGREGATE_MIN ?> || e.target.value == <?= AGGREGATE_MAX ?>
+				|| e.target.value == <?= AGGREGATE_SUM ?> ? '' : 'none';
 		});
 	}
 
