@@ -208,7 +208,7 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 				makeHelpIcon([
 					_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
 					BR(), BR(),
-					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (ones with "any error" being the last of them).')
+					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
 				])
 			]),
 		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))->setId('preprocessing_div')

@@ -315,7 +315,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @throws APIException
 	 */
 	protected static function checkPreprocessingStepsDuplicates(array $items): void {
-		$uniq_rules = ['type' => API_OBJECTS, 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
 			'preprocessing' => ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
 				'type' =>	['type' => API_ANY],
 				'params' =>	['type' => API_ANY]
@@ -323,32 +323,26 @@ abstract class CItemGeneral extends CApiService {
 		]];
 		$items_steps = [];
 
-		foreach ($items as $item_index => $item) {
+		foreach ($items as $i1 => $item) {
 			if (!array_key_exists('preprocessing', $item)) {
 				continue;
 			}
 
-			$step_any_error = [];
-
-			foreach ($item['preprocessing'] as $step_index => $step) {
+			foreach ($item['preprocessing'] as $i2 => $step) {
 				if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 					[$match_type] = explode("\n", $step['params']);
 
 					if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
-						$step_any_error[$step_index] = [
+						$items_steps[$i1]['preprocessing'][$i2] = [
 							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
 							'params' => ZBX_PREPROC_MATCH_ERROR_ANY
 						];
 					}
 				}
 			}
-
-			if ($step_any_error) {
-				$items_steps[$item_index] = ['preprocessing' => $step_any_error];
-			}
 		}
 
-		if ($items_steps && !CApiInputValidator::validateUniqueness($uniq_rules, $items_steps, '', $error)) {
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items_steps, '', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
@@ -2832,26 +2826,26 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array
 	 */
 	private static function sortPreprocessingSteps(array $steps): array {
-		$preproc_regex = [];
-		$preproc_any = [];
-		$sorted_steps = [];
+		$ns_regex = [];
+		$ns_any = [];
+		$other = [];
 
 		foreach ($steps as $step) {
 			if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-				$sorted_steps[] = $step;
+				$other[] = $step;
 				continue;
 			}
 
 			[$match_type] = explode("\n", $step['params']);
 
-			if ($match_type != ZBX_PREPROC_MATCH_ERROR_ANY) {
-				$preproc_regex[] = $step;
+			if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+				$ns_any[] = $step;
 			}
 			else {
-				$preproc_any[] = $step;
+				$ns_regex[] = $step;
 			}
 		}
 
-		return array_merge($preproc_regex, $preproc_any, $sorted_steps);
+		return array_merge($ns_regex, $ns_any, $other);
 	}
 }

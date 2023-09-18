@@ -2537,21 +2537,23 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
  * @return array
  */
 function sortPreprocessingSteps(array $steps): array {
-	$preproc_regex = [];
-	$preproc_any = [];
-	$sorted_steps = [];
+	$ns_regex = [];
+	$ns_any = [];
+	$other = [];
 
 	foreach ($steps as $step) {
 		if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-			$sorted_steps[] = $step;
+			$other[] = $step;
+			continue;
 		}
-		elseif ($step['params'][0] != ZBX_PREPROC_MATCH_ERROR_ANY) {
-			$preproc_regex[] = $step;
+
+		if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+			$ns_any[] = $step;
 		}
 		else {
-			$preproc_any[] = $step;
+			$ns_regex[] = $step;
 		}
 	}
 
-	return array_merge($preproc_regex, $preproc_any, $sorted_steps);
+	return array_merge($ns_regex, $ns_any, $other);
 }

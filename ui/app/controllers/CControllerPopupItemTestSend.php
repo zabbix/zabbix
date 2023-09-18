@@ -169,7 +169,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 						break;
 
 					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-						$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+						$api_input_rules = CItemPrototype::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
 						break;
 
 					case self::ZBX_TEST_TYPE_LLD:

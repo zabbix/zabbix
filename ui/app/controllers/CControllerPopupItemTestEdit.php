@@ -107,6 +107,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			 * be disabled otherwise).
 			 */
 			$steps = $this->getInput('steps', []);
+
 			if ($ret && $steps) {
 				$steps = normalizeItemPreprocessingSteps($steps);
 
@@ -116,7 +117,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 						break;
 
 					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-						$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+						$api_input_rules = CItemPrototype::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
 						break;
 
 					case self::ZBX_TEST_TYPE_LLD:
@@ -130,18 +131,18 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 				}
 
 				if ($ret && $this->test_type != self::ZBX_TEST_TYPE_LLD) {
-					$step_any_error = [];
-					$rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
+					$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
 						'type' =>	['type' => API_ANY],
 						'params' =>	['type' => API_ANY]
 					]];
+					$_steps = [];
 
 					foreach ($steps as $i => $step) {
 						if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 							[$match_type] = explode("\n", $step['params']);
 
 							if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
-								$step_any_error[$i] = [
+								$_steps[$i] = [
 									'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
 									'params' => ZBX_PREPROC_MATCH_ERROR_ANY
 								];
@@ -149,10 +150,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 						}
 					}
 
-					$ret = !$step_any_error
-						|| CApiInputValidator::validateUniqueness($rules, $step_any_error, '', $error);
-
-					if (!$ret) {
+					if (!CApiInputValidator::validateUniqueness($api_input_rules, $_steps, '', $error)) {
 						error($error);
 						$ret = false;
 					}
