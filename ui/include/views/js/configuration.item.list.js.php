@@ -163,7 +163,9 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
 		},
 
 		massCheckNow() {
