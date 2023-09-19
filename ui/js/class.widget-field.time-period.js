@@ -181,7 +181,9 @@ class CWidgetFieldTimePeriod {
 		}
 
 		for (const reference_form_rows of document.querySelectorAll(`.js-${this.#field_name}-reference`)) {
-			reference_form_rows.hidden = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET;
+			reference_form_rows.style.dispaly = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET
+				? 'none'
+				: '';
 		}
 
 		if (this.#widget_accepted) {
@@ -211,7 +213,7 @@ class CWidgetFieldTimePeriod {
 		const date_picker_form_rows = `.js-${this.#field_name}-from, .js-${this.#field_name}-to`;
 
 		for (const element of document.querySelectorAll(date_picker_form_rows)) {
-			element.hidden = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
+			element.style.display = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT ? 'none' : '';
 		}
 	}
 

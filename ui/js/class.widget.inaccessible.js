@@ -28,7 +28,7 @@ class CWidgetInaccessible extends CWidget {
 
 	_updateButtons() {
 		for (const button of this._header.querySelectorAll('button')) {
-			button.hidden = !button.classList.contains('js-widget-action') || !this.isEditMode();
+			button.style.display = !button.classList.contains('js-widget-action') || !this.isEditMode() ? 'none' : '';
 		}
 	}
 
