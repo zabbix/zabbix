@@ -89,15 +89,29 @@
 					array_keys(itemTypeInterface(), INTERFACE_TYPE_OPT)
 				) ?>.indexOf(type) != -1;
 
-		if (type == <?= ITEM_TYPE_SIMPLE ?> && (key.substr(0, 7) === 'vmware.' || key.substr(0, 8) === 'icmpping')) {
+		if (type == <?= ITEM_TYPE_SIMPLE ?>
+				&& (key.substring(0, 7) === 'vmware.' || key.substring(0, 8) === 'icmpping')) {
 			jQuery('#test_item').prop('disabled', true);
 		}
 		else {
 			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
 		}
 
+		// timeout field
+		if (type == <?= ITEM_TYPE_SIMPLE ?>) {
+			const toggle_fields = [
+				'js-item-timeout-label',
+				'js-item-timeout-field'
+			];
+			const set_hidden = key.substring(0, 8) === 'icmpping' || key.substring(0, 7) === 'vmware.';
+			const object_switcher = globalAllObjForViewSwitcher['type'];
+
+			toggle_fields.forEach((element_id) =>
+				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
+			);
+		}
 		// delay field
-		if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
+		else if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
 			const toggle_fields = [
 				'delay',
 				'js-item-delay-label',
@@ -105,20 +119,7 @@
 				'js-item-flex-intervals-label',
 				'js-item-flex-intervals-field'
 			];
-			const set_hidden = (key.substr(0, 8) === 'mqtt.get'),
-				object_switcher = globalAllObjForViewSwitcher['type'];
-
-			toggle_fields.forEach((element_id) =>
-				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
-			);
-		}
-		// timeout field
-		else if (type == <?= ITEM_TYPE_SIMPLE ?>) {
-			const toggle_fields = [
-				'js-item-timeout-label',
-				'js-item-timeout-field'
-			];
-			const set_hidden = key.substr(0, 8) === 'icmpping' || key.substr(0, 6) === 'vmware';
+			const set_hidden = key.substring(0, 8) === 'mqtt.get';
 			const object_switcher = globalAllObjForViewSwitcher['type'];
 
 			toggle_fields.forEach((element_id) =>

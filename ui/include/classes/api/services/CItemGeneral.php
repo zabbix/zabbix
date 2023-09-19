@@ -1319,61 +1319,67 @@ abstract class CItemGeneral extends CApiService {
 				$item += array_intersect_key($type_field_defaults, $field_names);
 			}
 
-			if ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE) {
-				if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
-						&& strncmp($item['key_'], 'mqtt.get', 8) == 0) {
-					$item += array_intersect_key($type_field_defaults, array_flip(['delay']));
-				}
-			}
-			elseif ($item['type'] == ITEM_TYPE_SIMPLE) {
-				if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
-						&& (strncmp($item['key_'], 'icmpping', 8) === 0
-							|| strncmp($item['key_'], 'vmware', 6) === 0)) {
-					$item += array_intersect_key($type_field_defaults, array_flip(['timeout']));
-				}
-			}
-			elseif ($item['type'] == ITEM_TYPE_SSH) {
-				if ($item['type'] != $db_item['type']) {
-					if ($db_item['type'] == ITEM_TYPE_HTTPAGENT) {
-						$item += array_intersect_key($type_field_defaults, array_flip(['authtype']));
+			switch ($item['type']) {
+				case ITEM_TYPE_SIMPLE:
+					if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
+							&& (strncmp($item['key_'], 'icmpping', 8) === 0
+								|| strncmp($item['key_'], 'vmware.', 7) === 0)) {
+						$item += array_intersect_key($type_field_defaults, array_flip(['timeout']));
 					}
-				}
-				elseif (array_key_exists('authtype', $item) && $item['authtype'] !== $db_item['authtype']
-						&& $item['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
-					$item += array_intersect_key($type_field_defaults, array_flip(['publickey', 'privatekey']));
-				}
-			}
-			elseif ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-				if ($item['type'] != $db_item['type']) {
-					if (!array_key_exists('authtype', $item)) {
-						$item += array_intersect_key($type_field_defaults, array_flip(['authtype']));
-					}
+					break;
 
-					if ($item['authtype'] == ZBX_HTTP_AUTH_NONE) {
-						$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
+				case ITEM_TYPE_ZABBIX_ACTIVE:
+					if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
+							&& strncmp($item['key_'], 'mqtt.get', 8) === 0) {
+						$item += array_intersect_key($type_field_defaults, array_flip(['delay']));
 					}
+					break;
 
-					if (!array_key_exists('allow_traps', $item) || $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
-						$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
+				case ITEM_TYPE_SSH:
+					if ($item['type'] != $db_item['type']) {
+						if ($db_item['type'] == ITEM_TYPE_HTTPAGENT) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['authtype']));
+						}
 					}
-				}
-				else {
-					if (array_key_exists('request_method', $item)
-							&& $item['request_method'] != $db_item['request_method']
-							&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
-						$item += ['retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS];
+					elseif (array_key_exists('authtype', $item) && $item['authtype'] !== $db_item['authtype']
+							&& $item['authtype'] == ITEM_AUTHTYPE_PASSWORD) {
+						$item += array_intersect_key($type_field_defaults, array_flip(['publickey', 'privatekey']));
 					}
+					break;
 
-					if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
-							&& $item['authtype'] == ZBX_HTTP_AUTH_NONE) {
-						$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
-					}
+				case ITEM_TYPE_HTTPAGENT:
+					if ($item['type'] != $db_item['type']) {
+						if (!array_key_exists('authtype', $item)) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['authtype']));
+						}
 
-					if (array_key_exists('allow_traps', $item) && $item['allow_traps'] != $db_item['allow_traps']
-							&& $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
-						$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
+						if ($item['authtype'] == ZBX_HTTP_AUTH_NONE) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
+						}
+
+						if (!array_key_exists('allow_traps', $item)
+								|| $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
+						}
 					}
-				}
+					else {
+						if (array_key_exists('request_method', $item)
+								&& $item['request_method'] != $db_item['request_method']
+								&& $item['request_method'] == HTTPCHECK_REQUEST_HEAD) {
+							$item += ['retrieve_mode' => HTTPTEST_STEP_RETRIEVE_MODE_HEADERS];
+						}
+
+						if (array_key_exists('authtype', $item) && $item['authtype'] != $db_item['authtype']
+								&& $item['authtype'] == ZBX_HTTP_AUTH_NONE) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['username', 'password']));
+						}
+
+						if (array_key_exists('allow_traps', $item) && $item['allow_traps'] != $db_item['allow_traps']
+								&& $item['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_OFF) {
+							$item += array_intersect_key($type_field_defaults, array_flip(['trapper_hosts']));
+						}
+					}
+					break;
 			}
 
 			if (array_key_exists('value_type', $item) && $item['value_type'] != $db_item['value_type']) {

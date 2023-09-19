@@ -166,7 +166,7 @@ abstract class CItemType {
 					case ITEM_TYPE_SIMPLE:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
-								return strncmp($data['key_'], 'icmpping', 8) !== 0 && strncmp($data['key_'], 'vmware', 6) !== 0;
+								return strncmp($data['key_'], 'icmpping', 8) !== 0 && strncmp($data['key_'], 'vmware.', 7) !== 0;
 							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];
@@ -180,7 +180,7 @@ abstract class CItemType {
 					case ITEM_TYPE_ZABBIX_ACTIVE:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
-								return strncmp($data['key_'], 'mqtt.get', 8) != 0;
+								return strncmp($data['key_'], 'mqtt.get', 8) !== 0;
 							}, 'type' => API_ITEM_DELAY, 'flags' => API_REQUIRED | API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'length' => DB::getFieldLength('items', 'delay')],
 							['else' => true, 'type' => API_TIME_UNIT, 'in' => DB::getDefault('items', 'delay')]
 						]];
@@ -270,7 +270,7 @@ abstract class CItemType {
 					case ITEM_TYPE_SIMPLE:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
-								return strncmp($data['key_'], 'icmpping', 8) !== 0 && strncmp($data['key_'], 'vmware', 6) !== 0;
+								return strncmp($data['key_'], 'icmpping', 8) !== 0 && strncmp($data['key_'], 'vmware.', 7) !== 0;
 							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];

@@ -2458,10 +2458,10 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 
 			case 'timeout':
 				return $input['type'] != ITEM_TYPE_SIMPLE
-					|| (strncmp($input['key_'], 'icmpping', 8) !== 0 && strncmp($input['key_'], 'vmware', 6) !== 0);
+					|| (strncmp($input['key_'], 'icmpping', 8) !== 0 && strncmp($input['key_'], 'vmware.', 7) !== 0);
 
 			case 'delay':
-				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;
+				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) !== 0;
 
 			case 'trapper_hosts':
 				return $input['type'] != ITEM_TYPE_HTTPAGENT || $input['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON;
