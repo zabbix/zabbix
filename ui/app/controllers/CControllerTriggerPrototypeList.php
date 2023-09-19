@@ -35,7 +35,7 @@ class CControllerTriggerPrototypeList extends CController {
 			'context' =>				'required|in '.implode(',', ['host', 'template']),
 			'page' =>					'ge 1',
 			'parent_discoveryid' =>		'required|db items.itemid',
-			'sort' =>					'in '.implode(',', ['description', 'priority', 'status']),
+			'sort' =>					'in '.implode(',', ['description', 'priority', 'status', 'discover']),
 			'sortorder' =>				'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
 			'uncheck' =>				'in 1'
 		];
