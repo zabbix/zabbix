@@ -515,14 +515,8 @@ function getMenuPopupMapElementTrigger(options) {
 		const item_urls = [];
 
 		for (const value of options.triggers) {
-			url = new Curl('zabbix.php');
-			url.setArgument('action', 'trigger.edit');
-			url.setArgument('triggerid', value.triggerid);
-			url.setArgument('context', 'host');
-
 			trigger_urls.push({
 				label: value.description,
-				url: url.getUrl(),
 				clickCallback: function(e) {
 					e.preventDefault();
 					jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
@@ -804,12 +798,8 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const config_urls = [];
 		const item_urls = [];
 
-		url = new Curl('zabbix.php');
-		url.setArgument('action', 'trigger.edit');
-
 		config_urls.push({
 			label: t('Trigger'),
-			url: url.getUrl(),
 			clickCallback: function(e) {
 				e.preventDefault();
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
@@ -1083,12 +1073,8 @@ function getMenuPopupItem(options) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
-				url = new Curl('zabbix.php');
-				url.setArgument('action', 'trigger.edit');
-
 				trigger_items.push({
 					label: value.description,
-					url: url.getUrl(),
 					clickCallback: function(e) {
 						e.preventDefault();
 						jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
@@ -1107,12 +1093,8 @@ function getMenuPopupItem(options) {
 
 		config_urls.push(config_triggers);
 
-		url = new Curl('zabbix.php');
-		url.setArgument('action', 'trigger.edit');
-
 		config_urls.push({
 			label: t('Create trigger'),
-			url: url.getUrl(),
 			disabled: options.binary_value_type,
 			clickCallback: function(e) {
 				e.preventDefault();
@@ -1227,12 +1209,8 @@ function getMenuPopupItemPrototype(options) {
 		const trigger_prototypes = [];
 
 		for (const value of options.trigger_prototypes) {
-			url = new Curl('zabbix.php');
-			url.setArgument('action', 'trigger.prototype.edit');
-
 			trigger_prototypes.push({
 				label: value.description,
-				url: url.getUrl(),
 				clickCallback: function(e) {
 					e.preventDefault();
 					jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
@@ -1253,12 +1231,8 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push(config_triggers);
 
-	url = new Curl('zabbix.php');
-	url.setArgument('action', 'trigger.prototype.edit')
-
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		url: url.getUrl(),
 		clickCallback: function(e) {
 			e.preventDefault();
 			jQuery(this).closest('.menu-popup').menuPopup('close', null);
