@@ -199,7 +199,7 @@ class testDashboardURLWidget extends CWebTest {
 			'Show header' => true,
 			'Refresh interval' => 'Default (No refresh)',
 			'URL' => '',
-			'Enable host selection' => false
+			'Override host' => ''
 		];
 
 		$form->checkValue($default_state);
@@ -230,14 +230,14 @@ class testDashboardURLWidget extends CWebTest {
 		$dialog->close();
 		$dashboard->save();
 
-		// Check parameter 'Enable host selection' true/false state.
+		// Check 'Override host' functionality.
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
 		$this->assertEquals('No host selected.', $dashboard->getWidget(self::$default_widget)
 				->query('class:nothing-to-show')->one()->getText());
 		$dashboard->getWidget(self::$default_widget)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
-		$form->fill(['Enable host selection' => false])->submit();
+		$form->fill(['Override host' => ''])->submit();
 		$dashboard->save();
 		$this->assertFalse($host_selector->isVisible());
 	}
@@ -594,7 +594,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'ЗАББИКС Сервер',
-						'Enable host selection' => true,
+						'Override host' => 'Dashboard',
 						'URL' => 'zabbix.php?action=host.edit&hostid={HOST.ID}'
 					],
 					'result' => [
@@ -608,7 +608,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Dynamic widgets H1',
-						'Enable host selection' => true,
+						'Override host' => 'Dashboard',
 						'URL' => 'zabbix.php?name={HOST.NAME}&ip=&dns=&port=&status=-1&evaltype=0&tags[0][tag]=&'.
 							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
 							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
@@ -626,7 +626,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Host-layout-test-001',
-						'Enable host selection' => true,
+						'Override host' => 'Dashboard',
 						'URL' => 'zabbix.php?name=&ip={HOST.IP}&dns=&port=&status=-1&evaltype=0&tags[0][tag]=&'.
 							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
 							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'
@@ -644,7 +644,7 @@ class testDashboardURLWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Host for resolved DNS macro',
-						'Enable host selection' => true,
+						'Override host' => 'Dashboard',
 						'URL' => 'zabbix.php?name=&ip=&dns={HOST.DNS}&port=&status=-1&evaltype=0&tags[0][tag]=&'.
 							'tags[0][operator]=0&tags[0][value]=&maintenance_status=1&filter_name=&filter_show_counter=0&'.
 							'filter_custom_time=0&sort=name&sortorder=ASC&show_suppressed=0&action=host.view'

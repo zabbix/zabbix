@@ -296,7 +296,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			}
 
 			// Check advanced fields when Advanced configuration is true.
-			if ($advanced_config){
+			if ($advanced_config) {
 				// Check hintbox.
 				$form->getLabel('Description')->query('class:zi-help-filled-small')->one()->click();
 				$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
