@@ -20,7 +20,6 @@
 #include "zbxcacheconfig.h"
 
 #include "zbxalgo.h"
-#include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"

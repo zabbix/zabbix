@@ -180,7 +180,7 @@ static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
 
 ZBX_PTR_VECTOR_IMPL(event_suppress_query_ptr, zbx_event_suppress_query_t*)
 
-int	event_suppress_query_eventid_compare(const void *d1, const void *d2)
+static int	event_suppress_query_eventid_compare(const void *d1, const void *d2)
 {
 	const zbx_event_suppress_query_t	*ds1 = *(const zbx_event_suppress_query_t * const *)d1;
 	const zbx_event_suppress_query_t	*ds2 = *(const zbx_event_suppress_query_t * const *)d2;
@@ -234,7 +234,7 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 ZBX_PTR_VECTOR_DECL(event_suppress_data_ptr, zbx_event_suppress_data_t*)
 ZBX_PTR_VECTOR_IMPL(event_suppress_data_ptr, zbx_event_suppress_data_t*)
 
-int	event_suppress_data_eventid_compare(const void *d1, const void *d2)
+static int	event_suppress_data_eventid_compare(const void *d1, const void *d2)
 {
 	const zbx_event_suppress_data_t    *ds1 = *(const zbx_event_suppress_data_t * const *)d1;
 	const zbx_event_suppress_data_t    *ds2 = *(const zbx_event_suppress_data_t * const *)d2;

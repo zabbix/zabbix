@@ -23,7 +23,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
-#include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
 #include "zbxstr.h"
 
