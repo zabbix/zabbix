@@ -23,6 +23,7 @@ class CSVGPie {
 	static ZBX_STYLE_CLASS =				'svg-pie-chart';
 	static ZBX_STYLE_ARCS =					'svg-pie-chart-arcs';
 	static ZBX_STYLE_ARC =					'svg-pie-chart-arc';
+	static ZBX_STYLE_ARC_PLACEHOLDER =		'svg-pie-chart-arc-placeholder';
 	static ZBX_STYLE_ARC_NO_DATA_OUTER =	'svg-pie-chart-arc-no-data-outer';
 	static ZBX_STYLE_ARC_NO_DATA_INNER =	'svg-pie-chart-arc-no-data-inner';
 	static ZBX_STYLE_TOTAL_VALUE =			'svg-pie-chart-total-value';
@@ -128,14 +129,15 @@ class CSVGPie {
 	 * @type {SVGPathElement}
 	 * @member {Selection}
 	 */
-	#pop_out_sector = null;
+	#popped_out_sector = null;
 
 	/**
-	 * Timeout that determines when the popped out sector can be popped back in.
+	 * SVG path element that represents a placeholder under a sector that is popped out.
 	 *
-	 * @type {number|null}
+	 * @type {SVGPathElement}
+	 * @member {Selection}
 	 */
-	#pop_in_timeout = null;
+	#popped_out_placeholder = null;
 
 	/**
 	 * Outer radius of pie chart.
@@ -222,6 +224,11 @@ class CSVGPie {
 	 * @param {Object} total_value    Object of total value and units.
 	 */
 	setValue({sectors, all_sectorids, total_value}) {
+		this.#svg.on('mousemove', null);
+
+		this.#popped_out_sector = null;
+		this.#popped_out_placeholder = null;
+
 		if (sectors.length > 0) {
 			sectors = this.#sortByReference(sectors, all_sectorids);
 
@@ -302,10 +309,16 @@ class CSVGPie {
 		const key = d => d.data.id;
 
 		this.#arcs_container
+			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
+			.data(this.#pieGenerator(this.#sectors_new), key)
+			.join('svg:path')
+			.attr('class', CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)
+			.attr('d', (d) => this.#arcGenerator(d));
+
+		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
 			.data(this.#pieGenerator(was), key)
-			.enter()
-			.insert('svg:path')
+			.join('svg:path')
 			.attr('class', CSVGPie.ZBX_STYLE_ARC)
 			.attr('data-hintbox', 1)
 			.attr('data-hintbox-static', 1)
@@ -320,7 +333,6 @@ class CSVGPie {
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
-			.style('fill', d => d.data.color)
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_WHOLE)
 			.attrTween('d', (d, index, nodes) => {
@@ -335,13 +347,10 @@ class CSVGPie {
 				};
 			})
 			.on('start', (d, index, nodes) => {
-				this.#svg.on('mousemove', null);
-				this.#pop_out_sector = null;
-				this.#pop_in_timeout = null;
-
 				d3.select(nodes[index])
 					.attr('transform', 'translate(0, 0)')
-					.attr('data-hintbox-contents', this.#setHint(d));
+					.attr('data-hintbox-contents', this.#setHint(d))
+					.style('fill', d => d.data.color);
 			})
 			.end()
 			.then(() => {
@@ -351,6 +360,7 @@ class CSVGPie {
 					// If mouse was on any sector before/during animation, then pop that sector out again.
 					if (sectors[i].matches(':hover')) {
 						this.#popOut(sectors[i]);
+						this.#popped_out_sector = sectors[i];
 					}
 				}
 
@@ -539,29 +549,30 @@ class CSVGPie {
 	 * @param {Event} e  Mouse move event.
 	 */
 	#onMouseMove(e) {
-		if (this.#pop_in_timeout !== null) {
-			clearTimeout(this.#pop_in_timeout);
-			this.#pop_in_timeout = null;
+		if (e.target.classList.contains(CSVGPie.ZBX_STYLE_ARC) && e.target.dataset.expanded) {
+			return;
 		}
+
+		const placeholder = document.elementsFromPoint(e.clientX, e.clientY)
+			.find((element) => element.classList.contains(CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER));
 
 		if (e.target.classList.contains(CSVGPie.ZBX_STYLE_ARC)) {
-			if (e.target !== this.#pop_out_sector) {
-				if (this.#pop_out_sector !== null) {
-					this.#popIn(this.#pop_out_sector);
-				}
-
-				this.#pop_out_sector = e.target;
-				this.#popOut(this.#pop_out_sector);
+			if (this.#popped_out_sector === null) {
+				this.#popped_out_sector = e.target;
+				this.#popped_out_placeholder = placeholder;
+				this.#popOut(this.#popped_out_sector);
+			}
+			else if (e.target !== this.#popped_out_sector) {
+				this.#popIn(this.#popped_out_sector);
+				this.#popped_out_sector = e.target;
+				this.#popped_out_placeholder = placeholder;
+				this.#popOut(this.#popped_out_sector);
 			}
 		}
-		else if (this.#pop_out_sector !== null) {
-			this.#pop_in_timeout = setTimeout(() => {
-				clearTimeout(this.#pop_in_timeout);
-				this.#pop_in_timeout = null;
-
-				this.#popIn(this.#pop_out_sector);
-				this.#pop_out_sector = null;
-			}, 300);
+		else if (this.#popped_out_sector !== null && e.target !== this.#popped_out_placeholder) {
+			this.#popIn(this.#popped_out_sector);
+			this.#popped_out_sector = null;
+			this.#popped_out_placeholder = null;
 		}
 	}
 

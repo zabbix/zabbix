@@ -9,6 +9,11 @@
 			stroke: $ui-bg-color;
 		}
 
+		.svg-pie-chart-arc-placeholder {
+			stroke-width: 0;
+			fill: transparent;
+		}
+
 		.svg-pie-chart-arc-no-data-outer {
 			fill: $pie-chart-arc-no-data-color;
 		}

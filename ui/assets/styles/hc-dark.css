@@ -3297,6 +3297,9 @@ section {
     .svg-pie-chart .svg-pie-chart-arcs path {
       vector-effect: non-scaling-stroke;
       stroke: #000000; }
+    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-placeholder {
+      stroke-width: 0;
+      fill: transparent; }
     .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-outer {
       fill: #111111; }
     .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-inner {
