@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,40 +19,21 @@
 **/
 
 
-class CControllerUsergroupTagfilterAdd extends CController {
+class CControllerUsergroupTagFilterEdit extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
-
 		$fields = [
-			'tag_filters'    => 'array',
-			'new_tag_filter' => 'required|array'
+			'edit' =>			'in 1,0',
+			'groupid' =>		'db hosts_groups.groupid',
+			'name' =>			'string',
+			'tag_filters' =>	'array'
 		];
 
 		$ret = $this->validateInput($fields);
-
-		if ($ret) {
-			$new_tag_filter = $this->getInput('new_tag_filter') + [
-				'groupids' => [],
-				'tag' => '',
-				'value' => ''
-			];
-
-			if (!$new_tag_filter['groupids']) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Host groups'), _('cannot be empty')));
-
-				$ret = false;
-			}
-
-			if ($ret && $new_tag_filter['tag'] === '' && $new_tag_filter['value'] !== '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
-
-				$ret = false;
-			}
-		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -72,32 +53,34 @@ class CControllerUsergroupTagfilterAdd extends CController {
 	}
 
 	protected function doAction() {
-		$new_tag_filter = $this->getInput('new_tag_filter') + [
-			'groupids' => [],
-			'tag' => '',
-			'value' => '',
-			'include_subgroups' => '0'
+		$data = [
+			'edit' => 0,
+			'groupid' => null,
+			'name' => '',
+			'tag_filters' => []
 		];
+		$this->getInputs($data, array_keys($data));
 
-		$groupids = $new_tag_filter['include_subgroups']
-			? getSubGroups($new_tag_filter['groupids'])
-			: $new_tag_filter['groupids'];
-
-		$tag_filters = $this->getInput('tag_filters', []);
-
-		foreach ($groupids as $groupid) {
-			$tag_filters[] = [
-				'groupid' => $groupid,
-				'tag' => $new_tag_filter['tag'],
-				'value' => $new_tag_filter['value']
-			];
-		}
-
-		$this->setResponse(new CControllerResponseData([
-			'tag_filters' => collapseTagFilters($tag_filters),
+		$data += [
+			'title' => $data['edit'] == 0 ? _('New tag filter') : _('Tag filter'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
-		]));
+		];
+
+		$data['host_groups_ms'] = [];
+
+		if ($data['groupid'] !== null) {
+			$host_groups = API::HostGroup()->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $data['groupid'],
+				'preservekeys' => true
+			]);
+			CArrayHelper::sort($host_groups, ['name']);
+
+			$data['host_groups_ms'] = CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
+		}
+
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }

@@ -20,6 +20,7 @@
 #ifndef ZABBIX_WIN32_CPU_H
 #define ZABBIX_WIN32_CPU_H
 
+int	get_cpu_num_win32(void);
 int	get_cpu_group_num_win32(void);
 int	get_numa_node_num_win32(void);
 

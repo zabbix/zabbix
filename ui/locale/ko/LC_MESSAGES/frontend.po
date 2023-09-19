@@ -892,6 +892,10 @@ msgstr "추가"
 msgid "Add (message type limit reached)"
 msgstr "추가(메시지 유형 제한에 도달함)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "새로운 위젯을 추가"
@@ -25297,6 +25301,10 @@ msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "수치"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
