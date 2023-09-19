@@ -34,7 +34,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxpreproc.h"
 #include "zbxtagfilter.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"
@@ -172,6 +171,12 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num);
 static void	hc_queue_item(zbx_hc_item_t *item);
 static int	hc_queue_elem_compare_func(const void *d1, const void *d2);
 static int	hc_get_history_compression_age(void);
+
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt)
+{
+	if (0 != (opt->flags & ZBX_PP_VALUE_OPT_LOG))
+		zbx_free(opt->source);
+}
 
 /******************************************************************************
  *                                                                            *

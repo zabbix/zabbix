@@ -39,7 +39,7 @@ class testDataCollection extends CIntegrationTest {
 		// Create proxy "proxy".
 		CDataHelper::call('proxy.create', [
 			'name' => 'proxy',
-			'mode' => PROXY_MODE_ACTIVE
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 		]);
 
 		$proxyids = CDataHelper::getIds('name');
@@ -167,6 +167,7 @@ class testDataCollection extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
 
 		$this->reloadConfigurationCache();
+		sleep(5);
 
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-09 08:26+0000\n"
+"PO-Revision-Date: 2023-09-11 06:11+0000\n"
 "Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -936,6 +936,10 @@ msgstr "Přidat"
 msgid "Add (message type limit reached)"
 msgstr "Přidat (dosaženo limitu typů zpráv)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "Přidat nový widget"
@@ -1403,6 +1407,10 @@ msgstr "Každoročně"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Jakýkoliv"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr "Veškeré změny provedené v aktuálním formuláři budou ztraceny."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -5945,7 +5953,7 @@ msgstr[2] "Dashboardy byl smazány"
 
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
-msgstr ""
+msgstr "Seznam dashboardů"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -8269,7 +8277,7 @@ msgstr "Seznam událostí [posledních 20]"
 
 #: include/classes/data/CItemData.php:946
 msgid "Event log monitoring. Returns count of entries"
-msgstr ""
+msgstr "Monitoring logu událostí. Vráti počet záznamů"
 
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
@@ -9736,7 +9744,7 @@ msgstr "Počet hostů"
 
 #: app/views/monitoring.host.dashboard.view.php:71
 msgid "Host dashboards"
-msgstr ""
+msgstr "Dashboard hosta"
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14501,6 +14509,10 @@ msgstr "Nový krok webového scénáře"
 msgid "New tag name"
 msgstr "Nový název tagu"
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr "Nová šablona"
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14516,7 +14528,7 @@ msgstr "Nové mapování uživatelských skupin"
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Next dashboard"
-msgstr ""
+msgstr "Další dashboard"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16609,7 +16621,7 @@ msgstr "Náhled"
 
 #: app/views/monitoring.host.dashboard.view.php:133
 msgid "Previous dashboard"
-msgstr ""
+msgstr "Předchozí dashboard"
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -16990,6 +17002,10 @@ msgstr "Veřejný klíč"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Soubor s veřejným klíčem"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr "Push"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -24190,7 +24206,7 @@ msgstr "očekává se IP adresa"
 
 #: include/classes/validators/CApiInputValidator.php:2773
 msgid "an IP or DNS is expected"
-msgstr ""
+msgstr "očekává se IP adresa nebo DNS záznam"
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481
@@ -25607,6 +25623,10 @@ msgstr "now() - Počet sekund od Období"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "číslo"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

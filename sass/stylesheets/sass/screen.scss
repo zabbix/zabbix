@@ -483,6 +483,14 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+
+		span {
+			white-space: normal;
+		}
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -614,6 +622,7 @@ form {
 	color: $font-color;
 	background-color: transparent;
 	border-color: transparent;
+	vertical-align: top;
 
 	&[disabled] {
 		color: $form-disabled-font-color;
@@ -1914,7 +1923,7 @@ select {
 		}
 
 		.overlay-dialogue-body {
-			overflow: auto;
+			overflow-y: auto;
 			overflow-x: hidden;
 			width: 100%;
 			max-height: calc(100vh - 220px);
@@ -1924,7 +1933,7 @@ select {
 			position: relative;
 			@extend %webkit-scrollbar;
 
-			> form {
+			form {
 				padding: 2px 0;
 			}
 
@@ -3832,8 +3841,8 @@ svg {
 	.table-col-action { width: 55px; }
 }
 
-z-select,
-.z-select {
+.z-select,
+z-select {
 	&.z-select-host-interface {
 		.description:not(:empty) {
 			display: block;

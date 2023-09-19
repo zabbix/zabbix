@@ -1,1 +1,0 @@
-A......... [ZBX-23214] fixed inability to import a host if a template with non-existent template group is specified in the same import file (vmaksimovs)

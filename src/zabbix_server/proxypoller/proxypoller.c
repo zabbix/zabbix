@@ -402,7 +402,7 @@ static int	proxy_process_proxy_data(zbx_dc_proxy_t *proxy, const char *answer, z
 		goto out;
 	}
 
-	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, PROXY_MODE_PASSIVE, events_cbs,
+	if (SUCCEED != (ret = zbx_process_proxy_data(proxy, &jp, ts, PROXY_OPERATING_MODE_PASSIVE, events_cbs,
 			proxydata_frequency, more, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned invalid proxy data: %s",

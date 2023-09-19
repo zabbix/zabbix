@@ -914,6 +914,10 @@ msgstr "Lisää"
 msgid "Add (message type limit reached)"
 msgstr ""
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr ""
@@ -1382,6 +1386,10 @@ msgstr ""
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Mikä tahansa"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -14339,6 +14347,10 @@ msgstr ""
 msgid "New tag name"
 msgstr ""
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -16825,6 +16837,10 @@ msgstr ""
 #: include/views/configuration.item.edit.php:687
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
+msgstr ""
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
 msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
@@ -25412,6 +25428,10 @@ msgstr ""
 
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127

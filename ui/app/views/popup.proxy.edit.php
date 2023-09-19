@@ -56,11 +56,11 @@ $proxy_tab = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Proxy mode'), 'mode'),
+		new CLabel(_('Proxy mode'), 'operating_mode'),
 		new CFormField(
-			(new CRadioButtonList('mode', $data['form']['mode']))
-				->addValue(_('Active'), PROXY_MODE_ACTIVE)
-				->addValue(_('Passive'), PROXY_MODE_PASSIVE)
+			(new CRadioButtonList('operating_mode', $data['form']['operating_mode']))
+				->addValue(_('Active'), PROXY_OPERATING_MODE_ACTIVE)
+				->addValue(_('Passive'), PROXY_OPERATING_MODE_PASSIVE)
 				->setModern(true)
 		)
 	])

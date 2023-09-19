@@ -37,7 +37,6 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
-#include "zbxpreproc.h"
 #include "zbxautoreg.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */
@@ -94,10 +93,16 @@ typedef struct
 zbx_host_rights_t;
 
 static zbx_lld_process_agent_result_func_t	lld_process_agent_result_cb = NULL;
+static zbx_preprocess_item_value_func_t		preprocess_item_value_cb = NULL;
+static zbx_preprocessor_flush_func_t		preprocessor_flush_cb = NULL;
 
-void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func)
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func,
+	zbx_preprocess_item_value_func_t preprocess_item_value_func,
+	zbx_preprocessor_flush_func_t preprocessor_flush_func)
 {
 	lld_process_agent_result_cb = lld_process_agent_result_func;
+	preprocess_item_value_cb = preprocess_item_value_func;
+	preprocessor_flush_cb = preprocessor_flush_func;
 }
 
 /******************************************************************************
@@ -604,7 +609,7 @@ static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT
 {
 	if (0 == item->host.proxyid)
 	{
-		zbx_preprocess_item_value(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
+		preprocess_item_value_cb(item->itemid, item->host.hostid, item->value_type, item->flags, result, ts,
 				item->state, error);
 		*h_num = 0;
 	}
@@ -784,7 +789,7 @@ int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *
 	if (0 < processed_num)
 		zbx_dc_items_update_nextcheck(items, values, errcodes, values_num);
 
-	zbx_preprocessor_flush();
+	preprocessor_flush_cb();
 	zbx_dc_flush_history();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
@@ -2247,9 +2252,9 @@ static void	check_proxy_nodata(const zbx_timespec_t *ts, unsigned char proxy_sta
 
 	delay = ts->sec - diff->lastaccess;
 
-	if ((PROXY_MODE_PASSIVE == proxy_status &&
+	if ((PROXY_OPERATING_MODE_PASSIVE == proxy_status &&
 			(2 * proxydata_frequency) < delay && NET_DELAY_MAX < delay) ||
-			(PROXY_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
+			(PROXY_OPERATING_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay))
 	{
 		diff->nodata_win.values_num = 0;
 		diff->nodata_win.period_end = ts->sec;
@@ -2280,8 +2285,8 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
 
 	delay_empty = ts->sec - diff->nodata_win.period_end;
 
-	if (PROXY_MODE_PASSIVE == proxy_status ||
-			(PROXY_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay_empty))
+	if (PROXY_OPERATING_MODE_PASSIVE == proxy_status ||
+			(PROXY_OPERATING_MODE_ACTIVE == proxy_status && NET_DELAY_MAX < delay_empty))
 	{
 		diff->nodata_win.period_end = 0;
 		diff->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;

@@ -895,7 +895,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				continue;
 			}
 
-			if (PROXY_MODE_ACTIVE == type)
+			if (PROXY_OPERATING_MODE_ACTIVE == type)
 			{
 				zbx_tm_task_t	*task;
 
@@ -903,7 +903,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				zbx_vector_tm_task_append(&tasks_active, task);
 				zbx_vector_str_append(&proxynames_log, name);
 			}
-			else if (PROXY_MODE_PASSIVE == type)
+			else if (PROXY_OPERATING_MODE_PASSIVE == type)
 			{
 				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
 				{
@@ -1455,12 +1455,12 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 		proxy = proxies.values[i];
 
-		if (PROXY_MODE_ACTIVE == proxy->mode)
+		if (PROXY_OPERATING_MODE_ACTIVE == proxy->mode)
 		{
 			task = tm_create_active_proxy_reload_task(proxy->proxyid);
 			zbx_vector_tm_task_append(&tasks_active, task);
 		}
-		else if (PROXY_MODE_PASSIVE == proxy->mode)
+		else if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
 		{
 			if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxy->proxyid))
 			{
@@ -1543,7 +1543,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 				continue;
 			}
 
-			if (PROXY_MODE_ACTIVE == type)
+			if (PROXY_OPERATING_MODE_ACTIVE == type)
 			{
 				zbx_tm_task_t	*task;
 
@@ -1551,7 +1551,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 				zbx_vector_tm_task_append(&tasks_active, task);
 				zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 			}
-			else if (PROXY_MODE_PASSIVE == type)
+			else if (PROXY_OPERATING_MODE_PASSIVE == type)
 			{
 				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
 				{

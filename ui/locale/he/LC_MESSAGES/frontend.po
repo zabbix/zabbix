@@ -913,6 +913,10 @@ msgstr "הוספה"
 msgid "Add (message type limit reached)"
 msgstr "הוספה (הגעת לגבול כמות סוגי הודעות)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "הוספת וידג׳ט חדש"
@@ -1380,6 +1384,10 @@ msgstr "שנתית"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "כלשהו"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -14361,6 +14369,10 @@ msgstr ""
 msgid "New tag name"
 msgstr "שם תגית חדש"
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -16848,6 +16860,10 @@ msgstr "מפתח ציבורי"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "קובץ מפתח ציבורי"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -25441,6 +25457,10 @@ msgstr "now()‎ - מספר השניות מאז ראשית ספירת Epoch"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "מספר"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

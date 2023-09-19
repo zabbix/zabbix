@@ -4056,7 +4056,7 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select p.proxyid,p.name,p.mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
+			"select p.proxyid,p.name,p.operating_mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
 				"p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,pr.lastaccess"
 			" from proxy p"
 			" join proxy_rtdata pr"

@@ -116,7 +116,7 @@ void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb)
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
-zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
+static zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
 		void *finished_data, const char *config_source_ip, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
@@ -203,7 +203,7 @@ out:
  * Purpose: destroy preprocessing manager                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
+static void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 {
 	int	i;
 
@@ -247,7 +247,7 @@ void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
  *             client  - [IN] request source                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
+static void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc, zbx_variant_t *value,
 		zbx_timespec_t ts, zbx_ipc_client_t *client)
 {
 	zbx_pp_task_t	*task = pp_task_test_create(preproc, value, ts, client);
@@ -263,7 +263,7 @@ void	zbx_pp_manager_queue_test(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t 
  * Purpose: queue value/value_sec preprocessing tasks                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
+static void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
 {
 	zbx_prof_start(__func__, ZBX_PROF_MUTEX);
 	pp_task_queue_lock(&manager->queue);
@@ -292,8 +292,8 @@ void	zbx_pp_manager_queue_value_preproc(zbx_pp_manager_t *manager, zbx_vector_pp
  * Return value: The created task or NULL if the data can be flushed directly.*
  *                                                                            *
  ******************************************************************************/
-zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
-		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt)
+static zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_t itemid,
+		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt)
 {
 	zbx_pp_item_t	*item;
 
@@ -534,7 +534,7 @@ static zbx_pp_task_t	*pp_manager_requeue_next_sequence_task(zbx_pp_manager_t *ma
  *             finished_num   - [OUT] finished tasks                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
+static void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
 		zbx_uint64_t *pending_num, zbx_uint64_t *processing_num, zbx_uint64_t *finished_num)
 {
 #define PP_FINISHED_TASK_BATCH_SIZE	100
@@ -600,7 +600,7 @@ void	zbx_pp_manager_process_finished(zbx_pp_manager_t *manager, zbx_vector_pp_ta
  * Parameters: manager - [IN] manager                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
+static void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_pp_item_t		*item;
@@ -646,8 +646,8 @@ zbx_hashset_t  *zbx_pp_manager_items(zbx_pp_manager_t *manager)
  * Purpose: get diagnostic statistics                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_get_diag_stats(zbx_pp_manager_t *manager, zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
-		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num)
+static void	zbx_pp_manager_get_diag_stats(zbx_pp_manager_t *manager, zbx_uint64_t *preproc_num,
+		zbx_uint64_t *pending_num, zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num)
 {
 	*preproc_num = (zbx_uint64_t)manager->items.num_data;
 	*pending_num = manager->queue.pending_num;
@@ -660,7 +660,8 @@ void	zbx_pp_manager_get_diag_stats(zbx_pp_manager_t *manager, zbx_uint64_t *prep
  * Purpose: get task sequence statistics                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vector_pp_sequence_stats_ptr_t *sequences)
+static void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager,
+		zbx_vector_pp_sequence_stats_ptr_t *sequences)
 {
 	pp_task_queue_get_sequence_stats(&manager->queue, sequences);
 }
@@ -670,7 +671,7 @@ void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vector_pp_
  * Purpose: get worker usage statistics                                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pp_manager_get_worker_usage(zbx_pp_manager_t *manager, zbx_vector_dbl_t *worker_usage)
+static void	zbx_pp_manager_get_worker_usage(zbx_pp_manager_t *manager, zbx_vector_dbl_t *worker_usage)
 {
 	(void)zbx_timekeeper_get_usage(manager->timekeeper, worker_usage);
 }

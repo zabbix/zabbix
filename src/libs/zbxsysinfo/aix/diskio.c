@@ -20,7 +20,6 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxlog.h"
 #include "zbxstr.h"
 
 typedef struct

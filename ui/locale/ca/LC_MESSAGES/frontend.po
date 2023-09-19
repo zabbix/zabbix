@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-07-30 07:05+0000\n"
+"PO-Revision-Date: 2023-08-28 07:45+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -913,6 +913,10 @@ msgstr "Afegeix"
 msgid "Add (message type limit reached)"
 msgstr "Afegeix (s'ha arribat al límit de tipus de missatge)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "Afegeix un giny nou"
@@ -1380,6 +1384,10 @@ msgstr "Anualment"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Qualsevol"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr "Es perdran els canvis fets al formulari actual."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -5843,7 +5851,7 @@ msgstr[1] "S'han esborrat els taulers"
 
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
-msgstr ""
+msgstr "Llistat de taulers"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -8161,7 +8169,7 @@ msgstr "Llista d'esdeveniments [20 anteriors]"
 
 #: include/classes/data/CItemData.php:946
 msgid "Event log monitoring. Returns count of entries"
-msgstr ""
+msgstr "Monitoratge del registre d'esdeveniments. Retorna el recompte d'entrades"
 
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
@@ -9624,7 +9632,7 @@ msgstr "Recompte d'equips"
 
 #: app/views/monitoring.host.dashboard.view.php:71
 msgid "Host dashboards"
-msgstr ""
+msgstr "Taulers d'equip"
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -14361,6 +14369,10 @@ msgstr "Nova passa d'escenari web"
 msgid "New tag name"
 msgstr "Nou nom d'etiqueta"
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr "Plantilla nova"
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14376,7 +14388,7 @@ msgstr "Nou mapatge de grups d'usuaris"
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Next dashboard"
-msgstr ""
+msgstr "Tauler següent"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16468,7 +16480,7 @@ msgstr "Vista prèvia"
 
 #: app/views/monitoring.host.dashboard.view.php:133
 msgid "Previous dashboard"
-msgstr ""
+msgstr "Tauler anterior"
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -16848,6 +16860,10 @@ msgstr "Clau pública"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Fitxer de clau pública"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr "Empènyer"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -24024,7 +24040,7 @@ msgstr "s'espera una adreça IP"
 
 #: include/classes/validators/CApiInputValidator.php:2773
 msgid "an IP or DNS is expected"
-msgstr ""
+msgstr "s'esperava una IP o nom DNS"
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481
@@ -25441,6 +25457,10 @@ msgstr "now() - Nombre de segons des de l'època"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "nombre"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

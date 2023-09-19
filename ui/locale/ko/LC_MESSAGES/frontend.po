@@ -892,6 +892,10 @@ msgstr "추가"
 msgid "Add (message type limit reached)"
 msgstr "추가(메시지 유형 제한에 도달함)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "새로운 위젯을 추가"
@@ -1359,6 +1363,10 @@ msgstr "매년"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "전부"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -14229,6 +14237,10 @@ msgstr ""
 msgid "New tag name"
 msgstr ""
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr ""
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -16714,6 +16726,10 @@ msgstr "공개키"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "공개키 파일"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -25285,6 +25301,10 @@ msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "수치"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

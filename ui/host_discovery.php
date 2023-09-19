@@ -341,7 +341,7 @@ $filter_groupids = CProfile::getArray($prefix.'host_discovery.filter.groupids', 
 $filter_hostids = CProfile::getArray($prefix.'host_discovery.filter.hostids', []);
 
 // Get host groups.
-$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], ['editable' => true], getRequest('context'));
+$filter_groupids = getSubGroups($filter_groupids, $filter['groups'], getRequest('context'));
 
 // Get hosts.
 if (getRequest('context') === 'host') {

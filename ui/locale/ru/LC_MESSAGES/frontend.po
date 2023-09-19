@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-09 03:13+0000\n"
-"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
+"PO-Revision-Date: 2023-09-12 12:01+0000\n"
+"Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -936,6 +936,10 @@ msgstr "Добавить"
 msgid "Add (message type limit reached)"
 msgstr "Добавить (достигнуто максимальное количество типов сообщений)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "Добавить новый виджет"
@@ -1403,6 +1407,10 @@ msgstr "Ежегодно"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Любое"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr "Любые изменения, внесенные в данную форму, будут потеряны."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -3366,8 +3374,8 @@ msgstr "Нельзя иметь не пустое значение тега пр
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] "Не удалось импортировать шаблон \"%1$s\", соединенный шаблон \"%2$s\" не существует."
-msgstr[1] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
+msgstr[0] "Не удалось импортировать шаблон \"%1$s\", присоединенный шаблон \"%2$s\" не существует."
+msgstr[1] "Не удалось импортировать шаблон \"%1$s\", присоединенные шаблоны \"%2$s\" не существуют."
 msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 
 #: include/classes/api/services/CItemGeneral.php:588
@@ -8269,7 +8277,7 @@ msgstr "Список событий [20 предыдущих]"
 
 #: include/classes/data/CItemData.php:946
 msgid "Event log monitoring. Returns count of entries"
-msgstr ""
+msgstr "Мониторинг журнала событий. Возвращает количество записей"
 
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
@@ -14501,6 +14509,10 @@ msgstr "Новый шаг веб-сценария"
 msgid "New tag name"
 msgstr "Имя нового тега"
 
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr "Новый шаблон"
+
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
@@ -14516,7 +14528,7 @@ msgstr "Новое соответствие группы пользовател�
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Next dashboard"
-msgstr ""
+msgstr "Следующая панель"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16609,7 +16621,7 @@ msgstr "Предпросмотр"
 
 #: app/views/monitoring.host.dashboard.view.php:133
 msgid "Previous dashboard"
-msgstr ""
+msgstr "Предыдущая панель"
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -16990,6 +17002,10 @@ msgstr "Публичный ключ"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Файл публичного ключа"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -19054,7 +19070,7 @@ msgstr "Узлы сети в обслуживании"
 
 #: widgets/gauge/includes/WidgetForm.php:299
 msgid "Show labels"
-msgstr ""
+msgstr "Показывать подписи"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -19150,7 +19166,7 @@ msgstr "Отображать недоступные карты"
 
 #: widgets/gauge/includes/WidgetForm.php:292
 msgid "Show units"
-msgstr ""
+msgstr "Показывать единицы измерения"
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -19451,7 +19467,7 @@ msgstr "Статус"
 
 #: include/classes/data/CItemData.php:2832
 msgid "State of proxy memory buffer."
-msgstr ""
+msgstr "Состояние буфера памяти прокси."
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
@@ -20070,7 +20086,7 @@ msgstr "Свойства шаблона и узла сети, которые н�
 
 #: include/classes/api/services/CHostBase.php:1386
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "Шаблон не может быть соединен с другим шаблоном несколько раз, даже через другие шаблоны."
+msgstr "Шаблон не может быть присоединен к другому шаблону несколько раз, даже через другие шаблоны."
 
 #: app/controllers/CControllerAuditLogList.php:241
 msgid "Template dashboard"
@@ -20133,7 +20149,7 @@ msgstr "Группы шаблонов"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
-msgstr "Соединения с шаблонами"
+msgstr "Присоединение шаблонов"
 
 #: include/views/configuration.template.edit.php:194
 msgid "Template macros"
@@ -25607,6 +25623,10 @@ msgstr "now() - Количество секунд начиная с Epoch"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "число"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
