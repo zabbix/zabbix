@@ -55,7 +55,6 @@ class CControllerPopupMassupdateItem extends CController {
 			'authtype' => 'string',
 			'username' => 'string',
 			'password' => 'string',
-			'has_custom_timeout' => 'in '.implode(',', [ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 			'timeout' => 'string|not_empty',
 			'delay' => 'string',
 			'trapper_hosts' => 'string',
