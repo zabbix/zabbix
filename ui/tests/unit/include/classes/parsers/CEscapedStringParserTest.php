@@ -99,29 +99,29 @@ class CEscapedStringParserTest extends TestCase {
 			['\\\\\n', 0, ['characters' => '\\'], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '\\\\',
-				'error' => 'value contains unescaped backslash at position 3'
+				'error' => 'value contains unescaped character at position 3'
 			]],
 			['\\\\valid\n\\\\till\\\\position 29\ and then failed', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '\\\\valid\n\\\\till\\\\position 29',
-				'error' => 'value contains unescaped backslash at position 29'
+				'error' => 'value contains unescaped character at position 29'
 			]],
 			['\\\\valid\n\\\\in the middle\ ', 9, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,
 				'match' => '\\\\in the middle',
-				'error' => 'value contains unescaped backslash at position 16'
+				'error' => 'value contains unescaped character at position 16'
 			]],
 
 			// CParser::PARSE_FAIL
 			['\ ', 0, ['characters' => '\\nrts'], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'error' => 'value contains unescaped backslash at position 1'
+				'error' => 'value contains unescaped character at position 1'
 			]],
 			['\n\\', 0, ['characters' => '\\'], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
-				'error' => 'value contains unescaped backslash at position 1'
+				'error' => 'value contains unescaped character at position 1'
 			]]
 		];
 	}

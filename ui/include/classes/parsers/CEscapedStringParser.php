@@ -73,7 +73,7 @@ class CEscapedStringParser extends CParser {
 			elseif (isset($source[$pos + 1]) && $source[$pos + 1] === '\\' && $backslash_escaping_not_required) {
 				/*
 				 * Switch one position to the left when next character is backslash and backslash is not required
-				 * to be escaped so that it can serve as escaping char for next character.
+				 * to be escaped so that it can serve as escaping char for the next character.
 				 */
 				$pos--;
 
@@ -87,7 +87,7 @@ class CEscapedStringParser extends CParser {
 		// No backslash occurances or loop has been stopped.
 		if ($pos !== false) {
 			$result = $pos > $offset ? self::PARSE_SUCCESS_CONT : self::PARSE_FAIL;
-			$this->error = _s('value contains unescaped backslash at position %1$d', $pos + 1 - $offset);
+			$this->error = _s('value contains unescaped character at position %1$d', $pos + 1 - $offset);
 		}
 		else {
 			$result = self::PARSE_SUCCESS;
