@@ -4,7 +4,7 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-23303] fixed syntax of message identifier in the In-Reply-To e-mail header field (asitals)
-...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
 ...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
 ..F....... [ZBX-17279] fixed graph widget loading (apoga)
 A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
