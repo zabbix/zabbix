@@ -181,7 +181,7 @@ class WidgetForm extends CWidgetForm {
 				$agg_function_count++;
 			}
 
-			if (array_key_exists('item_time', $column) && $column['item_time'] == 0) {
+			if (array_key_exists('item_time', $column) && $column['item_time'] != 0) {
 				$item_time_count++;
 			}
 		}
