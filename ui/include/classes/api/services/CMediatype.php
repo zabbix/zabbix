@@ -75,7 +75,6 @@ class CMediatype extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'selectActions'				=> null,
 			'selectMessageTemplates'	=> null,
 			'selectUsers'				=> null,
 			'countOutput'				=> false,
@@ -87,6 +86,14 @@ class CMediatype extends CApiService {
 		];
 
 		$options = zbx_array_merge($defOptions, $options);
+
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'selectActions' =>  ['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CAction::OUTPUT_FIELDS), 'default' => null]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 
 		// permission check
 		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
@@ -1023,7 +1030,7 @@ class CMediatype extends CApiService {
 	 * @param array $result
 	 */
 	private static function addRelatedActions(array $options, array &$result): void {
-		if (!is_array($options['selectActions'])) {
+		if ($options['selectActions'] === null) {
 			return;
 		}
 
@@ -1038,12 +1045,12 @@ class CMediatype extends CApiService {
 
 		while ($row = DBfetch($db_action_mediatypes)) {
 			if ($row['mediatypeid'] == 0) {
-				foreach ($result as $mediatypeid => $mediatype) {
-					$action_mediatypeids[$row['actionid']][$mediatypeid] = true;
+				foreach ($result as $mediatype) {
+					$action_mediatypeids[$row['actionid']][$mediatype['mediatypeid']] = $mediatype['mediatypeid'];
 				}
 			}
 			else {
-				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = true;
+				$action_mediatypeids[$row['actionid']][$row['mediatypeid']] = $row['mediatypeid'];
 			}
 		}
 
@@ -1059,7 +1066,7 @@ class CMediatype extends CApiService {
 		}
 
 		while ($action = DBfetch($db_actions)) {
-			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid => $foo) {
+			foreach ($action_mediatypeids[$action['actionid']] as $mediatypeid) {
 				$result[$mediatypeid]['actions'][] = $action;
 
 				CArrayHelper::sort($result[$mediatypeid]['actions'], ['name']);
