@@ -91,7 +91,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 			$this->trigger_prototype = API::TriggerPrototype()->get([
 				'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments',
 					'templateid', 'type', 'state', 'flags', 'recovery_mode', 'recovery_expression', 'correlation_mode',
-					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name'
+					'correlation_tag', 'manual_close', 'opdata', 'event_name', 'url_name', 'discover'
 				],
 				'selectHosts' => ['hostid'],
 				'triggerids' => $this->getInput('triggerid'),
