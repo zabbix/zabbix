@@ -121,8 +121,7 @@ class CDashboardHelper {
 						'width' => (int) $widget_data['width'],
 						'height' => (int) $widget_data['height']
 					],
-					'rf_rate' => 0,
-					'fields' => []
+					'rf_rate' => 0
 				];
 
 				if (array_key_exists($widget_data['widgetid'], $widgets_and_forms)) {
@@ -150,7 +149,9 @@ class CDashboardHelper {
 					}
 				}
 				else {
+					// Inaccessible widget must contain original fields data not to lose them upon saving.
 					$prepared_widget['type'] = '';
+					$prepared_widget['fields'] = self::constructWidgetFields($widget_data['fields']);
 				}
 
 				$prepared_widgets[] = $prepared_widget;
