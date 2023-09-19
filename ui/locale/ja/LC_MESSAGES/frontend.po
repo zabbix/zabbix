@@ -892,6 +892,10 @@ msgstr "追加"
 msgid "Add (message type limit reached)"
 msgstr "追加 (メッセージタイプのリミットに到達)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "新しいウィジェットを追加"
@@ -25289,6 +25293,10 @@ msgstr "now() - エポックを基準とした経過秒数"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "数値"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
