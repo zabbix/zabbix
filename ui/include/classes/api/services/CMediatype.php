@@ -1061,8 +1061,8 @@ class CMediatype extends CApiService {
 
 		$db_actions = DBselect(DB::makeSql('actions', $action_options));
 
-		foreach ($result as $mediatypeid => $mediatype){
-			$result[$mediatypeid]['actions'] = [];
+		foreach ($result as $mediatype) {
+			$result[$mediatype['mediatypeid']]['actions'] = [];
 		}
 
 		while ($action = DBfetch($db_actions)) {
