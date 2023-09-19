@@ -568,9 +568,9 @@ class testFormTabIndicators extends CWebTest {
 						[
 							'name' => 'Time period',
 							'entries' => [
-								'selector' => 'id:graph_time',
-								'value' => true,
-								'old_value' => false
+								'selector' => 'id:time_period_data_source',
+								'value' => 'Custom',
+								'old_value' => 'Dashboard'
 							],
 							'field_type' => 'general_field'
 						],

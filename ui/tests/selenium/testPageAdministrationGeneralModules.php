@@ -138,7 +138,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'sysmapid._reference',
-										'value' => 'GZCSV'
+										'value' => 'GZCSV._mapid'
 									]
 								]
 							],
