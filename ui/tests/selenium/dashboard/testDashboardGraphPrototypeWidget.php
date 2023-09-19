@@ -426,7 +426,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 				$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
 				$this->assertEquals($expected_placeholders_count, $placeholders_count);
 				// Check Dynamic item setting on Dashboard.
-				if (CTestArrayHelper::get($data['fields'], 'Enable host selection')) {
+				if (CTestArrayHelper::get($data['fields'], 'Override host')) {
 					$this->assertTrue($dashboard->getControls()->query('xpath://form[@aria-label = '.
 						'"Main filter"]')->one()->isPresent());
 				}
@@ -474,7 +474,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 					'Source' => 'Simple graph prototype',
 					'Item prototype' => 'testFormItemPrototype2',
 					'Show legend' => false,
-					'Enable host selection' => true,
+					'Override host' => 'Dashboard',
 					'Columns' => '3',
 					'Rows' => '2'
 				]);

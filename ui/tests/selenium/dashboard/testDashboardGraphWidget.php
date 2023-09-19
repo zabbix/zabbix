@@ -499,36 +499,35 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '',
 						'To' => ''
 					],
 					'error' => [
-						'Invalid parameter "From": cannot be empty.',
-						'Invalid parameter "To": cannot be empty.'
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 15:53:07',
 						'To' => ''
 					],
-					'error' => 'Invalid parameter "To": cannot be empty.'
+					'error' => 'Invalid parameter "Time period/To": cannot be empty.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": cannot be empty.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": cannot be empty.'
 					]
 				]
 			],
@@ -536,107 +535,104 @@ class testDashboardGraphWidget extends CWebTest {
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '1',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": a time is expected.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 15:53:07',
 						'To' => 'abc'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '5:53:06 2021-07-31',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": a time is expected.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-02-30 00:00:00',
 						'To' => '2021-07-04 15:53:07'
 					],
 					'error' => [
-						'Invalid parameter "From": a time is expected.',
-						'Minimum time period to display is 1 minute.'
+						'Invalid parameter "Time period/From": a time is expected.'
 					]
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021-25-09 00:00:00'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021.07.31 15:53:07'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 12:53:00',
 						'To' => 'now-s'
 					],
-					'error' => 'Invalid parameter "To": a time is expected.'
+					'error' => 'Invalid parameter "Time period/To": a time is expected.'
 				]
 			],
 			// Time range validation
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2021-07-04 12:53:00',
 						'To' => '2021-07-04 12:52:59'
 					],
-					'error' => 'Minimum time period to display is 1 minute.'
+					'error' => 'Invalid parameter "Time period/To": value must be greater than "Time period/From".'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
-					'error' => 'Minimum time period to display is 1 minute.'
+					'error' => 'Invalid parameter "Time period/To": value must be greater than "Time period/From".'
 				]
 			],
 			[
 				[
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-58s',
 						'To' => 'now'
 					],
@@ -1073,7 +1069,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'item' => 'Two item'
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/2": at least one override option must be specified.'
+					'error' => 'Invalid parameter "Overrides": at least one override option must be specified.'
 				]
 			],
 			[
@@ -1173,7 +1169,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'host' => '*',
 						'item' => '*'
 					],
-					'error' => 'Invalid parameter "Overrides/1": at least one override option must be specified.'
+					'error' => 'Invalid parameter "Overrides": at least one override option must be specified.'
 				]
 			]
 		]);
@@ -1198,7 +1194,7 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Widget name' => 'Test cases for update',
 					'remove_override_options' => true,
-					'error' => 'Invalid parameter "Overrides/1": at least one override option must be specified.'
+					'error' => 'Invalid parameter "Overrides": at least one override option must be specified.'
 				]
 			],
 			[
@@ -1335,7 +1331,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'Y-axis' => 'Right'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-1w',
 						'To' => 'now'
 					],
@@ -1393,7 +1389,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'History data selection' => 'Trends'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-59s',
 						'To' => 'now'
 					],
@@ -1461,7 +1457,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'History data selection' => 'History'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2018-11-15',
 						'To' => '2018-11-15 14:20:00'
 					],
@@ -1581,7 +1577,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'Y-axis' => 'Right'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-1w',
 						'To' => 'now'
 					],
@@ -1641,7 +1637,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'History data selection' => 'Trends'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => 'now-59s',
 						'To' => 'now'
 					],
@@ -1749,7 +1745,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'History data selection' => 'History'
 					],
 					'Time period' => [
-						'Set custom time period' => true,
+						'Time period' => 'Custom',
 						'From' => '2018-11-15',
 						'To' => '2018-11-15 14:20'
 					],
@@ -2283,17 +2279,22 @@ class testDashboardGraphWidget extends CWebTest {
 	}
 
 	/*
-	 * Test "From" and "To" fields in tab "Time period" by check/uncheck "Set custom time period".
+	 * Test "From" and "To" fields in tab "Time period" by setting 'Time period' to 'Custom'.
 	 */
 	public function testDashboardGraphWidget_TimePeriodDisabledFields() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1030');
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Time period');
-
 		$fields = ['From', 'To'];
-		$this->assertEnabledFields($fields, false);
 
-		$form->fill(['Set custom time period' => true]);
+		foreach ($fields as $field) {
+			$this->assertFalse($form->getField($field)->isDisplayed());
+		}
+		$form->fill(['Time period' => 'Custom']);
+
+		foreach ($fields as $field) {
+			$this->assertTrue($form->getField($field)->isDisplayed());
+		}
 		$this->assertEnabledFields($fields, true);
 	}
 
