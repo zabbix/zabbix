@@ -1,19 +1,38 @@
 // Widget view.
 
 div.dashboard-widget-hostavail {
+	padding-bottom: 0;
+
 	.host-avail-widget {
-		td:not(:first-child) {
-			border-left: 1px dotted $table-border-color;
+		thead {
+			th {
+				font-weight: bold;
+			}
 		}
 
-		tr {
+		tbody {
+			tr {
+				th {
+					min-width: 100px;
+					width: 15%;
+				}
+
+				td {
+					min-width: 95px;
+				}
+			}
+
 			th {
-				min-width: 120px;
-				width: 120px;
+				&:has(.host-avail-true),
+				&:has(.host-avail-mixed),
+				&:has(.host-avail-false),
+				&:has(.host-avail-unknown) {
+					border-bottom: none;
+				}
 			}
 
 			td {
-				min-width: 80px;
+				color: $font-color;
 			}
 		}
 
@@ -42,7 +61,14 @@ div.dashboard-widget-hostavail {
 			}
 		}
 
+		th:last-child,
+		td:last-child {
+			padding-right: 5px;
+		}
 
+		td:not(:first-child) {
+			border-left: 1px dotted $table-border-color;
+		}
 	}
 }
 
@@ -59,11 +85,24 @@ div.dashboard-widget-hostavail {
 			div {
 				background: transparent;
 
-				.host-avail-true,
-				.host-avail-false,
-				.host-avail-unknown,
-				.host-avail-total {
+				&:has(.host-avail-true),
+				&:has(.host-avail-false),
+				&:has(.host-avail-mixed),
+				&:has(.host-avail-unknown),
+				&:has(.host-avail-total) {
 					background: transparent;
+				}
+			}
+
+			tbody {
+				th {
+					&:has(.host-avail-true),
+					&:has(.host-avail-false),
+					&:has(.host-avail-mixed),
+					&:has(.host-avail-unknown),
+					&:has(.host-avail-total) {
+						border-bottom: 1px solid $ui-border-color;
+					}
 				}
 			}
 		}

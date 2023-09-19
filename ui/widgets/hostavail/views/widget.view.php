@@ -138,10 +138,9 @@ else {
 
 	if ($data['layout'] == STYLE_VERTICAL) {
 		foreach ($interface_states_fields as $state => $field) {
-			$table->addRow(array_merge(
-				[(new CSpan($field['name']))->addClass($field['style'])],
-				$rows[$state]
-			));
+			$table->addRow(
+				array_merge([(new CSpan($field['name']))->addClass($field['style'])], $rows[$state])
+			);
 		}
 	}
 }

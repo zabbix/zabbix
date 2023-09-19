@@ -3750,46 +3750,57 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
-div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
-  border-left: 1px dotted #888888; }
-div.dashboard-widget-hostavail .host-avail-widget tr th {
-  min-width: 120px;
-  width: 120px; }
-div.dashboard-widget-hostavail .host-avail-widget tr td {
-  min-width: 80px; }
-div.dashboard-widget-hostavail .host-avail-widget th,
-div.dashboard-widget-hostavail .host-avail-widget div {
-  color: #000000; }
-  div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-true),
-  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-true) {
-    background: #34af67; }
-  div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-mixed),
-  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-mixed) {
-    background: #f1a50b; }
-  div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-false),
-  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-false) {
-    background: #d64e4e; }
-  div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-unknown),
-  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-unknown) {
-    background: #f0f0f0; }
-  div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-total),
-  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-total) {
-    background: transparent; }
+div.dashboard-widget-hostavail {
+  padding-bottom: 0; }
+  div.dashboard-widget-hostavail .host-avail-widget thead th {
+    font-weight: bold; }
+  div.dashboard-widget-hostavail .host-avail-widget tbody tr th {
+    min-width: 100px;
+    width: 15%; }
+  div.dashboard-widget-hostavail .host-avail-widget tbody tr td {
+    min-width: 95px; }
+  div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-true), div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-mixed), div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-false), div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-unknown) {
+    border-bottom: none; }
+  div.dashboard-widget-hostavail .host-avail-widget tbody td {
+    color: #000000; }
+  div.dashboard-widget-hostavail .host-avail-widget th,
+  div.dashboard-widget-hostavail .host-avail-widget div {
+    color: #000000; }
+    div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-true),
+    div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-true) {
+      background: #34af67; }
+    div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-mixed),
+    div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-mixed) {
+      background: #f1a50b; }
+    div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-false),
+    div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-false) {
+      background: #d64e4e; }
+    div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-unknown),
+    div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-unknown) {
+      background: #f0f0f0; }
+    div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-total),
+    div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-total) {
+      background: transparent; }
+  div.dashboard-widget-hostavail .host-avail-widget th:last-child,
+  div.dashboard-widget-hostavail .host-avail-widget td:last-child {
+    padding-right: 5px; }
+  div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
+    border-left: 1px dotted #888888; }
 
 div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
   border-left: 1px solid #9f9f9f; }
 div.dashboard-widget-hostavail .host-avail-widget th,
 div.dashboard-widget-hostavail .host-avail-widget div {
   background: transparent; }
-  div.dashboard-widget-hostavail .host-avail-widget th .host-avail-true,
-  div.dashboard-widget-hostavail .host-avail-widget th .host-avail-false,
-  div.dashboard-widget-hostavail .host-avail-widget th .host-avail-unknown,
-  div.dashboard-widget-hostavail .host-avail-widget th .host-avail-total,
-  div.dashboard-widget-hostavail .host-avail-widget div .host-avail-true,
-  div.dashboard-widget-hostavail .host-avail-widget div .host-avail-false,
-  div.dashboard-widget-hostavail .host-avail-widget div .host-avail-unknown,
-  div.dashboard-widget-hostavail .host-avail-widget div .host-avail-total {
+  div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-true), div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-false), div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-mixed), div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-unknown), div.dashboard-widget-hostavail .host-avail-widget th:has(.host-avail-total),
+  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-true),
+  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-false),
+  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-mixed),
+  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-unknown),
+  div.dashboard-widget-hostavail .host-avail-widget div:has(.host-avail-total) {
     background: transparent; }
+div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-true), div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-false), div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-mixed), div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-unknown), div.dashboard-widget-hostavail .host-avail-widget tbody th:has(.host-avail-total) {
+  border-bottom: 1px solid #9f9f9f; }
 
 .dashboard-widget-inaccessible {
   display: grid;
