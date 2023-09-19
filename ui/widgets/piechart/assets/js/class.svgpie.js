@@ -169,6 +169,13 @@ class CSVGPie {
 	#pieGenerator;
 
 	/**
+	 * Observer that checks attributes of sectors.
+	 *
+	 * @type {MutationObserver}
+	 */
+	#sector_observer;
+
+	/**
 	 * @param {Object} padding             Inner padding of the root SVG element.
 	 *        {number} padding.horizontal
 	 *        {number} padding.vertical
@@ -189,6 +196,15 @@ class CSVGPie {
 		this.#svg = d3.create('svg:svg').attr('class', CSVGPie.ZBX_STYLE_CLASS);
 
 		this.#createContainers();
+
+		this.#sector_observer = new MutationObserver((mutationList) => {
+			for (let i = 0; i < mutationList.length; i++) {
+				if (mutationList[i].type === 'attributes' && mutationList[i].oldValue === 'true'
+						&& !mutationList[i].target.matches(':hover')) {
+					this.#popIn(mutationList[i].target);
+				}
+			}
+		});
 	}
 
 	/**
@@ -224,6 +240,8 @@ class CSVGPie {
 	 * @param {Object} total_value    Object of total value and units.
 	 */
 	setValue({sectors, all_sectorids, total_value}) {
+		this.#sector_observer.disconnect();
+
 		this.#svg.on('mousemove', null);
 
 		this.#popped_out_sector = null;
@@ -358,6 +376,11 @@ class CSVGPie {
 
 				if (sectors.length > 1) {
 					for (let i = 0; i < sectors.length; i++) {
+						this.#sector_observer.observe(sectors[i], {
+							attributeFilter: ['data-expanded'],
+							attributeOldValue: true
+						});
+
 						// If mouse was on any sector before/during animation, then pop that sector out again.
 						if (sectors[i].matches(':hover')) {
 							this.#popOut(sectors[i]);
