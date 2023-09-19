@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,21 +21,17 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $output = [
-	'body' => (new CPartial('administration.usergroup.templategrouprights.html', [
-		'templategroup_rights' => $data['templategroup_rights']
+	'body' => (new CPartial('usergroup.tagfilters', [
+		'tag_filters' => $data['tag_filters'],
+		'tag_filters_badges' => $data['tag_filters_badges']
 	]))->getOutput()
 ];
 
-if (($messages = getMessages()) !== null) {
-	$output['messages'] = $messages->toString();
-}
-
-if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-	CProfiler::getInstance()->stop();
-	$output['debug'] = CProfiler::getInstance()->make()->toString();
-}
+$messages = CMessageHelper::getMessages();
+$output['messages'] = $messages ? [$messages[0]['message']] : [];
 
 echo json_encode($output);
