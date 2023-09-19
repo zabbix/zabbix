@@ -229,7 +229,7 @@ abstract class CItemGeneral extends CApiService {
 					$item += array_intersect_key($db_item, array_flip(['jmx_endpoint']));
 				}
 
-				if ($item['type'] == ITEM_TYPE_SNMP && $db_item['type'] != ITEM_TYPE_SNMP) {
+				if ($item['type'] == ITEM_TYPE_SNMP) {
 					$item += array_intersect_key($db_item, array_flip(['snmp_oid']));
 				}
 

@@ -60,6 +60,22 @@
 	}
 })();
 
+// Timeout.
+(() => {
+	const has_custom_timeout = document.getElementById('has_custom_timeout');
+
+	if (!has_custom_timeout) {
+		return false;
+	}
+
+	has_custom_timeout.addEventListener('change', () => {
+		document.getElementById('timeout').disabled =
+			has_custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>;
+	});
+
+	has_custom_timeout.dispatchEvent(new CustomEvent('change'));
+})();
+
 // History mode.
 (() => {
 	const history_toggle = document.getElementById('history_mode');
