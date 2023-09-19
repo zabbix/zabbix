@@ -228,7 +228,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
 			$copied_widget_form = $copied_widget->edit();
-			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
+			$copied_widget_form->fill(['Map' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
 		}
 
