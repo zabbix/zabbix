@@ -230,7 +230,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:show_3' => true,
 			'id:show_4' => true,
 			'Advanced configuration' => false,
-			'id:dynamic' => false
+			'id:override_hostid_ms' => ''
 		];
 
 		foreach ($default_values as $field => $value) {
@@ -286,7 +286,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$form->fill(['Advanced configuration' => $advanced_config]);
 
 			// Check that dynamic item checkbox is not depending on Advanced configuration checkbox state.
-			$dynamic_field = $form->getField('Enable host selection');
+			$dynamic_field = $form->getField('Override host');
 			$this->assertTrue($dynamic_field->isVisible());
 			$this->assertTrue($dynamic_field->isEnabled());
 
@@ -832,7 +832,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '13',
 						'id:time_bold' => true,
-						'Enable host selection' => true
+						'Override host' => 'Dashboard'
 					]
 				]
 			],
