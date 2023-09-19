@@ -6,6 +6,7 @@ New features:
 ..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
 
 Bug fixes:
+..F....... [ZBX-23302] fixed 'access denied' error in template multiselect popup (esekace)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
 ...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)
 A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)
@@ -270,6 +271,8 @@ New features:
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
+..F....... [ZBX-23302] fixed 'access denied' error in template multiselect popup (esekace)
+...G...... [ZBX-23417] fixed possible memory leak when checking modbus.get[] item (Andris)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
 ...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)
 A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)
@@ -1690,6 +1693,7 @@ New features:
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
+...G...... [ZBX-23417] fixed possible memory leak when checking modbus.get[] item (Andris)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
 ...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)
 A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)

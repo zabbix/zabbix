@@ -19,6 +19,7 @@
 
 #include "zbxsysinfo.h"
 #include "sysinfo.h"
+
 #include "alias/alias.h"
 
 #include "zbxlog.h"
@@ -178,7 +179,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 
 /******************************************************************************
  *                                                                            *
- * Purpose: registers a new item key into the system                          *
+ * Purpose: registers new item key into system                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_add_metric(zbx_metric_t *metric, char *error, size_t max_error_len)
@@ -189,7 +190,7 @@ int	zbx_add_metric(zbx_metric_t *metric, char *error, size_t max_error_len)
 #ifdef WITH_COMMON_METRICS
 /******************************************************************************
  *                                                                            *
- * Purpose: registers a new item key as local into the system                 *
+ * Purpose: registers new item key as local into system                       *
  *                                                                            *
  ******************************************************************************/
 static int	add_metric_local(zbx_metric_t *metric, char *error, size_t max_error_len)
@@ -235,12 +236,12 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 
 void	zbx_remove_user_parameters(void)
 {
-	int	i, usr = -1;
+	int	usr = -1;
 
 	if (NULL == commands)
 		return;
 
-	for (i = 0; NULL != commands[i].key; i++)
+	for (int i = 0; NULL != commands[i].key; i++)
 	{
 		if (0 != (CF_USERPARAMETER & commands[i].flags))
 		{
@@ -316,7 +317,6 @@ void	zbx_init_metrics(void)
 {
 #if (defined(WITH_AGENT_METRICS) || defined(WITH_COMMON_METRICS) || defined(WITH_HTTP_METRICS) ||	\
 	defined(WITH_SPECIFIC_METRICS) || defined(WITH_SIMPLE_METRICS))
-	int	i;
 	char	error[MAX_STRING_LEN];
 #elif (defined(WITH_HOSTNAME_METRIC))
 	char	error[MAX_STRING_LEN];
@@ -332,7 +332,7 @@ void	zbx_init_metrics(void)
 #ifdef WITH_AGENT_METRICS
 	zbx_metric_t	*parameters_agent = get_parameters_agent();
 
-	for (i = 0; NULL != parameters_agent[i].key; i++)
+	for (int i = 0; NULL != parameters_agent[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_agent[i], error, sizeof(error)))
 		{
@@ -345,7 +345,7 @@ void	zbx_init_metrics(void)
 #ifdef WITH_COMMON_METRICS
 	zbx_metric_t	*parameters_common = get_parameters_common();
 
-	for (i = 0; NULL != parameters_common[i].key; i++)
+	for (int i = 0; NULL != parameters_common[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_common[i], error, sizeof(error)))
 		{
@@ -356,7 +356,7 @@ void	zbx_init_metrics(void)
 
 	zbx_metric_t	*parameters_common_local = get_parameters_common_local();
 
-	for (i = 0; NULL != parameters_common_local[i].key; i++)
+	for (int i = 0; NULL != parameters_common_local[i].key; i++)
 	{
 		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
 		{
@@ -369,7 +369,7 @@ void	zbx_init_metrics(void)
 #ifdef WITH_HTTP_METRICS
 	zbx_metric_t	*parameters_common_http = get_parameters_common_http();
 
-	for (i = 0; NULL != parameters_common_http[i].key; i++)
+	for (int i = 0; NULL != parameters_common_http[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_common_http[i], error, sizeof(error)))
 		{
@@ -382,7 +382,7 @@ void	zbx_init_metrics(void)
 #ifdef WITH_SPECIFIC_METRICS
 	zbx_metric_t	*parameters_specific = get_parameters_specific();
 
-	for (i = 0; NULL != parameters_specific[i].key; i++)
+	for (int i = 0; NULL != parameters_specific[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_specific[i], error, sizeof(error)))
 		{
@@ -395,7 +395,7 @@ void	zbx_init_metrics(void)
 #ifdef WITH_SIMPLE_METRICS
 	zbx_metric_t	*parameters_simple = get_parameters_simple();
 
-	for (i = 0; NULL != parameters_simple[i].key; i++)
+	for (int i = 0; NULL != parameters_simple[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_simple[i], error, sizeof(error)))
 		{
@@ -418,9 +418,7 @@ void	zbx_free_metrics_ext(zbx_metric_t **metrics)
 {
 	if (NULL != *metrics)
 	{
-		int	i;
-
-		for (i = 0; NULL != (*metrics)[i].key; i++)
+		for (int i = 0; NULL != (*metrics)[i].key; i++)
 		{
 			zbx_free((*metrics)[i].key);
 			zbx_free((*metrics)[i].test_param);
@@ -673,7 +671,6 @@ static int	zbx_parse_key_access_rule(char *pattern, zbx_key_access_rule_t *rule)
 static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
 {
 	const zbx_key_access_rule_t	*a, *b;
-	int				i;
 
 	a = *(zbx_key_access_rule_t * const *)rule_a;
 	b = *(zbx_key_access_rule_t * const *)rule_b;
@@ -681,7 +678,7 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
 	if (a->empty_arguments != b->empty_arguments || a->elements.values_num != b->elements.values_num)
 		return 1;
 
-	for (i = 0; a->elements.values_num > i; i++)
+	for (int i = 0; a->elements.values_num > i; i++)
 	{
 		if (0 != strcmp(a->elements.values[i], b->elements.values[i]))
 			return 1;
@@ -694,7 +691,7 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
  *                                                                            *
  * Purpose: adds new key access rule from AllowKey and DenyKey parameters     *
  *                                                                            *
- * Parameters: parameter - [IN] parameter that defined the rule               *
+ * Parameters: parameter - [IN] parameter that defined rule                   *
  *             pattern   - [IN] key access rule wildcard                      *
  *             type      - [IN] key access rule type (allow/deny)             *
  *                                                                            *
@@ -743,13 +740,12 @@ int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access
  ******************************************************************************/
 int	zbx_check_request_access_rules(AGENT_REQUEST *request)
 {
-	int			i, j, empty_arguments;
 	zbx_key_access_rule_t	*rule;
 
 	/* empty arguments flag means key is followed by empty brackets, which is not the same as no brackets */
-	empty_arguments = (1 == request->nparam && 0 == strlen(request->params[0]));
+	int	empty_arguments = (1 == request->nparam && 0 == strlen(request->params[0]));
 
-	for (i = 0; key_access_rules.values_num > i; i++)
+	for (int i = 0; key_access_rules.values_num > i; i++)
 	{
 		rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
 
@@ -790,7 +786,7 @@ int	zbx_check_request_access_rules(AGENT_REQUEST *request)
 		if (0 == request->nparam && 1 == rule->elements.values_num)	/* no parameters */
 			return rule->type;
 
-		for (j = 1; rule->elements.values_num > j; j++)
+		for (int j = 1; rule->elements.values_num > j; j++)
 		{
 			if ((rule->elements.values_num - 1) == j)	/* last parameter */
 			{
@@ -844,14 +840,12 @@ int	zbx_check_key_access_rules(const char *metric)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cleanup key access rule list                                      *
+ * Purpose: cleans-up key access rule list                                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_free_key_access_rules(void)
 {
-	int	i;
-
-	for(i = 0; i < key_access_rules.values_num; i++)
+	for (int i = 0; i < key_access_rules.values_num; i++)
 		zbx_key_access_rule_free((zbx_key_access_rule_t *)key_access_rules.values[i]);
 
 	zbx_vector_ptr_destroy(&key_access_rules);
@@ -868,9 +862,9 @@ static void	zbx_log_init(zbx_log_t *log)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize the request structure                                  *
+ * Purpose: initializes request structure                                     *
  *                                                                            *
- * Parameters: request - pointer to the structure                             *
+ * Parameters: request - pointer to structure                                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_init_agent_request(AGENT_REQUEST *request)
@@ -885,17 +879,16 @@ void	zbx_init_agent_request(AGENT_REQUEST *request)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free memory used by the request parameters                        *
+ * Purpose: frees memory used by request parameters                           *
  *                                                                            *
- * Parameters: request - pointer to the request structure                     *
+ * Parameters: request - pointer to request structure                         *
  *                                                                            *
  ******************************************************************************/
 static void	free_request_params(AGENT_REQUEST *request)
 {
-	int	i;
-
-	for (i = 0; i < request->nparam; i++)
+	for (int i = 0; i < request->nparam; i++)
 		zbx_free(request->params[i]);
+
 	zbx_free(request->params);
 	zbx_free(request->types);
 
@@ -904,9 +897,9 @@ static void	free_request_params(AGENT_REQUEST *request)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free memory used by the request                                   *
+ * Purpose: frees memory used by request                                      *
  *                                                                            *
- * Parameters: request - pointer to the request structure                     *
+ * Parameters: request - pointer to request structure                         *
  *                                                                            *
  ******************************************************************************/
 void	zbx_free_agent_request(AGENT_REQUEST *request)
@@ -917,9 +910,9 @@ void	zbx_free_agent_request(AGENT_REQUEST *request)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add a new parameter                                               *
+ * Purpose: adds new parameter                                                *
  *                                                                            *
- * Parameters: request - [OUT] pointer to the request structure               *
+ * Parameters: request - [OUT] pointer to request structure                   *
  *             pvalue  - [IN]  parameter value string                         *
  *             type    - [IN]  parameter type                                 *
  *                                                                            *
@@ -936,7 +929,7 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse item command (key) and fill AGENT_REQUEST structure         *
+ * Purpose: parses item command (key) and fill AGENT_REQUEST structure        *
  *                                                                            *
  * Parameters: itemkey - [IN] complete item key                               *
  *             request - [OUT] structure filled with data from item key       *
@@ -949,7 +942,7 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_
  ******************************************************************************/
 int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 {
-	int	i, ret = FAIL;
+	int	ret = FAIL;
 	char	*key = NULL, *params = NULL;
 
 	switch (parse_command_dyn(itemkey, &key, &params))
@@ -962,7 +955,7 @@ int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request)
 			request->types = (zbx_request_parameter_type_t*)zbx_malloc(request->types,
 					request->nparam * sizeof(zbx_request_parameter_type_t));
 
-			for (i = 0; i < request->nparam; i++)
+			for (int i = 0; i < request->nparam; i++)
 				request->params[i] = zbx_get_param_dyn(params, i + 1, &request->types[i]);
 			break;
 		case ZBX_COMMAND_ERROR:
@@ -1029,11 +1022,10 @@ void	zbx_test_parameter(const char *key)
 
 void	zbx_test_parameters(void)
 {
-	int	i;
 	char	*key = NULL;
 	size_t	key_alloc = 0;
 
-	for (i = 0; NULL != commands[i].key; i++)
+	for (int i = 0; NULL != commands[i].key; i++)
 	{
 		if (0 != strcmp(commands[i].key, "__UserPerfCounter"))
 		{
@@ -1521,8 +1513,9 @@ static zbx_log_t	*get_result_log_value(AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return value of result in special type                            *
- *          if value missing, convert existing value to requested type        *
+ * Purpose: Returns value of the result in the special type.                  *
+ *          If value is missing, it converts existing value to requested      *
+ *          type.                                                             *
  *                                                                            *
  * Return value:                                                              *
  *         NULL - if value is missing or can't be converted                   *
@@ -1575,7 +1568,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 #else
 /*******************************************************************************
  *                                                                             *
- * Purpose: serialize agent result to transfer over pipe/socket                *
+ * Purpose: serializes agent result to transfer over pipe/socket               *
  *                                                                             *
  * Parameters: data        - [IN/OUT] data buffer                              *
  *             data_alloc  - [IN/OUT] data buffer allocated size               *
@@ -1660,7 +1653,7 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
 
 /******************************************************************************
  *                                                                            *
- * Purpose: deserialize agent result                                          *
+ * Purpose: deserializes agent result                                         *
  *                                                                            *
  * Parameters: data        - [IN] data to deserialize                         *
  *             result      - [OUT] agent result                               *
@@ -1708,8 +1701,8 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute metric in a separate process/thread so it can be          *
- *          killed/terminated when timeout is detected                        *
+ * Purpose: Executes metric in a separate process/thread so it can be         *
+ *          killed/terminated when timeout is detected.                       *
  *                                                                            *
  * Parameters: metric_func - [IN] metric function to execute                  *
  *             ...                metric function parameters                  *
@@ -1848,13 +1841,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mpoints_free                                                 *
- *                                                                            *
  * Purpose: frees previously allocated mount-point structure                  *
  *                                                                            *
  * Parameters: mpoint - [IN] pointer to structure from vector                 *
- *                                                                            *
- * Return value:                                                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
@@ -1912,8 +1901,8 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute metric in a separate process/thread so it can be          *
- *          killed/terminated when timeout is detected                        *
+ * Purpose: Executes metric in a separate process/thread so it can be         *
+ *          killed/terminated when timeout is detected.                       *
  *                                                                            *
  * Parameters: metric_func - [IN] metric function to execute                  *
  *             ...                metric function parameters                  *
@@ -2096,7 +2085,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char **
 
 /******************************************************************************
  *                                                                            *
- * Purpose: format string containing human-readable mount options from flags  *
+ * Purpose: formats string containing human-readable mount options from flags *
  *                                                                            *
  * Parameters: mntopts     - [IN] array containing flag to string mappings    *
  *             flags       - [IN] mount point flags                           *
