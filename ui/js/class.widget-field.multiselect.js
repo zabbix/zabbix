@@ -78,11 +78,6 @@ class CWidgetFieldMultiselect {
 	#labels;
 
 	/**
-	 * @type {string|null}
-	 */
-	#selected_typed_reference = null;
-
-	/**
 	 * @type {int}
 	 */
 	#selected_limit = 0;
@@ -96,6 +91,16 @@ class CWidgetFieldMultiselect {
 	 * @type {boolean}
 	 */
 	#is_disabled = false;
+
+	/**
+	 * @type {boolean}
+	 */
+	#is_selecting_typed_reference = false;
+
+	/**
+	 * @type {boolean}
+	 */
+	#is_selected_typed_reference = false;
 
 	constructor({
 		field_name,
@@ -151,13 +156,33 @@ class CWidgetFieldMultiselect {
 			custom_suggest_select_handler: has_optional_sources ? (entity) => this.#selectSuggested(entity) : null
 		})
 			.on('before-add', () => {
-				if (this.#selected_typed_reference !== null) {
-					this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
-					this.#selected_typed_reference = null;
+				if (this.#is_selecting_typed_reference !== this.#is_selected_typed_reference) {
+					for (const item of this.#multiselect.multiSelect('getData')) {
+						this.#multiselect.multiSelect('removeSelected', item.id);
+					}
+
+					if (this.#is_selecting_typed_reference) {
+						this.#multiselect.multiSelect('modify', {
+							name: `${this.#field_name}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
+							selectedLimit: 1
+						});
+					}
+					else {
+						this.#multiselect.multiSelect('modify', {
+							name: `${this.#field_name}${this.#is_multiple ? '[]' : ''}`,
+							selectedLimit: this.#selected_limit
+						});
+					}
+
+					this.#is_selected_typed_reference = this.#is_selecting_typed_reference;
 				}
+
+				this.#is_selecting_typed_reference = false;
 			})
 			.on('before-remove', () => {
-				this.#multiselect_list.innerHTML = '';
+				if (this.#is_selected_typed_reference) {
+					this.#multiselect_list.innerHTML = '';
+				}
 			});
 
 		this.#multiselect_list = this.#multiselect[0].querySelector('.multiselect-list');
@@ -202,11 +227,6 @@ class CWidgetFieldMultiselect {
 	}
 
 	#selectDefaultPopup(e) {
-		this.#multiselect.multiSelect('modify', {
-			name: `${this.#field_name}${this.#is_multiple ? '[]' : ''}`,
-			selectedLimit: this.#selected_limit
-		});
-
 		this.#multiselect.multiSelect('openSelectPopup', e.target);
 	}
 
@@ -242,13 +262,7 @@ class CWidgetFieldMultiselect {
 		}
 
 		if (caption !== null) {
-			this.#multiselect.multiSelect('modify', {
-				name: `${this.#field_name}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
-				selectedLimit: 1
-			});
-
-			this.#selected_typed_reference = typed_reference;
-
+			this.#is_selecting_typed_reference = true;
 			this.#multiselect.multiSelect('addData', [caption]);
 
 			if (hint_text !== null) {
@@ -265,16 +279,6 @@ class CWidgetFieldMultiselect {
 			this.#selectTypedReference(entity.id);
 		}
 		else {
-			this.#multiselect.multiSelect('modify', {
-				name: `${this.#field_name}${this.#is_multiple ? '[]' : ''}`,
-				selectedLimit: this.#selected_limit
-			});
-
-			if (this.#selected_typed_reference !== null) {
-				this.#multiselect.multiSelect('removeSelected', this.#selected_typed_reference);
-				this.#selected_typed_reference = null;
-			}
-
 			this.#multiselect.multiSelect('addData', [entity]);
 		}
 	}

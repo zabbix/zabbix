@@ -100,8 +100,6 @@
 				var $obj = $(this),
 					ms = $obj.data('multiSelect');
 
-				$obj.trigger('before-add', ms);
-
 				if (typeof trigger_change !== 'boolean') {
 					trigger_change = true;
 				}
@@ -111,6 +109,8 @@
 						removeSelected($obj, id);
 					}
 				}
+
+				$obj.trigger('before-add', ms);
 
 				for (var i = 0, l = items.length; i < l; i++) {
 					addSelected($obj, items[i]);
@@ -1002,7 +1002,7 @@
 
 		$obj.trigger('before-remove', ms);
 
-		$('.selected li[data-id]', $obj).each(function() {
+		$('.multiselect-list [data-id]', $obj).each(function() {
 			if ($(this).data('id') == id) {
 				$(this).remove();
 			}
