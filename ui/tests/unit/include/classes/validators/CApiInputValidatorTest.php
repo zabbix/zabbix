@@ -8509,6 +8509,12 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_ESCAPED_STRING_UTF8],
 				'\\',
 				'/',
+				'\\'
+			],
+			[
+				['type' => API_ESCAPED_STRING_UTF8, 'characters' => '\\'],
+				'\\',
+				'/',
 				'Invalid parameter "/": value contains unescaped backslash at position 1.'
 			],
 			[

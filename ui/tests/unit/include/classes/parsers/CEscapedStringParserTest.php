@@ -79,6 +79,21 @@ class CEscapedStringParserTest extends TestCase {
 				'match' => '\n\n\n\n\n',
 				'error' => ''
 			]],
+			['\n\n\n\\n\n', 0, ['characters' => 'n'], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '\n\n\n\\n\n',
+				'error' => ''
+			]],
+			['\\', 0, ['characters' => 'nrts'], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '\\',
+				'error' => ''
+			]],
+			['\\', 0, [], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '\\',
+				'error' => ''
+			]],
 
 			// CParser::PARSE_SUCCESS_CONT
 			['\\\\\n', 0, ['characters' => '\\'], [
@@ -96,11 +111,6 @@ class CEscapedStringParserTest extends TestCase {
 				'match' => '\\\\in the middle',
 				'error' => 'value contains unescaped backslash at position 16'
 			]],
-			['\n\n\n\\\n\n', 0, ['characters' => 'n'], [
-				'rc' => CParser::PARSE_SUCCESS_CONT,
-				'match' => '\n\n\n',
-				'error' => 'value contains unescaped backslash at position 7'
-			]],
 
 			// CParser::PARSE_FAIL
 			['\ ', 0, ['characters' => '\\nrts'], [
@@ -109,11 +119,6 @@ class CEscapedStringParserTest extends TestCase {
 				'error' => 'value contains unescaped backslash at position 1'
 			]],
 			['\n\\', 0, ['characters' => '\\'], [
-				'rc' => CParser::PARSE_FAIL,
-				'match' => '',
-				'error' => 'value contains unescaped backslash at position 1'
-			]],
-			['\\', 0, ['characters' => 'nrts'], [
 				'rc' => CParser::PARSE_FAIL,
 				'match' => '',
 				'error' => 'value contains unescaped backslash at position 1'

@@ -57,13 +57,29 @@ class CEscapedStringParser extends CParser {
 		$this->match = '';
 		$this->error = '';
 
-		if ($offset >= strlen($source)) {
-			return self::PARSE_SUCCESS;
-		}
+		$backslash_escaping_not_required = strpos($this->options['characters'], '\\') === false;
 
 		// Check if all backslash characters in given string are escaped.
 		for ($pos = strpos($source, '\\', $offset); $pos !== false; $pos = strpos($source, '\\', $pos + 2)) {
-			if (!isset($source[$pos + 1]) || strpos($this->options['characters'], $source[$pos + 1]) === false) {
+			if ($backslash_escaping_not_required && !isset($source[$pos + 1])) {
+				/*
+				 * If the last character is unescaped backslash and backslash is not required to be escaped, this
+				 * is considered a valid string.
+				 */
+				$pos = false;
+
+				break;
+			}
+			elseif (isset($source[$pos + 1]) && $source[$pos + 1] === '\\' && $backslash_escaping_not_required) {
+				/*
+				 * Switch one position to the left when next character is backslash and backslash is not required
+				 * to be escaped so that it can serve as escaping char for next character.
+				 */
+				$pos--;
+
+				continue;
+			}
+			elseif (!isset($source[$pos + 1]) || strpos($this->options['characters'], $source[$pos + 1]) === false) {
 				break;
 			}
 		}
@@ -71,6 +87,7 @@ class CEscapedStringParser extends CParser {
 		// No backslash occurances or loop has been stopped.
 		if ($pos !== false) {
 			$result = $pos > $offset ? self::PARSE_SUCCESS_CONT : self::PARSE_FAIL;
+			$this->error = _s('value contains unescaped backslash at position %1$d', $pos + 1 - $offset);
 		}
 		else {
 			$result = self::PARSE_SUCCESS;
@@ -79,10 +96,6 @@ class CEscapedStringParser extends CParser {
 		if ($result != self::PARSE_FAIL) {
 			$this->length = $result == self::PARSE_SUCCESS ? strlen($source) - $offset :  $pos - $offset;
 			$this->match = substr($source, $offset, $this->length);
-		}
-
-		if ($result != self::PARSE_SUCCESS) {
-			$this->error = _s('value contains unescaped backslash at position %1$d', $pos + 1 - $offset);
 		}
 
 		return $result;
