@@ -786,8 +786,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		'backurl' => getRequest('backurl')
 	];
 
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
+
 	if (!$data['is_discovery_rule']) {
-		CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 		$data['preprocessing'] = sortPreprocessingSteps($data['preprocessing']);
 	}
 
