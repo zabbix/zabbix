@@ -21,20 +21,19 @@
 #include "zbxsysinfo.h"
 
 #include "../sysinfo.h"
-#include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxcomms.h"
 #include "zbxjson.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check whether JSON response is "success" or "failed"              *
+ * Purpose: checks whether JSON response is "success" or "failed"             *
  *                                                                            *
- * Parameters: response - [IN] the request                                    *
- *             result   - [OUT] check result                                  *
+ * Parameters: response - [IN]                                                *
+ *             result   - [OUT]                                               *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 static int	check_response(const char *response, AGENT_RESULT *result)
@@ -69,7 +68,7 @@ static int	check_response(const char *response, AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: send Zabbix stats request and receive the result data             *
+ * Purpose: sends Zabbix stats request and receives result data               *
  *                                                                            *
  * Parameters: json    - [IN] the request                                     *
  *             ip      - [IN] external Zabbix instance hostname               *
@@ -121,7 +120,7 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create Zabbix stats request                                       *
+ * Purpose: creates Zabbix stats request                                      *
  *                                                                            *
  * Parameters: ip      - [IN] external Zabbix instance hostname               *
  *             port    - [IN] external Zabbix instance port                   *
@@ -129,7 +128,7 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
  *             result  - [OUT] check result                                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout, AGENT_RESULT *result)
@@ -148,7 +147,7 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create Zabbix stats queue request                                 *
+ * Purpose: creates Zabbix stats queue request                                *
  *                                                                            *
  * Parameters: ip      - [IN] external Zabbix instance hostname               *
  *             port    - [IN] external Zabbix instance port                   *
@@ -158,7 +157,7 @@ int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, int timeout
  *             result  - [OUT] check result                                   *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,

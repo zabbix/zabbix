@@ -511,8 +511,12 @@ out:
  ******************************************************************************/
 int	zbx_init_builtin_counter_indexes(void)
 {
-	int 				ret = SUCCEED, i;
-	wchar_t 			*counter_text, *eng_names, *counter_base;
+#	define VER_CMP(vi, c)								\
+		10 * vi->dwMajorVersion + vi->dwMinorVersion >=				\
+		10 * c.minSupported_dwMajorVersion + c.minSupported_dwMinorVersion
+
+	int				ret = SUCCEED, i;
+	wchar_t				*counter_text, *eng_names, *counter_base;
 	DWORD				counter_index;
 	static const OSVERSIONINFOEX	*vi = NULL;
 
@@ -545,9 +549,7 @@ int	zbx_init_builtin_counter_indexes(void)
 
 		for (i = 0; i < ARRSIZE(builtin_object_map); i++)
 		{
-			if (0 == builtin_object_map[i].pdhIndex && vi->dwMajorVersion >=
-					builtin_object_map[i].minSupported_dwMajorVersion && vi->dwMinorVersion >=
-					builtin_object_map[i].minSupported_dwMinorVersion && 0 ==
+			if (0 == builtin_object_map[i].pdhIndex && VER_CMP(vi, builtin_object_map[i]) && 0 ==
 					wcscmp(builtin_object_map[i].eng_name, counter_text))
 			{
 				builtin_object_map[i].pdhIndex = counter_index;
@@ -565,9 +567,7 @@ int	zbx_init_builtin_counter_indexes(void)
 
 		for (i = 0; i < ARRSIZE(builtin_counter_map); i++)
 		{
-			if (0 == builtin_counter_map[i].pdhIndex && vi->dwMajorVersion >=
-					builtin_counter_map[i].minSupported_dwMajorVersion && vi->dwMinorVersion >=
-					builtin_counter_map[i].minSupported_dwMinorVersion && 0 ==
+			if (0 == builtin_counter_map[i].pdhIndex && VER_CMP(vi, builtin_counter_map[i]) && 0 ==
 					wcscmp(builtin_counter_map[i].eng_name, counter_text) && SUCCEED ==
 					validate_object_counter(zbx_get_builtin_object_index(i), counter_index))
 			{
@@ -582,9 +582,7 @@ int	zbx_init_builtin_counter_indexes(void)
 #define CHECK_COUNTER_INDICES(index_map)								\
 	for (i = 0; i < ARRSIZE(index_map); i++)							\
 	{												\
-		if (0 == index_map[i].pdhIndex && vi->dwMajorVersion >=					\
-				index_map[i].minSupported_dwMajorVersion && vi->dwMinorVersion >=       \
-				builtin_counter_map[i].minSupported_dwMinorVersion)                     \
+		if (0 == index_map[i].pdhIndex && VER_CMP(vi, index_map[i]))				\
 		{											\
 			char	*counter;								\
 													\
@@ -603,6 +601,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef VER_CMP
 }
 
 /******************************************************************************

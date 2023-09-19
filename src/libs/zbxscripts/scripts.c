@@ -21,15 +21,18 @@
 #include "zbxexpression.h"
 
 #include "../../zabbix_server/poller/checks_agent.h"
+#ifdef HAVE_OPENIPMI
 #include "../../zabbix_server/ipmi/ipmi.h"
+#endif
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "../../zabbix_server/poller/checks_ssh.h"
+#endif
 #include "../../zabbix_server/poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
 #include "zbxnum.h"
-#include "zbxsysinfo.h"
 #include "zbxparam.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"

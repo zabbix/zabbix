@@ -241,9 +241,7 @@ static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int le
 
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	level;
-
-	level = LOG_LEVEL_DEBUG;
+	int	level = LOG_LEVEL_DEBUG;
 
 	if (0 != sysinfo_get_config_log_remote_commands())
 		level = LOG_LEVEL_WARNING;

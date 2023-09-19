@@ -937,6 +937,10 @@ msgstr "Pridať"
 msgid "Add (message type limit reached)"
 msgstr "Pridať (bol dosiahnutý limit typov správ)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "Pridajte nový widget"
@@ -25620,6 +25624,10 @@ msgstr "now() - Počet sekúnd od epochy"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "číslo"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

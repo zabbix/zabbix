@@ -90,9 +90,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 						jQuery("#widget-dialogue-form")[0].scrollHeight - container.height()
 					));
 
-					jQuery(".multiselect", jQuery("#overrides")).each(function() {
-						jQuery(this).multiSelect(jQuery(this).data("params"));
-					});
+					jQuery("#overrides .multiselect").multiSelect();
 
 					widget_svggraph_form.updateVariableOrder(jQuery("#overrides"), ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'", "or");
 					widget_svggraph_form.onGraphConfigChange();
@@ -118,9 +116,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			initializeOverrides();
 
 			// Initialize override pattern-selectors.
-			jQuery(".multiselect", jQuery("#overrides")).each(function() {
-				jQuery(this).multiSelect(jQuery(this).data("params"));
-			});
+			jQuery("#overrides .multiselect").multiSelect();
 
 			// Make overrides sortable.
 			if (jQuery("#overrides .'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'").length < 2) {
