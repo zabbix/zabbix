@@ -9,7 +9,6 @@ New features:
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
-...G...PS. [ZBX-22343] removed use of deprecated curl setopt options (jxl)
 ...G...... [ZBX-23417] fixed possible memory leak when checking modbus.get[] item (Andris)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
 ...G...... [ZBX-23110] fixed possible crash on Windows 11 by removing concurrent Win API call for update perfCounters list (MVekslers)
@@ -2739,7 +2738,7 @@ New features:
 
 Bug fixes:
 ........S. [ZBX-23303] fixed syntax of message identifier in the In-Reply-To e-mail header field (asitals)
-...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
 ...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
 ..F....... [ZBX-17279] fixed graph widget loading (apoga)
 A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
