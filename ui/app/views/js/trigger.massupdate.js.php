@@ -60,8 +60,10 @@
 		jQuery('#dependencies_' + triggerid).remove();
 	}
 
-	document.addEventListener('click', (e) => {
+	document.getElementById('massupdate-form').addEventListener('click', (e) => {
 		if (e.target.classList.contains('js-edit-dependency')) {
+			e.preventDefault();
+
 			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
 				return;
 			}
@@ -84,10 +86,10 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				postMessageOk(e.detail.title);
+				postMessageOk(e.detail.success.title);
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+				if ('messages' in e.detail.success) {
+					postMessageDetails('success', e.detail.success.messages);
 				}
 
 				location.href = location.href;

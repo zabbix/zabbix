@@ -209,7 +209,8 @@ $html_page
 		'context' => $data['context'],
 		'hostid' => $data['hostid'],
 		'parent_discoveryid' => $data['parent_discoveryid'],
-		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')]
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME => CCsrfTokenHelper::get('trigger')],
+		'form_name' => $trigger_form->getName()
 	]).');
 '))
 	->setOnDocumentReady()
