@@ -1388,7 +1388,7 @@ function getMenuPopupTriggerMacro(options) {
 		items[items.length] = {
 			label: expression.label,
 			clickCallback: function() {
-				var expressionInput = jQuery('#expression');
+				var expressionInput = jQuery('#expr_temp');
 
 				if (expressionInput.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
 					return false;
@@ -1397,7 +1397,7 @@ function getMenuPopupTriggerMacro(options) {
 				expressionInput.val(expression.string);
 
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
-				document.getElementById('expression').dispatchEvent(new Event('change'));
+				document.getElementById('expr_temp').dispatchEvent(new Event('change'));
 			}
 		};
 	});
