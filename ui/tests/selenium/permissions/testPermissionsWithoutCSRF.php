@@ -658,7 +658,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			$selectors = [
 				'create' => "//div[@class=\"header-controls\"]//button",
 				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
-				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[5]/a",
+				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[4]/a",
 				'problem' => '//table[@class="list-table"]//tr[1]//a[text()="Update"]',
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];

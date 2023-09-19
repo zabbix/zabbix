@@ -52,7 +52,7 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
+						'Trigger' => 'zabbix.php?action=trigger.edit',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
@@ -69,7 +69,7 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
+						'Trigger' => 'zabbix.php?action=trigger.edit',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',

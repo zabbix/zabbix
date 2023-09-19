@@ -889,7 +889,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				COverlayDialogElement::find()->one()->close();
 			}
 			else {
-				$this->query('xpath://*[@id="expression-table"]/div/span')->waitUntilVisible()->one();
+				$this->query('xpath://*[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
 				$this->zbxTestAssertElementPresentXpath("//button[@name='test_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='and_expression']");
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='or_expression']");

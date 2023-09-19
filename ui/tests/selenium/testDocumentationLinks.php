@@ -1104,7 +1104,7 @@ class testDocumentationLinks extends CWebTest {
 			// #106 Host trigger create form.
 			[
 				[
-					'url' => 'zabbix.php?action=trigger.list&filter_hostids[]=40001&context=host',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=40001&context=host',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1117,7 +1117,7 @@ class testDocumentationLinks extends CWebTest {
 			// #107 Host trigger update form.
 			[
 				[
-					'url' => 'zabbix.php?action=trigger.list&filter_hostids[]=40001&context=host',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=40001&context=host',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',

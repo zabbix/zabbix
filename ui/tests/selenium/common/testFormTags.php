@@ -1185,6 +1185,10 @@ class testFormTags extends CWebTest {
 
 		// Check disabled inherited tags from host or template on created element.
 		$this->assertEquals($this->prepareInheritedTags($data['tags'], $parent_tags), $this->getInheritedTags());
+
+		if ($object === 'trigger' || $object == 'trigger prototype') {
+			COverlayDialogElement::find()->one()->close();
+		}
 	}
 
 	/**
@@ -1348,6 +1352,11 @@ class testFormTags extends CWebTest {
 				: [['tag' => '', 'operator' => 'Equals', 'value' => '']];
 
 		$data = ['name' => $this->remove_name, 'tags' => $tags];
+
+		if ($object === 'trigger' || $object == 'trigger prototype') {
+			COverlayDialogElement::find()->one()->close();
+		}
+
 		$this->page->login()->open($this->link);
 
 		if ($object === 'service') {
