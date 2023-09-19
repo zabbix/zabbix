@@ -73,7 +73,7 @@ else {
 	$severity = new CSeverity('priority', (int) $data['priority']);
 }
 
-$trigger_form_grid->addItem([new CLabel(_('Severity')), $severity]);
+$trigger_form_grid->addItem([new CLabel(_('Severity'), 'priority'), $severity]);
 
 $expression_row = [
 	(new CTextArea('expression', $data['expression']))
@@ -154,7 +154,7 @@ $trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
 	->setId('close-expression-constructor-field')
 );
 
-$trigger_form_grid->addItem([new CLabel(_('OK event generation')),
+$trigger_form_grid->addItem([new CLabel(_('OK event generation'), 'recovery_mode'),
 	(new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
 		->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
 		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
@@ -231,14 +231,14 @@ $trigger_form_grid
 		->addStyle('display: none')
 		->setId('close-recovery-expression-constructor-field')
 	)
-	->addItem([new CLabel(_('PROBLEM event generation mode')),
+	->addItem([new CLabel(_('PROBLEM event generation mode'), 'type'),
 		(new CRadioButtonList('type', (int) $data['type']))
 			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 			->setModern()
 			->setEnabled(!$readonly)
 	])
-	->addItem([new CLabel(_('OK event closes')),
+	->addItem([new CLabel(_('OK event closes'), 'correlation_mode'),
 		(new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
