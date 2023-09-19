@@ -160,7 +160,7 @@ $filter_column3 = (new CFormList());
 if ($data['context'] === 'host') {
 	$filter_column3->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter']['state']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Normal'), ITEM_STATE_NORMAL)
 			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
 			->setModern(true)
@@ -169,7 +169,7 @@ if ($data['context'] === 'host') {
 
 $filter_column3->addRow(_('Status'),
 	(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-		->addValue(_('all'), -1)
+		->addValue(_('All'), -1)
 		->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 		->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
 		->setModern(true)

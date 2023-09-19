@@ -82,7 +82,7 @@ $filter_column1 = (new CFormList())
 if ($data['context'] === 'host') {
 	$filter_column1->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter_state']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
 			->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
 			->setModern(true)
@@ -91,7 +91,7 @@ if ($data['context'] === 'host') {
 
 $filter_column1->addRow(_('Status'),
 	(new CRadioButtonList('filter_status', (int) $data['filter_status']))
-		->addValue(_('all'), -1)
+		->addValue(_('All'), -1)
 		->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
 		->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 		->setModern(true)
@@ -100,7 +100,7 @@ $filter_column1->addRow(_('Status'),
 if ($data['context'] === 'host') {
 	$filter_column1->addRow(_('Value'),
 		(new CRadioButtonList('filter_value', (int) $data['filter_value']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
 			->addValue(_('Problem'), TRIGGER_VALUE_TRUE)
 			->setModern(true)
@@ -121,7 +121,7 @@ $filter_column2 = (new CFormList())
 	->addRow(_('Tags'), $filter_tags_table)
 	->addRow(_('Inherited'),
 		(new CRadioButtonList('filter_inherited', (int) $data['filter_inherited']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern(true)
@@ -130,7 +130,7 @@ $filter_column2 = (new CFormList())
 if ($data['context'] === 'host') {
 	$filter_column2->addRow(_('Discovered'),
 		(new CRadioButtonList('filter_discovered', (int) $data['filter_discovered']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern(true)
@@ -139,7 +139,7 @@ if ($data['context'] === 'host') {
 
 $filter_column2->addRow(_('With dependencies'),
 	(new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
-		->addValue(_('all'), -1)
+		->addValue(_('All'), -1)
 		->addValue(_('Yes'), 1)
 		->addValue(_('No'), 0)
 		->setModern(true)
