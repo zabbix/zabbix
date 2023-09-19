@@ -369,7 +369,7 @@ class CDataHelper extends CAPIHelper {
 	}
 
 	/**
-	 *  Add data to item.
+	 * Add data to item.
 	 *
 	 * @param string $itemid		item id
 	 * @param array $values			value that should be sent to item
@@ -391,7 +391,32 @@ class CDataHelper extends CAPIHelper {
 			$time = array_values($time);
 		}
 
-		// Check item value type to set correct history table where to insert data.
+		// Set correct history table where to insert data.
+		$history_table = static::getItemDataTable($itemid);
+
+		foreach (array_values($values) as $key => $value) {
+			$clock = is_array($time) ? $time[$key] : $time;
+			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
+					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
+		}
+	}
+
+	/**
+	 * Remove item data from history table.
+	 *
+	 * @param string $itemid		item id
+	 */
+	public static function removeItemData($itemid) {
+		DBexecute('DELETE FROM '.self::getItemDataTable($itemid).' WHERE itemid='.zbx_dbstr($itemid));
+	}
+
+	/**
+	 * Get history data table.
+	 *
+	 * @param string $itemid		item id
+	 */
+	public static function getItemDataTable($itemid) {
+		// Check item value type to set correct history table.
 		$value_type = CDBHelper::getValue('SELECT value_type FROM items where itemid='.zbx_dbstr($itemid));
 		$suffixes = ['', '_str', '_log', '_uint', '_text'];
 
@@ -399,12 +424,6 @@ class CDataHelper extends CAPIHelper {
 			throw new Exception('Unsupported item value type: '.$value_type);
 		}
 
-		$history_table = 'history'.$suffixes[$value_type];
-
-		foreach (array_values($values) as $key => $value) {
-			$clock = is_array($time) ? $time[$key] : $time;
-			DBexecute('INSERT INTO '.$history_table.' (itemid, clock, value) VALUES ('.zbx_dbstr($itemid).', '
-					.zbx_dbstr($clock).', '.zbx_dbstr($value).')');
-		}
+		return 'history'.$suffixes[$value_type];
 	}
 }

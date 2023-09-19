@@ -178,10 +178,32 @@ window.tophosts_column_edit_form = new class {
 		});
 	}
 
+	#trimFields(fields) {
+		fields.name = fields.name.trim();
+
+		for (const field of ['text', 'timeshift', 'aggregate_interval', 'min', 'max', 'decimal_places']) {
+			if (field in fields) {
+				fields[field] = fields[field].trim();
+			}
+		}
+
+		if ('thresholds' in fields) {
+			for (const threshold of Object.values(fields.thresholds)) {
+				threshold.threshold = threshold.threshold.trim();
+			}
+		}
+
+		return fields;
+	}
+
 	handleFormSubmit(e, overlay) {
-		fetch(new Curl(e.target.getAttribute('action')).getUrl(), {
+		const curl = new Curl(e.target.getAttribute('action'));
+		const fields = this.#trimFields(getFormFields(e.target));
+
+		fetch(curl.getUrl(), {
 			method: 'POST',
-			body: new URLSearchParams(new FormData(e.target))
+			headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'},
+			body: urlEncodeData(fields)
 		})
 			.then(response => response.json())
 			.then(response => {

@@ -45,7 +45,7 @@ if (array_key_exists('edit', $data)) {
 
 // Name.
 $form_grid->addItem([
-	new CLabel(_('Name'), 'name'),
+	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 	new CFormField(
 		(new CTextBox('name', $data['name'], false))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

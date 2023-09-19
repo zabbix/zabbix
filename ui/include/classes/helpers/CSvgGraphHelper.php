@@ -461,7 +461,11 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+					if ($metric['history'] != 0) {
+						$metric['history'] = timeUnitToSeconds(
+							CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
+						);
+					}
 				}
 				unset($metric);
 			}
@@ -471,7 +475,9 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					if ($metric['trends'] != 0) {
+						$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					}
 				}
 				unset($metric);
 			}

@@ -22,12 +22,12 @@
 namespace Widgets\TopHosts\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CHousekeepingHelper,
 	CMacrosResolverHelper,
 	CNumberParser,
-	CParser,
 	CSettingsHelper,
 	Manager,
 	CRangeTimeParser;
@@ -114,87 +114,174 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$hostids = $this->fields_values['hostids'] ?: null;
 		}
 
-		if (array_key_exists('tags', $this->fields_values)) {
-			$options = [
-				'output' => ['name'],
-				'groupids' => $groupids,
-				'hostids' => $hostids,
-				'evaltype' => $this->fields_values['evaltype'],
-				'tags' => $this->fields_values['tags'],
-				'monitored_hosts' => true,
-				'preservekeys' => true,
-				'dashboard_time' => $dashboard_time
-			];
+		$tags_exist = array_key_exists('tags', $this->fields_values);
+		$maintenance_status = $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
+			? HOST_MAINTENANCE_STATUS_OFF
+			: null;
 
-			if ($from !== null && $to !== null) {
-				$options['time_period'] = [
-					'time_from' => $time_from,
-					'time_to' => $time_to
-				];
+		$options = [
+			'output' => ['name', 'maintenance_status', 'maintenanceid'],
+			'groupids' => $groupids,
+			'hostids' => $hostids,
+			'evaltype' => $tags_exist ? $this->fields_values['evaltype'] : null,
+			'tags' => $tags_exist ? $this->fields_values['tags'] : null,
+			'filter' => ['maintenance_status' => $maintenance_status],
+			'monitored_hosts' => true,
+			'preservekeys' => true,
+			'dashboard_time' => $dashboard_time
+		];
+
+		if ($from !== null && $to !== null) {
+			$options['time_period'] = [
+				'time_from' => $time_from,
+				'time_to' => $time_to
+			];
+		}
+
+		$hosts = API::Host()->get($options);
+
+		$hostids = array_keys($hosts);
+		$maintenanceids = array_filter(array_column($hosts, 'maintenanceid', 'maintenanceid'));
+
+		$db_maintenances = $maintenanceids && $maintenance_status === null
+			? API::Maintenance()->get([
+				'output' => ['name', 'maintenance_type', 'description'],
+				'maintenanceids' => $maintenanceids,
+				'preservekeys' => true
+			])
+			: [];
+
+		$db_maintenances = CArrayHelper::renameObjectsKeys($db_maintenances,
+			['name' => 'maintenance_name', 'description' => 'maintenance_description']
+		);
+
+		$has_text_column = false;
+		$item_names = [];
+		$items = [];
+
+		foreach ($configuration as $column_index => $column) {
+			switch ($column['data']) {
+				case CWidgetFieldColumnsList::DATA_TEXT:
+					$has_text_column = true;
+					break 2;
+
+				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+					$item_names[$column_index] = $column['item'];
+					break;
+			}
+		}
+
+		if (!$has_text_column && $item_names) {
+			$hosts_with_items = [];
+
+			foreach ($item_names as $column_index => $item_name) {;
+				$numeric_only = self::isNumericOnlyColumn($configuration[$column_index]);
+				$items[$column_index] = self::getItems($item_name, $numeric_only, $groupids, $hostids);
+
+				foreach ($items[$column_index] as $item) {
+					$hosts_with_items[$item['hostid']] = true;
+				}
 			}
 
-			$hosts = API::Host()->get($options);
-
-			$hostids = array_keys($hosts);
-		}
-		else {
-			$hosts = null;
+			$hostids = array_keys($hosts_with_items);
+			$hosts = array_intersect_key($hosts, $hosts_with_items);
 		}
 
-		$time_now = time();
-
-		$master_column = $configuration[$this->fields_values['column']];
-		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
-
-		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids,
-			$master_column['aggregate_function'] == AGGREGATE_COUNT);
-		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
-
-		if (!$master_item_values) {
+		if (!$hostids) {
 			return [
 				'configuration' => $configuration,
 				'rows' => []
 			];
 		}
 
-		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_items,
+		$time_now = time();
+
+		$master_column_index = $this->fields_values['column'];
+		$master_column = $configuration[$master_column_index];
+		$master_entities = $hosts;
+		$master_entity_values = [];
+		$master_items_only_numeric_allowed = false;
+
+		switch ($master_column['data']) {
+			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
+				$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
+				$master_entities = array_key_exists($master_column_index, $items)
+					? $items[$master_column_index]
+					: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
+				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
+				break;
+
+			case CWidgetFieldColumnsList::DATA_HOST_NAME:
+				$master_entity_values = array_column($master_entities, 'name', 'hostid');
+				break;
+
+			case CWidgetFieldColumnsList::DATA_TEXT:
+				$master_entity_values = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns(
+					[$master_column_index => $master_column['text']], $hostids
+				)[$master_column_index];
+
+				foreach ($master_entity_values as $key => $value) {
+					if ($value === '') {
+						unset($master_entity_values[$key], $master_entities[$key]);
+					}
+				}
+
+				break;
+		}
+
+		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_entities,
 			static function(array $item): bool {
 				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
 		);
 
 		if ($this->fields_values['order'] == Widget::ORDER_TOP_N) {
-			if ($master_items_only_numeric_present || $column['aggregate_function'] == AGGREGATE_COUNT) {
-				arsort($master_item_values, SORT_NUMERIC);
+			if ($master_items_only_numeric_present) {
+				arsort($master_entity_values, SORT_NUMERIC);
 
-				$master_items_min = end($master_item_values);
-				$master_items_max = reset($master_item_values);
+				$master_entities_min = end($master_entity_values);
+				$master_entities_max = reset($master_entity_values);
 			}
 			else {
-				asort($master_item_values, SORT_NATURAL);
+				natcasesort($master_entity_values);
 			}
 		}
 		else {
 			if ($master_items_only_numeric_present) {
-				asort($master_item_values, SORT_NUMERIC);
+				asort($master_entity_values, SORT_NUMERIC);
 
-				$master_items_min = reset($master_item_values);
-				$master_items_max = end($master_item_values);
+				$master_entities_min = reset($master_entity_values);
+				$master_entities_max = end($master_entity_values);
 			}
 			else {
-				arsort($master_item_values, SORT_NATURAL);
+				natcasesort($master_entity_values);
+				$master_entity_values = array_reverse($master_entity_values, true);
 			}
 		}
 
 		$show_lines = $this->isTemplateDashboard() ? 1 : $this->fields_values['show_lines'];
-		$master_item_values = array_slice($master_item_values, 0, $show_lines, true);
-		$master_items = array_intersect_key($master_items, $master_item_values);
+		$master_entity_values = array_slice($master_entity_values, 0, $show_lines, true);
+		$master_entities = array_intersect_key($master_entities, $master_entity_values);
 
 		$master_hostids = [];
 
-		foreach (array_keys($master_item_values) as $itemid) {
-			$master_hostids[$master_items[$itemid]['hostid']] = true;
+		foreach (array_keys($master_entity_values) as $entity) {
+			$master_hostids[$master_entities[$entity]['hostid']] = true;
 		}
+
+		if (count($master_hostids) < $show_lines) {
+			foreach ($hostids as $hostid) {
+				if (!array_key_exists($hostid, $master_hostids)) {
+					$master_hostids[$hostid] = true;
+				}
+
+				if (count($master_hostids) == $show_lines) {
+					break;
+				}
+			}
+		}
+
+		$master_hostids = array_keys($master_hostids);
 
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
@@ -209,8 +296,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		]);
 
 		$item_values = [];
+		$text_columns = [];
 
 		foreach ($configuration as $column_index => &$column) {
+			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
+				$text_columns[$column_index] = $column['text'];
+				continue;
+			}
+
 			if ($column['data'] != CWidgetFieldColumnsList::DATA_ITEM_VALUE) {
 				continue;
 			}
@@ -218,18 +311,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
-			if ($column_index == $this->fields_values['column']) {
-				$column_items = $master_items;
-				$column_item_values = $master_item_values;
+			if ($column_index == $master_column_index) {
+				$column_items = $master_entities;
+				$column_item_values = $master_entity_values;
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
 
-				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
-					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids),
-						$column['aggregate_function'] == AGGREGATE_COUNT)
-					: self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids,
-						$column['aggregate_function'] == AGGREGATE_COUNT);
+				if (!$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')) {
+					$column_items = self::getItems($column['item'], $numeric_only, $groupids, $master_hostids);
+				}
+				else {
+					$column_items = array_key_exists($column_index, $items)
+						? $items[$column_index]
+						: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
+				}
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
 			}
@@ -263,15 +359,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				unset($threshold);
 			}
 
-			if ($column_index == $this->fields_values['column']) {
+			if ($column_index == $master_column_index) {
 				if ($calc_extremes) {
 					if ($column['min'] === '') {
-						$column['min'] = $master_items_min;
+						$column['min'] = $master_entities_min;
 						$column['min_binary'] = $column['min'];
 					}
 
 					if ($column['max'] === '') {
-						$column['max'] = $master_items_max;
+						$column['max'] = $master_entities_max;
 						$column['max_binary'] = $column['max'];
 					}
 				}
@@ -293,7 +389,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item_values[$column_index] = [];
 
 			foreach ($column_item_values as $itemid => $column_item_value) {
-				if (array_key_exists($column_items[$itemid]['hostid'], $master_hostids)) {
+				if (in_array($column_items[$itemid]['hostid'], $master_hostids)) {
 					$item_values[$column_index][$column_items[$itemid]['hostid']] = [
 						'value' => $column_item_value,
 						'item' => $column_items[$itemid],
@@ -304,47 +400,32 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		unset($column);
 
-		$text_columns = [];
-
-		foreach ($configuration as $column_index => $column) {
-			if ($column['data'] == CWidgetFieldColumnsList::DATA_TEXT) {
-				$text_columns[$column_index] = $column['text'];
-			}
-		}
-
-		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_items);
-
-		$hostid_to_itemid = array_column($master_items, 'itemid', 'hostid');
+		$text_columns = CMacrosResolverHelper::resolveWidgetTopHostsTextColumns($text_columns, $master_hostids);
 
 		$rows = [];
 
-		foreach (array_keys($master_hostids) as $hostid) {
+		foreach ($master_hostids as $hostid) {
 			$row = [];
 
 			foreach ($configuration as $column_index => $column) {
 				switch ($column['data']) {
 					case CWidgetFieldColumnsList::DATA_HOST_NAME:
-						if ($hosts === null) {
-							$hosts = API::Host()->get([
-								'output' => ['name'],
-								'groupids' => $groupids,
-								'hostids' => array_keys($master_hostids),
-								'monitored_hosts' => true,
-								'preservekeys' => true
-							]);
+						$data = [
+							'value' => $hosts[$hostid]['name'],
+							'hostid' => $hostid,
+							'maintenance_status' => $hosts[$hostid]['maintenance_status']
+						];
+
+						if ($data['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+							$data = array_merge($data, $db_maintenances[$hosts[$hostid]['maintenanceid']]);
 						}
 
-						$row[] = [
-							'value' => $hosts[$hostid]['name'],
-							'hostid' => $hostid
-						];
+						$row[] = $data;
 
 						break;
 
 					case CWidgetFieldColumnsList::DATA_TEXT:
-						$row[] = [
-							'value' => $text_columns[$column_index][$hostid_to_itemid[$hostid]]
-						];
+						$row[] = ['value' => $text_columns[$column_index][$hostid]];
 
 						break;
 
