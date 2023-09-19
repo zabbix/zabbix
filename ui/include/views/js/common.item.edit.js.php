@@ -97,7 +97,6 @@
 			jQuery('#test_item').prop('disabled', (testable_item_types.indexOf(type) == -1));
 		}
 
-		// timeout field
 		if (type == <?= ITEM_TYPE_SIMPLE ?>) {
 			const toggle_fields = [
 				'js-item-timeout-label',
@@ -110,7 +109,6 @@
 				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
 			);
 		}
-		// delay field
 		else if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
 			const toggle_fields = [
 				'delay',
@@ -120,6 +118,18 @@
 				'js-item-flex-intervals-field'
 			];
 			const set_hidden = key.substring(0, 8) === 'mqtt.get';
+			const object_switcher = globalAllObjForViewSwitcher['type'];
+
+			toggle_fields.forEach((element_id) =>
+				object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
+			);
+		}
+		else if (type == <?= ITEM_TYPE_SNMP ?>) {
+			const toggle_fields = [
+				'js-item-timeout-label',
+				'js-item-timeout-field'
+			];
+			const set_hidden = document.getElementById('snmp_oid').value.substring(0, 5) !== 'walk[';
 			const object_switcher = globalAllObjForViewSwitcher['type'];
 
 			toggle_fields.forEach((element_id) =>
@@ -176,7 +186,7 @@
 			new CViewSwitcher('allow_traps', 'change', item_form.field_switches.for_traps);
 		}
 
-		$("#key").on('keyup change', updateItemFormElements);
+		$("#key, #snmp_oid").on('keyup change', updateItemFormElements);
 
 		$('#parameters_table').dynamicRows({template: '#parameters_table_row', allow_empty: true});
 

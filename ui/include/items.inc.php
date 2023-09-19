@@ -2418,12 +2418,13 @@ function getTypeItemFieldNames(array $input): array {
  *
  * @param array  $field_names
  * @param array  $input
- * @param int    $input['type']
- * @param string $input['key_']
- * @param int    $input['value_type']
- * @param int    $input['authtype']
- * @param int    $input['allow_traps']
- * @param int    $input['hosts'][0]['status']
+ *        int    $input['type']
+ *        string $input['key_']
+ *        int    $input['value_type']
+ *        int    $input['authtype']
+ *        int    $input['allow_traps']
+ *        string $input['snmp_oid']
+ *        int    $input['hosts'][0]['status']
  *
  * @return array
  */
@@ -2457,8 +2458,9 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 				);
 
 			case 'timeout':
-				return $input['type'] != ITEM_TYPE_SIMPLE
-					|| (strncmp($input['key_'], 'icmpping', 8) !== 0 && strncmp($input['key_'], 'vmware.', 7) !== 0);
+				return ($input['type'] != ITEM_TYPE_SIMPLE || (strncmp($input['key_'], 'icmpping', 8) !== 0
+						&& strncmp($input['key_'], 'vmware.', 7) !== 0))
+					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'walk[', 5) === 0);
 
 			case 'delay':
 				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) !== 0;
