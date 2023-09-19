@@ -356,15 +356,17 @@ class CSVGPie {
 			.then(() => {
 				const sectors = this.#arcs_container.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`).nodes();
 
-				for (let i = 0; i < sectors.length; i++) {
-					// If mouse was on any sector before/during animation, then pop that sector out again.
-					if (sectors[i].matches(':hover')) {
-						this.#popOut(sectors[i]);
-						this.#popped_out_sector = sectors[i];
+				if (sectors.length > 1) {
+					for (let i = 0; i < sectors.length; i++) {
+						// If mouse was on any sector before/during animation, then pop that sector out again.
+						if (sectors[i].matches(':hover')) {
+							this.#popOut(sectors[i]);
+							this.#popped_out_sector = sectors[i];
+						}
 					}
-				}
 
-				this.#svg.on('mousemove', (e) => this.#onMouseMove(e));
+					this.#svg.on('mousemove', (e) => this.#onMouseMove(e));
+				}
 			})
 			.catch(() => {});
 
