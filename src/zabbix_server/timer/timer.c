@@ -180,6 +180,16 @@ static void	event_suppress_data_free(zbx_event_suppress_data_t *data)
 
 ZBX_PTR_VECTOR_IMPL(event_suppress_query_ptr, zbx_event_suppress_query_t*)
 
+int	event_suppress_query_eventid_compare(const void *d1, const void *d2)
+{
+	const zbx_event_suppress_query_t	*ds1 = *(const zbx_event_suppress_query_t * const *)d1;
+	const zbx_event_suppress_query_t	*ds2 = *(const zbx_event_suppress_query_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ds1->eventid, ds2->eventid);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: fetches events that need to be queried for maintenance            *
@@ -223,6 +233,16 @@ static void	event_queries_fetch(zbx_db_result_t result, zbx_vector_event_suppres
 
 ZBX_PTR_VECTOR_DECL(event_suppress_data_ptr, zbx_event_suppress_data_t*)
 ZBX_PTR_VECTOR_IMPL(event_suppress_data_ptr, zbx_event_suppress_data_t*)
+
+int	event_suppress_data_eventid_compare(const void *d1, const void *d2)
+{
+	const zbx_event_suppress_data_t    *ds1 = *(const zbx_event_suppress_data_t * const *)d1;
+	const zbx_event_suppress_data_t    *ds2 = *(const zbx_event_suppress_data_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(ds1->eventid, ds2->eventid);
+
+	return 0;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -286,7 +306,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 		zbx_event_suppress_query_t	event_query_search = {.eventid = eventid};
 
 		if (FAIL == zbx_vector_event_suppress_query_ptr_bsearch(event_queries, &event_query_search,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+				event_suppress_query_eventid_compare))
 		{
 			zbx_vector_uint64_append(&eventids, eventid);
 		}
@@ -350,7 +370,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Create/Updates event suppress data to reflect latest maintenance  *
+ * Purpose: Creates/Updates event suppress data to reflect latest maintenance *
  *          changes in cache.                                                 *
  *                                                                            *
  * Parameters: suppressed_num - [OUT]                                         *
@@ -406,7 +426,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 			zbx_event_suppress_data_t event_suppress_data_search = {.eventid = query->eventid};
 
 			if (FAIL != (j = zbx_vector_event_suppress_data_ptr_bsearch(&event_data,
-					&event_suppress_data_search, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+					&event_suppress_data_search, event_suppress_data_eventid_compare)))
 			{
 				data = event_data.values[j];
 				zbx_vector_uint64_pair_sort(&data->maintenances, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -525,7 +545,7 @@ cleanup:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update host maintenance parameters in cache and database          *
+ * Purpose: updates host maintenance parameters in cache and database         *
  *                                                                            *
  ******************************************************************************/
 static int	update_host_maintenances(void)
@@ -573,7 +593,7 @@ static int	update_host_maintenances(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
-#define ZBX_TIMER_DELAY		SEC_PER_MIN
+#define ZBX_MAINTENANCE_TIMER_DELAY	SEC_PER_MIN
 	time_t			maintenance_time = 0, update_time = 0;
 	char			*info = NULL;
 	size_t			info_alloc = 0, info_offset = 0;
@@ -604,7 +624,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		if (1 == process_num)
 		{
 			/* start update process only when all timers have finished their updates */
-			if (sec - (double)maintenance_time >= ZBX_TIMER_DELAY &&
+			if (sec - (double)maintenance_time >= ZBX_MAINTENANCE_TIMER_DELAY &&
 					FAIL == zbx_dc_maintenance_check_update_flags())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
@@ -662,7 +682,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			update_time -= update_time % 60;
 			maintenance_time = update_time;
 
-			if (0 > (idle = (int)(ZBX_TIMER_DELAY - (zbx_time() - (double)maintenance_time))))
+			if (0 > (idle = (int)(ZBX_MAINTENANCE_TIMER_DELAY - (zbx_time() - (double)maintenance_time))))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",
@@ -679,5 +699,5 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-#undef ZBX_TIMER_DELAY
+#undef ZBX_MAINTENANCE_TIMER_DELAY
 }
