@@ -26,19 +26,17 @@
 
 <script>
 	const view = new class {
-		init({context, hostid, parent_discoveryid, token, form_name}) {
+		init({context, hostid, parent_discoveryid, token}) {
 			this.context = context;
 			this.hostid = hostid;
 			this.parent_discoveryid = parent_discoveryid;
 			this.token = token;
-			this.form_name = form_name;
-			this.form = document.getElementsByName(form_name)[0];
 
 			this.#initActions();
 		}
 
 		#initActions() {
-			this.form.addEventListener('click', (e) => {
+			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-trigger-edit')) {
 					this.#edit('trigger.edit', {
 						triggerid: e.target.dataset.triggerid,

@@ -30,13 +30,11 @@
 
 <script>
 	const view = new class {
-		init({checkbox_hash, checkbox_object, context, token, form_name}) {
+		init({checkbox_hash, checkbox_object, context, token}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
 			this.context = context;
 			this.token = token;
-			this.form_name = form_name;
-			this.form = document.getElementsByName(form_name)[0];
 
 			this.#initFilter();
 			this.#initActions();
@@ -75,7 +73,7 @@
 		}
 
 		#initActions() {
-			this.form.addEventListener('click', (e) => {
+			document.addEventListener('click', (e) => {
 				if (e.target.id === 'js-create') {
 					this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context})
 				}
