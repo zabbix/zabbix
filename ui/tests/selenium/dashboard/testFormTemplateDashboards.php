@@ -27,7 +27,7 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 /**
  * @backup dashboard, hosts
  *
- * @dataSource Services, Sla
+ * @dataSource Services, Sla, Proxies
  *
  * @onBefore prepareTemplateDashboardsData
  */
@@ -319,6 +319,11 @@ class testFormTemplateDashboards extends CWebTest {
 										'type' => 10,
 										'name' => 'slaid',
 										'value' => 6
+									],
+									[
+										'type' => 1,
+										'name' => 'date_from',
+										'value' => '2023-09-01'
 									]
 								]
 							],
@@ -371,7 +376,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'columns.name.0',
-										'value' => ''
+										'value' => 'Column 1'
 									],
 									[
 										'type' => 1,
@@ -4272,15 +4277,21 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->query('xpath://span[text()="Dashboard with all widgets"]')->one()->waitUntilVisible()->click();
 		$this->page->waitUntilReady();
 
+		$time_period = [
+			'id:from' => '2023-09-01 08:00:00',
+			'id:to' => '2023-09-01 10:00:00'
+		];
+
+		foreach ($time_period as $field => $time) {
+			$this->query($field)->one()->fill($time);
+		}
+
+		$this->query('button:Apply')->one()->click();
+		CDashboardElement::find()->one()->waitUntilReady();
+
 		// TODO: should be fixed after git-hook improvements in DEV-2396.
 		$skip_selectors = [
 			'class:clock',
-			'class:flickerfreescreen',
-			'class:svg-graph-grid',
-			'class:svg-graph-axis-bottom',
-			"xpath://div[@class='dashboard-grid-widget-contents dashboard-widget-slareport']//thead//th[3]",
-			"xpath://div[@class='dashboard-grid-widget-contents dashboard-widget-slareport']//thead//th[4]",
-			"xpath://div[@class='dashboard-grid-widget-contents dashboard-widget-slareport']//thead//th[5]",
 			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
 			'class:widget-url',
 			'xpath://footer'

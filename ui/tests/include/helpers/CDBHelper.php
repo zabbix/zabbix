@@ -287,7 +287,7 @@ class CDBHelper {
 			}
 
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
-			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --dbname='.$DB['DATABASE'];
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=9 --dbname='.$DB['DATABASE'];
 			$cmd .= ' --table='.implode(' --table=', $tables).' --file='.$file;
 
 			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {
@@ -360,7 +360,7 @@ class CDBHelper {
 			$cmd .= $port;
 
 			$file = PHPUNIT_COMPONENT_DIR.$DB['DATABASE'].$suffix.'.dump';
-			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=5 --clean --dbname='.$DB['DATABASE'];
+			$cmd .= ' --username='.$DB['USER'].' --format=d --jobs=1 --clean --dbname='.$DB['DATABASE'];
 			$cmd .= ' '.$file;
 
 			if (self::$db_extension  == ZBX_DB_EXTENSION_TIMESCALEDB) {

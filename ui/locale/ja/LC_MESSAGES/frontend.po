@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-08 03:33+0000\n"
-"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
+"PO-Revision-Date: 2023-09-05 04:24+0000\n"
+"Last-Translator: Satoshi Fujioka <s.fujioka.exeo@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -892,6 +892,10 @@ msgstr "追加"
 msgid "Add (message type limit reached)"
 msgstr "追加 (メッセージタイプのリミットに到達)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "新しいウィジェットを追加"
@@ -930,7 +934,7 @@ msgstr "ホストを追加"
 
 #: include/actions.inc.php:653 include/actions.inc.php:871
 msgid "Add host tags"
-msgstr ""
+msgstr "ホストタグを追加"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -1226,7 +1230,7 @@ msgstr "手動クローズを許可"
 
 #: app/views/popup.discovery.check.php:125
 msgid "Allow redirect"
-msgstr ""
+msgstr "リダイレクトを許可"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -25289,6 +25293,10 @@ msgstr "now() - エポックを基準とした経過秒数"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "数値"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
