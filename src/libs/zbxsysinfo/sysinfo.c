@@ -2129,14 +2129,6 @@ int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error
 #define ZBX_ITEM_TIMEOUT_MAX	600
 	int	sec;
 
-	if ('\0' == *timeout_str)
-	{
-		if (NULL != sec_out)
-			*sec_out = 0;
-
-		return SUCCEED;
-	}
-
 	if (SUCCEED != zbx_is_time_suffix(timeout_str, &sec, ZBX_LENGTH_UNLIMITED) ||
 			ZBX_ITEM_TIMEOUT_MAX < sec || 1 > sec)
 	{

@@ -466,16 +466,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				continue;
 			}
 		}
-		else
-		{
-			if (NULL != items[i].timeout &&
-					FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = CONFIG_ERROR;
-				continue;
-			}
-		}
 
 		switch (items[i].type)
 		{
@@ -512,14 +502,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
-
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-				}
-
 				break;
 			case ITEM_TYPE_SNMP:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -567,14 +549,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
-
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-				}
-
 				break;
 			case ITEM_TYPE_SCRIPT:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -585,14 +559,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON,
 						NULL, 0);
-
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-				}
-
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
 						NULL, NULL, NULL, NULL, NULL, &items[i].script_params,
 						ZBX_MACRO_TYPE_SCRIPT_PARAMS_FIELD, NULL, 0);
@@ -643,14 +609,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
-
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-				}
-
 				break;
 			case ITEM_TYPE_JMX:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
@@ -687,13 +645,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 							NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].timeout,
 							ZBX_MACRO_TYPE_COMMON, NULL, 0);
-
-					if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-					{
-						SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-						errcodes[i] = CONFIG_ERROR;
-						continue;
-					}
 
 					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL,
 							&items[i].host, &items[i], NULL, NULL, NULL, NULL, NULL,
@@ -775,13 +726,17 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 						NULL, NULL, NULL, NULL, NULL, &items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
 						0);
 
-				if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-				{
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-					errcodes[i] = CONFIG_ERROR;
-					continue;
-				}
 				break;
+		}
+
+		if (NULL != items[i].timeout)
+		{
+			if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
+			{
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+				errcodes[i] = CONFIG_ERROR;
+				continue;
+			}
 		}
 	}
 
