@@ -116,7 +116,7 @@ $filter_type_visibility = [];
 $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setFocusableElementId('label-type')
-	->addOption(new CSelectOption(-1, _('all')))
+	->addOption(new CSelectOption(-1, _('All')))
 	->setValue($data['filter']['type']);
 
 zbx_subarray_push($filter_type_visibility, -1, 'filter_delay_row');

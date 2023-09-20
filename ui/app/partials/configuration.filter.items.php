@@ -131,14 +131,14 @@ $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setValue((int) $data['filter_data']['filter_type'])
 	->setFocusableElementId('label-filter-type')
-	->addOption(new CSelectOption(-1, _('all')))
+	->addOption(new CSelectOption(-1, _('All')))
 	->addOptions(CSelect::createOptionsFromArray($item_types));
 
 $info_type_select = (new CSelect('filter_value_type'))
 	->setFocusableElementId('label-filter-value-type')
 	->setValue($data['filter_data']['filter_value_type'])
 	->addOptions(CSelect::createOptionsFromArray([
-		-1 => _('all'),
+		-1 => _('All'),
 		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 		ITEM_VALUE_TYPE_STR => _('Character'),

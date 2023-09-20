@@ -1,1 +1,1 @@
-..F....... [ZBX-23361] fixed uncapitalized first letter for radio buttons with value 'all' (dpetra)
+..F....... [ZBX-23361] fixed uncapitalized first letter for value 'all' in radio buttons and in filter select fields (dpetra)
