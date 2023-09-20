@@ -10,12 +10,9 @@ div.dashboard-widget-hostavail {
 				}
 
 				td {
+					color: $font-color;
 					min-width: 95px;
 				}
-			}
-
-			td {
-				color: $font-color;
 			}
 		}
 

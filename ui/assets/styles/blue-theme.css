@@ -3796,9 +3796,8 @@ div.dashboard-widget-hostavail .host-avail-widget tbody tr th {
   min-width: 100px;
   width: 15%; }
 div.dashboard-widget-hostavail .host-avail-widget tbody tr td {
+  color: #1f2c33;
   min-width: 95px; }
-div.dashboard-widget-hostavail .host-avail-widget tbody td {
-  color: #1f2c33; }
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-true {
   color: #1f2c33;
   background: #34af67; }
