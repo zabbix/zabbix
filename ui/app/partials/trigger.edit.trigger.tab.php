@@ -73,7 +73,7 @@ else {
 	$severity = new CSeverity('priority', (int) $data['priority']);
 }
 
-$trigger_form_grid->addItem([new CLabel(_('Severity'), 'priority'), $severity]);
+$trigger_form_grid->addItem([new CLabel(_('Severity'), 'priority'), new CFormField($severity)]);
 
 $expression_row = [
 	(new CTextArea('expression', $data['expression']))
@@ -155,12 +155,13 @@ $trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
 );
 
 $trigger_form_grid->addItem([new CLabel(_('OK event generation'), 'recovery_mode'),
-	(new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
+	new CFormField((new CRadioButtonList('recovery_mode', (int) $data['recovery_mode']))
 		->addValue(_('Expression'), ZBX_RECOVERY_MODE_EXPRESSION)
 		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
 		->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
 		->setModern()
 		->setEnabled(!$readonly)
+	)
 ]);
 
 $recovery_expression_row = [
@@ -232,25 +233,28 @@ $trigger_form_grid
 		->setId('close-recovery-expression-constructor-field')
 	)
 	->addItem([new CLabel(_('PROBLEM event generation mode'), 'type'),
-		(new CRadioButtonList('type', (int) $data['type']))
+		new CFormField((new CRadioButtonList('type', (int) $data['type']))
 			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 			->setModern()
 			->setEnabled(!$readonly)
+		)
 	])
 	->addItem([new CLabel(_('OK event closes'), 'correlation_mode'),
-		(new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
+		new CFormField((new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 			->setModern()
 			->setId('ok-event-closes')
 			->setEnabled(!$readonly)
+		)
 	])
 	->addItem([(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),
-		(new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
+		new CFormField((new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setId('correlation_tag')
+		)
 	])
 	->addItem([new CLabel(_('Allow manual close'), 'manual_close'),
 		new CFormField(
@@ -264,22 +268,26 @@ $trigger_form_grid
 			_('Menu entry name'),
 			makeHelpIcon([_('Menu entry name is used as a label for the trigger URL in the event context menu.')])
 		], 'url_name'),
-		(new CTextBox('url_name', array_key_exists('url_name', $data) ? $data['url_name'] : '', $discovered_trigger,
-			DB::getFieldLength('triggers', 'url_name')
+		new CFormField((new CTextBox('url_name', array_key_exists('url_name', $data) ? $data['url_name'] : '',
+			$discovered_trigger, DB::getFieldLength('triggers', 'url_name')
 		))
 			->setAttribute('placeholder', _('Trigger URL'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
 	])
 	->addItem([new CLabel(_('Menu entry URL'), 'url'),
-		(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '', $discovered_trigger,
-			DB::getFieldLength('triggers', 'url')
-		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		new CFormField(
+			(new CTextBox('url', array_key_exists('url', $data) ? $data['url'] : '', $discovered_trigger,
+				DB::getFieldLength('triggers', 'url')
+			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
 	])
 	->addItem([new CLabel(_('Description'), 'description'),
-		(new CTextArea('description', array_key_exists('comments', $data) ? $data['comments'] : ''))
+		new CFormField((new CTextArea('description', array_key_exists('comments', $data) ? $data['comments'] : ''))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxlength(DB::getFieldLength('triggers', 'comments'))
 			->setReadonly($discovered_trigger)
+		)
 	]);
 
 if (array_key_exists('parent_discoveryid', $data)) {

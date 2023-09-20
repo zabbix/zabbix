@@ -103,8 +103,9 @@ $dependencies_table = (new CTable())
 
 (new CFormGrid())
 	->addItem([new CLabel(_('Dependencies')),
-		(new CDiv($dependencies_table))
+		new CFormField((new CDiv($dependencies_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		)
 	])
 	->show();
