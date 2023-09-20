@@ -180,7 +180,6 @@ window.trigger_edit_popup = new class {
 			const panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'triggersTab') {
-				console.log(triggers_initialized);
 				if (triggers_initialized) {
 					return;
 				}

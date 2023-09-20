@@ -241,20 +241,18 @@ $trigger_form_grid
 		)
 	])
 	->addItem([new CLabel(_('OK event closes'), 'correlation_mode'),
-		new CFormField((new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
+		(new CFormField((new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 			->setModern()
-			->setId('ok-event-closes')
 			->setEnabled(!$readonly)
-		)
+		))->setId('ok-event-closes')
 	])
 	->addItem([(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),
-		new CFormField((new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
+		(new CFormField((new CTextBox('correlation_tag', $data['correlation_tag'], $readonly))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
-			->setId('correlation_tag')
-		)
+		))->setId('correlation_tag')
 	])
 	->addItem([new CLabel(_('Allow manual close'), 'manual_close'),
 		new CFormField(
