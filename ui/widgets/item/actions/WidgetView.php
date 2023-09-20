@@ -228,17 +228,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$history[$itemid][0]['clock'] = $time_to;
 				}
 
+
 				if ($aggregate_function == AGGREGATE_COUNT && $history) {
-					foreach ($history as $itemid => &$data) {
-						foreach ($data as &$data_) {
-							$data_['value'] = $data_['count'];
-							unset($data_['count']);
+					foreach ($history as &$item_data) {
+						foreach ($item_data as &$data) {
+							$data['value'] = $data['count'];
+							unset($data['count']);
 						}
-
-						unset($data_);
+						unset($data);
 					}
-
-					unset($data);
+					unset($item_data);
 				}
 			}
 			else {
