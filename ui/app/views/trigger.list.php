@@ -78,7 +78,7 @@ $filter_column1 = (new CFormGrid())
 			->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 		)
 	])
-	->addItem([new CLabel(_('Severity')),
+	->addItem([new CLabel(_('Severity'), 'filter_priority'),
 		new CFormField((new CCheckBoxList('filter_priority'))
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['filter_priority'])
@@ -88,7 +88,7 @@ $filter_column1 = (new CFormGrid())
 	]);
 
 if ($data['context'] === 'host') {
-	$filter_column1->addItem([new CLabel(_('State')),
+	$filter_column1->addItem([new CLabel(_('State'), 'filter_state'),
 		new CFormField((new CRadioButtonList('filter_state', (int) $data['filter_state']))
 			->addValue(_('all'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
@@ -98,7 +98,7 @@ if ($data['context'] === 'host') {
 	]);
 }
 
-$filter_column1->addItem([new CLabel(_('Status')),
+$filter_column1->addItem([new CLabel(_('Status'), 'filter_status'),
 	new CFormField((new CRadioButtonList('filter_status', (int) $data['filter_status']))
 		->addValue(_('all'), -1)
 		->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
@@ -108,7 +108,7 @@ $filter_column1->addItem([new CLabel(_('Status')),
 ]);
 
 if ($data['context'] === 'host') {
-	$filter_column1->addItem([new CLabel(_('Value')),
+	$filter_column1->addItem([new CLabel(_('Value'), 'filter_value'),
 		new CFormField((new CRadioButtonList('filter_value', (int) $data['filter_value']))
 			->addValue(_('all'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
@@ -130,7 +130,7 @@ $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 
 $filter_column2 = (new CFormGrid())
 	->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
-	->addItem([new CLabel(_('Inherited')),
+	->addItem([new CLabel(_('Inherited'), 'filter_inherited'),
 		new CFormField((new CRadioButtonList('filter_inherited', (int) $data['filter_inherited']))
 			->addValue(_('all'), -1)
 			->addValue(_('Yes'), 1)
@@ -139,7 +139,7 @@ $filter_column2 = (new CFormGrid())
 	]);
 
 if ($data['context'] === 'host') {
-	$filter_column2->addItem([new CLabel(_('Discovered')),
+	$filter_column2->addItem([new CLabel(_('Discovered'), 'filter_discovered'),
 		new CFormField((new CRadioButtonList('filter_discovered', (int) $data['filter_discovered']))
 			->addValue(_('all'), -1)
 			->addValue(_('Yes'), 1)
@@ -148,7 +148,7 @@ if ($data['context'] === 'host') {
 	]);
 }
 
-$filter_column2->addItem([new CLabel(_('With dependencies')),
+$filter_column2->addItem([new CLabel(_('With dependencies'), 'filter_dependent'),
 	new CFormField((new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
 		->addValue(_('all'), -1)
 		->addValue(_('Yes'), 1)
