@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T20:08:06Z'
+  date: '2023-08-03T14:55:39Z'
   groups:
     - uuid: 1d12408342854fd5a4436dd6d5d1bd4a
       name: Templates/Telephony
@@ -881,9 +881,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.iax.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].active_channels.first()'
+                    - $.active_channels
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.iax.trunk.get[{#OBJECTNAME}]'
               tags:
                 - tag: component
                   value: channels
@@ -899,6 +899,26 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
+            - uuid: 9c6554be77234ed98cee4a49e23506b7
+              name: 'IAX trunk "{#OBJECTNAME}": Get IAX trunk'
+              type: DEPENDENT
+              key: 'asterisk.iax.trunk.get[{#OBJECTNAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for a IAX trunk.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.iax.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].first()'
+              master_item:
+                key: asterisk.get_stats
+              tags:
+                - tag: component
+                  value: raw
+                - tag: trunk
+                  value: '{#OBJECTNAME}'
             - uuid: bbde7e898b4b4d34b27308d6ddaf86fc
               name: 'IAX trunk "{#OBJECTNAME}": Status'
               type: DEPENDENT
@@ -916,12 +936,12 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.iax.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].Status.first()'
+                    - $.Status
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.iax.trunk.get[{#OBJECTNAME}]'
               tags:
                 - tag: component
                   value: health
@@ -964,9 +984,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.pjsip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].active_channels.first()'
+                    - $.active_channels
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.pjsip.trunk.get[{#OBJECTNAME}]'
               tags:
                 - tag: component
                   value: channels
@@ -998,12 +1018,12 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.pjsip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].DeviceState.first()'
+                    - $.DeviceState
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.pjsip.trunk.get[{#OBJECTNAME}]'
               tags:
                 - tag: component
                   value: health
@@ -1018,6 +1038,26 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
+            - uuid: 0919612d88744ec7ad47b11ccfad1f4e
+              name: 'PJSIP trunk "{#OBJECTNAME}": Get PJSIP trunk'
+              type: DEPENDENT
+              key: 'asterisk.pjsip.trunk.get[{#OBJECTNAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for a PJSIP trunk.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.pjsip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].first()'
+              master_item:
+                key: asterisk.get_stats
+              tags:
+                - tag: component
+                  value: raw
+                - tag: trunk
+                  value: '{#OBJECTNAME}'
           master_item:
             key: asterisk.get_stats
           lld_macro_paths:
@@ -1046,9 +1086,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.queue.queues[?(@.Queue==''{#QUEUE}'')].Available.first()'
+                    - $.Available
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.queue.get[{#QUEUE}]'
               tags:
                 - tag: component
                   value: members
@@ -1064,9 +1104,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.queue.queues[?(@.Queue==''{#QUEUE}'')].Callers.first()'
+                    - $.Callers
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.queue.get[{#QUEUE}]'
               tags:
                 - tag: component
                   value: calls
@@ -1082,6 +1122,26 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
+            - uuid: 49bc8af136204b8bae9d7527d04b15bc
+              name: '"{#QUEUE}": Get queue'
+              type: DEPENDENT
+              key: 'asterisk.queue.get[{#QUEUE}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for a queue.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.queue.queues[?(@.Queue==''{#QUEUE}'')].first()'
+              master_item:
+                key: asterisk.get_stats
+              tags:
+                - tag: component
+                  value: raw
+                - tag: queue
+                  value: '{#QUEUE}'
             - uuid: 8319ec55cf6f4e8590f180f1a81f37ed
               name: '"{#QUEUE}": Logged in'
               type: DEPENDENT
@@ -1092,9 +1152,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.queue.queues[?(@.Queue==''{#QUEUE}'')].LoggedIn.first()'
+                    - $.LoggedIn
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.queue.get[{#QUEUE}]'
               tags:
                 - tag: component
                   value: members
@@ -1128,9 +1188,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.sip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].active_channels.first()'
+                    - $.active_channels
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.sip.trunk.get[{#OBJECTNAME}]'
               tags:
                 - tag: component
                   value: channels
@@ -1146,6 +1206,26 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
+            - uuid: a9532680f08445dd9a1bb37e2e2c44c5
+              name: 'SIP trunk "{#OBJECTNAME}": Get SIP trunk'
+              type: DEPENDENT
+              key: 'asterisk.sip.trunk.get[{#OBJECTNAME}]'
+              delay: '0'
+              history: 0d
+              trends: '0'
+              value_type: TEXT
+              description: 'Raw data for a SIP trunk.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.sip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].first()'
+              master_item:
+                key: asterisk.get_stats
+              tags:
+                - tag: component
+                  value: raw
+                - tag: trunk
+                  value: '{#OBJECTNAME}'
             - uuid: df33da749e874f55be5f0c33cd201f62
               name: 'SIP trunk "{#OBJECTNAME}": Status'
               type: DEPENDENT
@@ -1163,12 +1243,12 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.sip.trunks[?(@.ObjectName==''{#OBJECTNAME}'')].Status.first()'
+                    - $.Status
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
               master_item:
-                key: asterisk.get_stats
+                key: 'asterisk.sip.trunk.get[{#OBJECTNAME}]'
               tags:
                 - tag: component
                   value: health

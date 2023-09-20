@@ -1163,7 +1163,7 @@ reduce_max_vars:
 		}
 		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
-			if (1 >= level)
+			if (1 >= level && 1 < max_vars)
 				goto reduce_max_vars;
 
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);

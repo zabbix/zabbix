@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-22T14:40:45Z'
+  date: '2023-07-28T09:39:47Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -88,8 +88,10 @@ zabbix_export:
                     if (typeof data === 'undefined' || data === null) {
                         data = '';
                     }
-            
                     var response, request = new HttpRequest();
+                    if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+                        request.setProxy(Azure.params.proxy);
+                    }
                     if (Azure.token) {
                         request.addHeader('Accept: application/json');
                         request.addHeader('Authorization: Bearer ' + Azure.token);
@@ -152,8 +154,8 @@ zabbix_export:
             
                 try {
                     result = Azure.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) +'/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -171,11 +173,11 @@ zabbix_export:
                         for (var i in types) {
                             if (types[i].method === "Microsoft.Sql/servers") {
                                 mssql_servers = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
-                                
+            
                                 if ('nextLink' in mssql_servers) {
                                     mssql_servers = Azure.nextlink(mssql_servers);
                                 }
-                            
+            
                                 if ('value' in mssql_servers && mssql_servers.value.length > 0) {
                                     for (j in mssql_servers.value) {
                                         mssql_dbs = Azure.request('https://management.azure.com' + mssql_servers.value[j].id + '/databases?api-version=' + types[i].version);
@@ -183,7 +185,7 @@ zabbix_export:
                                         if ('nextLink' in mssql_dbs) {
                                             mssql_dbs = Azure.nextlink(mssql_dbs);
                                         }
-                                    
+            
                                         mssql_dbs.value.forEach(function (value) {
                                             raw_data.value.push(value);
                                         });
@@ -236,6 +238,8 @@ zabbix_export:
               value: '{$AZURE.TENANT.ID}'
             - name: subscription_id
               value: '{$AZURE.SUBSCRIPTION.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -264,6 +268,9 @@ zabbix_export:
             
                 login: function () {
                     var response, login = new HttpRequest();
+                    if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+                        login.setProxy(Azure.params.proxy);
+                    }
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     response = login.post(
                         'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
@@ -288,9 +295,11 @@ zabbix_export:
             
                 request: function (url) {
                     var response, request = new HttpRequest();
-            
+                    if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+                        request.setProxy(Azure.params.proxy);
+                    }
                     if (!Azure.token) {
-                        throw 'Request does not contain access token.'; 
+                        throw 'Request does not contain access token.';
                     }
                     request.addHeader('Accept: application/json');
                     request.addHeader('Authorization: Bearer ' + Azure.token);
@@ -322,7 +331,7 @@ zabbix_export:
                 },
             
                 getMetricsData: function () {
-                    var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Storage/storageAccounts?api-version=2021-05-01');
+                    var metric = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/Microsoft.Storage/storageAccounts?api-version=2021-05-01'),
                         data = [];
             
                     if (!metric.hasOwnProperty('value')) {
@@ -369,6 +378,8 @@ zabbix_export:
               value: '{$AZURE.TENANT.ID}'
             - name: subscription_id
               value: '{$AZURE.SUBSCRIPTION.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -854,6 +865,9 @@ zabbix_export:
                 
                     request: function (url) {
                         var response, request = new HttpRequest();
+                        if (typeof AzureStorage.params.proxy !== 'undefined' && AzureStorage.params.proxy !== '') {
+                            request.setProxy(AzureStorage.params.proxy);
+                        }
                         request.addHeader('Accept: application/json');
                         request.addHeader('Authorization: Bearer ' + AzureStorage.params.token);
                         Zabbix.log(4, '[ Azure ] Sending request: ' + url);
@@ -932,6 +946,8 @@ zabbix_export:
                   value: '{#ID}'
                 - name: token
                   value: '{#TOKEN}'
+                - name: proxy
+                  value: '{$AZURE.PROXY}'
               tags:
                 - tag: component
                   value: raw
@@ -2411,6 +2427,8 @@ zabbix_export:
         - macro: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in PostgreSQL servers discovery rule.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.GROUP.MATCHES}'
           value: '.*'
           description: 'This macro is used in discovery rules.'
@@ -2547,6 +2565,9 @@ zabbix_export:
             
                 login: function () {
                     var response, login = new HttpRequest();
+                    if (typeof AzureCosmoDB.params.proxy !== 'undefined' && AzureCosmoDB.params.proxy !== '') {
+                        login.setProxy(AzureCosmoDB.params.proxy);
+                    }
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     response = login.post(
                         'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmoDB.params.tenant_id) + '/oauth2/token',
@@ -2570,6 +2591,9 @@ zabbix_export:
             
                 request: function (url) {
                     var response, request = new HttpRequest();
+                    if (typeof AzureCosmoDB.params.proxy !== 'undefined' && AzureCosmoDB.params.proxy !== '') {
+                        request.setProxy(AzureCosmoDB.params.proxy);
+                    }
                     if (!AzureCosmoDB.token) {
                         throw 'Request does not contain access token.';
                     }
@@ -2660,6 +2684,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -3029,6 +3055,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Cosmos DB ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
@@ -3424,11 +3452,14 @@ zabbix_export:
                     }
             
                     var response, request = new HttpRequest();
-                        if (AzureDB.token) {
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                        }
-                
+                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+                        request.setProxy(AzureDB.params.proxy);
+                    }
+                    if (AzureDB.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                    }
+            
                     Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
                     if (data !== '') {
@@ -3451,7 +3482,7 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
-            }
+                }
             
             };
             
@@ -3489,8 +3520,8 @@ zabbix_export:
             
                 try {
                     result = AzureDB.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -3518,7 +3549,7 @@ zabbix_export:
                         var chunk = metrics.slice(i, i + 20);
             
                         prepared_metrics.push(
-                            chunk.map(function(element) {
+                            chunk.map(function (element) {
                                 return encodeURIComponent(element);
                             }).join(',')
                         );
@@ -3526,7 +3557,7 @@ zabbix_export:
             
                     start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    
+            
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
@@ -3588,6 +3619,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -4004,6 +4037,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Microsoft SQL database ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
@@ -4348,13 +4383,15 @@ zabbix_export:
                     if (typeof data === 'undefined' || data === null) {
                         data = '';
                     }
-            
                     var response, request = new HttpRequest();
-                        if (AzureDB.token) {
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                        }
-                
+                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+                        request.setProxy(AzureDB.params.proxy);
+                    }
+                    if (AzureDB.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                    }
+            
                     Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
                     if (data !== '') {
@@ -4377,7 +4414,7 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
-            }
+                }
             
             };
             
@@ -4416,8 +4453,8 @@ zabbix_export:
             
                 try {
                     result = AzureDB.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -4445,7 +4482,7 @@ zabbix_export:
                         var chunk = metrics.slice(i, i + 20);
             
                         prepared_metrics.push(
-                            chunk.map(function(element) {
+                            chunk.map(function (element) {
                                 return encodeURIComponent(element);
                             }).join(',')
                         );
@@ -4453,7 +4490,7 @@ zabbix_export:
             
                     start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    
+            
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
@@ -4500,6 +4537,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -4836,6 +4875,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Microsoft SQL database ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
@@ -5153,11 +5194,14 @@ zabbix_export:
                     }
             
                     var response, request = new HttpRequest();
-                        if (AzureDB.token) {
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                        }
-                
+                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+                        request.setProxy(AzureDB.params.proxy);
+                    }
+                    if (AzureDB.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                    }
+            
                     Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
                     if (data !== '') {
@@ -5180,7 +5224,7 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
-            }
+                }
             
             };
             
@@ -5212,8 +5256,8 @@ zabbix_export:
             
                 try {
                     result = AzureDB.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -5241,7 +5285,7 @@ zabbix_export:
                         var chunk = metrics.slice(i, i + 20);
             
                         prepared_metrics.push(
-                            chunk.map(function(element) {
+                            chunk.map(function (element) {
                                 return encodeURIComponent(element);
                             }).join(',')
                         );
@@ -5249,7 +5293,7 @@ zabbix_export:
             
                     start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    
+            
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
@@ -5264,7 +5308,7 @@ zabbix_export:
                         catch (error) {
                             data.errors[prepared_metrics[j]] = error.toString();
                         }
-                    } 
+                    }
                 }
             }
             catch (error) {
@@ -5296,6 +5340,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -5532,6 +5578,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure MySQL server ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
@@ -5797,11 +5845,14 @@ zabbix_export:
                     }
             
                     var response, request = new HttpRequest();
-                        if (AzureDB.token) {
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                        }
-                
+                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+                        request.setProxy(AzureDB.params.proxy);
+                    }
+                    if (AzureDB.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                    }
+            
                     Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
                     if (data !== '') {
@@ -5824,7 +5875,7 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
-            }
+                }
             
             };
             
@@ -5847,16 +5898,16 @@ zabbix_export:
             ],
                 prepared_metrics = [],
                 data = {};
-                data['errors'] = {};
-                data['metrics'] = {};
+            data['errors'] = {};
+            data['metrics'] = {};
             
             try {
                 AzureDB.setParams(JSON.parse(value));
             
                 try {
                     result = AzureDB.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -5884,7 +5935,7 @@ zabbix_export:
                         var chunk = metrics.slice(i, i + 20);
             
                         prepared_metrics.push(
-                            chunk.map(function(element) {
+                            chunk.map(function (element) {
                                 return encodeURIComponent(element);
                             }).join(',')
                         );
@@ -5892,7 +5943,7 @@ zabbix_export:
             
                     start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    
+            
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
@@ -5907,7 +5958,7 @@ zabbix_export:
                         catch (error) {
                             data.errors[prepared_metrics[j]] = error.toString();
                         }
-                    } 
+                    }
                 }
             }
             catch (error) {
@@ -5939,6 +5990,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -6227,6 +6280,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure MySQL server ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
@@ -6535,11 +6590,14 @@ zabbix_export:
                     }
             
                     var response, request = new HttpRequest();
-                        if (AzureDB.token) {
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                        }
-                
+                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+                        request.setProxy(AzureDB.params.proxy);
+                    }
+                    if (AzureDB.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                    }
+            
                     Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
                     if (data !== '') {
@@ -6562,7 +6620,7 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
-            }
+                }
             
             };
             
@@ -6599,8 +6657,8 @@ zabbix_export:
             
                 try {
                     result = AzureDB.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -6628,7 +6686,7 @@ zabbix_export:
                         var chunk = metrics.slice(i, i + 20);
             
                         prepared_metrics.push(
-                            chunk.map(function(element) {
+                            chunk.map(function (element) {
                                 return encodeURIComponent(element);
                             }).join(',')
                         );
@@ -6636,7 +6694,7 @@ zabbix_export:
             
                     start_date = new Date((new Date().getTime()) - 600000).toISOString().replace(/\.\d+/, '');
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    
+            
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
@@ -6659,7 +6717,7 @@ zabbix_export:
                         catch (error) {
                             data.errors[prepared_metrics[j]] = error.toString();
                         }
-                    } 
+                    }
                 }
             }
             catch (error) {
@@ -6691,6 +6749,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -7031,6 +7091,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure PostgreSQL server ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
@@ -7286,11 +7348,14 @@ zabbix_export:
                     }
             
                     var response, request = new HttpRequest();
-                        if (AzureDB.token) {
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureDB.token);
-                        }
-                
+                    if (typeof AzureDB.params.proxy !== 'undefined' && AzureDB.params.proxy !== '') {
+                        request.setProxy(AzureDB.params.proxy);
+                    }
+                    if (AzureDB.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureDB.token);
+                    }
+            
                     Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
                     if (data !== '') {
@@ -7313,7 +7378,7 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
-            }
+                }
             
             };
             
@@ -7345,8 +7410,8 @@ zabbix_export:
             
                 try {
                     result = AzureDB.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureDB.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -7374,7 +7439,7 @@ zabbix_export:
                         var chunk = metrics.slice(i, i + 20);
             
                         prepared_metrics.push(
-                            chunk.map(function(element) {
+                            chunk.map(function (element) {
                                 return encodeURIComponent(element);
                             }).join(',')
                         );
@@ -7382,7 +7447,7 @@ zabbix_export:
             
                     start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    
+            
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureDB.request('https://management.azure.com' + AzureDB.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
@@ -7397,7 +7462,7 @@ zabbix_export:
                         catch (error) {
                             data.errors[prepared_metrics[j]] = error.toString();
                         }
-                    } 
+                    }
                 }
             }
             catch (error) {
@@ -7429,6 +7494,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -7733,6 +7800,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure PostgreSQL server ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
@@ -8269,11 +8338,14 @@ zabbix_export:
                     }
             
                     var response, request = new HttpRequest();
-                        if (AzureVM.token) {
-                            request.addHeader('Accept: application/json');
-                            request.addHeader('Authorization: Bearer ' + AzureVM.token);
-                        }
-                
+                    if (typeof AzureVM.params.proxy !== 'undefined' && AzureVM.params.proxy !== '') {
+                        request.setProxy(AzureVM.params.proxy);
+                    }
+                    if (AzureVM.token) {
+                        request.addHeader('Accept: application/json');
+                        request.addHeader('Authorization: Bearer ' + AzureVM.token);
+                    }
+            
                     Zabbix.log(4, '[ Azure ] Sending request: ' + url);
             
                     if (data !== '') {
@@ -8296,7 +8368,7 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from API.';
                     }
-            }
+                }
             
             };
             
@@ -8362,8 +8434,8 @@ zabbix_export:
             
                 try {
                     result = AzureVM.request(
-                            'https://login.microsoftonline.com/' + encodeURIComponent(AzureVM.params.tenant_id) +'/oauth2/token',
-                            'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureVM.params.app_id) + '&client_secret=' + encodeURIComponent(AzureVM.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureVM.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureVM.params.app_id) + '&client_secret=' + encodeURIComponent(AzureVM.params.password)
                     );
             
                     if ('access_token' in result) {
@@ -8391,7 +8463,7 @@ zabbix_export:
                         var chunk = metrics.slice(i, i + 20);
             
                         prepared_metrics.push(
-                            chunk.map(function(element) {
+                            chunk.map(function (element) {
                                 return encodeURIComponent(element);
                             }).join(',')
                         );
@@ -8399,7 +8471,7 @@ zabbix_export:
             
                     start_date = new Date((new Date().getTime()) - 300000).toISOString().replace(/\.\d+/, '');
                     end_date = new Date().toISOString().replace(/\.\d+/, '');
-                    
+            
                     for (var j in prepared_metrics) {
                         try {
                             metrics_data = AzureVM.request('https://management.azure.com' + AzureVM.params.resource_id + '/providers/Microsoft.Insights/metrics?metricnames=' + prepared_metrics[j] + '&timespan=' + encodeURIComponent(start_date) + '/' + encodeURIComponent(end_date) + '&api-version=2021-05-01');
@@ -8414,7 +8486,7 @@ zabbix_export:
                         catch (error) {
                             data.errors[prepared_metrics[j]] = error.toString();
                         }
-                    } 
+                    }
                 }
             }
             catch (error) {
@@ -8446,6 +8518,8 @@ zabbix_export:
               value: '{$AZURE.SUBSCRIPTION.ID}'
             - name: resource_id
               value: '{$AZURE.RESOURCE.ID}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -9026,6 +9100,8 @@ zabbix_export:
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
           description: 'Microsoft Azure password.'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AZURE.RESOURCE.ID}'
           description: 'Microsoft Azure Virtual Machine ID.'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'

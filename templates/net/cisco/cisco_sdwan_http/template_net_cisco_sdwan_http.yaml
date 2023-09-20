@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-14T06:43:56Z'
+  date: '2023-08-04T08:26:47Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1393,7 +1393,7 @@ zabbix_export:
             } catch (error) {
                 error_msg = error.toString();
                 error_msg += (error_msg.endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Сisco SD-WAN ] ERROR: ' + error_msg);
+                Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
             };
             
             device_info.error = error_msg;
@@ -1461,7 +1461,7 @@ zabbix_export:
                 request.addHeader('Cookie: ' + cookie);
                 request.addHeader('X-XSRF-TOKEN: ' + token);
                 response = request.get(url);
-                Zabbix.log(4, '[ Сisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                 if (request.getStatus() !== 200) {
                     throw 'Failed to receive data: invalid response status code.';
@@ -1544,7 +1544,7 @@ zabbix_export:
             } catch (error) {
                 error_msg = error.toString();
                 error_msg += (error_msg.endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Сisco SD-WAN ] ERROR: ' + error_msg);
+                Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -1619,7 +1619,7 @@ zabbix_export:
                 }
             
                 response = request.post(url, data);
-                Zabbix.log(4, '[ Сisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
                 if (request.getStatus() !== 200) {
                     throw 'Failed to receive data: invalid response status code.';
@@ -1745,7 +1745,7 @@ zabbix_export:
             } catch (error) {
                 error_msg = error.toString();
                 error_msg += (error_msg.endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Сisco SD-WAN ] ERROR: ' + error_msg);
+                Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -2994,10 +2994,10 @@ zabbix_export:
                   height: '7'
                   fields:
                     - type: INTEGER
-                      name: columns
+                      name: rows
                       value: '1'
                     - type: INTEGER
-                      name: rows
+                      name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
