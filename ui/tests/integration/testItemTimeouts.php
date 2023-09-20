@@ -31,6 +31,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testItemTimeouts extends CIntegrationTest {
 
 	const HOSTNAME_AGENT = "agent_host_timeouts";
+	const HOSTNAME_AGENT2 = "agent2_host_timeouts";
 	const HOSTNAME_SNMP = "snmp_host_timeouts";
 	const HOSTNAME_SSH = "ssh_host_timeouts";
 	const HOSTNAME_SIMPLE = "simple_host_timeouts";
@@ -56,6 +57,19 @@ class testItemTimeouts extends CIntegrationTest {
 				],
 				'groups' => [['groupid' => 4]],
 				'status' => HOST_STATUS_MONITORED
+			],
+			[
+				'host' => self::HOSTNAME_AGENT2,
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => $this->getConfigurationValue(self::COMPONENT_AGENT2, 'ListenPort')
+				],
+				'groups' => [['groupid' => 4]],
+				'status' => HOST_STATUS_MONITORED
 			]
 		]);
 
@@ -63,18 +77,23 @@ class testItemTimeouts extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 
 		self::$hostids[self::HOSTNAME_AGENT] = $response['result']['hostids'][0];
+		self::$hostids[self::HOSTNAME_AGENT2] = $response['result']['hostids'][1];
 
 		// Get host interface ids.
 		$response = $this->call('host.get', [
 			'output' => ['host'],
-			'hostids' => self::$hostids[self::HOSTNAME_AGENT],
-			'selectInterfaces' => ['interfaceid']
+			'hostids' => [
+				self::$hostids[self::HOSTNAME_AGENT],
+				self::$hostids[self::HOSTNAME_AGENT2]
+			],
+			'selectInterfaces' => ['interfaceid'],
+			'sortfield' => 'hostid'
 		]);
-
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertArrayHasKey('interfaces', $response['result'][0]);
-		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
+		$this->assertTrue(count($response['result']) == 2);
 		$agent_interfaceid = $response['result'][0]['interfaces'][0]['interfaceid'];
+		$agent2_interfaceid = $response['result'][1]['interfaces'][0]['interfaceid'];
 
 		$response = $this->call('host.create', [
 			[
@@ -150,6 +169,16 @@ class testItemTimeouts extends CIntegrationTest {
 				'timeout' => '10s'
 			],
 			[
+				'hostid' => self::$hostids[self::HOSTNAME_AGENT2],
+				'name' => "userparam.test",
+				'key_' => 'userparam.test',
+				'interfaceid' => $agent2_interfaceid,
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '1m',
+				'timeout' => '10s'
+			],
+			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT],
 				'name' => "system.run",
 				'key_' => 'system.run[sleep 5 && echo ok]',
@@ -160,10 +189,30 @@ class testItemTimeouts extends CIntegrationTest {
 				'timeout' => '10s'
 			],
 			[
+				'hostid' => self::$hostids[self::HOSTNAME_AGENT2],
+				'name' => "system.run",
+				'key_' => 'system.run[sleep 5 && echo ok]',
+				'interfaceid' => $agent2_interfaceid,
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '1m',
+				'timeout' => '10s'
+			],
+			[
 				'hostid' => self::$hostids[self::HOSTNAME_AGENT],
 				'name' => "userparam.test.active",
 				'key_' => 'userparam.test.active',
 				'interfaceid' => $agent_interfaceid,
+				'type' => ITEM_TYPE_ZABBIX,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '1m',
+				'timeout' => '10s'
+			],
+			[
+				'hostid' => self::$hostids[self::HOSTNAME_AGENT2],
+				'name' => "userparam.test.active",
+				'key_' => 'userparam.test.active',
+				'interfaceid' => $agent2_interfaceid,
 				'type' => ITEM_TYPE_ZABBIX,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '1m',
@@ -261,6 +310,17 @@ class testItemTimeouts extends CIntegrationTest {
 						'ListenPort', 10051),
 				'AllowKey' => 'system.run[*]',
 				'LogRemoteCommands' => 1,
+				'UnsafeUserParameters' => 1,
+				'UserParameter' => [
+					'userparam.test,sleep 5 && echo ok',
+					'userparam.test.active,sleep 5 && echo ok'
+				]
+			],
+			self::COMPONENT_AGENT2 => [
+				'Hostname' => self::HOSTNAME_AGENT2,
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER,
+						'ListenPort', 10051),
+				'AllowKey' => 'system.run[*]',
 				'UnsafeUserParameters' => 1,
 				'UserParameter' => [
 					'userparam.test,sleep 5 && echo ok',
@@ -368,7 +428,7 @@ class testItemTimeouts extends CIntegrationTest {
 	/**
 	 * Test timeouts for various agent checks and external check.
 	 *
-	 * @required-components server, agent
+	 * @required-components server, agent, agent2
 	 * @configurationDataProvider defaultConfigurationProvider
 	 * @backup config, history_text, items, item_rtdata
 	 */
