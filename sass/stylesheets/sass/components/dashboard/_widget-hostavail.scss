@@ -63,13 +63,11 @@ div.dashboard-widget-hostavail {
 
 			th,
 			div {
-				background: transparent;
-
-				&:has(.host-avail-true),
-				&:has(.host-avail-false),
-				&:has(.host-avail-mixed),
-				&:has(.host-avail-unknown),
-				&:has(.host-avail-total) {
+				&.host-avail-true,
+				&.host-avail-false,
+				&.host-avail-mixed,
+				&.host-avail-unknown,
+				&.host-avail-total {
 					background: transparent;
 				}
 			}
