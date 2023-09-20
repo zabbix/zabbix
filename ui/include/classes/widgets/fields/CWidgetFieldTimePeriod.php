@@ -21,11 +21,10 @@
 
 namespace Zabbix\Widgets\Fields;
 
-use CAbsoluteTimeParser,
-	CApiInputValidator,
-	CParser,
+use CApiInputValidator,
 	CRangeTimeParser,
-	CRelativeTimeParser,
+	CTimePeriodHelper,
+	CTimePeriodValidator,
 	DateTimeZone;
 
 use Zabbix\Widgets\CWidgetField;
@@ -90,13 +89,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function validate(bool $strict = false): array {
 		$validation_rules = $this->getValidationRules($strict);
 
-		$field_label = $this->full_name ?? $this->label;
-		$period_labels_prefix = $field_label !== null ? $field_label.'/' : '';
-		$period_labels = [
-			'from' => $this->getFromLabel(),
-			'to' => $this->getToLabel()
-		];
-
+		$field_label = $this->full_name ?? $this->label ?? '';
 		$field_value = $this->getValue();
 
 		$default = $this->getDefault();
@@ -111,100 +104,35 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				: '';
 
 			if (!CApiInputValidator::validate($validation_rules['fields'][CWidgetField::FOREIGN_REFERENCE_KEY],
-					$reference_value, $period_labels_prefix.$data_source_label, $error)) {
+					$reference_value, ($field_label !== '' ? $field_label.'/' : '').$data_source_label, $error)) {
 				$errors[] = $error;
 			}
 		}
 		else {
-			$absolute_time_parser = new CAbsoluteTimeParser();
-			$relative_time_parser = new CRelativeTimeParser();
-
 			$default_period = $this->getDefaultPeriod();
 
-			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
-				if (!array_key_exists($name, $field_value)) {
+			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
+				if (!array_key_exists($field, $field_value)) {
 					if ($strict) {
 						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name,
-							_s('the parameter "%1$s" is missing', $name)
+							_s('the parameter "%1$s" is missing', $field)
 						);
 						continue;
 					}
 
-					$field_value[$name] = array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
-						? $default_period[$name]
-						: $default[$name];
-				}
-
-				$value = &$field_value[$name];
-				$value_ts = &$field_value[$name_ts];
-				$label = $period_labels_prefix.$period_labels[$name];
-
-				if (!CApiInputValidator::validate($validation_rules['fields'][$name], $value, $label, $error)) {
-					$errors[] = $error;
-					continue;
-				}
-
-				if ($value === '') {
-					$value_ts = 0;
-					continue;
-				}
-
-				if ($absolute_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
-					$datetime = $absolute_time_parser->getDateTime($name === 'from', $this->timezone);
-					$time_range = $name === 'from' ? '00:00:00' : '23:59:59';
-
-					if (!$this->is_date_only || $datetime->format('H:i:s') === $time_range) {
-						$value_ts = $datetime->getTimestamp();
-						continue;
-					}
-				}
-
-				if ($relative_time_parser->parse($value) === CParser::PARSE_SUCCESS) {
-					$datetime = $relative_time_parser->getDateTime($name === 'from', $this->timezone);
-					$has_errors = false;
-
-					if ($this->is_date_only) {
-						foreach ($relative_time_parser->getTokens() as $token) {
-							if ($token['suffix'] === 'h' || $token['suffix'] === 'm' || $token['suffix'] === 's') {
-								$has_errors = true;
-								break;
-							}
-						}
-					}
-
-					if (!$has_errors) {
-						$value_ts = $datetime->getTimestamp();
-						continue;
-					}
-				}
-
-				$errors[] = [
-					_s('Invalid parameter "%1$s": %2$s.', $label,
-						$this->is_date_only ? _('a date is expected') : _('a time is expected')
-					)
-				];
-			}
-
-			if (!$errors) {
-				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
-					$label = $period_labels_prefix.$period_labels[$name];
-
-					if ($field_value[$name_ts] < 0 || $field_value[$name_ts] > ZBX_MAX_DATE) {
-						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $label,
-							$this->is_date_only ? _('a date is expected') : _('a time is expected')
-						);
-					}
+					$field_value[$field] = array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
+						? $default_period[$field]
+						: $default[$field];
 				}
 			}
 
-			if (!$errors) {
-				if ($field_value['from'] !== '' && $field_value['to'] !== ''
-						&& $field_value['from_ts'] >= $field_value['to_ts']) {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $period_labels_prefix.$period_labels['to'],
-						_s('value must be greater than "%1$s"', $period_labels_prefix.$period_labels['from'])
-					);
-				}
-			}
+			$errors = CTimePeriodValidator::validate($field_value, [
+				'require_not_empty' => (bool) ($validation_rules['fields']['from']['flags'] & API_NOT_EMPTY),
+				'min_period' => CTimePeriodHelper::getMinPeriod(),
+				'max_period' => CTimePeriodHelper::getMaxPeriod(),
+				'from_label' => ($field_label !== '' ? $field_label.'/' : '').$this->getFromLabel(),
+				'to_label' => ($field_label !== '' ? $field_label.'/' : '').$this->getToLabel()
+			]);
 		}
 
 		if ($errors) {

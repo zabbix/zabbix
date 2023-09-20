@@ -280,13 +280,14 @@ abstract class CController {
 	 *
 	 * @return bool
 	 */
-	protected function validateTimeSelectorPeriod() {
-		if (!$this->hasInput('from') || !$this->hasInput('to')) {
-			return true;
-		}
-
+	protected function validateTimeSelectorPeriod(): bool {
 		try {
-			$errors = (new CTimePeriodService($this->getInput('from'), $this->getInput('to')))->getErrors();
+			$time_period = ['from' => $this->getInput('from', ''), 'to' => $this->getInput('to', '')];
+
+			$errors = CTimePeriodValidator::validate($time_period, [
+				'min_period' => CTimePeriodHelper::getMinPeriod(),
+				'max_period' => CTimePeriodHelper::getMaxPeriod()
+			]);
 
 			if ($errors) {
 				foreach ($errors as $error) {

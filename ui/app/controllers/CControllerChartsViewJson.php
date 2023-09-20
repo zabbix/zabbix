@@ -30,8 +30,8 @@ class CControllerChartsViewJson extends CControllerCharts {
 
 	protected function checkInput() {
 		$fields = [
-			'from'                  => 'range_time',
-			'to'                    => 'range_time',
+			'from'                  => 'string',
+			'to'                    => 'string',
 			'filter_hostids'        => 'required | array_id',
 			'filter_name'           => 'string',
 			'filter_show'           => 'in '.GRAPH_FILTER_ALL.','.GRAPH_FILTER_HOST.','.GRAPH_FILTER_SIMPLE,

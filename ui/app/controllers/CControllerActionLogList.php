@@ -49,27 +49,14 @@ class CControllerActionLogList extends CController {
 			'filter_mediatypeids' =>	'array_db media_type.mediatypeid',
 			'filter_statuses' =>		'array_db alerts.status',
 			'filter_messages' =>		'string',
-			'from' =>					'range_time',
-			'to' =>						'range_time'
+			'from' =>					'string',
+			'to' =>						'string'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
-		}
-		else {
-			if ($this->hasInput('from') || $this->hasInput('to')) {
-				validateTimeSelectorPeriod(
-					$this->hasInput('from') ? $this->getInput('from') : null,
-					$this->hasInput('to') ? $this->getInput('to') : null
-				);
-			}
-
-			$this->from = $this->getInput('from', CProfile::get('web.actionlog.filter.from',
-				'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
-			));
-			$this->to = $this->getInput('to', CProfile::get('web.actionlog.filter.to', 'now'));
 		}
 
 		return $ret;
@@ -80,6 +67,11 @@ class CControllerActionLogList extends CController {
 	}
 
 	protected function doAction(): void {
+		$this->from = $this->getInput('from', CProfile::get('web.actionlog.filter.from',
+			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
+		));
+		$this->to = $this->getInput('to', CProfile::get('web.actionlog.filter.to', 'now'));
+
 		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}

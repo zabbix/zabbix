@@ -79,58 +79,90 @@ class CControllerTimeSelectorUpdate extends CController {
 	}
 
 	protected function doAction() {
-		$time_period_service = new CTimePeriodService($this->getInput('from'), $this->getInput('to'));
+		$time_period = ['from' => $this->getInput('from'), 'to' => $this->getInput('to')];
 
-		$fields_errors = $time_period_service->getErrors();
+		$min_period = CTimePeriodHelper::getMinPeriod();
+		$max_period = CTimePeriodHelper::getMaxPeriod();
 
-		if (!$fields_errors) {
+		$fields_typed_errors = CTimePeriodValidator::validateRaw($time_period, [
+			'min_period' => $min_period,
+			'max_period' => $max_period
+		]);
+
+		if (!$fields_typed_errors) {
 			switch ($this->getInput('method')) {
 				case 'increment':
-					$time_period_service->increment();
+					CTimePeriodHelper::increment($time_period);
 					break;
 
 				case 'decrement':
-					$time_period_service->decrement();
+					CTimePeriodHelper::decrement($time_period);
 					break;
 
 				case 'zoomout':
-					$time_period_service->zoomOut();
+					CTimePeriodHelper::zoomOut($time_period);
 					break;
 
 				case 'rangechange':
-					$time_period_service->rangeChange();
+					CTimePeriodHelper::rangeChange($time_period);
 					break;
 
 				case 'rangeoffset':
-					$time_period_service->rangeOffset($this->getInput('from_offset'), $this->getInput('to_offset'));
+					CTimePeriodHelper::rangeOffset($time_period, $this->getInput('from_offset'),
+						$this->getInput('to_offset')
+					);
 					break;
 			}
 
-			$fields_errors = $time_period_service->getErrors();
+			$fields_typed_errors = CTimePeriodValidator::validateRaw($time_period, [
+				'min_period' => $min_period,
+				'max_period' => $max_period
+			]);
+		}
+
+		$fields_errors = [];
+
+		foreach ($fields_typed_errors as $field => $error_type) {
+			switch ($error_type) {
+				case CTimePeriodValidator::ERROR_TYPE_INVALID_RANGE:
+				case CTimePeriodValidator::ERROR_TYPE_INVALID_MIN_PERIOD:
+					$fields_errors[$field] = _n('Minimum time period to display is %1$s minute.',
+						'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
+					);
+					break;
+
+				case CTimePeriodValidator::ERROR_TYPE_INVALID_MAX_PERIOD:
+					$fields_errors[$field] = _n('Maximum time period to display is %1$s day.',
+						'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
+					);
+					break;
+
+				default:
+					$fields_errors[$field] = _('Invalid date.');
+					break;
+			}
 		}
 
 		if ($fields_errors) {
 			$output = ['fields_errors' => $fields_errors];
 		}
 		else {
-			$data = $time_period_service->getData();
-
 			updateTimeSelectorPeriod([
 				'profileIdx' => $this->getInput('idx'),
 				'profileIdx2' => $this->getInput('idx2'),
-				'from' => $data['from'],
-				'to' => $data['to']
+				'from' => $time_period['from'],
+				'to' => $time_period['to']
 			]);
 
 			$output = [
-				'label' => relativeDateToText($data['from'], $data['to']),
-				'from' => $data['from'],
-				'from_ts' => $data['from_ts'],
-				'from_date' => date(ZBX_FULL_DATE_TIME, $data['from_ts']),
-				'to' => $data['to'],
-				'to_ts' => $data['to_ts'],
-				'to_date' => date(ZBX_FULL_DATE_TIME, $data['to_ts']),
-			] + getTimeselectorActions($data['from'], $data['to']);
+				'label' => relativeDateToText($time_period['from'], $time_period['to']),
+				'from' => $time_period['from'],
+				'from_ts' => $time_period['from_ts'],
+				'from_date' => date(ZBX_FULL_DATE_TIME, $time_period['from_ts']),
+				'to' => $time_period['to'],
+				'to_ts' => $time_period['to_ts'],
+				'to_date' => date(ZBX_FULL_DATE_TIME, $time_period['to_ts']),
+			] + getTimeselectorActions($time_period['from'], $time_period['to']);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

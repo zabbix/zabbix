@@ -57,8 +57,8 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 			'show_opdata' =>			'in '.OPERATIONAL_DATA_SHOW_NONE.','.OPERATIONAL_DATA_SHOW_SEPARATELY.','.OPERATIONAL_DATA_SHOW_WITH_PROBLEM,
 			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
 			'tag_priority' =>			'string',
-			'from' =>					'range_time',
-			'to' =>						'range_time',
+			'from' =>					'string',
+			'to' =>						'string',
 			'filter_counters' =>		'in 1'
 		];
 

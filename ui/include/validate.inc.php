@@ -474,7 +474,12 @@ function validateTimeSelectorPeriod($from, $to) {
 		return;
 	}
 
-	$errors = (new CTimePeriodService($from, $to))->getErrors();
+	$time_period = ['from' => $from, 'to' => $to];
+
+	$errors = CTimePeriodValidator::validate($time_period, [
+		'min_period' => CTimePeriodHelper::getMinPeriod(),
+		'max_period' => CTimePeriodHelper::getMaxPeriod()
+	]);
 
 	if ($errors) {
 		foreach ($errors as $error) {

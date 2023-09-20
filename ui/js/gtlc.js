@@ -219,33 +219,35 @@ jQuery(function($) {
 				request_data = $.extend(data, request_data, json, {event: event.namespace});
 				updateTimeSelectorUI(request_data);
 
-				if ('error' in json) {
+				if ('error' in request_data) {
 					clearMessages();
 
-					const message_box = makeMessageBox('bad', json.error.messages, json.error.title);
+					const message_box = makeMessageBox('bad', request_data.error.messages, request_data.error.title);
 
 					addMessage(message_box);
+
+					delete request_data.error;
 				}
-				else if ('fields_errors' in json) {
+				else if ('fields_errors' in request_data) {
 					$container.find('.time-input-error').each(function(i, elm) {
 						const $node = $(elm);
 						const field = $node.attr('data-error-for');
 
-						if (field in json.fields_errors) {
+						if (field in request_data.fields_errors) {
 							$node
 								.show()
 								.find('.red')
-								.text(json.fields_errors[field]);
+								.text(request_data.fields_errors[field]);
 						}
 						else {
 							$node.hide();
 						}
 					});
 
-					delete request_data.error;
+					delete request_data.fields_errors;
 				}
 				else {
-					updateUrlArguments(json.from, json.to);
+					updateUrlArguments(request_data.from, request_data.to);
 					$container
 						.find('.time-input-error')
 						.hide();

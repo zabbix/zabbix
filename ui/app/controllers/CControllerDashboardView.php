@@ -32,8 +32,8 @@ class CControllerDashboardView extends CController {
 			'new' =>				'in 1',
 			'cancel' =>				'in 1',
 			'clone' =>				'in 1',
-			'from' =>				'range_time',
-			'to' =>					'range_time',
+			'from' =>				'string',
+			'to' =>					'string',
 			'slideshow' =>			'in 1'
 		];
 

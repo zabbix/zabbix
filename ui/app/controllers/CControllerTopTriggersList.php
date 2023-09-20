@@ -43,8 +43,8 @@ class CControllerTopTriggersList extends CController {
 			'filter_severities' =>	'array',
 			'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>		'array',
-			'from' =>				'range_time',
-			'to' =>					'range_time',
+			'from' =>				'string',
+			'to' =>					'string',
 			'filter_set' =>			'in 1',
 			'filter_rst' =>			'in 1'
 		];
@@ -53,19 +53,6 @@ class CControllerTopTriggersList extends CController {
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
-		}
-		else {
-			if ($this->hasInput('from') || $this->hasInput('to')) {
-				validateTimeSelectorPeriod(
-					$this->hasInput('from') ? $this->getInput('from') : null,
-					$this->hasInput('to') ? $this->getInput('to') : null
-				);
-			}
-
-			$this->from = $this->getInput('from', CProfile::get('web.toptriggers.filter.from',
-				'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
-			));
-			$this->to = $this->getInput('to', CProfile::get('web.toptriggers.filter.to', 'now'));
 		}
 
 		return $ret;
@@ -76,6 +63,11 @@ class CControllerTopTriggersList extends CController {
 	}
 
 	protected function doAction(): void {
+		$this->from = $this->getInput('from', CProfile::get('web.toptriggers.filter.from',
+			'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)
+		));
+		$this->to = $this->getInput('to', CProfile::get('web.toptriggers.filter.to', 'now'));
+
 		if ($this->hasInput('filter_set')) {
 			CProfile::updateArray('web.toptriggers.filter.groupids', $this->getInput('filter_groupids', []),
 				PROFILE_TYPE_ID
