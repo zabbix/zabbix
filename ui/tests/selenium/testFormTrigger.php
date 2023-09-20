@@ -827,6 +827,124 @@ class testFormTrigger extends CLegacyWebTest {
 						'Incorrect item key "test" provided for trigger expression on "Simple form test host".'
 					]
 				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'jsonpath Trigger all fields',
+					'expression' => 'jsonpath(last(/Simple form test host/test-item-form4,#10:now),"$.[0].last_name","LastName")="Penddreth"',
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'jsonpath Trigger min',
+					'expression' => 'jsonpath(last(/Simple form test host/test-item-form4),"$.last_name")<>"Test"'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Trigger wrong json function',
+					'expression' => 'jsonpath(max(/Simple form test host/test-item-form4,#1:now-5m),"$.[0].last_name","last_name")="Test"',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Incorrect item value type "Text" provided for trigger function "max".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Missing json parameters',
+					'expression' => 'jsonpath(last(/Simple form test host/test-item-form4,#1:now-5m))="Test"',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Invalid parameter "/1/expression": invalid number of parameters in function "jsonpath".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Wrong json parameters',
+					'expression' => 'jsonpath(last(/Simple form test host/test-item-form4,20),"$.[0].last_name")="Test"',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Invalid parameter "/1/expression": invalid second parameter in function "last".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Incorrect json expression',
+					'expression' => 'jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")<"Test"',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Invalid parameter "/1/expression": incorrect expression starting from "jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")<"Test"".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'xml xpath Trigger all fields',
+					'expression' => 'xmlxpath(last(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()",5.0)=7.0',
+					'formCheck' => true
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'description' => 'xml xpath Trigger min fields',
+					'expression' => 'xmlxpath(last(/Simple form test host/test-item-form4),"/zabbix_export/version")=1'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Trigger wrong xml function',
+					'expression' => 'xmlxpath(min(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()",5.0)=7.0',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Incorrect item value type "Text" provided for trigger function "min".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Missing xml parameters',
+					'expression' => 'xmlxpath(last(/Simple form test host/test-item-form4,#1:now-5m))="Test"',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Invalid parameter "/1/expression": invalid number of parameters in function "xmlxpath".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Wrong xml parameters',
+					'expression' => 'xmlxpath(last(/Simple form test host/test-item-form4,4),5.0)=7.0',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Invalid parameter "/1/expression": invalid second parameter in function "last".'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'description' => 'Incorrect json expression',
+					'expression' => 'xmlxpath(last(/Simple form test host/test-item-form4,#3-now),"/zabbix_export/version/text()",5.0)=7.0',
+					'error_msg' => 'Cannot add trigger',
+					'errors' => [
+						'Invalid parameter "/1/expression": incorrect expression starting from "xmlxpath(last(/Simple form test host/test-item-form4,#3-now),"/zabbix_export/version/text()",5.0)=7.0".'
+					]
+				]
 			]
 		];
 	}

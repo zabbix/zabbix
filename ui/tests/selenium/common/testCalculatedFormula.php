@@ -3478,6 +3478,79 @@ class testCalculatedFormula extends CWebTest {
 							"/between(5,(last(//trap)),10)*fuzzytime(/host/trap,60)=>trendsum(/host/item,60m:now/h)",
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from ">trendsum(/host/item,60m:now/h)".'
 				]
+			],
+			// jsonpath() function
+			[
+				[
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#10:now),"$.[0].last_name","LastName")'
+				]
+			],
+			[
+				[
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4),"$.last_name")'
+				]
+			],
+			// TODO: uncomment when  ZBXNEXT-8643 (3) is fixed.
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'formula' => 'jsonpath(avg(/Simple form test host/test-item-form4,#1:now-5m),"$.[0].last_name","last_name")',
+//					'error' => 'Incorrect item value type "Text" provided for trigger function "avg".'
+//				]
+//			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#1:now-5m))',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "jsonpath".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,20),"$.[0].last_name")',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "jsonpath(last(/Simple form test host/test-item-form4,#5-now),"$.[0].last_name","last")".'
+				]
+			],
+			// xmlxpath() function
+			[
+				[
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()",5.0)'
+				]
+			],
+			[
+				[
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4),"/zabbix_export/version")'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'xmlxpath(min(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from '.
+							'"xmlxpath(min(/Simple form test host/test-item-form4,#4:now-1m),"/zabbix_export/version/text()".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#1:now-5m))',
+					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "xmlxpath".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,4),5.0)',
+					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "last".'
+				]
 			]
 		];
 	}
