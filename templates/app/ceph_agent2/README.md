@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -125,7 +125,7 @@ Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Ceph: OSD osd.{#OSDNAME} is down|<p>OSD osd.{#OSDNAME} is marked "down" in the *osdmap*.The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p>|`last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0`|Average||
+|Ceph: OSD osd.{#OSDNAME} is down|<p>OSD osd.{#OSDNAME} is marked "down" in the *osdmap*.<br>The OSD daemon may have been stopped, or peer OSDs may be unable to reach the OSD over the network.</p>|`last(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},up]) = 0`|Average||
 |Ceph: OSD osd.{#OSDNAME} is full||`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_full_ratio)*100`|Average||
 |Ceph: Ceph OSD osd.{#OSDNAME} is near full||`min(/Ceph by Zabbix agent 2/ceph.osd[{#OSDNAME},fill],15m) > last(/Ceph by Zabbix agent 2/ceph.osd_nearfull_ratio)*100`|Warning|**Depends on**:<br><ul><li>Ceph: OSD osd.{#OSDNAME} is full</li></ul>|
 

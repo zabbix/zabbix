@@ -37,7 +37,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -186,7 +186,7 @@ Refer to the vendor documentation.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |{#FAN_DESCR}: Fan status|<p>MIB: IMM-MIB</p><p>A description of the fan component status.</p>|SNMP agent|sensor.fan.status[fanHealthStatus.{#SNMPINDEX}]|
-|{#FAN_DESCR}: Fan speed, %|<p>MIB: IMM-MIB</p><p>Fan speed expressed in percent(%) of maximum RPM.</p><p>An octet string expressed as 'ddd% of maximum' where:d is a decimal digit or blank space for a leading zero.</p><p>If the fan is determined not to be running or the fan speed cannot be determined, the string will indicate 'Offline'.</p>|SNMP agent|sensor.fan.speed.percentage[fanSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `(\d{1,3}) *%( of maximum)? \1`</p></li></ul>|
+|{#FAN_DESCR}: Fan speed, %|<p>MIB: IMM-MIB</p><p>Fan speed expressed in percent(%) of maximum RPM.</p><p>An octet string expressed as 'ddd% of maximum' where:d is a decimal digit or blank space for a leading zero.</p><p>If the fan is determined not to be running or the fan speed cannot be determined, the string will indicate 'Offline'.</p>|SNMP agent|sensor.fan.speed.percentage[fanSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `(\d{1,3}) *%( of maximum)? \1`</p></li></ul>|
 
 ### Trigger prototypes for FAN Discovery
 
