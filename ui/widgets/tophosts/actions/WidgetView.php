@@ -72,8 +72,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($configuration as $key => &$column) {
 			if ($column['aggregate_function'] != AGGREGATE_NONE && !array_key_exists('item_time', $column)) {
-				$configuration[$key]['time_from'] = $this->getInput('from');
-				$configuration[$key]['time_to'] = $this->getInput('to');
+				$column['time_from'] = $this->getInput('from');
+				$column['time_to'] = $this->getInput('to');
 			}
 		}
 		unset($column);
@@ -94,7 +94,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			? HOST_MAINTENANCE_STATUS_OFF
 			: null;
 
-		$options = [
+		$hosts = API::Host()->get([
 			'output' => ['name', 'maintenance_status', 'maintenanceid'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
@@ -103,9 +103,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'filter' => ['maintenance_status' => $maintenance_status],
 			'monitored_hosts' => true,
 			'preservekeys' => true
-		];
-
-		$hosts = API::Host()->get($options);
+		]);
 
 		$hostids = array_keys($hosts);
 		$maintenanceids = array_filter(array_column($hosts, 'maintenanceid', 'maintenanceid'));
@@ -427,7 +425,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
-		$options = [
+		$items = API::Item()->get([
 			'output' => ['itemid', 'hostid', 'key_', 'history', 'trends', 'value_type', 'units'],
 			'selectValueMap' => ['mappings'],
 			'groupids' => $groupids,
@@ -436,13 +434,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'webitems' => true,
 			'filter' => [
 				'name' => $name,
+				'value_type' => $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null,
 				'status' => ITEM_STATUS_ACTIVE
 			],
 			'sortfield' => 'key_',
 			'preservekeys' => true
-		];
-
-		$items = API::Item()->get($options);
+		]);
 
 		if ($items) {
 			$single_key = reset($items)['key_'];
