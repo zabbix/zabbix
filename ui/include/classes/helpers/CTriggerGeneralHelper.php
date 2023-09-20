@@ -247,21 +247,21 @@ class CTriggerGeneralHelper {
 		$flag = (array_key_exists('parent_discoveryid', $input_data))
 			? ZBX_FLAG_DISCOVERY_PROTOTYPE
 			: ZBX_FLAG_DISCOVERY_NORMAL;
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($trigger,
+		$resolved_trigger = CMacrosResolverHelper::resolveTriggerExpressions($trigger,
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
-		$data = array_merge($input_data, reset($triggers));
+		if ($input_data['hostid'] == 0) {
+			$input_data['hostid'] = $trigger[0]['hosts'][0]['hostid'];
+		}
+
+		$data = array_merge($input_data, reset($resolved_trigger));
 
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($data['triggerid'],
 			getTriggerParentTemplates([$data], $flag), $flag,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		);
-
-		if ($data['hostid'] == 0) {
-			$data['hostid'] = $data['hosts'][0]['hostid'];
-		}
 
 		if ($data['show_inherited_tags']) {
 			$data['tags'] = self::getInheritedTags($data, $input_tags);
