@@ -180,10 +180,8 @@ class CWidgetFieldTimePeriod {
 				|| this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DASHBOARD;
 		}
 
-		for (const reference_form_rows of document.querySelectorAll(`.js-${this.#field_name}-reference`)) {
-			reference_form_rows.style.dispaly = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET
-				? 'none'
-				: '';
+		for (const element of document.querySelectorAll(`.js-${this.#field_name}-reference`)) {
+			element.style.display = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET ? 'none' : '';
 		}
 
 		if (this.#widget_accepted) {
