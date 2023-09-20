@@ -231,6 +231,18 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="preprocessing-steps-parameters-snmp-get-value-tmpl">
+	<?= (new CSelect('preprocessing[#{rowNum}][params][0]'))
+			->setValue(ZBX_PREPROC_SNMP_UTF8_FROM_HEX)
+			->setAdaptiveWidth(202)
+			->addOptions([
+				new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+				new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+				new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+			])
+	?>
+</script>
+
 <script type="text/javascript">
 	jQuery(function($) {
 		function makeParameterInput(index, type) {
@@ -249,6 +261,9 @@
 			);
 			const preproc_param_snmp_walk_to_json_tmpl = new Template(
 				$('#preprocessing-steps-parameters-snmp-walk-to-json-tmpl').html()
+			);
+			const preproc_param_snmp_get_value_tmpl = new Template(
+				$('#preprocessing-steps-parameters-snmp-get-value-tmpl').html()
 			);
 
 			switch (type) {
@@ -358,11 +373,16 @@
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_VALUE ?>':
 					return $(preproc_param_snmp_walk_value_tmpl.evaluate({
-						rowNum: index,
+						rowNum: index
 					}));
 
 				case '<?= ZBX_PREPROC_SNMP_WALK_TO_JSON ?>':
 					return $(preproc_param_snmp_walk_to_json_tmpl.evaluate({
+						rowNum: index
+					}));
+
+				case '<?= ZBX_PREPROC_SNMP_GET_VALUE ?>':
+					return $(preproc_param_snmp_get_value_tmpl.evaluate({
 						rowNum: index
 					}));
 

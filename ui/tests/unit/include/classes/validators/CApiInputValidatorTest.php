@@ -7890,6 +7890,60 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/params/7": cannot be empty.'
 			],
 			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"",
+				'/1/params',
+				'Invalid parameter "/1/params/1": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"abc",
+				'/1/params',
+				'Invalid parameter "/1/params/1": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"0",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"1",
+				'/1/params',
+				"1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"2",
+				'/1/params',
+				"2"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"3",
+				'/1/params',
+				"3"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"4",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"1\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
 				['type' => API_PROMETHEUS_PATTERN],
 				'',
 				'/1/prometheus_pattern',
