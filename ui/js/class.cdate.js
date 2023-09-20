@@ -52,19 +52,16 @@ CDate.prototype = {
 	* @return string|bool human readable date or false if unsupported format given
 	*/
 	format: function(format) {
-		var shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		const shortMn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-		var dt = this.getDate(),
-			mnth = this.getMonth(),
-			yr = this.getFullYear(),
-			hrs = this.getHours(),
-			mnts = this.getMinutes(),
-			sec = this.getSeconds();
-
-		if (format[format.length - 1] === 'A') {
-			var ampm = (hrs < 12) ? 'AM' : 'PM',
-				ampmhrs = appendZero((hrs + 11) % 12 + 1);
-		}
+		const dt = this.getDate();
+		const mnth = this.getMonth();
+		const yr = this.getFullYear();
+		const hrs = this.getHours();
+		const mnts = this.getMinutes();
+		const sec = this.getSeconds();
+		const ampm = (hrs < 12) ? 'AM' : 'PM';
+		const ampmhrs = appendZero((hrs + 11) % 12 + 1);
 
 		/**
 		 * Append date suffix according to English rules e.g., 3 becomes 3rd.
@@ -73,7 +70,7 @@ CDate.prototype = {
 		 *
 		 * @return string
 		 */
-		var appSfx = function(date) {
+		const appSfx = function(date) {
 			if (date % 10 == 1 && date != 11) {
 				return date + 'st';
 			}
