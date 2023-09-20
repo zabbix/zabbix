@@ -92,11 +92,13 @@ class CControllerTriggerEdit extends CController {
 				$parameters['selectItems'] = ['itemid', 'templateid', 'flags'];
 			}
 
-			$this->trigger = API::Trigger()->get($parameters);
+			$triggers = API::Trigger()->get($parameters);
 
-			if (!$this->trigger) {
+			if (!$triggers) {
 				return false;
 			}
+
+			$this->trigger = reset($triggers);
 		}
 		else {
 			$this->trigger = null;
@@ -147,12 +149,17 @@ class CControllerTriggerEdit extends CController {
 		$data['comments'] = $this->getInput('description', '');
 		$data['dependencies'] = zbx_toObject($this->getInput('dependencies', []), 'triggerid');
 
-		if ($data['tags'] && ($data['show_inherited_tags'] == 0 || !$this->trigger)) {
-			// Unset inherited tags.
+		if ($data['tags']) {
+			// Unset empty and inherited tags.
 			$tags = [];
 
 			foreach ($data['tags'] as $tag) {
-				if (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					continue;
+				}
+
+				if (($data['show_inherited_tags'] == 0 || !$this->trigger)
+						&& (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN))) {
 					continue;
 				}
 
@@ -165,20 +172,8 @@ class CControllerTriggerEdit extends CController {
 			$data['tags'] = $tags;
 		}
 
-		if ($data['tags']) {
-			$tags = $data['tags'];
-
-			foreach ($tags as $key => $tag) {
-				if ($tag['tag'] === '' && $tag['value'] === '') {
-					unset($tags[$key]);
-				}
-			}
-
-			$data['tags'] = $tags;
-		}
-
 		if ($this->trigger) {
-			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data, $data['tags']);
+			$trigger = CTriggerGeneralHelper::getAdditionalTriggerData($this->trigger, $data);
 
 			if ($data['form_refresh']) {
 				if ($data['show_inherited_tags']) {

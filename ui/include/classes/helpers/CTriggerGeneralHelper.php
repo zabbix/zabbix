@@ -243,16 +243,16 @@ class CTriggerGeneralHelper {
 	 * @param array $input_data
 	 * @return array
 	 */
-	public static function getAdditionalTriggerData(array $trigger, array $input_data, array $input_tags): array {
+	public static function getAdditionalTriggerData(array $trigger, array $input_data): array {
 		$flag = (array_key_exists('parent_discoveryid', $input_data))
 			? ZBX_FLAG_DISCOVERY_PROTOTYPE
 			: ZBX_FLAG_DISCOVERY_NORMAL;
-		$resolved_trigger = CMacrosResolverHelper::resolveTriggerExpressions($trigger,
+		$resolved_trigger = CMacrosResolverHelper::resolveTriggerExpressions([$trigger],
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
 		if ($input_data['hostid'] == 0) {
-			$input_data['hostid'] = $trigger[0]['hosts'][0]['hostid'];
+			$input_data['hostid'] = $trigger['hosts'][0]['hostid'];
 		}
 
 		$data = array_merge($input_data, reset($resolved_trigger));
@@ -264,7 +264,7 @@ class CTriggerGeneralHelper {
 		);
 
 		if ($data['show_inherited_tags']) {
-			$data['tags'] = self::getInheritedTags($data, $input_tags);
+			$data['tags'] = self::getInheritedTags($data, $input_data['tags']);
 		}
 
 		$data['limited'] = ($data['templateid'] != 0);
@@ -408,7 +408,7 @@ class CTriggerGeneralHelper {
 	 * @return array
 	 */
 	public static function convertApiInputForForm(array $db_trigger): array {
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger,
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions([$db_trigger],
 			['sources' => ['expression', 'recovery_expression']]
 		);
 		$trigger = reset($triggers);
