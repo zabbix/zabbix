@@ -197,11 +197,11 @@ class CSVGPie {
 
 		this.#createContainers();
 
-		this.#sector_observer = new MutationObserver((mutationList) => {
-			for (let i = 0; i < mutationList.length; i++) {
-				if (mutationList[i].type === 'attributes' && mutationList[i].oldValue === 'true'
-						&& !mutationList[i].target.matches(':hover')) {
-					this.#popIn(mutationList[i].target);
+		this.#sector_observer = new MutationObserver((mutation_list) => {
+			for (let i = 0; i < mutation_list.length; i++) {
+				if (mutation_list[i].type === 'attributes' && mutation_list[i].oldValue === 'true'
+						&& !mutation_list[i].target.matches(':hover')) {
+					this.#popIn(mutation_list[i].target);
 				}
 			}
 		});
