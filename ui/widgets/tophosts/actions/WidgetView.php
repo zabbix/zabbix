@@ -68,40 +68,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getData(): array {
-		$from = null;
-		$to = null;
-
-		foreach ($this->fields_values['columns'] as $key => $column) {
-			$dashboard_time = false;
-
-			if ($column['aggregate_function'] != AGGREGATE_NONE && !array_key_exists('item_time', $column)) {
-				$dashboard_time = true;
-			}
-
-			if ($dashboard_time) {
-				$from = $this->getInput('from');
-				$to = $this->getInput('to');
-
-				$this->fields_values['columns'][$key]['time_from'] = $from;
-				$this->fields_values['columns'][$key]['time_to'] = $to;
-			}
-			elseif ($column['aggregate_function'] != AGGREGATE_NONE) {
-				$from = $column['time_from'];
-				$to = $column['time_to'];
-			}
-		}
-
-		if ($from !== null && $to !== null) {
-			$range_time_parser = new CRangeTimeParser();
-
-			$range_time_parser->parse($from);
-			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-			$range_time_parser->parse($to);
-			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-		}
-
 		$configuration = $this->fields_values['columns'];
+
+		foreach ($configuration as $key => &$column) {
+			if ($column['aggregate_function'] != AGGREGATE_NONE && !array_key_exists('item_time', $column)) {
+				$configuration[$key]['time_from'] = $this->getInput('from');
+				$configuration[$key]['time_to'] = $this->getInput('to');
+			}
+		}
+		unset($column);
 
 		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 			? getSubGroups($this->fields_values['groupids'])
@@ -127,16 +102,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'tags' => $tags_exist ? $this->fields_values['tags'] : null,
 			'filter' => ['maintenance_status' => $maintenance_status],
 			'monitored_hosts' => true,
-			'preservekeys' => true,
-			'dashboard_time' => $dashboard_time
+			'preservekeys' => true
 		];
-
-		if ($from !== null && $to !== null) {
-			$options['time_period'] = [
-				'time_from' => $time_from,
-				'time_to' => $time_to
-			];
-		}
 
 		$hosts = API::Host()->get($options);
 
@@ -459,8 +426,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			) || $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS;
 	}
 
-	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids,
-			bool $count = false): array {
+	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
 		$options = [
 			'output' => ['itemid', 'hostid', 'key_', 'history', 'trends', 'value_type', 'units'],
 			'selectValueMap' => ['mappings'],
@@ -475,10 +441,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'sortfield' => 'key_',
 			'preservekeys' => true
 		];
-
-		if (!$count) {
-			$options['filter']['value_type'] = $numeric_only ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null;
-		}
 
 		$items = API::Item()->get($options);
 
@@ -554,7 +516,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 			else {
-				$non_numeric_history = Manager::History()->getAggregatedValue($item, $function, $time_from, $time_to);
+				$non_numeric_history = [];
+
+				if ($aggregate_function == AGGREGATE_LAST || $aggregate_function == AGGREGATE_FIRST) {
+					$non_numeric_history = Manager::History()->getAggregatedValue($item, $function, $time_from,
+						$time_to);
+				}
 
 				if ($aggregate_function == AGGREGATE_COUNT) {
 					$item['value_type'] = ITEM_VALUE_TYPE_UINT64;

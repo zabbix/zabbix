@@ -61,8 +61,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$decimals = null;
 		$last_value = null;
 		$is_binary_units = true;
-		$from = null;
-		$to = null;
 		$prev_value = null;
 
 		$options = [
@@ -73,28 +71,24 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'preservekeys' => true
 		];
 
-		$dashboard_time = $this->fields_values['aggregate_function'] != AGGREGATE_NONE
-			&& !WidgetForm::hasOverrideTime($this->fields_values);
-
-		if ($dashboard_time) {
+		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE
+			&& !WidgetForm::hasOverrideTime($this->fields_values)) {
 			$from = $this->getInput('from');
 			$to = $this->getInput('to');
 		}
-
-		if (!$dashboard_time && $this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
+		else {
 			$from = $this->fields_values['time_from'];
 			$to = $this->fields_values['time_to'];
 		}
 
-		if ($from !== null && $to !== null) {
-			$range_time_parser = new CRangeTimeParser();
+		$range_time_parser = new CRangeTimeParser();
 
-			$range_time_parser->parse($from);
-			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+		$range_time_parser->parse($from);
+		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
 
-			$range_time_parser->parse($to);
-			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-		}
+		$range_time_parser->parse($to);
+		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+
 
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
 			&& ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
@@ -121,15 +115,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'preservekeys' => true
 				];
 			}
-		}
-
-		$options['dashboard_time'] = $dashboard_time;
-
-		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
-			$options['time_period'] = [
-				'time_from' => $time_from,
-				'time_to' => $time_to
-			];
 		}
 
 		$show = array_flip($this->fields_values['show']);
@@ -198,8 +183,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$history_period = $time_to - $time_from;
 			}
 
-			$aggregate_function = $aggregate_function == AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
-
 			if ($value_type == ITEM_VALUE_TYPE_FLOAT || $value_type == ITEM_VALUE_TYPE_UINT64) {
 				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
 					$item = $items[$itemid];
@@ -213,23 +196,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					);
 				}
 
-				if ($this->fields_values['item_time'] == 1) {
-					$from = $this->fields_values['time_from'];
-					$to = $this->fields_values['time_to'];
-
-					$range_time_parser = new CRangeTimeParser();
-
-					$range_time_parser->parse($from);
-					$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-					$range_time_parser->parse($to);
-					$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-
-					$aggregate_interval = $time_to - $time_from;
-				}
-				else {
-					$aggregate_interval = $history_period;
-				}
+				$aggregate_interval = $this->fields_values['item_time'] == 1 ? $time_to - $time_from : $history_period;
 
 				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
 					$last_results = [];
@@ -275,19 +242,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 				}
 			}
 			else {
-				$non_numeric_history = [];
+				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
+					$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
+					$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
+				}
 
 				if ($aggregate_function == AGGREGATE_LAST
 						|| $aggregate_function == AGGREGATE_FIRST
 						|| $aggregate_function == AGGREGATE_COUNT) {
-					if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
-						$non_numeric_history = Manager::History()->getAggregatedValue($item, $aggregate_function,
-							$time_from, $time_to);
-					}
-					else {
-						$history_limit = array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) ? 2 : 1;
-						$history = Manager::History()->getLastValues($items, $history_limit, $history_period);
-					}
+					$non_numeric_history = Manager::History()->getAggregatedValue($item, $aggregate_function,
+						$time_from, $time_to);
 
 					if ($non_numeric_history) {
 						$history = [
