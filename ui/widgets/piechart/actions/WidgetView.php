@@ -586,6 +586,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			unset($metric);
 
+			if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON) {
+				$all_sectorids[] = 'other';
+			}
+
 			foreach ($sectors as $key => $sector) {
 				if ($sector['value'] == 0 || $raw_total_value == 0) {
 					$percentage = 0;
@@ -596,7 +600,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($merge_sectors['merge'] == self::MERGE_SECTORS_ON
 						&& $percentage < $merge_sectors['percent']) {
-					$others_value += abs($sector['value']);
+					$others_value += abs($sector['value'] ?? 0);
 
 					$below_threshold_sectors[] = $key;
 				}
@@ -615,8 +619,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'units' => $chart_units,
 					'is_total' => false
 				];
-
-				$all_sectorids[] = 'other';
 			}
 		}
 
