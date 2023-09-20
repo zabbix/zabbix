@@ -777,9 +777,9 @@ class CHistoryManager {
 				foreach ($item['group_by_script']['buckets'] as $point) {
 					$row = [
 						'itemid' => $item['key'],
-						'tick' => (int)$point['key'],
+						'tick' => (int) $point['key'],
 						'count' => $point['doc_count'],
-						'clock' => (int)$point['clock']['value_as_string']
+						'clock' => (int) $point['clock']['value_as_string']
 					];
 
 					if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {

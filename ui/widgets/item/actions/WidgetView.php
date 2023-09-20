@@ -72,7 +72,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE
-			&& !WidgetForm::hasOverrideTime($this->fields_values)) {
+				&& !WidgetForm::hasOverrideTime($this->fields_values)) {
 			$from = $this->getInput('from');
 			$to = $this->getInput('to');
 		}
@@ -376,22 +376,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null) {
 							if ($aggregate_function == AGGREGATE_COUNT) {
-								if ($last_value > (int)$prev_value) {
+								if ($last_value > (int) $prev_value) {
 									$change_indicator = Widget::CHANGE_INDICATOR_UP;
 								}
-								elseif ($last_value < (int)$prev_value) {
+								elseif ($last_value < (int) $prev_value) {
 									$change_indicator = Widget::CHANGE_INDICATOR_DOWN;
 								}
 							}
-							else {
-								if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
+							else if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
 									&& $last_value !== $prev_value) {
-									$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
-								}
+								$change_indicator = Widget::CHANGE_INDICATOR_UP_DOWN;
 							}
 						}
 
-					break;
+						break;
 				}
 			}
 			else {
