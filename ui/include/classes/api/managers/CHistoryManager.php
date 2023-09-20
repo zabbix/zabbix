@@ -1205,13 +1205,6 @@ class CHistoryManager {
 	 */
 	private function getAggregatedValueFromElasticsearch(array $item, $aggregation, $time_from, $time_to) {
 		$query = [
-			'aggs' => [
-				$aggregation.'_value' => [
-					$aggregation => [
-						'field' => 'value'
-					]
-				]
-			],
 			'query' => [
 				'bool' => [
 					'must' => [
@@ -1230,18 +1223,67 @@ class CHistoryManager {
 						]
 					]
 				]
-			],
-			'size' => 0
+			]
 		];
+
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+			switch ($aggregation) {
+				case AGGREGATE_MIN:
+					$aggs['value'] = ['min' => ['field' => 'value']];
+					break;
+				case AGGREGATE_MAX:
+					$aggs['value'] = ['max' => ['field' => 'value']];
+					break;
+				case AGGREGATE_AVG:
+					$aggs['value'] = ['avg' => ['field' => 'value']];
+					break;
+				case AGGREGATE_SUM:
+					$aggs['value'] = ['sum' => ['field' => 'value']];
+					break;
+				case AGGREGATE_FIRST:
+					$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
+					$aggs['clock'] = ['min' => ['field' => 'clock']];
+					break;
+				case AGGREGATE_LAST:
+					$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
+					break;
+			}
+
+			$query['aggs'] = $aggs;
+			$query['size'] = 0;
+		}
+		else {
+			if ($aggregation == AGGREGATE_LAST) {
+				$query['size'] = 1;
+				$query['sort'] = [
+					'clock' => 'desc'
+				];
+			}
+			if ($aggregation == AGGREGATE_FIRST) {
+				$query['size'] = 1;
+				$query['sort'] = [
+					'clock' => 'asc'
+				];
+			}
+		}
 
 		$endpoints = self::getElasticsearchEndpoints($item['value_type']);
 
 		if ($endpoints) {
 			$data = CElasticsearchHelper::query('POST', reset($endpoints), $query);
-
-			if (array_key_exists($aggregation.'_value', $data)
-					&& array_key_exists('value', $data[$aggregation.'_value'])) {
-				return $data[$aggregation.'_value']['value'];
+			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+				if (array_key_exists($aggregation . '_value', $data)
+					&& array_key_exists('value', $data[$aggregation . '_value'])) {
+					return $data[$aggregation . '_value']['value'];
+				}
+			}
+			else {
+				if ($data && $aggregation == AGGREGATE_COUNT) {
+					return count($data);
+				}
+				if ($data) {
+					return $data[0]['value'];
+				}
 			}
 		}
 
