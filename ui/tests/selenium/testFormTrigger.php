@@ -706,7 +706,7 @@ class testFormTrigger extends CLegacyWebTest {
 						'elementError' => true,
 						'element_count' => 2,
 						'errors' => [
-							'last(/Zabbix host/test-item-reuse,#1):Unknown host, no such host present in system'
+							'last(/Zabbix host/test-item-reuse,#1): Unknown host, no such host present in system'
 						]
 					]
 				]
@@ -722,7 +722,7 @@ class testFormTrigger extends CLegacyWebTest {
 						'elementError' => true,
 						'element_count' => 2,
 						'errors' => [
-							'last(/Simple form test host/someItem,#1):Unknown host item, no such item in selected host'
+							'last(/Simple form test host/someItem,#1): Unknown host item, no such item in selected host'
 						]
 					]
 				]
@@ -738,8 +738,8 @@ class testFormTrigger extends CLegacyWebTest {
 						'elementError' => true,
 						'element_count' => 4,
 						'errors' => [
-							'lasta(/Simple form test host/test-item-reuse,#1):Incorrect function is used',
-							'last(/Simple form test host/test-item-reuse2,#1):Unknown host item, no such item in selected host'
+							'lasta(/Simple form test host/test-item-reuse,#1): Incorrect function is used',
+							'last(/Simple form test host/test-item-reuse2,#1): Unknown host item, no such item in selected host'
 						]
 					]
 				]
