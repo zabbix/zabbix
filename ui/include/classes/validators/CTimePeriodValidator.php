@@ -126,8 +126,14 @@ class CTimePeriodValidator {
 		$fields_typed_errors = [];
 
 		foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
-			if ($time_period[$field] === '' && $options['require_not_empty']) {
-				$fields_typed_errors[$field] = self::ERROR_TYPE_EMPTY;
+			if ($time_period[$field] === '') {
+				if ($options['require_not_empty']) {
+					$fields_typed_errors[$field] = self::ERROR_TYPE_EMPTY;
+				}
+				else {
+					$time_period[$field_ts] = 0;
+				}
+
 				continue;
 			}
 
