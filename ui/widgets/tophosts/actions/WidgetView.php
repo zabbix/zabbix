@@ -473,15 +473,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			self::addDataSource($items, $time_from, $time_now, $column['history']);
 
-			$items_by_source = ['history' => []];
+			$history = [];
 
 			foreach ($items as $itemid => $item) {
-				$items_by_source[$item['source']][$itemid] = $item;
+				if ($item['source'] === 'history') {
+					$history[$itemid] = $item;
+				}
 			}
 
-			$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
+			$values = Manager::History()->getLastValues($history, 1, $history_period);
 
-			return array_column(array_column($values, 0), 'value', 'itemid');
+			return array_map(fn ($value) => $value[0]['value'], $values);
 		}
 		else {
 			$range_time_parser = new CRangeTimeParser();
