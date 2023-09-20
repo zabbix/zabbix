@@ -146,7 +146,7 @@ $fields = [
 	'jmx_endpoint' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 										'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_JMX
 									],
-	'has_custom_timeout' =>			[T_ZBX_INT, O_OPT, null,
+	'custom_timeout' =>				[T_ZBX_INT, O_OPT, null,
 										IN([ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 										null
 									],
@@ -363,7 +363,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				: getRequest('password', DB::getDefault('items', 'password')),
 			'params' => getRequest('params', DB::getDefault('items', 'params')),
 			'delay' => getDelayWithCustomIntervals(getRequest('delay', DB::getDefault('items', 'delay')), $delay_flex),
-			'timeout' => getRequest('has_custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
+			'timeout' => getRequest('custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
 				? getRequest('timeout', DB::getDefault('items', 'timeout'))
 				: DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => getRequest('trapper_hosts', DB::getDefault('items', 'trapper_hosts')),
@@ -611,15 +611,17 @@ if (hasRequest('form') || (hasRequest('clone') && getRequest('itemid') != 0)) {
 	$data['trends_default'] = DB::getDefault('items', 'trends');
 
 	$default_timeout = DB::getDefault('items', 'timeout');
+	$data['custom_timeout'] = (int) getRequest('custom_timeout', $data['timeout'] !== $default_timeout);
 	$data['inherited_timeouts'] = getInheritedTimeouts($lld_rules[0]['hosts'][0]['proxyid']);
-	$data['inherited_timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
-		? $data['inherited_timeouts']['timeouts'][$data['type']]
-		: $default_timeout;
-	$data['has_custom_timeout'] = (int) getRequest('has_custom_timeout', $data['timeout'] !== $default_timeout);
-	$data['timeout'] = $data['has_custom_timeout'] ? $data['timeout'] : $data['inherited_timeout'];
 	$data['can_edit_source_timeouts'] = $data['inherited_timeouts']['source'] === 'proxy'
 		? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
 		: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+
+	if (!$data['custom_timeout']) {
+		$data['timeout'] = array_key_exists($data['type'], $data['inherited_timeouts']['timeouts'])
+			? $data['inherited_timeouts']['timeouts'][$data['type']]
+			: $default_timeout;
+	}
 
 	$data['display_interfaces'] = $data['hostid']
 		? (bool) API::Host()->get([

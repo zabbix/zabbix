@@ -281,7 +281,7 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[timeout]', 'timeout-field', _('Original')))->setLabel(_('Timeout')),
 		(new CDiv([
-			(new CRadioButtonList('has_custom_timeout', ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED))
+			(new CRadioButtonList('custom_timeout', ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED))
 				->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
 				->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
 				->setModern(),

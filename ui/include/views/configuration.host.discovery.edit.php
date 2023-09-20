@@ -698,8 +698,7 @@ $item_tab->addItem([
 $edit_source_timeouts_link = null;
 
 if ($data['can_edit_source_timeouts']
-		&& (($data['limited'] && $data['has_custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
-			|| !$data['limited'])) {
+		&& (($data['limited'] && $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) || !$data['limited'])) {
 	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
 		? (new CLink(_('Timeouts')))
 			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
@@ -714,14 +713,14 @@ $item_tab->addItem([
 		->setAsteriskMark()
 		->setId('js-item-timeout-label'),
 	(new CFormField([
-		(new CRadioButtonList('has_custom_timeout', $data['has_custom_timeout']))
+		(new CRadioButtonList('custom_timeout', $data['custom_timeout']))
 			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
 			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
 			->setReadonly($data['limited'])
 			->setModern(),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('timeout', $data['timeout'],
-			$data['limited'] || $data['has_custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+			$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
 		)
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired(),

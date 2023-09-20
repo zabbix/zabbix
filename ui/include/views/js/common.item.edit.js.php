@@ -69,9 +69,9 @@
 			this.interface_types = interface_types;
 			this.discovered_item = discovered_item === undefined ? false : discovered_item;
 			this.type = document.getElementById('type');
-			this.has_custom_timeout = document.getElementById('has_custom_timeout');
 			this.timeout = document.getElementById('timeout');
-			this.custom_timeout = this.timeout.value;
+			this.custom_timeout = document.getElementById('custom_timeout');
+			this.custom_timeout_value = this.timeout.value;
 			this.inherited_timeouts = inherited_timeouts;
 
 			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
@@ -140,7 +140,7 @@
 		if (type in item_form.inherited_timeouts) {
 			item_form.timeout.disabled = false;
 
-			if (item_form.has_custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
 				item_form.timeout.value = item_form.inherited_timeouts[type];
 			}
 		}
@@ -148,7 +148,7 @@
 			item_form.timeout.disabled = true;
 		}
 
-		item_form.custom_timeout = item_form.timeout.value;
+		item_form.custom_timeout_value = item_form.timeout.value;
 
 		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !interface_optional);
 		$('input[name=interfaceid]').prop('aria-required', !interface_optional);
@@ -232,18 +232,15 @@
 			})
 			.trigger('change');
 
-		item_form.has_custom_timeout.addEventListener('change', () => {
-			const show_inherited_timeout =
-				item_form.has_custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>;
-
-			item_form.timeout.toggleAttribute('readonly', show_inherited_timeout);
-
-			if (show_inherited_timeout) {
-				item_form.custom_timeout = item_form.timeout.value;
+		item_form.custom_timeout.addEventListener('change', () => {
+			if (item_form.custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+				item_form.custom_timeout_value = item_form.timeout.value;
 				item_form.timeout.value = item_form.inherited_timeouts[item_form.type.value] || '';
+				item_form.timeout.readOnly = true;
 			}
 			else {
-				item_form.timeout.value = item_form.custom_timeout;
+				item_form.timeout.value = item_form.custom_timeout_value;
+				item_form.timeout.readOnly = false;
 			}
 		});
 
