@@ -329,14 +329,16 @@ class CSVGPie {
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}`)
 			.data(this.#pieGenerator(this.#sectors_new), key)
-			.join('svg:path')
+			.enter()
+			.insert('svg:path')
 			.attr('class', CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)
 			.attr('d', (d) => this.#arcGenerator(d));
 
 		this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
 			.data(this.#pieGenerator(was), key)
-			.join('svg:path')
+			.enter()
+			.insert('svg:path')
 			.attr('class', CSVGPie.ZBX_STYLE_ARC)
 			.attr('data-hintbox', 1)
 			.attr('data-hintbox-static', 1)
