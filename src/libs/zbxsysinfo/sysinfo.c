@@ -2138,7 +2138,7 @@ int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error
 	}
 
 	if (SUCCEED != zbx_is_time_suffix(timeout_str, &sec, ZBX_LENGTH_UNLIMITED) ||
-			ZBX_ITEM_TIMEOUT_MAX < sec)
+			ZBX_ITEM_TIMEOUT_MAX < sec || 0 == sec)
 	{
 		zbx_strlcpy(error, "Unsupported timeout value.", error_len);
 		return FAIL;
