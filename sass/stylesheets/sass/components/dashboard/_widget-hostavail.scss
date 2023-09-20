@@ -2,12 +2,6 @@
 
 div.dashboard-widget-hostavail {
 	.host-avail-widget {
-		thead {
-			th {
-				font-weight: bold;
-			}
-		}
-
 		tbody {
 			tr {
 				th {
@@ -20,43 +14,34 @@ div.dashboard-widget-hostavail {
 				}
 			}
 
-			th {
-				&:has(.host-avail-true),
-				&:has(.host-avail-mixed),
-				&:has(.host-avail-false),
-				&:has(.host-avail-unknown) {
-					border-bottom: none;
-				}
-			}
-
 			td {
 				color: $font-color;
 			}
 		}
 
-		th,
-		div {
+		.host-avail-true {
 			color: $font-color;
+			background: $host-avail-true-bg-color;
+		}
 
-			&:has(.host-avail-true) {
-				background: $host-avail-true-bg-color;
-			}
+		.host-avail-false {
+			color: $font-color;
+			background: $host-avail-false-bg-color;
+		}
 
-			&:has(.host-avail-mixed) {
-				background: $host-avail-mixed-bg-color;
-			}
+		.host-avail-mixed {
+			color: $font-color;
+			background: $host-avail-mixed-bg-color;
+		}
 
-			&:has(.host-avail-false) {
-				background: $host-avail-false-bg-color;
-			}
+		.host-avail-unknown {
+			color: $font-color;
+			background: $host-avail-unknown-bg-color;
+		}
 
-			&:has(.host-avail-unknown) {
-				background: $host-avail-unknown-bg-color;
-			}
-
-			&:has(.host-avail-total) {
-				background: $host-avail-total-bg-color;
-			}
+		.host-avail-total {
+			color: $font-color;
+			background: $host-avail-total-bg-color;
 		}
 
 		th:last-child,
@@ -89,18 +74,6 @@ div.dashboard-widget-hostavail {
 				&:has(.host-avail-unknown),
 				&:has(.host-avail-total) {
 					background: transparent;
-				}
-			}
-
-			tbody {
-				th {
-					&:has(.host-avail-true),
-					&:has(.host-avail-false),
-					&:has(.host-avail-mixed),
-					&:has(.host-avail-unknown),
-					&:has(.host-avail-total) {
-						border-bottom: 1px solid $ui-border-color;
-					}
 				}
 			}
 		}

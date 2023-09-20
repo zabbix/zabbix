@@ -63,7 +63,7 @@ $header = [
 ];
 
 foreach ($interface_states_fields as $field) {
-	$header[STYLE_HORIZONTAL][] = (new CSpan($field['name_in_context']))->addClass($field['style']);
+	$header[STYLE_HORIZONTAL][] = (new CColHeader($field['name_in_context']))->addClass($field['style']);
 }
 
 foreach ($type_field_names as $type => $interface_name) {
@@ -88,10 +88,11 @@ if (count($data['interface_types']) == 1 || $data['only_totals'] == 1) {
 	foreach ($interface_states_fields as $state => $field) {
 		$table->addItem((new CDiv([
 			(new CSpan($state != 'total' ? $counts[$state] : $data['total_hosts_sum']))
-				->addClass(ZBX_STYLE_TOTALS_LIST_COUNT)
-				->addClass($field['style']),
+				->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 			$field['name']
-		])));
+		]))
+			->addClass($field['style'])
+		);
 	}
 }
 else {
@@ -138,9 +139,7 @@ else {
 
 	if ($data['layout'] == STYLE_VERTICAL) {
 		foreach ($interface_states_fields as $state => $field) {
-			$table->addRow(
-				array_merge([(new CSpan($field['name']))->addClass($field['style'])], $rows[$state])
-			);
+			$table->addRow(array_merge([(new CColHeader($field['name']))->addClass($field['style'])], $rows[$state]));
 		}
 	}
 }
