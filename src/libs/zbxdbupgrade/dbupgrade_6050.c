@@ -1282,7 +1282,8 @@ static int	DBpatch_6050102(void)
 
 	zbx_vector_str_sort(&references, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
-	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "value_str", NULL);
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_str",
+			NULL);
 
 	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
 
@@ -1292,7 +1293,8 @@ static int	DBpatch_6050102(void)
 
 		ZBX_STR2UINT64(widgetid, row[0]);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, create_widget_reference(&references));
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, "reference",
+				create_widget_reference(&references));
 	}
 	zbx_db_free_result(result);
 
