@@ -369,7 +369,8 @@ class CSVGPie {
 				d3.select(nodes[index])
 					.attr('transform', 'translate(0, 0)')
 					.attr('data-hintbox-contents', this.#setHint(d))
-					.style('fill', d => d.data.color);
+					.style('fill', d => d.data.color)
+					.on('mouseleave', null);
 			})
 			.end()
 			.then(() => {
@@ -387,6 +388,8 @@ class CSVGPie {
 							this.#popOut(sectors[i]);
 							this.#popped_out_sector = sectors[i];
 						}
+
+						d3.select(sectors[i]).on('mouseleave', (e) => this.#onMouseLeave(e));
 					}
 
 					this.#svg.on('mousemove', (e) => this.#onMouseMove(e));
@@ -597,8 +600,17 @@ class CSVGPie {
 		}
 		else if (this.#popped_out_sector !== null && e.target !== this.#popped_out_placeholder) {
 			this.#popIn(this.#popped_out_sector);
-			this.#popped_out_sector = null;
-			this.#popped_out_placeholder = null;
+		}
+	}
+
+	/**
+	 * Pop in sector if it or its placeholder lost mouse capture.
+	 *
+	 * @param {Event} e  Mouse leave event.
+	 */
+	#onMouseLeave(e) {
+		if (e.toElement === null || !e.toElement.classList.contains(CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER)) {
+			this.#popIn(this.#popped_out_sector);
 		}
 	}
 
@@ -633,5 +645,8 @@ class CSVGPie {
 				.duration(CSVGPie.ANIMATE_DURATION_POP_IN)
 				.attr('transform', 'translate(0, 0)');
 		}
+
+		this.#popped_out_sector = null;
+		this.#popped_out_placeholder = null;
 	}
 }
