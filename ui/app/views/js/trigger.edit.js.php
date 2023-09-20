@@ -485,11 +485,11 @@ window.trigger_edit_popup = new class {
 
 		if (expression_type === <?= TRIGGER_EXPRESSION ?>) {
 			if (Object.keys(fields).length === 0 || fields.add_expression) {
-				fields.expression = this.expression.value;
+				fields.expression = this.expression.value.trim();
 			}
 			else {
-				fields.expression = this.expr_temp.value;
-				fields.expr_temp = this.expression.value;
+				fields.expression = this.expr_temp.value.trim();
+				fields.expr_temp = this.expression.value.trim();
 				fields.expr_target_single = this.form
 					.querySelector('input[name="expr_target_single"]:checked').value;
 			}
@@ -498,11 +498,11 @@ window.trigger_edit_popup = new class {
 		}
 		else {
 			if (Object.keys(fields).length === 0 || fields.add_expression) {
-				fields.recovery_expression = this.recovery_expression.value;
+				fields.recovery_expression = this.recovery_expression.value.trim();
 			}
 			else {
-				fields.recovery_expression = this.recovery_expr_temp.value;
-				fields.recovery_expr_temp = this.recovery_expression.value;
+				fields.recovery_expression = this.recovery_expr_temp.value.trim();
+				fields.recovery_expr_temp = this.recovery_expression.value.trim();
 				fields.recovery_expr_target_single = this.form
 					.querySelector('input[name="recovery_expr_target_single"]:checked').value;
 			}
