@@ -961,7 +961,7 @@ static int	DBpatch_6050092(void)
 
 	if (ZBX_DB_OK > zbx_db_execute(
 			"delete from widget_field"
-			" where name='source_type'"
+			" where name in ('source_type','reference')"
 				" and widgetid in (select widgetid from widget where type='map')"))
 	{
 		return FAIL;
@@ -977,7 +977,7 @@ static int	DBpatch_6050093(void)
 
 	if (ZBX_DB_OK > zbx_db_execute(
 			"update widget_field"
-			" set name='sysmapid._reference'"
+			" set name='sysmapid._reference',value_str=CONCAT(value_str,'._mapid')"
 			" where name='filter_widget_reference'"
 				" and widgetid in (select widgetid from widget where type='map')"))
 	{
@@ -1229,6 +1229,84 @@ out:
 	return ret;
 }
 
+#define REFERENCE_LEN	5
+#define FIRST_LETTER	'A'
+#define TOTAL_LETTERS	26
+
+static char	*create_widget_reference(const zbx_vector_str_t *references)
+{
+	static char	buf[REFERENCE_LEN + 1];	/* static buffers are automatically initialized to zeroes */
+	static int	next_index = 0;
+
+	while (1)
+	{
+		int	i, index = next_index++;
+
+		for (i = REFERENCE_LEN - 1; i >= 0; i--)
+		{
+			buf[i] = FIRST_LETTER + index % TOTAL_LETTERS;
+			index = floor(index / TOTAL_LETTERS);
+		}
+
+		if (FAIL == zbx_vector_str_search(references, buf, ZBX_DEFAULT_STR_COMPARE_FUNC))
+			break;
+	}
+
+	return buf;
+}
+
+#undef TOTAL_LETTERS
+#undef FIRST_LETTER
+#undef REFERENCE_LEN
+
+static int	DBpatch_6050102(void)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_db_insert_t		db_insert;
+	zbx_vector_str_t	references;
+	int			ret;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_str_create(&references);
+
+	result = zbx_db_select("select distinct value_str from widget_field where name='reference' order by value_str");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_vector_str_append(&references, zbx_strdup(NULL, row[0]));
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_str_sort(&references, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "value_str", NULL);
+
+	result = zbx_db_select("select widgetid from widget where type in ('graph','svggraph','graphprototype')");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 1, create_widget_reference(&references));
+	}
+	zbx_db_free_result(result);
+
+	zbx_vector_str_clear_ext(&references, zbx_str_free);
+	zbx_vector_str_destroy(&references);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1335,5 +1413,6 @@ DBPATCH_ADD(6050098, 0, 1)
 DBPATCH_ADD(6050099, 0, 1)
 DBPATCH_ADD(6050100, 0, 1)
 DBPATCH_ADD(6050101, 0, 1)
+DBPATCH_ADD(6050102, 0, 1)
 
 DBPATCH_END()
