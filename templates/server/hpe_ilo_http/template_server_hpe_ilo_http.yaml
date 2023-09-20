@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-18T17:40:34Z'
+  date: '2023-09-20T15:16:21Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -325,14 +325,14 @@ zabbix_export:
           description: 'The JSON with the result of API requests.'
           timeout: '{$ILO.TIMEOUT}'
           parameters:
-            - name: ilo_url
-              value: '{$ILO.URL}'
-            - name: user
-              value: '{$ILO.USER}'
-            - name: password
-              value: '{$ILO.PASSWORD}'
             - name: http_proxy
               value: '{$ILO.HTTP_PROXY}'
+            - name: ilo_url
+              value: '{$ILO.URL}'
+            - name: password
+              value: '{$ILO.PASSWORD}'
+            - name: user
+              value: '{$ILO.USER}'
           tags:
             - tag: component
               value: raw
@@ -1689,7 +1689,7 @@ zabbix_export:
                 The manager type. Possible values:
                 
                 0 - "ManagementController", a controller used primarily to monitor or manage the operation of a device or system;
-                1 - "EnclosureManager", a controller which provides management functions for a chassis or group of devices or systems
+                1 - "EnclosureManager", a controller which provides management functions for a chassis or group of devices or systems;
                 2 - "BMC", a controller which provides management functions for a single computer system;
                 10 - "Unknown", the manager type is unknown.
               valuemap:
@@ -2006,17 +2006,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_STATE}'
-                value: Absent
-                operator: NOT_MATCHES_REGEX
-                formulaid: E
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ILO.SENSOR.DISCOVERY.NAME.MATCHES}'
-                formulaid: C
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ILO.SENSOR.DISCOVERY.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#SENSOR_CONTEXT}'
                 value: '{$ILO.SENSOR.DISCOVERY.CONTEXT.MATCHES}'
                 formulaid: A
@@ -2024,6 +2013,17 @@ zabbix_export:
                 value: '{$ILO.SENSOR.DISCOVERY.CONTEXT.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ILO.SENSOR.DISCOVERY.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ILO.SENSOR.DISCOVERY.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#SENSOR_STATE}'
+                value: Absent
+                operator: NOT_MATCHES_REGEX
+                formulaid: E
           description: 'Discovers chassis temperature sensors.'
           item_prototypes:
             - uuid: 0067035f746a4317988d70844e71dd7a
@@ -2641,14 +2641,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Computer system [{#SYSTEM_HOSTNAME}]: Resources usage'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
             - name: 'HPE iLO: Fans'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -2658,14 +2658,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Reading, in %'
+                    - type: INTEGER
+                      name: rows
+                      value: '2'
             - name: 'HPE iLO: Thermal sensors'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -2675,14 +2675,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Reading'
+                    - type: INTEGER
+                      name: rows
+                      value: '2'
             - name: 'HPE iLO: Power supplies'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -2692,14 +2692,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Line input voltage'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2708,14 +2708,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'HPE iLO by HTTP'
                         name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: PSU [{#PSU_ID}]: Last power output'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: 724ed4e07ca34bf594719298055a0837
           name: 'Computer system type'
