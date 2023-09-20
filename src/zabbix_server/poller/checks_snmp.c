@@ -2131,7 +2131,7 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		zbx_bulkwalk_context_t *bulkwalk_context, char **results, size_t *results_alloc,
 		size_t *results_offset, const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface,
-		 unsigned char snmp_oid_type, char *error,
+		unsigned char snmp_oid_type, char *error,
 		size_t max_error_len)
 {
 	struct variable_list	*var;
