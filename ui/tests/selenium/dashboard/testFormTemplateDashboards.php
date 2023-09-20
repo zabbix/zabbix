@@ -3831,8 +3831,8 @@ class testFormTemplateDashboards extends CWebTest {
 						'To' => '1969-10-10'
 					],
 					'error_message' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
@@ -3848,8 +3848,8 @@ class testFormTemplateDashboards extends CWebTest {
 						'To' => '2050-10-10'
 					],
 					'error_message' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
