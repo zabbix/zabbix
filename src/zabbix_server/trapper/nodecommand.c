@@ -479,8 +479,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	if (ZBX_SCRIPT_MANUALINPUT_YES == script.manualinput)
 	{
-		char *expanded_cmd;
-		size_t expanded_cmd_size;
+		char	*expanded_cmd;
+		size_t	expanded_cmd_size;
 
 		if (NULL == manualinput)
 		{
