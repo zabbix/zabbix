@@ -1706,7 +1706,7 @@ static void	lld_group_candidates_validate_db(zbx_vector_lld_group_ptr_t *groups_
  *                                                                            *
  * Purpose: copy renamed discovery link to a new group                        *
  *                                                                            *
- * Return value: SUCEED - discovery link was copied                           *
+ * Return value: SUCCEED - discovery link was copied                          *
  *               FAIL   - otherwise                                           *
  *                                                                            *
  ******************************************************************************/
@@ -2048,6 +2048,7 @@ out:
  *                                         by groupid                         *
  *             group_prototypes - [IN] list of group prototypes; should be    *
  *                                     sorted by group_prototypeid            *
+ *             error            - [OUT] error message                         *
  *                                                                            *
  ******************************************************************************/
 static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
