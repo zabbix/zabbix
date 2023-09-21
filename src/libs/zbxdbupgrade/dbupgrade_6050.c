@@ -1128,11 +1128,9 @@ static int	DBpatch_6050090(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	result = zbx_db_select("select w.widgetid from widget w,widget_field wf"
-		" where w.type='hostavail' and w.widgetid=wf.widgetid and w.widgetid in ("
-			" select widgetid from widget_field where name='interface_type'"
-			" group by widgetid having count(name)=1"
-		")");
+	result = zbx_db_select("select wf.widgetid from widget_field wf,widget w"
+			" where wf.name='interface_type' and w.type='hostavail' and w.widgetid=wf.widgetid"
+			" group by wf.widgetid having count(wf.name)=1");
 
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "name", "type", "value_int",
 			NULL);
@@ -1143,7 +1141,7 @@ static int	DBpatch_6050090(void)
 
 		ZBX_STR2UINT64(widgetid, row[0]);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, "interface_type", 0, 1);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, "only_totals", 0, 1);
 	}
 	zbx_db_free_result(result);
 
