@@ -54,9 +54,10 @@ class CControllerScriptUpdate extends CController {
 			'hgstype' =>				'in 0,1',
 			'enable_user_input' =>		'db scripts.manualinput|in '.SCRIPT_MANUALINPUT_ENABLED,
 			'input_prompt' =>			'db scripts.manualinput_prompt',
-			'show_dropdown' =>			'db scripts.manualinput_validator_type|in '.SCRIPT_MANUALINPUT_ENABLED,
-			'default_user_input' =>		'db scripts.manualinput_default_value|string',
-			'validate_user_input' =>	'db scripts.manualinput_validator',
+			'input_type' =>				'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_STRING, SCRIPT_MANUALINPUT_TYPE_LIST]),
+			'default_input' =>			'db scripts.manualinput_default_value|string',
+			'input_validation' =>		'db scripts.manualinput_validator',
+			'dropdown_options' =>		'db scripts.manualinput_validator',
 			'enable_confirmation' =>	'in 1',
 			'confirmation' =>			'db scripts.confirmation|not_empty'
 		];
@@ -71,13 +72,15 @@ class CControllerScriptUpdate extends CController {
 					$ret = false;
 				}
 
-				if ($this->hasInput('show_dropdown') && $this->getInput('default_user_input', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', _('default_user_input'), _('cannot be empty')));
+				if ($this->getInput('input_type') == SCRIPT_MANUALINPUT_TYPE_LIST
+						&& $this->getInput('dropdown_options', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.', _('dropdown_options'), _('cannot be empty')));
 
 					$ret = false;
 				}
-				else if (!$this->hasInput('show_dropdown') && $this->getInput('validate_user_input', '') === '') {
-					info(_s('Incorrect value for field "%1$s": %2$s.', _('validate_user_input'), _('cannot be empty')));
+				else if ($this->getInput('input_type') == SCRIPT_MANUALINPUT_TYPE_STRING
+						&& $this->getInput('input_validation', '') === '') {
+					info(_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'), _('cannot be empty')));
 
 					$ret = false;
 				}
@@ -123,36 +126,35 @@ class CControllerScriptUpdate extends CController {
 				: SCRIPT_MANUALINPUT_DISABLED;
 
 			if ($script['manualinput']) {
-				$default_user_input = trim($this->getInput('default_user_input', ''));
-				$script['manualinput_default_value'] = trim($default_user_input);
+				$script['manualinput_validator_type'] = $this->getInput('input_type');
 
-				if ($this->hasInput('show_dropdown')) {
+				if ($script['manualinput_validator_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 					// Check if values are unique.
-					$user_input_values = array_map('trim', explode(",", $default_user_input));
+					$user_input_values = array_map('trim', explode(",", $this->getInput('dropdown_options')));
 
 					if (array_unique($user_input_values) !== $user_input_values) {
-						error(_('Default user input values should be unique.'));
+						error(_('Default user input values must be unique.'));
 					}
+
+					$script['manualinput_validator'] = implode(',', $user_input_values);
 				}
 				else {
-					$user_input_value = $default_user_input;
-					$validate_user_input = trim($this->getInput('validate_user_input'));
+					$default_input = trim($this->getInput('default_input', ''));
+					$input_validation = trim($this->getInput('input_validation'));
 
-					if (!preg_match('/'.str_replace('/', '\/', $validate_user_input).'/', $user_input_value)) {
+					if (!preg_match('/'.str_replace('/', '\/', $input_validation).'/', $default_input)) {
 						error(
-							_s('Incorrect value for field "%1$s": %2$s.', 'default_user_input',
-								_s('input does not match the provided pattern: %1$s', $validate_user_input)
+							_s('Incorrect value for field "%1$s": %2$s.', 'input_validation',
+								_s('input does not match the provided pattern: %1$s', $input_validation)
 							)
 						);
 					}
 
-					$script['manualinput_validator'] = $validate_user_input;
+					$script['manualinput_default_value'] = trim($default_input);
+					$script['manualinput_validator'] = $input_validation;
 				}
 
 				$script['manualinput_prompt'] = $this->getInput('input_prompt');
-				$script['manualinput_validator_type'] = $this->hasInput('show_dropdown')
-					? SCRIPT_MANUALINPUT_TYPE_LIST
-					: SCRIPT_MANUALINPUT_TYPE_REGEX;
 			}
 			else {
 				$script['manualinput_default_value'] = DB::getDefault('scripts', 'manualinput_default_value');

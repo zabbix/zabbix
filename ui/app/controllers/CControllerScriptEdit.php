@@ -93,7 +93,7 @@ class CControllerScriptEdit extends CController {
 			'hgstype' => 0,
 			'actions' => [],
 			'enable_user_input' => false,
-			'show_dropdown' => false
+			'input_type' => SCRIPT_MANUALINPUT_TYPE_STRING
 		];
 
 		// Get values from the database.
@@ -147,7 +147,7 @@ class CControllerScriptEdit extends CController {
 				$data['enable_user_input'] = $script['manualinput'];
 				$data['input_prompt'] = $script['manualinput_prompt'];
 				$data['input_validator'] = $script['manualinput_validator'];
-				$data['show_dropdown'] = $script['manualinput_validator_type'];
+				$data['input_type'] = $script['manualinput_validator_type'];
 				$data['input_default_value'] = $script['manualinput_default_value'];
 
 				if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {

@@ -706,19 +706,14 @@ class CScript extends CApiService {
 			if ($manualinput_type !== null) {
 				$common_fields += [
 					'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
-					'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_REGEX])]
+					'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING])],
+					'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
 				];
 			}
 
-			if ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_LIST) {
+			if ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_STRING) {
 				$common_fields += [
-					'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
-				];
-			}
-			elseif ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_REGEX) {
-				$common_fields += [
-					'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
-					'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
+					'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
 				];
 			}
 		}
@@ -726,7 +721,7 @@ class CScript extends CApiService {
 			$common_fields += [
 				'manualinput' =>				['type' =>  API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_DISABLED],
 				'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
-				'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_TYPE_REGEX],
+				'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_TYPE_STRING],
 				'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
 				'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
 			];

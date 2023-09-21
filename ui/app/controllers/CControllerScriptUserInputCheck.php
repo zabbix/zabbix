@@ -28,11 +28,11 @@ class CControllerScriptUserInputCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'validate_input' =>	'db scripts.manualinput_validator|required|string|',
-			'manual_input' =>	'required|string',
-			'show_dropdown' =>	'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_REGEX]),
-			'default_value' =>	'db scripts.manualinput_default_value|string',
-			'test' =>			'in 1'
+			'manual_input' =>		'required|string',
+			'default_input' =>		'db scripts.manualinput_default_value|string',
+			'input_type' =>			'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
+			'input_validation' =>	'db scripts.manualinput_validator',
+			'test' =>				'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,15 +55,15 @@ class CControllerScriptUserInputCheck extends CController {
 	}
 
 	protected function doAction(): void {
-		$dropdown_enabled = $this->getInput('show_dropdown');
+		$input_type = $this->getInput('input_type');
 		$manual_input = $this->getInput('manual_input');
 		$output = [];
 		$result = false;
 		$test = $this->hasInput('test');
 
 		if ($test) {
-			if ($dropdown_enabled == SCRIPT_MANUALINPUT_TYPE_LIST) {
-				$dropdown_values = explode(",", $this->getInput('default_value'));
+			if ($input_type == SCRIPT_MANUALINPUT_TYPE_LIST) {
+				$dropdown_values = explode(",", $this->getInput('input_validation'));
 
 				if (in_array($manual_input, $dropdown_values)) {
 					$result = true;
@@ -77,7 +77,7 @@ class CControllerScriptUserInputCheck extends CController {
 				}
 			}
 			else {
-				$validate_user_input = $this->getInput('validate_input');
+				$validate_user_input = $this->getInput('input_validation');
 
 				if (preg_match('/'.str_replace('/', '\/', $validate_user_input).'/', $manual_input) == false){
 					error(

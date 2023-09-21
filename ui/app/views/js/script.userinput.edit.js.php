@@ -26,16 +26,16 @@
 
 window.script_userinput_popup = new class {
 
-	init({test, show_dropdown, validate_input, default_value}) {
+	init({test, input_type, default_input, input_validation}) {
 		this.overlay = overlays_stack.getById('script-userinput-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.is_test = test;
-		this.show_dropdown = show_dropdown;
-		this.validate_input = validate_input;
-		this.default_value = default_value;
+		this.input_type = input_type;
+		this.input_validation = input_validation;
+		this.default_input = default_input;
 
-		if (show_dropdown && test) {
+		if (input_type == <?= SCRIPT_MANUALINPUT_TYPE_LIST ?> && test) {
 			document.querySelector('.userinput-submit').disabled = true;
 		}
 	}
@@ -43,11 +43,9 @@ window.script_userinput_popup = new class {
 	test() {
 		const curl = new Curl('zabbix.php');
 		const fields = getFormFields(this.form);
-		fields.show_dropdown = this.show_dropdown
-			? <?= SCRIPT_MANUALINPUT_TYPE_LIST ?>
-			: <?= SCRIPT_MANUALINPUT_TYPE_REGEX ?>;
-		fields.validate_input = this.validate_input;
-		fields.default_value = this.default_value;
+		fields.input_type = this.input_type;
+		fields.input_validation = this.input_validation;
+		fields.default_input = this.default_input;
 
 		if (this.is_test) {
 			fields.test = 1;

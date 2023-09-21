@@ -28,30 +28,24 @@ $form = (new CForm())
 	->setId('script-userinput-form')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
-if ($data['show_dropdown']) {
+if ($data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 	$form
-		->addItem(
-			(new CSpan($data['input_prompt']))->addClass(ZBX_STYLE_WORDBREAK)
-		)
+		->addItem((new CSpan($data['input_prompt']))->addClass(ZBX_STYLE_WORDBREAK))
 		->addItem(
 			(new CSelect('manual_input'))
 				->addStyle('margin-top: 8px;')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->addOptions(CSelect::createOptionsFromArray(
-					$data['dropdown_options']
-				))
+				->addOptions(CSelect::createOptionsFromArray($data['dropdown_options']))
 		);
 }
 else {
 	$form
+		->addItem((new CSpan($data['input_prompt']))->addClass(ZBX_STYLE_WORDBREAK))
 		->addItem(
-			(new CSpan($data['input_prompt']))
-				->addClass(ZBX_STYLE_WORDBREAK)
-		)
-		->addItem(
-			new CFormField((new CTextBox('manual_input', $data['default_value']))
-				->addStyle('margin-top: 8px;')
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			new CFormField(
+				(new CTextBox('manual_input', $data['default_input']))
+					->addStyle('margin-top: 8px;')
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
 		);
 }
@@ -82,9 +76,9 @@ $form
 	->addItem(
 		(new CScriptTag('script_userinput_popup.init('.json_encode([
 				'test' => $data['test'],
-				'show_dropdown' => $data['show_dropdown'],
-				'validate_input' => $data['validate_input'],
-				'default_value' => $data['default_value']
+				'input_type' => $data['input_type'],
+				'default_input' => $data['default_input'],
+				'input_validation' => $data['input_validation']
 			]).');'))->setOnDocumentReady()
 	);
 

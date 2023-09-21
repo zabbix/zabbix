@@ -107,7 +107,7 @@ window.script_edit_popup = new class {
 		this.form.querySelector('#enable-confirmation').onchange = (e) => this.#loadConfirmationFields(e);
 
 		// Test user input button.
-		this.form.querySelector('#test-user-input').addEventListener('click', (e) =>
+		this.form.querySelector('#test-user-input').addEventListener('click', () =>
 			this.#openTestPopup()
 		);
 
@@ -128,15 +128,22 @@ window.script_edit_popup = new class {
 	}
 
 	#openTestPopup() {
+		const input_validation = this.input_type == <?= SCRIPT_MANUALINPUT_TYPE_STRING ?>
+			? this.form.querySelector('#input_validation').value
+			: this.form.querySelector('#dropdown_options').value;
+
+		const default_input = this.input_type == <?= SCRIPT_MANUALINPUT_TYPE_STRING ?>
+			? this.form.querySelector('#default_input').value
+			: '';
+
 		const parameters = {
 			input_prompt: this.form.querySelector('#input_prompt').value,
-			default_value: this.form.querySelector('#default_user_input').value,
-			show_dropdown: this.show_dropdown_checked
-				? <?= SCRIPT_MANUALINPUT_TYPE_LIST ?>
-				: <?= SCRIPT_MANUALINPUT_TYPE_REGEX ?>,
-			validate_input: this.form.querySelector('#validate_user_input').value,
+			default_input: default_input,
+			input_type: this.input_type,
+			input_validation: input_validation,
 			test: 1
 		};
+
 		PopUp('script.userinput.edit', parameters, {
 			dialogueid: 'script-userinput-form',
 			dialogue_class: 'modal-popup-small'
@@ -424,69 +431,106 @@ window.script_edit_popup = new class {
 			this.user_input_checked = event.target.checked;
 		}
 
-		const user_input_prompt = this.form.querySelector('#input_prompt');
+		const input_prompt = this.form.querySelector('#input_prompt');
 		const test_user_input = this.form.querySelector('#test-user-input');
-		const validate_user_input = this.form.querySelector('#validate_user_input');
-		const default_user_input = this.form.querySelector('#default_user_input');
-		const show_dropdown = this.form.querySelector('#show_dropdown');
-
-		this.show_dropdown_checked = this.form.querySelector('#show_dropdown').checked;
+		const input_type = this.form.querySelector('#input_type');
+		const default_input = this.form.querySelector('#default_input');
+		const input_validation = this.form.querySelector('#input_validation');
+		const dropdown_options = this.form.querySelector('#dropdown_options');
+		this.input_type = this.form.querySelector('input[name="input_type"]:checked').value;
 
 		if (this.user_input_checked) {
-			// Enable all user input fields.
-			show_dropdown.disabled = false;
-			validate_user_input.disabled = false;
-			user_input_prompt.disabled = false;
-			default_user_input.disabled = false;
+			// Add asterisk mark to Input prompt field:
+			$('label[for=input_prompt]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 
-			// Hide/show Validate user input field:
-			show_dropdown.onchange = (e) => {
-				this.show_dropdown_checked = e.target.checked;
+			const enable_elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
 
-				if (this.show_dropdown_checked) {
-					this.form.querySelector('#validate-input-label').style.display = 'none';
-					this.form.querySelector('#validate-input-field').style.display = 'none';
+			enable_elements.forEach(element => element.disabled = false);
 
-					const updateTestUserInput = () => {
-						test_user_input.disabled = !(
-							user_input_prompt.value !== '' && default_user_input.value !== '' && this.user_input_checked
-						);
-					};
-
-					user_input_prompt.onkeyup = updateTestUserInput;
-					default_user_input.onkeyup = updateTestUserInput;
-
-					user_input_prompt.dispatchEvent(new Event('keyup'));
-					default_user_input.dispatchEvent(new Event('keyup'));
-				}
-				else {
-					this.form.querySelector('#validate-input-label').style.display = '';
-					this.form.querySelector('#validate-input-field').style.display = '';
-
-					const updateTestUserInput = () => {
-						test_user_input.disabled = !(
-							user_input_prompt.value !== '' && validate_user_input.value !== ''
-								&& this.user_input_checked
-						);
-					};
-
-					user_input_prompt.onkeyup = updateTestUserInput;
-					validate_user_input.onkeyup = updateTestUserInput;
-
-					user_input_prompt.dispatchEvent(new Event('keyup'));
-					validate_user_input.dispatchEvent(new Event('keyup'));
-				}
-			};
+			input_type.querySelectorAll('input').forEach(function(element) {
+				element.disabled = false;
+			});
 		}
 		else {
-			const disable_elements = [
-				user_input_prompt, test_user_input, show_dropdown, default_user_input, validate_user_input
-			];
+			$('label[for=input_prompt]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+
+			const disable_elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
 
 			disable_elements.forEach(element => element.disabled = true);
+
+			input_type.querySelectorAll('input').forEach(function(element) {
+				element.disabled = true;
+			});
 		}
 
-		this.form.querySelector('#show_dropdown').dispatchEvent(new Event('change'));
+		input_type.onchange = (e) => {
+			if (e.target.value != undefined) {
+				this.input_type = e.target.value;
+			}
+
+			if (this.input_type == <?= SCRIPT_MANUALINPUT_TYPE_STRING ?>) {
+				this.form.querySelector('#default-input-label').style.display = '';
+				this.form.querySelector('#default-input-field').style.display = '';
+
+				this.form.querySelector('#input-validation-label').style.display = '';
+				this.form.querySelector('#input-validation-field').style.display = '';
+
+				this.form.querySelector('#dropdown-options-label').style.display = 'none';
+				this.form.querySelector('#dropdown-options-field').style.display = 'none';
+
+				if (this.user_input_checked) {
+					$('label[for=input-validation]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				}
+				else {
+					$('label[for=input-validation]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				}
+
+				const updateTestUserInput = () => {
+					test_user_input.disabled = !(
+						input_prompt.value !== '' && input_validation.value !== ''
+						&& this.user_input_checked
+					);
+				};
+
+				input_prompt.onkeyup = updateTestUserInput;
+				input_validation.onkeyup = updateTestUserInput;
+
+				input_prompt.dispatchEvent(new Event('keyup'));
+				input_validation.dispatchEvent(new Event('keyup'));
+			}
+			else {
+				this.form.querySelector('#default-input-label').style.display = 'none';
+				this.form.querySelector('#default-input-field').style.display = 'none';
+
+				this.form.querySelector('#input-validation-label').style.display = 'none';
+				this.form.querySelector('#input-validation-field').style.display = 'none';
+
+				this.form.querySelector('#dropdown-options-label').style.display = '';
+				this.form.querySelector('#dropdown-options-field').style.display = '';
+				dropdown_options.disabled = !this.user_input_checked;
+
+				if (this.user_input_checked) {
+					$('label[for=dropdown_options]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				}
+				else {
+					$('label[for=dropdown_options]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+				}
+
+				const updateTestUserInput = () => {
+					test_user_input.disabled = !(
+						input_prompt.value !== '' && dropdown_options.value !== '' && this.user_input_checked
+					);
+				};
+
+				input_prompt.onkeyup = updateTestUserInput;
+				dropdown_options.onkeyup = updateTestUserInput;
+
+				input_prompt.dispatchEvent(new Event('keyup'));
+				dropdown_options.dispatchEvent(new Event('keyup'));
+			}
+		}
+
+		this.form.querySelector('#input_type').dispatchEvent(new Event('change'));
 	}
 
 	/**
@@ -504,6 +548,7 @@ window.script_edit_popup = new class {
 		const test_confirmation = this.form.querySelector('#test-confirmation');
 
 		if (this.confirmation) {
+			$('label[for=confirmation]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 			confirmation.removeAttribute('disabled');
 
 			confirmation.onkeyup = () => confirmation.value !== ''
@@ -513,6 +558,7 @@ window.script_edit_popup = new class {
 			confirmation.dispatchEvent(new Event('keyup'));
 		}
 		else {
+			$('label[for=confirmation]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 			confirmation.setAttribute('disabled', 'disabled');
 			test_confirmation.setAttribute('disabled', 'disabled');
 		}
