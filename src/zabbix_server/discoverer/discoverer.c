@@ -922,7 +922,6 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 	if (0 != results.values_num)
 	{
-
 		void	*handle;
 
 		handle = zbx_discovery_open();
@@ -1753,6 +1752,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_vector_uint64_t		del_druleids;
 	zbx_hashset_t			incomplete_druleids;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
+	zbx_uint64_t			rev_last = 0;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -1793,35 +1793,40 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int		processing_rules_num, i, more_results;
+		int		processing_rules_num, i, more_results, is_drules_rev_updated;
 		zbx_uint64_t	queue_used, unsaved_checks;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
-		zbx_vector_uint64_clear(&del_druleids);
-
 		/* update local drules revisions */
+
+		zbx_vector_uint64_clear(&del_druleids);
 		zbx_vector_uint64_pair_clear(&revisions);
-		zbx_dc_drule_revisions_get(&revisions);
+		is_drules_rev_updated = zbx_dc_drule_revisions_get(&rev_last, &revisions);
 
 		discoverer_queue_lock(&dmanager.queue);
 
-		for (i = 0; i < dmanager.job_refs.values_num; i++)
+		if (SUCCEED == is_drules_rev_updated)
 		{
-			int			k;
-			zbx_uint64_pair_t	revision;
-			zbx_discoverer_job_t	*job = dmanager.job_refs.values[i];
-
-			revision.first = job->druleid;
-
-			if (FAIL == (k = zbx_vector_uint64_pair_bsearch(&revisions, revision,
-					ZBX_DEFAULT_UINT64_COMPARE_FUNC)) ||
-					revisions.values[k].second != job->drule_revision)
+			for (i = 0; i < dmanager.job_refs.values_num; i++)
 			{
-				zbx_vector_uint64_append(&del_druleids, job->druleid);
-				dmanager.queue.pending_checks_count -= discoverer_job_tasks_free(job);
+				int			k;
+				zbx_uint64_pair_t	revision;
+				zbx_discoverer_job_t	*job = dmanager.job_refs.values[i];
+
+				revision.first = job->druleid;
+
+				if (FAIL == (k = zbx_vector_uint64_pair_bsearch(&revisions, revision,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC)) ||
+						revisions.values[k].second != job->drule_revision)
+				{
+					zbx_vector_uint64_append(&del_druleids, job->druleid);
+					dmanager.queue.pending_checks_count -= discoverer_job_tasks_free(job);
+				}
 			}
+
+			nextcheck = 0;
 		}
 
 		processing_rules_num = dmanager.job_refs.values_num;
@@ -1853,9 +1858,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					discoverer_check_count_compare);
 
 			rule_count = process_discovery(&nextcheck, &incomplete_druleids, &jobs, &check_counts);
-
-			if (0 == nextcheck)
-				nextcheck = time(NULL) + DISCOVERER_DELAY;
 
 			if (0 < rule_count)
 			{
