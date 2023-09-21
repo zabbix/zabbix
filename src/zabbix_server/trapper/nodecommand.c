@@ -32,7 +32,7 @@ extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 /**********************************************************************************
  *                                                                                *
- * Purpose: replace occurence of macro in input string with value given in        *
+ * Purpose: replace occurrence of macro in input string with value given in       *
  *          macrovalue, with memory management                                    *
  *                                                                                *
  * Parameters:  in               - [IN] input string to be processed              *
