@@ -92,8 +92,8 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_SNMP_WALK_TO_JSON;
 	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_VALUE"))
 		return ZBX_PREPROC_SNMP_WALK_TO_VALUE;
-	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_GET_TO_VALUE"))
-		return ZBX_PREPROC_SNMP_GET_TO_VALUE;
+	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_GET_VALUE"))
+		return ZBX_PREPROC_SNMP_GET_VALUE;
 	if (0 == strcmp(str, "ZBX_PREPROC_SCRIPT"))
 		return ZBX_PREPROC_SCRIPT;
 

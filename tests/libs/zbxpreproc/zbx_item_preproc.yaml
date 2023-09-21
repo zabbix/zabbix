@@ -2780,7 +2780,7 @@ in:
     data: |
       74 65 73 74 20 D1 91
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '1'
 out:
   return: SUCCEED
@@ -2794,7 +2794,7 @@ in:
     data: |
       74 65 73 74 20 D1 91 00
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '1'
 out:
   return: SUCCEED
@@ -2808,7 +2808,7 @@ in:
     data: |
       74 65 X3 74 20 D1 91
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '1'
 out:
   return: FAIL
@@ -2821,7 +2821,7 @@ in:
     data: |
       74 65 74 20 D1 9
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '1'
 out:
   return: FAIL
@@ -2834,7 +2834,7 @@ in:
     data: |
       74 65 73 74 20 D1 91 FF
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '1'
 out:
   return: SUCCEED
@@ -2848,7 +2848,7 @@ in:
     data: |
       74 65 73 74 20 D1
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '2'
 out:
   return: SUCCEED
@@ -2862,7 +2862,7 @@ in:
     data: |
       74 65 73 74 XX
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '2'
 out:
   return: FAIL
@@ -2875,7 +2875,7 @@ in:
     data: |
       FE EE 15 15
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '3'
 out:
   return: SUCCEED
@@ -2889,7 +2889,7 @@ in:
     data: |
       01
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '3'
 out:
   return: SUCCEED
@@ -2903,7 +2903,7 @@ in:
     data: |
       00 00 00
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '3'
 out:
   return: SUCCEED
@@ -2917,7 +2917,7 @@ in:
     data: |
       01 02 03 04 05 06 07 08 09 10
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '3'
 out:
   return: SUCCEED
@@ -2931,7 +2931,7 @@ in:
     data: |
       01 02 03 04 05 06 07 08
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '3'
 out:
   return: SUCCEED
@@ -2945,7 +2945,7 @@ in:
     data: |
       01 02 03 04 05 06 07 0
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '3'
 out:
   return: FAIL
@@ -2958,7 +2958,7 @@ in:
     data: |
       .QW 11
   step:
-    type: ZBX_PREPROC_SNMP_GET_TO_VALUE
+    type: ZBX_PREPROC_SNMP_GET_VALUE
     params: '3'
 out:
   return: FAIL

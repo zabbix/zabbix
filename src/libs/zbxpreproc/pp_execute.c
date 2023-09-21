@@ -1144,7 +1144,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		case ZBX_PREPROC_SNMP_WALK_TO_JSON:
 			ret = pp_execute_snmp_to_json(value, params);
 			goto out;
-		case ZBX_PREPROC_SNMP_GET_TO_VALUE:
+		case ZBX_PREPROC_SNMP_GET_VALUE:
 			ret = pp_execute_snmp_get_to_value(value, params);
 			goto out;
 		default:
