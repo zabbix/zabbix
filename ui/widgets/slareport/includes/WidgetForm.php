@@ -92,7 +92,9 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(ZBX_SLA_DEFAULT_REPORTING_PERIODS)
 			)
 			->addField(
-				(new CWidgetFieldTimePeriod('date_period'))->setDateOnly()
+				(new CWidgetFieldTimePeriod('date_period'))
+					->setDateOnly()
+					->setMaxPeriod(null)
 			);
 	}
 }

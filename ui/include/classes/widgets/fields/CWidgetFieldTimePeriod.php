@@ -45,11 +45,17 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	private array $default_period = ['from' => '', 'to' => ''];
 
+	private ?int $min_period;
+	private ?int $max_period;
+
 	private ?DateTimeZone $timezone = null;
 	private bool $is_date_only = false;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
+
+		$this->min_period = CTimePeriodHelper::getMinPeriod();
+		$this->max_period = CTimePeriodHelper::getMaxPeriod();
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
@@ -128,8 +134,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			$errors = CTimePeriodValidator::validate($field_value, [
 				'require_not_empty' => (bool) ($validation_rules['fields']['from']['flags'] & API_NOT_EMPTY),
-				'min_period' => CTimePeriodHelper::getMinPeriod(),
-				'max_period' => CTimePeriodHelper::getMaxPeriod(),
+				'min_period' => $this->min_period,
+				'max_period' => $this->max_period,
 				'from_label' => ($field_label !== '' ? $field_label.'/' : '').$this->getFromLabel(),
 				'to_label' => ($field_label !== '' ? $field_label.'/' : '').$this->getToLabel()
 			]);
@@ -241,6 +247,18 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	 */
 	public function setDefaultPeriod(array $period): self {
 		$this->default_period = $period;
+
+		return $this;
+	}
+
+	public function setMinPeriod(?int $min_period): self {
+		$this->min_period = $min_period;
+
+		return $this;
+	}
+
+	public function setMaxPeriod(?int $max_period): self {
+		$this->max_period = $max_period;
 
 		return $this;
 	}
