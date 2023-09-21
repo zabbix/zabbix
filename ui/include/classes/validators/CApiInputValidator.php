@@ -449,20 +449,6 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$errors = expressionHighLevelErrors($data);
-
-		if ($errors) {
-			$_errors = [];
-
-			foreach ($errors as $expression => $message) {
-				$_errors[] = mb_strtolower($message).' - '.$expression;
-			}
-
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, implode('; ', $_errors));
-
-			return false;
-		}
-
 		return true;
 	}
 

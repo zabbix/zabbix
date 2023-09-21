@@ -3490,13 +3490,14 @@ class testCalculatedFormula extends CWebTest {
 					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4),"$.last_name")'
 				]
 			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'formula' => 'jsonpath(avg(/Simple form test host/test-item-form4,#1:now-5m),"$.[0].last_name","last_name")',
-					'error' => 'Invalid parameter "/1/params": incorrect item value type - avg(/Simple form test host/test-item-form4,#1:now-5m).'
-				]
-			],
+			// TODO: uncomment after release with ZBXNEXT-8638; see ZBXNEXT-8643 (3).
+//			[
+//				[
+//					'expected' => TEST_BAD,
+//					'formula' => 'jsonpath(avg(/Simple form test host/test-item-form4,#1:now-5m),"$.[0].last_name","last_name")',
+//					'error' => 'Incorrect item value type "Text" provided for trigger function "avg".'
+//				]
+//			],
 			[
 				[
 					'expected' => TEST_BAD,
