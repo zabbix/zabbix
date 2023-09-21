@@ -247,7 +247,7 @@ class CTriggerGeneralHelper {
 		$flag = (array_key_exists('parent_discoveryid', $input_data))
 			? ZBX_FLAG_DISCOVERY_PROTOTYPE
 			: ZBX_FLAG_DISCOVERY_NORMAL;
-		$resolved_trigger = CMacrosResolverHelper::resolveTriggerExpressions([$trigger],
+		$resolved_triggers = CMacrosResolverHelper::resolveTriggerExpressions([$trigger],
 			['sources' => ['expression', 'recovery_expression']]
 		);
 
@@ -255,7 +255,7 @@ class CTriggerGeneralHelper {
 			$input_data['hostid'] = $trigger['hosts'][0]['hostid'];
 		}
 
-		$data = array_merge($input_data, reset($resolved_trigger));
+		$data = array_merge($input_data, reset($resolved_triggers));
 
 		// Get templates.
 		$data['templates'] = makeTriggerTemplatesHtml($data['triggerid'],
