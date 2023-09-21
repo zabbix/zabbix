@@ -854,6 +854,7 @@ int	item_preproc_snmp_get_to_value(zbx_variant_t *value, const char *params, cha
 		return FAIL;
 
 	zbx_remove_chars(value->data.str, "\r\n");
+	zbx_rtrim(value->data.str, " ");
 
 	switch ((format = atoi(params)))
 	{
