@@ -56,6 +56,18 @@ window.script_userinput_popup = new class {
 		this.#post(curl.getUrl(), fields);
 	}
 
+	submit() {
+		const fields = getFormFields(this.form);
+		fields.input_type = this.input_type;
+		fields.input_validation = this.input_validation;
+		fields.default_input = this.default_input;
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'script.userinput.check');
+		this.#post(curl.getUrl(), fields);
+	}
+
 	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
@@ -76,6 +88,15 @@ window.script_userinput_popup = new class {
 				}
 				else if ('success' in response) {
 					messages = response.success.messages;
+
+					const message_box = makeMessageBox('good', messages)[0];
+					this.form.parentNode.insertBefore(message_box, this.form);
+				}
+				else if ('data' in response) {
+					console.log(response);
+					debugger;
+					overlayDialogueDestroy(this.overlay.dialogueid);
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 
 				const message_box = makeMessageBox('good', messages)[0];

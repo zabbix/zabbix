@@ -1133,7 +1133,8 @@ class CScript extends CApiService {
 		$scripts = $this->get([
 			'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 				'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username', 'password',
-				'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
+				'publickey', 'privatekey', 'menu_path', 'url', 'new_window', 'manualinput', 'manualinput_prompt',
+				'manualinput_validator', 'manualinput_validator_type', 'manualinput_default_value'
 			],
 			'hostids' => $hostids,
 			'sortfield' => 'name',

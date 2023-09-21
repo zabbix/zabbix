@@ -67,7 +67,7 @@ else {
 			'title' => _('Execute'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'script_userinput_popup.execute();',
+			'action' => 'script_userinput_popup.submit();',
 		]
 	];
 }

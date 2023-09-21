@@ -1417,7 +1417,12 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_
 				scriptid: script.scriptid,
 				confirmation: script.confirmation,
 				hostid: hostid,
-				eventid: eventid
+				eventid: eventid,
+				manualinput: script.manualinput,
+				manualinput_prompt: script.manualinput_prompt,
+				manualinput_validator_type: script.manualinput_validator_type,
+				manualinput_validator: script.manualinput_validator,
+				manualinput_default_value: script.manualinput_default_value
 			});
 		}
 	}
@@ -1549,7 +1554,9 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 						.closest('.menu-popup-top')
 						.menuPopup('close', trigger_elm, false);
 					executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
-						data.params.eventid, csrf_token
+						data.params.eventid, csrf_token, data.params.manualinput, data.params.manualinput_prompt,
+						data.params.manualinput_validator_type, data.params.manualinput_validator,
+						data.params.manualinput_default_value
 					);
 					cancelEvent(e);
 				};

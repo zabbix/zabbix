@@ -554,7 +554,8 @@ function overlayDialogue(params, trigger_elmnt) {
  * @param string eventid			Event ID.
  * @param string csrf_token			CSRF token.
  */
-function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token) {
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token, manualinput,
+	manualinput_prompt, manualinput_validator_type, manualinput_validator, manualinput_default_value) {
 	var execute = function() {
 		var popup_options = {scriptid: scriptid};
 
@@ -573,7 +574,25 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 		}
 	};
 
-	if (confirmation.length > 0) {
+	if (manualinput == 1) {
+		const parameters = {
+			input_prompt: manualinput_prompt,
+			default_input: manualinput_default_value,
+			input_type: manualinput_validator_type,
+			input_validation: manualinput_validator
+		};
+
+		const overlay = PopUp('script.userinput.edit', parameters, {
+			dialogueid: 'script-userinput-form',
+			dialogue_class: 'modal-popup-small'
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+			const manualinput_value = e.detail.data.manualinput;
+		});
+	}
+
+	if (manualinput == 0 && confirmation.length > 0) {
 		overlayDialogue({
 			'title': t('Execution confirmation'),
 			'content': jQuery('<span>')
@@ -600,9 +619,9 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 
 		return false;
 	}
-	else {
-		execute();
-	}
+	// else {
+	// 	execute();
+	// }
 }
 
 (function($) {
