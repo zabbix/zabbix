@@ -133,6 +133,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			}
 
 			$errors = CTimePeriodValidator::validate($field_value, [
+				'require_date_only' => $this->is_date_only,
 				'require_not_empty' => (bool) ($validation_rules['fields']['from']['flags'] & API_NOT_EMPTY),
 				'min_period' => $this->min_period,
 				'max_period' => $this->max_period,
