@@ -1000,9 +1000,8 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute 'snmp to value' step                                      *
  *                                                                            *
- * Parameters: cache  - [IN/OUT] preprocessing cache                          *
- *             value  - [IN/OUT] value to process                             *
- *             params - [IN] step parameters                                  *
+ * Parameters:  value  - [IN/OUT] value to process                            *
+ *              params - [IN] step parameters                                 *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *

@@ -2150,6 +2150,7 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 	{
 		zbx_snprintf(error, max_error_len, "No variables");
 		ret = NOTSUPPORTED;
+		bulkwalk_context->running = 0;
 	}
 
 	for (var = response->variables; NULL != var; var = var->next_variable)
