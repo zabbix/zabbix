@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-09-07 11:40+0000\n"
+"PO-Revision-Date: 2023-09-12 12:01+0000\n"
 "Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -935,6 +935,10 @@ msgstr "Добавить"
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
 msgstr "Добавить (достигнуто максимальное количество типов сообщений)"
+
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -14507,7 +14511,7 @@ msgstr "Имя нового тега"
 
 #: app/views/template.edit.php:352
 msgid "New template"
-msgstr ""
+msgstr "Новый шаблон"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
@@ -14524,7 +14528,7 @@ msgstr "Новое соответствие группы пользовател�
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Next dashboard"
-msgstr ""
+msgstr "Следующая панель"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16617,7 +16621,7 @@ msgstr "Предпросмотр"
 
 #: app/views/monitoring.host.dashboard.view.php:133
 msgid "Previous dashboard"
-msgstr ""
+msgstr "Предыдущая панель"
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -25619,6 +25623,10 @@ msgstr "now() - Количество секунд начиная с Epoch"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "число"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

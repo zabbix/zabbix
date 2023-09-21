@@ -169,7 +169,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				],
 				'severities' => $filter_severities,
 				'evaltype' => $this->fields_values['evaltype'],
-				'tags' => $this->fields_values['tags'],
+				'tags' => $this->fields_values['tags'] ?: null,
 				'acknowledged' => ($filter_ext_ack == EXTACK_OPTION_UNACK) ? false : null,
 				'suppressed' => ($filter_show_suppressed == ZBX_PROBLEM_SUPPRESSED_FALSE) ? false : null,
 				'symptom' => false
