@@ -1006,7 +1006,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 				// Days count for the case when current or past year is leap year.
 				$days_count = CDateTimeHelper::countDays();
 				$this->assertEquals('Maximum time period to display is '.$days_count.' days.',
-						$this->query('xpath://ul[@data-error-for="to"]')->waitUntilVisible()->one()->getText());
+						$this->query('xpath://ul[@data-error-for="from"]')->waitUntilVisible()->one()->getText());
 				break;
 		}
 	}
