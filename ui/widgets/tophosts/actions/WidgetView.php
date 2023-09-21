@@ -139,7 +139,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (!$has_text_column && $item_names) {
 			$hosts_with_items = [];
 
-			foreach ($item_names as $column_index => $item_name) {;
+			foreach ($item_names as $column_index => $item_name) {
 				$numeric_only = self::isNumericOnlyColumn($configuration[$column_index]);
 				$items[$column_index] = self::getItems($item_name, $numeric_only, $groupids, $hostids);
 
@@ -417,11 +417,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private static function isNumericOnlyColumn(array $column): bool {
-		return ($column['aggregate_function'] != AGGREGATE_NONE
-				&& $column['aggregate_function'] != AGGREGATE_LAST
-				&& $column['aggregate_function'] != AGGREGATE_FIRST
-				&& $column['aggregate_function'] != AGGREGATE_COUNT
-			) || $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS;
+		$aggregate_functions = [AGGREGATE_NONE, AGGREGATE_LAST, AGGREGATE_FIRST, AGGREGATE_COUNT];
+
+		return (!in_array($column['aggregate_function'], $aggregate_functions))
+			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS;
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
@@ -485,12 +484,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$range_time_parser = new CRangeTimeParser();
 
-			$time_from = $column['time_from'];
-			$range_time_parser->parse($time_from);
+			$range_time_parser->parse($column['time_from']);
 			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
 
-			$time_to = $column['time_to'];
-			$range_time_parser->parse($time_to);
+			$range_time_parser->parse($column['time_to']);
 			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
 			$from = time() - $history_period;
@@ -498,12 +495,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			self::addDataSource($items, $from, $time_now, $column['history']);
 		}
 
-		$function = $aggregate_function == AGGREGATE_NONE ? AGGREGATE_LAST : $aggregate_function;
-
 		foreach ($items as $item) {
 			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 				$values = Manager::History()->getAggregationByInterval(
-					$items, $time_from, $time_to, $function, $time_from
+					[$item], $time_from, $time_to, $aggregate_function, $time_from
 				);
 
 				if ($values) {
@@ -519,8 +514,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($aggregate_function == AGGREGATE_LAST || $aggregate_function == AGGREGATE_FIRST
 						|| $aggregate_function == AGGREGATE_COUNT) {
-					$non_numeric_history = Manager::History()->getAggregatedValue($item, $function, $time_from,
-						$time_to);
+					$non_numeric_history = Manager::History()->getAggregatedValue($item, $aggregate_function,
+						$time_from, $time_to);
 				}
 
 				if ($aggregate_function == AGGREGATE_COUNT) {

@@ -1182,9 +1182,10 @@ class CHistoryManager {
 	 *
 	 * The $item parameter must have the value_type and itemid properties set.
 	 *
-	 * @param array  $item         Item to get aggregated value for.
-	 * @param string $aggregation  Aggregation to be applied (min / max / avg).
-	 * @param int    $time_from    Timestamp (seconds).
+	 * @param array     $item         Item to get aggregated value for.
+	 * @param string    $aggregation  Aggregation to be applied (min / max / avg).
+	 * @param int       $time_from    Timestamp indicating start of time period (seconds).
+	 * @param int|null  $time_to      Timestamp indicating end of time period (seconds) or null.
 	 *
 	 * @return string  Aggregated history value.
 	 */
