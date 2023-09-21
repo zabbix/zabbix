@@ -2,9 +2,16 @@
 
 div.dashboard-widget-hostavail {
 	.host-avail-widget {
+		thead {
+			th.host-avail-total {
+				border-top: 1px solid $table-border-color;
+			}
+		}
+
 		tbody {
 			tr {
 				th {
+					color: $font-alt-color;
 					min-width: 100px;
 					width: 15%;
 				}
@@ -57,6 +64,24 @@ div.dashboard-widget-hostavail {
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-hostavail {
 		.host-avail-widget {
+			thead {
+				th {
+					color: $font-color;
+
+					&.host-avail-total {
+						border-top: none;
+					}
+				}
+			}
+
+			tbody {
+				tr {
+					th {
+						color: $font-color;
+					}
+				}
+			}
+
 			td:not(:first-child) {
 				border-left: 1px solid $ui-border-color;
 			}

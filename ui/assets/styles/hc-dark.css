@@ -3753,7 +3753,10 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
+div.dashboard-widget-hostavail .host-avail-widget thead th.host-avail-total {
+  border-top: 1px solid #333333; }
 div.dashboard-widget-hostavail .host-avail-widget tbody tr th {
+  color: #cacaca;
   min-width: 100px;
   width: 15%; }
 div.dashboard-widget-hostavail .host-avail-widget tbody tr td {
@@ -3780,6 +3783,12 @@ div.dashboard-widget-hostavail .host-avail-widget td:last-child {
 div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
   border-left: 1px dotted #333333; }
 
+div.dashboard-widget-hostavail .host-avail-widget thead th {
+  color: #ffffff; }
+  div.dashboard-widget-hostavail .host-avail-widget thead th.host-avail-total {
+    border-top: none; }
+div.dashboard-widget-hostavail .host-avail-widget tbody tr th {
+  color: #ffffff; }
 div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
   border-left: 1px solid #444444; }
 div.dashboard-widget-hostavail .host-avail-widget th.host-avail-true, div.dashboard-widget-hostavail .host-avail-widget th.host-avail-false, div.dashboard-widget-hostavail .host-avail-widget th.host-avail-mixed, div.dashboard-widget-hostavail .host-avail-widget th.host-avail-unknown, div.dashboard-widget-hostavail .host-avail-widget th.host-avail-total,

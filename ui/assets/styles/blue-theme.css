@@ -3792,7 +3792,10 @@ div.dashboard-widget-gauge {
     div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
       display: block; }
 
+div.dashboard-widget-hostavail .host-avail-widget thead th.host-avail-total {
+  border-top: 1px solid #ebeef0; }
 div.dashboard-widget-hostavail .host-avail-widget tbody tr th {
+  color: #768d99;
   min-width: 100px;
   width: 15%; }
 div.dashboard-widget-hostavail .host-avail-widget tbody tr td {

@@ -3800,7 +3800,10 @@ div.dashboard-widget-gauge {
     div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
       display: block; }
 
+div.dashboard-widget-hostavail .host-avail-widget thead th.host-avail-total {
+  border-top: 1px solid #383838; }
 div.dashboard-widget-hostavail .host-avail-widget tbody tr th {
+  color: #737373;
   min-width: 100px;
   width: 15%; }
 div.dashboard-widget-hostavail .host-avail-widget tbody tr td {
@@ -3817,7 +3820,7 @@ div.dashboard-widget-hostavail .host-avail-widget .host-avail-mixed {
   background: #f1a50b; }
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown {
   color: #f2f2f2;
-  background: #2b2b2b; }
+  background: #737373; }
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
   color: #f2f2f2;
   background: transparent; }
