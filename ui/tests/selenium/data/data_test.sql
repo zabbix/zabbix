@@ -702,7 +702,7 @@ INSERT INTO interface (interfaceid, hostid, main, type, useip, ip, port) VALUES 
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99098, 0, 40001, 'testFormItem1', 'testFormItems', 'test-item-form1', 30, 40011, '', 1, '', '');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99099, 0, 40001, 'testFormItem2', 'testFormItems', 'test-item-form2', 30, 40011, '', 1, '', '');
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99100, 0, 40001, 'testFormItem3', 'testFormItems', 'test-item-form3', 30, 40011, '', 1, '', '');
-INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers, value_type) VALUES (99101, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '', 1, '', '',4);
+INSERT INTO items (itemid, type, hostid, name, description, key_, delay, interfaceid, params, formula, posts, headers) VALUES (99101, 0, 40001, 'testFormItem4', 'testFormItems', 'test-item-form4', 30, 40011, '', 1, '', '');
 
 -- testFormTrigger.SimpleCreate
 INSERT INTO items (itemid, type, hostid, name, description, key_, delay, history, trends, status, value_type, trapper_hosts, units, logtimefmt, templateid, valuemapid, params, ipmi_sensor, authtype, username, password, publickey, privatekey, flags, interfaceid, posts, headers) VALUES (99102, 0, 40001, 'testFormItem', 'testFormItems', 'test-item-reuse', '30s', '90d', '365d', 0, 0, '', '', '', NULL, NULL, '', '', 0, '', '', '', '', 0, 40011, '', '');
