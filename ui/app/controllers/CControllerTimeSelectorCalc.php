@@ -73,17 +73,26 @@ class CControllerTimeSelectorCalc extends CController {
 	}
 
 	protected function doAction() {
-		$time_period = ['from' => $this->getInput('from'), 'to' => $this->getInput('to')];
+		$range_time_parser = new CRangeTimeParser();
 
-		$min_period = CTimePeriodHelper::getMinPeriod();
-		$max_period = CTimePeriodHelper::getMaxPeriod();
+		$time_period = [
+			'from' => $this->getInput('from'),
+			'to' => $this->getInput('to')
+		];
 
-		$fields_typed_errors = CTimePeriodValidator::validateRaw($time_period, [
-			'min_period' => $min_period,
-			'max_period' => $max_period
-		]);
+		$has_fields_errors = false;
 
-		if (!$fields_typed_errors && $this->hasInput('method')) {
+		foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
+			if ($range_time_parser->parse($time_period[$field]) == CParser::PARSE_SUCCESS) {
+				$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+			}
+			else {
+				$has_fields_errors = true;
+				break;
+			}
+		}
+
+		if (!$has_fields_errors) {
 			switch ($this->getInput('method')) {
 				case 'zoomout':
 					CTimePeriodHelper::zoomOut($time_period);
@@ -96,37 +105,16 @@ class CControllerTimeSelectorCalc extends CController {
 					break;
 			}
 
-			$fields_typed_errors = CTimePeriodValidator::validateRaw($time_period, [
-				'min_period' => $min_period,
-				'max_period' => $max_period
-			]);
+			$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;
+
+			$min_period = CTimePeriodHelper::getMinPeriod();
+			$max_period = CTimePeriodHelper::getMaxPeriod();
+
+			$has_fields_errors = $period < $min_period || $period > $max_period + 1;
 		}
 
-		$fields_errors = [];
-
-		foreach ($fields_typed_errors as $field => $error_type) {
-			switch ($error_type) {
-				case CTimePeriodValidator::ERROR_TYPE_INVALID_RANGE:
-				case CTimePeriodValidator::ERROR_TYPE_INVALID_MIN_PERIOD:
-					$fields_errors[$field] = _n('Minimum time period to display is %1$s minute.',
-						'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
-					);
-					break;
-
-				case CTimePeriodValidator::ERROR_TYPE_INVALID_MAX_PERIOD:
-					$fields_errors[$field] = _n('Maximum time period to display is %1$s day.',
-						'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
-					);
-					break;
-
-				default:
-					$fields_errors[$field] = _('Invalid date.');
-					break;
-			}
-		}
-
-		if ($fields_errors) {
-			$output = ['fields_errors' => $fields_errors];
+		if ($has_fields_errors) {
+			$output = ['has_fields_errors' => true];
 		}
 		else {
 			$output = $time_period;

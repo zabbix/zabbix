@@ -278,27 +278,48 @@ abstract class CController {
 	/**
 	 * Validate "from" and "to" parameters for allowed period.
 	 *
+	 * @throws CAccessDeniedException
+	 *
 	 * @return bool
 	 */
 	protected function validateTimeSelectorPeriod(): bool {
+		if (!$this->hasInput('from') || !$this->hasInput('to')) {
+			return true;
+		}
+
 		try {
-			$time_period = ['from' => $this->getInput('from', ''), 'to' => $this->getInput('to', '')];
-
-			$errors = CTimePeriodValidator::validate($time_period, [
-				'min_period' => CTimePeriodHelper::getMinPeriod(),
-				'max_period' => CTimePeriodHelper::getMaxPeriod()
-			]);
-
-			if ($errors) {
-				foreach ($errors as $error) {
-					info($error);
-				}
-
-				return false;
-			}
+			$min_period = CTimePeriodHelper::getMinPeriod();
+			$max_period = CTimePeriodHelper::getMaxPeriod();
 		}
 		catch (Exception $x) {
-			access_deny(ACCESS_DENY_PAGE);
+			throw new CAccessDeniedException();
+		}
+
+		$range_time_parser = new CRangeTimeParser();
+
+		$time_period = [
+			'from' => $this->getInput('from'),
+			'to' => $this->getInput('to')
+		];
+
+		foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
+			$range_time_parser->parse($time_period[$field]);
+			$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
+		}
+
+		$period = $time_period['to'] - $time_period['from'] + 1;
+
+		if ($period < $min_period) {
+			info(_n('Minimum time period to display is %1$s minute.',
+				'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
+			));
+
+			return false;
+		}
+		elseif ($period > $max_period + 1) {
+			info(_n('Maximum time period to display is %1$s day.',
+				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
+			));
 
 			return false;
 		}

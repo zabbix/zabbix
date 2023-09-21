@@ -321,7 +321,7 @@ jQuery(function($) {
 						to: obj.timeline.to
 					})
 						.then((response) => {
-							if ('fields_errors' in response) {
+							if ('has_fields_errors' in response) {
 								return;
 							}
 
@@ -476,7 +476,7 @@ jQuery(function($) {
 				to_offset: Math.ceil(to_offset)
 			})
 				.then((response) => {
-					if ('fields_errors' in response) {
+					if ('has_fields_errors' in response) {
 						return;
 					}
 

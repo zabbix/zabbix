@@ -21,10 +21,12 @@
 
 namespace Zabbix\Widgets\Fields;
 
-use CApiInputValidator,
+use CAbsoluteTimeParser,
+	CApiInputValidator,
+	CParser,
 	CRangeTimeParser,
+	CRelativeTimeParser,
 	CTimePeriodHelper,
-	CTimePeriodValidator,
 	DateTimeZone;
 
 use Zabbix\Widgets\CWidgetField;
@@ -45,17 +47,14 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	private array $default_period = ['from' => '', 'to' => ''];
 
-	private ?int $min_period;
-	private ?int $max_period;
+	private ?int $min_period = 0;
+	private ?int $max_period = 0;
 
 	private ?DateTimeZone $timezone = null;
 	private bool $is_date_only = false;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
-
-		$this->min_period = CTimePeriodHelper::getMinPeriod();
-		$this->max_period = CTimePeriodHelper::getMaxPeriod();
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
@@ -95,8 +94,8 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public function validate(bool $strict = false): array {
 		$validation_rules = $this->getValidationRules($strict);
 
-		$field_label = $this->full_name ?? $this->label ?? '';
-		$field_value = $this->getValue();
+		$label = $this->full_name ?? $this->label ?? '';
+		$value = $this->getValue();
 
 		$default = $this->getDefault();
 
@@ -105,20 +104,28 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		if ($this->data_source !== self::DATA_SOURCE_DEFAULT) {
 			$data_source_label = $this->data_source === self::DATA_SOURCE_DASHBOARD ? _('Dashboard') : _('Widget');
 
-			$reference_value = array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $field_value)
-				? $field_value[CWidgetField::FOREIGN_REFERENCE_KEY]
+			$reference_value = array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value)
+				? $value[CWidgetField::FOREIGN_REFERENCE_KEY]
 				: '';
 
 			if (!CApiInputValidator::validate($validation_rules['fields'][CWidgetField::FOREIGN_REFERENCE_KEY],
-					$reference_value, ($field_label !== '' ? $field_label.'/' : '').$data_source_label, $error)) {
+					$reference_value, ($label !== '' ? $label.'/' : '').$data_source_label, $error)) {
 				$errors[] = $error;
 			}
 		}
 		else {
+			$absolute_time_parser = new CAbsoluteTimeParser();
+			$relative_time_parser = new CRelativeTimeParser();
+
 			$default_period = $this->getDefaultPeriod();
 
+			$field_labels = [
+				'from' => ($label !== '' ? $label.'/' : '').$this->getFromLabel(),
+				'to' => ($label !== '' ? $label.'/' : '').$this->getToLabel(),
+			];
+
 			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
-				if (!array_key_exists($field, $field_value)) {
+				if (!array_key_exists($field, $value)) {
 					if ($strict) {
 						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name,
 							_s('the parameter "%1$s" is missing', $field)
@@ -126,43 +133,111 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 						continue;
 					}
 
-					$field_value[$field] = array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
+					$value[$field] = array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
 						? $default_period[$field]
 						: $default[$field];
 				}
+
+				$field_value = &$value[$field];
+				$field_value_ts = &$value[$field_ts];
+
+				if (!CApiInputValidator::validate($validation_rules['fields'][$field], $field_value,
+						$field_labels[$field], $error)) {
+					$errors[] = $error;
+					continue;
+				}
+
+				if ($field_value === '') {
+					$field_value_ts = 0;
+					continue;
+				}
+
+				if ($absolute_time_parser->parse($field_value) === CParser::PARSE_SUCCESS) {
+					$datetime = $absolute_time_parser->getDateTime($field === 'from', $this->timezone);
+					$time_range = $field === 'from' ? '00:00:00' : '23:59:59';
+
+					if (!$this->is_date_only || $datetime->format('H:i:s') === $time_range) {
+						$field_value_ts = $datetime->getTimestamp();
+						continue;
+					}
+				}
+
+				if ($relative_time_parser->parse($field_value) === CParser::PARSE_SUCCESS) {
+					$datetime = $relative_time_parser->getDateTime($field === 'from', $this->timezone);
+					$has_errors = false;
+
+					if ($this->is_date_only) {
+						foreach ($relative_time_parser->getTokens() as $token) {
+							if ($token['suffix'] === 'h' || $token['suffix'] === 'm' || $token['suffix'] === 's') {
+								$has_errors = true;
+								break;
+							}
+						}
+					}
+
+					if (!$has_errors) {
+						$field_value_ts = $datetime->getTimestamp();
+						continue;
+					}
+				}
+
+				$errors[] = [
+					_s('Invalid parameter "%1$s": %2$s.', $field_labels[$field],
+						$this->is_date_only ? _('a date is expected') : _('a time is expected')
+					)
+				];
 			}
 
-			$errors = CTimePeriodValidator::validate($field_value, [
-				'require_date_only' => $this->is_date_only,
-				'require_not_empty' => (bool) ($validation_rules['fields']['from']['flags'] & API_NOT_EMPTY),
-				'min_period' => $this->min_period,
-				'max_period' => $this->max_period,
-				'from_label' => ($field_label !== '' ? $field_label.'/' : '').$this->getFromLabel(),
-				'to_label' => ($field_label !== '' ? $field_label.'/' : '').$this->getToLabel()
-			]);
+			if (!$errors && $value['from'] !== '' && $value['to'] !== '') {
+				$min_period = $this->min_period !== 0
+					? $this->min_period
+					: ($this->is_date_only ? null : CTimePeriodHelper::getMinPeriod());
+
+				$max_period = $this->max_period !== 0
+					? $this->max_period
+					: ($this->is_date_only ? null : CTimePeriodHelper::getMaxPeriod($this->timezone));
+
+				$period = $value['to_ts'] - $value['from_ts'] + 1;
+
+				if ($min_period === null && $period <= 1) {
+					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_labels['to'],
+						_s('value must be greater than "%1$s"', $field_labels['from'])
+					);
+				}
+				elseif ($min_period !== null && $period < $min_period) {
+					$errors[] = _n('Minimum time period to display is %1$s minute.',
+						'Minimum time period to display is %1$s minutes.', (int) ($min_period / SEC_PER_MIN)
+					);
+				}
+				elseif ($max_period !== null && $period > $max_period + 1) {
+					$errors[] = _n('Maximum time period to display is %1$s day.',
+						'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
+					);
+				}
+			}
 		}
 
 		if ($errors) {
-			$field_value = $default;
+			$value = $default;
 
-			if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $field_value)) {
+			if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
 				$range_time_parser = new CRangeTimeParser();
 
-				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $name => $name_ts) {
-					if ($field_value[$name] !== '') {
-						$range_time_parser->parse($field_value[$name]);
-						$field_value[$name_ts] = $range_time_parser
-							->getDateTime($name === 'from', $this->timezone)
+				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
+					if ($value[$field] !== '') {
+						$range_time_parser->parse($value[$field]);
+						$value[$field_ts] = $range_time_parser
+							->getDateTime($field === 'from', $this->timezone)
 							->getTimestamp();
 					}
 					else {
-						$field_value[$name_ts] = 0;
+						$value[$field_ts] = 0;
 					}
 				}
 			}
 		}
 
-		$this->setValue($field_value);
+		$this->setValue($value);
 
 		return $errors;
 	}

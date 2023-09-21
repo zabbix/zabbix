@@ -292,7 +292,7 @@
 					throw {error: time_period.error};
 				}
 
-				if ('fields_errors' in time_period) {
+				if ('has_fields_errors' in time_period) {
 					return;
 				}
 
