@@ -124,6 +124,20 @@ class CSVGPie {
 	#sectors_new = [];
 
 	/**
+	 * Old ids of sectors (for animation).
+	 *
+	 * @type {Array}
+	 */
+	#all_sectorids_old = [];
+
+	/**
+	 * New ids of sectors (for animation).
+	 *
+	 * @type {Array}
+	 */
+	#all_sectorids_new = [];
+
+	/**
 	 * SVG path element that represents a sector that is popped out.
 	 *
 	 * @type {SVGPathElement}
@@ -248,6 +262,7 @@ class CSVGPie {
 		this.#popped_out_placeholder = null;
 
 		if (sectors.length > 0) {
+			all_sectorids = this.#prepareAllSectorids(all_sectorids);
 			sectors = this.#sortByReference(sectors, all_sectorids);
 
 			this.#arcs_container
@@ -517,6 +532,36 @@ class CSVGPie {
 			});
 
 		return hint.node().outerHTML;
+	}
+
+	/**
+	 * Combine old and new ids of sectors to use result for animation.
+	 *
+	 * @param {Array} all_sectorids  Array of ids of sectors to sort result by.
+	 *
+	 * @returns {Array}
+	 */
+	#prepareAllSectorids(all_sectorids) {
+		this.#all_sectorids_old = this.#all_sectorids_new;
+		this.#all_sectorids_new = all_sectorids;
+
+		const all_sectorids_new_set = new Set(this.#all_sectorids_new);
+		const missing_ids = this.#all_sectorids_old.filter(id => !all_sectorids_new_set.has(id));
+
+		for (const missing_id of missing_ids) {
+			const index = this.#all_sectorids_old.indexOf(missing_id);
+			const after = this.#all_sectorids_old[index + 1] || null;
+
+			let insert_at_index = this.#all_sectorids_new.indexOf(after);
+
+			if (insert_at_index === -1) {
+				insert_at_index = this.#all_sectorids_new.length;
+			}
+
+			all_sectorids.splice(insert_at_index, 0, missing_id);
+		}
+
+		return all_sectorids;
 	}
 
 	/**
