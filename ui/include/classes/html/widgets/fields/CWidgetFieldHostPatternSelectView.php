@@ -70,6 +70,6 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 	public function getJavaScript(): string {
 		$field_id = zbx_formatDomId($this->field->getName().'[]');
 
-		return 'jQuery("#'.$field_id.'").multiSelect(jQuery("#'.$field_id.'").data("params"));';
+		return 'jQuery("#'.$field_id.'").multiSelect();';
 	}
 }

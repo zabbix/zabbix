@@ -913,6 +913,10 @@ msgstr "הוספה"
 msgid "Add (message type limit reached)"
 msgstr "הוספה (הגעת לגבול כמות סוגי הודעות)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "הוספת וידג׳ט חדש"
@@ -25453,6 +25457,10 @@ msgstr "now()‎ - מספר השניות מאז ראשית ספירת Epoch"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "מספר"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
