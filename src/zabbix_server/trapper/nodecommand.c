@@ -285,10 +285,10 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
 
 	switch (validator_type)
 	{
-		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_REGEX:
+		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_REGEX:
 			ret = (NULL != zbx_regexp_match(manualinput, validator, NULL) ? SUCCEED : FAIL);
 			break;
-		case ZBX_SCRIPT_USER_INPUT_VALIDATOR_TYPE_LIST:
+		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_LIST:
 			ret = zbx_str_in_list(validator, manualinput, ',');
 			break;
 		default:
