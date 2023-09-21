@@ -1235,8 +1235,8 @@ out:
 
 static char	*create_widget_reference(const zbx_vector_str_t *references)
 {
-	static char	buf[REFERENCE_LEN + 1];	/* static buffers are automatically initialized to zeroes */
-	static int	next_index = 0;
+	static char	buf[REFERENCE_LEN + 1];
+	static int	next_index;
 
 	while (1)
 	{
@@ -1245,14 +1245,12 @@ static char	*create_widget_reference(const zbx_vector_str_t *references)
 		for (i = REFERENCE_LEN - 1; i >= 0; i--)
 		{
 			buf[i] = FIRST_LETTER + index % TOTAL_LETTERS;
-			index = floor(index / TOTAL_LETTERS);
+			index /= TOTAL_LETTERS;
 		}
 
 		if (FAIL == zbx_vector_str_search(references, buf, ZBX_DEFAULT_STR_COMPARE_FUNC))
-			break;
+			return buf;
 	}
-
-	return buf;
 }
 
 #undef TOTAL_LETTERS
