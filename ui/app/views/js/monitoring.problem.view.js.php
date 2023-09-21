@@ -393,24 +393,20 @@
 
 		refreshData() {
 			clearTimeout(this.refresh_timer);
-
 			fetch(this.refresh_simple_url, {
 				method: 'POST',
-				body: new URLSearchParams({filter_counters: 1})
+				body: new URLSearchParams({
+					filter_counters: 1,
+					from: this.filter._active_item._data.from,
+					to: this.filter._active_item._data.to
+				})
 			})
 				.then(response => response.json())
 				.then(response => {
 					const timeselector_text = document.querySelector('li[data-target="tabfilter_timeselector"]')
 						.querySelector('a.tabfilter-item-link');
 
-					const data_target = document
-						.querySelector('.ui-sortable-container')
-						.querySelector('li.selected')
-						.getAttribute('data-target');
-
-					const selected_tab = data_target.replace('tabfilter_', '');
-
-					timeselector_text.textContent = `${response.timeselector_label[selected_tab]}`;
+					timeselector_text.textContent = `${response.timeselector_label}`;
 
 					if (response.filter_counters) {
 						this.filter.updateCounters(response.filter_counters);

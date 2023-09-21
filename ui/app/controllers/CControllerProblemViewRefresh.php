@@ -97,9 +97,10 @@ class CControllerProblemViewRefresh extends CControllerProblemView {
 					$tabfilter['show'] = TRIGGERS_OPTION_ALL;
 				}
 
-				$data['timeselector_label'][$index] = relativeDateToText($filters[$index]['from'], $filters[$index]['to']);
 				$data['filter_counters'][$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
 			}
+
+			$data['timeselector_label'] = relativeDateToText($this->getInput('from'), $this->getInput('to'));
 
 			if (($messages = getMessages()) !== null) {
 				$data['messages'] = $messages->toString();
