@@ -1,13 +1,15 @@
 Changes for 7.0.0alpha5
 
 New features:
+..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 .........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
 ..F....... [ZBXNEXT-7687] extended Top Hosts widget column sorting (dfofanovs)
-..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
 
 Bug fixes:
+..F....... [ZBX-23302] fixed 'access denied' error in template multiselect popup (esekace)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
-...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)
+...G...... [ZBX-23110] fixed possible crash on Windows 11 by removing concurrent Win API call for update perfCounters list (MVekslers)
 A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)
 ..F....... [ZBX-21094] fixed graphs not displaying values when items do not have trends and trend storage period is overridden in configuration (Ivo)
 .........T [ZBX-23162] fixed variable in JavaScript for Cisco Meraki template (egordymov)
@@ -21,9 +23,9 @@ A......... [ZBX-23284] prevented deletion of the discovered group as a result of
 ....I..... [ZBX-22779] replaced HTTP with HTTPS in Zabbix homepage address (mprihodko)
 .......PS. [ZBX-23298] fixed walk[oid] discovery rule not working as test item (vso)
 .......PS. [ZBX-23336] fixed items not to become unsupported if interface is not available (vso)
-.........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
+.........T [ZBX-23244] added escaping for special characters in HTML mode of Telegram mediatype (aiantsen)
 ..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
-...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
 ........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
 ...G...... [ZBX-21560] fixed default Zabbix agent 1 and 2 config file name and path for Windows; fixed logging to stderr in Zabbix agent 2 (mprihodko)
 ..F....... [ZBX-22991] resolved recommendations/issues regarding new icons style (ashubin)
@@ -263,15 +265,17 @@ Changes for 6.4.7rc1
 
 New features:
 .........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
-..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
 .........T [ZBXNEXT-8610] added MantisBT template (abiba)
 .......PS. [ZBXNEXT-8358] improved items configuration sync on PostgreSQL by selecting using equal condition instead of not equal (vso)
-.........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
+.........T [ZBXNEXT-8429] added HashiCorp Nomad template (igorbach)
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
+..F....... [ZBX-23302] fixed 'access denied' error in template multiselect popup (esekace)
+...G...... [ZBX-23417] fixed possible memory leak when checking modbus.get[] item (Andris)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
-...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)
+...G...... [ZBX-23110] fixed possible crash on Windows 11 by removing concurrent Win API call for update perfCounters list (MVekslers)
 A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)
 ..F....... [ZBX-21094] fixed graphs not displaying values when items do not have trends and trend storage period is overridden in configuration (Ivo)
 .........T [ZBX-23162] fixed variable in JavaScript for Cisco Meraki template (egordymov)
@@ -281,10 +285,10 @@ A......... [ZBX-23284] prevented deletion of the discovered group as a result of
 ........S. [ZBX-21898] fixed wrong escaping in trigger expression during upgrade and escaping as a workaround for calculated items (asestakovs, kprutkovs)
 ...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
 .......PS. [ZBX-23298] fixed walk[oid] sometimes not being collected when combined requests are enabled; fixed walk[oid] discovery rule not working as test item (vso)
-.........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
+.........T [ZBX-23244] added escaping for special characters in HTML mode of Telegram mediatype (aiantsen)
 ..F....... [ZBX-22818] fixed some aggregation functions not working with last_foreach() (agriscenko)
 ..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
-...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
 ........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
 ..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
 ..F....... [ZBX-23035] fixed disappearing filter group in host, item, trigger, graph, discovery rule, web and template lists (dpetra)
@@ -1683,15 +1687,16 @@ Changes for 6.0.22rc1
 
 New features:
 .........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
-..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MBs (dgoloscapov)
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
 .........T [ZBXNEXT-8610] added MantisBT template (abiba)
 .......PS. [ZBXNEXT-8358] improved items configuration sync on PostgreSQL by selecting using equal condition instead of not equal (vso)
-.........T [ZBXNEXT-8429] added hashicorp nomad template (igorbach)
+.........T [ZBXNEXT-8429] added HashiCorp Nomad template (igorbach)
 .........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
 
 Bug fixes:
+...G...... [ZBX-23417] fixed possible memory leak when checking modbus.get[] item (Andris)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
-...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)
+...G...... [ZBX-23110] fixed possible crash on Windows 11 by removing concurrent Win API call for update perfCounters list (MVekslers)
 A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)
 ..F....... [ZBX-21094] fixed graphs not displaying values when items do not have trends and trend storage period is overridden in configuration (Ivo)
 .........T [ZBX-23162] fixed variable in JavaScript for Cisco Meraki template (egordymov)
@@ -1700,10 +1705,10 @@ A......... [ZBX-23284] prevented deletion of the discovered group as a result of
 ..F....... [ZBX-23253] added static units support to graph widget legend and hint box (ashubin)
 ..F....... [ZBX-21898] fixed expression validation, history function parser to accept backslash without escaping (epulke)
 ...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
-.........T [ZBX-23244] added escaping for special characters in html mode of Telegram mediatype (aiantsen)
+.........T [ZBX-23244] added escaping for special characters in HTML mode of Telegram mediatype (aiantsen)
 ..F....... [ZBX-22818] fixed some aggregation functions not working with last_foreach() (agriscenko)
 ..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
-...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
 ........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
 ..F....... [ZBX-22685] fixed issue of error message details not being expanded by default in various forms (esekace)
 ..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
@@ -4414,11 +4419,9 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.38rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-23303] fixed syntax of message identifier in the In-Reply-To e-mail header field (asitals)
-...G...... [ZBX-20442] fixed ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
 ...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
 ..F....... [ZBX-17279] fixed graph widget loading (apoga)
 A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
@@ -7261,8 +7264,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 
 --------------------------------------------------------------------------------
 Changes for 4.0.49rc1
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)

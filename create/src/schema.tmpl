@@ -121,13 +121,15 @@ INDEX		|1		|hostid
 INDEX		|2		|groupid
 INDEX		|3		|templateid
 
-TABLE|group_discovery|groupid|ZBX_TEMPLATE
+TABLE|group_discovery|groupdiscoveryid|ZBX_TEMPLATE
+FIELD		|groupdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|1|hstgrp
 FIELD		|parent_group_prototypeid|t_id	|	|NOT NULL	|0			|2|group_prototype|group_prototypeid|RESTRICT
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
-INDEX		|1		|parent_group_prototypeid
+UNIQUE		|1		|groupid,parent_group_prototypeid
+INDEX		|2		|parent_group_prototypeid
 
 TABLE|drules|druleid|ZBX_DATA
 FIELD		|druleid	|t_id		|	|NOT NULL	|0
@@ -2169,4 +2171,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050091	|6050091
+ROW		|1		|6050099	|6050099
