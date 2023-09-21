@@ -1373,10 +1373,9 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		$dashboard->waitUntilReady();
 
 		// Set specific time selector in zoom filter.
-		$filter_link = $this->query('xpath://ul[@class="time-quick"]//a[text()="Last 1 day"]')
-				->waitUntilClickable()->one();
-		if ($filter_link->getAttribute('class') !== 'selected') {
-			$filter_link->click();
+		$filter = CFilterElement::find()->one();
+		if ($filter->isTabSelected('Last 1 day') === false) {
+			$filter->query('link:Last 1 day')->one()->click();
 			$this->page->waitUntilReady();
 			$dashboard->waitUntilReady();
 		}
