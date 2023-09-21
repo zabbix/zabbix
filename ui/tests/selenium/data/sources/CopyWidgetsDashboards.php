@@ -166,6 +166,11 @@ class CopyWidgetsDashboards {
 										'type' => 4,
 										'name' => 'itemid',
 										'value' => 99088
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'ABCDE'
 									]
 								]
 							],
@@ -255,6 +260,11 @@ class CopyWidgetsDashboards {
 										'type' => '7',
 										'name' => 'graphid',
 										'value' => 600000
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'BCDEF'
 									]
 								]
 							],
@@ -314,11 +324,6 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'reference',
-										'value' => 'OYKZW'
-									],
-									[
 										'type' => 8,
 										'name' => 'sysmapid',
 										'value' => 3
@@ -343,11 +348,6 @@ class CopyWidgetsDashboards {
 										'type' => 1,
 										'name' => 'sysmapid._reference',
 										'value' => 'STZDI._mapid'
-									],
-									[
-										'type' => 1,
-										'name' => 'reference',
-										'value' => 'PVEYR'
 									]
 								]
 							],
@@ -1180,6 +1180,11 @@ class CopyWidgetsDashboards {
 										'type' => 7,
 										'name' => 'graphid',
 										'value' => 600000
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'CDEFG'
 									]
 								]
 							],
@@ -1738,6 +1743,11 @@ class CopyWidgetsDashboards {
 										'type' => 4,
 										'name' => 'itemid',
 										'value' => 400410
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'EFGHI'
 									]
 								]
 							],
@@ -1783,6 +1793,11 @@ class CopyWidgetsDashboards {
 										'type' => 7,
 										'name' => 'graphid',
 										'value' => 700016
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'FGHIJ'
 									]
 								]
 							],
