@@ -622,13 +622,22 @@ class CSVGPie {
 	#popOut(sector) {
 		const sector_d3 = d3.select(sector);
 
-		const x = this.#arcGenerator.centroid(sector_d3.datum())[0] / 10;
-		const y = this.#arcGenerator.centroid(sector_d3.datum())[1] / 10;
+		const centroid = this.#arcGenerator.centroid(sector_d3.datum());
+
+		const x = centroid[0];
+		const y = centroid[1];
+
+		const hypotenuse = Math.sqrt(x * x + y * y);
+
+		const offset = 60;
+
+		const x_position = x / hypotenuse * offset;
+		const y_position = y / hypotenuse * offset;
 
 		sector_d3
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_POP_OUT)
-			.attr('transform', `translate(${x}, ${y})`);
+			.attr('transform', `translate(${x_position}, ${y_position})`);
 	}
 
 	/**
