@@ -69,8 +69,16 @@
 	}
 
 	custom_timeout.addEventListener('change', () => {
-		document.getElementById('timeout').disabled =
-			custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>;
+		const timeout = document.getElementById('timeout');
+
+		if (custom_timeout.querySelector(':checked').value == <?= ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED ?>) {
+			timeout.style.display = 'none';
+			timeout.disabled = true;
+		}
+		else {
+			timeout.style.display = '';
+			timeout.disabled = false;
+		}
 	});
 
 	custom_timeout.dispatchEvent(new CustomEvent('change'));
