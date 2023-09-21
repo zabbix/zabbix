@@ -1138,7 +1138,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		case ZBX_PREPROC_STR_REPLACE:
 			ret = pp_execute_str_replace(value, params);
 			goto out;
-		case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
+		case ZBX_PREPROC_SNMP_WALK_VALUE:
 			ret = pp_execute_snmp_to_value(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_SNMP_WALK_TO_JSON:

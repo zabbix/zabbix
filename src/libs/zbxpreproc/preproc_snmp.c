@@ -795,7 +795,7 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 		return FAIL;
 	}
 
-	if (NULL == cache || ZBX_PREPROC_SNMP_WALK_TO_VALUE != cache->type)
+	if (NULL == cache || ZBX_PREPROC_SNMP_WALK_VALUE != cache->type)
 	{
 		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 			return FAIL;

@@ -90,8 +90,8 @@ static int	str_to_preproc_type(const char *str)
 		return ZBX_PREPROC_STR_REPLACE;
 	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_JSON"))
 		return ZBX_PREPROC_SNMP_WALK_TO_JSON;
-	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_TO_VALUE"))
-		return ZBX_PREPROC_SNMP_WALK_TO_VALUE;
+	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_WALK_VALUE"))
+		return ZBX_PREPROC_SNMP_WALK_VALUE;
 	if (0 == strcmp(str, "ZBX_PREPROC_SNMP_GET_VALUE"))
 		return ZBX_PREPROC_SNMP_GET_VALUE;
 	if (0 == strcmp(str, "ZBX_PREPROC_SCRIPT"))
@@ -210,7 +210,7 @@ static int	check_mib_existence(zbx_pp_step_t *op)
 	size_t		oid_len = MAX_OID_LEN;
 	char		*oid_str = NULL, *right = NULL;
 
-	if (ZBX_PREPROC_SNMP_WALK_TO_VALUE == op->type)
+	if (ZBX_PREPROC_SNMP_WALK_VALUE == op->type)
 	{
 		zbx_strsplit_first(op->params, '\n', &oid_str, &right);
 	}
