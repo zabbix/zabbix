@@ -222,7 +222,7 @@ $group_prototype_template = (new CTemplateTag('groupPrototypeRow'))->addItem(
 		new CCol([
 			(new CTextBox('group_prototypes[#{i}][name]', '#{name}'))
 				->addStyle('width: 448px')
-				->setAttribute('placeholder', '{$MACRO}'),
+				->setAttribute('placeholder', '{#MACRO}'),
 			new CInput('hidden', 'group_prototypes[#{i}][group_prototypeid]', '#{group_prototypeid}')
 		]),
 		(new CCol(

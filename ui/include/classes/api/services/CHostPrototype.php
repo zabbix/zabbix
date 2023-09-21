@@ -2605,15 +2605,23 @@ class CHostPrototype extends CHostBase {
 	 */
 	private static function deleteDiscoveredGroups(array $group_prototypeids): void {
 		$db_groups = DBfetchArrayAssoc(DBselect(
-			'SELECT gd.groupid,g.name'.
+			'SELECT DISTINCT gd.groupid,g.name'.
 			' FROM group_discovery gd,hstgrp g'.
 			' WHERE gd.groupid=g.groupid'.
-				' AND '.dbConditionId('gd.parent_group_prototypeid', $group_prototypeids)
+				' AND '.dbConditionId('gd.parent_group_prototypeid', $group_prototypeids).
+				' AND NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM group_discovery gd2'.
+					' WHERE gd.groupid=gd2.groupid'.
+					' AND '.dbConditionId('gd2.parent_group_prototypeid', $group_prototypeids, true).
+				')'
 		), 'groupid');
 
 		if ($db_groups) {
 			CHostGroup::validateDeleteForce($db_groups);
 			CHostGroup::deleteForce($db_groups);
 		}
+
+		DB::delete('group_discovery', ['parent_group_prototypeid' => $group_prototypeids]);
 	}
 }
