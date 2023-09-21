@@ -20,23 +20,21 @@
 /* strptime() on newer and older GNU/Linux systems */
 #define _GNU_SOURCE
 
-#include "zbxsysinfo.h"
 #include "../sysinfo.h"
 #include "software.h"
 
 #include "zbxalgo.h"
 #include "zbxexec.h"
-#include "cfg.h"
 #include "zbxregexp.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
-#       include <sys/utsname.h>
+#	include <sys/utsname.h>
 #endif
 
 #define SW_OS_FULL			"/proc/version"
-#define SW_OS_SHORT 			"/proc/version_signature"
+#define SW_OS_SHORT			"/proc/version_signature"
 #define SW_OS_NAME			"/etc/issue.net"
 #define SW_OS_NAME_RELEASE		"/etc/os-release"
 #define SW_OS_OPTION_PRETTY_NAME	"PRETTY_NAME"
@@ -284,8 +282,8 @@ static void	rpm_details(const char *manager, const char *line, const char *regex
 {
 	static char	fmt[64] = "";
 
-	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "", buildtime_value[DETAIL_BUF],
-			installtime_value[DETAIL_BUF];
+	char		name[DETAIL_BUF] = "", version[DETAIL_BUF] = "", arch[DETAIL_BUF] = "",
+			buildtime_value[DETAIL_BUF], installtime_value[DETAIL_BUF];
 	zbx_uint64_t	size;
 	time_t		buildtime_timestamp, installtime_timestamp;
 	int		rv;
@@ -706,7 +704,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	size_t			output_alloc = 0, output_offset = 0;
-	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
+	int			ret = SYSINFO_RET_FAIL, show_pm, check_regex, check_manager;
 	char			*output = NULL, *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
 				*package, *saveptr;
 	zbx_vector_str_t	packages;
@@ -737,7 +735,7 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_vector_str_create(&packages);
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
 		saveptr = NULL;
@@ -920,7 +918,7 @@ out:
 
 int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int			ret = SYSINFO_RET_FAIL, i, check_regex, check_manager;
+	int			ret = SYSINFO_RET_FAIL, check_regex, check_manager;
 	char			*regex, *manager, *line, *saveptr, *buf = NULL, error[MAX_STRING_LEN];
 	ZBX_PACKAGE_MANAGER	*mng;
 	struct zbx_json		json;
@@ -939,7 +937,7 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_initarray(&json, 10 * ZBX_KIBIBYTE);
 
-	for (i = 0; NULL != package_managers[i].name; i++)
+	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
 		mng = &package_managers[i];
 		saveptr = NULL;
@@ -951,8 +949,8 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
-					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error),
+					sysinfo_get_config_timeout(), ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
 			}
