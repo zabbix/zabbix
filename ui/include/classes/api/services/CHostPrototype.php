@@ -2613,7 +2613,7 @@ class CHostPrototype extends CHostBase {
 					'SELECT NULL'.
 					' FROM group_discovery gd2'.
 					' WHERE gd.groupid=gd2.groupid'.
-					' AND '.dbConditionId('gd2.parent_group_prototypeid', $group_prototypeids, true).
+						' AND '.dbConditionId('gd2.parent_group_prototypeid', $group_prototypeids, true).
 				')'
 		), 'groupid');
 
