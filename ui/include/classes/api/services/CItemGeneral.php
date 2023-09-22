@@ -56,7 +56,8 @@ abstract class CItemGeneral extends CApiService {
 		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
 		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
 		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
+		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON,
+		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
 	];
 
 	/**
@@ -307,6 +308,46 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
+	 * Check preprocessing steps do not have duplicates with "Check for not supported item" with "error any".
+	 *
+	 * @param array $items
+	 *
+	 * @throws APIException
+	 */
+	protected static function checkPreprocessingStepsDuplicates(array $items): void {
+		$api_input_rules = ['type' => API_OBJECTS, 'fields' => [
+			'preprocessing' => ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
+				'type' =>	['type' => API_ANY],
+				'params' =>	['type' => API_ANY]
+			]]
+		]];
+		$items_steps = [];
+
+		foreach ($items as $i1 => $item) {
+			if (!array_key_exists('preprocessing', $item)) {
+				continue;
+			}
+
+			foreach ($item['preprocessing'] as $i2 => $step) {
+				if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+					[$match_type] = explode("\n", $step['params']);
+
+					if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+						$items_steps[$i1]['preprocessing'][$i2] = [
+							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+							'params' => ZBX_PREPROC_MATCH_ERROR_ANY
+						];
+					}
+				}
+			}
+		}
+
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $items_steps, '', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
 	 * @param array $items
 	 */
 	protected static function validateUniqueness(array &$items): void {
@@ -343,8 +384,7 @@ abstract class CItemGeneral extends CApiService {
 			'uniq_by_values' => [
 				['type' => [ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED]],
 				['type' => [ZBX_PREPROC_THROTTLE_VALUE, ZBX_PREPROC_THROTTLE_TIMED_VALUE]],
-				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]],
-				['type' => [ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]]
+				['type' => [ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON]]
 			],
 			'fields' => [
 				'type' =>					['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', static::SUPPORTED_PREPROCESSING_TYPES)],
@@ -1518,9 +1558,10 @@ abstract class CItemGeneral extends CApiService {
 				: [];
 
 			$step = 1;
+			$item['preprocessing'] = self::sortPreprocessingSteps($item['preprocessing']);
 
 			foreach ($item['preprocessing'] as &$item_preproc) {
-				$item_preproc['step'] = ($item_preproc['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) ? 0 : $step++;
+				$item_preproc['step'] = $step++;
 
 				if (array_key_exists($item_preproc['step'], $db_item_preprocs)) {
 					$db_item_preproc = $db_item_preprocs[$item_preproc['step']];
@@ -2775,5 +2816,36 @@ abstract class CItemGeneral extends CApiService {
 		if ($del_trigger_prototypeids) {
 			CTriggerPrototypeManager::delete($del_trigger_prototypeids);
 		}
+	}
+
+	/**
+	 * Prioritize ZBX_PREPROC_VALIDATE_NOT_SUPPORTED checks, with "match any error" being the last of them.
+	 *
+	 * @param array $steps
+	 *
+	 * @return array
+	 */
+	private static function sortPreprocessingSteps(array $steps): array {
+		$ns_regex = [];
+		$ns_any = [];
+		$other = [];
+
+		foreach ($steps as $step) {
+			if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+				$other[] = $step;
+				continue;
+			}
+
+			[$match_type] = explode("\n", $step['params']);
+
+			if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+				$ns_any[] = $step;
+			}
+			else {
+				$ns_regex[] = $step;
+			}
+		}
+
+		return array_merge($ns_regex, $ns_any, $other);
 	}
 }

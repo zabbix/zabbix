@@ -699,6 +699,10 @@ define('ZBX_PREPROC_SNMP_UTF8_FROM_HEX', 1);
 define('ZBX_PREPROC_SNMP_MAC_FROM_HEX', 2);
 define('ZBX_PREPROC_SNMP_INT_FROM_BITS', 3);
 
+define('ZBX_PREPROC_MATCH_ERROR_ANY', -1);
+define('ZBX_PREPROC_MATCH_ERROR_REGEX', 0);
+define('ZBX_PREPROC_MATCH_ERROR_NOT_REGEX', 1);
+
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);
 define('ZBX_LLD_OVERRIDE_STOP_YES',	1);
@@ -1928,6 +1932,7 @@ define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
+define('ZBX_STYLE_VISIBILITY_HIDDEN', 'visibility-hidden');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');

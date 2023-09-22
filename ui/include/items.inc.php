@@ -1907,6 +1907,14 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 				$step['params'] = implode("\n", $step['params']);
 				break;
 
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+					unset($step['params'][1]);
+				}
+
+				$step['params'] = implode("\n", $step['params']);
+				break;
+
 			case ZBX_PREPROC_CSV_TO_JSON:
 				if (!array_key_exists(2, $step['params'])) {
 					$step['params'][2] = ZBX_PREPROC_CSV_NO_HEADER;
@@ -2519,4 +2527,33 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
 	}
 
 	return array_values($conditions);
+}
+
+/**
+ * Prioritize ZBX_PREPROC_VALIDATE_NOT_SUPPORTED checks, with "match any error" being the last of them.
+ *
+ * @param array $steps
+ *
+ * @return array
+ */
+function sortPreprocessingSteps(array $steps): array {
+	$ns_regex = [];
+	$ns_any = [];
+	$other = [];
+
+	foreach ($steps as $step) {
+		if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+			$other[] = $step;
+			continue;
+		}
+
+		if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
+			$ns_any[] = $step;
+		}
+		else {
+			$ns_regex[] = $step;
+		}
+	}
+
+	return array_merge($ns_regex, $ns_any, $other);
 }

@@ -1026,10 +1026,15 @@ $item_tabs = (new CTabView())
 		(new CFormGrid())
 			->setId('item_preproc_list')
 			->addItem([
-				new CLabel(_('Preprocessing steps')),
-				new CFormField(
-					getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types'])
-				)
+				new CLabel([
+					_('Preprocessing steps'),
+					makeHelpIcon([
+						_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
+						BR(), BR(),
+						_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
+					])
+				]),
+				new CFormField(getItemPreprocessing($data['preprocessing'], $readonly, $data['preprocessing_types']))
 			])
 			->addItem([
 				(new CLabel(_('Type of information'), 'label-value-type-steps'))
