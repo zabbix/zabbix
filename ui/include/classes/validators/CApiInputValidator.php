@@ -4182,8 +4182,8 @@ class CApiInputValidator {
 
 			case ZBX_PREPROC_STR_REPLACE:
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'characters' => '\\nrts'],
-					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '', 'characters' => '\\nrts']
+					'1' =>	['type' => API_ESCAPED_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'characters' => 'nrts'],
+					'2' =>	['type' => API_ESCAPED_STRING_UTF8, 'default' => '', 'characters' => 'nrts']
 				]];
 				break;
 

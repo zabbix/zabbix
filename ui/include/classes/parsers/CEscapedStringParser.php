@@ -41,9 +41,15 @@ class CEscapedStringParser extends CParser {
 	];
 
 	public function __construct($options = []) {
-		if (array_key_exists('characters', $options)) {
-			$this->options['characters'] = $options['characters'];
+		if (!array_key_exists('characters', $options)) {
+			$options['characters'] = '';
 		}
+
+		if (strpos($options['characters'], '\\') === false) {
+			$options['characters'] .= '\\';
+		}
+
+		$this->options['characters'] = $options['characters'];
 	}
 
 	/**
@@ -57,29 +63,13 @@ class CEscapedStringParser extends CParser {
 		$this->match = '';
 		$this->error = '';
 
-		$backslash_escaping_not_required = strpos($this->options['characters'], '\\') === false;
+		if ($offset >= strlen($source)) {
+			return self::PARSE_SUCCESS;
+		}
 
 		// Check if all backslash characters in given string are escaped.
 		for ($pos = strpos($source, '\\', $offset); $pos !== false; $pos = strpos($source, '\\', $pos + 2)) {
-			if ($backslash_escaping_not_required && !isset($source[$pos + 1])) {
-				/*
-				 * If the last character is unescaped backslash and backslash is not required to be escaped, this
-				 * is considered a valid string.
-				 */
-				$pos = false;
-
-				break;
-			}
-			elseif (isset($source[$pos + 1]) && $source[$pos + 1] === '\\' && $backslash_escaping_not_required) {
-				/*
-				 * Switch one position to the left when next character is backslash and backslash is not required
-				 * to be escaped so that it can serve as escaping char for the next character.
-				 */
-				$pos--;
-
-				continue;
-			}
-			elseif (!isset($source[$pos + 1]) || strpos($this->options['characters'], $source[$pos + 1]) === false) {
+			if (!isset($source[$pos + 1]) || strpos($this->options['characters'], $source[$pos + 1]) === false) {
 				break;
 			}
 		}
