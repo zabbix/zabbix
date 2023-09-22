@@ -704,8 +704,7 @@ window.trigger_edit_popup = new class {
 		}
 
 		delete form_fields.show_inherited_tags;
-		console.log(form_fields);
-		console.log({...form_fields, ...this.db_trigger});
+
 		return JSON.stringify({...form_fields, ...this.db_trigger}) !== JSON.stringify(form_fields);
 	}
 
