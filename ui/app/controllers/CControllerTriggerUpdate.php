@@ -145,7 +145,7 @@ class CControllerTriggerUpdate extends CController {
 
 		$trigger += [
 			'triggerid' => $this->getInput('triggerid'),
-			'status' => $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED
+			'status' => $this->getInput('status', TRIGGER_STATUS_DISABLED)
 		];
 
 		$result = (bool) API::Trigger()->update($trigger);

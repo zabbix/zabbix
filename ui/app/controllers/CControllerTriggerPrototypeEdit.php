@@ -114,7 +114,7 @@ class CControllerTriggerPrototypeEdit extends CController {
 	}
 
 	protected function doAction() {
-		$form_fields = [
+		$data = [
 			'hostid' => 0,
 			'dependencies' => [],
 			'context' => '',
@@ -135,27 +135,15 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'triggerid' => null,
 			'show_inherited_tags' => 0,
 			'form_refresh' => 0,
-			'status' => TRIGGER_STATUS_ENABLED,
+			'status' => $this->hasInput('form_refresh') ? TRIGGER_STATUS_DISABLED : TRIGGER_STATUS_ENABLED,
 			'templates' => [],
 			'parent_discoveryid' => 0,
-			'discover' => ZBX_PROTOTYPE_DISCOVER,
+			'discover' => $this->hasInput('form_refresh') ? ZBX_PROTOTYPE_NO_DISCOVER : ZBX_PROTOTYPE_DISCOVER,
 			'url' => '',
 			'url_name' => ''
 		];
 
-		$data = [];
-		$this->getInputs($data, array_keys($form_fields));
-
-		if ($this->hasInput('form_refresh') && $data['form_refresh']) {
-			$data['manual_close'] = (!array_key_exists('manual_close', $data) || !$data['manual_close'])
-				? ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED
-				: ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED;
-
-			$data['status'] = $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-			$data['discover'] = $this->hasInput('discover') ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER;
-		}
-
-		$data += $form_fields;
+		$this->getInputs($data, array_keys($data));
 
 		$data['description'] = $this->getInput('name', '');
 		$data['comments'] = $this->getInput('description', '');

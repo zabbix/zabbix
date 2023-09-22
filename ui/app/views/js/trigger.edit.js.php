@@ -79,8 +79,10 @@ window.trigger_edit_popup = new class {
 				this.#toggleExpressionConstructor(e.target.id);
 			}
 			else if (e.target.id === 'insert-expression') {
-				const dstfld1 = this.expression_constructor_active ? 'expr_temp' : 'expression';
-				this.#openPopupTriggerExpr(dstfld1, this.expression.value);
+				this.#openPopupTriggerExpr({
+					dstfld1: this.expression_constructor_active ? 'expr_temp' : 'expression',
+					expression: this.expression.value
+				});
 			}
 			else if (e.target.id === 'add_expression' || e.target.id === 'and_expression'
 					|| e.target.id === 'or_expression' || e.target.id === 'replace_expression') {
@@ -111,11 +113,10 @@ window.trigger_edit_popup = new class {
 				this.#toggleRecoveryExpressionConstructor(e.target.id);
 			}
 			else if (e.target.id === 'insert-recovery-expression') {
-				const dstfld1 = this.recovery_expression_constructor_active
-					? 'recovery_expr_temp'
-					: 'recovery_expression'
-
-				this.#openPopupTriggerExpr(dstfld1, this.recovery_expression.value);
+				this.#openPopupTriggerExpr({
+					dstfld1: this.recovery_expression_constructor_active ? 'recovery_expr_temp' : 'recovery_expression',
+					expression: this.recovery_expression.value
+				});
 			}
 			else if (e.target.id === 'add_expression_recovery' || e.target.id === 'and_expression_recovery'
 					|| e.target.id === 'or_expression_recovery' || e.target.id === 'replace_expression_recovery') {
@@ -459,8 +460,8 @@ window.trigger_edit_popup = new class {
 		}
 	}
 
-	#openPopupTriggerExpr(dstfld1, expression) {
-		PopUp('popup.triggerexpr', {...this.expression_popup_parameters, dstfld1: dstfld1, expression: expression},
+	#openPopupTriggerExpr(trigger_options) {
+		PopUp('popup.triggerexpr', {...this.expression_popup_parameters, ...trigger_options},
 			{dialogueid: 'trigger-expr', dialogue_class: 'modal-popup-generic'}
 		);
 	}
@@ -737,7 +738,7 @@ window.trigger_edit_popup = new class {
 			: this.recovery_expression;
 
 		if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
-			return null;
+			return;
 		}
 
 		if (typeof target.textContent != 'undefined') {

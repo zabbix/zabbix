@@ -256,7 +256,7 @@ $trigger_form_grid
 	])
 	->addItem([new CLabel(_('Allow manual close'), 'manual_close'),
 		new CFormField(
-			(new CCheckBox('manual_close'))
+			(new CCheckBox('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED))
 				->setChecked($data['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED)
 				->setEnabled(!$readonly)
 		)
@@ -291,7 +291,9 @@ $trigger_form_grid
 if (array_key_exists('parent_discoveryid', $data)) {
 	$trigger_form_grid
 		->addItem([new CLabel(_('Create enabled'), 'status'),
-			new CFormField((new CCheckBox('status'))->setChecked($data['status'] == TRIGGER_STATUS_ENABLED))
+			new CFormField((new CCheckBox('status', TRIGGER_STATUS_ENABLED))
+				->setChecked($data['status'] == TRIGGER_STATUS_ENABLED)
+			)
 		])
 		->addItem([new CLabel(_('Discover'), 'discover'),
 			new CFormField(
@@ -304,7 +306,9 @@ if (array_key_exists('parent_discoveryid', $data)) {
 	$trigger_form_grid
 		->addItem([
 			new CLabel(_('Enabled'), 'status'),
-			new CFormField((new CCheckBox('status'))->setChecked($data['status'] == TRIGGER_STATUS_ENABLED))
+			new CFormField((new CCheckBox('status', TRIGGER_STATUS_ENABLED))
+				->setChecked($data['status'] == TRIGGER_STATUS_ENABLED)
+			)
 		]);
 }
 

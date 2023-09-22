@@ -160,7 +160,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'comments' => $this->getInput('description', ''),
 			'dependencies' => zbx_toObject($this->getInput('dependencies', []), 'triggerid'),
 			'tags' => $tags,
-			'status' => $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED,
+			'status' => $this->getInput('status', TRIGGER_STATUS_DISABLED),
 			'triggerid' => $this->getInput('triggerid'),
 			'discover' => $this->getInput('discover', ZBX_PROTOTYPE_NO_DISCOVER)
 		];

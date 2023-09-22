@@ -110,7 +110,7 @@ class CControllerTriggerPrototypeCreate extends CController {
 			'tags' => $tags,
 			'manual_close' => $this->getInput('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
 			'dependencies' => zbx_toObject($this->getInput('dependencies', []), 'triggerid'),
-			'status' => $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED,
+			'status' => $this->getInput('status', TRIGGER_STATUS_DISABLED),
 			'discover' => $this->getInput('discover', ZBX_PROTOTYPE_NO_DISCOVER)
 		];
 
