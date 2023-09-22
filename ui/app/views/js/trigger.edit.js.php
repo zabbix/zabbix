@@ -45,6 +45,8 @@ window.trigger_edit_popup = new class {
 		this.name = this.form.querySelector('#name');
 		this.recovery_expression = this.form.querySelector('#recovery_expression');
 		this.recovery_expr_temp = this.form.querySelector('#recovery_expr_temp');
+		this.expression_constructor_active = false;
+		this.recovery_expression_constructor_active = false;
 
 		window.addPopupValues = (data) => {
 			this.addPopupValues(data.values);
@@ -77,7 +79,8 @@ window.trigger_edit_popup = new class {
 				this.#toggleExpressionConstructor(e.target.id);
 			}
 			else if (e.target.id === 'insert-expression') {
-				this.#openPopupTriggerExpr(e.target);
+				const dstfld1 = this.expression_constructor_active ? 'expr_temp' : 'expression';
+				this.#openPopupTriggerExpr(dstfld1, this.expression.value);
 			}
 			else if (e.target.id === 'add_expression' || e.target.id === 'and_expression'
 					|| e.target.id === 'or_expression' || e.target.id === 'replace_expression') {
@@ -108,7 +111,11 @@ window.trigger_edit_popup = new class {
 				this.#toggleRecoveryExpressionConstructor(e.target.id);
 			}
 			else if (e.target.id === 'insert-recovery-expression') {
-				this.#openPopupTriggerExpr(e.target);
+				const dstfld1 = this.recovery_expression_constructor_active
+					? 'recovery_expr_temp'
+					: 'recovery_expression'
+
+				this.#openPopupTriggerExpr(dstfld1, this.recovery_expression.value);
 			}
 			else if (e.target.id === 'add_expression_recovery' || e.target.id === 'and_expression_recovery'
 					|| e.target.id === 'or_expression_recovery' || e.target.id === 'replace_expression_recovery') {
@@ -375,6 +382,7 @@ window.trigger_edit_popup = new class {
 			this.expr_temp.name = 'expression';
 			this.expr_temp.id = 'expression';
 			insert_expression.textContent = <?= json_encode(_('Edit')) ?>;
+			this.expression_constructor_active = true;
 
 			if (this.expression.value === '') {
 				this.#showConstructorAddButton();
@@ -398,6 +406,7 @@ window.trigger_edit_popup = new class {
 			this.expression.readOnly = this.readonly;
 			insert_expression.textContent = <?= json_encode(_('Add')) ?>;
 			this.expression.value = this.expr_temp.value;
+			this.expression_constructor_active = false;
 		}
 	}
 
@@ -422,6 +431,7 @@ window.trigger_edit_popup = new class {
 			this.recovery_expr_temp.name = 'recovery_expression';
 			this.recovery_expr_temp.id = 'recovery_expression';
 			insert_recovery_expression.textContent = <?= json_encode(_('Edit')) ?>;
+			this.recovery_expression_constructor_active = true;
 
 			if (recovery_expression.value === '') {
 				this.#showRecoveryConstructorAddButton();
@@ -445,23 +455,11 @@ window.trigger_edit_popup = new class {
 			this.recovery_expr_temp.id = 'recovery_expr_temp';
 			insert_recovery_expression.textContent = <?= json_encode(_('Add')) ?>;
 			this.recovery_expression.value = this.recovery_expr_temp.value;
+			this.recovery_expression_constructor_active = false;
 		}
 	}
 
-	#openPopupTriggerExpr(target) {
-		let dstfld1;
-
-		if (target.innerHTML === 'Add') {
-			dstfld1 = (target.id === 'insert-expression') ?'expression' : 'recovery_expression';
-		}
-		else {
-			dstfld1 = (target.id === 'insert-expression') ? 'expr_temp' : 'recovery_expr_temp';
-		}
-
-		const expression = (target.id === 'insert-expression')
-			? this.expression.value
-			: this.recovery_expression.value;
-
+	#openPopupTriggerExpr(dstfld1, expression) {
 		PopUp('popup.triggerexpr', {...this.expression_popup_parameters, dstfld1: dstfld1, expression: expression},
 			{dialogueid: 'trigger-expr', dialogue_class: 'modal-popup-generic'}
 		);
