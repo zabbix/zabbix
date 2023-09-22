@@ -888,7 +888,12 @@ class CControllerMenuPopup extends CController {
 					'name' => $script['name'],
 					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
+					'confirmation' => $script['confirmation'],
+					'manualinput' => $script['manualinput'],
+					'manualinput_prompt' => $script['manualinput_prompt'],
+					'manualinput_validator_type' => $script['manualinput_validator_type'],
+					'manualinput_validator' => $script['manualinput_validator'],
+					'manualinput_default_value' => $script['manualinput_default_value']
 				];
 			}
 

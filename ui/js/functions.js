@@ -581,7 +581,8 @@ function executeScript(scriptid, confirmation, trigger_element, hostid = null, e
 			if (confirmation) {
 				confirmation = confirmation.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
 
-				showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token);
+				showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
+					e.detail.data.manualinput);
 			}
 			else {
 				execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
@@ -639,7 +640,8 @@ function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_ele
  * @param string  scriptid         Script ID.
  * @param string  csrf_token       CSRF token.
  */
-function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token) {
+function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token,
+		manualinput = null) {
 	overlayDialogue({
 		'title': t('Execution confirmation'),
 		'content': jQuery('<span>')
@@ -658,7 +660,7 @@ function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element
 				'enabled': (hostid !== null || eventid !== null),
 				'focused': (hostid !== null || eventid !== null),
 				'action': function() {
-					execute(scriptid, eventid, hostid, null, csrf_token, trigger_element);
+					execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element);
 				}
 			}
 		]
