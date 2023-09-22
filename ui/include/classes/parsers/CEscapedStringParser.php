@@ -63,24 +63,16 @@ class CEscapedStringParser extends CParser {
 		$this->match = '';
 		$this->error = '';
 
-		if ($offset >= strlen($source)) {
-			return self::PARSE_SUCCESS;
-		}
+		$result = self::PARSE_SUCCESS;
 
 		// Check if all backslash characters in given string are escaped.
 		for ($pos = strpos($source, '\\', $offset); $pos !== false; $pos = strpos($source, '\\', $pos + 2)) {
 			if (!isset($source[$pos + 1]) || strpos($this->options['characters'], $source[$pos + 1]) === false) {
+				$result = $pos > $offset ? self::PARSE_SUCCESS_CONT : self::PARSE_FAIL;
+				$this->error = _s('value contains unescaped character at position %1$d', $pos + 1 - $offset);
+
 				break;
 			}
-		}
-
-		// No backslash occurances or loop has been stopped.
-		if ($pos !== false) {
-			$result = $pos > $offset ? self::PARSE_SUCCESS_CONT : self::PARSE_FAIL;
-			$this->error = _s('value contains unescaped character at position %1$d', $pos + 1 - $offset);
-		}
-		else {
-			$result = self::PARSE_SUCCESS;
 		}
 
 		if ($result != self::PARSE_FAIL) {
