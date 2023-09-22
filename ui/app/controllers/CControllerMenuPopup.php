@@ -276,7 +276,12 @@ class CControllerMenuPopup extends CController {
 					'url' => $url['url'],
 					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
 					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
+					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : ''),
+					'manualinput' => $url['manualinput'],
+					'manualinput_prompt' => $url['manualinput_prompt'],
+					'manualinput_validator_type' => $url['manualinput_validator_type'],
+					'manualinput_validator' => $url['manualinput_validator'],
+					'manualinput_default_value' => $url['manualinput_default_value']
 				];
 			}
 
@@ -908,7 +913,12 @@ class CControllerMenuPopup extends CController {
 					'url' => $url['url'],
 					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
 					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
+					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : ''),
+					'manualinput' => $url['manualinput'],
+					'manualinput_prompt' => $url['manualinput_prompt'],
+					'manualinput_validator_type' => $url['manualinput_validator_type'],
+					'manualinput_validator' => $url['manualinput_validator'],
+					'manualinput_default_value' => $url['manualinput_default_value']
 				];
 			}
 

@@ -96,9 +96,6 @@ window.script_userinput_popup = new class {
 					overlayDialogueDestroy(this.overlay.dialogueid);
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
-
-				const message_box = makeMessageBox('good', messages)[0];
-				this.form.parentNode.insertBefore(message_box, this.form);
 			})
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
