@@ -637,7 +637,7 @@ zabbix_export:
                     request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                    
+            
                     Zabbix.log(4, '[ AWS RDS ] Sending request: ' + url);
             
                     response = request.get(url);
@@ -670,28 +670,21 @@ zabbix_export:
                 },
             
                 getAlarms: function () {
-                    var payload = {},
+                    var payload = {
+                        'Action': 'DescribeAlarms',
+                        'Version': '2010-08-01',
+                        'MaxRecords': 100
+                    },
                         result = [];
             
-                    payload['Action'] = 'DescribeAlarms';
-                    payload['MaxRecords'] = 100;
-                    payload['Version'] = '2010-08-01';
+                    while (payload.nextToken !== '') {
+                        var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
+                        payload.nextToken = alarms.nextToken || '';
+                        alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
-                    while (payload.NextToken !== '') {
-                        var alarms = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
-            
-                        if (typeof alarms !== 'object'
-                            || typeof alarms.DescribeAlarmsResponse !== 'object'
-                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult !== 'object'
-                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms !== 'object') {
-                            throw 'Cannot get alarms from AWS CloudWatch API. Check debug log for more information.';
-                        }
-            
-                        payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
-            
-                        if (!Array.isArray(alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms))
-                            alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms = [alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms]
-                        alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
+                        if (!Array.isArray(alarms_list))
+                            alarms_list = [alarms_list]
+                        alarms_list.forEach(function (alarm) {
                             var dimensions = alarm.Dimensions;
             
                             if (Array.isArray(alarm.Metrics)) {
@@ -736,16 +729,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -920,33 +913,28 @@ zabbix_export:
                 },
             
                 getEvents: function () {
-                    var payload = {},
+                    var payload = {
+                        'Action': 'DescribeEvents',
+                        'Version': '2014-09-01',
+                        'MaxRecords': 100,
+                        'Duration': 30,
+                        'SourceType': 'db-instance',
+                        'SourceIdentifier': AWS.params.db_instance_id
+                    },
                         result = [];
             
-                    payload['Action'] = 'DescribeEvents';
-                    payload['MaxRecords'] = 100;
-                    payload['Version'] = '2014-09-01';
-                    payload['Duration'] = 30;
-                    payload['SourceType'] = 'db-instance';
-                    payload['SourceIdentifier'] = AWS.params.db_instance_id;
-            
-                    while (payload.NextToken !== '') {
-                        var events = AWS.request('GET', AWS.params.region, 'rds', AWS.prepareParams(payload));
-            
-                        if (typeof events !== 'object'
-                            || typeof events.DescribeEventsResponse !== 'object'
-                            || typeof events.DescribeEventsResponse.DescribeEventsResult !== 'object'
-                            || typeof events.DescribeEventsResponse.DescribeEventsResult.Events !== 'object') {
-                            throw 'Cannot get events from AWS RDS API. Check debug log for more information.';
-                        }
-            
-                        if (!Array.isArray(events.DescribeEventsResponse.DescribeEventsResult.Events))
-                            events.DescribeEventsResponse.DescribeEventsResult.Events = [events.DescribeEventsResponse.DescribeEventsResult.Events]
-                        events.DescribeEventsResponse.DescribeEventsResult.Events.forEach(function (event) {
+                    while (payload.nextToken !== '') {
+                        var events = AWS.getField(AWS.request('GET', AWS.params.region, 'rds', AWS.prepareParams(payload)), 'DescribeEventsResponse.DescribeEventsResult');
+                        events_list = AWS.getField(events, 'Events');
+                  
+                        if (!Array.isArray(events_list))
+                        events_list = [events_list]
+                        events_list.forEach(function (event) {
                             event.EventCategories = event.EventCategories.toString()
                             result.push(event)
                         });
-                        payload.NextToken = events.DescribeEventsResponse.DescribeEventsResult.NextToken || '';
+                        payload.nextToken = events.nextToken || '';
+            
             
                     };
             
@@ -974,16 +962,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -1188,16 +1176,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -1507,16 +1495,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: db_instance_id
               value: '{$AWS.RDS.INSTANCE.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -2124,13 +2112,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#ALARM_SERVICE_NAMESPACE}'
-                value: '{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
-                formulaid: C
-              - macro: '{#ALARM_SERVICE_NAMESPACE}'
-                value: '{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.RDS.LLD.FILTER.ALARM_NAME.MATCHES}'
                 formulaid: A
@@ -2138,6 +2119,13 @@ zabbix_export:
                 value: '{$AWS.RDS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#ALARM_SERVICE_NAMESPACE}'
+                value: '{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
+              - macro: '{#ALARM_SERVICE_NAMESPACE}'
+                value: '{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: aab5aaf6e27740c6ac92f5494b3aef4b

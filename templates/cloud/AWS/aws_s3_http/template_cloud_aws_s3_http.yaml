@@ -411,7 +411,7 @@ zabbix_export:
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-                        Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
+                    Zabbix.log(4, '[ AWS S3 ] Sending request: ' + url);
             
                     response = request.get(url);
             
@@ -443,28 +443,21 @@ zabbix_export:
                 },
             
                 getAlarms: function () {
-                    var payload = {},
+                    var payload = {
+                        'Action': 'DescribeAlarms',
+                        'Version': '2010-08-01',
+                        'MaxRecords': 100
+                    },
                         result = [];
             
-                    payload['Action'] = 'DescribeAlarms';
-                    payload['MaxRecords'] = 100;
-                    payload['Version'] = '2010-08-01';
+                    while (payload.nextToken !== '') {
+                        var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
+                        payload.nextToken = alarms.nextToken || '';
+                        alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
-                    while (payload.NextToken !== '') {
-                        var alarms = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
-            
-                        if (typeof alarms !== 'object'
-                            || typeof alarms.DescribeAlarmsResponse !== 'object'
-                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult !== 'object'
-                            || typeof alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms !== 'object') {
-                            throw 'Cannot get alarms from AWS CloudWatch API. Check debug log for more information.';
-                        }
-            
-                        payload.NextToken = alarms.DescribeAlarmsResponse.DescribeAlarmsResult.NextToken || '';
-            
-                        if (!Array.isArray(alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms))
-                            alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms = [alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms]
-                        alarms.DescribeAlarmsResponse.DescribeAlarmsResult.MetricAlarms.forEach(function (alarm) {
+                        if (!Array.isArray(alarms_list))
+                            alarms_list = [alarms_list]
+                        alarms_list.forEach(function (alarm) {
                             var dimensions = alarm.Dimensions;
             
                             if (Array.isArray(alarm.Metrics)) {
@@ -511,16 +504,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -794,18 +787,18 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
-            - name: filter_id
-              value: '{$AWS.S3.FILTER.ID}'
             - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
+            - name: filter_id
+              value: '{$AWS.S3.FILTER.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
