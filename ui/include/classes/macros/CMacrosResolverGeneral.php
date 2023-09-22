@@ -1495,6 +1495,43 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Get macros with values.
+	 *
+	 * @param array $usermacros
+	 * @param array $usermacros[<triggerid>]['macros']  The list of user macros to resolve,
+	 *                                                    ['<usermacro1>' => null, ...].
+	 *
+	 * @return array
+	 */
+	protected function getTriggerUserMacros(array $usermacros, array $macro_values) {
+		if (!$usermacros) {
+			return $macro_values;
+		}
+
+		$db_triggers = API::Trigger()->get([
+			'output' => [],
+			'selectHosts' => ['hostid'],
+			'triggerids' => array_keys($usermacros),
+			'preservekeys' => true
+		]);
+
+		foreach ($usermacros as $triggerid => &$usermacros_data) {
+			if (array_key_exists($triggerid, $db_triggers)) {
+				$usermacros_data['hostids'] = array_unique(array_column($db_triggers[$triggerid]['hosts'], 'hostid'));
+			}
+		}
+		unset($usermacros_data);
+
+		foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
+			$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+				? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
+				: $usermacros_data['macros'];
+		}
+
+		return $macro_values;
+	}
+
+	/**
 	 * Get host macros.
 	 *
 	 * @param array $macros

@@ -454,30 +454,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 			$macro_values = $this->getItemMacros($macros['item'], $macro_values);
 			$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
-
-			if ($usermacros) {
-				// Get hosts for triggers.
-				$db_triggers = API::Trigger()->get([
-					'output' => [],
-					'selectHosts' => ['hostid'],
-					'triggerids' => array_keys($usermacros),
-					'preservekeys' => true
-				]);
-
-				foreach ($usermacros as $triggerid => &$usermacros_data) {
-					if (array_key_exists($triggerid, $db_triggers)) {
-						$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
-					}
-				}
-				unset($usermacros_data);
-
-				// Get user macros values.
-				foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
-					$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
-						? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
-						: $usermacros_data['macros'];
-				}
-			}
+			$macro_values = $this->getTriggerUserMacros($usermacros, $macro_values);
 		}
 
 		$types = $this->transformToPositionTypes($types);
@@ -585,30 +562,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 		$macro_values = $this->getItemMacros($macros['item'], $macro_values, $triggers, $options);
 		$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
-
-		if ($usermacros) {
-			// Get hosts for triggers.
-			$db_triggers = API::Trigger()->get([
-				'output' => [],
-				'selectHosts' => ['hostid'],
-				'triggerids' => array_keys($usermacros),
-				'preservekeys' => true
-			]);
-
-			foreach ($usermacros as $triggerid => &$usermacros_data) {
-				if (array_key_exists($triggerid, $db_triggers)) {
-					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
-				}
-			}
-			unset($usermacros_data);
-
-			// Get user macros values.
-			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
-				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
-					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
-					: $usermacros_data['macros'];
-			}
-		}
+		$macro_values = $this->getTriggerUserMacros($usermacros, $macro_values);
 
 		$types = $this->transformToPositionTypes($types);
 
@@ -744,30 +698,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = $this->getIpMacros($macros['interface'], $macro_values);
 		$macro_values = $this->getItemMacros($macros['item'], $macro_values);
 		$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
-
-		if ($usermacros) {
-			// Get hosts for triggers.
-			$db_triggers = API::Trigger()->get([
-				'output' => [],
-				'selectHosts' => ['hostid'],
-				'triggerids' => array_keys($usermacros),
-				'preservekeys' => true
-			]);
-
-			foreach ($usermacros as $triggerid => &$usermacros_data) {
-				if (array_key_exists($triggerid, $db_triggers)) {
-					$usermacros_data['hostids'] = zbx_objectValues($db_triggers[$triggerid]['hosts'], 'hostid');
-				}
-			}
-			unset($usermacros_data);
-
-			// Get user macros values.
-			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
-				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
-					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
-					: $usermacros_data['macros'];
-			}
-		}
+		$macro_values = $this->getTriggerUserMacros($usermacros, $macro_values);
 
 		$types = $this->transformToPositionTypes($types);
 
