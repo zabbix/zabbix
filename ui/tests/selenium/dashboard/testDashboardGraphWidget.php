@@ -200,7 +200,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000!'
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -210,7 +210,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'xpath://button[@id="lbl_ds_0_color"]/..' => '00000 '
 						]
 					],
-					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -356,7 +356,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'xpath://button[@id="lbl_ds_1_color"]/..' => '00000 '
 						]
 					],
-					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Data set/2/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -908,7 +908,7 @@ class testDashboardGraphWidget extends CWebTest {
 					'Overrides' => [
 						[
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
@@ -921,11 +921,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000!',
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			[
@@ -934,11 +934,11 @@ class testDashboardGraphWidget extends CWebTest {
 						[
 							'color' => '00000 ',
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
-					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal color code (6 symbols) is expected.'
+					'error' => 'Invalid parameter "Overrides/1/color": a hexadecimal colour code (6 symbols) is expected.'
 				]
 			],
 			// Time shift field validation.
@@ -1088,7 +1088,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => 'Two host',
 							'item' => 'Two item',
 							'options' => [
-								'Base color'
+								'Base colour'
 							]
 						]
 					],
@@ -1498,7 +1498,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '-5s',
 							'color' => '000000',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1515,7 +1515,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '5s',
 							'color' => 'FFFFFF',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '1'],
 								['Draw', 'Points'],
 								['Transparency', '2'],
@@ -1790,7 +1790,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '-5s',
 							'color' => '000000',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '0'],
 								['Draw', 'Line'],
 								['Transparency', '0'],
@@ -1807,7 +1807,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'time_shift' => '5s',
 							'color' => 'FFFFFF',
 							'options' => [
-								'Base color',
+								'Base colour',
 								['Width', '1'],
 								['Draw', 'Bar'],
 								['Transparency', '2'],
