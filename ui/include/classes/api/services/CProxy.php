@@ -217,6 +217,7 @@ class CProxy extends CApiService {
 		$this->validateUpdate($proxies, $db_proxies);
 
 		self::addFieldDefaultsByTls($proxies, $db_proxies);
+		self::addFieldDefaultsByCustomTimeouts($proxies, $db_proxies);
 
 		$upd_proxies = [];
 
@@ -693,12 +694,10 @@ class CProxy extends CApiService {
 		self::checkCustomTimeouts($proxies, $db_proxies);
 
 		self::addFieldDefaultsByMode($proxies, $db_proxies);
-		self::addFieldDefaultsByCustomTimeouts($proxies, $db_proxies);
 
-		$proxies = $this->extendObjectsByKey($proxies, $db_proxies, 'proxyid', ['tls_connect', 'tls_accept',
-			'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
-			'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
-		]);
+		$proxies = $this->extendObjectsByKey($proxies, $db_proxies, 'proxyid', ['tls_connect', 'tls_accept']);
+
+		self::addDbFieldsByCustomTimeouts($proxies, $db_proxies);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
 			'proxyid' =>				['type' => API_ANY],
@@ -827,11 +826,8 @@ class CProxy extends CApiService {
 		]);
 
 		foreach ($proxies as $i => $proxy) {
-			if ($proxy['custom_timeouts'] == $db_proxies[$proxy['proxyid']]['custom_timeouts']) {
-				continue;
-			}
-
-			if ($proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED
+			if ($proxy['custom_timeouts'] != $db_proxies[$proxy['proxyid']]['custom_timeouts']
+					&& $proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED
 					&& ($db_proxy_rtdata[$proxy['proxyid']]['compatibility'] == ZBX_PROXY_VERSION_OUTDATED
 						|| $db_proxy_rtdata[$proxy['proxyid']]['compatibility'] == ZBX_PROXY_VERSION_UNSUPPORTED)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -861,16 +857,16 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Add default values for fields that became unnecessary as the result of the change of "custom_timeouts".
+	 * Add DB fields that became required as the result of the change of "custom_timeouts".
 	 *
 	 * @param array $proxies
 	 * @param array $db_proxies
 	 */
-	private static function addFieldDefaultsByCustomTimeouts(array &$proxies, array $db_proxies): void {
+	private static function addDbFieldsByCustomTimeouts(array &$proxies, array $db_proxies): void {
 		foreach ($proxies as &$proxy) {
-			if ($proxy['custom_timeouts'] != $db_proxies[$proxy['proxyid']]['custom_timeouts']
-					&& $proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
-				$proxy += array_intersect_key(DB::getDefaults('proxy'), array_flip(['timeout_zabbix_agent',
+			if ($proxy['custom_timeouts'] !== $db_proxies[$proxy['proxyid']]['custom_timeouts']
+					&& $proxy['custom_timeouts'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+				$proxy += array_intersect_key($db_proxies[$proxy['proxyid']], array_flip(['timeout_zabbix_agent',
 					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
 					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
 				]));
@@ -908,6 +904,25 @@ class CProxy extends CApiService {
 						'tls_psk' => DB::getDefault('proxy', 'tls_psk')
 					], $db_proxy);
 				}
+			}
+		}
+		unset($proxy);
+	}
+
+	/**
+	 * Add default values for fields that became unnecessary as the result of the change of "custom_timeouts".
+	 *
+	 * @param array $proxies
+	 * @param array $db_proxies
+	 */
+	private static function addFieldDefaultsByCustomTimeouts(array &$proxies, array $db_proxies): void {
+		foreach ($proxies as &$proxy) {
+			if ($proxy['custom_timeouts'] != $db_proxies[$proxy['proxyid']]['custom_timeouts']
+					&& $proxy['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED) {
+				$proxy += array_intersect_key(DB::getDefaults('proxy'), array_flip(['timeout_zabbix_agent',
+					'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor',
+					'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script'
+				]));
 			}
 		}
 		unset($proxy);
