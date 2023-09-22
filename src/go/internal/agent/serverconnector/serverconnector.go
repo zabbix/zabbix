@@ -82,6 +82,7 @@ type activeChecksResponse struct {
 	Data           []*plugin.Request      `json:"data"`
 	Commands       []*agent.RemoteCommand `json:"commands"`
 	Expressions    []*glexpr.Expression   `json:"regexp"`
+	HistoryUpload  string                 `json:"upload"`
 }
 
 type agentDataResponse struct {
@@ -239,6 +240,12 @@ func (c *Connector) refreshActiveChecks() {
 			[]*glexpr.Expression{}, []*plugin.Request{}, now)
 		c.firstActiveChecksRefreshed = true
 		return
+	}
+
+	if response.HistoryUpload == "disabled" {
+		c.resultCache.EnableUpload(false)
+	} else {
+		c.resultCache.EnableUpload(true)
 	}
 
 	if response.Commands != nil {

@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"reflect"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -40,6 +41,8 @@ type MemoryCache struct {
 	maxBufferSize   int32
 	totalValueNum   int32
 	persistValueNum int32
+	historyUpload   bool
+	mu              sync.Mutex
 }
 
 func (c *MemoryCache) upload(u Uploader) (err error) {
@@ -298,5 +301,6 @@ func (c *MemoryCache) PersistSlotsAvailable() int {
 	if slots < 0 {
 		slots = 0
 	}
+
 	return int(slots)
 }
