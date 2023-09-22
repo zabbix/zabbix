@@ -470,9 +470,10 @@ class CWidgetBase {
 	 * Require loading the specified foreign data source.
 	 *
 	 * @param {string} reference
+	 * @param {string} type
 	 */
-	requireDataSource(reference) {
-		this.fire(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, {reference});
+	requireDataSource(reference, type) {
+		this.fire(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, {reference, type});
 	}
 
 	/**
@@ -493,7 +494,7 @@ class CWidgetBase {
 				continue;
 			}
 
-			this.requireDataSource(reference);
+			this.requireDataSource(reference, type);
 
 			const broadcast_subscription = ZABBIX.EventHub.subscribe({
 				require: {

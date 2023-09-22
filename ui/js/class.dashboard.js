@@ -2041,6 +2041,19 @@ class CDashboard {
 					return;
 				}
 
+				ZABBIX.EventHub.publish({
+					data: null,
+					descriptor: {
+						context: 'dashboard',
+						sender_unique_id: 'dashboard',
+						sender_type: 'dashboard',
+						event_type: 'broadcast',
+						event_origin: 'dashboard',
+						reference: e.detail.reference,
+						type: e.detail.type
+					}
+				});
+
 				console.log('Could not find required data source', e.detail.reference);
 			},
 

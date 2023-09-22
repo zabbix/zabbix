@@ -1915,7 +1915,8 @@ class CDashboardPage {
 				}
 
 				this.fire(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, {
-					reference: e.detail.reference
+					reference: e.detail.reference,
+					type: e.detail.type
 				});
 			},
 
