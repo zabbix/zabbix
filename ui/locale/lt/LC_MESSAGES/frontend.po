@@ -936,6 +936,10 @@ msgstr "Pridėti"
 msgid "Add (message type limit reached)"
 msgstr ""
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr ""
@@ -1513,6 +1517,32 @@ msgstr ""
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Aprašo punkto gairė"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr ""
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -14479,6 +14509,10 @@ msgstr ""
 msgid "New step of web scenario"
 msgstr ""
 
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr ""
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
 msgstr ""
@@ -19912,6 +19946,10 @@ msgstr ""
 msgid "Tag for matching"
 msgstr ""
 
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
@@ -23707,6 +23745,14 @@ msgstr ""
 msgid "Y-m-d H:i:s"
 msgstr ""
 
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr ""
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
+msgstr ""
+
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
 msgstr ""
@@ -24919,6 +24965,14 @@ msgctxt "hour short"
 msgid "h"
 msgstr ""
 
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr ""
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr ""
+
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
 msgid "hh.mm"
@@ -25281,6 +25335,10 @@ msgstr ""
 msgid "m-d H:i"
 msgstr ""
 
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
+msgstr ""
+
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr ""
@@ -25479,6 +25537,10 @@ msgstr ""
 msgid "n-d H:i"
 msgstr ""
 
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
 #: include/views/configuration.item.edit.php:262
@@ -25590,6 +25652,10 @@ msgstr ""
 
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
 msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127

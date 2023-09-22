@@ -588,15 +588,19 @@ class CElement extends CBaseElement implements IWaitable {
 		$element = $this;
 		$wait = forward_static_call_array([CElementQuery::class, 'wait'], $timeout !== null ? [$timeout] : []);
 		$wait->until(function () use ($element) {
+			try {
 				if ($element->isStalled()) {
 					$element->reload();
 
 					return !$element->isStalled();
 				}
-
-				return null;
 			}
-		);
+			catch (Exception $e) {
+				// Code is not missing here.
+			}
+
+			return null;
+		}, 'Failed to wait until element reloaded.');
 
 		return $this;
 	}

@@ -2100,7 +2100,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		// Check widget added and assert screenshots.
 		$element = CDashboardElement::find()->one()->getWidget($data['main_fields']['Name'])
-				->query('class:list-table')->one();
+				->query('class:dashboard-grid-widget-container')->one();
 		$this->assertScreenshot($element, $data['screen_name']);
 	}
 
