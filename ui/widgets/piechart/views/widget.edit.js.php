@@ -122,9 +122,7 @@ window.widget_pie_chart_form = new class {
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
 
 		// Initialize pattern fields.
-		jQuery('.multiselect', jQuery(this.#dataset_wrapper)).each(function() {
-			jQuery(this).multiSelect(jQuery(this).data('params'));
-		});
+		jQuery('.multiselect', jQuery(this.#dataset_wrapper)).multiSelect();
 
 		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			jQuery(colorpicker).colorpicker({
@@ -267,7 +265,7 @@ window.widget_pie_chart_form = new class {
 		}
 
 		for (const multiselect of dataset.querySelectorAll('.multiselect')) {
-			jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
+			jQuery(multiselect).multiSelect();
 		}
 
 		const $overlay_body = jQuery('.overlay-dialogue-body')
