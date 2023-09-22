@@ -50,7 +50,7 @@ void	discoverer_task_clear(zbx_discoverer_task_t *task)
 		zbx_free(task->ips);
 	}
 
-	zbx_vector_dc_dcheck_ptr_clear_ext(&task->dchecks, zbx_discovery_dcheck_free);
+	/* dcheck is stored in job->dcheck_common */
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
 
 	zbx_free(task->ip);
@@ -87,10 +87,14 @@ void	discoverer_job_free(zbx_discoverer_job_t *job)
 {
 	(void)discoverer_job_tasks_free(job);
 
+	zbx_vector_dc_dcheck_ptr_clear_ext(&job->dchecks_common, zbx_discovery_dcheck_free);
+	zbx_vector_dc_dcheck_ptr_destroy(&job->dchecks_common);
+
 	zbx_free(job);
 }
 
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule)
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeout,
+		zbx_vector_dc_dcheck_ptr_t *dchecks_common)
 {
 	zbx_discoverer_job_t	*job;
 
@@ -101,6 +105,9 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule)
 	job->drule_revision = drule->revision;
 	job->status = DISCOVERER_JOB_STATUS_QUEUED;
 	zbx_list_create(&job->tasks);
+	zbx_vector_dc_dcheck_ptr_create(&job->dchecks_common);
+	zbx_vector_dc_dcheck_ptr_append_array(&job->dchecks_common, dchecks_common->values, dchecks_common->values_num);
+	zbx_vector_dc_dcheck_ptr_clear(dchecks_common);
 
 	return job;
 }

@@ -399,7 +399,7 @@ static void	dcheck_copy(const zbx_dc_dcheck_t *src, zbx_dc_dcheck_t *dst)
 	dst->dcheckid = src->dcheckid;
 	dst->druleid = src->druleid;
 	dst->key_ = zbx_strdup(NULL, src->key_);
-	dst->ports = NULL;
+	dst->ports = zbx_strdup(NULL, src->ports);
 	dst->uniq = src->uniq;
 	dst->type = src->type;
 	dst->allow_redirect = src->allow_redirect;
@@ -443,7 +443,7 @@ static void	results_free(zbx_discoverer_results_t *result)
 	zbx_free(result);
 }
 
-static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dcheck_t *dcheck, char *ip,
+static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck, const char *ip,
 		int *need_resolve, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
 {
 	const char	*start;
@@ -470,46 +470,12 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 		for (port = first; port <= last; port++)
 		{
 			zbx_discoverer_task_t	task_local, *task;
-			zbx_dc_dcheck_t		*dcheck_ptr;
 
 			if (0 == *queue_capacity)
 				return checks_count;
 
 			task_local.ip = zbx_strdup(NULL, SVC_ICMPPING == dcheck->type ? "" : ip);
 			task_local.port = (unsigned short)port;
-
-			dcheck_ptr = (zbx_dc_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
-			dcheck_copy(dcheck, dcheck_ptr);
-
-			if (SVC_SNMPv1 == dcheck_ptr->type || SVC_SNMPv2c == dcheck_ptr->type ||
-					SVC_SNMPv3 == dcheck_ptr->type)
-			{
-				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-						NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community,
-						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				zbx_substitute_key_macros(&dcheck_ptr->key_, NULL, NULL, NULL, NULL,
-						ZBX_MACRO_TYPE_SNMP_OID, NULL, 0);
-
-				if (SVC_SNMPv3 == dcheck_ptr->type)
-				{
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_securityname, ZBX_MACRO_TYPE_COMMON, NULL,
-							0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_authpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
-							0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_privpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
-							0);
-					zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
-							NULL, NULL, NULL, NULL, NULL, NULL,
-							&dcheck_ptr->snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL,
-							0);
-				}
-			}
 
 			if (NULL != (task = zbx_hashset_search(tasks, &task_local)))
 			{
@@ -518,20 +484,14 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 				if ('\0' == *task->ip && task->dchecks.values[0]->dcheckid == dcheck->dcheckid)
 				{
 					zbx_vector_str_append(task->ips, zbx_strdup(NULL, ip));
-					zbx_discovery_dcheck_free(dcheck_ptr);
 				}
-				else if (FAIL == zbx_vector_dc_dcheck_ptr_search(&task->dchecks, dcheck_ptr,
+				else if (FAIL == zbx_vector_dc_dcheck_ptr_search(&task->dchecks, dcheck,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 				{
-					zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck_ptr);
+					zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck);
 				}
 				else if ('\0' != *task->ip)
-				{
-					zbx_discovery_dcheck_free(dcheck_ptr);
 					continue;
-				}
-				else
-					zbx_discovery_dcheck_free(dcheck_ptr);
 			}
 			else
 			{
@@ -554,7 +514,7 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 				}
 
 				zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
-				zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck_ptr);
+				zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
 				zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
 			}
 
@@ -574,15 +534,64 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 	return checks_count;
 }
 
+static zbx_dc_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_dc_dcheck_ptr_t *dchecks_common)
+{
+	zbx_dc_dcheck_t	*dcheck_ptr, dcheck_cmp = {.dcheckid = dcheck->dcheckid};
+	int		idx;
+
+	if (FAIL != (idx = zbx_vector_dc_dcheck_ptr_search(dchecks_common, &dcheck_cmp,
+							ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	{
+		return dchecks_common->values[idx];
+	}
+
+	dcheck_ptr = (zbx_dc_dcheck_t*)zbx_malloc(NULL, sizeof(zbx_dc_dcheck_t));
+	dcheck_copy(dcheck, dcheck_ptr);
+
+	if (SVC_SNMPv1 == dcheck_ptr->type || SVC_SNMPv2c == dcheck_ptr->type ||
+			SVC_SNMPv3 == dcheck_ptr->type)
+	{
+		zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				NULL, NULL, NULL, NULL, &dcheck_ptr->snmp_community,
+				ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_substitute_key_macros(&dcheck_ptr->key_, NULL, NULL, NULL, NULL,
+				ZBX_MACRO_TYPE_SNMP_OID, NULL, 0);
+
+		if (SVC_SNMPv3 == dcheck_ptr->type)
+		{
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, NULL,
+					&dcheck_ptr->snmpv3_securityname, ZBX_MACRO_TYPE_COMMON, NULL,
+					0);
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, NULL,
+					&dcheck_ptr->snmpv3_authpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
+					0);
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, NULL,
+					&dcheck_ptr->snmpv3_privpassphrase, ZBX_MACRO_TYPE_COMMON, NULL,
+					0);
+			zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, NULL, NULL,
+					&dcheck_ptr->snmpv3_contextname, ZBX_MACRO_TYPE_COMMON, NULL,
+					0);
+		}
+	}
+
+	zbx_vector_dc_dcheck_ptr_append(dchecks_common, dcheck_ptr);
+
+	return dcheck_ptr;
+}
+
 static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int unique, int *need_resolve,
-		zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks)
+		zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks, zbx_vector_dc_dcheck_ptr_t *dchecks_common)
 {
 	int		i;
 	zbx_uint64_t	checks_count = 0;
 
 	for (i = 0; i < drule->dchecks.values_num; i++)
 	{
-		zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
+		zbx_dc_dcheck_t	*dcheck_common, *dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 
 		if (0 == *queue_capacity)
 			break;
@@ -594,7 +603,8 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 			continue;
 		}
 
-		checks_count += process_check(drule, dcheck, ip, need_resolve, queue_capacity, tasks);
+		dcheck_common = dcheck_clone_get(dcheck, dchecks_common);
+		checks_count += process_check(drule, dcheck_common, ip, need_resolve, queue_capacity, tasks);
 	}
 
 	return checks_count;
@@ -630,7 +640,7 @@ static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dh
  *                                                                            *
  ******************************************************************************/
 static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
-		zbx_hashset_t *check_counts)
+		zbx_hashset_t *check_counts, zbx_vector_dc_dcheck_ptr_t *dchecks_common)
 {
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *start, *comma;
 	int		ipaddress[8];
@@ -710,9 +720,13 @@ static void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zb
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() ip:'%s'", __func__, ip);
 
 			if (0 != drule->unique_dcheckid)
-				checks_count = process_checks(drule, ip, 1, &need_resolve, queue_capacity, tasks);
+			{
+				checks_count = process_checks(drule, ip, 1, &need_resolve, queue_capacity, tasks,
+						dchecks_common);
+			}
 
-			checks_count += process_checks(drule, ip, 0, &need_resolve, queue_capacity, tasks);
+			checks_count += process_checks(drule, ip, 0, &need_resolve, queue_capacity, tasks,
+					dchecks_common);
 
 			if (0 == *queue_capacity)
 				goto out;
@@ -998,6 +1012,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 		zbx_discoverer_check_count_t	*count;
 		zbx_discoverer_job_t		*job, cmp;
 		zbx_dc_drule_t			*drule = drules.values[k];
+		zbx_vector_dc_dcheck_ptr_t	dchecks_common;
 
 		now = time(NULL);
 
@@ -1078,8 +1093,9 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 		zbx_hashset_create(&tasks, 1, discoverer_task_hash, discoverer_task_compare);
 		zbx_hashset_create(&drule_check_counts, 1, discoverer_check_count_hash,
 				discoverer_check_count_compare);
+		zbx_vector_dc_dcheck_ptr_create(&dchecks_common);
 
-		process_rule(drule, &queue_capacity_local, &tasks, &drule_check_counts);
+		process_rule(drule, &queue_capacity_local, &tasks, &drule_check_counts, &dchecks_common);
 		zbx_hashset_iter_reset(&tasks, &iter);
 
 		if (0 == queue_capacity_local)
@@ -1091,12 +1107,14 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 
 			zbx_hashset_destroy(&tasks);
 			zbx_hashset_destroy(&drule_check_counts);
+			zbx_vector_dc_dcheck_ptr_destroy(&dchecks_common);
 			goto next;
 		}
 
 		queue_checks_count = queue_capacity - queue_capacity_local;
 
-		job = discoverer_job_create(drule);
+		job = discoverer_job_create(drule, config_timeout, &dchecks_common);
+		zbx_vector_dc_dcheck_ptr_destroy(&dchecks_common);
 
 		while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 		{
