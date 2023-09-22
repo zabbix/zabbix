@@ -168,7 +168,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			if (!$errors) {
 				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
-					if ($value[$field] !== '' && ($value[$field_ts] < 0 || $value[$field_ts] > ZBX_MAX_DATE)) {
+					if ($value[$field_ts] < 0 || $value[$field_ts] > ZBX_MAX_DATE) {
 						$errors[] = [
 							_s('Invalid parameter "%1$s": %2$s.', $field_labels[$field],
 								$this->is_date_only ? _('a date is expected') : _('a time is expected')
