@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-23 21:55+0000\n"
-"Last-Translator: Andi Chandler <andi@gowling.com>\n"
+"PO-Revision-Date: 2023-09-22 05:57+0000\n"
+"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
 "Language-Team: none\n"
 "Language: en_GB\n"
 "MIME-Version: 1.0\n"
@@ -23582,11 +23582,11 @@ msgstr ""
 
 #: include/translateDefines.inc.php:32
 msgid "Y-m-d h:i A"
-msgstr ""
+msgstr "Y-m-d H:i"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d h:i:s A"
-msgstr ""
+msgstr "Y-m-d H:i:s"
 
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
@@ -24802,11 +24802,11 @@ msgstr ""
 
 #: include/translateDefines.inc.php:37
 msgid "h:i A"
-msgstr ""
+msgstr "H:i"
 
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"
-msgstr ""
+msgstr "H:i:s"
 
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
@@ -25172,7 +25172,7 @@ msgstr ""
 
 #: include/translateDefines.inc.php:33
 msgid "m-d h:i A"
-msgstr ""
+msgstr "m-d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
@@ -25374,7 +25374,7 @@ msgstr ""
 
 #: include/translateDefines.inc.php:39
 msgid "n-d h:i A"
-msgstr ""
+msgstr "n-d H:i"
 
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
