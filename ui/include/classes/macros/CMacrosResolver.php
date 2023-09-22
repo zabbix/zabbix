@@ -147,33 +147,33 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			if (array_key_exists('macros', $matched_macros)) {
 				if (array_key_exists('host', $matched_macros['macros']) && $matched_macros['macros']['host']) {
-					foreach ($matched_macros['macros']['host'] as $macro) {
-						$macros[$hostid][$macro] = UNRESOLVED_MACRO_STRING;
+					foreach ($matched_macros['macros']['host'] as $token => $foo) {
+						$macros[$hostid][$token] = UNRESOLVED_MACRO_STRING;
 					}
 					$host_hostids[$hostid] = true;
 				}
 
 				if (array_key_exists('hostId', $matched_macros['macros']) && $hostid != 0) {
-					foreach ($matched_macros['macros']['hostId'] as $macro) {
-						$macros[$hostid][$macro] = $hostid;
+					foreach ($matched_macros['macros']['hostId'] as $token => $foo) {
+						$macros[$hostid][$token] = $hostid;
 					}
 				}
 
 				if (array_key_exists('interface', $matched_macros['macros'])
 						&& $matched_macros['macros']['interface']) {
-					foreach ($matched_macros['macros']['interface'] as $macro) {
-						$macros[$hostid][$macro] = UNRESOLVED_MACRO_STRING;
+					foreach ($matched_macros['macros']['interface'] as $token => $foo) {
+						$macros[$hostid][$token] = UNRESOLVED_MACRO_STRING;
 					}
 					$interface_hostids[$hostid] = true;
 				}
 
 				if (array_key_exists('user_data', $matched_macros['macros'])
 						&& $matched_macros['macros']['user_data']) {
-					foreach ($matched_macros['macros']['user_data'] as $macro) {
-						switch ($macro) {
+					foreach ($matched_macros['macros']['user_data'] as $token => $foo) {
+						switch ($token) {
 							case '{USER.ALIAS}': // Deprecated in version 5.4.
 							case '{USER.USERNAME}':
-								$macros[$hostid][$macro] = CWebUser::$data['username'];
+								$macros[$hostid][$token] = CWebUser::$data['username'];
 								break;
 
 							case '{USER.FULLNAME}':
@@ -185,17 +185,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 									}
 								}
 
-								$macros[$hostid][$macro] = $fullname
+								$macros[$hostid][$token] = $fullname
 									? implode(' ', array_merge($fullname, ['('.CWebUser::$data['username'].')']))
 									: CWebUser::$data['username'];
 								break;
 
 							case '{USER.NAME}':
-								$macros[$hostid][$macro] = CWebUser::$data['name'];
+								$macros[$hostid][$token] = CWebUser::$data['name'];
 								break;
 
 							case '{USER.SURNAME}':
-								$macros[$hostid][$macro] = CWebUser::$data['surname'];
+								$macros[$hostid][$token] = CWebUser::$data['surname'];
 								break;
 						}
 					}
@@ -701,15 +701,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$functionids = $this->findFunctions($trigger['expression']);
 		$matched_macros = self::extractMacros([$trigger[$options['source']]], $types);
 
-		foreach ($matched_macros['macros']['trigger'] as $macro) {
-			$macro_values[$triggerid][$macro] = $triggerid;
+		foreach ($matched_macros['macros']['trigger'] as $token => $data) {
+			$macro_values[$triggerid][$token] = $triggerid;
 		}
 
-		foreach ($matched_macros['macros']['event'] as $macro) {
-			if (!array_key_exists('eventid', $trigger) && $macro === '{EVENT.ID}') {
+		foreach ($matched_macros['macros']['event'] as $token => $data) {
+			if (!array_key_exists('eventid', $trigger) && $token === '{EVENT.ID}') {
 				return false;
 			}
-			$macro_values[$triggerid][$macro] = $trigger['eventid'];
+			$macro_values[$triggerid][$token] = $trigger['eventid'];
 		}
 
 		foreach ($matched_macros['macros_n'] as $key => $macro_data) {
@@ -1522,7 +1522,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($items as $key => $item) {
 			$matched_macros = self::extractMacros([$item['widget_description']], $types);
 
-			foreach ($matched_macros['macros']['host'] as $token) {
+			foreach ($matched_macros['macros']['host'] as $token => $data) {
 				if ($token === '{HOST.ID}') {
 					$macro_values[$key][$token] = $item['hostid'];
 				}
@@ -1532,12 +1532,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			foreach ($matched_macros['macros']['interface'] as $token) {
+			foreach ($matched_macros['macros']['interface'] as $token => $data) {
 				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 				$macros['interface'][$item['itemid']][$key] = true;
 			}
 
-			foreach ($matched_macros['macros']['item'] as $token) {
+			foreach ($matched_macros['macros']['item'] as $token => $data) {
 				if ($token === '{ITEM.ID}') {
 					$macro_values[$key][$token] = $item['itemid'];
 				}
@@ -1547,9 +1547,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
-			foreach ($matched_macros['macros']['item_value'] as $token) {
+			foreach ($matched_macros['macros']['item_value'] as $token => $data) {
 				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['item_value'][$item['itemid']][$key][$token] = ['macro' => substr($token, 1, -1)];
+				$macros['item_value'][$item['itemid']][$key][$token] = $data;
 			}
 
 			foreach ($matched_macros['macro_funcs']['item_value'] as $token => $data) {
@@ -1557,7 +1557,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$macros['item_value'][$item['itemid']][$key][$token] = $data;
 			}
 
-			foreach ($matched_macros['macros']['inventory'] as $token) {
+			foreach ($matched_macros['macros']['inventory'] as $token => $data) {
 				$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 				$macros['inventory'][$item['hostid']][$key] = true;
 			}
@@ -1613,24 +1613,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($hostids as $hostid) {
 			$macro_values[$hostid] = [];
 
-			foreach ($matched_macros['macros']['host'] as $token) {
-				if ($token === '{HOST.ID}') {
-					$macro_values[$hostid][$token] = $hostid;
+			foreach ($matched_macros['macros'] as $key => $macro_data) {
+				foreach ($macro_data as $token => $data) {
+					if ($token === '{HOST.ID}') {
+						$macro_values[$hostid][$token] = $hostid;
+					}
+					else {
+						$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
+						$macros[$key][$hostid][$hostid] = true;
+					}
 				}
-				else {
-					$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
-					$macros['host'][$hostid][$hostid] = true;
-				}
-			}
-
-			foreach ($matched_macros['macros']['interface'] as $token) {
-				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['interface'][$hostid][$hostid] = true;
-			}
-
-			foreach ($matched_macros['macros']['inventory'] as $token) {
-				$macro_values[$hostid][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['inventory'][$hostid][$hostid] = true;
 			}
 
 			if ($matched_macros['usermacros']) {
@@ -1828,8 +1820,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($shapes as $shape) {
 			$matched_macros = self::extractMacros(array_intersect_key($shape, $fields), $types);
 
-			foreach ($matched_macros['macros']['map'] as $macro) {
-				$macro_values[$macro] = $map_name;
+			foreach ($matched_macros['macros']['map'] as $token => $data) {
+				$macro_values[$token] = $map_name;
 			}
 
 			foreach ($matched_macros['expr_macros'] as $macro => $data) {
@@ -1985,54 +1977,54 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				if (array_key_exists('macros', $matched_macros)) {
 					if (array_key_exists('map', $matched_macros['macros'])) {
-						foreach ($matched_macros['macros']['map'] as $macro) {
-							switch ($macro) {
+						foreach ($matched_macros['macros']['map'] as $token => $data) {
+							switch ($token) {
 								case '{MAP.ID}':
-									$macro_values[$key][$macro] = $selement['elements'][0]['sysmapid'];
+									$macro_values[$key][$token] = $selement['elements'][0]['sysmapid'];
 									break;
 
 								default:
-									$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+									$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 									$macros['map'][$selement['elements'][0]['sysmapid']][$key] = true;
 							}
 						}
 					}
 
 					if (array_key_exists('triggers', $matched_macros['macros'])) {
-						foreach ($matched_macros['macros']['triggers'] as $macro) {
-							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+						foreach ($matched_macros['macros']['triggers'] as $token => $data) {
+							$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 							$macros['triggers'][$key] = true;
 						}
 					}
 
 					if (array_key_exists('hostgroup', $matched_macros['macros'])) {
-						foreach ($matched_macros['macros']['hostgroup'] as $macro) {
-							$macro_values[$key][$macro] = $selement['elements'][0]['groupid'];
+						foreach ($matched_macros['macros']['hostgroup'] as $token => $data) {
+							$macro_values[$key][$token] = $selement['elements'][0]['groupid'];
 						}
 					}
 
 					if (array_key_exists('host', $matched_macros['macros'])) {
-						foreach ($matched_macros['macros']['host'] as $macro) {
+						foreach ($matched_macros['macros']['host'] as $token => $data) {
 							if (array_key_exists('hostid', $selement['elements'][0])) {
-								switch ($macro) {
+								switch ($token) {
 									case '{HOST.ID}':
-										$macro_values[$key][$macro] = $selement['elements'][0]['hostid'];
+										$macro_values[$key][$token] = $selement['elements'][0]['hostid'];
 										break;
 
 									default:
-										$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+										$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 										$macros['host'][$selement['elements'][0]['hostid']][$key] = true;
 								}
 							}
 							else {
-								$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+								$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 							}
 						}
 					}
 
 					if (array_key_exists('interface', $matched_macros['macros'])) {
-						foreach ($matched_macros['macros']['interface'] as $macro) {
-							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+						foreach ($matched_macros['macros']['interface'] as $token => $data) {
+							$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 							if (array_key_exists('hostid', $selement['elements'][0])) {
 								$macros['interface'][$selement['elements'][0]['hostid']][$key] = true;
 							}
@@ -2040,8 +2032,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 
 					if (array_key_exists('inventory', $matched_macros['macros'])) {
-						foreach ($matched_macros['macros']['inventory'] as $macro) {
-							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
+						foreach ($matched_macros['macros']['inventory'] as $token => $data) {
+							$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 							if (array_key_exists('hostid', $selement['elements'][0])) {
 								$macros['inventory'][$selement['elements'][0]['hostid']][$key] = true;
 							}
@@ -2049,8 +2041,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					}
 
 					if (array_key_exists('trigger', $matched_macros['macros'])) {
-						foreach ($matched_macros['macros']['trigger'] as $macro) {
-							$macro_values[$key][$macro] = $selement['elements'][0]['triggerid'];
+						foreach ($matched_macros['macros']['trigger'] as $token => $data) {
+							$macro_values[$key][$token] = $selement['elements'][0]['triggerid'];
 						}
 					}
 				}
@@ -2288,8 +2280,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			);
 
 			foreach ($matched_macros['macros'] as $type => $matches) {
-				foreach ($matches as $macro) {
-					$macros[$macro] = $data['macros_values'][$type][$macro];
+				foreach ($matches as $token => $data) {
+					$macros[$token] = $data['macros_values'][$type][$token];
 				}
 			}
 		}
@@ -2489,11 +2481,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						}
 					}
 					else {
-						foreach ($_macros as $key => $__macros) {
-							// $key = 'host', 'interface', 'user_data' and 'inventory'
-							foreach ($__macros as $macro) {
-								if (!in_array($macro, $matched_macros[$type][$key])) {
-									$matched_macros[$type][$key][] = $macro;
+						foreach ($_macros as $key => $macro_data) {
+							foreach ($macro_data as $token => $foo) {
+								if (!in_array($token, $matched_macros[$type][$key])) {
+									$matched_macros[$type][$key][] = $token;
 								}
 							}
 						}
@@ -2643,11 +2634,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							break;
 
 						case 'macros':
-							foreach ($_macros as $key => $__macros) {
-								// $key = 'host', 'interface', 'inventory', 'event' and 'user_data'
-								foreach ($__macros as $macro) {
-									if (!in_array($macro, $matched_macros[$type][$key])) {
-										$matched_macros[$type][$key][] = $macro;
+							foreach ($_macros as $key => $macro_data) {
+								foreach ($macro_data as $token => $foo) {
+									if (!in_array($token, $matched_macros[$type][$key])) {
+										$matched_macros[$type][$key][] = $token;
 									}
 								}
 							}

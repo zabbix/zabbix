@@ -456,7 +456,9 @@ class CMacrosResolverGeneral {
 				if ($extract_macros) {
 					foreach ($types['macros'] as $key => $macro_parser) {
 						if ($macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-							$macros['macros'][$key][$macro_parser->getMatch()] = true;
+							$macros['macros'][$key][$macro_parser->getMatch()] = [
+								'macro' => $macro_parser->getMacro()
+							];
 							$pos += $macro_parser->getLength() - 1;
 							continue 2;
 						}
@@ -697,12 +699,6 @@ class CMacrosResolverGeneral {
 						continue;
 					}
 				}
-			}
-		}
-
-		if ($extract_macros) {
-			foreach ($types['macros'] as $key => $macro_parser) {
-				$macros['macros'][$key] = array_keys($macros['macros'][$key]);
 			}
 		}
 
