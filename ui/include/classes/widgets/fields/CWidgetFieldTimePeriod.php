@@ -40,8 +40,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	public const DATA_SOURCE_WIDGET = 1;
 	public const DATA_SOURCE_DASHBOARD = 2;
 
-	private int $data_source = self::DATA_SOURCE_DEFAULT;
-
 	private ?string $from_label = null;
 	private ?string $to_label = null;
 
@@ -66,27 +64,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	}
 
 	public function setValue($value): self {
-		$value = (array) $value;
-
-		if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
-			[
-				'reference' => $reference
-			] = self::parseTypedReference($value[self::FOREIGN_REFERENCE_KEY]);
-
-			$this->data_source = $reference === self::REFERENCE_DASHBOARD
-				? self::DATA_SOURCE_DASHBOARD
-				: self::DATA_SOURCE_WIDGET;
-		}
-		elseif (array_key_exists('data_source', $value)) {
-			$this->data_source = $value['data_source'];
-		}
-		else {
-			$this->data_source = self::DATA_SOURCE_DEFAULT;
-		}
-
-		unset($value['data_source']);
-
-		$this->value = $value;
+		parent::setValue((array) $value);
 
 		return $this;
 	}
@@ -96,13 +74,13 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 		$label = $this->full_name ?? $this->label ?? '';
 		$value = $this->getValue();
-
 		$default = $this->getDefault();
+		$data_source = $this->getDataSource();
 
 		$errors = [];
 
-		if ($this->data_source !== self::DATA_SOURCE_DEFAULT) {
-			$data_source_label = $this->data_source === self::DATA_SOURCE_DASHBOARD ? _('Dashboard') : _('Widget');
+		if ($data_source !== self::DATA_SOURCE_DEFAULT) {
+			$data_source_label = $data_source === self::DATA_SOURCE_DASHBOARD ? _('Dashboard') : _('Widget');
 
 			$reference_value = array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value)
 				? $value[CWidgetField::FOREIGN_REFERENCE_KEY]
@@ -246,7 +224,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 		$value = $this->getValue();
 		$default = $this->getDefault();
 
-		switch ($this->data_source) {
+		switch ($this->getDataSource()) {
 			case self::DATA_SOURCE_DEFAULT:
 				foreach (['from', 'to'] as $name) {
 					if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $default) || $value[$name] !== $default[$name]) {
@@ -261,21 +239,34 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			case self::DATA_SOURCE_WIDGET:
 			case self::DATA_SOURCE_DASHBOARD:
-				if ($value === $default) {
-					return;
+				if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
+						|| $value[self::FOREIGN_REFERENCE_KEY] !== $default[self::FOREIGN_REFERENCE_KEY]) {
+					$widget_fields[] = [
+						'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+						'name' => $this->name.'.'.self::FOREIGN_REFERENCE_KEY,
+						'value' => $value[self::FOREIGN_REFERENCE_KEY]
+					];
 				}
-
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.'.self::FOREIGN_REFERENCE_KEY,
-					'value' => $value[self::FOREIGN_REFERENCE_KEY]
-				];
 				return;
 		}
 	}
 
 	public function getDataSource(): int {
-		return $this->data_source;
+		$value = $this->getValue();
+
+		if (array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
+			[
+				'reference' => $reference
+			] = self::parseTypedReference($value[self::FOREIGN_REFERENCE_KEY]);
+
+			return $reference === self::REFERENCE_DASHBOARD ? self::DATA_SOURCE_DASHBOARD : self::DATA_SOURCE_WIDGET;
+		}
+		elseif (array_key_exists('data_source', $value)) {
+			return $value['data_source'];
+		}
+		else {
+			return self::DATA_SOURCE_DEFAULT;
+		}
 	}
 
 	public function getFromLabel(): string {
@@ -340,7 +331,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 	}
 
 	protected function getValidationRules(bool $strict = false): array {
-		if ($this->data_source === self::DATA_SOURCE_DEFAULT) {
+		if ($this->getDataSource() === self::DATA_SOURCE_DEFAULT) {
 			$validation_rules = parent::getValidationRules($strict);
 
 			if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
