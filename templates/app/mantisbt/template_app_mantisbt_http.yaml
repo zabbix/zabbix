@@ -48,6 +48,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
+              - macro: '{#ENABLED}'
+                value: 'true'
+                formulaid: A
               - macro: '{#NAME}'
                 value: '{$MANTIS.LLD.FILTER.PROJECTS.MATCHES}'
                 formulaid: B
@@ -55,9 +58,6 @@ zabbix_export:
                 value: '{$MANTIS.LLD.FILTER.PROJECTS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#ENABLED}'
-                value: 'true'
-                formulaid: A
           description: 'Discovery rule for a Mantis BT projects.'
           item_prototypes:
             - uuid: baffdd6d9e51403084fc4a98bb4b9ff7
@@ -888,6 +888,22 @@ zabbix_export:
             - name: 'Mantis BT: Issues'
               widgets:
                 - type: graphprototype
+                  name: 'Mantis BT: Issues total'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'Mantis BT by HTTP'
+                        name: 'Mantis BT: [{#NAME}] Issues total'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: graphprototype
                   name: 'Mantis BT: Issues by priority'
                   'y': '5'
                   width: '6'
@@ -896,14 +912,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by priority'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: graphprototype
                   name: 'Mantis BT: Issues by resolution'
                   x: '6'
@@ -914,14 +930,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by resolution'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: graphprototype
                   name: 'Mantis BT: Issues by severity'
                   x: '12'
@@ -932,14 +948,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by severity'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: graphprototype
                   name: 'Mantis BT: Issues by status'
                   x: '18'
@@ -950,27 +966,11 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by status'
-                - type: graphprototype
-                  name: 'Mantis BT: Issues total'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: INTEGER
                       name: rows
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'Mantis BT by HTTP'
-                        name: 'Mantis BT: [{#NAME}] Issues total'

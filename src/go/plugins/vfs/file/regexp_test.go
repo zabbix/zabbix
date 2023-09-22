@@ -26,7 +26,9 @@ import (
 	"reflect"
 	"regexp"
 	"testing"
+
 	"zabbix.com/pkg/zbxregexp"
+	"zabbix.com/pkg/zbxtest"
 )
 
 func TestExecuteRegex(t *testing.T) {
@@ -72,9 +74,7 @@ func TestExecuteRegex(t *testing.T) {
 }
 
 func TestFileRegexpOutput(t *testing.T) {
-
-	impl.options.Timeout = 3
-
+	var ctx zbxtest.MockEmptyCtx
 	filename := "/tmp/zbx_vfs_file_regexp_test.dat"
 
 	type testCase struct {
@@ -235,7 +235,7 @@ func TestFileRegexpOutput(t *testing.T) {
 		var err error
 
 		if result, err = impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+			c.lineStart, c.lineEnd, c.targetStringGroup}, ctx); err != nil {
 			t.Errorf("vfs.file.regexp (testCase[%d]) returned error %s", i, err.Error())
 
 			return
@@ -285,7 +285,7 @@ func TestFileRegexpOutput(t *testing.T) {
 		defer os.Remove(filename)
 
 		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+			c.lineStart, c.lineEnd, c.targetStringGroup}, ctx); err != nil {
 			if err.Error() != expectedError {
 				t.Errorf("vfs.file.regexp testcase[%d] failed with unexpected error: %s, expected: %s",
 					i, err.Error(), expectedError)
@@ -333,7 +333,7 @@ func TestFileRegexpOutput(t *testing.T) {
 
 		var err error
 		_, err = impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd, c.targetStringGroup}, nil)
+			c.lineStart, c.lineEnd, c.targetStringGroup}, ctx)
 
 		if nil == err {
 			t.Errorf("vfs.file.regexp (testCase[%d]) did not return error: ->%s<- when wrong target "+

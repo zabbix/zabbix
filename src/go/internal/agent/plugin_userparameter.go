@@ -114,7 +114,7 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 
 	p.Debugf("executing command:'%s'", s)
 
-	stdoutStderr, err := zbxcmd.Execute(s, time.Second*time.Duration(Options.Timeout), p.userParameterDir)
+	stdoutStderr, err := zbxcmd.Execute(s, time.Second*time.Duration(ctx.Timeout()), p.userParameterDir)
 	if err != nil {
 		return nil, err
 	}

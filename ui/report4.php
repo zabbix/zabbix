@@ -80,7 +80,7 @@ if ($media_types) {
 	$select_media_type = (new CSelect('media_type'))
 		->setValue($media_type)
 		->setFocusableElementId('media-type')
-		->addOption(new CSelectOption(0, _('all')))
+		->addOption(new CSelectOption(0, _('All')))
 		->addOptions(CSelect::createOptionsFromArray($media_types));
 
 	$select_period = (new CSelect('period'))

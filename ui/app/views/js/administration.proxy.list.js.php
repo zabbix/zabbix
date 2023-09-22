@@ -71,11 +71,11 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('popup.proxy.edit', parameters, {
 				dialogueid: 'proxy_edit',
-				dialogue_class: 'modal-popup-large',
+				dialogue_class: 'modal-popup-static',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail));
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
 		}
 
 		_editHost(hostid) {

@@ -178,6 +178,22 @@ class testFormulaCalculatedItem extends testCalculatedFormula {
 					'formula' => 'avg(/host/trap,"{#LLD}h")',
 					'error' => 'Invalid parameter "/1/params": invalid second parameter in function "avg".'
 				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'jsonpath(last(/Simple form test host/test-item-form4,#10:{#LLD}),"$.[0].last_name","LastName")',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from '.
+							'"jsonpath(last(/Simple form test host/test-item-form4,#10:{#LLD}),"$.[0].last_name","LastName")".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'xmlxpath(last(/Simple form test host/test-item-form4,#4:{#LLD}),"/zabbix_export/version/text()",5.0)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from '.
+							'"xmlxpath(last(/Simple form test host/test-item-form4,#4:{#LLD}),"/zabbix_export/version/text()",5.0)".'
+				]
 			]
 		];
 	}
