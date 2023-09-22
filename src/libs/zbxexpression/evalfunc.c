@@ -3627,6 +3627,7 @@ int	zbx_is_trigger_function(const char *name, size_t len)
 			"sumofsquares", "varpop", "varsamp", "ascii", "bitlength", "char", "concat", "insert", "lcase",
 			"left", "ltrim", "bytelength", "repeat", "replace", "right", "rtrim", "mid", "trim", "between",
 			"in", "bitor", "bitxor", "bitnot", "bitlshift", "bitrshift", "baselinewma", "baselinedev",
+			"jsonpath", "xmlxpath",
 			NULL};
 	char	**ptr;
 

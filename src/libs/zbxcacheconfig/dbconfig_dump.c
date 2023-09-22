@@ -18,14 +18,16 @@
 **/
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
+#include "user_macro.h"
 
-#include "zbxcommon.h"
+#include "zbx_host_constants.h"
+#include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 static void	DCdump_config(void)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
 	if (NULL == config->config)
@@ -45,7 +47,7 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "autoreg_tls_accept:%hhu", config->config->autoreg_tls_accept);
 
 	zabbix_log(LOG_LEVEL_TRACE, "severity names:");
-	for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
+	for (int i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 		zabbix_log(LOG_LEVEL_TRACE, "  %s", config->config->severity_name[i]);
 
 	zabbix_log(LOG_LEVEL_TRACE, "housekeeping:");

@@ -28,7 +28,6 @@
 #include "zbxvault.h"
 #include "zbxdbhigh.h"
 #include "dbsync.h"
-#include "actions.h"
 #include "zbxtrends.h"
 #include "zbxserialize.h"
 #include "user_macro.h"
@@ -37,6 +36,7 @@
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
@@ -46,6 +46,11 @@
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxdbschema.h"
+#include "zbxeval.h"
+#include "zbxipcservice.h"
+#include "zbxjson.h"
+#include "zbxkvs.h"
 
 int	sync_in_progress = 0;
 
@@ -3814,8 +3819,6 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-#define ZBX_TIMER_DELAY		30
-
 static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_handle,
 		const zbx_trigger_timer_t *timer, zbx_uint64_t seed, time_t *nextcheck, char **error)
 {
@@ -3928,15 +3931,16 @@ out:
 static time_t	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handle, const zbx_trigger_timer_t *timer,
 		time_t from, zbx_uint64_t seed)
 {
+#define ZBX_TRIGGER_TIMER_DELAY	30
 	if (ZBX_TRIGGER_TIMER_FUNCTION_TIME == timer->type || ZBX_TRIGGER_TIMER_TRIGGER == timer->type)
 	{
 		int	nextcheck;
 
-		nextcheck = ZBX_TIMER_DELAY * (int)(from / (time_t)ZBX_TIMER_DELAY) +
-				(int)(seed % (zbx_uint64_t)ZBX_TIMER_DELAY);
+		nextcheck = ZBX_TRIGGER_TIMER_DELAY * (int)(from / (time_t)ZBX_TRIGGER_TIMER_DELAY) +
+				(int)(seed % (zbx_uint64_t)ZBX_TRIGGER_TIMER_DELAY);
 
 		while (nextcheck <= from)
-			nextcheck += ZBX_TIMER_DELAY;
+			nextcheck += ZBX_TRIGGER_TIMER_DELAY;
 
 		return nextcheck;
 	}
@@ -3960,6 +3964,7 @@ static time_t	dc_function_calculate_nextcheck(const zbx_dc_um_handle_t *um_handl
 	THIS_SHOULD_NEVER_HAPPEN;
 
 	return 0;
+#undef ZBX_TRIGGER_TIMER_DELAY
 }
 
 /******************************************************************************

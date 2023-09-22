@@ -1058,6 +1058,10 @@ typedef struct
 #define ZBX_FLAG_HOST_MAINTENANCE_UPDATE_MAINTENANCE_STATUS	0x0004
 }
 zbx_host_maintenance_diff_t;
+/* NOTE: Do not forget to sync changes with zbx_host_maintenance_diff_free(). */
+
+ZBX_PTR_VECTOR_DECL(host_maintenance_diff_ptr, zbx_host_maintenance_diff_t*)
+void	zbx_host_maintenance_diff_free(zbx_host_maintenance_diff_t *hmd);
 
 /* event maintenance query data, used to get event maintenances from cache */
 typedef struct
@@ -1072,14 +1076,18 @@ typedef struct
 }
 zbx_event_suppress_query_t;
 
+ZBX_PTR_VECTOR_DECL(event_suppress_query_ptr, zbx_event_suppress_query_t*)
+
 #define ZBX_MAINTENANCE_UPDATE_TRUE	1
 #define ZBX_MAINTENANCE_UPDATE_FALSE	0
 
 void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
 int	zbx_dc_update_maintenances(void);
-void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids, zbx_vector_ptr_t *updates);
-void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_ptr_t *updates);
-int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vector_uint64_t *maintenanceids);
+void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids,
+		zbx_vector_host_maintenance_diff_ptr_t *updates);
+void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_host_maintenance_diff_ptr_t *updates);
+int	zbx_dc_get_event_maintenances(zbx_vector_event_suppress_query_ptr_t *event_queries,
+		const zbx_vector_uint64_t *maintenanceids);
 int	zbx_dc_get_running_maintenanceids(zbx_vector_uint64_t *maintenanceids);
 
 void	zbx_dc_maintenance_set_update_flags(void);

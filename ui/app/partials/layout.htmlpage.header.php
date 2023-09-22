@@ -70,7 +70,7 @@ foreach ($modules_assets as $module_id => $assets) {
 $page_header
 	->addJavaScript('
 		const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
-		const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
+		const PHP_ZBX_FULL_DATE_TIME = "'.DATE_TIME_FORMAT_SECONDS.'";
 	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))

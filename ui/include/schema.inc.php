@@ -439,8 +439,13 @@ return [
 		]
 	],
 	'group_discovery' => [
-		'key' => 'groupid',
+		'key' => 'groupdiscoveryid',
 		'fields' => [
+			'groupdiscoveryid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
 			'groupid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,

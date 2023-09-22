@@ -4419,8 +4419,6 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.38rc1
 
-New features:
-
 Bug fixes:
 ........S. [ZBX-23303] fixed syntax of message identifier in the In-Reply-To e-mail header field (asitals)
 ...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
@@ -7266,8 +7264,6 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 
 --------------------------------------------------------------------------------
 Changes for 4.0.49rc1
-
-New features:
 
 Bug fixes:
 ...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
