@@ -1023,6 +1023,20 @@ static int	DBpatch_6050099(void)
 	return DBadd_foreign_key("group_discovery", 2, &field);
 }
 
+static int	DBpatch_6050100(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'piechart','widgets/piechart',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1127,6 +1141,7 @@ DBPATCH_ADD(6050096, 0, 1)
 DBPATCH_ADD(6050097, 0, 1)
 DBPATCH_ADD(6050098, 0, 1)
 DBPATCH_ADD(6050099, 0, 1)
+DBPATCH_ADD(6050100, 0, 1)
 
 
 DBPATCH_END()

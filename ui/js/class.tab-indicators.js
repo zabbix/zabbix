@@ -59,6 +59,7 @@ class TabIndicators {
 		const ITEM_PROTOTYPE = document.querySelector('#item-prototype-form');
 		const MAP = document.querySelector('#sysmap-form');
 		const MEDIA_TYPE = document.querySelector('#media-type-form');
+		const PIE_CHART = document.querySelector('#widget-dialogue-form');
 		const PROXY = document.querySelector('#proxy-form');
 		const SERVICE = document.querySelector('#service-form');
 		const SLA = document.querySelector('#sla-form');
@@ -92,6 +93,8 @@ class TabIndicators {
 				return MAP;
 			case !!MEDIA_TYPE:
 				return MEDIA_TYPE;
+			case !!PIE_CHART:
+				return PIE_CHART;
 			case !!PROXY:
 				return PROXY;
 			case !!SERVICE:
@@ -229,6 +232,14 @@ class TabIndicatorFactory {
 				return new TemplatePermissionsTabIndicatorItem;
 			case 'HostPermissions':
 				return new HostPermissionsTabIndicatorItem;
+			case 'PieDataset':
+				return new PieDatasetTabIndicatorItem;
+			case 'PieDisplayOptions':
+				return new PieDisplayOptionsTabIndicatorItem;
+			case 'PieLegend':
+				return new PieLegendTabIndicatorItem;
+			case 'PieTime':
+				return new PieTimeTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
@@ -1428,6 +1439,12 @@ class GraphLegendTabIndicatorItem extends TabIndicatorItem {
 			return true;
 		}
 
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked && !legend_aggregation.disabled) {
+			return true;
+		}
+
 		const legend_lines = document.getElementById('legend_lines');
 
 		if (legend_lines !== null && legend_lines.value != GraphLegendTabIndicatorItem.SVG_GRAPH_LEGEND_LINES_MIN) {
@@ -1611,5 +1628,135 @@ class TemplateValuemapsTabIndicatorItem extends TabIndicatorItem {
 				subtree: true
 			});
 		}
+	}
+}
+
+class PieDatasetTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#data_set .list-accordion-item')
+			.length;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#data_set');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+	}
+}
+
+class PieDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
+
+	static PIE_CHART_SPACE_DEFAULT = 1;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const names = ['source', 'draw_type', 'merge'];
+
+		for (const name of names) {
+			const elem = document.querySelector("[name='" + name + "']:checked");
+			if (elem !== null && elem.value > 0) {
+				return true;
+			}
+		}
+
+		const space = document.getElementById('space');
+
+		if (space !== null && space.value != PieDisplayOptionsTabIndicatorItem.PIE_CHART_SPACE_DEFAULT) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class PieTimeTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const element = document.getElementById('graph_time');
+
+		if (element !== null) {
+			return element.checked;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
+	}
+}
+
+class PieLegendTabIndicatorItem extends TabIndicatorItem {
+
+	static PIE_CHART_LEGEND_LINES_MIN = 1;
+	static PIE_CHART_LEGEND_COLUMNS_MAX = 4;
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const legend = document.getElementById('legend');
+
+		if (legend !== null && !legend.checked) {
+			return true;
+		}
+
+		const legend_aggregation = document.getElementById('legend_aggregation');
+
+		if (legend_aggregation !== null && legend_aggregation.checked) {
+			return true;
+		}
+
+		const legend_lines = document.getElementById('legend_lines');
+
+		if (legend_lines !== null && legend_lines.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_LINES_MIN) {
+			return true;
+		}
+
+		const legend_columns = document.getElementById('legend_columns');
+
+		if (legend_columns !== null
+			&& legend_columns.value != PieLegendTabIndicatorItem.PIE_CHART_LEGEND_COLUMNS_MAX) {
+			return true;
+		}
+
+		return false;
+	}
+
+	initObserver() {
+		document.getElementById('tabs').addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
+			this.addAttributes();
+		});
 	}
 }

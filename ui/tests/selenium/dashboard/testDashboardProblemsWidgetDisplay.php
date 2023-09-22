@@ -614,7 +614,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 unsigned',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => 'Item value: 0'
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 2 log',
@@ -626,7 +626,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						],
 						[
 							'Problem • Severity' => 'Trigger for widget 1 float',
-							'Operational data' => "Item value: \n0"
+							'Operational data' => 'Item value: 0'
 						]
 					],
 					'headers' => ['Time', '', '', 'Recovery time', 'Status', 'Info', 'Host', 'Problem • Severity',
@@ -646,7 +646,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 1 char'],
-						['Problem • Severity' => "Trigger for widget 1 float (Item value: \n0)"]
+						['Problem • Severity' => 'Trigger for widget 1 float (Item value: 0)']
 					]
 				]
 			],

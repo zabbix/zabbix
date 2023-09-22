@@ -2449,6 +2449,9 @@ class testDashboardGraphWidget extends CWebTest {
 					'Aggregation interval' => '24h',
 					'Aggregate' => 'Data set'
 				]
+			],
+			'Legend' => [
+				'Show aggregation function' => true
 			]
 		];
 		$displayed_data = [

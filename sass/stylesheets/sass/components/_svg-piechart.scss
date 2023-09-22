@@ -1,0 +1,78 @@
+.svg-pie-chart {
+	fill: $font-color;
+
+	.svg-pie-chart-arcs {
+		stroke-linejoin: round;
+
+		path {
+			vector-effect: non-scaling-stroke;
+			stroke: $ui-bg-color;
+		}
+
+		.svg-pie-chart-arc-placeholder {
+			stroke-width: 0;
+			fill: transparent;
+		}
+
+		.svg-pie-chart-arc-no-data-outer {
+			fill: $pie-chart-arc-no-data-color;
+		}
+
+		.svg-pie-chart-arc-no-data-inner {
+			fill: $ui-bg-color;
+		}
+	}
+
+	.svg-pie-chart-total-value {
+		text-anchor: middle;
+	}
+
+	.svg-pie-chart-total-value-no-data {
+		text-anchor: middle;
+		fill: $font-alt-color;
+	}
+}
+
+.svg-pie-chart-legend {
+	$legend-line-height: 18px;
+
+	box-sizing: border-box;
+	display: grid;
+	grid-template-columns: repeat(var(--columns, 4), auto);
+	grid-gap: 0 10px;
+	justify-content: start;
+	max-height: calc(var(--lines) * #{$legend-line-height});
+	margin: 0 10px;
+	overflow: hidden;
+	line-height: $legend-line-height;
+
+	.svg-pie-chart-legend-item {
+		min-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+
+		&::before {
+			position: relative;
+			top: -3px;
+			content: ' ';
+			display: inline-block;
+			width: 10px;
+			height: 4px;
+			margin-right: 4px;
+			background: var(--color);
+		}
+	}
+}
+
+.svg-pie-chart-hintbox {
+	display: flex;
+	align-items: center;
+	white-space: pre;
+
+	.svg-pie-chart-hintbox-color {
+		width: 10px;
+		height: 10px;
+		margin-right: 10px;
+	}
+}
