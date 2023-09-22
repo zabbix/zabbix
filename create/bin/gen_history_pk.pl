@@ -167,12 +167,9 @@ CREATE TEMP TABLE temp_%HISTTBL (
 
 DO $$
 DECLARE
-	tsdb_version_major	INTEGER;
 	chunk_tm_interval	INTEGER;
 	jobid			INTEGER;
 BEGIN
-	SELECT substring(extversion, '^\d+') INTO tsdb_version_major FROM pg_extension WHERE extname='timescaledb';
-
 	PERFORM create_hypertable('%HISTTBL', 'clock', chunk_time_interval => (
 		SELECT integer_interval FROM timescaledb_information.dimensions WHERE hypertable_name='%HISTTBL_old'
 	), migrate_data => true);
