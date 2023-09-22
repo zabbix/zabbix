@@ -36,6 +36,7 @@ if ($data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 				->addStyle('margin-top: 8px;')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->addOptions(CSelect::createOptionsFromArray($data['dropdown_options']))
+				->setValue(array_shift($data['dropdown_options']))
 		);
 }
 else {
@@ -43,7 +44,9 @@ else {
 		->addItem((new CSpan($data['input_prompt']))->addClass(ZBX_STYLE_WORDBREAK))
 		->addItem(
 			new CFormField(
-				(new CTextBox('manual_input', $data['default_input']))
+				(new CTextBox('manual_input', $data['default_input'], false,
+					DB::getFieldLength('scripts', 'manualinput_default_value'))
+				)
 					->addStyle('margin-top: 8px;')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)
@@ -64,7 +67,7 @@ if($data['test']) {
 else {
 	$buttons = [
 		[
-			'title' => _('Execute'),
+			'title' => $data['confirmation'] ? _('Continue') : _('Execute'),
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'action' => 'script_userinput_popup.submit();',
@@ -75,11 +78,11 @@ else {
 $form
 	->addItem(
 		(new CScriptTag('script_userinput_popup.init('.json_encode([
-				'test' => $data['test'],
-				'input_type' => $data['input_type'],
-				'default_input' => $data['default_input'],
-				'input_validation' => $data['input_validation']
-			]).');'))->setOnDocumentReady()
+			'test' => $data['test'],
+			'input_type' => $data['input_type'],
+			'default_input' => $data['default_input'],
+			'input_validation' => $data['input_validation']
+		]).');'))->setOnDocumentReady()
 	);
 
 $output = [

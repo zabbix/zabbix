@@ -156,19 +156,11 @@ class CControllerScriptUpdate extends CController {
 
 				$script['manualinput_prompt'] = $this->getInput('input_prompt');
 			}
-			else {
-				$script['manualinput_default_value'] = DB::getDefault('scripts', 'manualinput_default_value');
-				$script['manualinput_validator'] = DB::getDefault('scripts', 'manualinput_validator');
-			}
 		}
 
 		// Reset the manualinput values to default, if scope changed to Action operation.
 		if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 			$script['manualinput'] = DB::getDefault('scripts', 'manualinput');
-			$script['manualinput_prompt'] = DB::getDefault('scripts', 'manualinput_prompt');
-			$script['manualinput_validator_type'] = DB::getDefault('scripts', 'manualinput_validator_type');
-			$script['manualinput_default_value'] = DB::getDefault('scripts', 'manualinput_default_value');
-			$script['manualinput_validator'] = DB::getDefault('scripts', 'manualinput_validator');
 		}
 
 		switch ($script['type']) {

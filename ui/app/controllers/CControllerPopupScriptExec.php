@@ -25,7 +25,8 @@ class CControllerPopupScriptExec extends CController {
 		$fields = [
 			'scriptid' =>		'db scripts.scriptid',
 			'hostid' =>			'db hosts.hostid',
-			'eventid' =>		'db events.eventid'
+			'eventid' =>		'db events.eventid',
+			'manualinput' =>	'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -69,6 +70,7 @@ class CControllerPopupScriptExec extends CController {
 		$scriptid = $this->getInput('scriptid');
 		$hostid = $this->getInput('hostid', '');
 		$eventid = $this->getInput('eventid', '');
+		$manualinput = $this->getInput('manualinput', '');
 
 		$data = [
 			'title' => _('Scripts'),
@@ -99,6 +101,10 @@ class CControllerPopupScriptExec extends CController {
 			}
 			elseif ($eventid) {
 				$execution_params['eventid'] = $eventid;
+			}
+
+			if ($manualinput) {
+				$execution_params['manualinput'] = $manualinput;
 			}
 
 			$result = API::Script()->execute($execution_params);

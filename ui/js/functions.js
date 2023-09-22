@@ -547,81 +547,124 @@ function overlayDialogue(params, trigger_elmnt) {
 /**
  * Execute script.
  *
- * @param string scriptid			Script ID.
- * @param string confirmation		Confirmation text.
- * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
- * @param string hostid				Host ID.
- * @param string eventid			Event ID.
- * @param string csrf_token			CSRF token.
+ * @param string  scriptid                  Script ID.
+ * @param string  confirmation              Confirmation text.
+ * @param {Node}  trigger_element           UI element that was clicked to open overlay dialogue.
+ * @param string  hostid                    Host ID.
+ * @param string  eventid                   Event ID.
+ * @param string  csrf_token                CSRF token.
+ * @param string|null  manualinput          Manual input enabled/disabled or null.
+ * @param string  manualinput_prompt        Manual input prompt text.
+ * @param int manualinput_validator_tpye    Manual input type - 0(string) or 1 (dropdown).
+ * @param string manualinput_validator      Validation rule - regular expression or list of allowed values.
+ * @param string manualinput_default_value  Default value of manual input.
  */
-function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token, manualinput,
-	manualinput_prompt, manualinput_validator_type, manualinput_validator, manualinput_default_value) {
-	var execute = function() {
-		var popup_options = {scriptid: scriptid};
-
-		if (hostid !== null) {
-			popup_options.hostid = hostid;
-		}
-
-		if (eventid !== null) {
-			popup_options.eventid = eventid;
-		}
-
-		if (Object.keys(popup_options).length === 2) {
-			popup_options._csrf_token = csrf_token;
-
-			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
-		}
-	};
+function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token,
+		manualinput = null, manualinput_prompt, manualinput_validator_type, manualinput_validator,
+		manualinput_default_value) {
 
 	if (manualinput == 1) {
 		const parameters = {
 			input_prompt: manualinput_prompt,
 			default_input: manualinput_default_value,
 			input_type: manualinput_validator_type,
-			input_validation: manualinput_validator
+			input_validation: manualinput_validator,
+			confirmation: confirmation
 		};
 
 		const overlay = PopUp('script.userinput.edit', parameters, {
 			dialogueid: 'script-userinput-form',
-			dialogue_class: 'modal-popup-small'
+			dialogue_class: 'modal-popup-small position-middle'
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-			const manualinput_value = e.detail.data.manualinput;
+			if (confirmation) {
+				confirmation = confirmation.replace(/{MANUALINPUT}/g, e.detail.data.manualinput);
+
+				showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token);
+			}
+			else {
+				execute(scriptid, eventid, hostid, e.detail.data.manualinput, csrf_token, trigger_element);
+			}
 		});
 	}
-
-	if (manualinput == 0 && confirmation.length > 0) {
-		overlayDialogue({
-			'title': t('Execution confirmation'),
-			'content': jQuery('<span>')
-				.addClass('confirmation-msg')
-				.text(confirmation),
-			'class': 'modal-popup modal-popup-small position-middle',
-			'buttons': [
-				{
-					'title': t('Cancel'),
-					'class': 'btn-alt',
-					'focused': (hostid === null && eventid === null),
-					'action': function() {}
-				},
-				{
-					'title': t('Execute'),
-					'enabled': (hostid !== null || eventid !== null),
-					'focused': (hostid !== null || eventid !== null),
-					'action': function() {
-						execute();
-					}
-				}
-			]
-		}, trigger_element);
-
-		return false;
+	else if (confirmation.length > 0) {
+		showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token);
 	}
-	// else {
-	// 	execute();
-	// }
+	else {
+		execute(scriptid, eventid, hostid, null, csrf_token, trigger_element);
+	}
+}
+
+/**
+ * Execute script.
+ *
+ * @param string  scriptid          Script ID.
+ * @param string  eventid           Event ID.
+ * @param string  hostid            Host ID.
+ * @param string|null  manualinput  Manual input value.
+ * @param string  csrf_token        CSRF token.
+ * @param {Node}  trigger_element   UI element that was clicked to open overlay dialogue.
+ */
+function execute(scriptid, eventid, hostid, manualinput, csrf_token, trigger_element) {
+	var popup_options = {scriptid: scriptid};
+
+	if (hostid !== null) {
+		popup_options.hostid = hostid;
+	}
+
+	if (eventid !== null) {
+		popup_options.eventid = eventid;
+	}
+
+	if (manualinput !== null) {
+		popup_options.manualinput = manualinput;
+	}
+
+	if (Object.keys(popup_options).length === 2 ||
+		(manualinput !== null && Object.keys(popup_options).length === 3)) {
+		popup_options._csrf_token = csrf_token;
+
+		PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
+	}
+}
+
+/**
+ * Display script execution confirmation dialogue.
+ *
+ * @param string  confirmation     Confirmation text.
+ * @param string  hostid           Host ID.
+ * @param string  eventid          Event ID.
+ * @param {Node}  trigger_element  UI element that was clicked to open overlay dialogue.
+ * @param string  scriptid         Script ID.
+ * @param string  csrf_token       CSRF token.
+ */
+function showConfirmationDialogue(confirmation, hostid, eventid, trigger_element, scriptid, csrf_token) {
+	overlayDialogue({
+		'title': t('Execution confirmation'),
+		'content': jQuery('<span>')
+			.addClass('confirmation-msg')
+			.text(confirmation),
+		'class': 'modal-popup modal-popup-small position-middle',
+		'buttons': [
+			{
+				'title': t('Cancel'),
+				'class': 'btn-alt',
+				'focused': (hostid === null && eventid === null),
+				'action': function() {}
+			},
+			{
+				'title': t('Execute'),
+				'enabled': (hostid !== null || eventid !== null),
+				'focused': (hostid !== null || eventid !== null),
+				'action': function() {
+					execute(scriptid, eventid, hostid, null, csrf_token, trigger_element);
+				}
+			}
+		]
+	}, trigger_element);
+
+	return false;
 }
 
 (function($) {

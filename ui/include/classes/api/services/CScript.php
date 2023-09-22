@@ -266,6 +266,7 @@ class CScript extends CApiService {
 		 */
 		foreach ($scripts as $index => $script) {
 			$type_rules = $this->getTypeValidationRules($script['type'], 'create', $type_fields);
+
 			$scope_rules = $this->getScopeValidationRules(
 				$script['scope'],
 				$script['manualinput'] == SCRIPT_MANUALINPUT_ENABLED ? $script['manualinput_validator_type'] : null,
@@ -709,21 +710,17 @@ class CScript extends CApiService {
 					'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING])],
 					'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
 				];
-			}
 
-			if ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_STRING) {
-				$common_fields += [
-					'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
-				];
+				if ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_STRING) {
+					$common_fields += [
+						'manualinput_default_value' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')]
+					];
+				}
 			}
 		}
 		else {
 			$common_fields += [
-				'manualinput' =>				['type' =>  API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_DISABLED],
-				'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
-				'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_TYPE_STRING],
-				'manualinput_default_value' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_default_value')],
-				'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
+				'manualinput' => ['type' =>  API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_DISABLED]
 			];
 		}
 
@@ -1015,9 +1012,10 @@ class CScript extends CApiService {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'scriptid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-			'hostid' =>		['type' => API_ID],
-			'eventid' =>	['type' => API_ID]
+			'scriptid' =>		['type' => API_ID, 'flags' => API_REQUIRED],
+			'hostid' =>			['type' => API_ID],
+			'eventid' =>		['type' => API_ID],
+			'manualinput' =>	['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
@@ -1088,7 +1086,8 @@ class CScript extends CApiService {
 
 		$result = $zabbix_server->executeScript($data['scriptid'], self::getAuthIdentifier(),
 			$is_event ? null : $data['hostid'],
-			$is_event ? $data['eventid'] : null
+			$is_event ? $data['eventid'] : null,
+			array_key_exists('manualinput', $data) ? $data['manualinput'] : null
 		);
 
 		if ($result !== false) {

@@ -31,7 +31,8 @@ class CControllerScriptUserInputEdit extends CController {
 			'default_input' =>		'db scripts.manualinput_default_value|string',
 			'input_type' =>			'db scripts.manualinput_validator_type|in '.implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING]),
 			'input_validation' =>	'db scripts.manualinput_validator',
-			'test' =>				'in 1'
+			'test' =>				'in 1',
+			'confirmation' =>		'db scripts.confirmation'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,7 +61,8 @@ class CControllerScriptUserInputEdit extends CController {
 			'input_validation' => $this->getInput('input_validation', ''),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'test' => $this->hasInput('test'),
-			'input_type' => $this->getInput('input_type')
+			'input_type' => $this->getInput('input_type'),
+			'confirmation' => $this->hasInput('confirmation') && strlen($this->getInput('confirmation')) > 0
 		];
 
 		if ($data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
