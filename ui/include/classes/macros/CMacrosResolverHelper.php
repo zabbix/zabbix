@@ -379,7 +379,7 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerUrl(array $trigger, &$url) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerUrl($trigger, $url);
+		return self::$macrosResolver->resolveTriggerUrl($trigger, $url, ['source' => 'url']);
 	}
 
 	/**
@@ -397,7 +397,7 @@ class CMacrosResolverHelper {
 	public static function resolveTriggerUrlName(array $trigger, &$url_name) {
 		self::init();
 
-		return self::$macrosResolver->resolveTriggerUrlName($trigger, $url_name);
+		return self::$macrosResolver->resolveTriggerUrl($trigger, $url_name, ['source' => 'url_name']);
 	}
 
 	/**
