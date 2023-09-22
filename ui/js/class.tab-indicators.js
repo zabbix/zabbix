@@ -85,6 +85,8 @@ class TabIndicators {
 				return HOST_DISCOVERY;
 			case !!HOST_PROTOTYPE:
 				return HOST_PROTOTYPE;
+			case !!PROXY:
+				return PROXY;
 			case !!ITEM:
 				return ITEM;
 			case !!ITEM_PROTOTYPE:
@@ -244,6 +246,8 @@ class TabIndicatorFactory {
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
 				return new ProxyEncryptionTabIndicatorItem;
+			case 'ProxyTimeouts':
+				return new ProxyTimeoutsTabIndicatorItem;
 			case 'Saml':
 				return new SamlTabIndicatorItem;
 			case 'Sharing':
@@ -765,6 +769,27 @@ class ProxyEncryptionTabIndicatorItem extends TabIndicatorItem {
 		for (const _element of document.querySelectorAll(
 				'#tls_connect input, #tls_accept_psk, #tls_accept_certificate')) {
 			_element.addEventListener('change', () => this.addAttributes(element));
+		}
+	}
+}
+
+class ProxyTimeoutsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_MARK);
+	}
+
+	getValue() {
+		const custom_timeouts = document.querySelector('[name="custom_timeouts"]:checked');
+
+		return custom_timeouts !== null && custom_timeouts.value === '1';
+	}
+
+	initObserver() {
+		for (const input of document.querySelectorAll('[name="custom_timeouts"]')) {
+			input.addEventListener('click', () => {
+				this.addAttributes();
+			});
 		}
 	}
 }

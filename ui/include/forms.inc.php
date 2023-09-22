@@ -461,7 +461,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 		if ($filter_data['filter_delay'] === '' && $filter_data['filter_type'] != ITEM_TYPE_TRAPPER
 				&& $item['type'] != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_SNMPTRAP
 				&& $item['type'] != ITEM_TYPE_DEPENDENT
-				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) !== 0)) {
+				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) != 0)) {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 			$value = $delay;
@@ -733,7 +733,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
-		'type' => getRequest('type', 0),
+		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -1032,7 +1032,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
 							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($data['key'], 'mqtt.get', 8) === 0))) {
+								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}

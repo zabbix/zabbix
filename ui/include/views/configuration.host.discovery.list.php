@@ -266,7 +266,7 @@ foreach ($data['discoveries'] as $discovery) {
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP
 			|| $discovery['type'] == ITEM_TYPE_DEPENDENT || ($discovery['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-				&& strncmp($discovery['key_'], 'mqtt.get', 8) === 0)) {
+				&& strncmp($discovery['key_'], 'mqtt.get', 8) == 0)) {
 		$discovery['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($discovery['delay']) == CParser::PARSE_SUCCESS) {

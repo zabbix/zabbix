@@ -62,6 +62,8 @@ typedef struct
 	zbx_uint64_t		processed_bytes;	/* number of processed bytes for log[], log.count[], logrt[], */
 							/* logrt.count[] items */
 	char			*persistent_file_name;	/* not used on Microsoft Windows */
+
+	int			timeout;
 }
 ZBX_ACTIVE_METRIC;
 
