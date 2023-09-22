@@ -122,7 +122,7 @@ class testFormGraph extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Empty color.'
+						'Empty colour.'
 					]
 				]
 			],
