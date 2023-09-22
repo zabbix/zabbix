@@ -45,8 +45,8 @@ class CControllerAuditLogList extends CController {
 			'filter_userids' =>			'array_db users.userid',
 			'filter_resourceid' =>		'string',
 			'filter_recordsetid' =>		'string',
-			'from' =>					'string',
-			'to' =>						'string'
+			'from' =>					'range_time',
+			'to' =>						'range_time'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();

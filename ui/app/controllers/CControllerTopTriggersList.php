@@ -43,8 +43,8 @@ class CControllerTopTriggersList extends CController {
 			'filter_severities' =>	'array',
 			'filter_evaltype' =>	'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'filter_tags' =>		'array',
-			'from' =>				'string',
-			'to' =>					'string',
+			'from' =>				'range_time',
+			'to' =>					'range_time',
 			'filter_set' =>			'in 1',
 			'filter_rst' =>			'in 1'
 		];

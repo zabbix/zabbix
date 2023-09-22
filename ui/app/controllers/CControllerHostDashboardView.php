@@ -31,8 +31,8 @@ class CControllerHostDashboardView extends CController {
 		$fields = [
 			'hostid' => 'required|db hosts.hostid',
 			'dashboardid' => 'db dashboard.dashboardid',
-			'from' => 'string',
-			'to' => 'string'
+			'from' => 'range_time',
+			'to' => 'range_time'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();

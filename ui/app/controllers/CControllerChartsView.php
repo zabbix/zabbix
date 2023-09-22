@@ -40,8 +40,8 @@ class CControllerChartsView extends CControllerCharts {
 
 	protected function checkInput() {
 		$fields = [
-			'from' =>				'string',
-			'to' =>					'string',
+			'from' =>				'range_time',
+			'to' =>					'range_time',
 			'view_as' =>			'in '.HISTORY_GRAPH.','.HISTORY_VALUES,
 			'filter_set' =>			'in 1',
 			'filter_rst' =>			'in 1',

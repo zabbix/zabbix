@@ -307,7 +307,7 @@ abstract class CController {
 			$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
 		}
 
-		$period = $time_period['to'] - $time_period['from'] + 1;
+		$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;
 
 		if ($period < $min_period) {
 			info(_n('Minimum time period to display is %1$s minute.',

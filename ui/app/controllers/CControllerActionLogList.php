@@ -49,8 +49,8 @@ class CControllerActionLogList extends CController {
 			'filter_mediatypeids' =>	'array_db media_type.mediatypeid',
 			'filter_statuses' =>		'array_db alerts.status',
 			'filter_messages' =>		'string',
-			'from' =>					'string',
-			'to' =>						'string'
+			'from' =>					'range_time',
+			'to' =>						'range_time'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod();
