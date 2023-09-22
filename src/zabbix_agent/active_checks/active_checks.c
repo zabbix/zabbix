@@ -107,6 +107,11 @@ static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used 
 /* used for deleting inactive persistent files */
 static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec;
 
+#define ZBX_HISTORY_UPLOAD_ENABLED	0
+#define ZBX_HISTORY_UPLOAD_DISABLED	(-1)
+
+static ZBX_THREAD_LOCAL int	history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
+
 typedef struct
 {
 	zbx_uint64_t	id;
@@ -510,6 +515,14 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		zbx_vector_active_command_ptr_clear_ext(&active_commands, free_active_command);
 		zbx_vector_command_result_ptr_clear_ext(&command_results, free_command_result);
 	}
+
+	if (FAIL != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, tmp, sizeof(tmp), NULL) &&
+			0 == strcmp(tmp, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+	}
+	else
+		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
 
 	*config_revision_local = config_revision;
 
@@ -1007,6 +1020,12 @@ static int	format_metric_results(struct zbx_json *json, int now, int config_buff
 	int			i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (ZBX_HISTORY_UPLOAD_ENABLED != history_upload)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot send buffer: server has paused history upload");
+		goto ret;
+	}
 
 	if (config_buffer_size / 2 > buffer.pcount && config_buffer_size > buffer.count &&
 			config_buffer_send > now - buffer.lastsent)

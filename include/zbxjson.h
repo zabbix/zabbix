@@ -173,7 +173,7 @@
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
 #define ZBX_PROTO_TAG_ITEM_TAGS			"item_tags"
-#define ZBX_PROTO_TAG_PROXY_UPLOAD		"upload"
+#define ZBX_PROTO_TAG_HISTORY_UPLOAD		"upload"
 #define ZBX_PROTO_TAG_DASHBOARDID		"dashboardid"
 #define ZBX_PROTO_TAG_USERID			"userid"
 #define ZBX_PROTO_TAG_PERIOD			"period"
@@ -240,8 +240,8 @@
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
 
-#define ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED	"enabled"
-#define ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED	"disabled"
+#define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
+#define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"
 
 #define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
 

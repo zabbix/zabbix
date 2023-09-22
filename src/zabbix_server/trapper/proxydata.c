@@ -40,11 +40,11 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 	switch (upload_status)
 	{
 		case ZBX_PROXY_UPLOAD_DISABLED:
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED,
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HISTORY_UPLOAD, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED,
 					ZBX_JSON_TYPE_STRING);
 			break;
 		case ZBX_PROXY_UPLOAD_ENABLED:
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED,
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HISTORY_UPLOAD, ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED,
 					ZBX_JSON_TYPE_STRING);
 			break;
 	}
