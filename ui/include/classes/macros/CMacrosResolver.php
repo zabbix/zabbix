@@ -457,23 +457,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values = $this->getTriggerUserMacros($usermacros, $macro_values);
 		}
 
-		$types = $this->transformToPositionTypes($types);
-
-		// Replace macros to value.
-		foreach ($macro_values as $triggerid => $foo) {
-			$trigger = &$triggers[$triggerid];
-
-			$matched_macros = self::getMacroPositions($trigger['description'], $types);
-
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				if (array_key_exists($macro, $macro_values[$triggerid])) {
-					$trigger['description'] = substr_replace($trigger['description'], $macro_values[$triggerid][$macro],
-						$pos, strlen($macro)
-					);
-				}
-			}
+		foreach ($macro_values as $triggerid => $values) {
+			$triggers[$triggerid]['description'] = strtr($triggers[$triggerid]['description'], $values);
 		}
-		unset($trigger);
 
 		return $triggers;
 	}
@@ -564,16 +550,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
 		$macro_values = $this->getTriggerUserMacros($usermacros, $macro_values);
 
-		$types = $this->transformToPositionTypes($types);
+		if ($options['html']) {
+			$types = $this->transformToPositionTypes($types);
 
-		// Replace macros to value.
-		foreach ($macro_values as $triggerid => $foo) {
-			$trigger = &$triggers[$triggerid];
+			// Replace macros to value.
+			foreach ($macro_values as $triggerid => $foo) {
+				$trigger = &$triggers[$triggerid];
 
-			foreach ($options['sources'] as $source) {
-				$matched_macros = self::getMacroPositions($trigger[$source], $types);
+				foreach ($options['sources'] as $source) {
+					$matched_macros = self::getMacroPositions($trigger[$source], $types);
 
-				if ($options['html']) {
 					$macro_string = [];
 					$pos_left = 0;
 
@@ -591,16 +577,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 					$trigger[$source] = $macro_string;
 				}
-				else {
-					foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-						$trigger[$source] = substr_replace($trigger[$source], $macro_values[$triggerid][$macro], $pos,
-							strlen($macro)
-						);
-					}
+			}
+			unset($trigger);
+		}
+		else {
+			foreach ($macro_values as $triggerid => $values) {
+				foreach ($options['sources'] as $source) {
+					$triggers[$triggerid][$source] = strtr($triggers[$triggerid][$source], $values);
 				}
 			}
 		}
-		unset($trigger);
 
 		return $triggers;
 	}
@@ -700,14 +686,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = $this->getItemLogMacros($macros['log'], $macro_values);
 		$macro_values = $this->getTriggerUserMacros($usermacros, $macro_values);
 
-		$types = $this->transformToPositionTypes($types);
-
-		$matched_macros = self::getMacroPositions($trigger[$options['source']], $types);
-
-		$url = $trigger[$options['source']];
-		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-			$url = substr_replace($url, $macro_values[$triggerid][$macro], $pos, strlen($macro));
-		}
+		$url = strtr($trigger[$options['source']], $macro_values[$triggerid]);
 
 		return true;
 	}
