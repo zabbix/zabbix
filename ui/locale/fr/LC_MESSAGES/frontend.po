@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-28 18:59+0000\n"
+"PO-Revision-Date: 2023-09-18 18:57+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -916,7 +916,7 @@ msgstr "Ajouter (limite de type de message atteinte)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Ajouter une colonne"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -1495,6 +1495,30 @@ msgstr "Assertions"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Tag caractéristique"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr ""
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -14366,6 +14390,10 @@ msgstr "Nouveau service"
 msgid "New step of web scenario"
 msgstr "Nouvelle étape du scénario web"
 
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr ""
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
 msgstr "Nouveau nom de tag"
@@ -19788,6 +19816,10 @@ msgstr "Filtre de tag"
 msgid "Tag for matching"
 msgstr "Tag pour la concordance"
 
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
@@ -23568,6 +23600,14 @@ msgstr "d/m/Y H:i"
 msgid "Y-m-d H:i:s"
 msgstr "d/m/Y H:i:s"
 
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr ""
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
+msgstr ""
+
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
 msgstr "d/n/Y"
@@ -24786,6 +24826,14 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr ""
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr ""
+
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
 msgid "hh.mm"
@@ -25148,6 +25196,10 @@ msgstr "d-m"
 msgid "m-d H:i"
 msgstr "d-m H:i"
 
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
+msgstr ""
+
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr "la macro est vide"
@@ -25346,6 +25398,10 @@ msgstr "d/n"
 msgid "n-d H:i"
 msgstr "d/n H:i"
 
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr ""
+
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
 #: include/views/configuration.item.edit.php:262
@@ -25461,7 +25517,7 @@ msgstr "nombre"
 
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
-msgstr ""
+msgstr "l'objet n'existe pas ou appartient à un autre objet"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

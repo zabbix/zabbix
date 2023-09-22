@@ -1474,6 +1474,28 @@ msgstr "アサーション"
 msgid "Asset tag"
 msgstr "資産タグ"
 
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr ""
+
 #: include/maintenances.inc.php:70
 #, c-format
 msgid "At %1$s:%2$s %3$s of every week"
@@ -14227,6 +14249,10 @@ msgstr "新規サービス"
 msgid "New step of web scenario"
 msgstr ""
 
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr ""
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
 msgstr "新しいタグ名"
@@ -19638,6 +19664,10 @@ msgstr "タグフィルター"
 msgid "Tag for matching"
 msgstr "クローズに利用するタグ名"
 
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
@@ -23403,6 +23433,14 @@ msgstr "Y/m/d H:i"
 msgid "Y-m-d H:i:s"
 msgstr "Y/m/d H:i:s"
 
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr ""
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
+msgstr ""
+
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
 msgstr "Y-n-d"
@@ -24621,6 +24659,14 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr ""
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr ""
+
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
 msgid "hh.mm"
@@ -24983,6 +25029,10 @@ msgstr "m/d"
 msgid "m-d H:i"
 msgstr "m/d H:i"
 
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
+msgstr ""
+
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr "マクロが設定されていません"
@@ -25180,6 +25230,10 @@ msgstr "n-d"
 #: include/translateDefines.inc.php:39
 msgid "n-d H:i"
 msgstr "n-d H:i"
+
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr ""
 
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
