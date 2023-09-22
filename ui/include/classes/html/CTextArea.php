@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -24,77 +24,87 @@ class CTextArea extends CTag {
 	/**
 	 * Init textarea.
 	 *
-	 * @param string	$name
-	 * @param string	$value
-	 * @param array		$options
-	 * @param int		$options['rows']
-	 * @param int		$options['maxlength']
-	 * @param boolean	$options['readonly']
+	 * @param string   $name
+	 * @param string   $value
+	 * @param array    $options
+	 *        int      $options['rows']
+	 *        int      $options['maxlength']
+	 *        boolean  $options['readonly']
 	 */
-	public function __construct($name = 'textarea', $value = '', $options = []) {
+	public function __construct(string $name = 'textarea', $value = '', array $options = []) {
 		parent::__construct('textarea', true);
-		$this->setId(zbx_formatDomId($name));
-		$this->setAttribute('name', $name);
-		$this->setAttribute('rows', !empty($options['rows']) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
-		if (isset($options['readonly'])) {
+
+		$this
+			->setId(zbx_formatDomId($name))
+			->setName($name)
+			->setValue($value)
+			->setRows(array_key_exists('rows', $options) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
+
+		if (array_key_exists('readonly', $options)) {
 			$this->setReadonly($options['readonly']);
 		}
-		$this->addItem($value);
 
-		// set maxlength
-		if (!empty($options['maxlength'])) {
+		if (array_key_exists('maxlength', $options)) {
 			$this->setMaxlength($options['maxlength']);
 		}
 	}
 
-	public function setReadonly($value) {
-		if ($value) {
+	public function setReadonly(bool $is_readonly = true): self {
+		if ($is_readonly) {
 			$this->setAttribute('readonly', 'readonly');
 		}
 		else {
 			$this->removeAttribute('readonly');
 		}
+
 		return $this;
 	}
 
-	public function setValue($value = '') {
+	public function setValue($value = ''): self {
 		$this->addItem($value);
+
 		return $this;
 	}
 
-	public function setRows($value) {
-		$this->setAttribute('rows', $value);
+	public function setRows(int $rows): self {
+		$this->setAttribute('rows', $rows);
+
 		return $this;
 	}
 
-	public function setCols($value) {
-		$this->setAttribute('cols', $value);
-		return $this;
-	}
-
-	public function setMaxlength($maxlength) {
+	public function setMaxlength(int $maxlength): self {
 		$this->setAttribute('maxlength', $maxlength);
+
 		return $this;
 	}
 
-	public function setWidth($value) {
-		$this->addStyle('width: '.$value.'px;');
+	public function disableSpellcheck(): self {
+		$this->setAttribute('spellcheck', 'false');
+
 		return $this;
 	}
 
-	public function setAdaptiveWidth($value) {
-		$this->addStyle('max-width: '.$value.'px;');
+	public function setWidth(int $width): self {
+		$this->addStyle('width: '.$width.'px;');
+
+		return $this;
+	}
+
+	public function setAdaptiveWidth(int $width): self {
+		$this->addStyle('max-width: '.$width.'px;');
 		$this->addStyle('width: 100%;');
+
 		return $this;
 	}
 
-	public function setEnabled($value) {
-		if ($value) {
+	public function setEnabled(bool $is_enabled = true): self {
+		if ($is_enabled) {
 			$this->removeAttribute('disabled');
 		}
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+
 		return $this;
 	}
 }

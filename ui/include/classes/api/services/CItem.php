@@ -28,6 +28,15 @@ class CItem extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
 
+	public const OUTPUT_FIELDS = ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends',
+		'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+		'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
+		'description', 'inventory_link', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
+		'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
+		'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
+		'allow_traps', 'state', 'error', 'parameters', 'lastclock', 'lastns', 'lastvalue', 'prevvalue'
+	];
+
 	/**
 	 * @inheritDoc
 	 */
@@ -39,31 +48,6 @@ class CItem extends CItemGeneral {
 		ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_VALUE,
 		ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT, ZBX_PREPROC_PROMETHEUS_PATTERN,
 		ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON, ZBX_PREPROC_STR_REPLACE,
-		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
-		ZBX_PREPROC_SNMP_WALK_TO_JSON
-	];
-
-	/**
-	 * @inheritDoc
-	 */
-	protected const PREPROC_TYPES_WITH_PARAMS = [
-		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
-		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
-		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
-	];
-
-	/**
-	 * @inheritDoc
-	 */
-	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [
-		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
-		ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
-		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
-		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
 		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
 		ZBX_PREPROC_SNMP_WALK_TO_JSON
 	];
@@ -246,11 +230,11 @@ class CItem extends CItemGeneral {
 			zbx_value2array($options['proxyids']);
 
 			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where'][] = dbConditionId('h.proxy_hostid', $options['proxyids']);
+			$sqlParts['where'][] = dbConditionId('h.proxyid', $options['proxyids']);
 			$sqlParts['where'][] = 'h.hostid=i.hostid';
 
 			if ($options['groupCount']) {
-				$sqlParts['group']['h'] = 'h.proxy_hostid';
+				$sqlParts['group']['h'] = 'h.proxyid';
 			}
 		}
 
@@ -576,7 +560,6 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -719,7 +702,6 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -830,7 +812,7 @@ class CItem extends CItemGeneral {
 	 */
 	public static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
-		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
+		CArrayHelper::sort($items, ['itemid']);
 
 		self::addFieldDefaultsByType($items, $db_items);
 
@@ -1006,7 +988,7 @@ class CItem extends CItemGeneral {
 			$item_indexes = array_flip(array_column($items, 'itemid'));
 
 			foreach ($items as $i => $item) {
-				if ($item['type'] == ITEM_TYPE_DEPENDENT) {
+				if ($item['type'] == ITEM_TYPE_DEPENDENT && array_key_exists($item['master_itemid'], $item_indexes)) {
 					$dep_items_to_link[$item_indexes[$item['master_itemid']]][$i] = $item;
 
 					unset($items[$i]);
@@ -1035,7 +1017,7 @@ class CItem extends CItemGeneral {
 	 * @param array $tpl_links
 	 * @param array $hostids
 	 */
-	protected static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
+	private static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
 		$items_to_link = [];
 		$items_to_update = [];
 
@@ -1333,7 +1315,7 @@ class CItem extends CItemGeneral {
 
 		$result = DBselect(
 			'SELECT ii.itemid,ii.name,ii.type,ii.key_,ii.value_type,ii.templateid,ii.uuid,ii.valuemapid,ii.hostid,'.
-				'h.status AS host_status'.
+				'ii.flags,h.status AS host_status'.
 			' FROM items i,items ii,hosts h'.
 			' WHERE i.itemid=ii.templateid'.
 				' AND ii.hostid=h.hostid'.
@@ -1347,11 +1329,11 @@ class CItem extends CItemGeneral {
 		$db_items = [];
 		$i = 0;
 		$tpl_itemids = [];
+		$internal_fields = array_flip(['type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
 
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'type' => $row['type'],
 				'templateid' => 0
 			];
 
@@ -1364,10 +1346,12 @@ class CItem extends CItemGeneral {
 
 				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 					$tpl_itemids[$i] = $row['itemid'];
-					$item += array_intersect_key($row,
-						array_flip(['key_', 'hostid', 'host_status', 'value_type'])
-					);
+					$item += array_intersect_key($row, $internal_fields);
 				}
+			}
+
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE || $row['valuemapid'] == 0) {
+				unset($row['type']);
 			}
 
 			$items[$i++] = $item;
@@ -1848,10 +1832,10 @@ class CItem extends CItemGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDependentItems($db_items, $del_ruleids, $db_item_prototypes);
+		self::addDependentItems($db_items, $db_lld_rules, $db_item_prototypes);
 
-		if ($del_ruleids) {
-			CDiscoveryRuleManager::delete($del_ruleids);
+		if ($db_lld_rules) {
+			CDiscoveryRule::deleteForce($db_lld_rules);
 		}
 
 		if ($db_item_prototypes) {
@@ -1889,12 +1873,12 @@ class CItem extends CItemGeneral {
 	 * prototypes to the given appropriate variables.
 	 *
 	 * @param array      $db_items
-	 * @param array|null $del_ruleids
+	 * @param array|null $db_lld_rules
 	 * @param array|null $db_item_prototypes
 	 */
-	protected static function addDependentItems(array &$db_items, array &$del_ruleids = null,
+	protected static function addDependentItems(array &$db_items, array &$db_lld_rules = null,
 			array &$db_item_prototypes = null): void {
-		$del_ruleids = [];
+		$db_lld_rules = [];
 		$db_item_prototypes = [];
 
 		$master_itemids = array_keys($db_items);
@@ -1910,7 +1894,7 @@ class CItem extends CItemGeneral {
 
 			while ($row = DBfetch($result)) {
 				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
-					$del_ruleids[] = $row['itemid'];
+					$db_lld_rules[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
 				}
 				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$master_itemids[] = $row['itemid'];

@@ -25,7 +25,7 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"

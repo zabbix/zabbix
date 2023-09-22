@@ -31,7 +31,7 @@ $form = (new CForm('post'))
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -84,9 +84,7 @@ $form_grid = (new CFormGrid())
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 				->setFooter(
 					new CCol(
-						(new CSimpleButton(_('Add')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('element-table-add')
+						(new CButtonLink(_('Add')))->addClass('element-table-add')
 					)
 				),
 			(new CTemplateTag('tag-row-tmpl'))->addItem(
@@ -113,9 +111,7 @@ $form_grid = (new CFormGrid())
 						->addClass('js-tag-value')
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-					(new CSimpleButton(_('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
+					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 				]))->addClass('form_row')
 			)
 		])

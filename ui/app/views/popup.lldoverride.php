@@ -35,11 +35,10 @@ $overrides_popup_form = (new CForm())
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('overrides_names', $options['overrides_names'])
-	->addItem((new CVar('action', 'popup.lldoverride'))->removeId())
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
-	);
+	->addItem((new CVar('action', 'popup.lldoverride'))->removeId());
+
+// Enable form submitting on Enter.
+$overrides_popup_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $overrides_popup_form_list = (new CFormList())
 	->addRow(
@@ -81,9 +80,7 @@ $override_evaltype = (new CDiv([
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 	]))->addClass(ZBX_STYLE_CELL),
 	(new CDiv([
-		(new CSpan(''))
-			->addStyle('white-space: normal;')
-			->setId('overrides_expression'),
+		(new CSpan(''))->setId('overrides_expression'),
 		(new CTextBox('overrides_formula', $options['overrides_formula'], $options['templated'],
 				DB::getFieldLength('lld_override', 'formula')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -101,19 +98,6 @@ $filter_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), (new CColHeader(_('Action')))->setWidth('100%')]);
 
-$overrides_filters = $options['overrides_filters'];
-if (!$overrides_filters) {
-	$overrides_filters = [[
-		'macro' => '',
-		'operator' => CONDITION_OPERATOR_REGEXP,
-		'value' => '',
-		'formulaid' => num2letter(0)
-	]];
-}
-else {
-	$overrides_filters = CConditionHelper::sortConditionsByFormulaId($overrides_filters);
-}
-
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
@@ -121,7 +105,7 @@ $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
 ]);
 
-foreach ($overrides_filters as $i => $overrides_filter) {
+foreach ($options['overrides_filters'] as $i => $overrides_filter) {
 	$formulaid = [
 		new CSpan($overrides_filter['formulaid']),
 		new CVar('overrides_filters['.$i.'][formulaid]', $overrides_filter['formulaid'])

@@ -1,5 +1,4 @@
-//go:build linux && amd64
-// +build linux,amd64
+//go:build linux && (amd64 || arm64)
 
 /*
 ** Zabbix
@@ -23,65 +22,154 @@
 package file
 
 import (
+	"git.zabbix.com/ap/plugin-support/std"
 	"reflect"
 	"testing"
-
-	"git.zabbix.com/ap/plugin-support/std"
 )
 
+type testCase struct {
+	fileContents   []byte
+	targetEncoding string
+	targetContents string
+}
+
+const filename = "/tmp/zbx_vfs_file_contents_test.dat"
+const expectedErrorUTF8Convert = "Failed to convert from encoding to utf8: invalid argument"
+
+// августа\r\n
+var fileContents_UTF_8 = []byte{
+	0xfe, 0xff, 0x04, 0x30, 0x04, 0x32, 0x04, 0x33, 0x04, 0x43, 0x04, 0x41, 0x04, 0x42, 0x04, 0x30,
+	0x00, 0x0d, 0x00, 0x0a}
+
 func TestFileContentsEncoding(t *testing.T) {
-	stdOs = std.NewMockOs()
-
 	impl.options.Timeout = 3
 
-	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a})
-	if result, err := impl.Export("vfs.file.contents", []string{"text.txt", "iso-8859-5"}, nil); err != nil {
-		t.Errorf("vfs.file.contents returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.contents returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if contents != "августа" {
-				t.Errorf("vfs.file.contents returned invalid result")
-			}
+	fileContents_2_UTF_8 := []byte{
+		208, 176, 208, 178, 208, 179, 209, 131, 209, 129, 209, 130, 208, 176, 13, 10}
+
+	// кирпич
+	//
+	//  еще кирпич
+	// и еще один
+	fileContents_ISO_8859_5 := []byte{
+		0xda, 0xd8, 0xe0, 0xdf, 0xd8, 0xe7, 0x20, 0x0a, 0x0a, 0x20, 0xd5, 0xe9, 0xd5, 0x20, 0xda, 0xd8,
+		0xe0, 0xdf, 0xd8, 0xe7, 0x0a, 0xd8, 0x20, 0xd5, 0xe9, 0xd5, 0x20, 0xde, 0xd4, 0xd8, 0xdd, 0x0a}
+
+	// ロシアデスマン
+	//
+	// 🌭
+	// кирпич
+	fileContents_UTF_16BE := []byte{
+		0x30, 0xed, 0x30, 0xb7, 0x30, 0xa2, 0x30, 0xc7, 0x30, 0xb9, 0x30, 0xde, 0x30, 0xf3, 0x00, 0x0a,
+		0x00, 0x0a, 0xd8, 0x3c, 0xdf, 0x2d, 0x00, 0x0a, 0x04, 0x3a, 0x04, 0x38, 0x04, 0x40, 0x04, 0x3f,
+		0x04, 0x38, 0x04, 0x47, 0x00, 0x0a}
+
+	fileContents_UTF_32LE := []byte{
+		0xed, 0x30, 0x00, 0x00, 0xb7, 0x30, 0x00, 0x00, 0xa2, 0x30, 0x00, 0x00, 0xc7, 0x30, 0x00, 0x00,
+		0xb9, 0x30, 0x00, 0x00, 0xde, 0x30, 0x00, 0x00, 0xf3, 0x30, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00,
+		0x0a, 0x00, 0x00, 0x00, 0x2d, 0xf3, 0x01, 0x00, 0x0a, 0x00, 0x00, 0x00, 0x3a, 0x04, 0x00, 0x00,
+		0x38, 0x04, 0x00, 0x00, 0x40, 0x04, 0x00, 0x00, 0x3f, 0x04, 0x00, 0x00, 0x38, 0x04, 0x00, 0x00,
+		0x47, 0x04, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00}
+
+	// a
+	fileSingleCharNoNewLine := []byte{0x61}
+
+	// alphabeta
+	fileManyCharsNoNewLine := []byte{
+		0x61, 0x6c, 0x70, 0x68, 0x61, 0x62, 0x65, 0x74, 0x61}
+
+	tests := []*testCase{
+		{fileContents: fileContents_UTF_8, targetEncoding: "", targetContents: "августа"},
+		{fileContents: fileContents_2_UTF_8, targetEncoding: "", targetContents: "августа"},
+		{fileContents: []byte{}, targetEncoding: "iso-8859-5", targetContents: ""},
+		{fileContents: []byte{}, targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: []byte{0x0a, 0x0a}, targetEncoding: "", targetContents: ""},
+		{fileContents: []byte{0x0a, 0x0a}, targetEncoding: "UTF-8", targetContents: ""},
+		{fileContents: []byte{0x0a, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00},
+			targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: fileContents_ISO_8859_5, targetEncoding: "iso-8859-5",
+			targetContents: "кирпич \n\n еще кирпич\nи еще один"},
+		{fileContents: fileContents_UTF_16BE, targetEncoding: "UTF-16BE",
+			targetContents: "ロシアデスマン\n\n🌭\nкирпич"},
+		{fileContents: fileContents_UTF_32LE, targetEncoding: "UTF-32LE",
+			targetContents: "ロシアデスマン\n\n🌭\nкирпич"},
+		{fileContents: fileSingleCharNoNewLine, targetEncoding: "", targetContents: "a"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "", targetContents: "alphabeta"},
+		// file contents with wrong encodings
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-16BE", targetContents: "августа"},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-16BE", targetContents: "августа"},
+		{fileContents: fileContents_ISO_8859_5, targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: fileContents_ISO_8859_5, targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: fileSingleCharNoNewLine, targetEncoding: "UTF-16BE", targetContents: ""},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "UTF-16BE", targetContents: "慬灨慢整"},
+		{fileContents: fileSingleCharNoNewLine, targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "UTF-32LE", targetContents: ""},
+
+		// target encoding wrong, (iconv fails to detect this)
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "ロシアデスマン", targetContents: "alphabeta"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "🌭", targetContents: "alphabeta"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "кирпич", targetContents: "alphabeta"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "ロシавгуста\r\n", targetContents: "alphabeta"},
+	}
+
+	for i, c := range tests {
+		stdOs.(std.MockOs).MockFile(filename, c.fileContents)
+
+		var result interface{}
+		var err error
+
+		if result, err = impl.Export("vfs.file.contents", []string{filename, c.targetEncoding}, nil); err != nil {
+			t.Errorf("vfs.file.contents (testCase[%d]) returned error %s", i, err.Error())
+
+			return
+		}
+
+		var contents string
+		var ok bool
+
+		if contents, ok = result.(string); !ok {
+			t.Errorf("vfs.file.contents (testCase[%d]) returned unexpected value type %s", i,
+				reflect.TypeOf(result).Kind())
+
+			return
+		}
+
+		if contents != c.targetContents {
+			t.Errorf(`vfs.file.contents (testCase[%d]) returned invalid result: ->%s<-,
+				expected: ->%s<-, (bytes: %x and %x)`, i, contents, c.targetContents,
+				[]byte(contents), []byte(c.targetContents))
 		}
 	}
 }
 
-func TestFileContentsBom(t *testing.T) {
-	stdOs = std.NewMockOs()
-
-	impl.options.Timeout = 3
-
-	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xfe, 0xff, 0x04, 0x30, 0x04, 0x32, 0x04, 0x33, 0x04, 0x43, 0x04, 0x41, 0x04, 0x42, 0x04, 0x30, 0x00, 0x0d, 0x00, 0x0a})
-	if result, err := impl.Export("vfs.file.contents", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.contents returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.contents returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if contents != "августа" {
-				t.Errorf("vfs.file.contents returned invalid result")
-			}
-		}
+func TestFileContentsWrongTargetEncoding(t *testing.T) {
+	testCasesWrongTargetEncoding := []*testCase{
+		{fileContents: fileContents_UTF_8, targetEncoding: "BADGER", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "a", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-17", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "U", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "_UTF-16", targetContents: ""},
 	}
-}
 
-func TestFileContents(t *testing.T) {
-	stdOs = std.NewMockOs()
+	for i, c := range testCasesWrongTargetEncoding {
+		stdOs.(std.MockOs).MockFile(filename, c.fileContents)
 
-	impl.options.Timeout = 3
+		var err error
+		_, err = impl.Export("vfs.file.contents", []string{filename, c.targetEncoding}, nil)
 
-	stdOs.(std.MockOs).MockFile("text.txt", []byte{208, 176, 208, 178, 208, 179, 209, 131, 209, 129, 209, 130, 208, 176, 13, 10})
-	if result, err := impl.Export("vfs.file.contents", []string{"text.txt"}, nil); err != nil {
-		t.Errorf("vfs.file.contents returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.contents returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if contents != "августа" {
-				t.Errorf("vfs.file.contents returned invalid result")
-			}
+		if nil == err {
+			t.Errorf("vfs.file.contents (testCase[%d]) did not return error: ->%s<- when wrong target "+
+				"encoding:->%s<- was used", i, expectedErrorUTF8Convert, c.targetEncoding)
+
+			return
+		} else if err.Error() != expectedErrorUTF8Convert {
+			t.Errorf("vfs.file.contents (testCase[%d]) expected error: ->%s<-,"+
+				"but it instead returned: %s when wrong target encoding: ->%s<- was used", i,
+				expectedErrorUTF8Convert, err.Error(), c.targetEncoding)
+
+			return
 		}
 	}
 }

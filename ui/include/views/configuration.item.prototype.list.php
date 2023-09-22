@@ -152,18 +152,17 @@ foreach ($data['items'] as $item) {
 		$item['delay'] = $update_interval_parser->getDelay();
 	}
 
-	$item_menu = CMenuPopupHelper::getItemPrototype([
-		'itemid' => $item['itemid'],
-		'context' => $data['context'],
-		'backurl' => (new CUrl('disc_prototypes.php'))
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('context', $data['context'])
-			->getUrl()
-	]);
-
-	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-		->setMenuPopup($item_menu);
+	$wizard = (new CButtonIcon(ZBX_ICON_MORE))
+		->setMenuPopup(
+			CMenuPopupHelper::getItemPrototype([
+				'itemid' => $item['itemid'],
+				'context' => $data['context'],
+				'backurl' => (new CUrl('disc_prototypes.php'))
+					->setArgument('parent_discoveryid', $data['parent_discoveryid'])
+					->setArgument('context', $data['context'])
+					->getUrl()
+			])
+		);
 
 	$nodiscover = ($item['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
@@ -215,7 +214,8 @@ $itemForm->addItem([
 				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.itemprototype' => [
-				'content' => (new CButton('', _('Mass update')))
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.itemprototype', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('itemprototype').
@@ -224,8 +224,6 @@ $itemForm->addItem([
 							trigger_element: this
 						});"
 					)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
 			],
 			'itemprototype.massdelete' => [
 				'name' => _('Delete'),
@@ -237,6 +235,15 @@ $itemForm->addItem([
 		$data['parent_discoveryid']
 	)
 ]);
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'context' => $data['context'],
+		'checkbox_hash' => $data['parent_discoveryid']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
 
 $html_page
 	->addItem($itemForm)

@@ -20,7 +20,7 @@
 #include "zbxthreads.h"
 #include "zbxcommshigh.h"
 #include "cfg.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 #include "zbxmutexs.h"
@@ -133,10 +133,12 @@ const char	*usage_message[] = {
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
+#endif
 
 static int	config_timeout = 3;
 
@@ -401,7 +403,6 @@ typedef struct
 	int				fds[2];
 #endif
 	zbx_config_tls_t		*zbx_config_tls;
-	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 }
 zbx_thread_sendval_args;
 
@@ -810,6 +811,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
 #endif
 			sendval_args[i].sync_timestamp = sendval_args[0].sync_timestamp;
+			sendval_args[i].zbx_config_tls = sendval_args[0].zbx_config_tls;
 		}
 
 		destinations[i].thread = &threads[i];
@@ -817,7 +819,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 		if (-1 == pipe(sendval_args[i].fds))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot create data pipe: %s",
-					strerror_from_system((unsigned long)errno));
+					zbx_strerror_from_system((unsigned long)errno));
 			threads[i] = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 			continue;
 		}
@@ -1017,7 +1019,7 @@ static void	parse_commandline(int argc, char **argv)
 					config_file = zbx_strdup(config_file, zbx_optarg);
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
 			case 'V':
 				zbx_version();
@@ -1494,8 +1496,9 @@ int	main(int argc, char **argv)
 	char			*error = NULL;
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	zbx_thread_sendval_args	*sendval_args = NULL;
-	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
 
+	zbx_init_library_common(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 
 	progname = get_program_name(argv[0]);
@@ -1516,7 +1519,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1594,7 +1597,6 @@ int	main(int argc, char **argv)
 	}
 #endif
 	sendval_args->zbx_config_tls = zbx_config_tls;
-	sendval_args->zbx_get_program_type_cb_arg = get_program_type;
 	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
@@ -1872,7 +1874,7 @@ exit:
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);
-	zabbix_close_log();
+	zbx_close_log();
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif

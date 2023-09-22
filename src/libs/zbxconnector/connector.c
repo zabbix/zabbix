@@ -19,7 +19,6 @@
 
 #include "zbxconnector.h"
 
-#include "log.h"
 #include "zbxipcservice.h"
 #include "zbxserialize.h"
 #include "zbxalgo.h"

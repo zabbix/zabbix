@@ -28,6 +28,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxlib"
 )
@@ -35,6 +36,7 @@ import (
 // task priority within the same second is done by setting nanosecond component
 const (
 	priorityConfiguratorTaskNs = iota
+	priorityCommandTaskNs      = iota
 	priorityStarterTaskNs
 	priorityCollectorTaskNs
 	priorityWatcherTaskNs
@@ -474,4 +476,52 @@ func (t *configuratorTask) getWeight() int {
 
 func (t *configuratorTask) isItemKeyEqual(itemkey string) bool {
 	return false
+}
+
+// commandTask executes remote commands received with active requestes
+type commandTask struct {
+	taskBase
+	id     uint64
+	params []string
+	output resultcache.Writer
+}
+
+func (t *commandTask) isRecurring() bool {
+	return false
+}
+func (t *commandTask) perform(s Scheduler) {
+	// execute remote command
+	go func() {
+		e := t.plugin.impl.(plugin.Exporter)
+
+		var cr *resultcache.CommandResult
+
+		if ret, err := e.Export("system.run", t.params, nil); err == nil {
+			if ret != nil {
+				cr = &resultcache.CommandResult{
+					ID:     t.id,
+					Result: itemutil.ValueToString(ret),
+				}
+			}
+		} else {
+			log.Debugf("failed to execute remote command '%s' error: '%s'",
+				t.params[0], err.Error())
+
+			cr = &resultcache.CommandResult{
+				ID:    t.id,
+				Error: err,
+			}
+		}
+
+		t.output.WriteCommand(cr)
+		t.output.Flush()
+
+		s.FinishTask(t)
+	}()
+}
+
+func (t *commandTask) reschedule(now time.Time) (err error) {
+	t.scheduled = time.Unix(now.Unix(), priorityCommandTaskNs)
+
+	return
 }

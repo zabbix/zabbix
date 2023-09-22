@@ -29,6 +29,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 class testFormTagsServicesProblemTags extends testFormTags {
 
 	public $problem_tags = true;
+	protected $tags_table = 'id:problem_tags';
 
 	public $update_name = 'Service with tags for updating';
 	public $clone_name = 'Service with tags for cloning';

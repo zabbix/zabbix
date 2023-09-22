@@ -22,9 +22,9 @@
 namespace SCIM;
 
 use CJsonRpc;
-use Exception;
-use CHttpRequest;
+use APIException;
 use CApiClientResponse;
+use CHttpRequest;
 use SCIM\clients\ScimApiClient;
 
 class API {
@@ -32,69 +32,103 @@ class API {
 	/**
 	 * Executes received request.
 	 *
-	 * @param ScimApiClient  $client   API client.
-	 * @param CHttpRequest   $request  Request received.
+	 * @param ScimApiClient    $client   API client.
+	 * @param CHttpRequest  $request  Request received.
 	 *
 	 * @return HttpResponse
 	 */
 	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
-		[, $class] = explode('/', $request->header('PATH-INFO'), 3) + ['', ''];
-		$class = strtolower($class);
-		$action = strtolower($request->method());
-		$input = $this->parseRequestData($request, $class);
+		$response = new HttpResponse();
+		$endpoint = strtolower($request->getPathInfoSegment(0));
+		$method = strtolower($request->method());
+		$input = $this->getRequestData($request);
+		$response->setRequestDetails($endpoint, $method, $input);
+		$response->setResponse(
+			$client->callMethod($endpoint, $method, $input, [
+				'type' => CJsonRpc::AUTH_TYPE_HEADER,
+				'auth' => $request->getAuthBearerValue()
+			])
+		);
 
-		/** @var CApiClientResponse $response */
-		$response = $client->callMethod($class, $action, $input, [
-			'type' => CJsonRpc::AUTH_TYPE_HEADER,
-			'auth' => $request->getAuthBearerValue()
-		]);
-
-		if ($response->errorCode !== null) {
-			throw new Exception($response->errorMessage, $response->errorCode);
-		}
-
-		return new HttpResponse($response->data);
+		return $response;
 	}
 
 	/**
-	 * Parse request body data adding supported GET parameters, return parsed parameters as array.
+	 * Returns SCIM HTTP request data in array form for SCIM API.
 	 *
-	 * @param CHttpRequest $request
-	 * @param string       $class
+	 * @param CHttpRequest  $request
 	 *
 	 * @return array
+	 * @throws Exception
 	 */
-	private function parseRequestData(CHttpRequest $request, string $class): array {
-		$input = $request->body() === '' ? [] : json_decode($request->body(), true);
-		[, , $id] = explode('/', $request->header('PATH-INFO'), 3) + ['', '', ''];
+	public function getRequestData(CHttpRequest $request): array {
+		$data = (array) json_decode($request->body(), true);
+		$filter = $request->getUrlArgument('filter', '');
 
-		if ($id !== '') {
-			$input['id'] = $id;
+		if ($request->getPathInfoSegment(1) !== '') {
+			$data['id'] = $request->getPathInfoSegment(1);
 		}
 
-		if (array_key_exists('filter', $_GET)) {
-			$class === 'users'
-				? preg_match('/^userName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value)
-				: preg_match('/^displayName eq "(?<value>(?:[^"]|\\\\")*)"$/', $_GET['filter'], $filter_value);
-
-			if (array_key_exists('value', $filter_value)) {
-				$class === 'users'
-					? $input['userName'] = $filter_value['value']
-					: $input['displayName'] = $filter_value['value'];
+		if ($filter !== '') {
+			if (strtolower($request->method()) !== 'get') {
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported');
 			}
-			else {
-				throw new Exception(_('This filter is not supported'), 400);
+
+			$value = null;
+
+			switch (strtolower($request->getPathInfoSegment(0))) {
+				case 'users':
+					$key = 'userName';
+					$value = $this->getUsersQueryFilter($filter);
+					break;
+
+				case 'groups':
+					$key = 'displayName';
+					$value = $this->getGroupsQueryFilter($filter);
+					break;
 			}
+
+			if ($value === null) {
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported');
+			}
+
+			$data[$key] = $value;
 		}
 
-		if (array_key_exists('startIndex', $_GET)) {
-			$input['startIndex'] = $_GET['startIndex'];
+		if ($request->hasUrlArgument('startIndex')) {
+			$data['startIndex'] = $request->getUrlArgument('startIndex');
 		}
 
-		if (array_key_exists('count', $_GET)) {
-			$input['count'] = $_GET['count'];
+		if ($request->hasUrlArgument('count')) {
+			$data['count'] = $request->getUrlArgument('count');
 		}
 
-		return $input;
+		return $data;
+	}
+
+	/**
+	 * Parses filter for users request filter.
+	 *
+	 * @param string $filter  Filter string.
+	 *
+	 * @return ?string  String value for userName filter, null when filter is incorrect.
+	 */
+	public function getUsersQueryFilter(string $filter): ?string {
+		preg_match('/^userName eq "(?<value>(?:[^"]|\\\\")*)"$/', $filter, $filter_value);
+
+		return array_key_exists('value', $filter_value) ? $filter_value['value'] : null;
+	}
+
+	/**
+	 * Parses filter for groups request filter.
+	 *
+	 * @param string $filter  Filter string.
+	 *
+	 * @return ?string  String value for displayName filter, null when filter is incorrect.
+	 */
+	public function getGroupsQueryFilter(string $filter): ?string {
+		preg_match('/^displayName eq "(?<value>(?:[^"]|\\\\")*)"$/', $filter, $filter_value);
+
+		return array_key_exists('value', $filter_value) ? $filter_value['value'] : null;
 	}
 }

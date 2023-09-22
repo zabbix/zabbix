@@ -30,19 +30,21 @@ class CWidgetFieldLatLngView extends CWidgetFieldView {
 	public function __construct(CWidgetFieldLatLng $field) {
 		$this->field = $field;
 
-		$this->setHelpHint([
-			_('Comma separated center coordinates and zoom level to display when the widget is initially loaded.'),
-			BR(),
-			_('Supported formats:'),
-			(new CList([
-				new CListItem((new CSpan('<lat>,<lng>,<zoom>'))->addClass(ZBX_STYLE_MONOSPACE_FONT)),
-				new CListItem((new CSpan('<lat>,<lng>'))->addClass(ZBX_STYLE_MONOSPACE_FONT))
-			]))->addClass(ZBX_STYLE_LIST_DASHED),
-			BR(),
-			_s('The maximum zoom level is "%1$s".', CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM)),
-			BR(),
-			_('Initial view is ignored if the default view is set.')
-		]);
+		$this->setFieldHint(
+			makeHelpIcon([
+				_('Comma separated center coordinates and zoom level to display when the widget is initially loaded.'),
+				BR(),
+				_('Supported formats:'),
+				(new CList([
+					new CListItem((new CSpan('<lat>,<lng>,<zoom>'))->addClass(ZBX_STYLE_MONOSPACE_FONT)),
+					new CListItem((new CSpan('<lat>,<lng>'))->addClass(ZBX_STYLE_MONOSPACE_FONT))
+				]))->addClass(ZBX_STYLE_LIST_DASHED),
+				BR(),
+				_s('The maximum zoom level is "%1$s".', CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM)),
+				BR(),
+				_('Initial view is ignored if the default view is set.')
+			])
+		);
 	}
 
 	public function setPlaceholder(string $placeholder): self {

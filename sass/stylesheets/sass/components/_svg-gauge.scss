@@ -1,0 +1,68 @@
+.svg-gauge {
+	$transition: .5s ease-in-out;
+
+	fill: $font-color;
+
+	.svg-gauge-description {
+		text-anchor: middle;
+	}
+
+	.svg-gauge-thresholds-arc-sector,
+	.svg-gauge-empty-arc-sector {
+		fill: $gauge-empty-color;
+	}
+
+	.svg-gauge-value-arc-sector {
+		fill: $gauge-fill-color;
+	}
+
+	.svg-gauge-value-arc-sector,
+	.svg-gauge-empty-arc-sector {
+		transition: fill $transition;
+	}
+
+	.svg-gauge-needle {
+		fill: $gauge-needle-fill-color;
+		stroke: $gauge-needle-stroke-color;
+		vector-effect: non-scaling-stroke;
+		transition: fill $transition, stroke $transition;
+
+		&.svg-gauge-needle-light {
+			stroke: rgba(0, 0, 0, 0.2);
+		}
+
+		&.svg-gauge-needle-dark {
+			stroke: rgba(255, 255, 255, 0.3);
+		}
+	}
+
+	.svg-gauge-label-left {
+		text-anchor: end;
+	}
+
+	.svg-gauge-label-center {
+		text-anchor: middle;
+	}
+
+	.svg-gauge-value,
+	.svg-gauge-units {
+		text-anchor: middle;
+	}
+
+	.svg-gauge-no-data {
+		text-anchor: middle;
+		fill: $font-alt-color;
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'dark' or $theme-name == 'hc-dark' {
+	.svg-gauge {
+		.svg-gauge-needle {
+			&.svg-gauge-needle-dark {
+				stroke: rgba(255, 255, 255, 0.2);
+			}
+		}
+	}
+}

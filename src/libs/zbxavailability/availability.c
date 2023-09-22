@@ -20,14 +20,13 @@
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 
-#include "log.h"
 #include "zbxipcservice.h"
 
 ZBX_PTR_VECTOR_IMPL(proxy_hostdata_ptr, zbx_proxy_hostdata_t *)
 
 void	zbx_availability_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response)
 {
-	static zbx_ipc_socket_t	socket;
+	static ZBX_THREAD_LOCAL zbx_ipc_socket_t	socket;
 
 	/* each process has a permanent connection to availability manager */
 	if (0 == socket.fd)

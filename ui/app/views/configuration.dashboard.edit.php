@@ -46,6 +46,7 @@ $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
+$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->addJsFile('class.sortable.js');
 
@@ -61,16 +62,20 @@ $html_page = (new CHtmlPage())
 			->setId('dashboard-control')
 			->addItem(
 				(new CTag('nav', true, new CList([
-					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
+					(new CButton('dashboard-config'))
+						->addClass(ZBX_STYLE_BTN_ICON)
+						->addClass(ZBX_ICON_COG_FILLED),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem((new CButton('dashboard-add-widget',
-							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
-						))->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
-							(new CButton('dashboard-add', ZWSPACE()))
+							(new CButton('dashboard-add-widget', _('Add')))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+								->addClass(ZBX_ICON_PLUS_SMALL)
+						)
+						->addItem(
+							(new CButton('dashboard-add'))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
@@ -98,13 +103,11 @@ $dashboard->addItem(
 			(new CDiv())
 				->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 				->addItem([
-					(new CSimpleButton())
-						->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-						->addClass('btn-iterator-page-previous')
+					(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
 						->setEnabled(false),
-					(new CSimpleButton())
-						->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-						->addClass('btn-iterator-page-next')
+					(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
 						->setEnabled(false)
 				])
 		)

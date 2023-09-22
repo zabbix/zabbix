@@ -26,7 +26,7 @@
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxembed.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxpreproc.h"
 #include "libs/zbxpreproc/pp_execute.h"
 #include "libs/zbxpreproc/preproc_snmp.h"

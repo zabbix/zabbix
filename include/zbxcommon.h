@@ -100,7 +100,7 @@ const char	*zbx_result_string(int result);
 #define ZBX_HOSTNAME_BUF_LEN	(ZBX_MAX_HOSTNAME_LEN + 1)
 #define ZBX_MAX_DNSNAME_LEN		255	/* maximum host DNS name length from RFC 1035 */
 						/*(without terminating '\0') */
-#define MAX_EXECUTE_OUTPUT_LEN		(512 * ZBX_KIBIBYTE)
+#define MAX_EXECUTE_OUTPUT_LEN		(16 * ZBX_MEBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
@@ -307,7 +307,10 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_CONNECTORMANAGER	37
 #define ZBX_PROCESS_TYPE_CONNECTORWORKER	38
 #define ZBX_PROCESS_TYPE_DISCOVERYMANAGER	39
-#define ZBX_PROCESS_TYPE_COUNT			40	/* number of process types */
+#define ZBX_PROCESS_TYPE_HTTPAGENT_POLLER	40
+#define ZBX_PROCESS_TYPE_AGENT_POLLER		41
+#define ZBX_PROCESS_TYPE_SNMP_POLLER		42
+#define ZBX_PROCESS_TYPE_COUNT			43	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -409,6 +412,12 @@ char	*zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 void	*zbx_guaranteed_memset(void *v, int c, size_t n);
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	define zbx_get_thread_id()	(long int)GetCurrentThreadId()
+#else
+#	define zbx_get_thread_id()	(long int)getpid()
+#endif
+
 #define zbx_free(ptr)		\
 				\
 do				\
@@ -456,7 +465,7 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_help(void);
+void	zbx_help(const char *param);
 void	zbx_usage(void);
 void	zbx_version(void);
 
@@ -711,27 +720,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-void	__zbx_update_env(double time_now);
 
-#ifdef _WINDOWS
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	ZBX_UNUSED(info);				\
-}							\
-while (0)
-#else
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	zbx_prof_update(info, time_now);		\
-}							\
-while (0)
-#endif
 
 /* includes terminating '\0' */
 #define CUID_LEN	26
@@ -770,18 +759,70 @@ char	*zbx_strerror(int errnum);
 #	endif
 #endif
 
-#define ZBX_PROPERTY_DECL(type, varname, defvalue) \
+#define ZBX_GET_CONFIG_VAR(type, varname, defvalue) \
 static type	varname = defvalue; \
 static type	get_##varname(void) \
 { \
 	return varname; \
 }
 
-#define ZBX_PROPERTY_DECL_CONST(type, varname, defvalue) \
-static type	varname = defvalue; \
-static const type	get_##varname(void) \
+#define ZBX_GET_CONFIG_VAR2(type1, type2, varname, defvalue) \
+static	type1	varname = defvalue; \
+static	type2	get_##varname(void) \
 { \
 	return varname; \
 }
+
+#define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
+#define LOG_LEVEL_CRIT		1
+#define LOG_LEVEL_ERR		2
+#define LOG_LEVEL_WARNING	3
+#define LOG_LEVEL_DEBUG		4
+#define LOG_LEVEL_TRACE		5
+
+#define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
+
+#define ZBX_CHECK_LOG_LEVEL(level)			\
+		((LOG_LEVEL_INFORMATION != (level) &&	\
+		((level) > zbx_get_log_level() || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
+
+#ifdef HAVE___VA_ARGS__
+#	define ZBX_ZABBIX_LOG_CHECK
+#	define zabbix_log(level, ...)									\
+													\
+	do												\
+	{												\
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
+			zbx_log_handle(level, __VA_ARGS__);						\
+	}												\
+	while (0)
+#else
+#	define zabbix_log zbx_log_handle
+#endif
+
+typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
+
+void	zbx_init_library_common(zbx_log_func_t log_func);
+void	zbx_log_handle(int level, const char *fmt, ...);
+int	zbx_get_log_level(void);
+void	zbx_set_log_level(int level);
+const char	*zbx_get_log_component_name(void);
+
+#ifndef _WINDOWS
+void		zabbix_increase_log_level(void);
+void		zabbix_decrease_log_level(void);
+void		zabbix_report_log_level_change(void);
+const char	*zabbix_get_log_level_string(void);
+
+typedef struct
+{
+	int		level;
+	const char	*name;
+}
+zbx_log_component_t;
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+#endif
 
 #endif

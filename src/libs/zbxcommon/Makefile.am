@@ -8,7 +8,8 @@ libzbxcommon_a_SOURCES = \
 	setproctitle.c \
 	common_str.c \
 	cuid.c \
-	components_strings_representations.c
+	components_strings_representations.c \
+	common_log.c
 
 libzbxcommon_a_CFLAGS = $(ICONV_CFLAGS)
 

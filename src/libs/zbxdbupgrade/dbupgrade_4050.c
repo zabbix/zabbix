@@ -21,7 +21,6 @@
 
 #include "zbxnum.h"
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 /*
@@ -986,7 +985,7 @@ static int	DBpatch_snmp_if_save(zbx_vector_dbu_snmp_if_t *snmp_ifs)
 
 	zbx_db_insert_prepare(&db_insert_snmp_if, "interface_snmp", "interfaceid", "version", "bulk", "community",
 			"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
-			"privprotocol", "contextname", NULL);
+			"privprotocol", "contextname", (char *)NULL);
 
 	for (i = 0; i < snmp_ifs->values_num; i++)
 	{
@@ -1012,7 +1011,7 @@ static int	DBpatch_interface_create(zbx_vector_dbu_interface_t *interfaces)
 	int		i, ret;
 
 	zbx_db_insert_prepare(&db_insert_interfaces, "interface", "interfaceid", "hostid", "main", "type", "useip",
-			"ip", "dns", "port", NULL);
+			"ip", "dns", "port", (char *)NULL);
 
 	for (i = 0; i < interfaces->values_num; i++)
 	{
@@ -1377,7 +1376,8 @@ static int	DBpatch_interface_discovery_save(zbx_vector_uint64_pair_t *if_links)
 	zbx_db_insert_t	db_insert_if_links;
 	int		i, ret;
 
-	zbx_db_insert_prepare(&db_insert_if_links, "interface_discovery", "interfaceid", "parent_interfaceid", NULL);
+	zbx_db_insert_prepare(&db_insert_if_links, "interface_discovery", "interfaceid", "parent_interfaceid",
+			(char *)NULL);
 
 	for (i = 0; i < if_links->values_num; i++)
 	{

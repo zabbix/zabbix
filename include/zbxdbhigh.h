@@ -239,18 +239,6 @@ typedef struct
 }
 zbx_db_trigger;
 
-/* temporary cache of trigger related data */
-typedef struct
-{
-	zbx_uint64_t		serviceid;
-	char			*name;
-	char			*description;
-	zbx_vector_uint64_t	eventids;
-	zbx_vector_ptr_t	events;
-	zbx_vector_tags_t	service_tags;
-}
-zbx_db_service;
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -279,6 +267,20 @@ typedef struct
 	zbx_uint64_t		flags;
 }
 zbx_db_event;
+
+ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
+
+/* temporary cache of trigger related data */
+typedef struct
+{
+	zbx_uint64_t		serviceid;
+	char			*name;
+	char			*description;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_db_event_t	events;
+	zbx_vector_tags_t	service_tags;
+}
+zbx_db_service;
 
 /* media types */
 typedef enum
@@ -582,7 +584,7 @@ char	*zbx_db_dyn_escape_like_pattern(const char *src);
 void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char **values, const int num);
+		const char * const *values, const int num);
 
 int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid);
 
@@ -629,21 +631,6 @@ typedef struct
 
 int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
-void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now, const zbx_events_funcs_t *events_cbs);
-
-void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now);
-
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
-		const zbx_events_funcs_t *events_cbs);
-
-void	zbx_db_register_host_clean(zbx_vector_ptr_t *autoreg_hosts);
-
-void	zbx_db_proxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, unsigned short flag, int now);
 int	zbx_db_execute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
@@ -702,6 +689,8 @@ typedef struct
 	zbx_vector_ptr_t	rows;
 	/* index of autoincrement field */
 	int			autoincrement;
+	/* the last id assigned by autoincrement */
+	zbx_uint64_t		lastid;
 }
 zbx_db_insert_t;
 
@@ -713,6 +702,8 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
+zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
+
 int	zbx_db_get_database_type(void);
 
 typedef struct
@@ -759,14 +750,13 @@ typedef struct
 	char				*version_str;
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
-	int				lastaccess;
-	int				last_version_error_time;
+	time_t				lastaccess;
+	time_t				last_version_error_time;
 	int				proxy_delay;
 	int				more_data;
 	zbx_proxy_suppress_t		nodata_win;
 
 #define ZBX_FLAGS_PROXY_DIFF_UNSET				__UINT64_C(0x0000)
-#define ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS			__UINT64_C(0x0001)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION			__UINT64_C(0x0002)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS			__UINT64_C(0x0004)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTERROR			__UINT64_C(0x0008)
@@ -774,7 +764,6 @@ typedef struct
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN		__UINT64_C(0x0020)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE_CONFIG			__UINT64_C(0x0080)
 #define ZBX_FLAGS_PROXY_DIFF_UPDATE (			\
-		ZBX_FLAGS_PROXY_DIFF_UPDATE_COMPRESS |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_VERSION |	\
 		ZBX_FLAGS_PROXY_DIFF_UPDATE_LASTACCESS)
 	zbx_uint64_t			flags;
@@ -847,6 +836,8 @@ void	zbx_item_param_free(zbx_item_param_t *param);
 
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
 int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, char **error);
+void	zbx_add_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *addtags);
+void	zbx_del_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *deltags);
 
 typedef enum
 {
@@ -950,5 +941,8 @@ typedef struct
 	unsigned int	connection_type;
 }
 zbx_autoreg_host_t;
+
+#define PROXY_OPERATING_MODE_ACTIVE	0
+#define PROXY_OPERATING_MODE_PASSIVE	1
 
 #endif

@@ -71,7 +71,7 @@ function disableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxy_hostid').prop('disabled', true);
+			jQuery('#proxyid').prop('disabled', true);
 		<?php endif ?>
 
 	<?php else: ?>
@@ -103,7 +103,7 @@ function enableItemTestForm() {
 		<?php endif ?>
 
 		<?php if ($data['proxies_enabled']): ?>
-			jQuery('#proxy_hostid').prop('disabled', false);
+			jQuery('#proxyid').prop('disabled', false);
 		<?php endif ?>
 
 	<?php else: ?>
@@ -160,7 +160,7 @@ function itemGetValueTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
-		proxy_hostid: form_data['proxy_hostid'],
+		proxyid: form_data['proxyid'],
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
 		value: form_data['value']
@@ -247,7 +247,7 @@ function itemCompleteTest(overlay) {
 			details: interface ? interface['details'] : null
 		},
 		macros: form_data['macros'],
-		proxy_hostid: form_data['proxy_hostid'],
+		proxyid: form_data['proxyid'],
 		show_final_result: <?= $data['show_final_result'] ? 1 : 0 ?>,
 		test_type: <?= $data['test_type'] ?>,
 		hostid: <?= $data['hostid'] ?>,
@@ -410,7 +410,7 @@ function saveItemTestInputs() {
 	<?php if ($data['is_item_testable']): ?>
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
-			proxy_hostid: jQuery('#proxy_hostid', $form).val(),
+			proxyid: jQuery('#proxyid', $form).val(),
 			interfaceid: <?= $data['interfaceid'] ?> || 0,
 			address: jQuery('#interface_address', $form).val(),
 			port: jQuery('#interface_port', $form).val(),
@@ -496,7 +496,7 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxy_hostid').prop('disabled', false);
+					$('#proxyid').prop('disabled', false);
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>
@@ -566,7 +566,7 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 
 				<?php if ($data['proxies_enabled']): ?>
-					$('#proxy_hostid').prop('disabled', true);
+					$('#proxyid').prop('disabled', true);
 				<?php endif ?>
 
 				<?php if ($data['interface_address_enabled']): ?>

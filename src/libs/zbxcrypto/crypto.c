@@ -23,9 +23,8 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose:                                                                   *
- *     convert ASCII hex digit string to a binary representation (byte        *
- *     string)                                                                *
+ * Purpose: converts ASCII hex digit string to binary representation (byte    *
+ *          string)                                                           *
  *                                                                            *
  * Parameters:                                                                *
  *     p_hex   - [IN] null-terminated input string                            *
@@ -72,15 +71,15 @@ int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert binary data to hex string                                 *
+ * Purpose: converts binary data to hex string                                *
  *                                                                            *
- * Parameters: bin     - [IN] the data to convert                             *
- *             bin_len - [IN] the number of bytes to convert                  *
- *             out     - [OUT] the output buffer                              *
- *             out_len - [IN] the size of output buffer (should be at least   *
- *                            2 * bin_len + 1)                                *
+ * Parameters: bin     - [IN] data to convert                                 *
+ *             bin_len - [IN] number of bytes to convert                      *
+ *             out     - [OUT] output buffer                                  *
+ *             out_len - [IN] size of output buffer (should be at least       *
+ *                             2 * bin_len + 1)                               *
  *                                                                            *
- * Return value: The number of bytes written (excluding terminating zero)     *
+ * Return value: The number of bytes written (excluding terminating zero).    *
  *                                                                            *
  ******************************************************************************/
 int    zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t out_len)
@@ -104,11 +103,11 @@ int    zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t o
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates semi-unique token based on the seed and current timestamp *
+ * Purpose: creates semi-unique token based on seed and current timestamp     *
  *                                                                            *
- * Parameters:  seed - [IN] the seed                                          *
+ * Parameters:  seed - [IN]                                                   *
  *                                                                            *
- * Return value: Hexadecimal token string, must be freed by caller            *
+ * Return value: Hexadecimal token string, must be freed by caller.           *
  *                                                                            *
  * Comments: if you change token creation algorithm do not forget to adjust   *
  *           ZBX_SESSION_TOKEN_SIZE macro                                     *
@@ -145,9 +144,9 @@ char	*zbx_create_token(zbx_uint64_t seed)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate UUID version 4 as string of 32 symbols                  *
+ * Purpose: calculates UUID version 4 as string of 32 symbols                 *
  *                                                                            *
- * Parameters: seed    - [IN] string for seed calculation                     *
+ * Parameters: seed - [IN] string for seed calculation                        *
  *                                                                            *
  * Return value: uuid string                                                  *
  *                                                                            *

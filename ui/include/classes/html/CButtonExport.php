@@ -51,9 +51,9 @@ class CButtonExport extends CList {
 							->getUrl()
 					).');'
 				),
-			(new CButton('export', ZWSPACE()))
+			(new CButton('export'))
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+				->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
 				->setMenuPopup([
 					'type' => 'dropdown',
 					'data' => [
@@ -62,26 +62,26 @@ class CButtonExport extends CList {
 							[
 								'label' => _('YAML'),
 								'url' => (new CUrl('zabbix.php'))
-											->setArgument('action', $action)
-											->setArgument('format', CExportWriterFactory::YAML)
-											->setArgument('backurl', $back_url)
-											->getUrl()
+									->setArgument('action', $action)
+									->setArgument('format', CExportWriterFactory::YAML)
+									->setArgument('backurl', $back_url)
+									->getUrl()
 							],
 							[
 								'label' => _('XML'),
 								'url' => (new CUrl('zabbix.php'))
-											->setArgument('action', $action)
-											->setArgument('format', CExportWriterFactory::XML)
-											->setArgument('backurl', $back_url)
-											->getUrl()
+									->setArgument('action', $action)
+									->setArgument('format', CExportWriterFactory::XML)
+									->setArgument('backurl', $back_url)
+									->getUrl()
 							],
 							[
 								'label' => _('JSON'),
 								'url' => (new CUrl('zabbix.php'))
-											->setArgument('action', $action)
-											->setArgument('format', CExportWriterFactory::JSON)
-											->setArgument('backurl', $back_url)
-											->getUrl()
+									->setArgument('action', $action)
+									->setArgument('format', CExportWriterFactory::JSON)
+									->setArgument('backurl', $back_url)
+									->getUrl()
 							]
 						]
 					]

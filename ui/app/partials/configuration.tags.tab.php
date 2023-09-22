@@ -32,7 +32,7 @@ $show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
 
 // form list
-$tags_form_list = new CFormList('tagsFormList');
+$form_grid = (new CFormGrid())->setId('tagsFormList');
 
 $table = (new CTable())
 	->addClass('tags-table')
@@ -114,11 +114,9 @@ foreach ($data['tags'] as $i => $tag) {
 
 			foreach ($tag['parent_templates'] as $templateid => $template) {
 				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
-					$template_list[] = (new CLink($template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $templateid)
-					))->setTarget('_blank');
+					$template_list[] = (new CLink($template['name']))
+						->onClick('view.editTemplate(event, this.dataset.templateid);')
+						->setAttribute('data-templateid', $templateid);
 				}
 				else {
 					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -154,7 +152,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 
 		case 'httptest':
 			$btn_labels = [_('Scenario tags'), _('Inherited and scenario tags')];
-			$on_change = 'window.httpconf.$form.submit()';
+			$on_change = 'this.form.submit()';
 			break;
 
 		case 'item':
@@ -163,14 +161,20 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 			break;
 	}
 
-	$tags_form_list->addRow(null,
-		(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
-			->addValue($btn_labels[0], 0, null, $on_change)
-			->addValue($btn_labels[1], 1, null, $on_change)
-			->setModern(true)
+	$form_grid->addItem(
+		new CFormField(
+			(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
+				->addValue($btn_labels[0], 0, null, $on_change)
+				->addValue($btn_labels[1], 1, null, $on_change)
+				->setModern()
+		)
 	);
 }
 
-$tags_form_list->addRow(null, $table);
+if (array_key_exists('with_label', $data)) {
+	$form_grid->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+}
 
-$tags_form_list->show();
+$form_grid
+	->addItem(new CFormField($table))
+	->show();

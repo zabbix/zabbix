@@ -68,7 +68,12 @@ class CControllerPopupLldOverride extends CController {
 			'stop' => $this->getInput('stop', 0),
 			'overrides_evaltype' => $this->getInput('overrides_evaltype', CONDITION_EVAL_TYPE_AND_OR),
 			'overrides_formula' => $this->getInput('overrides_formula', ''),
-			'overrides_filters' => $this->getInput('overrides_filters', []),
+			'overrides_filters' => $this->getInput('overrides_filters', [[
+				'macro' => '',
+				'operator' => CONDITION_OPERATOR_REGEXP,
+				'value' => '',
+				'formulaid' => num2letter(0)
+			]]),
 			'operations' => $this->getInput('operations', []),
 			'overrides_names' => $this->getInput('overrides_names', [])
 		];
@@ -76,11 +81,6 @@ class CControllerPopupLldOverride extends CController {
 		if ($this->hasInput('validate')) {
 			if ($page_options['name'] === '') {
 				error(_s('Incorrect value for field "%1$s": %2$s.', _('Name'), _('cannot be empty')));
-			}
-
-			if ($page_options['overrides_evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
-					&& $page_options['overrides_formula'] === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
 			}
 
 			// Validate if override names are unique.
@@ -92,12 +92,20 @@ class CControllerPopupLldOverride extends CController {
 				}
 			}
 
-			foreach ($page_options['overrides_filters'] as $i => $filter) {
-				if ($filter['macro'] === '' && $filter['value'] === '') {
-					unset($page_options['overrides_filters'][$i]);
-				}
+			$overrides_filter = prepareLldFilter([
+				'evaltype' => $page_options['overrides_evaltype'],
+				'formula' => $page_options['overrides_formula'],
+				'conditions' => $page_options['overrides_filters']
+			]);
+
+			$overrides_filter['conditions'] = sortLldRuleFilterConditions($overrides_filter['conditions'],
+				$overrides_filter['evaltype']
+			);
+
+			if ($overrides_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION
+					&& $overrides_filter['formula'] === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', _('Custom expression'), _('cannot be empty')));
 			}
-			$page_options['overrides_filters'] = array_values($page_options['overrides_filters']);
 
 			// Return collected error messages.
 			if ($messages = get_and_clear_messages()) {
@@ -108,9 +116,9 @@ class CControllerPopupLldOverride extends CController {
 				$params = [
 					'name' => $page_options['name'],
 					'stop' => $page_options['stop'],
-					'overrides_evaltype' => $page_options['overrides_evaltype'],
-					'overrides_formula' => $page_options['overrides_formula'],
-					'overrides_filters' => $page_options['overrides_filters'],
+					'overrides_evaltype' => $overrides_filter['evaltype'],
+					'overrides_formula' => $overrides_filter['formula'],
+					'overrides_filters' => $overrides_filter['conditions'],
 					'operations' => $page_options['operations'],
 					'no' => $page_options['no']
 				];
@@ -125,6 +133,10 @@ class CControllerPopupLldOverride extends CController {
 			);
 		}
 		else {
+			$page_options['overrides_filters'] = sortLldRuleFilterConditions($page_options['overrides_filters'],
+				$page_options['overrides_evaltype']
+			);
+
 			$data = [
 				'title' => _('Override'),
 				'options' => $page_options,

@@ -25,7 +25,7 @@
 #ifndef _WINDOWS
 #	include "zbxmutexs.h"
 #	include "zbxnix.h"
-#	include "log.h"
+#	include "zbxlog.h"
 #	include "zbxtime.h"
 #	include "zbxthreads.h"
 

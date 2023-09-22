@@ -237,13 +237,14 @@ foreach ($data['items'] as $item) {
 		$triggerInfo = '';
 	}
 
-	$wizard = (new CButton(null))
-		->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getItem([
-			'itemid' => $item['itemid'],
-			'context' => $data['context'],
-			'backurl' => $backurl
-		]));
+	$wizard = (new CButtonIcon(ZBX_ICON_MORE))
+		->setMenuPopup(
+			CMenuPopupHelper::getItem([
+				'itemid' => $item['itemid'],
+				'context' => $data['context'],
+				'backurl' => $backurl
+			])
+		);
 
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT])) {
 		$item['trends'] = '';
@@ -269,7 +270,7 @@ foreach ($data['items'] as $item) {
 
 		// discovered item lifetime indicator
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_icons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
+			$info_icons[] = getItemLifetimeIndicator($current_time, (int) $item['itemDiscovery']['ts_delete']);
 		}
 	}
 
@@ -339,12 +340,12 @@ if ($data['context'] === 'host') {
 $button_list += [
 	'item.masscopyto' => [
 		'content' => (new CSimpleButton(_('Copy')))
-			->addClass('js-copy')
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeId()
+			->addClass('js-copy')
 	],
 	'popup.massupdate.item' => [
-		'content' => (new CButton('', _('Mass update')))
+		'content' => (new CSimpleButton(_('Mass update')))
+			->addClass(ZBX_STYLE_BTN_ALT)
 			->onClick(
 				"openMassupdatePopup('popup.massupdate.item', {".
 					CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('item').
@@ -353,8 +354,6 @@ $button_list += [
 					trigger_element: this
 				});"
 			)
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->removeAttribute('id')
 	],
 	'item.massdelete' => [
 		'name' => _('Delete'),
@@ -377,7 +376,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'group_itemid'
+		'checkbox_object' => 'group_itemid',
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

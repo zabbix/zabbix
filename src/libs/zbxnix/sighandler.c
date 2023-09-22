@@ -21,7 +21,6 @@
 #include "sigcommon.h"
 
 #include "zbxcommon.h"
-#include "log.h"
 #include "fatal.h"
 #include "zbxcomms.h"
 

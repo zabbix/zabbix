@@ -150,16 +150,11 @@ class testPageScheduledReport extends CWebTest {
 		// Check table headers.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['', 'Name', 'Owner', 'Repeats', 'Period', 'Last sent', 'Status', 'Info'], $table->getHeadersText());
-		foreach ($table->getHeaders() as $header) {
-			if ($header->getText() !== 'Name') {
-				// Only 'Name' column is clickable and contains tags 'a'.
-				$this->assertFalse($header->query('tag:a')->one(false)->isValid());
-			}
-		}
+		$this->assertEquals(['Name'], $table->getSortableHeaders()->asText());
 
 		// Check all columns and info icon for one report.
 		$row = $table->findRow('Name', $expired_report['Name']);
-		$row->getColumn('Info')->query('class:status-yellow')->one()->click();
+		$row->getColumn('Info')->query('class:zi-i-warning')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 		$this->assertEquals($expired_report['Info'], $hint->getText());
 		$hint->close();

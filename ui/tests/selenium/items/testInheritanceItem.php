@@ -75,8 +75,9 @@ class testInheritanceItem extends CLegacyWebTest {
 					'name' => 'itemInheritance',
 					'key' => 'key-item-inheritance',
 					'errors' => [
-						'Cannot inherit LLD rule with key "key-item-inheritance" of template "Inheritance test template" '.
-							'to host "Template inheritance test host", because an item with the same key already exists.'
+						'Cannot inherit item with key "key-item-inheritance" of template "Inheritance test template" to host '.
+							'"Template inheritance test host", because an item with the same key is already inherited '.
+							'from template "Inheritance test template 2".'
 					]
 				]
 			]

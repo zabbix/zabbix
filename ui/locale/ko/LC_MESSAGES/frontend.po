@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-12 02:59+0000\n"
-"Last-Translator: kimseungyong <sykim@feelatech.com>\n"
+"PO-Revision-Date: 2023-09-22 06:16+0000\n"
+"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -551,6 +551,11 @@ msgstr "대응 완료 장애 이벤트"
 msgid "Acknowledged RESOLVED events"
 msgstr "대응 완료된 해결 이벤트"
 
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.host.edit.html.php:144
@@ -887,6 +892,10 @@ msgstr "추가"
 msgid "Add (message type limit reached)"
 msgstr "추가(메시지 유형 제한에 도달함)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "새로운 위젯을 추가"
@@ -922,6 +931,10 @@ msgstr ""
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "호스트 추가"
+
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -1323,6 +1336,10 @@ msgstr "And"
 msgid "And/Or"
 msgstr "And/Or"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr "매년"
@@ -1346,6 +1363,10 @@ msgstr "매년"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "전부"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1398,6 +1419,19 @@ msgstr "4월"
 msgid "April"
 msgstr "4월"
 
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr ""
+
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
 msgstr "이 필터를 삭제하시겠습니까?"
@@ -1439,6 +1473,28 @@ msgstr ""
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "포함 태그"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr ""
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -1939,6 +1995,11 @@ msgstr "불가리아어 (bg_BG)"
 msgid "By host"
 msgstr "호스트를 통해"
 
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
+
 #: report2.php:196
 msgid "By trigger template"
 msgstr "트리거 템플릿을 통해"
@@ -2332,6 +2393,31 @@ msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] "그래프를 복사할 수 없습니다"
 
+#: include/classes/helpers/CGraphHelper.php:74
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:91
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:92
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:96
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CGraphGeneralHelper.php:97
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr ""
+
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
@@ -2352,10 +2438,25 @@ msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
 msgstr[0] "트리거를 복사할 수 없습니다"
 
+#: include/classes/helpers/CTriggerGeneralHelper.php:196
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/helpers/CTriggerGeneralHelper.php:197
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
+msgstr ""
+
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
 msgstr "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
+
+#: include/classes/helpers/CTriggerHelper.php:75
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
+msgstr ""
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2399,6 +2500,11 @@ msgstr "트리거 프로토타입 자신에 대한 의존관계는 작성할 수
 msgid "Cannot create discovery rule"
 msgstr "디스커버리 규칙을 작성할 수 없습니다"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "아이콘 맵을 작성할 수 없습니다"
@@ -2435,6 +2541,10 @@ msgstr "설정 파일을 작성할 수 없습니다."
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "사용자 역할을 생성할 수 없습니다."
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2495,6 +2605,11 @@ msgstr[0] "디스커버리 규칙을 삭제할 수 없습니다"
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "디스커버리 규칙을 삭제할 수 없습니다"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2773,6 +2888,11 @@ msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "디스커버리 규칙을 비활성화 할 수 없습니다."
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2854,6 +2974,11 @@ msgstr[0] "상관관계를 활성화 할 수 없습니다"
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "디스커버리 규칙을 활성화 할 수 없습니다."
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3133,6 +3258,11 @@ msgstr "동일한 키를 가진 검색된 항목이 이미 존재하므로 템�
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
 msgstr "\"%4$s\" 유형의 호스트 인터페이스가 필요하기 때문에 \"%2$s\" 템플릿의 \"%1$s\" 키가 있는 LLD 규칙을 \"%3$s\" 호스트에 상속할 수 없습니다."
 
+#: include/classes/api/services/CItemGeneral.php:834
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
@@ -3153,6 +3283,11 @@ msgstr "템플릿 \"%2$s\"의 \"%1$s\" 키가 있는 LLD 규칙을 호스트 \"%
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
 msgstr "동일한 키를 가진 검색된 항목이 이미 존재하므로 템플릿 \"%2$s\"의 키 \"%1$s\"가 있는 LLD 규칙을 템플릿 \"%3$s\"에 상속할 수 없습니다."
+
+#: include/classes/api/services/CItemGeneral.php:835
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
@@ -3195,6 +3330,11 @@ msgstr "\"%4$s\" 유형의 호스트 인터페이스가 필요하기 때문에 �
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "키가 동일한 LLD 규칙이 이미 존재하므로 템플릿 \"%2$s\"의 키 \"%1$s\"가 있는 항목 프로토타입을 호스트 \"%3$s\"에 상속할 수 없습니다."
 
+#: include/classes/api/services/CItemGeneral.php:840
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
@@ -3215,6 +3355,11 @@ msgstr "동일한 키를 가진 검색된 항목이 이미 존재하므로 템�
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "동일한 키를 가진 LLD 규칙이 이미 존재하므로 템플릿 \"%2$s\"의 키 \"%1$s\"가 있는 항목 프로토타입을 템플릿 \"%3$s\"에 상속할 수 없습니다."
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:726
 #, c-format
@@ -3335,6 +3480,11 @@ msgstr "트리거 \"%3$s\"의 종속성으로 인해 템플릿 \"%1$s\"을(를) 
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "트리거 \"%3$s\"의 표현으로 인해 템플릿 \"%1$s\"을(를) 호스트 \"%2$s\"에 연결할 수 없습니다."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3355,6 +3505,11 @@ msgstr "트리거 \"%3$s\"의 종속성으로 인해 템플릿 \"%1$s\"을(를) 
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "트리거 \"%3$s\"의 표현으로 인해 템플릿 \"%1$s\"을(를) 호스트 프로토타입 \"%2$s\"에 연결할 수 없습니다."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3386,6 +3541,41 @@ msgstr "\"%3$s\" 트리거의 표현으로 인해 \"%1$s\" 템플릿을 \"%2$s\"
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "순환 연결(%3$s)이 발생하기 때문에 \"%1$s\" 템플릿을 \"%2$s\" 템플릿에 연결할 수 없습니다."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3796,6 +3986,11 @@ msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] "이벤트를 갱신할 수 없습니다"
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr ""
@@ -4022,6 +4217,10 @@ msgstr "사용자 역할을 갱신할 수 없습니다."
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Web시나리오를 갱신할 수 없습니다"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -4404,6 +4603,10 @@ msgstr "색상 \"%1$s\"이(가) 올바르지 않습니다. 16진수 색상 코�
 #: include/views/js/monitoring.sysmaps.js.php:809
 msgid "Color (OK)"
 msgstr "색상(확인)"
+
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
@@ -5186,6 +5389,10 @@ msgstr "디스커버리 규칙 생성(먼저 템플릿 선택)"
 msgid "Create enabled"
 msgstr "자동생성 활성화"
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "그래프 생성"
@@ -5567,6 +5774,10 @@ msgstr "대시보드를 생성했습니다"
 msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] "대시보드를 삭제하셨습니다."
+
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -6008,6 +6219,10 @@ msgstr "대시보드를 삭제하시겠습니까?"
 msgid "Delete discovery rule?"
 msgstr "디스커버리 규칙를 삭제하시겠습니까?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6138,6 +6353,14 @@ msgstr "선택한 디스커버리 규칙를 삭제하시겠습니까?"
 #: jsLoader.php:273
 msgid "Delete selected elements?"
 msgstr "선택한 요소를 삭제하시겠습니까?"
+
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6468,6 +6691,10 @@ msgstr ""
 msgid "Description"
 msgstr "설명"
 
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr ""
@@ -6634,6 +6861,14 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "선택한 디스커버리 규칙을 비활성으로 하시겠습니까?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7528,6 +7763,14 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr "선택한 디스커버리 규칙를 활성화 하시겠습니까?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr ""
@@ -7788,11 +8031,43 @@ msgstr "장애대응 완료"
 msgid "Event correlation"
 msgstr "이벤트 상관관계"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "이벤트 상관관계 규칙"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -7813,6 +8088,10 @@ msgstr "이벤트가 인정되지 않음"
 #: tr_events.php:187
 msgid "Event list [previous 20]"
 msgstr "이벤트리스트 [최근20]"
+
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
 
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
@@ -8513,6 +8792,10 @@ msgstr "표시 설정"
 msgid "GUI access disabled."
 msgstr "GUI 액세스를 비활성 하였습니다"
 
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr ""
+
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
 msgid "General"
@@ -8665,6 +8948,16 @@ msgstr "그래프 프로토타입에서 생성된 그래프로 \"%1$s\" 그래�
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "그래프 \"%1$s\"는 \"%2$s\"에 이미 존재합니다."
 
+#: include/classes/api/services/CGraph.php:479
+#, c-format
+msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraph.php:480
+#, c-format
+msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
+msgstr ""
+
 #: include/classes/api/services/CGraph.php:36
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
@@ -8696,6 +8989,16 @@ msgstr "그래프를 삭제하였습니다"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:167
 msgid "Graph prototype"
 msgstr "그래프 프로토타입"
+
+#: include/classes/api/services/CGraphPrototype.php:470
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CGraphPrototype.php:471
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
@@ -9244,6 +9547,10 @@ msgstr "호스트에 같은 타입의 기본 인터페이스는 2개 이상 설�
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "호스트 수"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -12057,6 +12364,10 @@ msgstr ""
 msgid "LLD macros"
 msgstr ""
 
+#: app/controllers/CControllerAuditLogList.php:229
+msgid "LLD rule"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneralOld.php:700
 msgid "LLD rule with the same UUID already exists"
 msgstr ""
@@ -13763,6 +14074,11 @@ msgstr ""
 msgid "Navigate to initial view"
 msgstr ""
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "네트워크 디스커버리 데이터의 보존기간"
@@ -13870,6 +14186,10 @@ msgstr ""
 msgid "New element"
 msgstr "새 요소"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -13902,6 +14222,10 @@ msgstr "새 호스트 그룹"
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr ""
@@ -13927,8 +14251,20 @@ msgstr ""
 msgid "New service"
 msgstr ""
 
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr ""
+
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr ""
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
+msgstr ""
+
+#: app/views/template.edit.php:352
+msgid "New template"
 msgstr ""
 
 #: app/views/configuration.templategroup.edit.php:52
@@ -13942,6 +14278,10 @@ msgstr "신규 트리거"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
@@ -16031,6 +16371,10 @@ msgstr ""
 msgid "Preview"
 msgstr "미리보기"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -16408,6 +16752,10 @@ msgstr "공개키"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "공개키 파일"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -16898,6 +17246,10 @@ msgstr "호스트 그룹에서 삭제"
 msgid "Remove host"
 msgstr "호스트 삭제"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -17124,6 +17476,17 @@ msgstr "상관관계 규칙 \"%1$s\"에 의해 해결됨."
 msgid "Resolved by correlation rule."
 msgstr "상관관계 규칙에 의해 해결됨."
 
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr ""
+
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
@@ -17268,6 +17631,10 @@ msgstr "매개변수와 일치하는 TCP 소켓 수를 반환합니다. 정수�
 #: include/classes/data/CItemData.php:974
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr "매개변수와 일치하는 UDP 소켓 수를 반환합니다. 정수를 반환"
+
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
+msgstr ""
 
 #: include/classes/data/CItemData.php:850
 msgid "Returns percentage of lost ICMP ping packets."
@@ -17711,6 +18078,15 @@ msgstr "변경을 저장"
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "\"%1$s\"로 저장하였습니다"
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr ""
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18401,6 +18777,10 @@ msgstr "단축"
 msgid "Show"
 msgstr "보이기"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
@@ -18420,6 +18800,10 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
 msgstr "메인터넌스중 호스트 보이기"
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -18512,6 +18896,10 @@ msgstr "대응하지 않은 항목만 표시하기"
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
 msgstr "사용불가 맵의 표시"
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -18810,6 +19198,10 @@ msgstr "Zabbix서버의 기동시각, UNIX 타임스탬프."
 msgid "State"
 msgstr "스테이터스"
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -18819,6 +19211,10 @@ msgstr "고정"
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Zabbix 쓰기 캐시의 통계 및 가용성. 캐시 - 값 중 하나(모드: all, float, uint, str, log, text, 지원되지 않음), 기록(모드: pfree, free, total, used, pused), 인덱스(모드: pfree, free, total, used , pused), 추세(모드: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
@@ -19099,6 +19495,10 @@ msgstr ""
 msgid "Support"
 msgstr "지원"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr ""
@@ -19270,6 +19670,10 @@ msgstr "태그 필터"
 #: include/views/configuration.triggers.edit.php:550
 msgid "Tag for matching"
 msgstr "매칭을 위한 태그"
+
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
@@ -20055,12 +20459,23 @@ msgstr "오늘의 지금까지"
 msgid "Top"
 msgstr "위쪽"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr ""
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
+msgstr ""
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
 msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
@@ -20270,6 +20685,10 @@ msgstr "트리거는 자신을 계승한 트리거와 의존관계를 지닐 수
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "트리거를 복사하였습니다"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -20853,6 +21272,10 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:717
 msgid "Units"
 msgstr "단위"
+
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
@@ -22392,6 +22815,10 @@ msgstr "파라미터 \"grid_show\"의 값 \"%1$s\"가 올바르지 않습니다.
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "필드 \"%2$s\"의 값 \"%1$s\"가 너무 깁니다 - %3$d문자. %4$d문자 이내로 설정해주십시오."
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "값의 캐쉬 효과. 유효한 파라미터：requests, hits, misses."
@@ -22460,6 +22887,10 @@ msgstr ""
 
 #: include/actions.inc.php:352
 msgid "Value of tag"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
 msgstr ""
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
@@ -22630,6 +23061,10 @@ msgstr "경고"
 
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
+msgstr ""
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
 msgstr ""
 
 #: app/partials/administration.system.info.php:154
@@ -23003,6 +23438,14 @@ msgstr "Y/m/d H:i"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i:s"
+msgstr "Y/m/d H:i:s"
+
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr "Y/m/d H:i"
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
 msgstr "Y/m/d H:i:s"
 
 #: include/translateDefines.inc.php:40
@@ -23381,6 +23824,10 @@ msgstr ""
 msgid "a string, number or null value is expected"
 msgstr ""
 
+#: include/classes/api/services/CDiscoveryRule.php:1718
+msgid "a template ID is expected"
+msgstr ""
+
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:130
@@ -23470,6 +23917,10 @@ msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
+msgstr ""
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
 msgstr ""
 
 #: include/classes/api/services/CDRule.php:474
@@ -23866,6 +24317,10 @@ msgstr "연결을 해제할 수 없습니다."
 msgid "cannot convert to JSON, result value too long"
 msgstr "JSON으로 변환할 수 없습니다. 결과가 너무 깁니다"
 
+#: include/classes/api/services/CDiscoveryRule.php:3026
+msgid "cannot delete inherited LLD rule"
+msgstr ""
+
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
 msgstr ""
@@ -24211,6 +24666,14 @@ msgstr ""
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
+
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr "H:i"
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr "H:i:s"
 
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
@@ -24574,6 +25037,10 @@ msgstr "m/d"
 msgid "m-d H:i"
 msgstr "m/d H:i"
 
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
+msgstr "m/d H:i"
+
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr "매크로가 설정되어 있지 않습니다"
@@ -24683,6 +25150,11 @@ msgstr "min() - 기간T 안의 최소치"
 msgid "minimum length is %1$s characters"
 msgstr "%1$s 문자 이상 입력해주세요"
 
+#: include/classes/api/services/CDiscoveryRule.php:1630
+#, c-format
+msgid "missing filter condition \"%1$s\""
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "mod() - Division remainder"
 msgstr "mod() - 나누기 나머지"
@@ -24766,6 +25238,10 @@ msgstr ""
 #: include/translateDefines.inc.php:39
 msgid "n-d H:i"
 msgstr ""
+
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr "n-d H:i"
 
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
@@ -24879,6 +25355,10 @@ msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "수치"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
@@ -25667,6 +26147,11 @@ msgstr ""
 msgid "value must be empty or %1$s"
 msgid_plural "value must be empty or one of %1$s"
 msgstr[0] ""
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format

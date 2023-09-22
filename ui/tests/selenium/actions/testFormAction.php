@@ -994,6 +994,8 @@ class testFormAction extends CLegacyWebTest {
 							'Remove from host group',
 							'Link template',
 							'Unlink template',
+							'Add host tags',
+							'Remove host tags',
 							'Enable host',
 							'Disable host',
 							'Set host inventory mode',
@@ -1564,7 +1566,7 @@ class testFormAction extends CLegacyWebTest {
 				}
 				$this->assertEquals($expected_operations, $saved_operations);
 				$action_form->submit();
-				$this->query('xpath://button[@class="overlay-close-btn"]')->waitUntilVisible()->one()->click();
+				$this->query('xpath://button[@class="btn-overlay-close"]')->waitUntilVisible()->one()->click();
 			}
 		}
 		else {

@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {
@@ -303,18 +304,18 @@ int	lld_validate_item_override_no_discover(const zbx_vector_lld_override_t *over
 		unsigned char override_default);
 
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 void	lld_item_links_sort(zbx_vector_lld_row_t *lld_rows);
 
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck);
 
 int	lld_end_of_life(int lastcheck, int lifetime);
 

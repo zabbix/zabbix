@@ -5,8 +5,11 @@
 	li {
 		position: relative;
 		display: inline-block;
-		margin-right: -1px;
 		padding: 0;
+
+		&:not(:last-child) {
+			margin-right: -1px;
+		}
 
 		&:first-child {
 			border-top-left-radius: 3px;
@@ -34,8 +37,11 @@
 		border: 1px solid $form-border-color;
 		line-height: 14px;
 		padding: 4px 11px;
-		transition: background-color .2s ease-out;
 		cursor: pointer;
+
+		@if $ui-transitions {
+			transition: background-color $ui-controls-transition-duration ease-out;
+		}
 	}
 
 	input[type="radio"] {
@@ -51,17 +57,18 @@
 			background-color: $form-bg-color;
 
 			&:hover {
-				background-color: $btn-form-hover-color;
+				background-color: $btn-form-hover-bg-color;
 			}
 
 			&:active {
 				border-color: $form-border-color;
-				background-color: $btn-form-hover-color;
+				background-color: $btn-form-hover-bg-color;
 			}
 		}
 
 		&:checked + label {
 			color: $white;
+			-webkit-text-fill-color: $white;
 			border-color: $ui-bg-selected-color;
 			background-color: $ui-bg-selected-color;
 			position: relative;
@@ -69,7 +76,7 @@
 		}
 
 		&:focus + label {
-			box-shadow: 0 0 0 2px rgba($blue, .35);
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 
 		&:checked[disabled] + label {
@@ -82,9 +89,5 @@
 			cursor: default;
 			@extend %form-disabled;
 		}
-	}
-
-	+ .icon-info {
-		margin-left: 5px;
 	}
 }

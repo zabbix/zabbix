@@ -173,7 +173,7 @@ class ZBarGauge extends HTMLElement {
 
 				this._canvas.width = width + 2;
 
-				this._drawCell(ctx, 1, bar_size, this._getThresholdColorByValue(value), 1);
+				this._drawCell(ctx, 1, bar_size, this._getThresholdColorByValue(this._value), 1);
 			}
 			else {
 				const cell_count = Math.floor(width / BAR_GAUGE_BAR_ITEM_WIDTH);
@@ -222,7 +222,7 @@ class ZBarGauge extends HTMLElement {
 	}
 
 	_getThresholdColorByValue(value) {
-		let color = BAR_GAUGE_BAR_DEFAULT_COLOR;
+		let color = this._fill;
 
 		for (const threshold of Object.keys(this._thresholds).sort((a, b) => (a - b))) {
 			if (threshold <= value) {
@@ -258,7 +258,7 @@ class ZBarGauge extends HTMLElement {
 			},
 
 			update: () => {
-				this._thresholds = {0: this._fill};
+				this._thresholds = {};
 
 				for (const threshold of this.querySelectorAll('threshold')) {
 					if (threshold.hasAttribute('fill') && threshold.hasAttribute('value')) {

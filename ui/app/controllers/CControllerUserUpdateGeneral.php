@@ -130,6 +130,19 @@ abstract class CControllerUserUpdateGeneral extends CController {
 				return false;
 			}
 		}
+		else {
+			[$db_user] = API::User()->get([
+				'output' => [],
+				'selectRole' => ['roleid'],
+				'userids' => $this->getInput('userid')
+			]);
+
+			if ($db_user['role']) {
+				error(_s('Field "%1$s" is mandatory.', 'roleid'));
+
+				return false;
+			}
+		}
 
 		return true;
 	}

@@ -428,60 +428,6 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
 	return $result;
 }
 
-/**
- * Copy specified graph to specified host.
- *
- * @param string $graphid
- * @param string $hostid
- *
- * @return array
- */
-function copyGraphToHost($graphid, $hostid) {
-	$graphs = API::Graph()->get([
-		'output' => ['graphid', 'name', 'width', 'height', 'yaxismin', 'yaxismax', 'show_work_period', 'show_triggers',
-			'graphtype', 'show_legend', 'show_3d', 'percent_left', 'percent_right', 'ymin_type', 'ymax_type',
-			'ymin_itemid', 'ymax_itemid'
-		],
-		'selectGraphItems' => ['itemid', 'drawtype', 'sortorder', 'color', 'yaxisside', 'calc_fnc', 'type'],
-		'selectHosts' => ['hostid', 'name'],
-		'graphids' => $graphid
-	]);
-	$graph = reset($graphs);
-	$host = reset($graph['hosts']);
-
-	if ($host['hostid'] == $hostid) {
-		error(_s('Graph "%1$s" already exists on "%2$s".', $graph['name'], $host['name']));
-
-		return false;
-	}
-
-	$graph['gitems'] = getSameGraphItemsForHost(
-		$graph['gitems'],
-		$hostid,
-		true,
-		[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
-	);
-
-	if (!$graph['gitems']) {
-		$host = get_host_by_hostid($hostid);
-
-		info(_s('Skipped copying of graph "%1$s" to host "%2$s".', $graph['name'], $host['host']));
-
-		return false;
-	}
-
-	// retrieve actual ymax_itemid and ymin_itemid
-	if ($graph['ymax_itemid'] && $itemid = get_same_item_for_host($graph['ymax_itemid'], $hostid)) {
-		$graph['ymax_itemid'] = $itemid;
-	}
-
-	if ($graph['ymin_itemid'] && $itemid = get_same_item_for_host($graph['ymin_itemid'], $hostid)) {
-		$graph['ymin_itemid'] = $itemid;
-	}
-
-	return API::Graph()->create($graph);
-}
-
 function get_next_color($palettetype = 0) {
 	static $prev_color = ['dark' => true, 'color' => 0, 'grad' => 0];
 
@@ -824,8 +770,8 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 	];
 
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
-		$clearance_min = $rows * 0.05;
-		$clearance_max = $rows * 0.1;
+		$clearance_min = min(0.5, $rows * 0.05);
+		$clearance_max = min(1, $rows * 0.1);
 
 		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
 			if ($interval == INF) {
@@ -854,6 +800,10 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 			$min = truncateFloat($min);
 			$max = truncateFloat($max);
 
+			if (is_infinite($min) || is_infinite($max)) {
+				break;
+			}
+
 			if ($min > $scale_min || $max < $scale_max) {
 				continue;
 			}
@@ -874,6 +824,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 				'power' => $power
 			];
 
+			// Expression optimized to avoid overflow.
 			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
 
 			if ($best_result_value === null || $result_value < $best_result_value) {

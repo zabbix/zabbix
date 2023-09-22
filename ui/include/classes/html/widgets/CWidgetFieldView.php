@@ -27,13 +27,12 @@ abstract class CWidgetFieldView {
 
 	protected string $form_name = '';
 
-	protected array $class = [];
-	protected array $label_class = [];
+	protected array $label_class_list = [];
+	protected array $field_class_list = [];
 
 	protected bool $has_label = true;
 
-	protected ?CTag $hint = null;
-	protected $help_hint;
+	protected ?CTag $field_hint = null;
 
 	public function setFormName($form_name): self {
 		$this->form_name = $form_name;
@@ -41,35 +40,27 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
-	public function setHint(CTag $hint): self {
-		$this->hint = $hint;
+	public function getLabel(): ?CLabel {
+		if (!$this->has_label) {
+			return null;
+		}
 
-		return $this;
-	}
+		$label = $this->field->getLabel();
 
-	public function setHelpHint($help_hint): self {
-		$this->help_hint = $help_hint;
+		if ($label === null) {
+			return null;
+		}
 
-		return $this;
+		return (new CLabel([$label, $this->field_hint]))
+			->setFor(zbx_formatDomId($this->field->getName()))
+			->setAsteriskMark($this->isRequired())
+			->addClass($this->label_class_list ? implode(' ', $this->label_class_list) : null);
 	}
 
 	public function removeLabel(): self {
 		$this->has_label = false;
 
 		return $this;
-	}
-
-	public function getLabel(): ?CLabel {
-		$label = $this->field->getLabel();
-
-		if ($label === null || !$this->has_label) {
-			return null;
-		}
-
-		return (new CLabel([$label, $this->hint, $this->help_hint !== null ? makeHelpIcon($this->help_hint) : null]))
-			->setFor(zbx_formatDomId($this->field->getName()))
-			->setAsteriskMark($this->isRequired())
-			->addClass($this->label_class ? implode(' ', $this->label_class) : null);
 	}
 
 	/**
@@ -79,29 +70,35 @@ abstract class CWidgetFieldView {
 		return null;
 	}
 
+	public function setFieldHint(CTag $hint): self {
+		$this->field_hint = $hint;
+
+		return $this;
+	}
+
+	public function addLabelClass(?string $class): self {
+		if ($class !== null) {
+			$this->label_class_list[] = $class;
+		}
+
+		return $this;
+	}
+
 	public function getClass(): ?string {
-		return $this->class ? implode(' ', $this->class) : null;
+		return $this->field_class_list ? implode(' ', $this->field_class_list) : null;
 	}
 
 	public function addClass(?string $class): self {
 		if ($class !== null) {
-			$this->class[] = $class;
+			$this->field_class_list[] = $class;
 		}
 
 		return $this;
 	}
 
-	public function addLabelClass(?string $label_class): self {
-		if ($label_class !== null) {
-			$this->label_class[] = $label_class;
-		}
-
-		return $this;
-	}
-
-	public function addRowClass(?string $row_class): self {
-		$this->addLabelClass($row_class);
-		$this->addClass($row_class);
+	public function addRowClass(?string $class): self {
+		$this->addLabelClass($class);
+		$this->addClass($class);
 
 		return $this;
 	}

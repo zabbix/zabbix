@@ -215,11 +215,11 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 			[
 				[
 					'step_name' => 'Step URL fragment part ignored',
-					'url' => 'http://www.zabbix.com/enterprise_ready#test',
+					'url' => 'https://www.zabbix.com/enterprise_ready#test',
 					'parsed_query' => [
 						['name' => '', 'value' => '']
 					],
-					'parsed_url' => 'http://www.zabbix.com/enterprise_ready'
+					'parsed_url' => 'https://www.zabbix.com/enterprise_ready'
 				]
 			],
 			// User macro in url.

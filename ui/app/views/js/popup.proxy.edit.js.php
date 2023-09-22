@@ -38,10 +38,6 @@ window.proxy_edit_popup = new class {
 			this.form.querySelector('#tls_connect input:checked').value == <?= HOST_ENCRYPTION_PSK ?>
 				|| document.getElementById('tls_accept_psk').checked;
 
-		document
-			.getElementById('useip')
-			.addEventListener('change', () => this._updateInterface());
-
 		if (this.display_change_psk) {
 			document
 				.getElementById('tls-psk-change')
@@ -52,7 +48,7 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		for (const id of ['status', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate']) {
+		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this._update());
@@ -61,18 +57,7 @@ window.proxy_edit_popup = new class {
 		this._update();
 
 		document.getElementById('proxy-form').style.display = '';
-		document.getElementById('host').focus();
-	}
-
-	_updateInterface() {
-		if (this.form.querySelector('#useip input:checked').value == <?= INTERFACE_USE_IP ?>) {
-			document.querySelector('.js-interface input[name="ip"]').setAttribute('aria-required', 'true');
-			document.querySelector('.js-interface input[name="dns"]').removeAttribute('aria-required');
-		}
-		else {
-			document.querySelector('.js-interface input[name="ip"]').removeAttribute('aria-required');
-			document.querySelector('.js-interface input[name="dns"]').setAttribute('aria-required', 'true');
-		}
+		document.getElementById('name').focus();
 	}
 
 	_changePsk() {
@@ -92,22 +77,23 @@ window.proxy_edit_popup = new class {
 	}
 
 	_update() {
-		const status_active = document.querySelector('#status input:checked').value == <?= HOST_STATUS_PROXY_ACTIVE ?>;
+		const operating_mode_active =
+			document.querySelector('#operating_mode input:checked').value == <?= PROXY_OPERATING_MODE_ACTIVE ?>;
 
 		for (const element of this.form.querySelectorAll('.js-interface')) {
-			element.style.display = status_active ? 'none' : '';
+			element.style.display = operating_mode_active ? 'none' : '';
 		}
 
 		for (const element of this.form.querySelectorAll('.js-proxy-address')) {
-			element.style.display = status_active ? '' : 'none';
+			element.style.display = operating_mode_active ? '' : 'none';
 		}
 
 		for (const element of this.form.querySelectorAll('#tls_connect input')) {
-			element.disabled = status_active;
+			element.disabled = operating_mode_active;
 		}
 
 		for (const id of ['tls_accept_none', 'tls_accept_psk', 'tls_accept_certificate']) {
-			document.getElementById(id).disabled = !status_active;
+			document.getElementById(id).disabled = !operating_mode_active;
 		}
 
 		const tls_connect = this.form.querySelector('#tls_connect input:checked').value;
@@ -123,7 +109,7 @@ window.proxy_edit_popup = new class {
 
 		for (const id of ['tls_issuer', 'tls_subject']) {
 			document.getElementById(id).disabled =
-				!(status_active && tls_accept_certificate || !status_active && tls_connect_certificate);
+				!(operating_mode_active && tls_accept_certificate || !operating_mode_active && tls_connect_certificate);
 		}
 
 		if (this.display_change_psk) {
@@ -136,7 +122,7 @@ window.proxy_edit_popup = new class {
 			}
 
 			document.getElementById('tls-psk-change').disabled =
-				!(status_active && tls_accept_psk || !status_active && tls_connect_psk);
+				!(operating_mode_active && tls_accept_psk || !operating_mode_active && tls_connect_psk);
 		}
 		else {
 			for (const element of this.form.querySelectorAll('.js-tls-psk-identity, .js-tls-psk')) {
@@ -145,7 +131,7 @@ window.proxy_edit_popup = new class {
 
 			for (const id of ['tls_psk_identity', 'tls_psk']) {
 				document.getElementById(id).disabled =
-					!(status_active && tls_accept_psk || !status_active && tls_connect_psk);
+					!(operating_mode_active && tls_accept_psk || !operating_mode_active && tls_connect_psk);
 			}
 		}
 	}
@@ -153,7 +139,9 @@ window.proxy_edit_popup = new class {
 	refreshConfig() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.config.refresh');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('proxy')) ?>
+		);
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			for (const element of this.form.parentNode.children) {
@@ -179,12 +167,14 @@ window.proxy_edit_popup = new class {
 	delete() {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'proxy.delete');
-		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>', <?= json_encode(CCsrfTokenHelper::get('proxy')) ?>);
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('proxy')) ?>
+		);
 
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 
@@ -203,8 +193,8 @@ window.proxy_edit_popup = new class {
 			fields.clone_psk = false;
 		}
 
-		for (const name of ['host', 'ip', 'dns', 'port', 'proxy_address', 'description', 'tls_psk_identity', 'tls_psk',
-				'tls_issuer', 'tls_subject']) {
+		for (const name of ['name', 'allowed_addresses', 'address', 'port', 'description', 'tls_psk_identity',
+			'tls_psk', 'tls_issuer', 'tls_subject']) {
 			if (name in fields) {
 				fields[name] = fields[name].trim();
 			}

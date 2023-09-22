@@ -4281,10 +4281,10 @@ zabbix_export:
           master_item:
             key: hpe.synergy.get.interconnects
           lld_macro_paths:
-            - lld_macro: '{#ENCLOSURE_NAME}'
-              path: $.enclosureName
             - lld_macro: '{#NAME}'
               path: $.name
+            - lld_macro: '{#ENCLOSURE_NAME}'
+              path: $.enclosureName
           preprocessing:
             - type: JSONPATH
               parameters:

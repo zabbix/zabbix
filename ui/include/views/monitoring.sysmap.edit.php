@@ -175,6 +175,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append host to form list.
@@ -189,6 +190,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append trigger to form list.
@@ -203,6 +205,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append map to form list.
@@ -217,6 +220,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append image to form list.
@@ -231,6 +235,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append map element label to form list.
@@ -294,9 +299,7 @@ foreach ($data['sysmap']['urls'] as $url) {
 				->setValue($url['elementtype'])
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->onClick('$("#url-row-'.$i.'").remove();')
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))->onClick('$("#url-row-'.$i.'").remove();')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('url-row-'.$i)
 	);
@@ -306,10 +309,8 @@ foreach ($data['sysmap']['urls'] as $url) {
 // Append "add" button to url table.
 $url_table->addRow(
 	(new CCol(
-		(new CButton(null, _('Add')))
-			->setId('add-url')
-			->addClass(ZBX_STYLE_BTN_LINK))
-	)->setColSpan(4)
+		(new CButtonLink(_('Add')))->setId('add-url')
+	))->setColSpan(4)
 );
 
 // Append url table to form list.
@@ -325,25 +326,22 @@ $tabs->addTab('sysmap_tab', _('Map'), $map_tab);
 $user_group_shares_table = (new CTable())
 	->setId('user-group-share-table')
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
-	->setAttribute('style', 'width: 100%;');
-
-$add_user_group_btn = ([(new CButton(null, _('Add')))
-	->onClick(
-		'return PopUp("popup.generic", '.json_encode([
-			'srctbl' => 'usrgrp',
-			'srcfld1' => 'usrgrpid',
-			'srcfld2' => 'name',
-			'dstfrm' => $form->getName(),
-			'multiselect' => '1'
-		]).', {dialogue_class: "modal-popup-generic"});'
-	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
-
-$user_group_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_group_btn))->setColSpan(3)
-	))->setId('user_group_list_footer')
-);
+	->setAttribute('style', 'width: 100%')
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButtonLink(_('Add')))->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'usrgrp',
+						'srcfld1' => 'usrgrpid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'multiselect' => '1'
+					]).', {dialogue_class: "modal-popup-generic"});'
+				)
+			))->setColSpan(3)
+		))->setId('user_group_list_footer')
+	);
 
 $user_groups = [];
 
@@ -362,25 +360,22 @@ $js_insert = 'window.addPopupValues('.json_encode(['object' => 'usrgrpid', 'valu
 $user_shares_table = (new CTable())
 	->setId('user-share-table')
 	->setHeader([_('Users'), _('Permissions'), _('Action')])
-	->setAttribute('style', 'width: 100%;');
-
-$add_user_btn = ([(new CButton(null, _('Add')))
-	->onClick(
-		'return PopUp("popup.generic", '.json_encode([
-			'srctbl' => 'users',
-			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname',
-			'dstfrm' => $form->getName(),
-			'multiselect' => '1'
-		]).', {dialogue_class: "modal-popup-generic"});'
-	)
-	->addClass(ZBX_STYLE_BTN_LINK)]);
-
-$user_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_btn))->setColSpan(3)
-	))->setId('user_list_footer')
-);
+	->setAttribute('style', 'width: 100%')
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButtonLink(_('Add')))->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'users',
+						'srcfld1' => 'userid',
+						'srcfld2' => 'fullname',
+						'dstfrm' => $form->getName(),
+						'multiselect' => '1'
+					]).', {dialogue_class: "modal-popup-generic"});'
+				)
+			))->setColSpan(3)
+		))->setId('user_list_footer')
+	);
 
 $users = [];
 

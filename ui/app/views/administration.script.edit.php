@@ -30,7 +30,8 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('script-form')
 	->setName('scripts')
-	->addVar('scriptid', $data['scriptid']);
+	->addVar('scriptid', $data['scriptid'])
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $parameters_table = (new CTable())
 	->setId('parameters-table')
@@ -44,9 +45,7 @@ $parameters_table = (new CTable())
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('js-parameter-add')
+					(new CButtonLink(_('Add')))->addClass('js-parameter-add')
 				))->setColSpan(2)
 			)
 	);
@@ -62,10 +61,7 @@ $row_template = (new CTemplateTag('script-parameter-template'))
 				->setAttribute('style', 'width: 100%;')
 				->setAttribute('value', '#{value}')
 				->removeId(),
-			(new CButton('', _('Remove')))
-				->removeId()
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-remove')
+			(new CButtonLink(_('Remove')))->addClass('js-remove')
 		]))->addClass('form_row')
 	);
 
@@ -79,7 +75,7 @@ $form_grid = (new CFormGrid())
 				->setAriaRequired()
 		))
 	])
-	->addItem(([
+	->addItem([
 		new CLabel(_('Scope'), 'scope'),
 		new CFormField(
 			(new CRadioButtonList('scope', (int) $data['scope']))
@@ -87,8 +83,9 @@ $form_grid = (new CFormGrid())
 				->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 				->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
 				->setModern()
-				->setEnabled(!$data['actions']))
-	]))
+				->setEnabled(!$data['actions'])
+		)
+	])
 	->addItem([
 		(new CLabel(_('Menu path'), 'menu_path'))->setId('menu-path-label'),
 		(new CFormField(
@@ -195,6 +192,7 @@ $form_grid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('scripts', 'command'))
 				->setAriaRequired()
+				->disableSpellcheck()
 		))->setId('commands')
 	])
 	->addItem([
@@ -216,7 +214,6 @@ $form_grid = (new CFormGrid())
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('webhook-parameters')
 	])
-
 	->addItem([
 		(new CLabel(_('URL'), 'url'))
 			->setId('url-label')

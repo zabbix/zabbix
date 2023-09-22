@@ -2976,14 +2976,14 @@ zabbix_export:
           master_item:
             key: hpe.msa.get.fru
           lld_macro_paths:
-            - lld_macro: '{#DESCRIPTION}'
-              path: '$.[''description'']'
+            - lld_macro: '{#TYPE}'
+              path: '$.[''name'']'
             - lld_macro: '{#ENCLOSURE.ID}'
               path: '$.[''enclosure-id'']'
             - lld_macro: '{#LOCATION}'
               path: '$.[''fru-location'']'
-            - lld_macro: '{#TYPE}'
-              path: '$.[''name'']'
+            - lld_macro: '{#DESCRIPTION}'
+              path: '$.[''description'']'
         - uuid: 178b94ddcab947ffb1614622c2b7e08e
           name: 'Pools discovery'
           type: DEPENDENT

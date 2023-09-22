@@ -27,7 +27,7 @@
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #include "zbxthreads.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
@@ -328,6 +328,12 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 #endif
 
 #if defined(HAVE_GNUTLS)
+static void	tls_socket_event(gnutls_session_t session, ssize_t err, short *event)
+{
+	ZBX_UNUSED(err);
+	*event = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: wait for socket to be available for read or write depending on    *
@@ -343,7 +349,8 @@ static int	tls_socket_wait(ZBX_SOCKET s, gnutls_session_t session, ssize_t err)
 	ZBX_UNUSED(err);
 
 	pd.fd = s;
-	pd.events = event = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
+	tls_socket_event(session, err, &pd.events);
+	event = pd.events;
 
 	if (0 > (ret = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
 	{
@@ -370,6 +377,21 @@ static int	tls_is_nonblocking_error(ssize_t err)
 #endif
 
 #if defined(HAVE_OPENSSL)
+static void	tls_socket_event(SSL *ctx, ssize_t ssl_err, short *event)
+{
+	ZBX_UNUSED(ctx);
+	switch (ssl_err)
+	{
+		case SSL_ERROR_WANT_READ:
+			*event = POLLIN;
+			break;
+		case SSL_ERROR_WANT_WRITE:
+			*event = POLLOUT;
+			break;
+		default:
+			break;
+	}
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: wait for socket to be available for read or write depending on    *
@@ -385,17 +407,8 @@ static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 	ZBX_UNUSED(ctx);
 
 	pd.fd = s;
-	switch (ssl_err)
-	{
-		case SSL_ERROR_WANT_READ:
-			pd.events = POLLIN;
-			break;
-		case SSL_ERROR_WANT_WRITE:
-			pd.events = POLLOUT;
-			break;
-		default:
-			return FAIL;
-	}
+
+	tls_socket_event(ctx, ssl_err, &pd.events);
 
 	event = pd.events;
 
@@ -1486,11 +1499,15 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 		{
 			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_issuer, sizeof(tls_issuer), error))
+		{
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
+		}
 	}
 
 	if (NULL != subject && '\0' != *subject)
@@ -1499,11 +1516,15 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 		{
 			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_subject() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_subject, sizeof(tls_subject), error))
+		{
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
+		}
 	}
 
 	gnutls_x509_crt_deinit(cert);
@@ -1517,13 +1538,19 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	if (NULL != issuer && '\0' != *issuer)
 	{
 		if (SUCCEED != zbx_x509_dn_gets(X509_get_issuer_name(cert), tls_issuer, sizeof(tls_issuer), error))
+		{
+			X509_free(cert);
 			return FAIL;
+		}
 	}
 
 	if (NULL != subject && '\0' != *subject)
 	{
 		if (SUCCEED != zbx_x509_dn_gets(X509_get_subject_name(cert), tls_subject, sizeof(tls_subject), error))
+		{
+			X509_free(cert);
 			return FAIL;
+		}
 	}
 
 	X509_free(cert);
@@ -2694,16 +2721,33 @@ void	zbx_tls_free(void)
  *                        (in hex-string) to connect with depending on value  *
  *                        of 'tls_connect'.                                   *
  *     server_name - [IN] optional server name indication for TLS             *
- *     timeout     - [IN] the connection timeout                              *
+ *     event       - [OUT] may be NULL for blocking TLS handshake, otherwise  *
+*                          informs caller to wait for POLLIN or POLLOUT and   *
+*                          retry function to complete async TLS handshake     *
+ *     error       - [OUT] dynamically allocated memory with error message    *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
- *     FAIL - an error occurred                                               *
+ *     FAIL - an error occurred or retry is needed if event is filled         *
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
+
+static const char	*tls_error_string(int err)
+{
+	switch(err)
+	{
+		case GNUTLS_E_INTERRUPTED:
+			return "GNUTLS_E_INTERRUPTED";
+		case GNUTLS_E_AGAIN:
+			return "GNUTLS_E_AGAIN";
+		default:
+			return "unknown error";
+	}
+}
+
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, char **error)
+		const char *server_name, short *event, char **error)
 {
 	int	ret = FAIL, res;
 
@@ -2725,149 +2769,161 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	/* set up TLS context */
 
-	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
-	s->tls_ctx->ctx = NULL;
-	s->tls_ctx->psk_client_creds = NULL;
-	s->tls_ctx->psk_server_creds = NULL;
-
-	if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx->ctx, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS)))
-			/* GNUTLS_NO_EXTENSIONS is used because we do not currently support extensions (e.g. session */
-			/* tickets and OCSP) */
+	if (NULL == s->tls_ctx)
 	{
-		*error = zbx_dsprintf(*error, "gnutls_init() failed: %d %s", res, gnutls_strerror(res));
-		goto out;
-	}
+		s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
+		s->tls_ctx->ctx = NULL;
+		s->tls_ctx->psk_client_creds = NULL;
+		s->tls_ctx->psk_server_creds = NULL;
 
-	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
-	{
-		if (NULL == ciphersuites_cert)
+		if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx->ctx, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS)))
+				/* GNUTLS_NO_EXTENSIONS is used because we do not currently support extensions (e.g. */
+				/* session tickets and OCSP) */
 		{
-			*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate"
-					" loaded");
+			*error = zbx_dsprintf(*error, "gnutls_init() failed: %d %s", res, gnutls_strerror(res));
 			goto out;
 		}
 
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_set(s->tls_ctx->ctx, ciphersuites_cert)))
+		if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 		{
-			*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_cert' failed: %d %s",
-					res, gnutls_strerror(res));
-			goto out;
-		}
-
-		if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_CERTIFICATE,
-				my_cert_creds)))
-		{
-			*error = zbx_dsprintf(*error, "gnutls_credentials_set() for certificate failed: %d %s", res,
-					gnutls_strerror(res));
-			goto out;
-		}
-	}
-	else	/* use a pre-shared key */
-	{
-		if (NULL == ciphersuites_psk)
-		{
-			*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
-			goto out;
-		}
-
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_set(s->tls_ctx->ctx, ciphersuites_psk)))
-		{
-			*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_psk' failed: %d %s", res,
-					gnutls_strerror(res));
-			goto out;
-		}
-
-		if (NULL == tls_arg2)	/* PSK is not set from DB */
-		{
-			/* set up the PSK from a configuration file (always in agentd and a case in active proxy */
-			/* when it connects to server) */
-
-			if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_PSK,
-					my_psk_client_creds)))
+			if (NULL == ciphersuites_cert)
 			{
-				*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s", res,
-						gnutls_strerror(res));
-				goto out;
-			}
-		}
-		else
-		{
-			/* PSK comes from a database (case for a server/proxy when it connects to an agent for */
-			/* passive checks, for a server when it connects to a passive proxy) */
-
-			gnutls_datum_t	key;
-			int		psk_len;
-			unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
-
-			if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
-			{
-				*error = zbx_strdup(*error, "invalid PSK");
+				*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid"
+						" certificate loaded");
 				goto out;
 			}
 
-			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_allocate_client_credentials(
-					&s->tls_ctx->psk_client_creds)))
+			if (GNUTLS_E_SUCCESS != (res = gnutls_priority_set(s->tls_ctx->ctx, ciphersuites_cert)))
 			{
-				*error = zbx_dsprintf(*error, "gnutls_psk_allocate_client_credentials() failed: %d %s",
+				*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_cert' failed:"
+						" %d %s", res, gnutls_strerror(res));
+				goto out;
+			}
+
+			if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_CERTIFICATE,
+					my_cert_creds)))
+			{
+				*error = zbx_dsprintf(*error, "gnutls_credentials_set() for certificate failed: %d %s",
 						res, gnutls_strerror(res));
 				goto out;
 			}
-
-			key.data = psk_buf;
-			key.size = (unsigned int)psk_len;
-
-			/* Simplified. 'tls_arg1' (PSK identity) should have been prepared as required by RFC 4518. */
-			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(s->tls_ctx->psk_client_creds,
-					tls_arg1, &key, GNUTLS_PSK_KEY_RAW)))
+		}
+		else	/* use a pre-shared key */
+		{
+			if (NULL == ciphersuites_psk)
 			{
-				*error = zbx_dsprintf(*error, "gnutls_psk_set_client_credentials() failed: %d %s", res,
-						gnutls_strerror(res));
+				*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
 				goto out;
 			}
 
-			if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_PSK,
-					s->tls_ctx->psk_client_creds)))
+			if (GNUTLS_E_SUCCESS != (res = gnutls_priority_set(s->tls_ctx->ctx, ciphersuites_psk)))
 			{
-				*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s", res,
-						gnutls_strerror(res));
+				*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_psk' failed: %d"
+						" %s", res, gnutls_strerror(res));
 				goto out;
+			}
+
+			if (NULL == tls_arg2)	/* PSK is not set from DB */
+			{
+				/* set up the PSK from a configuration file (always in agentd and a case in active  */
+				/* proxy when it connects to server) */
+
+				if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_PSK,
+						my_psk_client_creds)))
+				{
+					*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s",
+							res, gnutls_strerror(res));
+					goto out;
+				}
+			}
+			else
+			{
+				/* PSK comes from a database (case for a server/proxy when it connects to an agent */
+				/* for passive checks, for a server when it connects to a passive proxy) */
+
+				gnutls_datum_t	key;
+				int		psk_len;
+
+				if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, s->tls_ctx->psk_buf,
+						sizeof(s->tls_ctx->psk_buf))))
+				{
+					*error = zbx_strdup(*error, "invalid PSK");
+					goto out;
+				}
+
+				if (GNUTLS_E_SUCCESS != (res = gnutls_psk_allocate_client_credentials(
+						&s->tls_ctx->psk_client_creds)))
+				{
+					*error = zbx_dsprintf(*error, "gnutls_psk_allocate_client_credentials() failed:"
+							" %d %s", res, gnutls_strerror(res));
+					goto out;
+				}
+
+				key.data = s->tls_ctx->psk_buf;
+				key.size = (unsigned int)psk_len;
+
+				/* Simplified. 'tls_arg1' (PSK identity) should have been prepared as required by */
+				/* RFC 4518.*/
+				if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(
+						s->tls_ctx->psk_client_creds, tls_arg1, &key, GNUTLS_PSK_KEY_RAW)))
+				{
+					*error = zbx_dsprintf(*error, "gnutls_psk_set_client_credentials() failed: %d"
+							" %s", res, gnutls_strerror(res));
+					goto out;
+				}
+
+				if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_PSK,
+						s->tls_ctx->psk_client_creds)))
+				{
+					*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s",
+							res, gnutls_strerror(res));
+					goto out;
+				}
 			}
 		}
+
+		if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect &&
+				GNUTLS_E_SUCCESS != gnutls_server_name_set( s->tls_ctx->ctx, GNUTLS_NAME_DNS,
+				server_name, strlen(server_name)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
+		}
+
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		{
+			/* set our own debug callback function */
+			gnutls_global_set_log_function(zbx_gnutls_debug_cb);
+
+			/* for Zabbix LOG_LEVEL_TRACE, GnuTLS debug level 4 seems the best */
+			/* (the highest GnuTLS debug level is 9) */
+			gnutls_global_set_log_level(4);
+		}
+		else
+			gnutls_global_set_log_level(0);		/* restore default log level */
+
+		/* set our own callback function to log issues into Zabbix log */
+		gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
+
+		gnutls_transport_set_int(s->tls_ctx->ctx, ZBX_SOCKET_TO_INT(s->socket));
 	}
-
-	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && GNUTLS_E_SUCCESS != gnutls_server_name_set(
-			s->tls_ctx->ctx, GNUTLS_NAME_DNS, server_name, strlen(server_name)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
-	}
-
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
-	{
-		/* set our own debug callback function */
-		gnutls_global_set_log_function(zbx_gnutls_debug_cb);
-
-		/* for Zabbix LOG_LEVEL_TRACE, GnuTLS debug level 4 seems the best */
-		/* (the highest GnuTLS debug level is 9) */
-		gnutls_global_set_log_level(4);
-	}
-	else
-		gnutls_global_set_log_level(0);		/* restore default log level */
-
-	/* set our own callback function to log issues into Zabbix log */
-	gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
-
-	gnutls_transport_set_int(s->tls_ctx->ctx, ZBX_SOCKET_TO_INT(s->socket));
 
 	/* TLS handshake */
 
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx->ctx)))
 	{
-		if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
+		if (SUCCEED == tls_is_nonblocking_error(res))
 		{
+			if (NULL != event)
+			{
+				tls_socket_event(s->tls_ctx->ctx, 0, event);
+				zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, tls_error_string(res));
+				return FAIL;
+			}
+
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, 0))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				goto out;
 			}
 
@@ -2999,7 +3055,7 @@ static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t
 				{
 					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
 							" I/O error: %s", func,
-							strerror_from_system(zbx_socket_last_error()));
+							zbx_strerror_from_system(zbx_socket_last_error()));
 				}
 				else
 				{
@@ -3031,37 +3087,58 @@ static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t
 			return FAIL;
 	}
 }
-
+static const char	*tls_error_string(int err)
+{
+	switch (err)
+	{
+		case SSL_ERROR_WANT_READ:
+			return "SSL_ERROR_WANT_READ";
+		case SSL_ERROR_WANT_WRITE:
+			return "SSL_ERROR_WANT_WRITE";
+		default:
+			return "unknown error";
+	}
+}
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, char **error)
+		const char *server_name, short *event, char **error)
 {
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
+	unsigned char	initialized;
 
-#if defined(HAVE_OPENSSL_WITH_PSK)
-	char	psk_buf[HOST_TLS_PSK_LEN / 2];
-#endif
+	if (NULL != event)
+		*event = 0;
 
-	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
-	s->tls_ctx->ctx = NULL;
+	if (NULL == s->tls_ctx)
+	{
+		s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
+		s->tls_ctx->ctx = NULL;
+		initialized = 0;
+	}
+	else
+		initialized = 1;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __func__,
-				ZBX_NULL2EMPTY_STR(tls_arg1), ZBX_NULL2EMPTY_STR(tls_arg2));
-
-		if (NULL == ctx_cert)
+		if (0 == initialized)
 		{
-			*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate"
-					" loaded");
-			goto out;
-		}
+			zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __func__,
+					ZBX_NULL2EMPTY_STR(tls_arg1), ZBX_NULL2EMPTY_STR(tls_arg2));
 
-		if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_cert)))
-		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
-			zbx_tls_error_msg(error, &error_alloc, &error_offset);
-			goto out;
+			if (NULL == ctx_cert)
+			{
+				*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid"
+					" certificate loaded");
+				goto out;
+			}
+
+			if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_cert)))
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection"
+						" context:");
+				zbx_tls_error_msg(error, &error_alloc, &error_offset);
+				goto out;
+			}
 		}
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
@@ -3069,17 +3146,21 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __func__, ZBX_NULL2EMPTY_STR(tls_arg1));
 
 #if defined(HAVE_OPENSSL_WITH_PSK)
-		if (NULL == ctx_psk)
+		if (0 == initialized)
 		{
-			*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
-			goto out;
-		}
+			if (NULL == ctx_psk)
+			{
+				*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
+				goto out;
+			}
 
-		if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_psk)))
-		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
-			zbx_tls_error_msg(error, &error_alloc, &error_offset);
-			goto out;
+			if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_psk)))
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection"
+						" context:");
+				zbx_tls_error_msg(error, &error_alloc, &error_offset);
+				goto out;
+			}
 		}
 
 		if (NULL == tls_arg2)	/* PSK is not set from DB */
@@ -3101,22 +3182,25 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			/* PSK comes from a database (case for a server/proxy when it connects to an agent for */
 			/* passive checks, for a server when it connects to a passive proxy) */
 
-			int	psk_len;
-
-			if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
-					sizeof(psk_buf))))
+			if (0 == initialized)
 			{
-				*error = zbx_strdup(*error, "invalid PSK");
-				goto out;
+				if (0 >= (s->tls_ctx->psk_len = zbx_hex2bin((const unsigned char *)tls_arg2,
+						(unsigned char *)s->tls_ctx->psk_buf, sizeof(s->tls_ctx->psk_buf))))
+				{
+					*error = zbx_strdup(*error, "invalid PSK");
+					goto out;
+				}
+
+				s->tls_ctx->identity_len = (NULL == tls_arg1 ? 0 : strlen(tls_arg1));
 			}
 
 			/* some data reside in stack but it will be available at the time when a PSK client callback */
 			/* function copies the data into buffers provided by OpenSSL within the callback */
 			psk_identity_for_cb = tls_arg1;			/* string is on stack */
 			/* NULL check to silence analyzer warning */
-			psk_identity_len_for_cb = (NULL == tls_arg1 ? 0 : strlen(tls_arg1));
-			psk_for_cb = psk_buf;				/* buffer is on stack */
-			psk_len_for_cb = (size_t)psk_len;
+			psk_identity_len_for_cb = s->tls_ctx->identity_len;
+			psk_for_cb = s->tls_ctx->psk_buf;				/* buffer is on stack */
+			psk_len_for_cb = (size_t)s->tls_ctx->psk_len;
 		}
 #else
 		*error = zbx_strdup(*error, "cannot connect with TLS and PSK: support for PSK was not compiled in");
@@ -3130,17 +3214,20 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		goto out1;
 	}
 
-	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
-			s->tls_ctx->ctx, server_name))
+	if (0 == initialized)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
-	}
+		if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
+				s->tls_ctx->ctx, server_name))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
+		}
 
-	/* set our connected TCP socket to TLS context */
-	if (1 != SSL_set_fd(s->tls_ctx->ctx, s->socket))
-	{
-		*error = zbx_strdup(*error, "cannot set socket for TLS context");
-		goto out;
+		/* set our connected TCP socket to TLS context */
+		if (1 != SSL_set_fd(s->tls_ctx->ctx, s->socket))
+		{
+			*error = zbx_strdup(*error, "cannot set socket for TLS context");
+			goto out;
+		}
 	}
 
 	/* TLS handshake */
@@ -3153,13 +3240,22 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 		ssl_err = SSL_get_error(s->tls_ctx->ctx, res);
 
-		if (SSL_ERROR_WANT_READ != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
+		if (SUCCEED != tls_is_nonblocking_error(ssl_err))
 			break;
+
+		if (NULL != event)
+		{
+			tls_socket_event(s->tls_ctx->ctx, ssl_err, event);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, tls_error_string(ssl_err),
+					zbx_result_string(ret));
+			return FAIL;
+		}
 
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-					strerror_from_system(zbx_socket_last_error()));
+					zbx_strerror_from_system(zbx_socket_last_error()));
 			goto out;
 		}
 
@@ -3394,7 +3490,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, 0))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				goto out;
 			}
 
@@ -3670,7 +3766,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-					strerror_from_system(zbx_socket_last_error()));
+					zbx_strerror_from_system(zbx_socket_last_error()));
 			goto out;
 		}
 
@@ -3782,7 +3878,7 @@ out1:
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
 #endif
 
-ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
+ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error)
 {
 	ssize_t		offset = 0, n;
 
@@ -3802,10 +3898,16 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 			if (SUCCEED != tls_is_nonblocking_error(err))
 				break;
 
+			if (NULL != event)
+			{
+				tls_socket_event(s->tls_ctx->ctx, err, event);
+				return offset;
+			}
+
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				return ZBX_PROTO_ERROR;
 			}
 		}
@@ -3856,7 +3958,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	return offset;
 }
 
-ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
+ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error)
 {
 	ssize_t		n = 0;
 
@@ -3874,10 +3976,16 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		if (SUCCEED != tls_is_nonblocking_error(err))
 			break;
 
+		if (NULL != events)
+		{
+			tls_socket_event(s->tls_ctx->ctx, err, events);
+			return ZBX_PROTO_ERROR;
+		}
+
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait socket: %s",
-					strerror_from_system(zbx_socket_last_error()));
+					zbx_strerror_from_system(zbx_socket_last_error()));
 			return ZBX_PROTO_ERROR;
 		}
 
@@ -3956,7 +4064,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				break;
 			}
 
@@ -4005,7 +4113,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				break;
 			}
 

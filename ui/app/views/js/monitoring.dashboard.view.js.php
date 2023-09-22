@@ -61,9 +61,9 @@
 						slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW ?>')
 					}
 					: {
-						previous_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE ?>'),
-						next_page: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NEXT_PAGE ?>'),
-						slideshow: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW ?>')
+						previous_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE ?>'),
+						next_page: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE ?>'),
+						slideshow: document.querySelector('.<?= ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW ?>')
 					},
 				data: {
 					dashboardid: dashboard.dashboardid,
@@ -241,6 +241,14 @@
 					curl.setArgument('action', 'dashboard.view');
 					curl.setArgument('dashboardid', response.dashboardid);
 
+					const dashboard_page_index = ZABBIX.Dashboard.getDashboardPageIndex(
+						ZABBIX.Dashboard.getSelectedDashboardPage()
+					);
+
+					if (dashboard_page_index > 0) {
+						curl.setArgument('page', dashboard_page_index + 1);
+					}
+
 					location.replace(curl.getUrl());
 				})
 				.catch((exception) => {
@@ -274,6 +282,8 @@
 		},
 
 		cancelEditing() {
+			this.disableNavigationWarning();
+
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'dashboard.view');
@@ -311,12 +321,20 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		},
 
 		events: {
@@ -428,7 +446,7 @@
 				view.updateBusy();
 			},
 
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

@@ -62,6 +62,7 @@ int	zbx_is_double_suffix(const char *str, unsigned char flags);
 double	zbx_str2double(const char *str);
 int	zbx_suffixed_number_parse(const char *number, int *len);
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op);
 
 /* token START */
 /* tokens used in expressions */

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
@@ -44,6 +45,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			$this->zbxTestTabSwitch('Problem tag filter');
 
 			// Add tag permissions
+			$i = 1;
 			foreach ($hostgroups as $hostgroup => $tags) {
 				if (empty($tags)) {
 					$tags = ['' => ''];
@@ -58,24 +60,27 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						$values = [''];
 					}
 
-					foreach ($values as $i => $value) {
-						$i += 1;
-						$this->zbxTestClickButtonMultiselect('new_tag_filter_groupids_');
-						$this->zbxTestLaunchOverlayDialog('Host groups');
-						$this->zbxTestClickLinkTextWait($hostgroup);
+					foreach ($values as $value) {
+						$this->query('id:tag-filter-table')->query('button', 'Add')->one()->click();
+						$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+						$form = $dialog->asForm();
+						$dialog->query('button', 'Select')->one()->click();
+						$this->query('link', $hostgroup)->waitUntilVisible()->one()->click();
 
-						if ($tag !== '') {
-							$this->zbxTestInputType('new_tag_filter_tag', $tag);
-						}
-						if ($value !== '') {
-							$this->zbxTestInputType('new_tag_filter_value', $value);
+						if ($tag !== '' || $value !== '') {
+							$form->fill(['Filter' => 'Tag list', 'id:new_tag_filter_0_tag' => $tag,
+									'id:new_tag_filter_0_value' => $value]
+							);
 						}
 
-						$this->zbxTestClickXpath("//div[@id='tag_filter_tab']//button[text()='Add']");
-						$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath)	);
+						$form->submit();
+						COverlayDialogElement::ensureNotPresent();
 					}
 				}
+
+				$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
+				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+				$i++;
 			}
 
 			$this->zbxTestClick('update');
@@ -180,7 +185,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
@@ -198,7 +203,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
-			COverlayDialogElement::find()->one()->waitUntilReady()->setDataContext($this->trigger_host);
+			COverlayDialogElement::find()->waitUntilReady()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickLinkTextWait($name);
 			COverlayDialogElement::ensureNotPresent();
 			// Apply filter
@@ -289,7 +294,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);
@@ -393,7 +398,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 
 		// Go to Dashboard and check user name
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view');
-		$this->zbxTestAssertAttribute("//a[@class='icon-profile']", 'title', $this->user);
+		$this->zbxTestAssertAttribute("//a[@class='zi-user-filled']", 'title', $this->user);
 
 		// Check tag filter in Problem widget
 		CDashboardElement::find()->one()->getWidget('Current problems', true);

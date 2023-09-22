@@ -264,10 +264,10 @@ class testItemState extends CIntegrationTest {
 		$key = self::$items[$scenario['name']]['key'];
 
 		// Wait for item to be checked
-		$first_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], $wait);
+		$first_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In process_async_result() key:'".$key."'"], $wait);
 
-		// Check item state
-		sleep(1);
+		// Wait for item state to be flushed (once per second in preprocessing manager and in poller)
+		sleep(2);
 
 		$response = $this->call('item.get', [
 			'itemids' => self::$items[$scenario['name']]['itemid'],
@@ -279,10 +279,10 @@ class testItemState extends CIntegrationTest {
 		);
 
 		// Verify item checks intervals
-		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], $wait);
+		$check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In process_async_result() key:'".$key."'"], $wait);
 		$this->assertTrue($check <= $first_check + $delay + 1);
 
-		$next_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In get_value() key:'".$key."'"], $wait);
+		$next_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In process_async_result() key:'".$key."'"], $wait);
 		$this->assertTrue($next_check <= $check + $delay + 1 && $next_check >= $check + $delay - 1);
 	}
 

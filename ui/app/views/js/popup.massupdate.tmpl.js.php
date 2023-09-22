@@ -31,9 +31,7 @@
 		(new CTextBox('valuemap_rename[#{rowNum}][to]', '', false, DB::getFieldLength('valuemap', 'name')))
 			->addStyle('width: 100%;'),
 		(new CCol(
-			(new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove'))
+			(new CButtonLink(_('Remove')))->addClass('element-table-remove'))
 		)
 			->addClass(ZBX_STYLE_TOP)
 	]))->addClass('form_row')
@@ -46,6 +44,7 @@
 					->addClass('macro')
 					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
+					->disableSpellcheck()
 			]))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)

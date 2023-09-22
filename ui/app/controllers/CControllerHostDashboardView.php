@@ -74,8 +74,8 @@ class CControllerHostDashboardView extends CController {
 				? $this->getInput('dashboardid')
 				: CProfile::get('web.host.dashboard.dashboardid', null, $this->getInput('hostid'));
 
-			if (!array_key_exists($dashboardid, $host_dashboards)) {
-				$dashboardid = array_keys($host_dashboards)[0];
+			if (!in_array($dashboardid, array_column($host_dashboards, 'dashboardid'))) {
+				$dashboardid = $host_dashboards[0]['dashboardid'];
 			}
 
 			$dashboards = API::TemplateDashboard()->get([
@@ -104,7 +104,7 @@ class CControllerHostDashboardView extends CController {
 
 				updateTimeSelectorPeriod($time_selector_options);
 
-				$widget_defaults = APP::ModuleManager()->getWidgetsDefaults(true);
+				$widget_defaults = APP::ModuleManager()->getWidgetsDefaults();
 
 				$data = [
 					'host' => $this->host,
@@ -134,6 +134,6 @@ class CControllerHostDashboardView extends CController {
 
 		CArrayHelper::sort($dashboards, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
-		return array_combine(array_column($dashboards, 'dashboardid'), array_column($dashboards, 'name'));
+		return array_values($dashboards);
 	}
 }

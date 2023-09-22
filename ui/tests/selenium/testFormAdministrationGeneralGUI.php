@@ -90,7 +90,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
-		$this->query('xpath://a[@class="icon-info status-red"]')->one()->click();
+		$this->query('class:zi-i-negative')->one()->click();
 		$this->assertEquals(
 			'You are not able to choose some of the languages,'.
 				' because locales for them are not installed on the web server.',
@@ -904,7 +904,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Default theme' => 'High-contrast dark'
 					],
-					'link' => 'templates.php?filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'color' => 'rgba(224, 224, 224, 1)'
 				]
 			],
@@ -913,7 +913,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Default theme' => 'High-contrast light'
 					],
-					'link' => 'templates.php?filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'color' => 'rgba(85, 85, 85, 1)'
 				]
 			],
@@ -922,7 +922,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Default theme' => 'Dark'
 					],
-					'link' => 'templates.php?filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'color' => 'rgba(105, 128, 141, 1)'
 				]
 			],
@@ -931,7 +931,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'field' =>  [
 						'Limit for search and filter results' => '2'
 					],
-					'link' => 'templates.php?filter_name=cisco',
+					'link' => 'zabbix.php?action=template.list&filter_name=cisco&filter_set=1',
 					'row_count' => 2
 				]
 			],
@@ -992,7 +992,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			case 'Max count of elements to show inside table cell':
 				$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 				$element_count = $table->findRow('Name', 'Templates/Applications')->getColumn(3)
-						->query('xpath:.//a[@class="link-alt grey"]')->all()->count();
+						->query('xpath:.//a[contains(@class, "link-alt grey")]')->all()->count();
 				$this->assertEquals(CTestArrayHelper::get($data, 'element_count'), $element_count);
 				break;
 

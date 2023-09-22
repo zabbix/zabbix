@@ -170,6 +170,27 @@ class CZabbixServer {
 	}
 
 	/**
+	 * @param array  $data
+	 *        string $data['itemid']  (optional) Item ID.
+	 *        string $data['host']    (optional) Technical name of the host.
+	 *        string $data['key']     (optional) Item key.
+	 *        string $data['value']   Item value.
+	 *        string $data['clock']   (optional) Time when the value was received.
+	 *        string $data['ns']      (optional) Nanoseconds when the value was received.
+	 * @param string $sid             User session ID or user API token.
+	 *
+	 * @return array|bool
+	 */
+	public function pushHistory(array $data, string $sid) {
+		return $this->request([
+			'request' => 'history.push',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
+		]);
+	}
+
+	/**
 	 * Request server to test item preprocessing steps.
 	 *
 	 * @param array  $data                                     Array of preprocessing steps test.

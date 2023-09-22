@@ -1,0 +1,19 @@
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-problemsbysv {
+		.by-severity-widget {
+			> div {
+				min-width: 65px;
+				padding-left: 42px;
+
+				&::before {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+			}
+		}
+	}
+}
+

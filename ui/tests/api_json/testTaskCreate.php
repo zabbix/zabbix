@@ -272,7 +272,6 @@ class testTaskCreate extends CAPITest {
 				'name' => '1 LLD (1/1/1)',
 				'key_' => '1_lld_111',
 				'type' => ITEM_TYPE_ZABBIX,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30',
 				'interfaceid' => $interfaceid_monitored
 			],
@@ -282,7 +281,6 @@ class testTaskCreate extends CAPITest {
 				'name' => '2 LLD (1/0/1)',
 				'key_' => '2_lld_101',
 				'type' => ITEM_TYPE_ZABBIX,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30',
 				'interfaceid' => $interfaceid_monitored,
 				'status' => ITEM_STATUS_DISABLED
@@ -292,8 +290,7 @@ class testTaskCreate extends CAPITest {
 				'hostid' => self::$data['hostids']['monitored'],
 				'name' => '3 LLD (1/1/0)',
 				'key_' => '3_lld_110',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT
+				'type' => ITEM_TYPE_TRAPPER
 			],
 			// Host is not monitored, LLD rule is monitored and is of allowed type.
 			[
@@ -301,7 +298,6 @@ class testTaskCreate extends CAPITest {
 				'name' => '4 LLD (0/1/1)',
 				'key_' => '4_lld_011',
 				'type' => ITEM_TYPE_ZABBIX,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30',
 				'interfaceid' => $interfaceid_not_monitored
 			],
@@ -311,7 +307,6 @@ class testTaskCreate extends CAPITest {
 				'name' => '5 LLD-T (0/1/1)',
 				'key_' => '5_lld_t_011',
 				'type' => ITEM_TYPE_ZABBIX,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'delay' => '30'
 			]
 		];
@@ -332,7 +327,6 @@ class testTaskCreate extends CAPITest {
 				'name' => '1.3 LLD (1/1/1)',
 				'key_' => '1_3_lld_111',
 				'type' => ITEM_TYPE_DEPENDENT,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'master_itemid' => self::$data['itemids']['1_item_111']
 			],
 			// Host is monitored, LLD rule is monitored and is of allowed type (but master item is not monitored).
@@ -341,7 +335,6 @@ class testTaskCreate extends CAPITest {
 				'name' => '3.2 LLD (1/1/1)',
 				'key_' => '3_2_lld_111',
 				'type' => ITEM_TYPE_DEPENDENT,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'master_itemid' => self::$data['itemids']['3_item_101']
 			],
 			// Host is monitored, LLD rule is monitored and is of allowed type (but master item is not of allowed type).
@@ -350,7 +343,6 @@ class testTaskCreate extends CAPITest {
 				'name' => '4.2 LLD (1/1/1)',
 				'key_' => '4_2_lld_111',
 				'type' => ITEM_TYPE_DEPENDENT,
-				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'master_itemid' => self::$data['itemids']['4_item_110']
 			]
 		];
@@ -799,7 +791,7 @@ class testTaskCreate extends CAPITest {
 				],
 				'expected_results' => [],
 				'expected_error' => 'Invalid parameter "/1/type": value must be one of '.(implode(', ', [
-					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXY_HOSTIDS, ZBX_TM_TASK_CHECK_NOW
+					ZBX_TM_DATA_TYPE_DIAGINFO, ZBX_TM_DATA_TYPE_PROXYIDS, ZBX_TM_TASK_CHECK_NOW
 				])).'.'
 			],
 
@@ -924,7 +916,7 @@ class testTaskCreate extends CAPITest {
 								]
 							]
 						],
-						'proxy_hostid' => '01'
+						'proxyid' => '01'
 					]
 				],
 				'expected_results' => [],
@@ -1314,7 +1306,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			],
@@ -1338,7 +1330,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			]

@@ -60,6 +60,7 @@ int	DBdrop_table(const char *table_name);
 int	DBadd_field(const char *table_name, const zbx_db_field_t *field);
 int	DBrename_field(const char *table_name, const char *field_name, const zbx_db_field_t *field);
 int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, const zbx_db_field_t *old_field);
+int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *field);
 int	DBset_not_null(const char *table_name, const zbx_db_field_t *field);
 int	DBset_default(const char *table_name, const zbx_db_field_t *field);
 int	DBdrop_default(const char *table_name, const zbx_db_field_t *field);

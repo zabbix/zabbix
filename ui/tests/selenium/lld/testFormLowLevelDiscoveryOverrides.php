@@ -68,6 +68,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 */
 	public static function getCreateData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -81,6 +82,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -101,6 +103,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -121,6 +124,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -141,6 +145,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -161,6 +166,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -182,6 +188,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -205,6 +212,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -226,6 +234,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -249,6 +258,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -270,6 +280,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -293,6 +304,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -317,6 +329,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -341,6 +354,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -372,6 +386,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -403,6 +418,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -434,6 +450,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -464,6 +481,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -488,6 +506,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -512,6 +531,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -524,6 +544,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -744,7 +765,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-						[
+			[
 				[
 					'expected' => TEST_BAD,
 					'overrides' => [
@@ -1079,7 +1100,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-						[
+			[
 				[
 					'expected' => TEST_BAD,
 					'overrides' => [
@@ -1801,8 +1822,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					break;
 
 				case USER_ACTION_REMOVE:
-					$override_container->findRow('Name', $override['name'])
-							->query('button:Remove')->one()->click();
+					$override_container->findRow('Name', $override['name'])->query('button:Remove')->one()->click();
 					break;
 
 				default:
@@ -1909,7 +1929,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 
 					$operation_overlay->submit();
 					$this->checkSubmittedOverlay($data['expected'], $operation_overlay,
-							CTestArrayHelper::get($override, 'error'));
+							CTestArrayHelper::get($override, 'error')
+					);
 
 					if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 						// Check that Operation was added to Operations table.
@@ -1939,8 +1960,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					$condition_text = $operation['fields']['Object'].' '.
 							$operation['fields']['Condition']['operator'].' '.
 							$operation['fields']['Condition']['value'];
-					$row = $operation_container->findRow('Condition', $condition_text)
-						->query('button:Remove')->one()->click();
+					$row = $operation_container->findRow('Condition', $condition_text)->query('button:Remove')->one()->click();
 					$row->waitUntilNotPresent();
 					break;
 			}

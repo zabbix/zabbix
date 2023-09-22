@@ -22,7 +22,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxthreads.h"
-#include "log.h"
+#include "zbxlog.h"
 
 /* the size of temporary buffer used to read from output stream */
 #define PIPE_BUFFER_SIZE	4096
@@ -91,7 +91,7 @@ static int	zbx_read_from_pipe(HANDLE hRead, char **buf, size_t *buf_size, size_t
 			if (0 == ReadFile(hRead, tmp_buf, sizeof(tmp_buf) - 1, &read_bytes, NULL))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "cannot read command output: %s",
-						strerror_from_system(GetLastError()));
+						zbx_strerror_from_system(GetLastError()));
 				return FAIL;
 			}
 
@@ -216,7 +216,7 @@ static int	zbx_popen(pid_t *pid, const char *command, const char *dir)
 		exit(EXIT_FAILURE);
 	}
 
-	execl("/bin/sh", "sh", "-c", command, NULL);
+	execl("/bin/sh", "sh", "-c", command, (char *)NULL);
 
 	/* restore original stdout and stderr, because we don't want our output to be confused with script's output */
 
@@ -349,14 +349,16 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	/* create a pipe for the child process's STDOUT */
 	if (0 == CreatePipe(&hRead, &hWrite, &sa, 0))
 	{
-		zbx_snprintf(error, max_error_len, "unable to create a pipe: %s", strerror_from_system(GetLastError()));
+		zbx_snprintf(error, max_error_len, "unable to create a pipe: %s",
+				zbx_strerror_from_system(GetLastError()));
 		goto close;
 	}
 
 	/* create a new job where the script will be executed */
 	if (0 == (job = CreateJobObject(&sa, NULL)))
 	{
-		zbx_snprintf(error, max_error_len, "unable to create a job: %s", strerror_from_system(GetLastError()));
+		zbx_snprintf(error, max_error_len, "unable to create a job: %s",
+				zbx_strerror_from_system(GetLastError()));
 		goto close;
 	}
 
@@ -379,7 +381,7 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (0 == CreateProcess(NULL, wcmd, NULL, NULL, TRUE, CREATE_SUSPENDED, NULL, wdir, &si, &pi))
 	{
 		zbx_snprintf(error, max_error_len, "unable to create process [%s]: %s",
-				cmd, strerror_from_system(GetLastError()));
+				cmd, zbx_strerror_from_system(GetLastError()));
 		goto close;
 	}
 
@@ -390,17 +392,17 @@ int	zbx_execute(const char *command, char **output, char *error, size_t max_erro
 	if (0 == AssignProcessToJobObject(job, pi.hProcess))
 	{
 		zbx_snprintf(error, max_error_len, "unable to assign process [%s] to a job: %s",
-				cmd, strerror_from_system(GetLastError()));
+				cmd, zbx_strerror_from_system(GetLastError()));
 		if (0 == TerminateProcess(pi.hProcess, 0))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "failed to terminate [%s]: %s",
-					cmd, strerror_from_system(GetLastError()));
+					cmd, zbx_strerror_from_system(GetLastError()));
 		}
 	}
 	else if (-1 == ResumeThread(pi.hThread))
 	{
 		zbx_snprintf(error, max_error_len, "unable to assign process [%s] to a job: %s",
-				cmd, strerror_from_system(GetLastError()));
+				cmd, zbx_strerror_from_system(GetLastError()));
 	}
 	else
 		ret = SUCCEED;
@@ -449,7 +451,10 @@ close:
 	{
 		/* terminate the child process and its children */
 		if (0 == TerminateJobObject(job, 0))
-			zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd, strerror_from_system(GetLastError()));
+		{
+			zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd,
+					zbx_strerror_from_system(GetLastError()));
+		}
 		CloseHandle(job);
 	}
 
@@ -607,7 +612,7 @@ int	zbx_execute_nowait(const char *command)
 		&pi))		/* process information stored upon return */
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to create process for [%s]: %s",
-				full_command, strerror_from_system(GetLastError()));
+				full_command, zbx_strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 
@@ -654,7 +659,7 @@ int	zbx_execute_nowait(const char *command)
 			zbx_redirect_stdio(NULL);
 
 			/* replace the process with actual command to be executed */
-			execl("/bin/sh", "sh", "-c", command, NULL);
+			execl("/bin/sh", "sh", "-c", command, (char *)NULL);
 
 			/* execl() returns only when an error occurs */
 			zabbix_log(LOG_LEVEL_WARNING, "execl() failed for [%s]: %s", command, zbx_strerror(errno));

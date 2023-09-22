@@ -18,11 +18,10 @@
 **/
 
 #include "postinit.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "db_lengths.h"
 #include "zbxtasks.h"
-#include "log.h"
 #include "zbxnum.h"
 #include "zbxcachevalue.h"
 #include "zbxdbwrap.h"
@@ -167,7 +166,7 @@ static void	preprocess_trigger_name(zbx_db_trigger *trigger, int *historical)
 	event.trigger = *trigger;
 
 	zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&trigger->description, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+			&trigger->description, ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 	if (SUCCEED == *historical)
 	{
@@ -311,7 +310,7 @@ static int	process_event_update(const zbx_db_trigger *trigger, char **sql, size_
 		name = zbx_strdup(NULL, trigger->description);
 
 		zbx_substitute_simple_macros(NULL, &event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&name, MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
+				&name, ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION, NULL, 0);
 
 		name_esc = zbx_db_dyn_escape_string_len(name, EVENT_NAME_LEN);
 
@@ -402,7 +401,7 @@ static int	update_event_names(void)
 
 		processed_num++;
 
-		if (last_completed != (completed = 100.0 * processed_num / triggers_num))
+		if (last_completed != (completed = (int)(100.0 * processed_num / triggers_num)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "completed %d%% of event name update", completed);
 			last_completed = completed;

@@ -165,7 +165,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Host to delete graphs'
 					],
-					'error' => 'Graph "Delete graph 1" already exists on "Host to delete graphs".'
+					'error' => 'Graph "Delete graph 1" already exists on the host "Host to delete graphs".'
 				]
 			],
 			// Copy graph to host without item.
@@ -180,7 +180,8 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Empty host'
 					],
-					'error' => 'Missing key "graph[1]" for host "Empty host".'
+					'error' => 'Cannot copy graph "Delete graph 3", because the item with key "graph[1]" does not '.
+							'exist on the host "Empty host".'
 				]
 			],
 			// Copy several graphs to host.
@@ -210,7 +211,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Host to check graph 1'
 					],
-					'error' => 'Graph with name "Delete graph 5" already exists in graphs or graph prototypes.'
+					'error' => 'Graph "Delete graph 5" already exists on the host "Host to check graph 1".'
 				]
 			],
 			// Copy all graphs to host.
@@ -265,7 +266,8 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Empty group'
 					],
-					'error' => 'Missing key "graph[1]" for host "Empty host".'
+					'error' => 'Cannot copy graph "Delete graph 3", because the item with key "graph[1]" does not '.
+							'exist on the host "Empty host".'
 				]
 			],
 			// Copy several graphs to host group.
@@ -294,7 +296,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Group to copy graph'
 					],
-					'error' => 'Graph with name "Delete graph 3" already exists in graphs or graph prototypes.'
+					'error' => 'Graph "Delete graph 3" already exists on the host "Host with item and without graph 1".'
 				]
 			],
 			// Copy all graphs to host group.
@@ -349,7 +351,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Template to test graphs'
 					],
-					'error' => 'Graph "Graph to check copy" already exists on "Template to test graphs".'
+					'error' => 'Graph "Graph to check copy" already exists on the template "Template to test graphs".'
 				]
 			],
 			// Copy graph to template without item.
@@ -365,7 +367,8 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Empty template'
 					],
-					'error' => 'Missing key "graph[1]" for host "Empty template".'
+					'error' => 'Cannot copy graph "Delete graph 3", because the item with key "graph[1]" does not '.
+							'exist on the template "Empty template".'
 				]
 			],
 			// Copy several graphs to template.
@@ -396,7 +399,7 @@ class testPageHostGraph extends CLegacyWebTest {
 					'targets' => [
 						'Template with item graph'
 					],
-					'error' => 'Graph with name "Delete graph 3" already exists in graphs or graph prototypes.'
+					'error' => 'Graph "Delete graph 3" already exists on the template "Template with item graph".'
 				]
 			],
 			// Copy all graphs to host group.

@@ -51,7 +51,7 @@ INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50011,NU
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50108, 50011, 'API discovery group {#HV.NAME}', NULL, NULL);
 INSERT INTO group_prototype (group_prototypeid, hostid, name, groupid, templateid) VALUES (50109, 50011, '', 50014, NULL);
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (50015,0,'de6322aebbae4f53acfc87747da877d8','API discovery group {#HV.NAME}',4);
-INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50015, 50108, 'API discovery group {#HV.NAME}');
+INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name) VALUES (1, 50015, 50108, 'API discovery group {#HV.NAME}');
 -- host prototype for delete
 INSERT INTO hosts (hostid, host, name, status, flags, description, custom_interfaces) VALUES (50015, 'API host prototype for delete {#FSNAME}', 'API host prototype for delete {#FSNAME}', 0, 2, '', 1);
 INSERT INTO host_discovery (hostid,parent_hostid,parent_itemid) VALUES (50015,NULL,400660);
@@ -256,7 +256,7 @@ INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (9
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004, 2, 1, '{$SNMP_COMMUNITY}');
 
 -- discovery action
-INSERT INTO hosts (hostid, host, status, description) VALUES (99000, 'API active proxy for discovery action', 5, '');
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99000, 'API active proxy for discovery action', 0, '');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (90, 'API action with proxy', 1, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (90, 90, 0, 0, 1, 1, 0);
 INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) VALUES (90, 0, 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}', 'Discovery rule: {DISCOVERY.RULE.NAME}', NULL);
@@ -303,18 +303,18 @@ INSERT INTO corr_condition_tag (corr_conditionid, tag) VALUES (99003, 'clone tag
 INSERT INTO corr_operation (corr_operationid, correlationid, type) VALUES (99003, 99003, 0);
 
 -- discovery rules
-INSERT INTO hosts (hostid, host, status, description) VALUES (99006, 'Api active proxy for discovery', 5, '');
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (10,NULL,'API discovery rule for delete 1','192.168.0.1-254','1h',0);
+INSERT INTO proxy (proxyid, name, operating_mode, description) VALUES (99006, 'Api active proxy for discovery', 0, '');
+INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (10,NULL,'API discovery rule for delete 1','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (10,10,4,'','','80','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (11,99006,'API discovery rule for delete with proxy','192.168.0.1-254','1h',0);
+INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (11,99006,'API discovery rule for delete with proxy','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (11,11,9,'agent.ping','','10050','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (12,NULL,'API discovery rule for delete 3','192.168.0.1-254','1h',0);
+INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (12,NULL,'API discovery rule for delete 3','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (12,12,15,'','','23','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (13,NULL,'API discovery rule for delete 4','192.168.0.1-254','1h',0);
+INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (13,NULL,'API discovery rule for delete 4','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (13,13,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (14,NULL,'API discovery rule for delete 5','192.168.0.1-254','1h',0);
+INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (14,NULL,'API discovery rule for delete 5','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (14,14,3,'','','21','',0,'','',0,0,0,'');
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (15,NULL,'API discovery rule used in action','192.168.0.1-254','1h',0);
+INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (15,NULL,'API discovery rule used in action','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (15,15,3,'','','21','',0,'','',0,0,0,'');
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (16,15,9,'agent.ping','','10050','',0,'','',0,0,0,'');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (95, 'API action for Discovery check', 1, 0, 0, '1h');
@@ -323,7 +323,7 @@ INSERT INTO opmessage (operationid, default_msg, subject, message, mediatypeid) 
 INSERT INTO opmessage_grp (opmessage_grpid, operationid, usrgrpid) VALUES (95, 95, 47);
 INSERT INTO conditions (conditionid, actionid, conditiontype, operator, value, value2) VALUES (95,95,19,0,'16','');
 
-INSERT INTO drules (druleid, proxy_hostid, name, iprange, delay, status) VALUES (16,NULL,'API discovery rule used in action 2','192.168.0.1-254','1h',0);
+INSERT INTO drules (druleid, proxyid, name, iprange, delay, status) VALUES (16,NULL,'API discovery rule used in action 2','192.168.0.1-254','1h',0);
 INSERT INTO dchecks (dcheckid, druleid, type, key_, snmp_community, ports, snmpv3_securityname, snmpv3_securitylevel, snmpv3_authpassphrase, snmpv3_privpassphrase, uniq, snmpv3_authprotocol, snmpv3_privprotocol, snmpv3_contextname) VALUES (17,16,0,'','','22','',0,'','',0,0,0,'');
 INSERT INTO actions (actionid, name, eventsource, evaltype, status, esc_period) VALUES (96, 'API action for Discovery rule', 1, 0, 0, '1h');
 INSERT INTO operations (operationid, actionid, operationtype, esc_period, esc_step_from, esc_step_to, evaltype) VALUES (96, 96, 0, 0, 1, 1, 0);
@@ -1036,7 +1036,7 @@ INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (1001
 INSERT INTO lld_override_optrends (lld_override_operationid,trends) VALUES (10018,'5d');
 
 -- LLD with overrides and template constraint
-INSERT INTO hosts (hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131001,NULL,'Overrides template constraint',3,-1,2,'','',NULL,0,0,0,'Overrides template constraint',0,NULL,'',1,1,'','','','','',1,0);
+INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131001,NULL,'Overrides template constraint',3,-1,2,'','',NULL,0,0,0,'Overrides template constraint',0,NULL,'',1,1,'','','','',0);
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (139001,1,'27e5744a60894c7c88c8df39573df06e','Overrides',0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139201,131001,139001);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133766,0,'',50009,'Overrides (template constraint)','overrides.template.constraint','1m','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,50022,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
@@ -1048,10 +1048,10 @@ INSERT INTO lld_override_opinventory (lld_override_operationid,inventory_mode) V
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10010,10019,131001);
 INSERT INTO lld_override_optemplate (lld_override_optemplateid,lld_override_operationid,templateid) VALUES (10011,10020,131001);
 
--- graph portotype
+-- graph prototype
 INSERT INTO hstgrp (groupid,type,uuid,name,flags) VALUES (139002,0,'c8aa3b02b1af4b049fcf88be47e5f892','test_graph_prototype',0);
-INSERT INTO hosts (hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131002,NULL,'item',0,-1,2,'','',NULL,0,0,0,'item',0,NULL,'',1,1,'','','','','',1,0);
-INSERT INTO hosts (hostid,proxy_hostid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,proxy_address,auto_compress,discover) VALUES (131003,NULL,'item_prototype',0,-1,2,'','',NULL,0,0,0,'item_prototype',0,NULL,'',1,1,'','','','','',1,0);
+INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131002,NULL,'item',0,-1,2,'','',NULL,0,0,0,'item',0,NULL,'',1,1,'','','','',0);
+INSERT INTO hosts (hostid,proxyid,host,status,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,maintenanceid,maintenance_status,maintenance_type,maintenance_from,name,flags,templateid,description,tls_connect,tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,discover) VALUES (131003,NULL,'item_prototype',0,-1,2,'','',NULL,0,0,0,'item_prototype',0,NULL,'',1,1,'','','','',0);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139203,131003,139002);
 INSERT INTO hosts_groups (hostgroupid,hostid,groupid) VALUES (139202,131002,139002);
 INSERT INTO items (itemid,type,snmp_oid,hostid,name,key_,delay,history,trends,status,value_type,trapper_hosts,units,formula,logtimefmt,templateid,valuemapid,params,ipmi_sensor,authtype,username,password,publickey,privatekey,flags,interfaceid,description,inventory_link,lifetime,evaltype,jmx_endpoint,master_itemid,timeout,url,query_fields,posts,status_codes,follow_redirects,post_type,http_proxy,headers,retrieve_mode,request_method,output_format,ssl_cert_file,ssl_key_file,ssl_key_password,verify_peer,verify_host,allow_traps,discover) VALUES (133767,2,'',131003,'rule','a','0','90d','0',0,4,'','','','',NULL,NULL,'','',0,'','','','',1,NULL,'',0,'30d',0,'',NULL,'3s','','','','200',1,0,'','',0,0,0,'','','',0,0,0,0);
@@ -1377,7 +1377,7 @@ INSERT INTO hosts (hostid, host, name, status, flags, description) VALUES (99012
 INSERT INTO items (itemid, type, hostid, name, key_, delay, history, trends, status, value_type, flags, params, description, posts, headers) VALUES (58735, 2, 99010, 'trap', 'trap', '0', '90d', '0', 0, 4, 1, '', '', '', '');
 INSERT INTO group_prototype (group_prototypeid, hostid, name) VALUES (50110, 99011, 'host group {#VALUE}');
 INSERT INTO group_prototype (group_prototypeid, hostid, groupid) VALUES (50111, 99011, 50025);
-INSERT INTO group_discovery (groupid, parent_group_prototypeid, name) VALUES (50026, 50110, 'host group {#VALUE}');
+INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name) VALUES (2, 50026, 50110, 'host group {#VALUE}');
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50020, 99010, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50021, 99012, 50025);
 INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50022, 99012, 50026);

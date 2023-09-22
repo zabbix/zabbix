@@ -23,7 +23,6 @@
 #include "inodes.h"
 
 #include "zbxjson.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *free,
@@ -245,15 +244,13 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct mnttab		mt;
 	FILE			*f;
 	struct zbx_json		j;
-	zbx_uint64_t		total, not_used, used;
-	zbx_uint64_t		itotal, inot_used, iused;
-	double			pfree, pused;
-	double			ipfree, ipused;
+	zbx_uint64_t		total, not_used, used, itotal, inot_used, iused;
+	double			pfree, pused, ipfree, ipused;
 	char			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
 	int			ret = SYSINFO_RET_FAIL;
-	char			*mpoint;
+	zbx_fsname_t		fsname;
 
 	/* opening the mounted filesystems file */
 	if (NULL == (f = fopen("/etc/mnttab", "r")))
@@ -267,21 +264,22 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* fill mnttab structure from file */
 	while (-1 != getmntent(f, &mt))
 	{
-		mpoint = mt.mnt_mountp;
-		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
+		fsname.mpoint = mt.mnt_mountp;
+
+		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused,&error))
 		{
 			zbx_free(error);
 			continue;
 		}
-		if (SYSINFO_RET_OK != get_fs_inode_stat(mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused, "pused",
-				&error))
+		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
+				"pused", &error))
 		{
 			zbx_free(error);
 			continue;
 		}
 
 		mntpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
-		zbx_strlcpy(mntpoint->fsname, mpoint, MAX_STRING_LEN);
+		zbx_strlcpy(mntpoint->fsname, fsname.mpoint, MAX_STRING_LEN);
 		zbx_strlcpy(mntpoint->fstype, mt.mnt_fstype, MAX_STRING_LEN);
 		mntpoint->bytes.total = total;
 		mntpoint->bytes.used = used;
@@ -310,10 +308,12 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* fill mnttab structure from file */
 	while (-1 != getmntent(f, &mt))
 	{
-		int idx;
-		mpoint = mt.mnt_mountp;
+		int	idx;
 
-		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, mpoint, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+		fsname.mpoint = mt.mnt_mountp;
+		fsname.type = mt.mnt_fstype;
+
+		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
 		{
 			mntpoint = (zbx_mpoint_t *)mntpoints.values[idx];
 			zbx_json_addobject(&j, NULL);

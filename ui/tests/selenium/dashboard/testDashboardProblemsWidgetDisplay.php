@@ -62,6 +62,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	}
 
 	public function prepareProblemsData() {
+		// Remove PROBLEM event status blinking to get correct status in table column.
+		CDataHelper::call('settings.update', [
+			'problem_unack_style' => 0
+		]);
+
 		// Create hostgroup for hosts with items triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [
 			['name' => 'Group for Problems Widgets'],
@@ -239,7 +244,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		$event = CDataHelper::call('event.get', [
 			'eventids' => 1009953,
-			'select_acknowledges' => ['clock']
+			'selectAcknowledges' => ['clock']
 		]);
 		self::$acktime = CTestArrayHelper::get($event, '0.acknowledges.0.clock');
 	}
@@ -254,7 +259,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Host groups' => 'Group for Problems Widgets'
 					],
 					'result' => [
-						['Problem • Severity' => 'Trigger for widget 2 unsigned', 'Actions' => "1 message\n1 action"],
+						['Problem • Severity' => 'Trigger for widget 2 unsigned'],
 						['Problem • Severity' => 'Trigger for widget 2 log'],
 						['Problem • Severity' => 'Trigger for widget 1 char'],
 						['Problem • Severity' => 'Trigger for widget 1 float']
@@ -262,10 +267,10 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'actions' => [
 						'Trigger for widget 2 unsigned' => [
 							// Green tick.
-							'icon-action-ack-green' => true,
+							'color-positive' => true,
 
 							// Message bubble.
-							'icon-action-msgs' => [
+							'zi-alert-with-content' => [
 								[
 									'Time' => 'acknowledged',
 									'User' => 'Admin (Zabbix Administrator)',
@@ -274,7 +279,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							],
 
 							// Actions arrow icon.
-							'icon-actions-number-gray' => [
+							'zi-bullet-right-with-content' => [
 								[
 									'Time' => 'acknowledged',
 									'User/Recipient' => 'Admin (Zabbix Administrator)',
@@ -300,7 +305,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Group, unsupressed filter',
+						'Name' => 'Group, unsuppressed filter',
 						'Host groups' => 'Group for Problems Widgets',
 						'Show suppressed problems' => true
 					],
@@ -323,7 +328,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'fields' => [
 						'Name' => 'Group, unucknowledged filter',
 						'Host groups' => 'Group for Problems Widgets',
-						'Show unacknowledged only' => true
+						'Acknowledgement status' => 'Unacknowledged'
 					],
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
@@ -636,7 +641,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Name' => 'Host, operational data - With problem name, Show unacknowledged',
 						'Hosts' => 'Host for Problems Widgets',
 						'Show operational data' => 'With problem name',
-						'Show unacknowledged only' => true
+						'Acknowledgement status' => 'Unacknowledged'
 					],
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
@@ -770,7 +775,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					$icon = $action_cell->query('xpath:.//*['.CXPathHelper::fromClass($class).']')->one();
 					$this->assertTrue($icon->isVisible());
 
-					if ($class !== 'icon-action-ack-green') {
+					if ($class !== 'color-positive') {
 						// Click on icon and open hint.
 						$icon->click();
 						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
@@ -825,7 +830,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'check_tag_ellipsis')) {
 			foreach ($data['check_tag_ellipsis'] as $problem => $ellipsis_text) {
-				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:icon-wizard-action')
+				$table->findRow('Problem • Severity', $problem)->getColumn('Tags')->query('class:zi-more')
 						->waitUntilClickable()->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
 				$this->assertEquals($ellipsis_text, $hint->getText());
@@ -836,7 +841,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 		// Check eye icon for suppressed problem.
 		if (CTestArrayHelper::get($data, 'check_suppressed_icon')) {
 			$table->findRow('Problem • Severity', $data['check_suppressed_icon']['problem'])->getColumn('Info')
-					->query('class:icon-action-suppress')->waitUntilClickable()->one()->click();
+					->query('class:zi-eye-off')->waitUntilClickable()->one()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilVisible()->one();
 			$this->assertEquals($data['check_suppressed_icon']['text'], $hint->getText());
 			$hint->close();

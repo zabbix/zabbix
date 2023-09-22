@@ -171,7 +171,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	public function testFormLowLevelDiscovery_CheckLayout($data) {
 
 		if (isset($data['template'])) {
-			$this->zbxTestLogin('templates.php');
+			$this->zbxTestLogin('zabbix.php?action=template.list');
 			$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$this->filterEntriesAndOpenDiscovery($form, $data['template']);
 			$hostid = 30000;
@@ -523,6 +523,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	// Returns create data
 	public static function create() {
 		return [
+			// #0
 			[
 				[
 					'expected' => TEST_BAD,
@@ -533,6 +534,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
+			// #1
 			[
 				[
 					'expected' => TEST_BAD,
@@ -543,6 +545,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
+			// #2
 			[
 				[
 					'expected' => TEST_BAD,
@@ -553,6 +556,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
+			// #3
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -564,6 +568,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'dbCheck' => true
 				]
 			],
+			// #4
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -577,6 +582,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
+			// #5
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -589,25 +595,27 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'dbCheck' => true
 				]
 			],
+			// #6
 			[
 				['expected' => TEST_BAD,
 					'name' => 'discoveryRuleNo1',
 					'key' => 'discovery-key-no1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item with key "discovery-key-no1" already exists on "Simple form test host".']
+						'An LLD rule with key "discovery-key-no1" already exists on the host "Simple form test host".']
 				]
 			],
+			// #7
 			[
 				['expected' => TEST_BAD,
 					'name' => 'discoveryRuleError',
 					'key' => 'discovery-key-no1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item with key "discovery-key-no1" already exists on "Simple form test host".']
+						'An LLD rule with key "discovery-key-no1" already exists on the host "Simple form test host".']
 				]
 			],
-			// Empty keep lost resources period
+			// #8 Empty keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -616,11 +624,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => ' ',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": a time unit is expected.'
+						'Invalid parameter "/1/lifetime": cannot be empty.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #9 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -629,11 +637,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '-30',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": a time unit is expected.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #10 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -642,11 +650,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 1,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #11 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -655,11 +663,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 3599,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #12 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -668,11 +676,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '59m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #13 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -681,11 +689,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '1304w',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #14 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -694,11 +702,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '9126d',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #15 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -707,11 +715,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '219001h',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #16 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -720,11 +728,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => '13140001m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Incorrect keep lost resources period
+			// #17 Incorrect keep lost resources period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -733,11 +741,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'lifetime' => 788400001,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "lifetime": value must be one of 0, 3600-788400000.'
+						'Invalid parameter "/1/lifetime": value must be one of 0, 3600-788400000.'
 					]
 				]
 			],
-			// Empty timedelay
+			// #18 Empty timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -746,11 +754,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'delay' => 0,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Specified update interval requires having at least one either flexible or scheduling interval.'
+						'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #19 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -763,7 +771,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #20 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -772,11 +780,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'delay' => 86401,
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Invalid parameter "/1/delay": value must be one of 0-86400.'
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #21 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -785,11 +793,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'delay' => '1w',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Invalid parameter "/1/delay": value must be one of 0-86400.'
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #22 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -798,11 +806,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'delay' => '2d',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Invalid parameter "/1/delay": value must be one of 0-86400.'
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #23 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -811,11 +819,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'delay' => '25h',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Invalid parameter "/1/delay": value must be one of 0-86400.'
 					]
 				]
 			],
-			// Incorrect timedelay
+			// #24 Incorrect timedelay
 			[
 				[
 					'expected' => TEST_BAD,
@@ -824,11 +832,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'delay' => '1441m',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Update interval should be between 1s and 1d. Also Scheduled/Flexible intervals can be used.'
+						'Invalid parameter "/1/delay": value must be one of 0-86400.'
 					]
 				]
 			],
-			// Empty time flex period
+			// #25 Empty time flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -843,7 +851,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #26 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -858,7 +866,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #27 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -873,7 +881,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #28 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -888,7 +896,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Incorrect flex period
+			// #29 Incorrect flex period
 			[
 				[
 					'expected' => TEST_BAD,
@@ -903,7 +911,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Multiple flex periods
+			// #30 Multiple flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -919,7 +927,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #31 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -936,11 +944,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #32 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -957,7 +965,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #33 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -975,11 +983,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": must have at least one interval greater than 0.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #34 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -994,7 +1002,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// Delay combined with flex periods
+			// #35 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1006,11 +1014,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #36 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1022,7 +1030,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #37 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1034,7 +1042,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #38 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1045,11 +1053,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #39 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1060,7 +1068,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #40 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1074,11 +1082,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #41 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1092,11 +1100,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #42 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1108,11 +1116,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #43 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1124,11 +1132,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item will not be refreshed. Please enter a correct update interval.'
+						'Invalid parameter "/1/delay": non-active intervals cannot fill the entire time.'
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #44 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1152,7 +1160,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #45 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1164,7 +1172,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Delay combined with flex periods
+			// #46 Delay combined with flex periods
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1180,6 +1188,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #47
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1189,7 +1198,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// List of all item types
+			// #48 List of all item types
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1199,7 +1208,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'dbCheck' => true
 				]
 			],
-			// Update and custom intervals are hidden if item key is mqtt.get
+			// #49 Update and custom intervals are hidden if item key is mqtt.get
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1210,6 +1219,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #50
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1220,6 +1230,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #51
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1230,6 +1241,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #52
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1241,6 +1253,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #53
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1253,6 +1266,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
+			// #54
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1262,10 +1276,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item with key "test-item-reuse" already exists on "Simple form test host".'
+						'An item with key "test-item-reuse" already exists on the host "Simple form test host".'
 					]
 				]
 			],
+			// #55
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1275,10 +1290,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'snmp_oid' => '[IF-MIB::]ifInOctets.1',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Item with key "test-item-form1" already exists on "Simple form test host".'
+						'An item with key "test-item-form1" already exists on the host "Simple form test host".'
 					]
 				]
 			],
+			// #56
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1289,6 +1305,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #57
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1300,6 +1317,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
+			// #58
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1310,6 +1328,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #59
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1322,6 +1341,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
+			// #60
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1333,7 +1353,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// IPMI sensor is optional if item key is ipmi.get
+			// #61 IPMI sensor is optional if item key is ipmi.get
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1344,6 +1364,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #62
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1357,6 +1378,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
+			// #63
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1369,6 +1391,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #64
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1377,10 +1400,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'key' => 'discovery-ipmi-agent-error',
 					'error_msg' => 'Cannot add discovery rule',
 					'errors' => [
-						'Incorrect value for field "ipmi_sensor": cannot be empty.'
+						'Invalid parameter "/1/ipmi_sensor": cannot be empty.'
 					]
 				]
 			],
+			// #65
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1394,6 +1418,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
+			// #66
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1407,6 +1432,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
+			// #67
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1418,7 +1444,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// Default
+			// #68 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1432,7 +1458,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Default
+			// #69 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1446,7 +1472,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					]
 				]
 			],
-			// Default
+			// #70 Default
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1807,6 +1833,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 	public static function getFiltersTabValidationData() {
 		return [
+			// #0
 			[
 				[
 					'name' => 'Rule with wrong macro',
@@ -1814,9 +1841,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'macros'=> [
 							['macro' => '{TEST_MACRO}', 'expression' => 'Test expression', 'operator' => 'does not match']
 					],
-					'error_message' => 'Incorrect filter condition macro for discovery rule'
+					'error_message' => 'Invalid parameter "/1/filter/conditions/1/macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #1
 			[
 				[
 					'name' => 'Rule with empty formula',
@@ -1827,9 +1855,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => '',
-					'error_message' => 'Incorrect custom expression "" for discovery rule "Rule with empty formula": expression is empty'
+					'error_message' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
+			// #2
 			[
 				[
 					'name' => 'Rule with missing argument',
@@ -1841,9 +1870,11 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B',
-					'error_message' => 'Condition "C" is not used in formula "A and B" for discovery rule "Rule with missing argument".'
+					'error_message' => 'Invalid parameter "/1/filter/conditions/3/formulaid": an identifier is not '.
+							'defined in the formula.'
 				]
 			],
+			// #3
 			[
 				[
 					'name' => 'Rule with extra argument',
@@ -1854,9 +1885,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B or C',
-					'error_message' => 'Condition "C" used in formula "A and B or C" for discovery rule "Rule with extra argument" is not defined'
+					'error_message' => 'Invalid parameter "/1/filter/formula": missing filter condition "C".'
 				]
 			],
+			// #4
 			[
 				[
 					'name' => 'Rule with wrong formula',
@@ -1867,9 +1899,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'Wrong formula',
-					'error_message' => 'Incorrect custom expression "Wrong formula" for discovery rule "Rule with wrong formula": check expression starting from "Wrong formula"'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Wrong formula".'
 				]
 			],
+			// #5
 			[
 				[
 					'name' => 'Check case sensitive of operator in formula',
@@ -1880,9 +1913,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'A and Not B',
-					'error_message' => 'Incorrect custom expression "A and Not B" for discovery rule "Check case sensitive of operator in formula": check expression starting from "Not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B".'
 				]
 			],
+			// #6
 			[
 				[
 					'name' => 'Check case sensitive of first operator in formula',
@@ -1893,9 +1927,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'NOT A and not B',
-					'error_message' => 'Incorrect custom expression "NOT A and not B" for discovery rule "Check case sensitive of first operator in formula": check expression starting from " A and not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
 				]
 			],
+			// #7
 			[
 				[
 					'name' => 'Test create with only NOT in formula',
@@ -1906,7 +1941,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula'=> 'not A not B',
-					'error_message' => 'Incorrect custom expression "not A not B" for discovery rule "Test create with only NOT in formula": check expression starting from " not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
 				]
 			]
 		];
@@ -1949,6 +1984,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 	public function getLLDMacrosTabData() {
 		return [
+			// #0
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1960,6 +1996,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
 			],
+			// #1
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1971,6 +2008,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #2
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1982,6 +2020,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #3
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1993,6 +2032,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #4
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2004,6 +2044,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
 				]
 			],
+			// #5
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2015,6 +2056,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #6
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2024,9 +2066,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 						['macro' => '{#MACRO}', 'path'=>'$.path.a'],
 						['macro' => '{#MACRO}', 'path'=>'$.path.b']
 					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#MACRO}" already exists.'
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2": value (lld_macro)=({#MACRO}) already exists.'
 				]
 			],
+			// #7
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2129,9 +2172,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @param string         $name    name of a host or template
 	 */
 	private function filterEntriesAndOpenDiscovery($form, $name) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

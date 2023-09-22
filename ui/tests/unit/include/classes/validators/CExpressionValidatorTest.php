@@ -50,9 +50,17 @@ class CExpressionValidatorTest extends TestCase {
 
 			['avg(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['kurtosis(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['mad(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['max(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['min(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['skewness(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['stddevpop(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['stddevsamp(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['sum(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['sumofsquares(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['varpop(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['varsamp(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
 			['avg(max_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(max_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],

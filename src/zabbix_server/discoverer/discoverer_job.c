@@ -62,17 +62,30 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 	zbx_free(task);
 }
 
-void	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
+zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 {
+	return NULL != task->ips ?
+			(zbx_uint64_t)task->ips->values_num * (zbx_uint64_t)task->dchecks.values_num :
+			(zbx_uint64_t)task->dchecks.values_num;
+}
+
+zbx_uint64_t	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
+{
+	zbx_uint64_t		check_count = 0;
 	zbx_discoverer_task_t	*task;
 
 	while (SUCCEED == zbx_list_pop(&job->tasks, (void*)&task))
+	{
+		check_count += discoverer_task_check_count_get(task);
 		discoverer_task_free(task);
+	}
+
+	return check_count;
 }
 
 void	discoverer_job_free(zbx_discoverer_job_t *job)
 {
-	discoverer_job_tasks_free(job);
+	(void)discoverer_job_tasks_free(job);
 
 	zbx_free(job);
 }

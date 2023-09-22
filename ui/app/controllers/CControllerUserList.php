@@ -126,6 +126,7 @@ class CControllerUserList extends CController {
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
 				'surname' => ($filter['surname'] === '') ? null : $filter['surname']
 			],
+			'filter' => ['roleid' => ($filter['roles'] == []) ? null : $filter['roles']],
 			'usrgrpids' => ($filter['usrgrpids'] == []) ? null : $filter['usrgrpids'],
 			'getAccess' => true,
 			'limit' => $limit

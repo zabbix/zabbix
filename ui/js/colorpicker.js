@@ -72,18 +72,20 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 				$overlay_colorbox
 					.css({'background': ''})
 					.attr('title', t('Use default'))
-					.addClass('use-default');
+					.addClass('use-default')
+					.removeClass('use-transparent');
 			}
 			else if (/^[0-9A-F]{6}$/i.test(color)) {
 				$overlay_colorbox
 					.css({'background': '#' + color})
 					.attr('title', '#' + color)
-					.removeClass('use-default');
+					.removeClass(['use-default', 'use-transparent']);
 			}
 			else {
 				$overlay_colorbox
 					.css({'background': ''})
 					.attr('title', t('Use default'))
+					.addClass('use-transparent')
 					.removeClass('use-default');
 			}
 		},
@@ -161,7 +163,7 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				const $close = $('<button>', {
 					type: 'button',
-					class: 'overlay-close-btn',
+					class: 'btn-overlay-close',
 					title: t('S_CLOSE')
 				})
 					.on('click', (e) => {
@@ -297,18 +299,20 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 					colorbox
 						.css({'background': ''})
 						.attr('title', t('Use default'))
-						.addClass('use-default');
+						.addClass('use-default')
+						.removeClass('use-transparent');
 				}
 				else if (/^[0-9A-F]{6}$/i.test(color)) {
 					colorbox
 						.css({'background': '#' + color})
 						.attr('title', '#' + color)
-						.removeClass('use-default');
+						.removeClass(['use-default', 'use-transparent']);
 				}
 				else {
 					colorbox
 						.css({'background': ''})
 						.attr('title', t('Use default'))
+						.addClass('use-transparent')
 						.removeClass('use-default');
 				}
 

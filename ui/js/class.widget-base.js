@@ -1088,24 +1088,24 @@ class CWidgetBase {
 	/**
 	 * Calculate viewport dimensions of the contents' container.
 	 *
-	 * @returns {{contents_height: number, contents_width: number}}
+	 * @returns {{height: number, width: number}}
 	 */
 	_getContentsSize() {
 		const computed_style = getComputedStyle(this._contents);
 
-		const contents_width = Math.floor(
+		const width = Math.floor(
 			parseFloat(computed_style.width)
 				- parseFloat(computed_style.paddingLeft) - parseFloat(computed_style.paddingRight)
 				- parseFloat(computed_style.borderLeftWidth) - parseFloat(computed_style.borderRightWidth)
 		);
 
-		const contents_height = Math.floor(
+		const height = Math.floor(
 			parseFloat(computed_style.height)
 				- parseFloat(computed_style.paddingTop) - parseFloat(computed_style.paddingBottom)
 				- parseFloat(computed_style.borderTopWidth) - parseFloat(computed_style.borderBottomWidth)
 		);
 
-		return {contents_width, contents_height};
+		return {width, height};
 	}
 
 	/**
@@ -1146,7 +1146,7 @@ class CWidgetBase {
 			li_button.type = 'button';
 			li_button.setAttribute('data-hintbox', '1');
 			li_button.setAttribute('data-hintbox-static', '1');
-			li_button.classList.add(info[i].icon);
+			li_button.classList.add(ZBX_STYLE_BTN_ICON, info[i].icon);
 			li.appendChild(li_button);
 
 			const li_div = document.createElement('div');
@@ -1236,7 +1236,7 @@ class CWidgetBase {
 			this._button_edit = document.createElement('button');
 			this._button_edit.type = 'button';
 			this._button_edit.title = t('Edit')
-			this._button_edit.classList.add('btn-widget-edit', 'js-widget-edit');
+			this._button_edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COG_FILLED, 'js-widget-edit');
 
 			const li = document.createElement('li');
 
@@ -1249,7 +1249,7 @@ class CWidgetBase {
 		this._button_actions.title = t('Actions');
 		this._button_actions.setAttribute('aria-expanded', 'false');
 		this._button_actions.setAttribute('aria-haspopup', 'true');
-		this._button_actions.classList.add('btn-widget-action', 'js-widget-action');
+		this._button_actions.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, 'js-widget-action');
 
 		const li = document.createElement('li');
 

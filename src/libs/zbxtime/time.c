@@ -141,9 +141,14 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 #endif	/* not _WINDOWS */
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
+			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+#else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
+#endif
 	{
-		ts->ns += ++corr;
+		ts->ns = last_ts.ns + (++corr);
 
 		while (ts->ns >= 1000000000)
 		{
@@ -388,6 +393,9 @@ int	zbx_day_in_month(int year, int mon)
  *                                                                            *
  * Return value: duration in milliseconds since time stamp till current time  *
  *                                                                            *
+ * Comments:                                                                  *
+ *     Timestamp value 'ts' must be before or equal to current time.          *
+ *                                                                            *
  ******************************************************************************/
 zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 {
@@ -395,7 +403,7 @@ zbx_uint64_t	zbx_get_duration_ms(const zbx_timespec_t *ts)
 
 	zbx_timespec(&now);
 
-	return (now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6;
+	return (zbx_uint64_t)((now.sec - ts->sec) * 1e3 + (now.ns - ts->ns) / 1e6);
 }
 
 static void	tm_add(struct tm *tm, int multiplier, zbx_time_unit_t base);

@@ -93,11 +93,6 @@ class CDashboardPage {
 
 		this._widgets = new Map();
 
-		this._original_properties = {
-			name: this._data.name,
-			display_period: this._data.display_period
-		};
-
 		this._grid_min_rows = 0;
 		this._grid_pad_rows = 2;
 
@@ -273,17 +268,7 @@ class CDashboardPage {
 	}
 
 	isUnsaved() {
-		if (this._is_unsaved) {
-			return true;
-		}
-
-		for (const [name, value] of Object.entries(this._original_properties)) {
-			if (value != this._data[name]) {
-				return true;
-			}
-		}
-
-		return false;
+		return this._is_unsaved;
 	}
 
 	// Data interface methods.
@@ -409,8 +394,6 @@ class CDashboardPage {
 	}
 
 	replaceWidget(widget, widget_data) {
-		this._is_unsaved = true;
-
 		this.deleteWidget(widget, {is_batch_mode: true});
 
 		return this.addWidget(widget_data);
@@ -725,7 +708,7 @@ class CDashboardPage {
 	}
 
 	_resizeGrid(min_rows = null) {
-		if (min_rows == 0) {
+		if (min_rows === 0) {
 			this._grid_min_rows = 0;
 		}
 		else if (min_rows !== null) {
@@ -733,6 +716,12 @@ class CDashboardPage {
 		}
 
 		let num_rows = Math.max(this._grid_min_rows, this._getNumOccupiedRows());
+
+		if (!this._is_edit_mode && num_rows === 0) {
+			this._dashboard_grid.style.height = '';
+
+			return;
+		}
 
 		let height = this._cell_height * num_rows;
 
@@ -751,11 +740,7 @@ class CDashboardPage {
 			height = Math.min(Math.max(height, min_height), this._cell_height * this._max_rows);
 		}
 
-		this._dashboard_grid.style.height = '';
-
-		if (num_rows !== 0) {
-			this._dashboard_grid.style.height = `${height}px`;
-		}
+		this._dashboard_grid.style.height = `${height}px`;
 	}
 
 	_getNumOccupiedRows() {

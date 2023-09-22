@@ -264,7 +264,6 @@
 							$('.wrapper > .msg-bad').remove();
 							$('#flickerfreescreen_' + id).replaceWith(html);
 							html.filter('.msg-bad').insertBefore('.wrapper main');
-
 							window.flickerfreeScreen.setElementProgressState(id, false);
 						}
 						else if (!html.length) {

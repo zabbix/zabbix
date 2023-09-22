@@ -28,7 +28,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxstr.h"
 
 #include <sys/pstat.h>
@@ -115,9 +114,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (0 < (count = pstat_getproc(pst, sizeof(*pst), ZBX_BURST, idx)))
 	{
-		int	i;
-
-		for (i = 0; i < count; i++)
+		for (int i = 0; i < count; i++)
 		{
 			if (NULL != procname && 0 != strcmp(pst[i].pst_ucomm, procname))
 				continue;

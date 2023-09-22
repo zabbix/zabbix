@@ -27,14 +27,12 @@
 <script type="text/x-jquery-tmpl" id="url-tpl">
 	<?= (new CRow([
 			(new CTextBox('urls[#{id}][name]'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			(new CTextBox('urls[#{id}][url]', false, DB::getFieldLength('sysmap_url', 'url')))
+			(new CTextBox('urls[#{id}][url]', '', false, DB::getFieldLength('sysmap_url', 'url')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CSelect('urls[#{id}][elementtype]'))
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->onClick('$("#url-row-#{id}").remove();')
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))->onClick('$("#url-row-#{id}").remove();')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('url-row-#{id}')
 	?>

@@ -19,7 +19,6 @@
 
 #include "zbxservice.h"
 
-#include "log.h"
 #include "zbxipcservice.h"
 
 ZBX_PTR_VECTOR_IMPL(service, zbx_db_service *)

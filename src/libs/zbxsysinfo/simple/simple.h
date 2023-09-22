@@ -22,9 +22,8 @@
 
 #include "module.h"
 
-extern ZBX_METRIC	parameters_simple[];
-
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
+zbx_metric_t	*get_parameters_simple(void);
 
 #endif /* ZABBIX_SYSINFO_SIMPLE_H */

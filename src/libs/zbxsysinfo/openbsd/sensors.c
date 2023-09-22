@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "log.h"
 
 #include <sys/sensors.h>
 
@@ -98,11 +97,9 @@ static int	get_device_sensors(int do_task, int *mib, const struct sensordev *sen
 	}
 	else
 	{
-		int	i, j;
-
-		for (i = 0; i < SENSOR_MAX_TYPES; i++)
+		for (int i = 0; i < SENSOR_MAX_TYPES; i++)
 		{
-			for (j = 0; j < sensordev->maxnumt[i]; j++)
+			for (int j = 0; j < sensordev->maxnumt[i]; j++)
 			{
 				char		human[64];
 				struct sensor	sensor;

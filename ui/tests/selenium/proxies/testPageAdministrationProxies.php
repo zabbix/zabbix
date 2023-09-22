@@ -82,10 +82,10 @@ class testPageAdministrationProxies extends CWebTest {
 		$versions = [
 			'active_current' => ['version' => '6.4.0'],
 			'active_unknown' => ['version' => ''],
-			'passive_outdated' => ['version' => '6.2.0 ', 'color' => 'red', 'icon_color' => 'yellow', 'hint_text' =>
+			'passive_outdated' => ['version' => '6.2.0 ', 'color' => 'red', 'icon_color' => 'zi-i-warning', 'hint_text' =>
 					'Proxy version is outdated, only data collection and remote execution is available with server version 6.4.0.'
 			],
-			'passive_unsupported' => ['version' => '5.4.1 ', 'color' => 'red', 'icon_color' => 'red', 'hint_text' =>
+			'passive_unsupported' => ['version' => '5.4.1 ', 'color' => 'red', 'icon_color' => 'zi-i-negative', 'hint_text' =>
 					'Proxy version is not supported by server version 6.4.0.', 'hint_color' => 'red'
 			]
 		];
@@ -101,12 +101,12 @@ class testPageAdministrationProxies extends CWebTest {
 				);
 
 				// Check info-icon color.
-				$this->assertTrue($column->query("xpath:.//a[@class=".
-						CXPathHelper::escapeQuotes("icon-info status-".$parameters['icon_color'])."]")->exists()
+				$this->assertTrue($column->query("xpath:.//button[".CXPathHelper::fromClass($parameters['icon_color'])."]")
+						->exists()
 				);
 
 				// Check version hint.
-				$column->query('xpath:.//a[@data-hintbox="1"]')->one()->waitUntilClickable()->click();
+				$column->query('xpath:.//button[@data-hintbox="1"]')->one()->waitUntilClickable()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one();
 				$this->assertEquals($parameters['hint_text'], $hint->getText());
 
@@ -501,11 +501,12 @@ class testPageAdministrationProxies extends CWebTest {
 					'action' => 'Delete',
 					'proxies' => [
 						'passive_proxy7',
-						'Proxy for Discovery rule'
+						'Delete Proxy used in Network discovery rule'
 					],
 					'alert' => 'Delete selected proxies?',
 					'title' => 'Cannot delete proxies',
-					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
+					'error' => "Proxy \"Delete Proxy used in Network discovery rule\" is used by discovery rule ".
+							"\"Discovery rule for proxy delete test\"."
 				]
 			],
 			// Delete one proxy with host.
@@ -527,11 +528,12 @@ class testPageAdministrationProxies extends CWebTest {
 					'expected' => TEST_BAD,
 					'action' => 'Delete',
 					'proxies' => [
-						'Proxy for Discovery rule'
+						'Delete Proxy used in Network discovery rule'
 					],
 					'alert' => 'Delete selected proxy?',
 					'title' => 'Cannot delete proxy',
-					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
+					'error' => "Proxy \"Delete Proxy used in Network discovery rule\" is used by discovery rule ".
+							"\"Discovery rule for proxy delete test\"."
 				]
 			]
 		];
@@ -563,7 +565,7 @@ class testPageAdministrationProxies extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $data['title'], CTestArrayHelper::get($data, 'message', null));
 
 			// Check DB. Status 5 stands for Active proxy and status 6 - for Passive proxy.
-			$db_proxies = CDBHelper::getColumn('SELECT * FROM hosts WHERE status IN (5,6)', 'host');
+			$db_proxies = CDBHelper::getColumn('SELECT * FROM proxy', 'name');
 
 			foreach ($data['proxies'] as $proxy) {
 				$this->assertEquals(($data['action'] !== 'Delete'), in_array($proxy, array_values($db_proxies)));
@@ -577,7 +579,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 			// Check that hosts are actually enabled/disabled.
 			if ($data['action'] === 'Enable hosts' || $data['action'] === 'Disable hosts') {
-				$hosts = CDBHelper::getAll('SELECT host, status FROM hosts WHERE proxy_hostid IS NOT NULL');
+				$hosts = CDBHelper::getAll('SELECT host, status FROM hosts WHERE proxyid IS NOT NULL');
 
 				// DB check for hosts.
 				foreach ($hosts as $host) {
@@ -597,7 +599,7 @@ class testPageAdministrationProxies extends CWebTest {
 	 */
 	public function testPageAdministrationProxies_SortColumns() {
 		// Open Proxies page with proxies sorted descendingly by name.
-		$this->page->login()->open('zabbix.php?action=proxy.list&sort=host&sortorder=DESC')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=proxy.list&sort=name&sortorder=DESC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilPresent();
 
 		foreach (['Name', 'Mode', 'Encryption', 'Version', 'Last seen (age)'] as $column) {

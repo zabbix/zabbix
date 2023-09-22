@@ -35,6 +35,16 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 		return $this;
 	}
 
+	public function getLabel(): ?CLabel {
+		$label = parent::getLabel();
+
+		if ($label !== null) {
+			$label->setFor(zbx_formatDomId($this->field->getName().'[]').'_ms');
+		}
+
+		return $label;
+	}
+
 	public function getView(): CPatternSelect {
 		return (new CPatternSelect([
 			'name' => $this->field->getName().'[]',
@@ -60,6 +70,6 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 	public function getJavaScript(): string {
 		$field_id = zbx_formatDomId($this->field->getName().'[]');
 
-		return 'jQuery("#'.$field_id.'").multiSelect(jQuery("#'.$field_id.'").data("params"));';
+		return 'jQuery("#'.$field_id.'").multiSelect();';
 	}
 }

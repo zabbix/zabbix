@@ -286,10 +286,10 @@ if ($data['admin']) {
 		$httptest_count = CViewHelper::showNum($template['httpTests']);
 
 		$template_cell = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink($visible_name, (new CUrl('templates.php'))
-				->setArgument('form', 'update')
-				->setArgument('templateid', $templateid)
-			)]
+			? [(new CLink($visible_name))
+				->setAttribute('data-templateid', $templateid)
+				->onClick('view.editTemplate(event, this.dataset.templateid);')
+			]
 			: [new CSpan($visible_name)];
 
 		$items_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
@@ -390,7 +390,8 @@ foreach ($data['template_groups'] as $groupid => $group) {
 
 	if ($data['admin']) {
 		$templates_link = ($group['editable'] && $data['allowed_ui_conf_templates'] && $group['templates'])
-			? [new CLink(_('Templates'), (new CUrl('templates.php'))
+			? [new CLink(_('Templates'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'template.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_groups', [$groupid])
 			), CViewHelper::showNum($group['templates'])]

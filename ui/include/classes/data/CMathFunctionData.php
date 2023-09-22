@@ -65,11 +65,13 @@ final class CMathFunctionData {
 		'histogram_quantile' =>	[['min' => 5, 'step' => 2], ['count' => 2]],
 		'in' =>					[['min' => 2]],
 		'insert' =>				[['count' => 4]],
+		'kurtosis' =>			[['min' => 1, 'max' => 2]],
 		'left' =>				[['count' => 2]],
 		'length' =>				[['count' => 1]],
 		'log' =>				[['count' => 1]],
 		'log10' =>				[['count' => 1]],
 		'ltrim' =>				[['min' => 1, 'max' => 2]],
+		'mad' =>				[['min' => 1, 'max' => 2]],
 		'max' =>				[['min' => 1]],
 		'mid' =>				[['count' => 3]],
 		'min' =>				[['min' => 1]],
@@ -87,12 +89,18 @@ final class CMathFunctionData {
 		'signum' =>				[['count' => 1]],
 		'sin' =>				[['count' => 1]],
 		'sinh' =>				[['count' => 1]],
+		'skewness' =>			[['min' => 1, 'max' => 2]],
 		'sqrt' =>				[['count' => 1]],
+		'stddevpop' =>			[['min' => 1, 'max' => 2]],
+		'stddevsamp' =>			[['min' => 1, 'max' => 2]],
 		'sum' =>				[['min' => 1]],
+		'sumofsquares' =>		[['min' => 1, 'max' => 2]],
 		'tan' =>				[['count' => 1]],
 		'time' =>				[['count' => 0]],
 		'trim' =>				[['min' => 1, 'max' => 2]],
-		'truncate' =>			[['count' => 2]]
+		'truncate' =>			[['count' => 2]],
+		'varpop' =>				[['min' => 1, 'max' => 2]],
+		'varsamp' =>			[['min' => 1, 'max' => 2]]
 	];
 
 	/**

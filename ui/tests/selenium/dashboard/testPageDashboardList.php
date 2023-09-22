@@ -145,6 +145,7 @@ class testPageDashboardList extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill($data['fields']);
 		$form->submit();
+		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
 		if ($data['result_count'] !== 0) {

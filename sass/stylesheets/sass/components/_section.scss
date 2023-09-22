@@ -16,15 +16,10 @@ section {
 			line-height: inherit;
 			color: lighten($font-color, 15%);
 		}
-	}
 
-	.section-toggle {
-		@extend %btn-widget-defaults;
-
-		width: 24px;
-		height: 24px;
-		margin: 2px 2px 0 auto;
-		background: url($sprite-path) no-repeat -6px -654px;
+		.section-toggle {
+			max-height: 24px;
+		}
 	}
 
 	.section-foot {
@@ -34,14 +29,10 @@ section {
 		color: $font-alt-color;
 	}
 
-	&.section-collapsed {
+	&.collapsed {
 		.section-body,
 		.section-foot {
 			display: none;
-		}
-
-		.section-toggle {
-			background-position: -6px -689px;
 		}
 	}
 

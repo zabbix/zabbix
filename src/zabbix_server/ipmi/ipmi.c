@@ -23,9 +23,8 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
-#include "log.h"
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"
 #include "checks_ipmi.h"
@@ -52,7 +51,7 @@ int	zbx_ipmi_port_expand_macros(zbx_uint64_t hostid, const char *port_orig, unsi
 
 	tmp = zbx_strdup(NULL, port_orig);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&tmp, MACRO_TYPE_COMMON, NULL, 0);
+			&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	if (FAIL == zbx_is_ushort(tmp, port) || 0 == *port)
 	{

@@ -20,9 +20,6 @@
 #include "zbxalgo.h"
 #include "algodefs.h"
 
-#include "zbxcommon.h"
-#include "log.h"
-
 static void	__hashset_free_entry(zbx_hashset_t *hs, ZBX_HASHSET_ENTRY_T *entry);
 
 #define	CRIT_LOAD_FACTOR	4/5
@@ -97,10 +94,9 @@ void	zbx_hashset_create_ext(zbx_hashset_t *hs, size_t init_size,
 
 void	zbx_hashset_destroy(zbx_hashset_t *hs)
 {
-	int			i;
 	ZBX_HASHSET_ENTRY_T	*entry, *next_entry;
 
-	for (i = 0; i < hs->num_slots; i++)
+	for (int i = 0; i < hs->num_slots; i++)
 	{
 		entry = hs->slots[i];
 
@@ -132,8 +128,8 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs)
  *                                                                            *
  * Purpose: allocation not less than the required number of slots for hashset *
  *                                                                            *
- * Parameters: hs            - [IN] the destination hashset                   *
- *             num_slots_req - [IN] the number of required slots              *
+ * Parameters: hs            - [IN] destination hashset                       *
+ *             num_slots_req - [IN] number of required slots                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req)
@@ -363,10 +359,9 @@ void	zbx_hashset_remove_direct(zbx_hashset_t *hs, void *data)
 
 void	zbx_hashset_clear(zbx_hashset_t *hs)
 {
-	int			slot;
 	ZBX_HASHSET_ENTRY_T	*entry;
 
-	for (slot = 0; slot < hs->num_slots; slot++)
+	for (int slot = 0; slot < hs->num_slots; slot++)
 	{
 		while (NULL != hs->slots[slot])
 		{
@@ -453,8 +448,8 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
  *                                                                               *
  * Purpose: copy hashset with fixed size entries                                 *
  *                                                                               *
- * Parameters:  dst  - [OUT] the destination hashset                             *
- *              src  - [IN] the source hashset                                   *
+ * Parameters:  dst  - [OUT] destination hashset                                 *
+ *              src  - [IN] source hashset                                       *
  *              size - [IN] hashset entry data size                              *
  *                                                                               *
  * Comments: Do NOT use this function with hashsets having variable size entries,*
@@ -463,7 +458,6 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
  *********************************************************************************/
 void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 {
-	int			i;
 	ZBX_HASHSET_ENTRY_T	*entry, **ref;
 
 	*dst = *src;
@@ -472,7 +466,7 @@ void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 			sizeof(ZBX_HASHSET_ENTRY_T *));
 	memset(dst->slots, 0, (size_t)dst->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 
-	for (i = 0; i < src->num_slots; i++)
+	for (int i = 0; i < src->num_slots; i++)
 	{
 		if (0 == src->slots[i])
 			continue;

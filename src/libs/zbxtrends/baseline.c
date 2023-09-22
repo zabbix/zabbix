@@ -20,7 +20,6 @@
 #include "trends.h"
 
 #include "zbxcommon.h"
-#include "log.h"
 #include "zbxstr.h"
 
 /******************************************************************************

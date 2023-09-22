@@ -186,7 +186,7 @@ class CWidgetGraph extends CWidget {
 	getActionsContextMenu({can_paste_widget}) {
 		const menu = super.getActionsContextMenu({can_paste_widget});
 
-		if (this._is_edit_mode) {
+		if (this.isEditMode()) {
 			return menu;
 		}
 
@@ -213,7 +213,7 @@ class CWidgetGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._is_graph_mode,
 			clickCallback: () => {
-				downloadPngImage(this._body.querySelector('img'), 'graph.png');
+				downloadPngImage(this._body.querySelector('img'), 'image.png');
 			}
 		});
 

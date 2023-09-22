@@ -62,6 +62,27 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			'url' => 'http://test.url'
 		]);
 		$this->assertArrayHasKey('connectorids', $connectors);
+
+		// Create event correlation.
+		CDataHelper::call('correlation.create', [
+			[
+				'name' => 'Event correlation for element remove',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'element remove'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			]
+		]);
 	}
 
 	public static function getElementRemoveData() {
@@ -114,16 +135,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=create',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'create'
 				]
 			],
 			// #7 Template update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=update&templateid=10169',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'update'
 				]
 			],
 			// #8 Host create.
@@ -256,16 +277,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?action=correlation.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=correlation.list',
+					'overlay' => 'create'
 				]
 			],
 			// #25 Event correlation update.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=correlation.list',
+					'overlay' => 'update'
 				]
 			],
 			// #26 Discovery create.
@@ -344,7 +365,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexid=20',
+					'link' => 'zabbix.php?action=regex.edit&regexid=2',
 					'return_button' => true
 				]
 			],
@@ -456,16 +477,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'update'
 				]
 			],
 			// #50 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'create'
 				]
 			],
 			// #51 Script update.

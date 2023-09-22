@@ -22,7 +22,7 @@
 #include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "zbxconnector.h"
 #include "zbxtime.h"
@@ -60,14 +60,34 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
-	char	headers[] = "", posts[] = "", status_codes[] = "200";
+	char			query_fields[] = "", headers[] = "", status_codes[] = "200";
+	zbx_http_context_t	context;
+	int			ret;
 
-	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, headers, posts,
-			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
-			connector.timeout, connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
+	zbx_http_context_create(&context);
+
+	if (SUCCEED == (ret = zbx_http_request_prepare(&context, HTTP_REQUEST_POST, connector.url, headers,
+			query_fields, str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0, connector.timeout,
+			connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
-			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON, status_codes,
-			HTTP_STORE_RAW, config_source_ip, &out, &error))
+			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON,
+			HTTP_STORE_RAW, config_source_ip, &error)))
+	{
+		long		response_code;
+		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context);
+
+		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code,
+				&out, &error)))
+		{
+			if (FAIL == (ret = zbx_int_in_list(status_codes, (int)response_code)))
+			{
+				error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
+						" required status codes \"%s\"", response_code, status_codes);
+			}
+		}
+	}
+
+	if (FAIL == ret)
 	{
 		char	*info = NULL;
 
@@ -103,6 +123,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 		zbx_free(info);
 	}
+
+	zbx_http_context_destroy(&context);
 #else
 	ZBX_UNUSED(config_source_ip);
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");

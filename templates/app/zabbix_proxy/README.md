@@ -17,7 +17,8 @@
 |Zabbix proxy: Utilization of data sender internal processes, in %|<p>Average percentage of time data sender processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,data sender,avg,busy]|
 |Zabbix proxy: Utilization of availability manager internal processes, in %|<p>Average percentage of time availability manager processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,availability manager,avg,busy]|
 |Zabbix proxy: Utilization of configuration syncer internal processes, in %|<p>Average percentage of time configuration syncer processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,configuration syncer,avg,busy]|
-|Zabbix proxy: Utilization of discoverer data collector processes, in %|<p>Average percentage of time discoverer processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,discoverer,avg,busy]|
+|Zabbix proxy: Utilization of discovery worker internal processes, in %|<p>Average percentage of time discovery worker processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,discovery worker,avg,busy]|
+|Zabbix proxy: Utilization of discovery manager internal processes, in %|<p>Average percentage of time discovery manager processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,discovery manager,avg,busy]|
 |Zabbix proxy: Utilization of ODBC poller data collector processes, in %|<p>Average percentage of time ODBC poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,odbc poller,avg,busy]|
 |Zabbix proxy: Utilization of history poller data collector processes, in %|<p>Average percentage of time history poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,history poller,avg,busy]|
 |Zabbix proxy: Utilization of history syncer internal processes, in %|<p>Average percentage of time history syncer processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,history syncer,avg,busy]|
@@ -36,6 +37,9 @@
 |Zabbix proxy: Utilization of trapper data collector processes, in %|<p>Average percentage of time trapper processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,trapper,avg,busy]|
 |Zabbix proxy: Utilization of unreachable poller data collector processes, in %|<p>Average percentage of time unreachable poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,unreachable poller,avg,busy]|
 |Zabbix proxy: Utilization of vmware data collector processes, in %|<p>Average percentage of time vmware collector processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,vmware collector,avg,busy]|
+|Zabbix proxy: Utilization of agent poller data collector processes, in %|<p>Average percentage of time agent poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,agent poller,avg,busy]|
+|Zabbix proxy: Utilization of http agent poller data collector processes, in %|<p>Average percentage of time http agent poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,http agent poller,avg,busy]|
+|Zabbix proxy: Utilization of snmp poller data collector processes, in %|<p>Average percentage of time snmp poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,snmp poller,avg,busy]|
 |Zabbix proxy: Configuration cache, % used|<p>Availability statistics of Zabbix configuration cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[rcache,buffer,pused]|
 |Zabbix proxy: Version|<p>Version of Zabbix proxy.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Zabbix proxy: VMware cache, % used|<p>Availability statistics of Zabbix vmware cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[vmware,buffer,pused]|
@@ -48,6 +52,7 @@
 |Zabbix proxy: Number of processed character values per second|<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed character/string values.</p>|Zabbix internal|zabbix[wcache,values,str]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Zabbix proxy: Number of processed text values per second|<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed text values.</p>|Zabbix internal|zabbix[wcache,values,text]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Zabbix proxy: Preprocessing queue|<p>Count of values enqueued in the preprocessing queue.</p>|Zabbix internal|zabbix[preprocessing_queue]|
+|Zabbix proxy: Discovery queue|<p>Count of values enqueued in the discovery queue.</p>|Zabbix internal|zabbix[discovery_queue]|
 |Zabbix proxy: Number of processed numeric (unsigned) values per second|<p>Statistics and availability of Zabbix write cache.</p><p>Number of processed numeric (unsigned) values.</p>|Zabbix internal|zabbix[wcache,values,uint]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Zabbix proxy: Values waiting to be sent|<p>Number of values in the proxy history table waiting to be sent to the server.</p>|Zabbix internal|zabbix[proxy_history]|
 |Zabbix proxy: Required performance|<p>Required performance of Zabbix proxy, in new values per second expected.</p>|Zabbix internal|zabbix[requiredperformance]|
@@ -61,7 +66,8 @@
 |Zabbix proxy: Utilization of data sender processes is high||`avg(/Zabbix proxy health/zabbix[process,data sender,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"data sender"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of availability manager processes is high||`avg(/Zabbix proxy health/zabbix[process,availability manager,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"availability manager"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of configuration syncer processes is high||`avg(/Zabbix proxy health/zabbix[process,configuration syncer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"configuration syncer"}`|Average|**Manual close**: Yes|
-|Zabbix proxy: Utilization of discoverer processes is high||`avg(/Zabbix proxy health/zabbix[process,discoverer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discoverer"}`|Average|**Manual close**: Yes|
+|Zabbix proxy: Utilization of discovery worker processes is high||`avg(/Zabbix proxy health/zabbix[process,discovery worker,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discovery worker"}`|Average|**Manual close**: Yes|
+|Zabbix proxy: Utilization of discovery manager processes is high||`avg(/Zabbix proxy health/zabbix[process,discovery manager,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"discovery manager"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of ODBC poller processes is high||`avg(/Zabbix proxy health/zabbix[process,odbc poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"ODBC poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of history poller processes is high||`avg(/Zabbix proxy health/zabbix[process,history poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"history poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of history syncer processes is high||`avg(/Zabbix proxy health/zabbix[process,history syncer,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"history syncer"}`|Average|**Manual close**: Yes|
@@ -80,6 +86,9 @@
 |Zabbix proxy: Utilization of trapper processes is high||`avg(/Zabbix proxy health/zabbix[process,trapper,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"trapper"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of unreachable poller processes is high||`avg(/Zabbix proxy health/zabbix[process,unreachable poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"unreachable poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of vmware collector processes is high||`avg(/Zabbix proxy health/zabbix[process,vmware collector,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}`|Average|**Manual close**: Yes|
+|Zabbix proxy: Utilization of agent poller processes is high||`avg(/Zabbix proxy health/zabbix[process,agent poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"agent poller"}`|Average|**Manual close**: Yes|
+|Zabbix proxy: Utilization of http agent poller processes is high||`avg(/Zabbix proxy health/zabbix[process,http agent poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}`|Average|**Manual close**: Yes|
+|Zabbix proxy: Utilization of snmp poller processes is high||`avg(/Zabbix proxy health/zabbix[process,snmp poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache|<p>Consider increasing CacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Version has changed|<p>Zabbix proxy version has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix proxy health/zabbix[version],#1)<>last(/Zabbix proxy health/zabbix[version],#2) and length(last(/Zabbix proxy health/zabbix[version]))>0`|Info|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache|<p>Consider increasing VMwareCacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|

@@ -21,7 +21,6 @@
 
 #include "zbxdbhigh.h"
 #include "zbxsysinfo.h"
-#include "log.h"
 #include "zbxparam.h"
 
 /*

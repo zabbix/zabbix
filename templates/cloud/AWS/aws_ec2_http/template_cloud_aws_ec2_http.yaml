@@ -28,7 +28,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Check result of the alarm data has been got correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1122,7 +1122,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Check result of the instance metric data has been got correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1343,7 +1343,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'Data collection check.'
+          description: 'Check result of the volume information has been got correctly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1390,6 +1390,25 @@ zabbix_export:
                 formulaid: B
           description: 'Discovery instance and attached EBS volumes alarms.'
           item_prototypes:
+            - uuid: 6294e05dc170431bb3af2caf1ccf6d40
+              name: 'AWS EC2 Alarms: ["{#ALARM_NAME}"]: Get metrics'
+              type: DEPENDENT
+              key: 'aws.ec2.alarm.get_metrics["{#ALARM_NAME}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get alarm metrics about the state and its reason.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[?(@.AlarmName == "{#ALARM_NAME}")].first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: aws.ec2.get_alarms
+              tags:
+                - tag: component
+                  value: raw
             - uuid: 87a163166aed40b786785b64122ab365
               name: 'AWS EC2 Alarms: ["{#ALARM_NAME}"]: State'
               type: DEPENDENT
@@ -1405,7 +1424,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.AlarmName == "{#ALARM_NAME}")].StateValue.first()'
+                    - $.StateValue
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '3'
                 - type: JAVASCRIPT
@@ -1415,7 +1434,7 @@ zabbix_export:
                       
                       return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
               master_item:
-                key: aws.ec2.get_alarms
+                key: 'aws.ec2.alarm.get_metrics["{#ALARM_NAME}"]'
               tags:
                 - tag: component
                   value: alarms
@@ -1442,13 +1461,13 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.AlarmName == "{#ALARM_NAME}")].StateReason.first()'
+                    - $.StateReason
                   error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: aws.ec2.get_alarms
+                key: 'aws.ec2.alarm.get_metrics["{#ALARM_NAME}"]'
               tags:
                 - tag: component
                   value: alarms
@@ -1516,7 +1535,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.volumeId == "{#VOLUME_ID}")].attachmentSet..[?(@.instanceId == "{$AWS.EC2.INSTANCE.ID}")].status.first()'
+                    - '$.attachmentSet..[?(@.instanceId == "{$AWS.EC2.INSTANCE.ID}")].status.first()'
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1528,7 +1547,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: aws.ec2.get_volumes
+                key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               tags:
                 - tag: component
                   value: volumes
@@ -1550,13 +1569,13 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.volumeId == "{#VOLUME_ID}")].attachmentSet..[?(@.instanceId == "{$AWS.EC2.INSTANCE.ID}")].attachTime.first()'
+                    - '$.attachmentSet..[?(@.instanceId == "{$AWS.EC2.INSTANCE.ID}")].attachTime.first()'
                   error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: aws.ec2.get_volumes
+                key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               tags:
                 - tag: component
                   value: volumes
@@ -1576,13 +1595,13 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.volumeId == "{#VOLUME_ID}")].createTime.first()'
+                    - $.createTime
                   error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: aws.ec2.get_volumes
+                key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               tags:
                 - tag: component
                   value: volumes
@@ -1602,16 +1621,39 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.volumeId == "{#VOLUME_ID}")].attachmentSet..[?(@.instanceId == "{$AWS.EC2.INSTANCE.ID}")].device.first()'
+                    - '$.attachmentSet..[?(@.instanceId == "{$AWS.EC2.INSTANCE.ID}")].device.first()'
                   error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 3h
               master_item:
-                key: aws.ec2.get_volumes
+                key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               tags:
                 - tag: component
                   value: volumes
+                - tag: type
+                  value: '{#VOLUME_TYPE}'
+                - tag: volume
+                  value: '{#VOLUME_ID}'
+            - uuid: 6145bf692ea0469eb5583485b6622a59
+              name: 'AWS EBS: ["{#VOLUME_ID}"]: Get volume data'
+              type: DEPENDENT
+              key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get data of the "{#VOLUME_ID}" volume.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.[?(@.volumeId == "{#VOLUME_ID}")].first()'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: aws.ec2.get_volumes
+              tags:
+                - tag: component
+                  value: raw
                 - tag: type
                   value: '{#VOLUME_TYPE}'
                 - tag: volume
@@ -1630,7 +1672,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.[?(@.volumeId == "{#VOLUME_ID}")].status.first()'
+                    - $.status
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
@@ -1642,7 +1684,7 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: aws.ec2.get_volumes
+                key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               tags:
                 - tag: component
                   value: volumes

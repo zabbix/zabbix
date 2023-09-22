@@ -1,0 +1,244 @@
+// Widget view.
+
+div.dashboard-widget-navtree {
+	.navtree {
+		$max_depth: 10;
+
+		@keyframes fadein {
+			from {
+				opacity: 0;
+			}
+			to {
+				opacity: 1;
+			}
+		}
+
+		.tree {
+			.tree-list {
+				.margin-lvl {
+					flex-shrink: 0;
+				}
+
+				&.root > .tree-item > .tree-row > .content > .margin-lvl {
+					width: 15px;
+				}
+
+				> .tree-item.ui-sortable-helper .content {
+					padding-left: 5px;
+				}
+
+				@for $i from 0 through $max_depth {
+					&[data-depth="#{$i}"] > .tree-item {
+						> .tree-row > .content > .margin-lvl {
+							width: $i * 15px + 5px;
+						}
+						&.ui-sortable-helper {
+							margin-left: ($i * 15px + 10px);
+
+							> .tree-row > .content > .margin-lvl {
+								display: none;
+							}
+						}
+					}
+				}
+
+				&[data-depth] .ui-sortable-helper {
+					> .tree-row > .content > .margin-lvl {
+						width: 15px;
+					}
+
+					@for $i from 1 through $max_depth - 1 {
+						$class_tree_list: '.tree-list';
+						@for $j from 1 through $i {
+							@if $j != 1 {
+								$class_tree_list: $class_tree_list + ' .tree-list';
+							}
+						}
+						#{$class_tree_list} > li > .tree-row > .content > .margin-lvl {
+							width: $i * 15px + 15px;
+						}
+					}
+				}
+			}
+
+			.tree-item {
+				.tree-row {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					min-width: 288px;
+					height: 18px;
+					padding: 9px 0;
+					border-bottom: 1px solid $table-border-color;
+
+					&:hover {
+						background-color: $ui-hover-bg-color;
+					}
+
+					.content {
+						position: relative;
+						display: flex;
+						min-width: 0;
+
+						.arrow {
+							flex-shrink: 0;
+							width: 16px;
+							margin-right: 2px;
+
+							> .treeview {
+								display: none;
+							}
+						}
+
+						> .item-name {
+							height: 14px;
+							white-space: nowrap;
+							overflow: hidden;
+							text-overflow: ellipsis;
+						}
+					}
+
+					.problem-icon-list {
+						padding-left: 10px;
+						margin-right: 10px;
+
+						.problem-icon-list-item {
+							border-radius: 2px;
+						}
+					}
+
+					.tools {
+						padding-left: 10px;
+						margin-right: 5px;
+						width: 87px;
+						white-space: nowrap;
+
+						.btn-icon {
+							@extend %button-size-medium;
+
+							&:not(:first-child) {
+								margin-left: 5px;
+							}
+						}
+					}
+				}
+
+				&.is-parent {
+					> .tree-row {
+						> .content {
+							> .arrow {
+								> .treeview {
+									display: block;
+								}
+							}
+						}
+					}
+				}
+
+				&.selected {
+					> .tree-row {
+						@extend %found-bg;
+
+						&:hover {
+							@extend %found-bg;
+						}
+					}
+				}
+
+				&.no-map,
+				&.inaccessible {
+					> .tree-row {
+						> .content {
+							> .item-name {
+								color: $form-border-color;
+							}
+						}
+					}
+				}
+
+				&.ui-sortable-helper {
+					background: $ui-sortable-helper-background-color;
+					border-color: $ui-sortable-helper-border-color;
+					border-width: 1px;
+					border-style: solid;
+
+					.tools {
+						display: none;
+					}
+				}
+
+				&.opened > ul {
+					display: block;
+				}
+
+				&.closed > ul {
+					display: none;
+				}
+
+				.sortable-error {
+					border-color: transparent;
+					background: rgba($red, .2);
+				}
+			}
+
+			.highlighted-parent > .tree-row {
+				background: $ui-highlighted-parent-background-color;
+			}
+
+			.placeholder {
+				background-color: $ui-placeholder-background-color;
+				animation: fadein .5s;
+			}
+		}
+	}
+
+	.treeview {
+		@extend %button-size-small;
+
+		display: inline-block;
+		padding: 0;
+		margin-right: 2px;
+		cursor: pointer;
+		line-height: 16px;
+		text-align: center;
+		border: 0;
+		background-color: transparent;
+
+		.arrow-right {
+			border-left-color: $font-alt-color;
+		}
+
+		.arrow-down {
+			position: relative;
+			top: -1px;
+			border-top-color: $font-alt-color;
+		}
+
+		&:hover,
+		&:focus {
+			.arrow-right {
+				border-left-color: $link-color;
+			}
+
+			.arrow-down {
+				border-top-color: $link-color;
+			}
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-navtree {
+		.navtree {
+			.tree {
+				.tree-item {
+					.tree-row {
+						min-width: 378px;
+					}
+				}
+			}
+		}
+	}
+}

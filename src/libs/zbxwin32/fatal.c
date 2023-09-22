@@ -20,7 +20,7 @@
 #include "zbxwin32.h"
 
 #include "zbxstr.h"
-#include "log.h"
+#include "zbxlog.h"
 
 #include <excpt.h>
 #include <DbgHelp.h>

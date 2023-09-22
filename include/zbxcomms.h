@@ -81,6 +81,8 @@ typedef struct pollfd zbx_pollfd_t;
 
 #endif
 
+void	zbx_tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
+
 int	zbx_socket_had_nonblocking_error(void);
 
 #ifdef _WINDOWS
@@ -143,6 +145,7 @@ typedef struct
 	const char		*server;
 	const int		proxymode;
 	const int		config_timeout;
+	const int		config_trapper_timeout;
 	const char		*config_source_ip;
 }
 zbx_config_comms_args_t;
@@ -164,8 +167,14 @@ typedef struct
 	gnutls_session_t		ctx;
 	gnutls_psk_client_credentials_t	psk_client_creds;
 	gnutls_psk_server_credentials_t	psk_server_creds;
+	unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 #elif defined(HAVE_OPENSSL)
 	SSL				*ctx;
+#if defined(HAVE_OPENSSL_WITH_PSK)
+	char	psk_buf[HOST_TLS_PSK_LEN / 2];
+	int	psk_len;
+	size_t	identity_len;
+#endif
 #endif
 } zbx_tls_context_t;
 #endif
@@ -198,15 +207,51 @@ typedef struct
 }
 zbx_socket_t;
 
+typedef struct
+{
+	size_t		buf_dyn_bytes;
+	size_t		buf_stat_bytes;
+	size_t		offset;
+	zbx_uint64_t	expected_len;
+	zbx_uint64_t	reserved;
+	zbx_uint64_t	max_len;
+	unsigned char	expect;
+	int		protocol_version;
+}
+zbx_tcp_recv_context_t;
+
+#define ZBX_MAX_HEADER_LEN 21
+typedef struct
+{
+	unsigned char	header_buf[ZBX_MAX_HEADER_LEN];
+	size_t		header_len;
+	char		*compressed_data;
+	const char	*data;
+	size_t		send_len;
+	ssize_t		written;
+	ssize_t		written_header;
+}
+zbx_tcp_send_context_t;
+
+#undef ZBX_MAX_HEADER_LEN
+
 const char	*zbx_socket_strerror(void);
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
+int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len);
 #endif
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
+
+void	zbx_socket_clean(zbx_socket_t *s);
+int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout);
+
+int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		const char *server_name, short *event, char **error);
 
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPRESS		0x02
@@ -229,6 +274,10 @@ const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
 		int timeout);
+int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, unsigned char flags,
+		zbx_tcp_send_context_t *context);
+void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state);
+int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event);
 
 void	zbx_tcp_close(zbx_socket_t *s);
 
@@ -249,17 +298,22 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 #define	zbx_tcp_recv_to(s, timeout)		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, 0))
 #define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
-ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len);
-ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len);
+ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events);
+ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
+void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv_context, unsigned char flags);
+ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events);
+
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
 
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode);
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
 int	validate_cidr(const char *ip, const char *cidr, void *value);
 

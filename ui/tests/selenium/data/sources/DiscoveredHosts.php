@@ -126,11 +126,11 @@ class DiscoveredHosts {
 		DBexecute("INSERT INTO hstgrp (groupid, name, flags, uuid, type) VALUES (".zbx_dbstr(self::DISCOVERED_GROUPID2).
 				", ".zbx_dbstr(self::DISCOVERED_GROUP2).", 4, '', 0)"
 		);
-		DBexecute("INSERT INTO group_discovery (groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(".
-				zbx_dbstr(self::DISCOVERED_GROUPID).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP).", '1672831234', 0)"
+		DBexecute("INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(50, ".
+				zbx_dbstr(self::DISCOVERED_GROUPID).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP).", '1672831234', '1677670843')"
 		);
-		DBexecute("INSERT INTO group_discovery (groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(".
-				zbx_dbstr(self::DISCOVERED_GROUPID2).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP2).", '1672831234', 0)"
+		DBexecute("INSERT INTO group_discovery (groupdiscoveryid, groupid, parent_group_prototypeid, name, lastcheck, ts_delete) VALUES(51, ".
+				zbx_dbstr(self::DISCOVERED_GROUPID2).", ".$group_prototypeid.", ".zbx_dbstr(self::DISCOVERED_GROUP2).", '1672831234', '1677670843')"
 		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID).
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".$hostgroupid.")"
@@ -214,7 +214,7 @@ class DiscoveredHosts {
 				'discoveryrules' => [
 					[
 						'name' => 'Template1 discovery rule',
-						'key_' => 'vfs.fs.discovery',
+						'key_' => 'vfs.fs.discovery2',
 						'type' => ITEM_TYPE_TRAPPER
 					]
 				]
@@ -239,7 +239,7 @@ class DiscoveredHosts {
 				'discoveryrules' => [
 					[
 						'name' => 'Template2 discovery rule',
-						'key_' => 'vfs.fs.discovery',
+						'key_' => 'vfs.fs.discovery3',
 						'type' => ITEM_TYPE_TRAPPER
 					]
 				]

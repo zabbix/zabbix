@@ -23,7 +23,7 @@
 #include "../events/events.h"
 
 #include "zbxnix.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "zbxself.h"
 #include "lld_protocol.h"

@@ -1,0 +1,79 @@
+// Widget view.
+
+div.dashboard-widget-map {
+	.sysmap-widget-container {
+		overflow: hidden;
+		height: 100%;
+		display: flex;
+
+		svg {
+			flex-grow: 1;
+		}
+	}
+
+	.btn-back-map-container {
+		text-align: left;
+		position: absolute;
+		left: -1px;
+		max-width: 100%;
+
+		a {
+			&:focus,
+			&:hover {
+				outline: none;
+
+				.btn-back-map {
+					background-color: $btn-back-background-hover;
+					border: $btn-border-color solid 1px;
+
+					.btn-back-map-content {
+						display: inline-block;
+						line-height: 24px;
+						padding: 0 6px 0 0;
+						flex: auto;
+						@extend %overflow-ellipsis;
+					}
+				}
+			}
+		}
+
+		.btn-back-map {
+			border: $ui-border-color solid 1px;
+			border-radius: 0 2px 2px 0;
+			background-color: $btn-back-map-background-color;
+			color: $btn-back-text-color;
+			margin-top: 10px;
+			padding: 0;
+			display: flex;
+			height: 24px;
+			line-height: 24px;
+			vertical-align: middle;
+			text-decoration: none;
+
+			.btn-back-map-content {
+				display: none;
+			}
+
+			.btn-back-map-icon {
+				margin-left: 5px;
+				display: inline-block;
+				flex: 1 0 auto;
+				width: 28px;
+				height: 24px;
+				vertical-align: middle;
+			}
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-map {
+		.btn-back-map-container {
+			a {
+				border-bottom: 0;
+			}
+		}
+	}
+}

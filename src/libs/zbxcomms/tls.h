@@ -24,10 +24,10 @@
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, char **error);
+		const char *server_name, short *event, char **error);
 int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error);
-ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error);
-ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error);
+ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error);
+ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error);
 void	zbx_tls_close(zbx_socket_t *s);
 #endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 

@@ -25,9 +25,9 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CMacrosResolverHelper,
+	CNumberParser,
 	CSettingsHelper,
 	CUrl,
-	CValueMapHelper,
 	Manager;
 
 use Widgets\Item\Widget;
@@ -57,6 +57,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$units = '';
 		$decimals = null;
 		$last_value = null;
+		$is_binary_units = true;
 
 		$options = [
 			'output' => ['value_type'],
@@ -117,7 +118,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$options['output'] = array_merge($options['output'], ['itemid', 'hostid']);
 			}
 
-			if ($this->fields_values['units_show'] == 1 && $this->fields_values['units'] === '') {
+			if ($this->fields_values['units_show'] != 1 || $this->fields_values['units'] === '') {
 				$options['output'][] = 'units';
 			}
 		}
@@ -152,12 +153,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$prev_value = array_key_exists(1, $history[$itemid]) ? $history[$itemid][1]['value'] : null;
 
 				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
+					$time = date(DATE_TIME_FORMAT_SECONDS, (int) $history[$itemid][0]['clock']);
 				}
 
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
+						$item_units = $this->fields_values['units_show'] == 1 && $this->fields_values['units'] !== ''
+							? $this->fields_values['units']
+							: $item['units'];
+
+						$is_binary_units = isBinaryUnits($item_units);
+
 						if ($this->fields_values['units_show'] == 1) {
 							if ($this->fields_values['units'] !== '') {
 								$item['units'] = $this->fields_values['units'];
@@ -222,7 +229,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				// Since there is no value, we can still show time.
 				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = date(ZBX_FULL_DATE_TIME);
+					$time = date(DATE_TIME_FORMAT_SECONDS);
 				}
 			}
 
@@ -243,15 +250,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			 */
 			if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 				// Overwrite item name with the custom description.
-				$items[$itemid]['name'] = $this->fields_values['description'];
+				$items[$itemid]['widget_description'] = $this->fields_values['description'];
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
 				if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
-					$items = CMacrosResolverHelper::resolveWidgetItemNames($items);
+					$items = CMacrosResolverHelper::resolveItemWidgetDescriptions($items);
 				}
 
 				// All macros in item name are resolved here.
-				$description = $items[$itemid]['name'];
+				$description = $items[$itemid]['widget_description'];
 			}
 
 			$cells = self::arrangeByCells($this->fields_values, [
@@ -283,8 +290,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$bg_color = $this->fields_values['bg_color'];
 
 		if ($last_value !== null) {
+			$number_parser = new CNumberParser([
+				'with_size_suffix' => true,
+				'with_time_suffix' => true,
+				'is_binary_size' => $is_binary_units
+			]);
+
 			foreach ($this->fields_values['thresholds'] as $threshold) {
-				if ($threshold['threshold_value'] > $last_value) {
+				$number_parser->parse($threshold['threshold']);
+
+				$threshold_value = $number_parser->calcValue();
+
+				if ($threshold_value > $last_value) {
 					break;
 				}
 

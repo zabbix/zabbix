@@ -781,10 +781,10 @@ func findFirstMatch(src string, reg *regexp.Regexp) (res string) {
 }
 
 func getName() (name string, err error) {
-	if readFile, err := os.Open(swOSNameRelease); err == nil {
-		defer readFile.Close()
+	if readTextLineFromFile, err := os.Open(swOSNameRelease); err == nil {
+		defer readTextLineFromFile.Close()
 
-		fileScanner := bufio.NewScanner(readFile)
+		fileScanner := bufio.NewScanner(readTextLineFromFile)
 		fileScanner.Split(bufio.ScanLines)
 
 		regexQuoted := regexp.MustCompile(swOSOptionPrettyName + "=\"([^\"]+)\"")

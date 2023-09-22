@@ -28,16 +28,16 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldMultiSelectUserView($data['fields']['userids'], $data['captions']['ms']['users']['userids'])
+		new CWidgetFieldMultiSelectUserView($data['fields']['userids'], $data['captions']['users']['userids'])
 	)
 	->addField(
 		new CWidgetFieldMultiSelectActionView($data['fields']['actionids'],
-			$data['captions']['ms']['actions']['actionids']
+			$data['captions']['actions']['actionids']
 		)
 	)
 	->addField(
 		new CWidgetFieldMultiSelectMediaTypeView($data['fields']['mediatypeids'],
-			$data['captions']['ms']['media_types']['mediatypeids']
+			$data['captions']['media_types']['mediatypeids']
 		)
 	)
 	->addField(

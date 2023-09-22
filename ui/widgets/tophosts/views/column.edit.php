@@ -30,12 +30,10 @@ $form = (new CForm())
 	->setName('tophosts_column')
 	->addStyle('display: none;')
 	->addVar('action', $data['action'])
-	->addVar('update', 1)
-	->addItem(
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	);
+	->addVar('update', 1);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = new CFormGrid();
 
@@ -47,7 +45,7 @@ if (array_key_exists('edit', $data)) {
 
 // Name.
 $form_grid->addItem([
-	new CLabel(_('Name'), 'name'),
+	(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 	new CFormField(
 		(new CTextBox('name', $data['name'], false))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -258,9 +256,7 @@ $thresholds = (new CDiv(
 		->setHeader($header_row)
 		->setFooter(new CRow(
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-add')
+				(new CButtonLink(_('Add')))->addClass('element-table-add')
 			))->setColSpan(count($header_row))
 		))
 ))

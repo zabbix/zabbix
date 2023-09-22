@@ -130,7 +130,7 @@
 			}
 		});
 
-		$('#delayFlexTable').dynamicRows({template: '#delayFlexRow'});
+		$('#delayFlexTable').dynamicRows({template: '#delayFlexRow', allow_empty: true});
 
 		new CViewSwitcher('authtype', 'change', item_form.field_switches.for_authtype);
 
@@ -146,7 +146,7 @@
 
 		$("#key").on('keyup change', updateItemFormElements);
 
-		$('#parameters_table').dynamicRows({template: '#parameters_table_row'});
+		$('#parameters_table').dynamicRows({template: '#parameters_table_row', allow_empty: true});
 
 		const item_interface_types = item_form.interface_types;
 		const interface_ids_by_types = {};

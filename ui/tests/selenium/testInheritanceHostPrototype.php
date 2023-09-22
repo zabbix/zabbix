@@ -66,16 +66,16 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.
-					'SELECT hostid'.
-					' FROM items'.
-					' WHERE templateid IS NOT NULL'.
-					' AND name='.zbx_dbstr($data['discovery']).
+						'SELECT hostid'.
+						' FROM items'.
+						' WHERE templateid IS NOT NULL'.
+						' AND name='.zbx_dbstr($data['discovery']).
 				')'
 		);
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="0"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//ul[@id="interfaces_'.$interface.'_useip"]//input[@value="1"][@disabled]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="proxy_hostid"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//input[@id="proxyid"][@readonly]');
 
 		// Check layout at Groups tab.
 		$this->zbxTestAssertElementPresentXpath('//div[@id="group_links_"]//ul[@class="multiselect-list disabled"]');
@@ -214,24 +214,24 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 	 */
 	private function sqlForHostPrototypeCompare($data) {
 		$sql = 'SELECT host, status, name, ipmi_authtype,'.
-				' ipmi_privilege, ipmi_username, ipmi_password,'.
-				' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
-				' tls_psk_identity, tls_psk, auto_compress, flags'.
-				' FROM hosts'.
-				' WHERE flags=2 AND hostid IN ('.
-					'SELECT hostid'.
-					' FROM host_discovery'.
-					' WHERE parent_itemid IN ('.
-						'SELECT itemid'.
-						' FROM items'.
-						' WHERE hostid in ('.
+						' ipmi_privilege, ipmi_username, ipmi_password,'.
+						' description, tls_connect, tls_accept, tls_issuer, tls_subject,'.
+						' tls_psk_identity, tls_psk, flags'.
+						' FROM hosts'.
+						' WHERE flags=2 AND hostid IN ('.
 							'SELECT hostid'.
-							' FROM hosts'.
-							' WHERE host='.zbx_dbstr($data).
+							' FROM host_discovery'.
+							' WHERE parent_itemid IN ('.
+								'SELECT itemid'.
+								' FROM items'.
+								' WHERE hostid in ('.
+									'SELECT hostid'.
+									' FROM hosts'.
+									' WHERE host='.zbx_dbstr($data).
+								')'.
+							')'.
 						')'.
-					')'.
-				')'.
-				' ORDER BY host, name';
+						' ORDER BY host, name';
 
 		return CDBHelper::getHash($sql);
 	}
@@ -362,7 +362,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$this->assertEquals($prototype_on_template, $prototype_on_host);
 	}
 
-		public static function getCloneData() {
+	public static function getCloneData() {
 		return [
 			[
 				[
@@ -411,7 +411,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'create_enabled' => true,
 					'hostgroup' => 'Hypervisors',
 					'group_prototype' => 'Clone group prototype {#CLONE_GROUP_PROTO}',
-					'template' => 'macOS',
+					'template' => 'macOS by Zabbix agent',
 					'inventory' => 'Manual',
 					'check_form' => true
 				]
@@ -441,7 +441,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Change groups.
 		if (array_key_exists('hostgroup', $data) || array_key_exists('group_prototype', $data)) {
 			if (array_key_exists('hostgroup', $data)) {
-				$this->zbxTestClickXpathWait('//span[@class="subfilter-disable-btn"]');
+				$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
 				$this->zbxTestMultiselectClear('group_links_');
 				$this->zbxTestClickButtonMultiselect('group_links_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');
@@ -580,7 +580,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		);
 	}
 
-		public static function getDeleteData() {
+	public static function getDeleteData() {
 		return [
 			[
 				[

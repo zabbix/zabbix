@@ -779,7 +779,7 @@ abstract class CGraphGeneral extends CApiService {
 		}
 		unset($graph);
 
-		$this->validateHostsAndTemplates($graphs);
+		$this->checkDuplicates($graphs);
 	}
 
 	/**
@@ -1004,75 +1004,15 @@ abstract class CGraphGeneral extends CApiService {
 			$this->checkAxisItems($graph);
 		}
 
-		$this->validateHostsAndTemplates($graphs);
+		static::checkDuplicates($graphs);
 	}
 
 	/**
-	 * Check if graph already exists somewhere in DB.
-	 *
 	 * @param array $graphs
+	 *
+	 * @throws APIException
 	 */
-	protected function validateHostsAndTemplates(array $graphs) {
-		$graphNames = [];
-
-		foreach ($graphs as $graph) {
-			// check if the host has any graphs in DB with the same name within host
-			$hostsAndTemplates = API::Host()->get([
-				'itemids' => zbx_objectValues($graph['gitems'], 'itemid'),
-				'output' => ['hostid'],
-				'nopermissions' => true,
-				'preservekeys' => true,
-				'templated_hosts' => true
-			]);
-
-			$hostAndTemplateIds = array_keys($hostsAndTemplates);
-
-			$dbGraphs = API::Graph()->get([
-				'hostids' => $hostAndTemplateIds,
-				'output' => ['graphid'],
-				'filter' => ['name' => $graph['name'], 'flags' => null], // 'flags' => null overrides default behaviour
-				'nopermissions' => true
-			]);
-
-			if ($dbGraphs) {
-				$duplicateGraphsFound = false;
-
-				if (isset($graph['graphid'])) {
-					foreach ($dbGraphs as $dbGraph) {
-						if (bccomp($dbGraph['graphid'], $graph['graphid']) != 0) {
-							$duplicateGraphsFound = true;
-							break;
-						}
-					}
-				}
-				else {
-					$duplicateGraphsFound = true;
-				}
-
-				if ($duplicateGraphsFound) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Graph with name "%1$s" already exists in graphs or graph prototypes.', $graph['name'])
-					);
-				}
-			}
-
-			// checks that there are no two graphs with the same name within host
-			foreach ($hostAndTemplateIds as $id) {
-				if (!isset($graphNames[$graph['name']])) {
-					$graphNames[$graph['name']] = [];
-				}
-
-				if (isset($graphNames[$graph['name']][$id])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('More than one graph with name "%1$s" within host.', $graph['name'])
-					);
-				}
-				else {
-					$graphNames[$graph['name']][$id] = true;
-				}
-			}
-		}
-	}
+	abstract protected static function checkDuplicates(array $graphs): void;
 
 	/**
 	 * Returns visible host name. Can be used for error reporting.

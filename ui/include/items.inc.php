@@ -399,353 +399,6 @@ function interfaceIdsByType(array $interfaces) {
 }
 
 /**
- * Create copies of items from the given sources to the given destination hosts or templates.
- *
- * If source type is 'templateids' or 'hostids', only non-inherited items are copied.
- *
- * If source type is 'itemids', all the given items are copied.
- *
- * @param string $src_type
- * @param array  $src_ids
- * @param bool   $dst_is_template
- * @param array  $dst_hostids
- *
- * @return bool
- */
-function copyItemsToHosts(string $src_type, array $src_ids, bool $dst_is_template, array $dst_hostids): bool {
-	$options = in_array($src_type, ['templateids', 'hostids']) ? ['inherited' => false] : [];
-
-	if ($src_type === 'hostids') {
-		$options['filter'] = ['flags' => ZBX_FLAG_DISCOVERY_NORMAL];
-	}
-
-	$src_items = API::Item()->get([
-		'output' => ['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-			'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status',
-
-			// Type fields.
-			// The fields used for multiple item types.
-			'interfaceid', 'authtype', 'username', 'password', 'params', 'timeout', 'delay', 'trapper_hosts',
-
-			// Dependent item type specific fields.
-			'master_itemid',
-
-			// HTTP Agent item type specific fields.
-			'url', 'query_fields', 'request_method', 'post_type', 'posts',
-			'headers', 'status_codes', 'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy',
-			'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'allow_traps',
-
-			// IPMI item type specific fields.
-			'ipmi_sensor',
-
-			// JMX item type specific fields.
-			'jmx_endpoint',
-
-			// Script item type specific fields.
-			'parameters',
-
-			// SNMP item type specific fields.
-			'snmp_oid',
-
-			// SSH item type specific fields.
-			'publickey', 'privatekey'
-		],
-		'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
-		'selectTags' => ['tag', 'value'],
-		$src_type => $src_ids,
-		'preservekeys' => true
-	] + $options);
-
-	if (!$src_items) {
-		return true;
-	}
-
-	$src_itemids = array_fill_keys(array_keys($src_items), true);
-	$src_valuemapids = [];
-	$src_interfaceids = [];
-	$src_dep_items = [];
-	$dep_itemids = [];
-
-	foreach ($src_items as $itemid => $item) {
-		if ($item['valuemapid'] != 0) {
-			$src_valuemapids[$item['valuemapid']] = true;
-		}
-
-		if ($item['interfaceid'] != 0) {
-			$src_interfaceids[$item['interfaceid']] = true;
-		}
-
-		if ($item['type'] == ITEM_TYPE_DEPENDENT) {
-			if (array_key_exists($item['master_itemid'], $src_itemids)) {
-				$src_dep_items[$item['master_itemid']][] = $item;
-
-				unset($src_items[$itemid]);
-			}
-			else {
-				$dep_itemids[$item['master_itemid']][] = $item['itemid'];
-			}
-		}
-	}
-
-	$valuemap_links = [];
-
-	if ($src_valuemapids) {
-		$src_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => array_keys($src_valuemapids)
-		]);
-
-		$dst_valuemaps = API::ValueMap()->get([
-			'output' => ['valuemapid', 'hostid', 'name'],
-			'hostids' => $dst_hostids,
-			'filter' => ['name' => array_unique(array_column($src_valuemaps, 'name'))]
-		]);
-
-		$dst_valuemapids = [];
-
-		foreach ($dst_valuemaps as $dst_valuemap) {
-			$dst_valuemapids[$dst_valuemap['name']][$dst_valuemap['hostid']] = $dst_valuemap['valuemapid'];
-		}
-
-		foreach ($src_valuemaps as $src_valuemap) {
-			if (array_key_exists($src_valuemap['name'], $dst_valuemapids)) {
-				foreach ($dst_valuemapids[$src_valuemap['name']] as $dst_hostid => $dst_valuemapid) {
-					$valuemap_links[$src_valuemap['valuemapid']][$dst_hostid] = $dst_valuemapid;
-				}
-			}
-		}
-	}
-
-	$interface_links = [];
-	$dst_interfaceids = [];
-
-	if (!$dst_is_template) {
-		$src_interfaces = [];
-
-		if ($src_interfaceids) {
-			$src_hosts = API::Host()->get([
-				'output' => [],
-				'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
-				$src_type => $src_ids
-			]);
-
-			foreach ($src_hosts as $src_host) {
-				foreach ($src_host['interfaces'] as $src_interface) {
-					if (array_key_exists($src_interface['interfaceid'], $src_interfaceids)) {
-						$src_interfaces[$src_interface['interfaceid']] =
-							array_diff_key($src_interface, array_flip(['interfaceid']));
-					}
-				}
-			}
-		}
-
-		$dst_hosts = API::Host()->get([
-			'output' => ['hostid'],
-			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip', 'ip', 'dns', 'port', 'details'],
-			'hostids' => $dst_hostids
-		]);
-
-		foreach ($dst_hosts as $dst_host) {
-			foreach ($dst_host['interfaces'] as $dst_interface) {
-				$dst_interfaceid = $dst_interface['interfaceid'];
-				unset($dst_interface['interfaceid']);
-
-				foreach ($src_interfaces as $src_interfaceid => $src_interface) {
-					if ($src_interface == $dst_interface) {
-						$interface_links[$src_interfaceid][$dst_host['hostid']] = $dst_interfaceid;
-					}
-				}
-
-				if ($dst_interface['main'] == INTERFACE_PRIMARY) {
-					$dst_interfaceids[$dst_host['hostid']][$dst_interface['type']] = $dst_interfaceid;
-				}
-			}
-		}
-	}
-
-	$master_item_links = [];
-
-	if ($dep_itemids) {
-		$master_items = API::Item()->get([
-			'output' => ['itemid', 'key_'],
-			'itemids' => array_keys($dep_itemids),
-			'webitems' => true
-		]);
-
-		$options = $dst_is_template ? ['templateids' => $dst_hostids] : ['hostids' => $dst_hostids];
-
-		$dst_master_items = API::Item()->get([
-			'output' => ['itemid', 'hostid', 'key_'],
-			'filter' => ['key_' => array_unique(array_column($master_items, 'key_'))],
-			'webitems' => true
-		] + $options);
-
-		$dst_master_itemids = [];
-
-		foreach ($dst_master_items as $item) {
-			$dst_master_itemids[$item['hostid']][$item['key_']] = $item['itemid'];
-		}
-
-		foreach ($master_items as $item) {
-			foreach ($dst_hostids as $dst_hostid) {
-				if (array_key_exists($dst_hostid, $dst_master_itemids)
-						&& array_key_exists($item['key_'], $dst_master_itemids[$dst_hostid])) {
-					$master_item_links[$item['itemid']][$dst_hostid] = $dst_master_itemids[$dst_hostid][$item['key_']];
-				}
-				else {
-					$src_itemid = reset($dep_itemids[$item['itemid']]);
-
-					error(_s('Cannot copy item with key "%1$s" without its master item with key "%2$s".',
-						$src_items[$src_itemid]['key_'], $item['key_']
-					));
-
-					return false;
-				}
-			}
-		}
-	}
-
-	do {
-		$dst_items = [];
-
-		if (!$dst_hostids) {
-			return true;
-		}
-
-		foreach ($dst_hostids as $dst_hostid) {
-			foreach ($src_items as $src_item) {
-				$dst_item = array_diff_key($src_item, array_flip(['itemid']));
-
-				if ($src_item['valuemapid'] != 0) {
-					if (array_key_exists($src_item['valuemapid'], $valuemap_links)
-							&& array_key_exists($dst_hostid, $valuemap_links[$src_item['valuemapid']])) {
-						$dst_item['valuemapid'] = $valuemap_links[$src_item['valuemapid']][$dst_hostid];
-					}
-					else {
-						$dst_item['valuemapid'] = 0;
-					}
-				}
-
-				$dst_item['interfaceid'] = 0;
-
-				if (!$dst_is_template) {
-					if (array_key_exists($src_item['interfaceid'], $interface_links)
-							&& array_key_exists($dst_hostid, $interface_links[$src_item['interfaceid']])) {
-						$dst_item['interfaceid'] = $interface_links[$src_item['interfaceid']][$dst_hostid];
-					}
-					else {
-						$type = itemTypeInterface($src_item['type']);
-
-						if (in_array($type,
-							[INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI]
-						)) {
-							if (array_key_exists($dst_hostid, $dst_interfaceids)
-									&& array_key_exists($type, $dst_interfaceids[$dst_hostid])) {
-								$dst_item['interfaceid'] = $dst_interfaceids[$dst_hostid][$type];
-							}
-							else {
-								$hosts = API::Host()->get([
-									'output' => ['host'],
-									'hostids' => $dst_hostid
-								]);
-
-								error(_s('Cannot find host interface on "%1$s" for item with key "%2$s".',
-									$hosts[0]['host'], $src_item['key_']
-								));
-
-								return false;
-							}
-						}
-					}
-				}
-
-				if ($src_item['type'] == ITEM_TYPE_DEPENDENT) {
-					$dst_item['master_itemid'] = $master_item_links[$src_item['master_itemid']][$dst_hostid];
-				}
-
-				$dst_items[] = ['hostid' => $dst_hostid] + $dst_item;
-			}
-		}
-
-		$response = API::Item()->create($dst_items);
-
-		if ($response === false) {
-			return false;
-		}
-
-		$_src_items = [];
-
-		if ($src_dep_items) {
-			foreach ($dst_hostids as $dst_hostid) {
-				foreach ($src_items as $src_item) {
-					$dst_itemid = array_shift($response['itemids']);
-
-					if (array_key_exists($src_item['itemid'], $src_dep_items)) {
-						$master_item_links[$src_item['itemid']][$dst_hostid] = $dst_itemid;
-
-						$_src_items = array_merge($_src_items, $src_dep_items[$src_item['itemid']]);
-						unset($src_dep_items[$src_item['itemid']]);
-					}
-				}
-			}
-		}
-
-		$src_items = $_src_items;
-	} while ($src_items);
-
-	return true;
-}
-
-/**
- * Description:
- * Replace items for specified host
- *
- * Comments:
- * $error= true : rise Error if item doesn't exist (error generated), false: special processing (NO error generated)
- */
-function get_same_item_for_host($item, $dest_hostids) {
-	$return_array = is_array($dest_hostids);
-	zbx_value2array($dest_hostids);
-
-	if (!is_array($item)) {
-		$itemid = $item;
-	}
-	elseif (isset($item['itemid'])) {
-		$itemid = $item['itemid'];
-	}
-
-	$same_item = null;
-	$same_items = [];
-
-	if (isset($itemid)) {
-		$db_items = DBselect(
-			'SELECT src.*'.
-			' FROM items src,items dest'.
-			' WHERE dest.itemid='.zbx_dbstr($itemid).
-				' AND src.key_=dest.key_'.
-				' AND '.dbConditionInt('src.hostid', $dest_hostids)
-		);
-		while ($db_item = DBfetch($db_items)) {
-			if (is_array($item)) {
-				$same_item = $db_item;
-				$same_items[$db_item['itemid']] = $db_item;
-			}
-			else {
-				$same_item = $db_item['itemid'];
-				$same_items[$db_item['itemid']] = $db_item['itemid'];
-			}
-		}
-		if ($return_array) {
-			return $same_items;
-		}
-		else {
-			return $same_item;
-		}
-	}
-	return false;
-}
-
-/**
  * Get parent templates for each given item.
  *
  * @param array  $items                  An array of items.
@@ -1343,7 +996,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 		$css = CSeverityHelper::getStyle((int) $trigger['priority']);
 
 		if ($trigger['problem']['acknowledged'] == 1) {
-			$ack = [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)];
+			$ack = [' ', (new CSpan())->addClass(ZBX_ICON_CHECK)];
 		}
 	}
 
@@ -1412,6 +1065,15 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 				];
 			}
 
+			if ($item['units'] === 's' && array_key_exists('decimals', $convert_options)
+					&& $convert_options['decimals'] != 0) {
+				return [
+					'value' => convertUnitSWithDecimals($value, false, $convert_options['decimals'], true),
+					'units' => '',
+					'is_mapped' => false
+				];
+			}
+
 			$converted_value = convertUnitsRaw([
 				'value' => $value,
 				'units' => $item['units']
@@ -1457,33 +1119,86 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 }
 
 /**
+ * Converts seconds to the biggest unit of measure with decimals.
+ *
+ * @param int|float|string  $value            Time period in seconds
+ * @param bool              $ignore_millisec  Ignores milliseconds
+ * @param int               $decimals         Max number of first non-zero decimals to display
+ * @param bool              $decimals_exact   Display exactly this number of decimals instead of first non-zeros
+ *
+ * @return string
+ */
+function convertUnitSWithDecimals($value, bool $ignore_millisec = false, int $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		bool $decimals_exact = false): string {
+	$value = (float)$value;
+	$part = '';
+	$result = 0;
+
+	foreach ([
+		'y' => SEC_PER_YEAR,
+		'M' => SEC_PER_MONTH,
+		'd' => SEC_PER_DAY,
+		'h' => SEC_PER_HOUR,
+		'm' => SEC_PER_MIN,
+		's' => 1
+	] as $key => $sec_per_part) {
+		if (floor($value / $sec_per_part) > 0) {
+			$part = $key;
+			$result = $value / $sec_per_part;
+			break;
+		}
+	}
+
+	if ($part === '' && $ignore_millisec) {
+		$part = 's';
+		$result = $value;
+	}
+	elseif ($part === '') {
+		$part = 'ms';
+		$result = $value * 1000;
+	}
+
+	return formatFloat($result, ['decimals' => $decimals, 'decimals_exact' => $decimals_exact]).$part;
+}
+
+/**
+ * Check whether the unit of an item is binary or not.
+ *
+ * @param string $units
+ *
+ * @return bool
+ */
+function isBinaryUnits(string $units): bool {
+	return $units === 'B' || $units === 'Bps';
+}
+
+/**
  * Retrieves from DB historical data for items and applies functional calculations.
- * If fails for some reason, returns UNRESOLVED_MACRO_STRING.
+ * If fails for some reason, returns null.
  *
  * @param array		$item
- * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
  * @param string	$item['itemid']		ID of item
- * @param string	$item['units']		units of item
+ * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
  * @param string	$function			function to apply to time period from param, allowed: min, max and avg
  * @param string	$parameter			formatted parameter for function, example: "2w" meaning 2 weeks
  *
- * @return string item functional value from history
+ * @return string|null item functional value from history
  */
 function getItemFunctionalValue($item, $function, $parameter) {
 	// Check whether function is allowed and parameter is specified.
 	if (!in_array($function, ['min', 'max', 'avg']) || $parameter === '') {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	// Check whether item type is allowed for min, max and avg functions.
 	if ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
 	if ($number_parser->parse($parameter) != CParser::PARSE_SUCCESS) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
 	$parameter = $number_parser->calcValue();
@@ -1491,17 +1206,10 @@ function getItemFunctionalValue($item, $function, $parameter) {
 	$time_from = time() - $parameter;
 
 	if ($time_from < 0 || $time_from > ZBX_MAX_DATE) {
-		return UNRESOLVED_MACRO_STRING;
+		return null;
 	}
 
-	$result = Manager::History()->getAggregatedValue($item, $function, $time_from);
-
-	if ($result !== null) {
-		return convertUnits(['value' => $result, 'units' => $item['units']]);
-	}
-	else {
-		return UNRESOLVED_MACRO_STRING;
-	}
+	return Manager::History()->getAggregatedValue($item, $function, $time_from);
 }
 
 /**
@@ -2357,6 +2065,105 @@ function prepareItemTags(array $tags): array {
 }
 
 /**
+ * Format LLD macro paths received via form for API input.
+ *
+ * @param array $macro_paths  Array of LLD macro paths, as received from form submit.
+ *
+ * @return array
+ */
+function prepareLldMacroPaths(array $macro_paths): array {
+	foreach ($macro_paths as $i => &$macro_path) {
+		if ($macro_path['lld_macro'] === '' && $macro_path['path'] === '') {
+			unset($macro_paths[$i]);
+			continue;
+		}
+
+		$macro_path['lld_macro'] = mb_strtoupper($macro_path['lld_macro']);
+	}
+	unset($macro_path);
+
+	return array_values($macro_paths);
+}
+
+/**
+ * Format LLD rule filter data received via form for API input.
+ *
+ * @param array $filter  Array of LLD filters, as received from form submit.
+ *
+ * @return array
+ */
+function prepareLldFilter(array $filter): array {
+	foreach ($filter['conditions'] as $i => &$condition) {
+		if ($condition['macro'] === '' && $condition['value'] === '') {
+			unset($filter['conditions'][$i]);
+			continue;
+		}
+
+		$condition['macro'] = mb_strtoupper($condition['macro']);
+
+		if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			$condition['formulaid'] = '';
+		}
+	}
+	unset($condition);
+
+	$filter['conditions'] = array_values($filter['conditions']);
+
+	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
+		$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+		$filter['formula'] = '';
+
+		if ($filter['conditions']) {
+			$filter['conditions'][0]['formulaid'] = '';
+		}
+	}
+
+	if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+		$filter['formula'] = '';
+	}
+
+	return $filter;
+}
+
+/**
+ * Format LLD rule overrides data received via form for API input.
+ *
+ * @param array      $overrides             Array of LLD overrides, as received from form submit.
+ * @param array|null $db_item
+ * @param array      $db_item['overrides']
+ *
+ * @return array
+ */
+function prepareLldOverrides(array $overrides, ?array $db_item): array {
+	$db_overrides = $db_item !== null && $overrides ? array_column($db_item['overrides'], null, 'step') : [];
+
+	foreach ($overrides as &$override) {
+		if (!array_key_exists($override['step'], $db_overrides)
+				&& !array_key_exists('conditions', $override['filter'])) {
+			unset($override['filter']);
+		}
+		elseif (!array_key_exists('conditions', $override['filter'])) {
+			$override['filter']['conditions'] = [];
+		}
+
+		if (array_key_exists('filter', $override)) {
+			$override['filter'] = prepareLldFilter([
+				'evaltype' => $override['filter']['evaltype'],
+				'formula' => $override['filter']['formula'],
+				'conditions' => $override['filter']['conditions']
+			]);
+		}
+
+		if (!array_key_exists('operations', $override)) {
+			$override['operations'] = [];
+		}
+	}
+	unset($override);
+
+	return $overrides;
+}
+
+/**
  * Format query fields received via form for API input.
  *
  * @param array $query_fields
@@ -2482,6 +2289,22 @@ function getMainItemFieldNames(array $input): array {
 			else {
 				return ['history', 'trends', 'inventory_link', 'description', 'status', 'tags'];
 			}
+
+		case ZBX_FLAG_DISCOVERY_RULE:
+			if ($input['templateid'] == 0) {
+				$field_names = ['name', 'type', 'key_', 'lifetime', 'description', 'status', 'preprocessing',
+					'lld_macro_paths', 'overrides'
+				];
+			}
+			else {
+				$field_names = ['lifetime', 'description', 'status'];
+			}
+
+			if (array_key_exists('itemid', $input) || $input['filter']['conditions']) {
+				$field_names[] = 'filter';
+			}
+
+			return $field_names;
 
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 			if ($input['templateid'] == 0) {
@@ -2649,4 +2472,51 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 
 		return true;
 	});
+}
+
+/**
+ * Apply sorting for discovery rule filter or override filter conditions, if appropriate.
+ * Prioritization by non/exist operator applied between matching macros.
+ *
+ * @param array $conditions
+ * @param int   $evaltype
+ *
+ * @return array
+ */
+function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
+	switch ($evaltype) {
+		case CONDITION_EVAL_TYPE_AND_OR:
+		case CONDITION_EVAL_TYPE_AND:
+		case CONDITION_EVAL_TYPE_OR:
+			usort($conditions, static function(array $condition_a, array $condition_b): int {
+				$comparison = strnatcasecmp($condition_a['macro'], $condition_b['macro']);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				$exist_operators = [CONDITION_OPERATOR_NOT_EXISTS, CONDITION_OPERATOR_EXISTS];
+
+				$comparison = (int) in_array($condition_b['operator'], $exist_operators)
+					- (int) in_array($condition_a['operator'], $exist_operators);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				return strnatcasecmp($condition_a['value'], $condition_b['value']);
+			});
+
+			foreach ($conditions as $i => &$condition) {
+				$condition['formulaid'] = num2letter($i);
+			}
+			unset($condition);
+			break;
+
+		case CONDITION_EVAL_TYPE_EXPRESSION:
+			CArrayHelper::sort($conditions, ['formulaid']);
+			break;
+	}
+
+	return array_values($conditions);
 }

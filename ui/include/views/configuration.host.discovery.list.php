@@ -92,7 +92,7 @@ $filter_column1 = (new CFormList())
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -357,7 +357,7 @@ if ($data['context'] === 'host') {
 			'content' => (new CSimpleButton(_('Execute now')))
 				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		]
 	];

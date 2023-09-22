@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
  * @onBefore prepareGraphPrototypesData
  *
  * @onAfter clearData
+ *
+ * @dataSource WebScenarios
  */
 class testFormGraphPrototype extends testFormGraphs {
 
@@ -184,7 +186,8 @@ class testFormGraphPrototype extends testFormGraphs {
 						]
 					],
 					'details' => [
-						'Graph with name "Duplicated graph prototype" already exists in graphs or graph prototypes.'
+						'Graph prototype "Duplicated graph prototype" already exists on the LLD rule with '.
+								'key "discovery-rule-form" of the host "Simple form test host".'
 					]
 				]
 			],
@@ -248,7 +251,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Response code for step "step 1 of scenario 1" of scenario "Template_Web_scenario".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',
@@ -513,7 +516,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Failed step of scenario "Scenario for Update".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -521,7 +524,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
+							'item' => 'Failed step of scenario "Scenario for Delete".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Simple',
@@ -541,7 +544,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					],
 					'items' => [
 						[
-							'item' => 'Response code for step "testFormWeb3" of scenario "testFormWeb3".',
+							'item' => 'Response code for step "step 2 of clone scenario" of scenario "Scenario for Clone".',
 							'color'=> 'AB47BC',
 							'functions' => [
 								'type' => 'Simple',
@@ -549,7 +552,7 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						],
 						[
-							'item' => 'Response code for step "testFormWeb4" of scenario "testFormWeb4".',
+							'item' => 'Download speed for scenario "Scenario for Update".',
 							'color'=> 'FFA000',
 							'functions' => [
 								'type' => 'Graph sum',

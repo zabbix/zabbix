@@ -36,7 +36,8 @@ window.connector_edit_popup = new class {
 
 		jQuery('#tags').dynamicRows({
 			template: '#tag-row-tmpl',
-			rows: tags
+			rows: tags,
+			allow_empty: true
 		});
 
 		for (const id of ['tags', 'authtype', 'max_records_mode']) {
@@ -90,7 +91,7 @@ window.connector_edit_popup = new class {
 		this._post(curl.getUrl(), {connectorids: [this.connectorid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

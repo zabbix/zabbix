@@ -39,7 +39,7 @@ $host_form = (new CForm())
 	->addVar('hostid', $data['hostid'])
 	->addVar('clone_hostid', $data['clone_hostid'])
 	->addVar('clone', $data['clone'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Host tab.
 $discovered_by = null;
@@ -118,11 +118,9 @@ if ($data['host']['parentTemplates']) {
 	foreach ($data['host']['parentTemplates'] as $template) {
 		if ($data['allowed_ui_conf_templates']
 				&& array_key_exists($template['templateid'], $data['editable_templates'])) {
-			$template_link = (new CLink($template['name'],
-				(new CUrl('templates.php'))
-					->setArgument('form','update')
-					->setArgument('templateid', $template['templateid'])
-			))->setTarget('_blank');
+			$template_link = (new CLink($template['name']))
+				->addClass('js-edit-linked-template')
+				->setAttribute('data-templateid', $template['templateid']);
 		}
 		else {
 			$template_link = new CSpan($template['name']);
@@ -144,14 +142,11 @@ if ($data['host']['parentTemplates']) {
 			(new CCol(
 				($template['link_type'] == TEMPLATE_LINK_MANUAL)
 					? new CHorList([
-						(new CSimpleButton(_('Unlink')))
-							->onClick('host_edit.unlinkTemplate(this)')
-							->addClass(ZBX_STYLE_BTN_LINK),
+						(new CButtonLink(_('Unlink')))->onClick('host_edit.unlinkTemplate(this)'),
 						($data['clone_hostid'] === null)
-							? (new CSimpleButton(_('Unlink and clear')))
+							? (new CButtonLink(_('Unlink and clear')))
 								->setAttribute('data-templateid', $template['templateid'])
 								->onClick('host_edit.unlinkAndClearTemplate(this, this.dataset.templateid)')
-								->addClass(ZBX_STYLE_BTN_LINK)
 							: null
 					])
 					: ''
@@ -236,8 +231,8 @@ $host_tab
 			$host_is_discovered
 				? null
 				: new CDiv(
-					(new CButton(null, _('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))
+						->addClass('add-interface')
 						->setMenuPopup([
 							'type' => 'submenu',
 							'data' => [
@@ -259,8 +254,8 @@ $host_tab
 	->addItem([
 		new CLabel(_('Monitored by proxy'), 'label-proxy'),
 		new CFormField(
-			(new CSelect('proxy_hostid'))
-				->setValue($data['host']['proxy_hostid'])
+			(new CSelect('proxyid'))
+				->setValue($data['host']['proxyid'])
 				->setFocusableElementId('label-proxy')
 				->setReadonly($host_is_discovered)
 				->addOptions(CSelect::createOptionsFromArray([0 => _('(no proxy)')] + $data['proxies']))
@@ -503,7 +498,8 @@ if (!$host_is_discovered) {
 			'source' => 'host',
 			'valuemaps' => $data['host']['valuemaps'],
 			'readonly' => $host_is_discovered,
-			'form' => 'host'
+			'form' => 'host',
+			'table_id' => 'valuemap-table'
 		]));
 }
 
@@ -513,7 +509,7 @@ $tabs = (new CTabView(['id' => 'host-tabs']))
 	->addTab('host-tab', _('Host'), $host_tab)
 	->addTab('ipmi-tab', _('IPMI'), $ipmi_tab, TAB_INDICATOR_IPMI)
 	->addTab('host-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
-	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_MACROS)
+	->addTab('macros-tab', _('Macros'), $macros_tab, TAB_INDICATOR_HOST_MACROS)
 	->addTab('inventory-tab', _('Inventory'), $inventory_tab, TAB_INDICATOR_INVENTORY)
 	->addTab('encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
 

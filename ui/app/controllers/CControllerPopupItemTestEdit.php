@@ -110,30 +110,23 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			if ($ret && $steps) {
 				$steps = normalizeItemPreprocessingSteps($steps);
 
-				if ($this->test_type == self::ZBX_TEST_TYPE_LLD) {
-					$lld_instance = new CDiscoveryRule();
-					$steps_validation_response = $lld_instance->validateItemPreprocessingSteps($steps);
+				switch ($this->test_type) {
+					case self::ZBX_TEST_TYPE_ITEM:
+						$api_input_rules = CItem::getPreprocessingValidationRules();
+						break;
 
-					if ($steps_validation_response !== true) {
-						error($steps_validation_response);
-						$ret = false;
-					}
+					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
+						$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+						break;
+
+					case self::ZBX_TEST_TYPE_LLD:
+						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
+						break;
 				}
-				else {
-					switch ($this->test_type) {
-						case self::ZBX_TEST_TYPE_ITEM:
-							$api_input_rules = CItem::getPreprocessingValidationRules();
-							break;
 
-						case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-							$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
-							break;
-					}
-
-					if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
-						error($error);
-						$ret = false;
-					}
+				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+					error($error);
+					$ret = false;
 				}
 			}
 			elseif ($ret && !$this->is_item_testable) {

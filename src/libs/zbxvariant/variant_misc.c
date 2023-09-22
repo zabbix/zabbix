@@ -27,12 +27,12 @@
  * Purpose: converts variant value to type compatible with requested value    *
  *          type                                                              *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the value to convert                  *
- *             value_type    - [IN] the target value type                     *
- *             errmsg        - [OUT] the error message                        *
+ * Parameters: value         - [IN/OUT] value to convert                      *
+ *             value_type    - [IN] target value type                         *
+ *             errmsg        - [OUT]                                          *
  *                                                                            *
- * Return value: SUCCEED - Value conversion was successful.                   *
- *               FAIL    - Otherwise                                          *
+ * Return value: SUCCEED - value conversion was successful                    *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)

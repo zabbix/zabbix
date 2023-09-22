@@ -21,7 +21,6 @@
 #include "dbupgrade_macros.h"
 
 #include "zbxeval.h"
-#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxregexp.h"
 #include "zbxalgo.h"
@@ -774,9 +773,9 @@ static int	DBpatch_5030046(void)
 	}
 	zbx_db_free_result(result);
 
-	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", NULL);
+	zbx_db_insert_prepare(&db_insert_valuemap, "valuemap", "valuemapid", "hostid", "name", (char *)NULL);
 	zbx_db_insert_prepare(&db_insert_valuemap_mapping, "valuemap_mapping", "valuemap_mappingid",
-			"valuemapid", "value", "newvalue", NULL);
+			"valuemapid", "value", "newvalue", (char *)NULL);
 
 	for (i = 0, valuemapid = 0; i < hosts.values_num; i++)
 	{
@@ -3747,7 +3746,7 @@ static int	DBpatch_5030120(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 	result = zbx_db_select(
 			"select i.itemid,a.name from items i"
 			" join items_applications ip on i.itemid=ip.itemid"
@@ -3780,7 +3779,7 @@ static int	DBpatch_5030121(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 
 	result = zbx_db_select(
 			"select i.itemid,ap.name from items i"
@@ -3815,7 +3814,7 @@ static int	DBpatch_5030122(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "httptest_tag", "httptesttagid", "httptestid", "tag", "value", (char *)NULL);
 	result = zbx_db_select(
 			"select h.httptestid,a.name from httptest h"
 			" join applications a on h.applicationid=a.applicationid");
@@ -3847,7 +3846,8 @@ static int	DBpatch_5030123(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "sysmaps_element_tag", "selementtagid", "selementid", "tag", "value",
+			(char *)NULL);
 	result = zbx_db_select(
 			"select selementid,application from sysmaps_elements"
 			" where elementtype in (0,3) and application<>''");
@@ -4158,7 +4158,7 @@ static int	DBpatch_5030131(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
-			"value_str", NULL);
+			"value_str", (char *)NULL);
 
 	zbx_vector_uint64_create(&widget_fieldids);
 
@@ -4843,7 +4843,7 @@ static int	DBpatch_5030165(void)
 	sql = zbx_malloc(NULL, sql_alloc);
 
 	zbx_db_insert_prepare(&db_insert_functions, "functions", "functionid", "itemid", "triggerid", "name",
-			"parameter", NULL);
+			"parameter", (char *)NULL);
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	result = zbx_db_select("select triggerid,recovery_mode,expression,recovery_expression from triggers"
@@ -5584,7 +5584,8 @@ static int	DBpatch_5030173(void)
 	if (SUCCEED != zbx_db_table_exists("trigger_queue_tmp"))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns", NULL);
+	zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns",
+			(char *)NULL);
 
 	result = zbx_db_select("select objectid,type,clock,ns from trigger_queue_tmp");
 

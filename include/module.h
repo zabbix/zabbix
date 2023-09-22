@@ -110,7 +110,10 @@ typedef struct
 	int		(*function)(AGENT_REQUEST *request, AGENT_RESULT *result);
 	char		*test_param;	/* item test parameters; user parameter items keep command here */
 }
-ZBX_METRIC;
+zbx_metric_t;
+
+/* for backward-compatibility */
+#define ZBX_METRIC	zbx_metric_t
 
 /* SET RESULT */
 

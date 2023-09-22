@@ -1641,12 +1641,12 @@ zabbix_export:
           master_item:
             key: velocloud.get.clear_metrics
           lld_macro_paths:
+            - lld_macro: '{#SOURCE}'
+              path: $.source.deviceName
             - lld_macro: '{#DESTINATION}'
               path: $.destination.deviceName
             - lld_macro: '{#NAME}'
               path: $.source.linkName
-            - lld_macro: '{#SOURCE}'
-              path: $.source.deviceName
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1869,16 +1869,16 @@ zabbix_export:
           master_item:
             key: velocloud.get.clear_metrics
           lld_macro_paths:
-            - lld_macro: '{#EDGE.ID}'
-              path: $.edgeId
-            - lld_macro: '{#EDGE}'
-              path: $.edgeName
             - lld_macro: '{#ID}'
               path: $.deviceLogicalId
             - lld_macro: '{#NAME}'
               path: $.peerName
             - lld_macro: '{#TYPE}'
               path: $.peerType
+            - lld_macro: '{#EDGE.ID}'
+              path: $.edgeId
+            - lld_macro: '{#EDGE}'
+              path: $.edgeName
           preprocessing:
             - type: JSONPATH
               parameters:

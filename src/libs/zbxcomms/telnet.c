@@ -20,7 +20,7 @@
 #include "zbxcomms.h"
 #include "comms.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxstr.h"
 
 #define CMD_IAC		255
@@ -45,7 +45,7 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, short mode)
 	if (0 > (rc = zbx_socket_poll(&pd, 1, 100)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() poll() error rc:%d errno:%d error:[%s]", __func__, rc,
-				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
+				zbx_socket_last_error(), zbx_strerror_from_system(zbx_socket_last_error()));
 	}
 	else if (0 < rc && POLLIN != (pd.revents & (POLLIN | POLLERR | POLLHUP | POLLNVAL)))
 	{
@@ -74,7 +74,7 @@ static ssize_t	telnet_socket_read(zbx_socket_t *s, void *buf, size_t count)
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
-				__func__, (long int)rc, error, strerror_from_system(error));
+				__func__, (long int)rc, error, zbx_strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -119,7 +119,7 @@ static ssize_t	telnet_socket_write(zbx_socket_t *s, const void *buf, size_t coun
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
-				__func__, (long int)rc, error, strerror_from_system(error));
+				__func__, (long int)rc, error, zbx_strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -438,11 +438,11 @@ fail:
 
 int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *result, const char *encoding)
 {
-	char	buf[MAX_BUFFER_LEN];
-	size_t	sz, offset;
-	int	rc, ret = FAIL;
-	char	*command_lf = NULL, *command_crlf = NULL;
-	size_t	i, offset_lf, offset_crlf;
+	char		buf[MAX_BUFFER_LEN];
+	char		*utf8_result, *err_msg = NULL, *command_lf = NULL, *command_crlf = NULL;
+	size_t		sz, offset;
+	int		rc, ret = FAIL;
+	size_t		i, offset_lf, offset_crlf;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -474,14 +474,15 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		const char	*errmsg;
+		const char	*err_msg_loc;
 
 		if (SUCCEED == zbx_socket_check_deadline(s))
-			errmsg = strerror_from_system(zbx_socket_last_error());
+			err_msg_loc = zbx_strerror_from_system(zbx_socket_last_error());
 		else
-			errmsg = "timeout occurred";
+			err_msg_loc = "timeout occurred";
 
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s", errmsg));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
+				err_msg_loc));
 
 		goto fail;
 	}
@@ -516,8 +517,17 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 		offset--;
 	buf[offset] = '\0';
 
-	SET_TEXT_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
-	ret = SUCCEED;
+	if (NULL == (utf8_result = zbx_convert_to_utf8(buf, offset, encoding, &err_msg)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot convert result to utf8: %s.", err_msg));
+		zbx_free(err_msg);
+		goto fail;
+	}
+	else
+	{
+		SET_TEXT_RESULT(result, utf8_result);
+		ret = SUCCEED;
+	}
 fail:
 	zbx_free(command_lf);
 	zbx_free(command_crlf);

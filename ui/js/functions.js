@@ -494,7 +494,7 @@ function overlayDialogueDestroy(dialogueid) {
 
 		removeFromOverlaysStack(dialogueid);
 
-		overlay.$dialogue[0].dispatchEvent(new CustomEvent('overlay.close', {detail: {dialogueid}}));
+		overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.close', {detail: {dialogueid}}));
 	}
 }
 
@@ -720,57 +720,39 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
-		msg_class = classes[type];
+	const classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'};
+	const aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';
 	}
 
-	var	$list = jQuery('<ul>')
-			.addClass('list-dashed'),
-		$msg_details = jQuery('<div>')
-			.addClass('msg-details')
-			.append($list),
-		aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')},
+	var	$list = jQuery('<ul>', {class: 'list-dashed'}),
+		$msg_details = jQuery('<div>', {class: 'msg-details'}).append($list),
 		$msg_box = jQuery('<output>')
-			.addClass(msg_class).attr('role', 'contentinfo')
+			.addClass(classes[type])
+			.attr('role', 'contentinfo')
 			.attr('aria-label', aria_labels[type]),
-		$details_arrow = jQuery('<span>')
-			.attr('id', 'details-arrow')
-			.addClass(show_details ? 'arrow-up' : 'arrow-down'),
 		$link_details = jQuery('<a>')
-			.text(t('Details') + ' ')
 			.addClass('link-action')
-			.attr('href', 'javascript:void(0)')
+			.attr('aria-expanded', show_details ? 'true' : 'false')
 			.attr('role', 'button')
-			.append($details_arrow)
-			.attr('aria-expanded', show_details ? 'true' : 'false');
+			.attr('href', 'javascript:void(0)')
+			.append(t('Details'), jQuery('<span>', {class: show_details ? 'arrow-up' : 'arrow-down'}));
 
-		$link_details.click(function() {
-			showHide(jQuery(this)
-				.siblings('.msg-details')
-				.find('.msg-details-border')
-			);
-			jQuery('#details-arrow', jQuery(this)).toggleClass('arrow-up arrow-down');
-			jQuery(this).attr('aria-expanded', jQuery(this)
-				.find('.arrow-down')
-				.length == 0
-			);
-		});
+		$link_details.click((e) => toggleMessageBoxDetails(e.target));
 
 	if (title !== null) {
 		if (Array.isArray(messages) && messages.length > 0) {
 			$msg_box.prepend($link_details);
+			$msg_box.addClass(ZBX_STYLE_COLLAPSIBLE);
 		}
 		jQuery('<span>')
 			.text(title)
 			.appendTo($msg_box);
 
-		$list.addClass('msg-details-border');
-
 		if (!show_details) {
-			$list.hide();
+			$msg_box.addClass(ZBX_STYLE_COLLAPSED);
 		}
 	}
 
@@ -786,19 +768,30 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 	}
 
 	if (show_close_box) {
-		var $button = jQuery('<button>')
-				.addClass('overlay-close-btn')
+		$msg_box.append(
+			jQuery('<button>')
+				.addClass('btn-overlay-close')
 				.attr('type', 'button')
 				.attr('title', t('Close'))
 				.click(function() {
 					jQuery(this)
-						.closest('.' + msg_class)
+						.closest(`.${classes[type]}`)
 						.remove();
-				});
-		$msg_box.append($button);
+				})
+		);
 	}
 
 	return $msg_box;
+}
+
+function toggleMessageBoxDetails(element) {
+	const parent = element.parentElement;
+	const arrow = element.querySelector('span');
+
+	parent.classList.toggle(ZBX_STYLE_COLLAPSED);
+	element.setAttribute('aria-expanded', !parent.classList.contains(ZBX_STYLE_COLLAPSED));
+	arrow.classList.toggle('arrow-down');
+	arrow.classList.toggle('arrow-up');
 }
 
 /**
@@ -826,7 +819,9 @@ function downloadSvgImage(svg, file_name) {
 	}).join('');
 
 	jQuery.map(['background-color', 'font-family', 'font-size', 'color'], function (key) {
-		$clone.css(key, $container.css(key));
+		if ($clone.css(key) === '') {
+			$clone.css(key, $container.css(key));
+		}
 	});
 
 	canvas.width = $dom_node.width()
@@ -853,7 +848,7 @@ function downloadSvgImage(svg, file_name) {
 		);
 
 	$clone.attr('height', canvas.height + 'px').append($labels_clone);
-	image.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString($clone[0]));
+	image.src = 'data:image/svg+xml;utf8,' + new XMLSerializer().serializeToString($clone[0]).replace(/#/g, '%23');
 }
 
 /**
@@ -991,4 +986,38 @@ function getFormFields(form) {
 	}
 
 	return fields;
+}
+
+/**
+ * Convert RGB encoded color into HSL encoded color.
+ *
+ * @param {number} r  Red component in range of 0-1.
+ * @param {number} g  Green component in range of 0-1.
+ * @param {number} b  Blue component in range of 0-1.
+ *
+ * @returns [{number}, {number}, {number}]  Hue, saturation and lightness components.
+ */
+function convertRGBToHSL(r, g, b) {
+	const v = Math.max(r, g, b);
+	const c = v - Math.min(r, g, b);
+	const f = 1 - Math.abs(v * 2 - c - 1);
+	const h = c && ((v === r) ? (g - b) / c : ((v === g) ? 2 + (b - r) / c : 4 + (r - g) / c));
+
+	return [60 * (h < 0 ? h + 6 : h), f ? c / f : 0, (v * 2 - c) / 2];
+}
+
+/**
+ * Convert HSL encoded color into RGB encoded color.
+ *
+ * @param {number} h  Hue component in range of 0-360.
+ * @param {number} s  Saturation component in range of 0-1.
+ * @param {number} l  Lightness component in range of 0-1.
+ *
+ * @returns [{number}, {number}, {number}]  Red, green and blue components in range 0-1.
+ */
+function convertHSLToRGB(h, s, l) {
+	const a = s * Math.min(l, 1 - l);
+	const f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+
+	return [f(0), f(8), f(4)];
 }

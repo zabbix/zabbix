@@ -38,7 +38,7 @@ class testFormTabIndicators extends CWebTest {
 			// Template configuration form tab data.
 			[
 				[
-					'url' => 'templates.php?form=create',
+					'url' => 'zabbix.php?action=template.list',
 					'form' => 'name:templatesForm',
 					'tabs' => [
 						[
@@ -411,7 +411,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
-					'form' => 'name:httpForm',
+					'form' => 'name:webscenario_form',
 					'tabs' => [
 						[
 							'name' => 'Steps',
@@ -518,7 +518,8 @@ class testFormTabIndicators extends CWebTest {
 			// Media type configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'create_button' => 'Create media type',
 					'form' => 'id:media-type-form',
 					'tabs' => [
 						[
@@ -664,15 +665,22 @@ class testFormTabIndicators extends CWebTest {
 
 		// Open widget configuration form if indicator check is performed on dachboard.
 		if ($data['url'] === 'zabbix.php?action=dashboard.view') {
-			$this->query('class:btn-widget-edit')->one()->click();
+			$this->query('class:js-widget-edit')->one()->click();
 			COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 			$form->getField('Type')->fill('Graph');
 			$form->invalidate();
 		}
+		elseif ($data['url'] === 'zabbix.php?action=template.list') {
+			$this->query('button:Create template')->one()->click();
+			$form = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
+		}
 		elseif (CTestArrayHelper::get($data, 'create_button')) {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		}
+		elseif ($data['form'] === 'name:triggersForm') {
+			$form = $this->query($data['form'])->asForm(['normalized' => true])->one()->waitUntilVisible();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
@@ -752,18 +760,16 @@ class testFormTabIndicators extends CWebTest {
 		$data = [
 			[
 				'tab_name' => 'Host permissions',
-				'group_table' => 'group-right-table',
-				'multiselect' => 'new_group_right_groupids_',
-				'segmentedradio' => 'new_group_right_permission',
-				'add_group_table' => 'new-group-right-table',
+				'group_table' => 'hostgroup-right-table',
+				'multiselect' => 'ms_hostgroup_right_groupids_0_',
+				'segmentedradio' => 'hostgroup_right_permission_0',
 				'group_name' => 'Discovered hosts'
 			],
 			[
 				'tab_name' => 'Template permissions',
 				'group_table' => 'templategroup-right-table',
-				'multiselect' => 'new_templategroup_right_groupids_',
-				'segmentedradio' => 'new_templategroup_right_permission',
-				'add_group_table' => 'new-templategroup-right-table',
+				'multiselect' => 'ms_templategroup_right_groupids_0_',
+				'segmentedradio' => 'templategroup_right_permission_0',
 				'group_name' => 'Templates/Power'
 			]
 		];
@@ -780,21 +786,16 @@ class testFormTabIndicators extends CWebTest {
 			$this->assertTabIndicator($tab_selector, false);
 
 			// Add read permissions to Discovered hosts group and check indicator.
+			$permissions_table->query('button', 'Add')->one()->click();
 			$group_selector = $form->query('xpath:.//div[@id="'.$permissions['multiselect'].'"]/..')->asMultiselect()->one();
 			$group_selector->fill($permissions['group_name']);
 			$permission_level = $form->query('id', $permissions['segmentedradio'])->asSegmentedRadio()->one();
 			$permission_level->fill('Read');
-			$add_button = $form->query('id', $permissions['add_group_table'])->query('button:Add')->one();
-			$add_button->click();
-			$permissions_table->waitUntilReloaded();
 			$tab_selector->waitUntilReady();
 			$this->assertTabIndicator($tab_selector, true);
 
-			// Remove read permissions from Discovered hosts group and check indicator.
-			$group_selector->fill($permissions['group_name']);
-			$permission_level->fill('None');
-			$add_button->click();
-			$permissions_table->waitUntilReloaded();
+			// Remove 'Discovered hosts' group and check indicator.
+			$permissions_table->query('button', 'Remove')->one()->click();
 			$tab_selector->waitUntilReady();
 			$this->assertTabIndicator($tab_selector, false);
 		}
@@ -804,14 +805,17 @@ class testFormTabIndicators extends CWebTest {
 		$tab_selector = $form->query('xpath:.//a[text()="Problem tag filter"]')->one();
 		$this->assertTabIndicator($tab_selector, false);
 
-		// Add tag filter for Discovered hosts group and check indicator.
-		$form->query('xpath:.//div[@id="new_tag_filter_groupids_"]/..')->asMultiselect()->one()->fill('Discovered hosts');
-		$form->query('id:new-tag-filter-table')->query('button:Add')->one()->click();
+		// Add tag filter for 'Discovered hosts' group and check indicator.
+		$tag_table->query('button','Add')->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->asForm()->fill(['Host groups' => 'Discovered hosts']);
+		$dialog->getFooter()->query('button', 'Add')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$tag_table->waitUntilReloaded();
 		$this->assertTabIndicator($tab_selector, true);
 
-		// Remove the tag filter for Discovered hosts group and check indicator.
-		$form->query('id:tag-filter-table')->query('button:Remove')->one()->click();
+		// Remove the tag filter for 'Discovered hosts' group and check indicator.
+		$tag_table->query('button', 'Remove')->one()->click();
 		$this->assertTabIndicator($tab_selector, false);
 	}
 
@@ -929,14 +933,14 @@ class testFormTabIndicators extends CWebTest {
 					}
 				}
 				else {
-					foreach($tab['entries'] as $entry) {
+					foreach ($tab['entries'] as $entry) {
 						if (array_key_exists('table_selector', $tab)) {
 							$form->query($tab['table_selector'])->query('button:Add')->one()->click();
 						}
 						else {
 							$form->getFieldContainer($tab['name'])->query('button:Add')->one()->click();
 						}
-						$overlay = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 						if (array_key_exists('selector', $entry)) {
 							$overlay->query($entry['selector'])->one()->detect()->fill($entry['value']);
 						}
@@ -947,7 +951,10 @@ class testFormTabIndicators extends CWebTest {
 							}
 						}
 						$overlay->submit();
+						$overlay->waitUntilNotVisible();
+					}
 
+					if (CTestArrayHelper::get($tab, 'name') !== 'Message templates') {
 						COverlayDialogElement::ensureNotPresent();
 					}
 				}
@@ -957,7 +964,7 @@ class testFormTabIndicators extends CWebTest {
 				if ($action === USER_ACTION_REMOVE) {
 					// In graph widget form the 1st row is covered by header with tabs if scroll is not in top position.
 					COverlayDialogElement::find()->one()->scrollToTop();
-					$form->query('class:btn-remove')->all()->click();
+					$form->query('class:js-remove')->all()->click();
 				}
 				else {
 					for ($i = 0; $i < $tab['new_entries']; $i++) {
@@ -968,15 +975,15 @@ class testFormTabIndicators extends CWebTest {
 
 			case 'value_mapping':
 				if ($action === USER_ACTION_REMOVE) {
-					$form->query('xpath://table[@id="valuemap-table"]//button[text()="Remove"]')->all()->click();
+					$form->query('xpath://table[contains(@id,"valuemap-table")]//button[text()="Remove"]')->waitUntilClickable()->all()->click();
 				}
 				else {
 					foreach ($tab['entries'] as $field_value) {
 						$form->query('id:valuemap_add')->one()->click();
-						$valuemap_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$valuemap_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
 						$valuemap_form->submit();
-						COverlayDialogElement::ensureNotPresent();
+						$valuemap_form->waitUntilNotVisible();
 					}
 				}
 				break;

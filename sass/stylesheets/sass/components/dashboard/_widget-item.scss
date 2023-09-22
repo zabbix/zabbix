@@ -7,7 +7,7 @@ form.dashboard-widget-item {
 		&.fields-group-time,
 		&.fields-group-change-indicator {
 			display: grid;
-			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+			grid-template-columns: minmax(100px, max-content) 1fr max-content minmax(95px, max-content);
 			align-items: center;
 			column-gap: 10px;
 			row-gap: 5px;
@@ -46,8 +46,6 @@ form.dashboard-widget-item {
 		}
 
 		&.fields-group-value {
-			grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
-
 			.units-show {
 				display: flex;
 

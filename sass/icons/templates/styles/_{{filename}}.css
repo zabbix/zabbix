@@ -1,0 +1,16 @@
+@font-face {
+  font-family: "{{fontname}}";
+  src: url("{{cssPath}}{{fontname}}.woff2?t={{timestamp}}") format("woff2"),
+  url("{{cssPath}}{{fontname}}.woff?t={{timestamp}}") format("woff"),
+  url('{{cssPath}}{{fontname}}.ttf?t={{timestamp}}') format('truetype'),
+  url('{{cssPath}}{{fontname}}.svg?t={{timestamp}}#{{fontname}}') format('svg');
+}
+
+[class^="{{prefix}}-"]::before, [class*=" {{prefix}}-"]::before {
+  font-family: '{{fontname}}' !important;
+  font-size: {{fontSize}};
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+{{cssString}}

@@ -23,7 +23,6 @@
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
 #include "zbxregexp.h"
-#include "log.h"
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"
@@ -342,7 +341,7 @@ static int	DBpatch_3050025(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", NULL);
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", (char *)NULL);
 	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ZBX_TM_TASK_UPDATE_EVENTNAMES, ZBX_TM_STATUS_NEW,
 			time(NULL));
 	zbx_db_insert_autoincrement(&db_insert, "taskid");
@@ -1634,7 +1633,7 @@ static int	DBpatch_3050144(void)
 		return SUCCEED;
 
 	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
-			NULL);
+			(char *)NULL);
 
 	/* type : 'problem' - WIDGET_PROBLEMS */
 	result = zbx_db_select("select w.widgetid"

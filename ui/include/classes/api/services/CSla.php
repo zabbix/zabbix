@@ -1439,22 +1439,36 @@ class CSla extends CApiService {
 
 		$uptime_periods = [];
 
-		$week_offset = $reporting_period['period_from'] -
-			(new DateTime('@'.$reporting_period['period_from']))
+		$reporting_period_from =
+			(new DateTimeImmutable('@'.$reporting_period['period_from']))
 				->setTimezone(new DateTimeZone($db_sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
 					? $db_sla['timezone']
 					: CTimezoneHelper::getSystemTimezone()
 				))
 				->modify('1 day')
-				->modify('last Sunday')
-				->getTimestamp();
+				->modify('last Sunday');
 
 		for ($week = 0;; $week++) {
-			$week_period_from = $reporting_period['period_from'] - $week_offset + SEC_PER_WEEK * $week;
+			$week_period_from = $reporting_period_from->modify($week.' week');
 
 			foreach ($db_sla['schedule'] as $schedule_row) {
-				$period_from = $week_period_from + $schedule_row['period_from'];
-				$period_to = $week_period_from + $schedule_row['period_to'];
+				$period_from = $week_period_from
+					->modify((int) ($schedule_row['period_from'] / SEC_PER_DAY).' day')
+					->setTime(
+						(int) ($schedule_row['period_from'] / SEC_PER_HOUR) % 24,
+						(int) ($schedule_row['period_from'] / SEC_PER_MIN) % 60,
+						$schedule_row['period_from'] % 60
+					)
+					->getTimestamp();
+
+				$period_to = $week_period_from
+					->modify((int) ($schedule_row['period_to'] / SEC_PER_DAY).' day')
+					->setTime(
+						(int) ($schedule_row['period_to'] / SEC_PER_HOUR) % 24,
+						(int) ($schedule_row['period_to'] / SEC_PER_MIN) % 60,
+						$schedule_row['period_to'] % 60
+					)
+					->getTimestamp();
 
 				if ($period_from < $reporting_period['period_to'] && $period_to > $reporting_period['period_from']) {
 					$new_period_from = max($reporting_period['period_from'], $period_from);

@@ -21,8 +21,6 @@
 
 class CFormFieldsetCollapsible extends CFormFieldset {
 
-	public const ZBX_STYLE_COLLAPSIBLE = 'collapsible';
-	public const ZBX_STYLE_COLLAPSED = 'collapsed';
 	public const ZBX_STYLE_TOGGLE = 'toggle';
 
 	protected bool $is_expanded = false;
@@ -30,7 +28,7 @@ class CFormFieldsetCollapsible extends CFormFieldset {
 	public function __construct(string $caption, $body = null) {
 		parent::__construct($caption, $body);
 
-		$this->addClass(self::ZBX_STYLE_COLLAPSIBLE);
+		$this->addClass(ZBX_STYLE_COLLAPSIBLE);
 	}
 
 	public function setExpanded(bool $expanded = true): self {
@@ -43,13 +41,14 @@ class CFormFieldsetCollapsible extends CFormFieldset {
 		return (new CTag('legend', true,
 			(new CSimpleButton(new CSpan($this->caption)))
 				->addClass(self::ZBX_STYLE_TOGGLE)
+				->addClass($this->is_expanded ? ZBX_ICON_CHEVRON_UP : ZBX_ICON_CHEVRON_DOWN)
 				->setTitle($this->is_expanded ? _('Collapse') : _('Expand'))
 		))->toString();
 	}
 
 	public function toString($destroy = true): string {
 		if (!$this->is_expanded) {
-			$this->addClass(self::ZBX_STYLE_COLLAPSED);
+			$this->addClass(ZBX_STYLE_COLLAPSED);
 		}
 
 		return parent::toString($destroy);

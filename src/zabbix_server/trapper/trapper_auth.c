@@ -20,7 +20,6 @@
 #include "trapper_auth.h"
 
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxhash.h"
 
 #define	ZBX_SID_AUTH_TOKEN_LENGTH	64

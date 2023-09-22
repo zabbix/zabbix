@@ -273,8 +273,9 @@ class testDashboardClockWidget extends CWebTest {
 				$form->fill(['Advanced configuration' => true]);
 
 				// Check that only Background color and Time fields are visible (because only Time checkbox is checked).
+				// There are two labels "Time zone", so the xpath is used for the container.
 				foreach (['Background color' => true, 'Date' => false, 'Time' => true,
-							'Time zone' => false] as $name => $visible) {
+							'xpath:.//div[@class="fields-group fields-group-tzone"]' => false] as $name => $visible) {
 					$this->assertTrue($form->getField($name)->isVisible($visible));
 				}
 
@@ -321,7 +322,7 @@ class testDashboardClockWidget extends CWebTest {
 					}
 				}
 
-				// Check form fields' maximal lenghts.
+				// Check form fields' maximal lengths.
 				foreach (['Name' =>  255, 'id:date_size' => 3, 'id:time_size' => 3, 'id:tzone_size' => 3]
 						as $field => $length) {
 					$this->assertEquals($length, $form->getField($field)->getAttribute('maxlength'));

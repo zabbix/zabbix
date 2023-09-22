@@ -44,22 +44,21 @@ $token_from_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Auth token').':'),
 		new CFormField([
-			$data['auth_token'],
+			new CSpan($data['auth_token']),
 			makeWarningIcon(
 				_("Make sure to copy the auth token as you won't be able to view it after the page is closed.")
 			),
-			' ',
-			(new CLinkAction(_('Copy to clipboard')))
-				->setAttribute('data-auth_token', $data['auth_token'])
+			(new CButtonLink(_('Copy to clipboard')))
 				->onClick('writeTextClipboard(this.dataset.auth_token);')
+				->setAttribute('data-auth_token', $data['auth_token'])
 				->setAttribute('autofocus', 'autofocus')
 		])
 	])
 	->addItem([
 		new CLabel(_('Expires at').':'),
 		new CFormField([
-			($data['expires_at'] == 0) ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at']),
-			($data['expires_at'] != 0 && time() > $data['expires_at'])
+			new CSpan($data['expires_at'] == 0 ? '-' : date(DATE_TIME_FORMAT_SECONDS, (int) $data['expires_at'])),
+			$data['expires_at'] != 0 && time() > $data['expires_at']
 				? makeErrorIcon(_('The token has expired. Please update the expiry date to use the token.'))
 				: null
 		])

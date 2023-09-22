@@ -154,7 +154,7 @@ class testFormMap extends CLegacyWebTest {
 		$form->getField('New triggers')->selectMultiple([
 				'First test trigger with tag priority',
 				'Fourth test trigger with tag priority',
-				'Lack of available memory'
+				'Linux: Lack of available memory'
 			], 'ЗАББИКС Сервер'
 		);
 		$form->query('button:Add')->one()->click();

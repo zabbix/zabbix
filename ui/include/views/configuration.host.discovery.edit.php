@@ -161,12 +161,10 @@ if ($parameters_data) {
 			)
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
-			(new CButton('', _('Remove')))
-				->removeId()
-				->onClick('jQuery(this).closest("tr").remove()')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Remove')))
 				->addClass('element-table-remove')
 				->setEnabled(!$data['limited'])
+				->onClick('jQuery(this).closest("tr").remove();')
 		]);
 	}
 }
@@ -189,8 +187,7 @@ $item_tab
 					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 					->setFooter(new CRow(
 						(new CCol(
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Add')))
 								->setEnabled(!$data['limited'])
 								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
@@ -198,11 +195,10 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(
-								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
-							))->addClass(ZBX_STYLE_DRAG_ICON)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -210,8 +206,7 @@ $item_tab
 						(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->setEnabled(!$data['limited'])
 							->setAttribute('data-row-action', 'remove_row')
 					])),
@@ -236,11 +231,9 @@ $item_tab
 					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
 						->setAttribute('style', 'width: 100%;')
 						->removeId(),
-					(new CButton('', _('Remove')))
-						->removeId()
-						->onClick('jQuery(this).closest("tr").remove()')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Remove')))
 						->addClass('element-table-remove')
+						->onClick('jQuery(this).closest("tr").remove();')
 				]))
 			)
 	)
@@ -310,6 +303,7 @@ $item_tab
 		(new CLabel(_('Request body'), 'posts'))->setId('js-item-posts-label'),
 		(new CFormField((new CTextArea('posts', $data['posts'], ['readonly' =>  $data['limited']]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 		))->setId('js-item-posts-field')
 	]);
 
@@ -346,8 +340,7 @@ $item_tab
 					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 					->setFooter(new CRow(
 						(new CCol(
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Add')))
 								->setEnabled(!$data['limited'])
 								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
@@ -355,11 +348,10 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(
-								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
-							))->addClass(ZBX_STYLE_DRAG_ICON)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -367,8 +359,7 @@ $item_tab
 						(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->setEnabled(!$data['limited'])
 							->setAttribute('data-row-action', 'remove_row')
 					])),
@@ -633,6 +624,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 		))->setId('js-item-executed-script-field')
 	])
 	->addItem([
@@ -643,6 +635,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 		))->setId('js-item-sql-query-field')
 	])
 	->addItem([
@@ -758,8 +751,7 @@ $condition_tab->addItem([
 				->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 		))->addClass(ZBX_STYLE_CELL),
 		(new CDiv([
-			(new CSpan(''))
-				->setId('expression'),
+			(new CSpan(''))->setId('expression'),
 			(new CTextBox('formula', $data['formula']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
@@ -776,20 +768,6 @@ $condition_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
-$conditions = $data['conditions'];
-
-if (!$conditions) {
-	$conditions = [[
-		'macro' => '',
-		'operator' => CONDITION_OPERATOR_REGEXP,
-		'value' => '',
-		'formulaid' => num2letter(0)
-	]];
-}
-else {
-	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
-}
-
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
@@ -797,8 +775,7 @@ $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
 ]);
 
-// fields
-foreach ($conditions as $i => $condition) {
+foreach ($data['conditions'] as $i => $condition) {
 	// formula id
 	$formulaid = [
 		new CSpan($condition['formulaid']),
@@ -898,14 +875,16 @@ foreach ($lld_macro_paths as $i => $lld_macro_path) {
 	]))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
-		->setAttribute('placeholder', '{#MACRO}');
+		->setAttribute('placeholder', '{#MACRO}')
+		->disableSpellcheck();
 
 	$path = (new CTextAreaFlexible('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], [
 		'readonly' => $templated,
 		'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
 	]))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		->setAttribute('placeholder', _('$.path.to.node'));
+		->setAttribute('placeholder', _('$.path.to.node'))
+		->disableSpellcheck();
 
 	$remove = [
 		(new CButton('lld_macro_paths['.$i.'][remove]', _('Remove')))
@@ -942,7 +921,7 @@ $overrides_tab = new CFormGrid();
 $overrides_list = (new CTable())
 	->addClass('lld-overrides-table')
 	->setHeader([
-		(new CColHeader())->setWidth('15'),
+		new CColHeader(),
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader(_('Name')))->setWidth('350'),
 		(new CColHeader(_('Stop processing')))->setWidth('100'),
@@ -1049,7 +1028,8 @@ $html_page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'form_name' => $form->getName(),
-		'counter' => $data['counter']
+		'counter' => $data['counter'],
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

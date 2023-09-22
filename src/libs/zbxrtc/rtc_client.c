@@ -24,7 +24,6 @@
 #include "zbxcommon.h"
 #include "zbxserialize.h"
 #include "zbxself.h"
-#include "log.h"
 #include "zbxthreads.h"
 
 /******************************************************************************

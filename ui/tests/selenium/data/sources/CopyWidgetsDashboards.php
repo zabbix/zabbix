@@ -493,7 +493,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'unacknowledged',
+										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
@@ -777,7 +777,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'unacknowledged',
+										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
@@ -1107,7 +1107,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'unacknowledged',
+										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
@@ -1192,7 +1192,7 @@ class CopyWidgetsDashboards {
 								'name' => 'Test copy item value',
 								'type' => 'item',
 								'x' => 0,
-								'y' => 28,
+								'y' => 12,
 								'width' => 6,
 								'height' => 4,
 								'view_mode' => 0,
@@ -1500,6 +1500,246 @@ class CopyWidgetsDashboards {
 										'value' => 0
 									]
 								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge for copying',
+								'x' => 6,
+								'y' => 12,
+								'width' => 10,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '99142'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'min',
+										'value' => '10'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'max',
+										'value' => '350'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'angle',
+										'value' => '270'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'description',
+										'value' => 'Test description'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_size',
+										'value' => 16
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_v_pos',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'desc_color',
+										'value' => 'FDD835'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'decimal_places',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_size',
+										'value' => 31
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'value_color',
+										'value' => 'FF6F00'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_arc_size',
+										'value' => 22
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'value_arc_color',
+										'value' => '0040FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'empty_color',
+										'value' => '00FF00'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'bg_color',
+										'value' => 'FFECB3'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'units',
+										'value' => 'bytes'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'units_size',
+										'value' => 26
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'units_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'units_color',
+										'value' => '42A5F5'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'needle_show',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'needle_color',
+										'value' => '9FA8DA'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'scale_decimal_places',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'scale_size',
+										'value' => 12
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'thresholds.color.0',
+										'value' => '26A69A'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'thresholds.threshold.0',
+										'value' => '123'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_show_labels',
+										'value' => '1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_show_arc',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_arc_size',
+										'value' => 56
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'dynamic',
+										'value' => 1
+									]
+								]
+							],
+							[
+								'type' => 'toptriggers',
+								'name' => 'Top triggers for copying',
+								'x' => 16,
+								'y' => 12,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 10
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids',
+										'value' => 4
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids',
+										'value' => 10084
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'problem',
+										'value' => 'test top triggers'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 25
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.0',
+										'value' => 'top trigger tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.0',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.0',
+										'value' => 'top trigger tag value1'
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.1',
+										'value' => 'top trigger tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.1',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.1',
+										'value' => 'top trigger tag value2'
+									]
+								]
 							]
 						]
 					],
@@ -1638,6 +1878,236 @@ class CopyWidgetsDashboards {
 										'type' => 0,
 										'name' => 'itemid',
 										'value' => 400410
+									]
+								]
+							],
+							[
+								'type' => 'gauge',
+								'name' => 'Gauge widget',
+								'x' => 17,
+								'y' => 4,
+								'width' => 7,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid',
+										'value' => '400410'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'min',
+										'value' => '5'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'max',
+										'value' => '123'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'angle',
+										'value' => '270'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'description',
+										'value' => 'Test templated description'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_size',
+										'value' => 7
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'desc_v_pos',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'desc_color',
+										'value' => 'BF00FF'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'decimal_places',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_size',
+										'value' => 13
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'value_color',
+										'value' => '26C6DA'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'value_arc_size',
+										'value' => 19
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'value_arc_color',
+										'value' => '66BB6A'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'empty_color',
+										'value' => 'FFFF00'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'bg_color',
+										'value' => '004D40'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'units',
+										'value' => 'KB'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'units_size',
+										'value' => 15
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'units_bold',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'units_color',
+										'value' => '8D6E63'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'needle_show',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'needle_color',
+										'value' => 'E64A19'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'scale_decimal_places',
+										'value' => 3
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'scale_size',
+										'value' => 9
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'thresholds.color.0',
+										'value' => '4527A0'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'thresholds.threshold.0',
+										'value' => '15'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_show_labels',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_show_arc',
+										'value' => 1
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'th_arc_size',
+										'value' => 52
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'dynamic',
+										'value' => 1
+									]
+								]
+							],
+							[
+								'type' => 'toptriggers',
+								'name' => 'Top triggers widget',
+								'x' => 0,
+								'y' => 10,
+								'width' => 7,
+								'height' => 5,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'rf_rate',
+										'value' => 10
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'problem',
+										'value' => 'test top triggers'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 25
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.0',
+										'value' => 'top trigger tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.0',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.0',
+										'value' => 'top trigger tag value1'
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.tag.1',
+										'value' => 'top trigger tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.operator.1',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.value.1',
+										'value' => 'top trigger tag value2'
 									]
 								]
 							]

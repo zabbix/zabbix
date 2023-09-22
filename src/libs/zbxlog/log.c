@@ -17,40 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
+#include "zbxlog.h"
 
 #include "zbxmutexs.h"
-#include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcommon.h"
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"
-#	include "zbxsysinfo.h"
+#	include <strsafe.h> /* StringCchPrintf */
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
-#define LOG_COMPONENT_NAME_LEN	64
+static char		log_filename[MAX_STRING_LEN];
+static int		log_type = ZBX_LOG_TYPE_UNDEFINED;
+static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
 
-static char			log_filename[MAX_STRING_LEN];
-static int			log_type = LOG_TYPE_UNDEFINED;
-static zbx_mutex_t		log_access = ZBX_MUTEX_NULL;
-
-static int			zbx_log_level = LOG_LEVEL_WARNING;
-ZBX_THREAD_LOCAL int		*zbx_plog_level = &zbx_log_level;
-
-#define LOG_LEVEL_DEC_FAIL	-2
-#define LOG_LEVEL_DEC_SUCCEED	-1
-#define LOG_LEVEL_UNCHANGED	0
-#define LOG_LEVEL_INC_SUCCEED	1
-#define LOG_LEVEL_INC_FAIL	2
-
-static ZBX_THREAD_LOCAL int	zbx_log_level_change = LOG_LEVEL_UNCHANGED;
-
-static ZBX_THREAD_LOCAL char	log_component_name[LOG_COMPONENT_NAME_LEN + 1];
-
-static int			config_log_file_size = -1;	/* max log file size in MB */
+static int		config_log_file_size = -1;	/* max log file size in MB */
 
 static int	get_config_log_file_size(void)
 {
@@ -79,156 +64,6 @@ static int	get_config_log_file_size(void)
 #	define dup2(fd1, fd2)	_dup2(fd1, fd2)
 #else
 #	define ZBX_DEV_NULL	"/dev/null"
-#endif
-
-#ifndef _WINDOWS
-
-static const char	*zabbix_get_log_level_ref_string(int loglevel)
-{
-	switch (loglevel)
-	{
-		case LOG_LEVEL_EMPTY:
-			return "0 (none)";
-		case LOG_LEVEL_CRIT:
-			return "1 (critical)";
-		case LOG_LEVEL_ERR:
-			return "2 (error)";
-		case LOG_LEVEL_WARNING:
-			return "3 (warning)";
-		case LOG_LEVEL_DEBUG:
-			return "4 (debug)";
-		case LOG_LEVEL_TRACE:
-			return "5 (trace)";
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
-}
-
-const char	*zabbix_get_log_level_string(void)
-{
-	return zabbix_get_log_level_ref_string(*zbx_plog_level);
-}
-
-void	zabbix_increase_log_level(void)
-{
-	if (LOG_LEVEL_TRACE == *zbx_plog_level)
-	{
-		zbx_log_level_change = LOG_LEVEL_INC_FAIL;
-		return;
-	}
-
-	zbx_log_level_change = LOG_LEVEL_INC_SUCCEED;
-
-	*zbx_plog_level = *zbx_plog_level + 1;
-
-	return;
-}
-
-void	zabbix_decrease_log_level(void)
-{
-	if (LOG_LEVEL_EMPTY == *zbx_plog_level)
-	{
-		zbx_log_level_change = LOG_LEVEL_DEC_FAIL;
-		return;
-	}
-
-	zbx_log_level_change = LOG_LEVEL_DEC_SUCCEED;
-
-	*zbx_plog_level = *zbx_plog_level - 1;
-
-	return;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: log last loglevel change result                                   *
- *                                                                            *
- * Comments: With consequent fast changes only the last attempt result would  *
- *           be logged.                                                       *
- *                                                                            *
- ******************************************************************************/
-void	 zabbix_report_log_level_change(void)
-{
-	int	change;
-
-	if (0 == zbx_log_level_change)
-		return;
-
-	/* reset log level change history to avoid recursion */
-	change = zbx_log_level_change;
-	zbx_log_level_change = LOG_LEVEL_UNCHANGED;
-
-	switch (change)
-	{
-		case LOG_LEVEL_DEC_FAIL:
-			zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
-					" minimum level has been already set");
-			break;
-		case LOG_LEVEL_DEC_SUCCEED:
-			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
-					zabbix_get_log_level_string());
-			break;
-		case LOG_LEVEL_INC_SUCCEED:
-			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
-					zabbix_get_log_level_string());
-			break;
-		case LOG_LEVEL_INC_FAIL:
-			zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
-					" maximum level has been already set");
-			break;
-	}
-}
-
-void	zbx_set_log_component(const char *name, zbx_log_component_t *component)
-{
-	int	log_level = *zbx_plog_level;
-
-	zbx_snprintf(log_component_name, sizeof(log_component_name), "[%s] ", name);
-
-	zbx_plog_level = &component->level;
-	component->level = log_level;
-	component->name = log_component_name;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: change log level of the specified component                       *
- *                                                                            *
- * Comments: This function is used to change log level managed threads.       *
- *                                                                            *
- ******************************************************************************/
-void	zbx_change_component_log_level(zbx_log_component_t *component, int direction)
-{
-	if (0 > direction)
-	{
-		if (LOG_LEVEL_EMPTY == component->level)
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot decrease log level:"
-					" minimum level has been already set", component->name);
-		}
-		else
-		{
-			component->level += direction;
-			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been decreased to %s",
-					component->name, zabbix_get_log_level_ref_string(component->level));
-		}
-	}
-	else
-	{
-		if (LOG_LEVEL_TRACE == component->level)
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%scannot increase log level:"
-					" maximum level has been already set", component->name);
-		}
-		else
-		{
-			component->level += direction;
-			zabbix_log(LOG_LEVEL_INFORMATION, "%slog level has been increased to %s",
-					component->name, zabbix_get_log_level_ref_string(component->level));
-		}
-	}
-}
 #endif
 
 int	zbx_redirect_stdio(const char *filename)
@@ -413,7 +248,7 @@ void	zbx_handle_log(void)
 #ifndef _WINDOWS
 	zabbix_report_log_level_change();
 #endif
-	if (LOG_TYPE_FILE != log_type)
+	if (ZBX_LOG_TYPE_FILE != log_type)
 		return;
 
 	LOCK_LOG;
@@ -423,16 +258,16 @@ void	zbx_handle_log(void)
 	UNLOCK_LOG;
 }
 
-int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
+int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
 {
 	const char	*filename = log_file_cfg->log_file_name;
 	int		type = log_file_cfg->log_type;
 
 	log_type = type;
-	*zbx_plog_level = level;
+	zbx_set_log_level(level);
 	config_log_file_size = log_file_cfg->log_file_size;
 
-	if (LOG_TYPE_SYSTEM == type)
+	if (ZBX_LOG_TYPE_SYSTEM == type)
 	{
 #ifdef _WINDOWS
 		wchar_t	*wevent_source;
@@ -444,7 +279,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 		openlog(syslog_app_name, LOG_PID, LOG_DAEMON);
 #endif
 	}
-	else if (LOG_TYPE_FILE == type)
+	else if (ZBX_LOG_TYPE_FILE == type)
 	{
 		FILE	*log_file = NULL;
 
@@ -467,7 +302,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 		zbx_strscpy(log_filename, filename);
 		zbx_fclose(log_file);
 	}
-	else if (LOG_TYPE_CONSOLE == type || LOG_TYPE_UNDEFINED == type)
+	else if (ZBX_LOG_TYPE_CONSOLE == type || ZBX_LOG_TYPE_UNDEFINED == type)
 	{
 		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 		{
@@ -488,9 +323,9 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 	return SUCCEED;
 }
 
-void	zabbix_close_log(void)
+void	zbx_close_log(void)
 {
-	if (LOG_TYPE_SYSTEM == log_type)
+	if (ZBX_LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		if (NULL != system_log_handle)
@@ -499,18 +334,18 @@ void	zabbix_close_log(void)
 		closelog();
 #endif
 	}
-	else if (LOG_TYPE_FILE == log_type || LOG_TYPE_CONSOLE == log_type || LOG_TYPE_UNDEFINED == log_type)
+	else if (ZBX_LOG_TYPE_FILE == log_type || ZBX_LOG_TYPE_CONSOLE == log_type ||
+			ZBX_LOG_TYPE_UNDEFINED == log_type)
 	{
 		zbx_mutex_destroy(&log_access);
 	}
 
-	log_type = LOG_TYPE_UNDEFINED;
+	log_type = ZBX_LOG_TYPE_UNDEFINED;
 }
 
-void	__zbx_zabbix_log(int level, const char *fmt, ...)
+void	zbx_log_impl(int level, const char *fmt, va_list args)
 {
 	char		message[MAX_BUFFER_LEN];
-	va_list		args;
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
@@ -523,7 +358,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		return;
 #endif
 
-	if (LOG_TYPE_FILE == log_type)
+	if (ZBX_LOG_TYPE_FILE == log_type)
 	{
 		FILE	*log_file;
 
@@ -549,12 +384,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 					tm.tm_min,
 					tm.tm_sec,
 					milliseconds,
-					log_component_name
+					zbx_get_log_component_name()
 					);
 
-			va_start(args, fmt);
 			vfprintf(log_file, fmt, args);
-			va_end(args);
 
 			fprintf(log_file, "\n");
 
@@ -564,9 +397,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		{
 			zbx_error("failed to open log file: %s", zbx_strerror(errno));
 
-			va_start(args, fmt);
 			zbx_vsnprintf(message, sizeof(message), fmt, args);
-			va_end(args);
 
 			zbx_error("failed to write [%s] into log file", message);
 		}
@@ -576,7 +407,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		return;
 	}
 
-	if (LOG_TYPE_CONSOLE == log_type)
+	if (ZBX_LOG_TYPE_CONSOLE == log_type)
 	{
 		long		milliseconds;
 		struct tm	tm;
@@ -595,12 +426,10 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				tm.tm_min,
 				tm.tm_sec,
 				milliseconds,
-				log_component_name
+				zbx_get_log_component_name()
 				);
 
-		va_start(args, fmt);
 		vfprintf(stdout, fmt, args);
-		va_end(args);
 
 		fprintf(stdout, "\n");
 
@@ -611,11 +440,9 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		return;
 	}
 
-	va_start(args, fmt);
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
-	va_end(args);
 
-	if (LOG_TYPE_SYSTEM == log_type)
+	if (ZBX_LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		switch (level)
@@ -655,20 +482,20 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				syslog(LOG_CRIT, "%s%s", log_component_name, message);
+				syslog(LOG_CRIT, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_ERR:
-				syslog(LOG_ERR, "%s%s", log_component_name, message);
+				syslog(LOG_ERR, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_WARNING:
-				syslog(LOG_WARNING, "%s%s", log_component_name, message);
+				syslog(LOG_WARNING, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_DEBUG:
 			case LOG_LEVEL_TRACE:
-				syslog(LOG_DEBUG, "%s%s", log_component_name, message);
+				syslog(LOG_DEBUG, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_INFORMATION:
-				syslog(LOG_INFO, "%s%s", log_component_name, message);
+				syslog(LOG_INFO, "%s%s", zbx_get_log_component_name(), message);
 				break;
 			default:
 				/* LOG_LEVEL_EMPTY - print nothing */
@@ -676,30 +503,30 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 		}
 
 #endif	/* _WINDOWS */
-	}	/* LOG_TYPE_SYSLOG */
-	else	/* LOG_TYPE_UNDEFINED == log_type */
+	}	/* ZBX_LOG_TYPE_SYSTEM */
+	else	/* ZBX_LOG_TYPE_UNDEFINED == log_type */
 	{
 		LOCK_LOG;
 
 		switch (level)
 		{
 			case LOG_LEVEL_CRIT:
-				zbx_error("ERROR: %s%s", log_component_name, message);
+				zbx_error("ERROR: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_ERR:
-				zbx_error("Error: %s%s", log_component_name, message);
+				zbx_error("Error: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_WARNING:
-				zbx_error("Warning: %s%s", log_component_name, message);
+				zbx_error("Warning: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_DEBUG:
-				zbx_error("DEBUG: %s%s", log_component_name, message);
+				zbx_error("DEBUG: %s%s", zbx_get_log_component_name(), message);
 				break;
 			case LOG_LEVEL_TRACE:
-				zbx_error("TRACE: %s%s", log_component_name, message);
+				zbx_error("TRACE: %s%s", zbx_get_log_component_name(), message);
 				break;
 			default:
-				zbx_error("%s%s", log_component_name, message);
+				zbx_error("%s%s", zbx_get_log_component_name(), message);
 				break;
 		}
 
@@ -718,19 +545,19 @@ int	zbx_get_log_type(const char *logtype)
 			return i + 1;
 	}
 
-	return LOG_TYPE_UNDEFINED;
+	return ZBX_LOG_TYPE_UNDEFINED;
 }
 
 int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_file_cfg)
 {
-	if (LOG_TYPE_UNDEFINED == log_file_cfg->log_type)
+	if (ZBX_LOG_TYPE_UNDEFINED == log_file_cfg->log_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'",
 				log_file_cfg->log_type_str);
 		return FAIL;
 	}
 
-	if (LOG_TYPE_CONSOLE == log_file_cfg->log_type && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
+	if (ZBX_LOG_TYPE_CONSOLE == log_file_cfg->log_type && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
 			ZBX_TASK_START == task->task)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"console\" parameter can only be used with the"
@@ -738,7 +565,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_f
 		return FAIL;
 	}
 
-	if (LOG_TYPE_FILE == log_file_cfg->log_type && (NULL == log_file_cfg->log_file_name || '\0' ==
+	if (ZBX_LOG_TYPE_FILE == log_file_cfg->log_type && (NULL == log_file_cfg->log_file_name || '\0' ==
 			*log_file_cfg->log_file_name))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"file\" parameter requires \"LogFile\" parameter to be set");
@@ -748,7 +575,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_f
 	return SUCCEED;
 }
 
-char	*strerror_from_system(zbx_syserror_t error)
+char	*zbx_strerror_from_system(zbx_syserror_t error)
 {
 #ifdef _WINDOWS
 	size_t		offset = 0;
@@ -781,7 +608,7 @@ char	*strerror_from_system(zbx_syserror_t error)
 }
 
 #ifdef _WINDOWS
-char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
+char	*zbx_strerror_from_module(zbx_syserror_t error, const wchar_t *module)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
@@ -799,7 +626,7 @@ char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
-				"unable to find message text: %s", strerror_from_system(GetLastError()));
+				"unable to find message text: %s", zbx_strerror_from_system(GetLastError()));
 
 		return utf8_string;
 	}
@@ -816,13 +643,13 @@ char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
  *                                                                            *
  * Purpose: log the message optionally appending to a string buffer           *
  *                                                                            *
- * Parameters: level      - [IN] the log level                                *
- *             out        - [OUT] the output buffer (optional)                *
- *             out_alloc  - [OUT] the output buffer size                      *
- *             out_offset - [OUT] the output buffer offset                    *
- *             format     - [IN] the format string                            *
+ * Parameters: level      - [IN] log level                                    *
+ *             out        - [OUT] output buffer (optional)                    *
+ *             out_alloc  - [OUT] output buffer size                          *
+ *             out_offset - [OUT] output buffer offset                        *
+ *             format     - [IN] format string                                *
  *                                                                            *
- * Return value: SUCCEED - the socket was successfully opened                 *
+ * Return value: SUCCEED - socket was successfully opened                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -858,4 +685,59 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	}
 
 	zbx_free(buf);
+}
+
+/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
+/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
+/******************************************************************************
+ *                                                                            *
+ * Purpose: react to "/etc/resolv.conf" update                                *
+ *                                                                            *
+ * Comments: it is intended to call this function in the end of each process  *
+ *           main loop. The purpose of calling it at the end (instead of the  *
+ *           beginning of main loop) is to let the first initialization of    *
+ *           libc resolver proceed internally.                                *
+ *                                                                            *
+ ******************************************************************************/
+static void	update_resolver_conf(void)
+{
+#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
+
+	static time_t	mtime = 0;
+	zbx_stat_t	buf;
+
+	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
+	{
+		mtime = buf.st_mtime;
+
+		if (0 != res_init())
+			zabbix_log(LOG_LEVEL_WARNING, "update_resolver_conf(): res_init() failed");
+	}
+
+#undef ZBX_RESOLV_CONF_FILE
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
+ *          log file after rotation                                           *
+ *                                                                            *
+ * Parameters: time_now - [IN] time for compare in seconds                    *
+ *                                                                            *
+ ******************************************************************************/
+void	__zbx_update_env(double time_now)
+{
+	static double	time_update = 0;
+
+	/* handle /etc/resolv.conf update and log rotate less often than once a second */
+	if (1.0 < time_now - time_update)
+	{
+		time_update = time_now;
+		zbx_handle_log();
+#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
+		update_resolver_conf();
+#endif
+	}
 }

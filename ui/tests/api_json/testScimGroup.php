@@ -36,7 +36,10 @@ class testScimGroup extends CAPIScimTest {
 		'userids' => [
 			'ldap_user' => null,
 			'user_active' => null,
-			'user_inactive' => null
+			'user_inactive' => null,
+			'admin' => null,
+			'user' => null,
+			'guest_user' => null
 		],
 		'usernames' => [
 			'ldap_user' => 'dwight.schrute@office.com',
@@ -56,8 +59,17 @@ class testScimGroup extends CAPIScimTest {
 		'user_scim_groupids' => [
 			'user_group_w_members' => null
 		],
-		'token' => [
-			'tokenid' => null
+		'tokenids' => [
+			'superadmin' => null,
+			'admin' => null,
+			'user' => null,
+			'guest_user' => null
+		],
+		'tokens' => [
+			'admin' => null,
+			'user' => null,
+			'guest_user' => null,
+			'no_token' => null
 		],
 		'mediatypeid' => '3'
 	];
@@ -184,12 +196,83 @@ class testScimGroup extends CAPIScimTest {
 			]
 		]);
 		$this->assertArrayHasKey('tokenids', $tokenid);
-		static::$data['token']['tokenid'] = $tokenid['tokenids'][0];
+		self::$data['tokenids']['superadmin'] = $tokenid['tokenids'][0];
 
-		$token = CDataHelper::call('token.generate', [static::$data['token']['tokenid']]);
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['superadmin']]);
 
 		$this->assertArrayHasKey('token', $token[0]);
 		CAPIScimHelper::setToken($token[0]['token']);
+
+		// Create users with different user roles for authorization testing.
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => 'admin',
+				'passwd' => 'testtest123',
+				'usrgrps' => [['usrgrpid' => 7]],
+				'roleid' => 2
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userids']['admin'] = $user['userids'][0];
+
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => 'user',
+				'passwd' => 'testtest123',
+				'usrgrps' => [['usrgrpid' => 7]],
+				'roleid' => 1
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userids']['user'] = $user['userids'][0];
+
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => 'guest_user',
+				'passwd' => 'testtest123',
+				'usrgrps' => [['usrgrpid' => 7]],
+				'roleid' => 4
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userids']['guest_user'] = $user['userids'][0];
+
+		// Create authorization token for each user with different user role for authorization testing.
+		$tokenid = CDataHelper::call('token.create', [
+			[
+				'name' => 'Token for admin',
+				'userid' => self::$data['userids']['admin']
+			]
+		]);
+		$this->assertArrayHasKey('tokenids', $tokenid);
+		self::$data['tokenids']['admin'] = $tokenid['tokenids'][0];
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['admin']]);
+		$this->assertArrayHasKey('token', $token[0]);
+		self::$data['tokens']['admin'] = $token[0]['token'];
+
+		$tokenid = CDataHelper::call('token.create', [
+			[
+				'name' => 'Token for user',
+				'userid' => self::$data['userids']['user']
+			]
+		]);
+		$this->assertArrayHasKey('tokenids', $tokenid);
+		self::$data['tokenids']['user'] = $tokenid['tokenids'][0];
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['user']]);
+		$this->assertArrayHasKey('token', $token[0]);
+		self::$data['tokens']['user'] = $token[0]['token'];
+
+		$tokenid = CDataHelper::call('token.create', [
+			[
+				'name' => 'Token for guest',
+				'userid' => self::$data['userids']['guest_user']
+			]
+		]);
+		$this->assertArrayHasKey('tokenids', $tokenid);
+		self::$data['tokenids']['guest_user'] = $tokenid['tokenids'][0];
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['guest_user']]);
+		$this->assertArrayHasKey('token', $token[0]);
+		self::$data['tokens']['guest_user'] = $token[0]['token'];
 	}
 
 	public function createInvalidGetRequest(): array {
@@ -1474,6 +1557,291 @@ class testScimGroup extends CAPIScimTest {
 		$this->assertEmpty($db_result_user_group);
 	}
 
+	public function createInvalidGetAuthentication() {
+		return [
+			'Admin tries to call SCIM Group GET request' => [
+				'group' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.get".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM Group GET request' => [
+				'group' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.get".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM Group GET request' => [
+				'group' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.get".',
+					'status' => 403
+				]
+			],
+			'Call SCIM Group GET request without token' => [
+				'group' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidGetAuthentication
+	 */
+	public function testScimGroup_AuthenticationGetInvalid($group, $expected_error) {
+		$group['token'] = self::$data['tokens'][$group['token']];
+
+		CAPIScimHelper::setToken($group['token']);
+		unset($group['token']);
+
+		$this->call('groups.get', $group, $expected_error);
+	}
+
+	public function createInvalidPutAuthentication() {
+		return [
+			'Admin tries to call SCIM Group PUT request' => [
+				'group' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.put".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM Group PUT request' => [
+				'group' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.put".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM Group PUT request' => [
+				'group' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.put".',
+					'status' => 403
+				]
+			],
+			'Call SCIM Group PUT request without token' => [
+				'group' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPutAuthentication
+	 */
+	public function testScimGroup_AuthenticationPutInvalid($group, $expected_error) {
+		$group['token'] = self::$data['tokens'][$group['token']];
+
+		CAPIScimHelper::setToken($group['token']);
+		unset($group['token']);
+
+		$this->call('groups.put', $group, $expected_error);
+	}
+
+	public function createInvalidPostAuthentication() {
+		return [
+			'Admin tries to call SCIM Group POST request' => [
+				'group' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.post".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM Group POST request' => [
+				'group' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.post".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM Group POST request' => [
+				'group' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.post".',
+					'status' => 403
+				]
+			],
+			'Call SCIM Group POST request without token' => [
+				'group' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPostAuthentication
+	 */
+	public function testScimGroup_AuthenticationPostInvalid($group, $expected_error) {
+		$group['token'] = self::$data['tokens'][$group['token']];
+
+		CAPIScimHelper::setToken($group['token']);
+		unset($group['token']);
+
+		$this->call('groups.post', $group, $expected_error);
+	}
+
+	public function createInvalidPatchAuthentication() {
+		return [
+			'Admin tries to call SCIM Group PATCH request' => [
+				'group' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.patch".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM Group PATCH request' => [
+				'group' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.patch".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM Group PATCH request' => [
+				'group' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.patch".',
+					'status' => 403
+				]
+			],
+			'Call SCIM Group PATCH request without token' => [
+				'group' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPatchAuthentication
+	 */
+	public function testScimGroup_AuthenticationPatchInvalid($group, $expected_error) {
+		$group['token'] = self::$data['tokens'][$group['token']];
+
+		CAPIScimHelper::setToken($group['token']);
+		unset($group['token']);
+
+		$this->call('groups.patch', $group, $expected_error);
+	}
+
+	public function createInvalidDeleteAuthentication() {
+		return [
+			'Admin tries to call SCIM Group DELETE request' => [
+				'group' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.delete".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM Group DELETE request' => [
+				'group' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.delete".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM Group DELETE request' => [
+				'group' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "groups.delete".',
+					'status' => 403
+				]
+			],
+			'Call SCIM Group DELETE request without token' => [
+				'group' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidDeleteAuthentication
+	 */
+	public function testScimGroup_AuthenticationDeleteInvalid($group, $expected_error) {
+		$group['token'] = self::$data['tokens'][$group['token']];
+
+		CAPIScimHelper::setToken($group['token']);
+		unset($group['token']);
+
+		$this->call('groups.delete', $group, $expected_error);
+	}
+
 	/**
 	 * Resolves unknown parameters in the input data or expected results.
 	 *
@@ -1542,7 +1910,7 @@ class testScimGroup extends CAPIScimTest {
 		DB::delete('scim_group', ['scim_groupid' => array_values(self::$data['scim_groupids'])]);
 
 		// Delete token.
-		CDataHelper::call('token.delete', [self::$data['token']['tokenid']]);
+		CDataHelper::call('token.delete', [self::$data['tokenids']['superadmin']]);
 	}
 }
 

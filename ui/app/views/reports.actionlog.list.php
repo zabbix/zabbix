@@ -43,7 +43,7 @@ $filter = (new CFilter())
 	->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', $data['action']))
 	->setProfile($data['timeline']['profileIdx'])
 	->addVar('action', $data['action'])
-	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'])
+	->addTimeSelector($data['timeline']['from'], $data['timeline']['to'], true, 'web.actionlog.filter')
 	->setActiveTab($data['active_tab'])
 	->addFilterTab(_('Filter'), [
 		(new CFormList())

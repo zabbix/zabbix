@@ -33,7 +33,7 @@ $form
 		new CWidgetFieldSelectView($data['fields']['time_type'])
 	)
 	->addField(array_key_exists('itemid', $data['fields'])
-		? (new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid']))
+		? (new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,
@@ -55,13 +55,13 @@ $form
 				new CWidgetFieldColorView($data['fields']['bg_color'])
 			)
 			->addFieldsGroup(
-				getDateFieldsGroupViews($form, $data['fields'])
+				getDateFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-date')
 			)
 			->addFieldsGroup(
-				getTimeFieldsGroupViews($form, $data['fields'])
+				getTimeFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-time')
 			)
 			->addFieldsGroup(
-				getTimeZoneFieldsGroupViews($form, $data['fields'])
+				getTimeZoneFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-tzone')
 			)
 			->addClass('js-fieldset-adv-conf')
 	)
@@ -69,30 +69,29 @@ $form
 	->addJavaScript('widget_clock_form.init();')
 	->show();
 
-function getDateFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$date_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['date_size']));
+function getDateFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$date_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['date_size']));
 
 	return (new CWidgetFieldsGroupView(_('Date')))
 		->addItem([
-			$date_size->getLabel(),
-			(new CFormField([$date_size->getView(), '%']))->addClass('field-size')
+			$date_size_field->getLabel(),
+			(new CFormField([$date_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['date_bold'])
 		)
 		->addField(
 			(new CWidgetFieldColorView($fields['date_color']))->addLabelClass('offset-3')
-		)
-		->addRowClass('fields-group-date');
+		);
 }
 
-function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$time_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
+function getTimeFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$time_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time')))
 		->addItem([
-			$time_size->getLabel(),
-			(new CFormField([$time_size->getView(), '%']))->addClass('field-size')
+			$time_size_field->getLabel(),
+			(new CFormField([$time_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['time_bold'])
@@ -105,17 +104,16 @@ function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetF
 		)
 		->addField(
 			(new CWidgetFieldRadioButtonListView($fields['time_format']))->addClass('field-format')
-		)
-		->addRowClass('fields-group-time');
+		);
 }
 
-function getTimeZoneFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$tzone_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['tzone_size']));
+function getTimeZoneFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$tzone_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['tzone_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time zone')))
 		->addItem([
-			$tzone_size->getLabel(),
-			(new CFormField([$tzone_size->getView(), '%']))->addClass('field-size')
+			$tzone_size_field->getLabel(),
+			(new CFormField([$tzone_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addField(
 			new CWidgetFieldCheckBoxView($fields['tzone_bold'])
@@ -128,6 +126,5 @@ function getTimeZoneFieldsGroupViews(CWidgetFormView $form, array $fields): CWid
 		)
 		->addField(
 			(new CWidgetFieldRadioButtonListView($fields['tzone_format']))->addRowClass('field-tzone-format')
-		)
-		->addRowClass('fields-group-tzone');
+		);
 }

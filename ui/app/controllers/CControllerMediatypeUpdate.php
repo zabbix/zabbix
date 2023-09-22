@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,11 +21,15 @@
 
 class CControllerMediatypeUpdate extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>			'fatal|required|db media_type.mediatypeid',
 			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
-			'name' =>					'db media_type.name|not_empty',
+			'name' =>					'required|db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
@@ -46,78 +50,77 @@ class CControllerMediatypeUpdate extends CController {
 			'show_event_menu' =>		'in '.ZBX_EVENT_MENU_HIDE.','.ZBX_EVENT_MENU_SHOW,
 			'event_menu_url' =>			'db media_type.event_menu_url',
 			'event_menu_name' =>		'db media_type.event_menu_name',
-			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE,
 			'maxsessions' =>			'db media_type.maxsessions',
 			'maxattempts' =>			'db media_type.maxattempts',
 			'attempt_interval' =>		'db media_type.attempt_interval',
 			'description' =>			'db media_type.description',
-			'form_refresh' =>			'int32',
 			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
 			'message_templates' =>		'array',
 			'provider' => 				'int32|in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
 		];
 
 		$ret = $this->validateInput($fields);
-		$error = $this->GetValidationError();
 
 		if ($ret && $this->getInput('type') == MEDIA_TYPE_EMAIL) {
 			$email_validator = new CEmailValidator();
 
-			if (!$email_validator->validate($this->getInput('smtp_email'))) {
+			if (!$email_validator->validate($this->getInput('smtp_email', ''))) {
 				error($email_validator->getError());
-				$error = self::VALIDATION_ERROR;
 				$ret = false;
 			}
 		}
 
 		if (!$ret) {
-			switch ($error) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=mediatype.edit');
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update media type'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update media type'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
-			return false;
-		}
-
-		return (bool) API::Mediatype()->get([
-			'output' => [],
-			'mediatypeids' => $this->getInput('mediatypeid'),
-			'editable' => true
-		]);
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	protected function doAction() {
-		$mediatype = [];
+	protected function doAction(): void {
+		$db_defaults = DB::getDefaults('media_type');
 
-		$this->getInputs($mediatype, ['mediatypeid', 'type', 'name', 'maxsessions', 'maxattempts', 'attempt_interval',
-			'description'
-		]);
-		$mediatype['status'] = $this->getInput('status', MEDIA_TYPE_STATUS_ACTIVE);
-		$mediatype['message_templates'] = $this->getInput('message_templates', []);
+		$mediatype = [
+			'mediatypeid' => $this->getInput('mediatypeid'),
+			'type' =>  $this->getInput('type'),
+			'name' => $this->getInput('name'),
+			'maxsessions' => $this->getInput('maxsessions',  $db_defaults['maxsessions']),
+			'maxattempts' =>  $this->getInput('maxattempts', $db_defaults['maxattempts']),
+			'attempt_interval' => $this->getInput('attempt_interval', $db_defaults['attempt_interval']),
+			'description' => $this->getInput('description', ''),
+			'status' => $this->hasInput('status') ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED,
+			'message_templates' => $this->getInput('message_templates', [])
+		];
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
-				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_authentication', 'passwd', 'content_type', 'provider'
+				$this->getInputs($mediatype, ['smtp_port', 'smtp_helo', 'smtp_security', 'smtp_authentication',
+					'content_type', 'passwd'
 				]);
 
+				$smtp_email = $this->getInput('smtp_email', '');
+
+				$mediatype['provider'] = $this->hasInput('provider') ? $this->getInput('provider') : null;
+				$mediatype['smtp_server'] = $this->getInput('smtp_server', '');
+				$mediatype['smtp_email'] = $smtp_email;
+				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);
+				$mediatype['smtp_verify_host'] = $this->getInput('smtp_verify_host', 0);
+
 				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
-					preg_match('/.*<(?<email>.*[^>])>$/i', $this->getInput('smtp_email'), $match);
-					$clean_email = $match ? $match['email'] : $this->getInput('smtp_email');
+					preg_match('/.*<(?<email>.*[^>])>$/i', $smtp_email, $match);
+					$clean_email = $match ? $match['email'] : $smtp_email;
 
 					$domain = substr($clean_email, strrpos($clean_email, '@') + 1);
 
@@ -128,28 +131,20 @@ class CControllerMediatypeUpdate extends CController {
 					}
 
 					if ($mediatype['provider'] == CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY) {
-
 						$formatted_domain = substr_replace($domain, '-', strrpos($domain, '.'), 1);
 						$static_part = CMediatypeHelper::getEmailProviders($mediatype['provider'])['smtp_server'];
 
 						$mediatype['smtp_server'] = $formatted_domain.$static_part;
 					}
 				}
-				else {
-					if ($this->hasInput('smtp_username')) {
-						$mediatype['username'] = $this->getInput('smtp_username');
-					}
+				elseif ($this->hasInput('smtp_username')) {
+					$mediatype['username'] = $this->getInput('smtp_username');
 				}
-
-				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);
-				$mediatype['smtp_verify_host'] = $this->getInput('smtp_verify_host', 0);
-
 				break;
 
 			case MEDIA_TYPE_EXEC:
 				$mediatype['parameters'] = [];
-
-				$this->getInputs($mediatype, ['exec_path']);
+				$mediatype['exec_path'] = $this->getInput('exec_path', '');
 
 				foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
 					$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
@@ -157,24 +152,27 @@ class CControllerMediatypeUpdate extends CController {
 				break;
 
 			case MEDIA_TYPE_SMS:
-				$this->getInputs($mediatype, ['gsm_modem']);
+				$mediatype['gsm_modem'] = $this->getInput('gsm_modem', '');
 				$mediatype['maxsessions'] = 1;
 				break;
 
 			case MEDIA_TYPE_WEBHOOK:
-				$mediatype['process_tags'] = ZBX_MEDIA_TYPE_TAGS_DISABLED;
-				$mediatype['show_event_menu'] = ZBX_EVENT_MENU_HIDE;
-				$mediatype['parameters'] = [];
-				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-					'event_menu_name'
-				]);
+				$this->getInputs($mediatype,
+					['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_name', 'event_menu_url']
+				);
+
+				$mediatype += [
+					'process_tags' => ZBX_MEDIA_TYPE_TAGS_DISABLED,
+					'show_event_menu' => ZBX_EVENT_MENU_HIDE,
+					'event_menu_name' => '',
+					'event_menu_url' => ''
+				];
 
 				$parameters = $this->getInput('parameters_webhook', []);
+				$mediatype['parameters'] = [];
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
-					$mediatype['parameters'] = array_map(function ($name, $value) {
-							return compact('name', 'value');
-						},
+					$mediatype['parameters'] = array_map(static fn($name, $value) => compact('name', 'value'),
 						$parameters['name'],
 						$parameters['value']
 					);
@@ -182,23 +180,27 @@ class CControllerMediatypeUpdate extends CController {
 				break;
 		}
 
+		if ($mediatype['type'] != MEDIA_TYPE_EMAIL) {
+			$mediatype['provider'] = CMediatypeHelper::EMAIL_PROVIDER_SMTP;
+		}
+
 		$result = API::Mediatype()->update($mediatype);
+		$output = [];
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'mediatype.list')
-				->setArgument('page', CPagerHelper::loadPage('mediatype.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Media type updated'));
+			$output['success']['title'] = _('Media type updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'mediatype.edit')
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update media type'));
+			$output['error'] = [
+				'title' => ('Cannot update media type'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
-		$this->setResponse($response);
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

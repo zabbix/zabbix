@@ -35,14 +35,39 @@ class CExpressionMacroFunctionParser extends CParser {
 	protected $function_parser;
 
 	/**
-	 * Set up necessary parsers.
+	 * An options array.
+	 *
+	 * Supported options:
+	 *   'usermacros' => false    Enable user macros usage in expression.
+	 *   'lldmacros' => false     Enable low-level discovery macros usage in expression.
+	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false    Allow empty hostname in the query string.
+	 *
+	 * @var array
 	 */
-	public function __construct() {
+	private $options = [
+		'usermacros' => false,
+		'lldmacros' => false,
+		'host_macro' => false,
+		'host_macro_n' => false,
+		'empty_host' => false
+	];
+
+	/**
+	 * Set up necessary parsers.
+	 *
+	 * @param array $options
+	 */
+	public function __construct(array $options = []) {
+		$this->options = $options + $this->options;
+
 		$this->expression_macro_parser = new CExpressionMacroParser([
-			'usermacros' => true,
-			'lldmacros' => true,
-			'host_macro_n' => true,
-			'empty_host' => true
+			'usermacros' => $this->options['usermacros'],
+			'lldmacros' => $this->options['lldmacros'],
+			'host_macro' => $this->options['host_macro'],
+			'host_macro_n' => $this->options['host_macro_n'],
+			'empty_host' => $this->options['empty_host']
 		]);
 		$this->function_parser = new C10FunctionParser();
 	}
@@ -88,5 +113,23 @@ class CExpressionMacroFunctionParser extends CParser {
 		$this->match = substr($source, $pos, $this->length);
 
 		return (isset($source[$p]) ? CParser::PARSE_SUCCESS_CONT : CParser::PARSE_SUCCESS);
+	}
+
+	/**
+	 * Returns the expression parser.
+	 *
+	 * @return CExpressionMacroParser
+	 */
+	public function getExpressionMacroParser(): CExpressionMacroParser {
+		return $this->expression_macro_parser;
+	}
+
+	/**
+	 * Returns function parser.
+	 *
+	 * @return C10FunctionParser
+	 */
+	public function getFunctionParser() {
+		return $this->function_parser;
 	}
 }

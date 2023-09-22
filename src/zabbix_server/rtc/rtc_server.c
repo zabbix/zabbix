@@ -18,7 +18,7 @@
 **/
 #include "rtc_server.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxdiag.h"
 #include "zbxtypes.h"
 #include "zbxcommon.h"
@@ -250,6 +250,11 @@ static int	rtc_process_diaginfo(const char *data, char **result)
 	else if (0 == strcmp(buf, ZBX_DIAG_ALERTING))
 	{
 		scope = 1 << ZBX_DIAGINFO_ALERTING;
+		ret = SUCCEED;
+	}
+	else if (0 == strcmp(buf, ZBX_DIAG_CONNECTOR))
+	{
+		scope = 1 << ZBX_DIAGINFO_CONNECTOR;
 		ret = SUCCEED;
 	}
 

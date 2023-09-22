@@ -19,8 +19,7 @@
 
 #include "active.h"
 
-#include "zbxserver.h"
-#include "log.h"
+#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
@@ -31,6 +30,8 @@
 #include "zbxversion.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxautoreg.h"
+#include "zbxscripts.h"
 
 extern unsigned char	program_type;
 
@@ -91,22 +92,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
 	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
 
-	do
-	{
-		zbx_db_begin();
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			zbx_db_register_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
-					(unsigned short)flag, now, events_cbs);
-		}
-		else
-		{
-			zbx_db_proxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
-					(unsigned short)flag, now);
-		}
-	}
-	while (ZBX_DB_DOWN == zbx_db_commit());
+	zbx_autoreg_update_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag, now,
+			events_cbs);
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
@@ -326,8 +313,8 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
@@ -397,7 +384,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6) || 0 == strncmp(key, "log.count[", 10) ||
 			0 == strncmp(key, "logrt.count[", 12))
 		item_key = ZBX_KEY_LOG;
-	else if (0 == strncmp(key, "eventlog[", 9))
+	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 15))
 		item_key = ZBX_KEY_EVENTLOG;
 	else
 		return;
@@ -592,15 +579,15 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 				continue;
 
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
-					NULL, NULL, NULL, NULL, NULL, &dc_items[i].delay, MACRO_TYPE_COMMON, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL, NULL,
+					NULL, NULL, NULL, NULL, &dc_items[i].delay, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 			if (SUCCEED != zbx_interval_preproc(dc_items[i].delay, &delay, NULL, NULL))
 				continue;
 
 			dc_items[i].key = zbx_strdup(dc_items[i].key, dc_items[i].key_orig);
 			zbx_substitute_key_macros_unmasked(&dc_items[i].key, NULL, &dc_items[i], NULL, NULL,
-					MACRO_TYPE_ITEM_KEY, NULL, 0);
+					ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0);
 
 			zbx_json_addobject(&json, NULL);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, dc_items[i].key, ZBX_JSON_TYPE_STRING);
@@ -646,6 +633,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	zbx_json_close(&json);
+
+	zbx_remote_commans_prepare_to_send(&json, hostid);
 
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);

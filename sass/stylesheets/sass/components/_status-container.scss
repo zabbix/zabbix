@@ -1,0 +1,93 @@
+%status {
+	box-sizing: border-box;
+	display: inline-block;
+	min-width: 16px;
+	height: 16px;
+	padding-right: 3px;
+	padding-left: 3px;
+	font-size: $font-h3-size;
+	line-height: 15px;
+	text-align: center;
+	vertical-align: top;
+	border-width: 1px;
+	border-style: solid;
+	border-radius: 2px;
+}
+
+.status-container {
+	display: inline-block;
+	height: 16px;
+	white-space: nowrap;
+
+	&:not(:first-of-type) {
+		margin-left: 3px;
+	}
+
+	[class^="status-"] {
+		&:not(:last-of-type) {
+			padding-right: 4px;
+			border-right-style: none;
+		}
+
+		&:not(:first-of-type) {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+
+		&:not(:last-of-type) {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+	}
+}
+
+.status-na-bg,
+.status-info-bg,
+.status-warning-bg,
+.status-average-bg,
+.status-high-bg,
+.status-disaster-bg {
+	@extend %status;
+
+	border-color: $status-border-color;
+}
+
+.status-green {
+	@extend %status;
+
+	color: $status-color;
+	background-color: $status-green-bg-color;
+	border-color: $status-green-border-color;
+}
+
+.status-disabled {
+	@extend %status;
+
+	color: $form-disabled-font-color;
+	background-color: $status-grey-bg-color;
+	border-color: $status-disabled-border-color;
+}
+
+.status-grey {
+	@extend %status;
+
+	color: $form-disabled-font-color;
+	background-color: $status-grey-bg-color;
+	border-color: $status-grey-border-color;
+}
+
+.status-yellow {
+	@extend %status;
+
+	color: $status-color;
+	background-color: $status-yellow-bg-color;
+	border-color: $status-yellow-border-color;
+}
+
+.status-red {
+	@extend %status;
+
+	color: $status-color;
+	background-color: $status-red-bg-color;
+	border-color: $status-red-border-color;
+}

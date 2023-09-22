@@ -19,7 +19,7 @@
 
 #include "housekeeper.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxcacheconfig.h"

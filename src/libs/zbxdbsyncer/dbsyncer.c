@@ -19,7 +19,6 @@
 
 #include "zbxdbsyncer.h"
 
-#include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtime.h"
@@ -69,7 +68,7 @@ static void	zbx_db_flush_timer_queue(void)
 	if (0 != persistent_timers.values_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "trigger_queue", "trigger_queueid", "objectid", "type", "clock", "ns",
-				NULL);
+				(char *)NULL);
 
 		for (int i = 0; i < persistent_timers.values_num; i++)
 		{

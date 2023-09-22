@@ -18,10 +18,9 @@
 **/
 
 #include "lld.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "../db_lengths.h"
-#include "log.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
@@ -1141,7 +1140,7 @@ static void	lld_trigger_expression_simplify_and_expand(const zbx_lld_trigger_t *
 }
 
 static int	lld_parameter_make(const char *e, char **exp, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
 {
 	int	ret;
 	size_t	exp_alloc = 0, exp_offset = 0;
@@ -1164,7 +1163,7 @@ static int	lld_parameter_make(const char *e, char **exp, const struct zbx_json_p
 }
 
 static int	lld_function_make(const zbx_lld_function_t *function_proto, zbx_vector_ptr_t *functions,
-		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros,
+		zbx_uint64_t itemid, const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros,
 		char **error)
 {
 	int			i, ret, function_found = 0;
@@ -1232,7 +1231,7 @@ static void	lld_functions_delete(zbx_vector_ptr_t *functions)
 
 static int	lld_functions_make(const zbx_vector_ptr_t *functions_proto, zbx_vector_ptr_t *functions,
 		const zbx_vector_ptr_t *items, const zbx_vector_lld_item_link_t *item_links,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macros, char **error)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros, char **error)
 {
 	int				i, index, ret = FAIL;
 	const zbx_lld_function_t	*function_proto;
@@ -1287,7 +1286,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static char	*lld_eval_get_expanded_expression(const zbx_eval_context_t *src, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macros, char *err, size_t err_len)
+		const zbx_vector_lld_macro_path_t *lld_macros, char *err, size_t err_len)
 {
 	zbx_eval_context_t	ctx;
 	int			i;
@@ -1340,7 +1339,7 @@ out:
  ******************************************************************************/
 static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototype, zbx_vector_ptr_t *triggers,
 		const zbx_vector_ptr_t *items, zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
-		const zbx_vector_ptr_t *lld_macros, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
 {
 	zbx_lld_trigger_t		*trigger;
 	char				*buffer = NULL, *expression = NULL, *recovery_expression = NULL, err[64];
@@ -1621,7 +1620,7 @@ static int	items_triggers_compare_func(const void *d1, const void *d2)
 
 static void	lld_triggers_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
 		const zbx_vector_ptr_t *items, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	const zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int					i, j;
@@ -1880,8 +1879,8 @@ static void	lld_trigger_dependencies_make(const zbx_vector_ptr_t *trigger_protot
  *                                                                            *
  ******************************************************************************/
 static void 	lld_trigger_tag_make(const zbx_lld_trigger_prototype_t *trigger_prototype,
-		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row, const zbx_vector_ptr_t *lld_macro_paths,
-		char **error)
+		zbx_hashset_t *items_triggers, const zbx_lld_row_t *lld_row,
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_t	*trigger;
 	int			i;
@@ -1934,7 +1933,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	lld_trigger_tags_make(const zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers,
-		const zbx_vector_lld_row_t *lld_rows, const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_row_t *lld_rows, const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	zbx_lld_trigger_prototype_t	*trigger_prototype;
 	int				i, j;
@@ -2502,7 +2501,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		functionid = zbx_db_get_maxid_num("functions", new_functions);
 
 		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
-				"name", "parameter", NULL);
+				"name", "parameter", (char *)NULL);
 	}
 
 	if (0 != new_triggers)
@@ -2512,10 +2511,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "expression", "priority",
 				"status", "comments", "url", "url_name", "type", "value", "state", "flags",
 				"recovery_mode", "recovery_expression", "correlation_mode", "correlation_tag",
-				"manual_close", "opdata", "event_name", NULL);
+				"manual_close", "opdata", "event_name", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_tdiscovery, "trigger_discovery", "triggerid", "parent_triggerid",
-				NULL);
+				(char *)NULL);
 	}
 
 	if (0 != new_tags)
@@ -2523,7 +2522,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		triggertagid = zbx_db_get_maxid_num("trigger_tag", new_tags);
 
 		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
-				NULL);
+				(char *)NULL);
 	}
 
 	if (0 != new_dependencies)
@@ -2531,7 +2530,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		triggerdepid = zbx_db_get_maxid_num("trigger_depends", new_dependencies);
 
 		zbx_db_insert_prepare(&db_insert_tdepends, "trigger_depends", "triggerdepid", "triggerid_down",
-				"triggerid_up", NULL);
+				"triggerid_up", (char *)NULL);
 	}
 
 	if (SUCCEED != zbx_db_lock_hostid(hostid) || SUCCEED != zbx_db_lock_triggerids(&trigger_protoids))
@@ -3601,7 +3600,7 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
  *                                                                            *
  ******************************************************************************/
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t		trigger_prototypes;
 	zbx_vector_ptr_t		triggers;

@@ -2380,12 +2380,12 @@ zabbix_export:
           master_item:
             key: rabbitmq.get_queues
           lld_macro_paths:
-            - lld_macro: '{#NODE}'
-              path: $.node
             - lld_macro: '{#QUEUE}'
               path: $.name
             - lld_macro: '{#VHOST}'
               path: $.vhost
+            - lld_macro: '{#NODE}'
+              path: $.node
       tags:
         - tag: class
           value: software

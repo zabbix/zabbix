@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha1])
+AC_INIT([Zabbix],[7.0.0alpha5])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -77,6 +77,9 @@ AC_CHECK_HEADERS(resolv.h, [], [], [
 #  include <arpa/nameser.h>
 #endif
 #ifdef HAVE_NETDB_H
+#if defined(_AIX)       /* AIX 5.1 needs this to get hstrerror() declaration */
+#define _USE_IRS
+#endif
 #  include <netdb.h>
 #endif
 ])
@@ -166,6 +169,7 @@ dnl *****************************************************************
 
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(kstat_open, kstat)
+AC_SEARCH_LIBS(inet_ntoa, nsl)
 AC_SEARCH_LIBS(clock_gettime, rt)
 AC_SEARCH_LIBS(dlopen, dl)
 
@@ -1029,6 +1033,7 @@ openbsd*)
 	;;
 *)
 	ARCH="unknown"
+	AC_DEFINE([ZBX_UNKNOWN_ARCH], 1, [Define to 1 if unsupported architecture was detected.])
 	;;
 esac
 
@@ -1980,7 +1985,10 @@ AC_CONFIG_FILES([
 	src/go/Makefile
 	src/libs/Makefile
 	src/libs/zbxalgo/Makefile
+	src/libs/zbxasyncpoller/Makefile
+	src/libs/zbxasynchttppoller/Makefile
 	src/libs/zbxaudit/Makefile
+	src/libs/zbxautoreg/Makefile
 	src/libs/zbxavailability/Makefile
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
@@ -2002,6 +2010,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxdiscovery/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxeval/Makefile
+	src/libs/zbxevent/Makefile
 	src/libs/zbxexec/Makefile
 	src/libs/zbxexport/Makefile
 	src/libs/zbxexpr/Makefile
@@ -2026,11 +2035,13 @@ AC_CONFIG_FILES([
 	src/libs/zbxparam/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
+	src/libs/zbxproxybuffer/Makefile
 	src/libs/zbxregexp/Makefile
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
-	src/libs/zbxserver/Makefile
+	src/libs/zbxexpression/Makefile
+	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
 	src/libs/zbxstr/Makefile
@@ -2063,6 +2074,8 @@ AC_CONFIG_FILES([
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
+	src/zabbix_agent/agent_conf/Makefile
+	src/zabbix_agent/listener/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
@@ -2097,7 +2110,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_server/rtc/Makefile
-	src/zabbix_server/scripts/Makefile
 	src/zabbix_server/service/Makefile
 	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile
@@ -2338,9 +2350,9 @@ fi
 
 echo
 echo "***********************************************************"
-echo "*            Now run '${am_make} install'                       *"
+echo "*            Now run '${am_make} install'                 *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
-echo "*              <http://www.zabbix.com>                    *"
+echo "*              <https://www.zabbix.com>                   *"
 echo "***********************************************************"
 echo

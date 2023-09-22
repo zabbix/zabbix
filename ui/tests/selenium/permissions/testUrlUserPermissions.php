@@ -199,9 +199,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'toptriggers.php',
-				'title' =>	'100 busiest triggers',
-				'header' =>	'100 busiest triggers',
+				'url' => 'zabbix.php?action=toptriggers.list',
+				'title' =>	'Top 100 triggers',
+				'header' =>	'Top 100 triggers',
 				'users' => [
 					'guest' => true,
 					'user-zabbix' => true,
@@ -296,19 +296,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'templates.php',
+				'url' => 'zabbix.php?action=template.list',
 				'title' =>	'Configuration of templates',
 				'header' => 'Templates',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'templates.php?form=update&templateid=10093',
-				'title' =>	'Configuration of templates',
-				'no_permissions_to_object' => true,
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -449,15 +439,6 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				'url' => 'zabbix.php?action=correlation.list',
 				'title' =>	'Event correlation rules',
 				'header' => 'Event correlation',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => false
-				]
-			]],
-			[[
-				'url' => 'zabbix.php?action=correlation.edit',
-				'title' =>	'Event correlation rules',
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,

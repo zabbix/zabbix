@@ -23,9 +23,14 @@
 #include "zbxcomms.h"
 #include "zbxjson.h"
 #include "zbxvault.h"
+#include "zbxdbhigh.h"
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		zbx_get_program_type_f get_program_type_cb, int config_timeout, const char *config_source_ip,
-		const char *server);
+		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
+		const zbx_config_vault_t *config_vault, int proxydata_frequency,
+		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs);
+
+int	init_proxy_history_lock(char **error);
+void	free_proxy_history_lock(void);
+
 #endif

@@ -19,7 +19,6 @@
 
 #include "lld_protocol.h"
 
-#include "log.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
 #include "zbxsysinfo.h"

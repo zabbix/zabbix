@@ -214,7 +214,8 @@ $triggersForm->addItem([
 				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.triggerprototype' => [
-				'content' => (new CButton('', _('Mass update')))
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('triggerprototype').
@@ -223,8 +224,6 @@ $triggersForm->addItem([
 							trigger_element: this
 						});"
 					)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
 			],
 			'triggerprototype.massdelete' => [
 				'name' => _('Delete'),
@@ -236,6 +235,15 @@ $triggersForm->addItem([
 		$this->data['parent_discoveryid']
 	)
 ]);
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'context' => $data['context'],
+		'checkbox_hash' => $data['parent_discoveryid']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
 
 $html_page
 	->addItem($triggersForm)

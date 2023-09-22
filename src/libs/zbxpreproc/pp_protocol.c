@@ -20,7 +20,6 @@
 #include "pp_protocol.h"
 #include "zbxpreproc.h"
 
-#include "log.h"
 #include "zbxserialize.h"
 #include "zbx_item_constants.h"
 #include "zbxvariant.h"

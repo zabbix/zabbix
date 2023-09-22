@@ -158,9 +158,7 @@ window.widget_svggraph_form = new class {
 		jQuery('.<?= CRangeControl::ZBX_STYLE_CLASS ?>', jQuery(this._dataset_wrapper)).rangeControl();
 
 		// Initialize pattern fields.
-		jQuery('.multiselect', jQuery(this._dataset_wrapper)).each(function() {
-			jQuery(this).multiSelect(jQuery(this).data('params'));
-		});
+		jQuery('.multiselect', jQuery(this._dataset_wrapper)).multiSelect();
 
 		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			jQuery(colorpicker).colorpicker({
@@ -174,7 +172,7 @@ window.widget_svggraph_form = new class {
 		}
 
 		this._dataset_wrapper.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-add-item')) {
+			if (e.target.classList.contains('js-add')) {
 				this._selectItems();
 			}
 
@@ -182,7 +180,7 @@ window.widget_svggraph_form = new class {
 				this._removeSingleItem(e.target);
 			}
 
-			if (e.target.classList.contains('btn-remove')) {
+			if (e.target.classList.contains('js-remove')) {
 				this._removeDataSet(e.target);
 			}
 		});
@@ -353,7 +351,7 @@ window.widget_svggraph_form = new class {
 		}
 
 		for (const multiselect of dataset.querySelectorAll('.multiselect')) {
-			jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
+			jQuery(multiselect).multiSelect();
 		}
 
 		for (const range_control of dataset.querySelectorAll('.<?= CRangeControl::ZBX_STYLE_CLASS ?>')) {
@@ -467,6 +465,8 @@ window.widget_svggraph_form = new class {
 				this._updatePreview();
 			});
 		}
+
+		this._sortable_data_set.enableSorting(datasets_count > 1);
 	}
 
 	_selectItems() {
@@ -555,11 +555,11 @@ window.widget_svggraph_form = new class {
 
 		jQuery(`.single-item-table`, dataset).sortable({
 			disabled: item_rows.length < 2,
-			items: 'tbody .single-item-table-row',
+			items: '.single-item-table-row',
 			axis: 'y',
 			containment: 'parent',
 			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: () => {

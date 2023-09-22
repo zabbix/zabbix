@@ -175,7 +175,7 @@ class testFormScheduledReport extends CWebTest {
 		$subscription_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$overlay_form = $subscription_overlay->query('id:subscription-form')->waitUntilVisible()->asForm()->one();
 		$overlay_form->checkValue(['Status' => 'Exclude']);
-		$subscription_overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+		$subscription_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 
 		// Close report overlay on Dashboard.
 		if ($dashboard) {

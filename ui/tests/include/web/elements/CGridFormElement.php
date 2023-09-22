@@ -120,6 +120,7 @@ class CGridFormElement extends CFormElement {
 	protected function findLabels($name) {
 		$labels = $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.
 				CXPathHelper::escapeQuotes($name).']|.//div[contains(@class, "form-grid")]/fieldset/label[text()='.
+				CXPathHelper::escapeQuotes($name).']|.//div[contains(@class, "form-grid")]/fieldset/div/label[text()='.
 				CXPathHelper::escapeQuotes($name).']')->all();
 
 		if ($labels->isEmpty()) {

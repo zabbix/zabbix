@@ -32,6 +32,10 @@ class CDService extends CApiService {
 	protected $tableAlias = 'ds';
 	protected $sortColumns = ['dserviceid', 'dhostid', 'ip'];
 
+	public const OUTPUT_FIELDS = ['dserviceid', 'dhostid', 'value', 'port', 'status', 'lastup', 'lastdown', 'dcheckid',
+		'ip', 'dns'
+	];
+
 	/**
 	 * Get discovery service data.
 	 *
@@ -269,10 +273,10 @@ class CDService extends CApiService {
 				' FROM dservices ds,dchecks dc,drules dr,hosts h,interface i'.
 				' WHERE ds.dcheckid=dc.dcheckid'.
 					' AND dc.druleid=dr.druleid'.
-					' AND (dr.proxy_hostid=h.proxy_hostid OR (dr.proxy_hostid IS NULL AND h.proxy_hostid IS NULL))'.
+					' AND (dr.proxyid=h.proxyid OR (dr.proxyid IS NULL AND h.proxyid IS NULL))'.
 					' AND h.hostid=i.hostid'.
 					' AND ds.ip=i.ip'.
-					' AND '.dbConditionInt('ds.dserviceid', $dserviceIds)
+					' AND '.dbConditionId('ds.dserviceid', $dserviceIds)
 			);
 
 			$host_services = [];

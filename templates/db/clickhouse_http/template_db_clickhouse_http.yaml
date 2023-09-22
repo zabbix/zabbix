@@ -1981,7 +1981,7 @@ zabbix_export:
           description: 'Maximum diff between log_pointer and log_max_index.'
         - macro: '{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}'
           value: '5'
-          description: 'Maximum number of smth for trigger expression'
+          description: 'Maximum number of network errors for trigger expression'
         - macro: '{$CLICKHOUSE.PARTS.PER.PARTITION.WARN}'
           value: '300'
           description: 'Maximum number of parts per partition for trigger expression.'

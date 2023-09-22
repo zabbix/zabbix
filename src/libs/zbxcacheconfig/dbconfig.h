@@ -372,7 +372,7 @@ ZBX_PTR_VECTOR_DECL(dc_httptest_ptr, zbx_dc_httptest_t *)
 typedef struct
 {
 	zbx_uint64_t	hostid;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	zbx_uint64_t	items_active_normal;		/* On enabled hosts these two fields store number of enabled */
 	zbx_uint64_t	items_active_notsupported;	/* and supported items and enabled and not supported items.  */
 	zbx_uint64_t	items_disabled;			/* On "hosts" corresponding to proxies this and two fields   */
@@ -448,10 +448,15 @@ ZBX_VECTOR_DECL(host_rev, zbx_host_rev_t)
 
 typedef struct
 {
-	zbx_uint64_t			hostid;
+	zbx_uint64_t			proxyid;
+	const char			*name;
+	unsigned char			mode;
 	zbx_uint64_t			hosts_monitored;	/* number of enabled hosts assigned to proxy */
 	zbx_uint64_t			hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
 	double				required_performance;
+	zbx_uint64_t			items_active_normal;		/* On enabled hosts these two fields store number of enabled */
+	zbx_uint64_t			items_active_notsupported;	/* and supported items and enabled and not supported items.  */
+	zbx_uint64_t			items_disabled;
 	int				proxy_config_nextcheck;
 	int				proxy_data_nextcheck;
 	int				proxy_tasks_nextcheck;
@@ -465,15 +470,30 @@ typedef struct
 	int				version_int;
 	zbx_proxy_compatibility_t	compatibility;
 	unsigned char			location;
-	unsigned char			auto_compress;
-	const char			*proxy_address;
+	const char			*allowed_addresses;
 	int				last_version_error_time;
 	zbx_uint64_t			revision;
 
 	zbx_vector_dc_host_ptr_t	hosts;
 	zbx_vector_host_rev_t		removed_hosts;
+	unsigned char			tls_connect;
+	unsigned char			tls_accept;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char			*tls_issuer;
+	const char			*tls_subject;
+	ZBX_DC_PSK			*tls_dc_psk;
+#endif
+	const char			*address;
+	const char			*port;
 }
 ZBX_DC_PROXY;
+
+typedef struct
+{
+	const char	*name;
+	ZBX_DC_PROXY	*proxy_ptr;
+}
+zbx_dc_proxy_name_t;
 
 typedef struct
 {
@@ -919,7 +939,7 @@ typedef struct
 	zbx_hashset_t		trigdeps;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
-	zbx_hashset_t		hosts_p;		/* for searching proxies by 'host' name */
+	zbx_hashset_t		proxies_p;		/* for searching proxies by name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		autoreg_hosts;
 	zbx_hashset_t		host_inventories;

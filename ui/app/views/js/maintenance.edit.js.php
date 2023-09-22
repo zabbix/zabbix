@@ -36,7 +36,8 @@ window.maintenance_edit = new class {
 		// Setup Tags.
 		jQuery(document.getElementById('tags')).dynamicRows({
 			template: '#tag-row-tmpl',
-			rows: tags
+			rows: tags,
+			allow_empty: true
 		});
 
 		if (allowed_edit) {
@@ -178,7 +179,7 @@ window.maintenance_edit = new class {
 		this._post(curl.getUrl(), post_data, (response) => {
 			overlayDialogueDestroy(this._overlay.dialogueid);
 
-			this._dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this._dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

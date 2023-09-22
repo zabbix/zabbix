@@ -31,9 +31,11 @@ include __DIR__.'/itemtest.js.php';
 <script>
 	const view = {
 		form_name: null,
+		context: null,
 
-		init({form_name, trends_default}) {
+		init({form_name, trends_default, context}) {
 			this.form_name = form_name;
+			this.context = context;
 
 			// Field switchers.
 			new CViewSwitcher('value_type', 'change', item_form.field_switches.for_value_type);
@@ -175,12 +177,31 @@ include __DIR__.'/itemtest.js.php';
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			)
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
 		},
 
 		refresh() {
@@ -192,8 +213,9 @@ include __DIR__.'/itemtest.js.php';
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(context, e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -201,26 +223,20 @@ include __DIR__.'/itemtest.js.php';
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				view.refresh();
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('items.php');
+						curl.setArgument('context', context);
+						curl.setArgument('filter_set', 1);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
-
-				location.href = curl.getUrl();
+				if (curl == null) {
+					view.refresh();
+				}
+				else {
+					location.href = curl.getUrl();
+				}
 			}
 		}
 	};

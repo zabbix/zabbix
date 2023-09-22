@@ -20,7 +20,6 @@
 #include "pp_execute.h"
 #include "pp_cache.h"
 #include "pp_error.h"
-#include "log.h"
 #include "item_preproc.h"
 #include "zbxpreprocbase.h"
 #include "zbxprometheus.h"

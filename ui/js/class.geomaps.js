@@ -67,7 +67,7 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 
 	onAdd: function(map) {
 		this.div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-		const btn = L.DomUtil.create('a', 'geomap-filter-button', this.div);
+		const btn = L.DomUtil.create('a', 'geomap-filter-button ' + ZBX_ICON_FILTER, this.div);
 		this.bar = L.DomUtil.create('ul', 'checkbox-list geomap-filter', this.div);
 
 		btn.ariaLabel = t('Severity filter');
@@ -139,7 +139,7 @@ L.Control.navigateHomeControl = L.Control.extend({
 
 	onAdd: function(map) {
 		this._div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-		this._btn = L.DomUtil.create('a', 'navigate-home-button', this._div);
+		this._btn = L.DomUtil.create('a', 'navigate-home-button ' + ZBX_ICON_HOME, this._div);
 
 		this._btn.role = 'button';
 		this._btn.href = '#';

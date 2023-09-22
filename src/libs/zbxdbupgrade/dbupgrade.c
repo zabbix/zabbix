@@ -21,7 +21,6 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-#include "log.h"
 #include "../../zabbix_server/ha/ha.h"
 #include "zbxtime.h"
 #include "zbxdb.h"
@@ -570,6 +569,16 @@ int	DBcreate_serial_sequence(const char *table_name)
 	return SUCCEED;
 }
 
+static int	DBdrop_serial_sequence(const char *table_name)
+{
+	if (ZBX_DB_OK > zbx_db_execute("drop sequence " ZBX_FS_DB_SEQUENCE, table_name))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
 {
 	if (ZBX_DB_OK > zbx_db_execute("create trigger " ZBX_FS_DB_TRIGGER " before insert on %s for each row\n"
@@ -583,6 +592,17 @@ int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
 
 	return SUCCEED;
 }
+
+static int	DBdrop_serial_trigger(const char *table_name)
+{
+	if (ZBX_DB_OK > zbx_db_execute("drop trigger " ZBX_FS_DB_TRIGGER, table_name))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 
 #endif
 
@@ -617,6 +637,35 @@ int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, con
 	zbx_free(sql);
 
 	return ret;
+}
+
+int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *field)
+{
+#if defined(HAVE_MYSQL)
+
+	return DBmodify_field_type(table_name, field, NULL);
+
+#elif defined(HAVE_POSTGRESQL)
+
+	if (SUCCEED != DBdrop_default(table_name, field))
+		return FAIL;
+
+	if (ZBX_DB_OK > zbx_db_execute("drop sequence if exists %s_%s_seq", table_name, field->name))
+		return FAIL;
+
+	return SUCCEED;
+
+#else /* ORACLE */
+	ZBX_UNUSED(field);
+
+	if (SUCCEED != DBdrop_serial_sequence(table_name))
+		return FAIL;
+
+	if (SUCCEED != DBdrop_serial_trigger(table_name))
+		return FAIL;
+
+	return SUCCEED;
+#endif
 }
 
 int	DBset_not_null(const char *table_name, const zbx_db_field_t *field)

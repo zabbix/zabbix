@@ -13,6 +13,7 @@ libzbxmocktest_a_CFLAGS = \
 	$(YAML_CFLAGS)
 
 libzbxmocktest_a_SOURCES = \
+	zbxmocklog.c \
 	zbxmocktest.c \
 	zbxmocktest.h
 
@@ -35,6 +36,5 @@ libzbxmockdata_a_SOURCES = \
 	zbxmocktime.c \
 	zbxmockhelper.c \
 	zbxmockhelper.h \
-	zbxmocklog.c \
 	zbxmockjson.c \
 	zbxmockjson.h

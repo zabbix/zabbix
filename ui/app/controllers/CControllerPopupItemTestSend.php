@@ -58,7 +58,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'get_value'				=> 'in 0,1',
 			'eol'					=> 'in '.implode(',', [ZBX_EOL_LF, ZBX_EOL_CRLF]),
 			'headers'				=> 'array',
-			'proxy_hostid'			=> 'id',
+			'proxyid'				=> 'id',
 			'hostid'				=> 'db hosts.hostid',
 			'http_authtype'			=> 'in '.implode(',', [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST, ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'http_password'			=> 'string',
@@ -159,30 +159,23 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			// Check preprocessing steps.
 			if ($steps) {
-				if ($this->test_type == self::ZBX_TEST_TYPE_LLD) {
-					$lld_instance = new CDiscoveryRule();
-					$steps_validation_response = $lld_instance->validateItemPreprocessingSteps($steps);
+				switch ($this->test_type) {
+					case self::ZBX_TEST_TYPE_ITEM:
+						$api_input_rules = CItem::getPreprocessingValidationRules();
+						break;
 
-					if ($steps_validation_response !== true) {
-						error($steps_validation_response);
-						$ret = false;
-					}
+					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
+						$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
+						break;
+
+					case self::ZBX_TEST_TYPE_LLD:
+						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
+						break;
 				}
-				else {
-					switch ($this->test_type) {
-						case self::ZBX_TEST_TYPE_ITEM:
-							$api_input_rules = CItem::getPreprocessingValidationRules();
-							break;
 
-						case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-							$api_input_rules = CItemPrototype::getPreprocessingValidationRules();
-							break;
-					}
-
-					if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
-						error($error);
-						$ret = false;
-					}
+				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+					error($error);
+					$ret = false;
 				}
 			}
 

@@ -83,9 +83,10 @@ $triggersFormList
 	->addRow(
 		(new CLabel(_('Event name'), 'event_name')),
 		(new CTextAreaFlexible('event_name', $data['event_name']))
-			->setReadonly($data['limited'])
 			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
+			->setReadonly($data['limited'])
 	)
 	->addRow(
 		new CLabel(_('Operational data'), 'opdata'),
@@ -136,7 +137,8 @@ $expression_row = [
 	))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableSpellcheck(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
 ];
@@ -183,13 +185,12 @@ if ($data['expression_constructor'] == IM_TREE) {
 	}
 }
 elseif ($data['expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick(
-			'document.getElementById("toggle_expression_constructor").value=1;'.
-			'document.getElementById("expression_constructor").value='.
-				(($data['expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();');
+	$input_method_toggle = (new CButtonLink(_('Expression constructor')))->onClick(
+		'document.getElementById("toggle_expression_constructor").value=1;'.
+		'document.getElementById("expression_constructor").value='.
+			($data['expression_constructor'] == IM_TREE ? IM_ESTABLISHED : IM_TREE).';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
+	);
 	$expression_row[] = [BR(), $input_method_toggle];
 }
 
@@ -251,8 +252,7 @@ if ($data['expression_constructor'] == IM_TREE) {
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['limited']
 						? (new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Remove')))
 								->setAttribute('data-id', $e['id'])
 								->onClick('
 									if (confirm('.json_encode(_('Delete expression?')).')) {
@@ -297,12 +297,11 @@ if ($data['expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
-	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick('javascript: '.
-			'document.getElementById("toggle_expression_constructor").value=1;'.
-			'document.getElementById("expression_constructor").value='.IM_ESTABLISHED.';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();');
+	$input_method_toggle = (new CButtonLink(_('Close expression constructor')))->onClick('javascript: '.
+		'document.getElementById("toggle_expression_constructor").value=1;'.
+		'document.getElementById("expression_constructor").value='.IM_ESTABLISHED.';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
+	);
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()]);
 }
 
@@ -349,7 +348,8 @@ $recovery_expression_row = [
 	))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableSpellcheck(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
 ];
@@ -387,14 +387,12 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 	}
 }
 elseif ($data['recovery_expression_constructor'] != IM_FORCED) {
-	$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick('javascript: '.
-			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
-			'document.getElementById("recovery_expression_constructor").value='.
-				(($data['recovery_expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();'
-		);
+	$input_method_toggle = (new CButtonLink(_('Expression constructor')))->onClick(
+		'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
+		'document.getElementById("recovery_expression_constructor").value='.
+			(($data['recovery_expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
+	);
 	$recovery_expression_row[] = [BR(), $input_method_toggle];
 }
 
@@ -458,10 +456,9 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 					$e['list'],
 					!$data['limited']
 						? (new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Remove')))
 								->setAttribute('data-id', $e['id'])
-								->onClick('javascript:'.
+								->onClick(
 									' if (confirm('.json_encode(_('Delete expression?')).')) {'.
 										' delete_expression(this.dataset.id, '.TRIGGER_RECOVERY_EXPRESSION.');'.
 										' document.forms["'.$triggersForm->getName().'"].submit();'.
@@ -504,13 +501,12 @@ if ($data['recovery_expression_constructor'] == IM_TREE) {
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	], null, 'recovery_expression_constructor_row');
 
-	$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->onClick('javascript: '.
-			'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
-			'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
-			'document.forms["'.$triggersForm->getName().'"].submit();'
-		);
+	$input_method_toggle = (new CButtonLink(_('Close expression constructor')))->onClick(
+		'document.getElementById("toggle_recovery_expression_constructor").value=1;'.
+		'document.getElementById("recovery_expression_constructor").value='.IM_ESTABLISHED.';'.
+		'document.forms["'.$triggersForm->getName().'"].submit();'
+	);
+
 	$triggersFormList->addRow(null, [$input_method_toggle, BR()], null, 'recovery_expression_constructor_row');
 }
 
@@ -759,7 +755,9 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'form_name' => $triggersForm->getName()
+		'form_name' => $triggersForm->getName(),
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

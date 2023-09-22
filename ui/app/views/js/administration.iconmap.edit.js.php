@@ -27,9 +27,7 @@
 <script type="text/x-jquery-tmpl" id="iconMapRowTPL">
 <?=
 	(new CRow([
-		(new CCol(
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-		))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+		(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 		(new CSpan('#0:'))->addClass('rowNum'),
 		(new CSelect('iconmap[mappings][#{iconmappingid}][inventory_link]'))
 			->addOptions(CSelect::createOptionsFromArray($data['inventory_list']))

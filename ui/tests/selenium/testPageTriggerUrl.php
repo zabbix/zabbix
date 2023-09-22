@@ -107,10 +107,9 @@ class testPageTriggerUrl extends CWebTest {
 	 * @dataProvider getTriggerLinkData
 	 */
 	public function testPageTriggerUrl_TriggerOverviewWidget($data) {
-		// Add 'Acknowledge' menu link to data provider.
-		$array = $data['links'];
-		array_shift($array);
-		$data['links'] = ['Problems' => $data['links']['Problems'],	'Update problem' => ''] + $array;
+		// Add 'Update problem' menu link to data provider.
+		$data['links'] = array_slice($data['links'], 0, 2, true) + ['Update problem' => ''] +
+				array_slice($data['links'], 2, count($data['links']) - 2, true);
 
 		// Remove 'cause and symptoms' from data provider.
 		unset($data['links']['Mark as cause']);
@@ -125,7 +124,7 @@ class testPageTriggerUrl extends CWebTest {
 
 		// Open trigger context menu.
 		$row->query('xpath://td[contains(@class, "'.$data['background'].'")]')->one()->click();
-		$this->checkTriggerUrl($data, ['VIEW', 'CONFIGURATION', 'LINKS']);
+		$this->checkTriggerUrl($data, ['VIEW', 'ACTIONS', 'CONFIGURATION', 'LINKS']);
 	}
 
 	/**

@@ -23,7 +23,6 @@
 #include "zbx_sysinfo_kstat.h"
 
 #include "zbxjson.h"
-#include "log.h"
 #include "zbxnum.h"
 
 static int	get_kstat_named_field(const char *name, const char *field, zbx_uint64_t *field_value, char **error)

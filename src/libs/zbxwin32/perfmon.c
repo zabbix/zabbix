@@ -21,8 +21,8 @@
 
 #include "zbxstr.h"
 #include "zbxnum.h"
-#include "stats.h"
-#include "log.h"
+#include "zbxthreads.h"
+#include "zbxlog.h"
 
 static ZBX_THREAD_LOCAL zbx_perf_counter_id_t	*PerfCounterList = NULL;
 
@@ -89,7 +89,7 @@ PDH_STATUS	zbx_PdhMakeCounterPath(const char *function, PDH_COUNTER_PATH_ELEMENT
 		counter = zbx_unicode_to_utf8(cpe->szCounterName);
 
 		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot make counterpath for \"\\%s\\%s\": %s",
-				function, object, counter, strerror_from_module(pdh_status, L"PDH.DLL"));
+				function, object, counter, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 
 		zbx_free(counter);
 		zbx_free(object);
@@ -109,7 +109,7 @@ PDH_STATUS	zbx_PdhOpenQuery(const char *function, PDH_HQUERY query)
 	if (ERROR_SUCCESS != (pdh_status = PdhOpenQuery(NULL, 0, query)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): call to PdhOpenQuery() failed: %s",
-				function, strerror_from_module(pdh_status, L"PDH.DLL"));
+				function, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
 	return pdh_status;
@@ -187,7 +187,7 @@ PDH_STATUS	zbx_PdhAddCounter(const char *function, zbx_perf_counter_data_t *coun
 			counter->status = PERF_COUNTER_NOTSUPPORTED;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): unable to add PerfCounter '%s': %s",
-				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
+				function, counterpath, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
 	zbx_free(wcounterPath);
@@ -202,7 +202,7 @@ PDH_STATUS	zbx_PdhCollectQueryData(const char *function, const char *counterpath
 	if (ERROR_SUCCESS != (pdh_status = PdhCollectQueryData(query)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot collect data '%s': %s",
-				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
+				function, counterpath, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
 	return pdh_status;
@@ -219,7 +219,7 @@ PDH_STATUS	zbx_PdhGetRawCounterValue(const char *function, const char *counterpa
 			pdh_status = value->CStatus;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot get counter value '%s': %s",
-				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
+				function, counterpath, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
 	return pdh_status;
@@ -276,7 +276,7 @@ PDH_STATUS	zbx_calculate_counter_value(const char *function, const char *counter
 			pdh_status = counterValue.CStatus;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot calculate counter value '%s': %s",
-				function, counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
+				function, counterpath, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 	else
 	{
@@ -392,7 +392,7 @@ static int	get_perf_name_by_index(DWORD index, wchar_t *name, DWORD size)
 	if (ERROR_SUCCESS != (pdh_status = PdhLookupPerfNameByIndex(NULL, index, name, &size)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex() failed: %s",
-				strerror_from_module(pdh_status, L"PDH.DLL"));
+				zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 		ret = FAIL;
 	}
 
@@ -424,7 +424,7 @@ static int	validate_counter_path(PDH_COUNTER_PATH_ELEMENTS	*cpe)
 		if (ERROR_SUCCESS != (pdh_status = PdhMakeCounterPath(cpe, path, &s, 0)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "PdhMakeCounterPath() failed: %s",
-					strerror_from_module(pdh_status, L"PDH.DLL"));
+					zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 		}
 		else if (ERROR_SUCCESS != (pdh_status = PdhValidatePath(path)))
 		{
@@ -432,7 +432,7 @@ static int	validate_counter_path(PDH_COUNTER_PATH_ELEMENTS	*cpe)
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "PdhValidatePath() szObjectName:%s szCounterName:%s"
 						" failed: %s", cpe->szObjectName, cpe->szCounterName,
-						strerror_from_module(pdh_status, L"PDH.DLL"));
+						zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 			}
 		}
 		else
@@ -445,7 +445,7 @@ static int	validate_counter_path(PDH_COUNTER_PATH_ELEMENTS	*cpe)
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "PdhMakeCounterPath() failed: %s",
-				strerror_from_module(pdh_status, L"PDH.DLL"));
+				zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 	}
 
 	return ret;
@@ -506,13 +506,17 @@ out:
  * Return value: SUCCEED/FAIL                                                 *
  *                                                                            *
  * Comments: This function should be normally called during agent             *
- *           initialization from init_perf_collector().                       *
+ *           initialization from zbx_init_perf_collector().                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_init_builtin_counter_indexes(void)
 {
-	int 				ret = SUCCEED, i;
-	wchar_t 			*counter_text, *eng_names, *counter_base;
+#	define VER_CMP(vi, c)								\
+		10 * vi->dwMajorVersion + vi->dwMinorVersion >=				\
+		10 * c.minSupported_dwMajorVersion + c.minSupported_dwMinorVersion
+
+	int				ret = SUCCEED, i;
+	wchar_t				*counter_text, *eng_names, *counter_base;
 	DWORD				counter_index;
 	static const OSVERSIONINFOEX	*vi = NULL;
 
@@ -545,9 +549,7 @@ int	zbx_init_builtin_counter_indexes(void)
 
 		for (i = 0; i < ARRSIZE(builtin_object_map); i++)
 		{
-			if (0 == builtin_object_map[i].pdhIndex && vi->dwMajorVersion >=
-					builtin_object_map[i].minSupported_dwMajorVersion && vi->dwMinorVersion >=
-					builtin_object_map[i].minSupported_dwMinorVersion && 0 ==
+			if (0 == builtin_object_map[i].pdhIndex && VER_CMP(vi, builtin_object_map[i]) && 0 ==
 					wcscmp(builtin_object_map[i].eng_name, counter_text))
 			{
 				builtin_object_map[i].pdhIndex = counter_index;
@@ -565,9 +567,7 @@ int	zbx_init_builtin_counter_indexes(void)
 
 		for (i = 0; i < ARRSIZE(builtin_counter_map); i++)
 		{
-			if (0 == builtin_counter_map[i].pdhIndex && vi->dwMajorVersion >=
-					builtin_counter_map[i].minSupported_dwMajorVersion && vi->dwMinorVersion >=
-					builtin_counter_map[i].minSupported_dwMinorVersion && 0 ==
+			if (0 == builtin_counter_map[i].pdhIndex && VER_CMP(vi, builtin_counter_map[i]) && 0 ==
 					wcscmp(builtin_counter_map[i].eng_name, counter_text) && SUCCEED ==
 					validate_object_counter(zbx_get_builtin_object_index(i), counter_index))
 			{
@@ -582,9 +582,7 @@ int	zbx_init_builtin_counter_indexes(void)
 #define CHECK_COUNTER_INDICES(index_map)								\
 	for (i = 0; i < ARRSIZE(index_map); i++)							\
 	{												\
-		if (0 == index_map[i].pdhIndex && vi->dwMajorVersion >=					\
-				index_map[i].minSupported_dwMajorVersion && vi->dwMinorVersion >=       \
-				builtin_counter_map[i].minSupported_dwMinorVersion)                     \
+		if (0 == index_map[i].pdhIndex && VER_CMP(vi, index_map[i]))				\
 		{											\
 			char	*counter;								\
 													\
@@ -603,6 +601,8 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef VER_CMP
 }
 
 /******************************************************************************
@@ -675,14 +675,14 @@ int	zbx_check_counter_path(char *counterPath, int convert_from_numeric)
 	else
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot get required buffer size for counter path '%s': %s",
-				counterPath, strerror_from_module(status, L"PDH.DLL"));
+				counterPath, zbx_strerror_from_module(status, L"PDH.DLL"));
 		goto clean;
 	}
 
 	if (ERROR_SUCCESS != (status = PdhParseCounterPath(wcounterPath, cpe, &dwSize, 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot parse counter path '%s': %s",
-				counterPath, strerror_from_module(status, L"PDH.DLL"));
+				counterPath, zbx_strerror_from_module(status, L"PDH.DLL"));
 		goto clean;
 	}
 

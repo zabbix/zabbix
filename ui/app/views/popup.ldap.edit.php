@@ -30,9 +30,13 @@ $form_action = (new CUrl('zabbix.php'))
 
 $form = (new CForm('post', $form_action))
 	->addItem(getMessages())
-	->addItem((new CInput('submit'))->addStyle('display: none;'))
 	->addVar('row_index', $data['row_index'])
-	->addVar('userdirectoryid', $data['userdirectoryid'])
+	->addVar('userdirectoryid', $data['userdirectoryid']);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$form
 	->addItem((new CFormGrid())
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
@@ -238,9 +242,7 @@ $form = (new CForm('post', $form_action))
 						->addItem(
 							(new CTag('tfoot', true))->addItem(
 								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('js-add')
+									(new CButtonLink(_('Add')))->addClass('js-add')
 								))->setColSpan(5)
 							)
 						)
@@ -268,9 +270,7 @@ $form = (new CForm('post', $form_action))
 						->addItem(
 							(new CTag('tfoot', true))->addItem(
 								(new CCol(
-									(new CSimpleButton(_('Add')))
-										->addClass(ZBX_STYLE_BTN_LINK)
-										->addClass('js-add')
+									(new CButtonLink(_('Add')))->addClass('js-add')
 								))->setColSpan(5)
 							)
 						)
@@ -304,7 +304,7 @@ $form = (new CForm('post', $form_action))
 	)
 	->addItem(
 		(new CScriptTag('
-			ldap_edit_popup.init('. json_encode([
+			ldap_edit_popup.init('.json_encode([
 				'provision_groups' => $data['provision_groups'],
 				'provision_media' => $data['provision_media']
 			], JSON_FORCE_OBJECT) .');

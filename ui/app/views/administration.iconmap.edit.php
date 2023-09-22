@@ -65,9 +65,7 @@ $i = 0;
 foreach ($data['iconmap']['mappings'] as $mapping) {
 	$table->addRow(
 		(new CRow([
-			(new CCol(
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan(($i + 1).':'))->addClass('rowNum'),
 			(new CSelect('iconmap[mappings]['.$i.'][inventory_link]'))
 				->setValue($mapping['inventory_link'])

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-23 10:13+0000\n"
+"PO-Revision-Date: 2023-09-22 05:58+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -570,6 +570,11 @@ msgstr "Esdeveniments PROBLEMA reconeguts"
 msgid "Acknowledged RESOLVED events"
 msgstr "Esdeveniments RESOLTS reconeguts"
 
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr "Estat de reconeixement"
+
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.host.edit.html.php:144
@@ -908,6 +913,10 @@ msgstr "Afegeix"
 msgid "Add (message type limit reached)"
 msgstr "Afegeix (s'ha arribat al límit de tipus de missatge)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr "Afegeix una columna"
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "Afegeix un giny nou"
@@ -943,6 +952,10 @@ msgstr "Afegir des d'una plantilla"
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "Afegir equip"
+
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr "Afegeix etiquetes d'equip"
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -1344,6 +1357,10 @@ msgstr "I"
 msgid "And/Or"
 msgstr "I/o"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr "Angle"
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr "Anualment"
@@ -1367,6 +1384,10 @@ msgstr "Anualment"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "Qualsevol"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr "Es perdran els canvis fets al formulari actual."
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1419,6 +1440,19 @@ msgstr "Abr"
 msgid "April"
 msgstr "Abril"
 
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr "Arc"
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr "Arc de fons"
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr "Mida de l'arc"
+
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
 msgstr "Segur que voleu suprimir aquest filtre?"
@@ -1460,6 +1494,30 @@ msgstr "Afirmacions"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Etiqueta d'actiu"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] "%1$s %2$s de cada setmana"
+msgstr[1] "%1$s %2$s de cada  %3$s setmanes"
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] "A %1$s cada dia"
+msgstr[1] "A %1$s cada %2$s dies"
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr "A %1$s el %2$s %3$s de cada %4$s"
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr "A %1$s el dia %2$s de cada %3$s"
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -1962,6 +2020,11 @@ msgstr "Búlgar (bg_BG)"
 msgid "By host"
 msgstr "Per equip"
 
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr "Al meu costat"
+
 #: report2.php:196
 msgid "By trigger template"
 msgstr "Per plantilla de trigger"
@@ -2357,6 +2420,31 @@ msgid_plural "Cannot copy graphs"
 msgstr[0] "No es pot pas copiar el gràfic"
 msgstr[1] "No es poden pas copiar els gràfics"
 
+#: include/classes/helpers/CGraphHelper.php:74
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because it has items from the multiple hosts."
+msgstr "No es pot copiar el gràfic \"%1$s\", perquè té elements dels equips múltiples."
+
+#: include/classes/helpers/CGraphGeneralHelper.php:91
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr "No es pot copiar el gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a l'equip \"%3$s\"."
+
+#: include/classes/helpers/CGraphGeneralHelper.php:92
+#, c-format
+msgid "Cannot copy graph \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr "No es pot copiar el gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a la plantilla \"%3$s\"."
+
+#: include/classes/helpers/CGraphGeneralHelper.php:96
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the host \"%3$s\"."
+msgstr "No es pot copiar el prototip de gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a l'equip \"%3$s\"."
+
+#: include/classes/helpers/CGraphGeneralHelper.php:97
+#, c-format
+msgid "Cannot copy graph prototype \"%1$s\", because the item with key \"%2$s\" does not exist on the template \"%3$s\"."
+msgstr "No es pot copiar el prototip de gràfic \"%1$s\", perquè l'element amb la clau \"%2$s\" no existeix a la plantilla \"%3$s\"."
+
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
@@ -2379,10 +2467,25 @@ msgid_plural "Cannot copy triggers"
 msgstr[0] "No es pot pas copiar el trigger"
 msgstr[1] "No es poden pas copiar els triggers"
 
+#: include/classes/helpers/CTriggerGeneralHelper.php:196
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the host \"%3$s\"."
+msgstr "No es pot copiar el trigger \"%1$s\" sense el trigger \"%2$s\", del que depèn, a l'equip \"%3$s\"."
+
+#: include/classes/helpers/CTriggerGeneralHelper.php:197
+#, c-format
+msgid "Cannot copy trigger \"%1$s\" without the trigger \"%2$s\", on which it depends, to the template \"%3$s\"."
+msgstr "No es pot copiar el trigger \"%1$s\" sense el trigger \"%2$s\", del que depèn, a la plantilla \"%3$s\"."
+
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
 msgstr "No es pot copiar el trigger \"%1$s\", perquè té diversos equips a l'expressió."
+
+#: include/classes/helpers/CTriggerHelper.php:75
+#, c-format
+msgid "Cannot copy trigger \"%1$s\", because it has multiple templates in the expression."
+msgstr "No es pot copiar el trigger \"%1$s\", perquè té diverses plantilles a l'expressió."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2426,6 +2529,11 @@ msgstr "No es pot pas crear dependència del propi prototip de trigger."
 msgid "Cannot create discovery rule"
 msgstr "No es pot pas crear una regla de descobriment"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr "No es pot pas crear la correlació de l'esdeveniment"
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "No es pot pas crear un mapa d'icones"
@@ -2462,6 +2570,10 @@ msgstr "No es pot pas crear el fitxer de configuració."
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "No es pot pas crear la funció d'usuari"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr "No es pot pas crear la passa d'escenari web"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2526,6 +2638,12 @@ msgstr[1] "No es poden pas esborrar les regles de descoberta"
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "No es poden pas esborrar les regles de descoberta"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] "No es pot pas esborrar la correlació de l'esdeveniment"
+msgstr[1] "No es poden pas esborrar les correlacions dels esdeveniments"
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2826,6 +2944,12 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "No es pot desactivar la regla de descobriment"
 msgstr[1] "No es poden desactivar les regles de descobriment"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] "No es pot desactivar la correlació de l'esdeveniment"
+msgstr[1] "No es poden desactivar les correlacions dels esdeveniments"
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2921,6 +3045,12 @@ msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "No es pot pas activar la regla de descobriment"
 msgstr[1] "No es poden pas activar les regles de descobriment"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] "No es pot activar la correlació de l'esdeveniment"
+msgstr[1] "No es poden activar les correlacions dels esdeveniments"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3209,6 +3339,11 @@ msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla 
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because a host interface of type \"%4$s\" is required."
 msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs es requereix una interfície d'equip del tipus \"%4$s\"."
 
+#: include/classes/api/services/CItemGeneral.php:834
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
+
 #: include/classes/api/services/CItemGeneral.php:710
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key already exists."
@@ -3229,6 +3364,11 @@ msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla 
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because a discovered item with the same key already exists."
 msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un element descobert amb la mateixa clau."
+
+#: include/classes/api/services/CItemGeneral.php:835
+#, c-format
+msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
+msgstr "No es pot pas heretar la regla LDD amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:711
 #, c-format
@@ -3271,6 +3411,11 @@ msgstr "No es pot pas heretar el prototip d'element amb la clau \"%1$s\" de la p
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau."
 
+#: include/classes/api/services/CItemGeneral.php:840
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr "No es pot pas heretar el prototip d'element amb la clau \"%1$s\" de la plantilla \"%2$s\" a l'equip \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau heretat de la plantilla \"%4$s\"."
+
 #: include/classes/api/services/CItemGeneral.php:725
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item with the same key already exists."
@@ -3291,6 +3436,11 @@ msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plan
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key already exists."
 msgstr "No es pot pas heretar el prototip d'element amb clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha una regla LLD amb la mateixa clau."
+
+#: include/classes/api/services/CItemGeneral.php:841
+#, c-format
+msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
+msgstr "No es pot pas heretar el prototip d'element amb la clau \"%1$s\" de la plantilla \"%2$s\" a la plantilla \"%3$s\", doncs ja hi ha un prototip d'element amb la mateixa clau heretat de la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:726
 #, c-format
@@ -3411,6 +3561,11 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a cau
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3431,6 +3586,11 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3462,6 +3622,41 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\" 
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè es produiria un enllaç circular (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops a l'equip \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops al prototip d'equip \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops a l'equip \"%4$s\"."
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops al prototip d'equip \"%4$s\"."
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3876,6 +4071,11 @@ msgid_plural "Cannot update events"
 msgstr[0] "No es pot pas actualitzar l'esdeveniment"
 msgstr[1] "No es poden pas actualitzar els esdeveniments"
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr "No es pot pas actualitzar la correlació de l'esdeveniment"
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr "No es poden pas actualitzar els esdeveniments"
@@ -4106,6 +4306,10 @@ msgstr "No es pot pas actualitzar el rol d'usuari"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "No es pot pas actualitzar l'escenari web"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr "No es pot pas actualitzar la passa d'escenari web"
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -4488,6 +4692,10 @@ msgstr "El color \"%1$s\" no és correcte: s'espera un codi de color hexadecimal
 #: include/views/js/monitoring.sysmaps.js.php:809
 msgid "Color (OK)"
 msgstr "Color (d'acord)"
+
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
+msgstr "Colors"
 
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
@@ -5278,6 +5486,10 @@ msgstr "Crea una regla de descoberta (tria primer la plantilla)"
 msgid "Create enabled"
 msgstr "Crea habilitat"
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr "Crea una correlació desdeveniment"
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "Crea un gràfic"
@@ -5660,6 +5872,10 @@ msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] "S'ha esborrat el tauler"
 msgstr[1] "S'han esborrat els taulers"
+
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr "Llistat de taulers"
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -6101,6 +6317,10 @@ msgstr "Vols esborrar el tauler?"
 msgid "Delete discovery rule?"
 msgstr "Vols esborrar la regla de descobriment?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr "Vols esborrar la correlació de l'esdeveniment?"
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6231,6 +6451,14 @@ msgstr "Vols esborrar les regles de descobriment triades?"
 #: jsLoader.php:273
 msgid "Delete selected elements?"
 msgstr "Vols esborrar els elements triats?"
+
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr "Vols esborrar la correlació de l'esdeveniment triada?"
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr "Vols esborrar les correlacions de l'esdeveniment triades?"
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6561,6 +6789,10 @@ msgstr "El grup d'usuaris desprovisionat no es pot pas activar."
 msgid "Description"
 msgstr "Descripció"
 
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr "Mida de la descripció"
+
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr "Llista en detall dels paquets instal·lats. Retorna text en format JSON"
@@ -6727,6 +6959,14 @@ msgstr "Voleu desactivar la regla de descoberta triada?"
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Vols desactivar les regles de descobriment triades?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr "Vols desactivar la correlació de l'esdeveniment triada?"
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr "Vols desactivar les correlacions de l'esdeveniment triades?"
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7622,6 +7862,14 @@ msgstr "Voleu activar la regla de descoberta triada?"
 msgid "Enable selected discovery rules?"
 msgstr "Vols activar les regles de descoberta triades?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr "Vols activar la correlació de l'esdeveniment triada?"
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr "Vols activar les correlacions de l'esdeveniment triades?"
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr "Voleu activar el grup triat?"
@@ -7882,11 +8130,46 @@ msgstr "Esdeveniment reconegut"
 msgid "Event correlation"
 msgstr "Correlació d'esdeveniments"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr "La correlació de l'esdeveniment \"%1$s\" ja existeix."
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr "Correlació d'esdeveniment creada"
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] "Correlació d'esdeveniment esborrada"
+msgstr[1] "Correlació d'esdeveniments creades"
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] "Correlació d'esdeveniment desactivada"
+msgstr[1] "Correlacions d'esdeveniment desactivades"
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] "Correlació d'esdeveniment activada"
+msgstr[1] "Correlacions d'esdeveniment activades"
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr "Regla de correlació d'esdeveniments"
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "Regles de correlació d'esdeveniments"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr "Correlació d'esdeveniment actualitzada"
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -7907,6 +8190,10 @@ msgstr "Esdeveniment no reconegut"
 #: tr_events.php:187
 msgid "Event list [previous 20]"
 msgstr "Llista d'esdeveniments [20 anteriors]"
+
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr "Monitoratge del registre d'esdeveniments. Retorna el recompte d'entrades"
 
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
@@ -8608,6 +8895,10 @@ msgstr "GUI"
 msgid "GUI access disabled."
 msgstr "Accés a la GUI desactivat."
 
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr "Calibre"
+
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
 msgid "General"
@@ -8760,6 +9051,16 @@ msgstr "El gràfic \"%1$s\" ja existeix a \"%2$s\" com a gràfic creat a partir 
 msgid "Graph \"%1$s\" already exists on \"%2$s\"."
 msgstr "El gràfic \"%1$s\" ja existeix a \"%2$s\"."
 
+#: include/classes/api/services/CGraph.php:479
+#, c-format
+msgid "Graph \"%1$s\" already exists on the host \"%2$s\"."
+msgstr "El gràfic \"%1$s\" ja existeix a l'equip \"%2$s\"."
+
+#: include/classes/api/services/CGraph.php:480
+#, c-format
+msgid "Graph \"%1$s\" already exists on the template \"%2$s\"."
+msgstr "El gràfic \"%1$s\" ja existeix a la plantilla \"%2$s\"."
+
 #: include/classes/api/services/CGraph.php:36
 #, c-format
 msgid "Graph \"%1$s\" with templated items cannot contain items from other hosts."
@@ -8792,6 +9093,16 @@ msgstr "Gràfic esborrat"
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:167
 msgid "Graph prototype"
 msgstr "Prototip de gràfic"
+
+#: include/classes/api/services/CGraphPrototype.php:470
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the host \"%3$s\"."
+msgstr "El prototip de gràfic \"%1$s\" ja existeix a la regla LLD amb la clau \"%2$s\" de l'equip \"%3$s\"."
+
+#: include/classes/api/services/CGraphPrototype.php:471
+#, c-format
+msgid "Graph prototype \"%1$s\" already exists on the LLD rule with key \"%2$s\" of the template \"%3$s\"."
+msgstr "El prototip de gràfic \"%1$s\" ja existeix a la regla LLD amb la clau \"%2$s\" de la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:568
 #, c-format
@@ -9342,6 +9653,10 @@ msgstr "L'equip no pot pas tindre més d'una interfície predeterminada del mate
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:159
 msgid "Host count"
 msgstr "Recompte d'equips"
+
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr "Taulers d'equip"
 
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
@@ -12165,6 +12480,10 @@ msgstr "Macro LLD"
 msgid "LLD macros"
 msgstr "Macros LLD"
 
+#: app/controllers/CControllerAuditLogList.php:229
+msgid "LLD rule"
+msgstr "Regla LLD"
+
 #: include/classes/api/services/CItemGeneralOld.php:700
 msgid "LLD rule with the same UUID already exists"
 msgstr "ja existeix una regla LLD el mateix UUID"
@@ -13889,6 +14208,11 @@ msgstr "Navegueu a la vista per defecte"
 msgid "Navigate to initial view"
 msgstr "Navegueu a la vista inicial"
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr "Necessari"
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "Període d'emmagatzematge de dades de descoberta de xarxa"
@@ -13996,6 +14320,10 @@ msgstr "Nova regla de descoberta"
 msgid "New element"
 msgstr "Nou element"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr "Nova correlació d'esdeveniment"
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14028,6 +14356,10 @@ msgstr "Nou grup d'equips"
 msgid "New maintenance period"
 msgstr "Nou període de manteniment"
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr "Nou tipus de suport"
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr "Nou mapatge del tipus de suport"
@@ -14053,9 +14385,21 @@ msgstr "Script nou"
 msgid "New service"
 msgstr "Nou servei"
 
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr "Nova passa d'escenari web"
+
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr "Nou filtre d'etiquetes"
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
 msgstr "Nou nom d'etiqueta"
+
+#: app/views/template.edit.php:352
+msgid "New template"
+msgstr "Plantilla nova"
 
 #: app/views/configuration.templategroup.edit.php:52
 #: app/views/popup.templategroup.edit.php:59
@@ -14069,6 +14413,10 @@ msgstr "Nous triggers"
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
 msgstr "Nou mapatge de grups d'usuaris"
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
+msgstr "Tauler següent"
 
 #: app/views/monitoring.dashboard.view.php:181
 #: app/views/monitoring.host.dashboard.view.php:115 jsLoader.php:193
@@ -16158,6 +16506,10 @@ msgstr "Hora anterior"
 msgid "Preview"
 msgstr "Vista prèvia"
 
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr "Tauler anterior"
+
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
@@ -16536,6 +16888,10 @@ msgstr "Clau pública"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "Fitxer de clau pública"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr "Empènyer"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -17027,6 +17383,10 @@ msgstr "Esborra dels grups d'equips"
 msgid "Remove host"
 msgstr "Esborra l'equip"
 
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr "Esborra etiquetes d'equip"
+
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
 #, c-format
@@ -17253,6 +17613,17 @@ msgstr "S'ha resolt per la regla de correlació \"%1$s\"."
 msgid "Resolved by correlation rule."
 msgstr "Resolt per regla de correlació."
 
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr "S'ha resolt per la regla de correlació d'esdeveniment \"%1$s\"."
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr "Resolt per regla de correlació d'esdeveniment."
+
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
@@ -17397,6 +17768,10 @@ msgstr "Retorna el nombre de sockets TCP que coincideixen amb els paràmetres. R
 #: include/classes/data/CItemData.php:974
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr "Retorna el nombre de sockets UDP que coincideixen amb els paràmetres. Retorna un nombre enter"
+
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
+msgstr "Retorna el nombre de canvis d'estat des del mode disc/memòria des de l'inici. Els canvis d'estat freqüents indiquen que s'ha d'augmentar la mida o la data del buffer de memòria."
 
 #: include/classes/data/CItemData.php:850
 msgid "Returns percentage of lost ICMP ping packets."
@@ -17843,6 +18218,15 @@ msgstr "Desar canvis"
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Desa-ho com a \"%1$s\""
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr "Escala"
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr "Mida d'escala"
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18537,6 +18921,10 @@ msgstr "Escurçat"
 msgid "Show"
 msgstr "Mostra"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr "Mostra l'arc"
+
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
@@ -18556,6 +18944,10 @@ msgstr "Mostra la capçalera"
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
 msgstr "Mostra els equips que són en manteniment"
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
+msgstr "Mostra les etiquetes"
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -18648,6 +19040,10 @@ msgstr "Mostra només els no reconeguts"
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
 msgstr "Mostra els mapes no disponibles"
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
+msgstr "Mostra unitats"
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -18946,6 +19342,10 @@ msgstr "Hora d'inici del servidor Zabbix, marca de temps Unix."
 msgid "State"
 msgstr "Estat"
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr "Estat de la memòria intermèdia del proxy."
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -18955,6 +19355,10 @@ msgstr "Estàtic"
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Estadístiques i disponibilitat de la memòria cau d'escriptura de Zabbix. Memòria cau: un dels valors (modes: all, float, uint, str, log, text, not supported), historial (modes: pfree, free, total, used, pused), índex (modes: pfree, free, total, used, pused), tendència (modes: pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr "Estadístiques i disponibilitat del buffer de memòria proxy. Mode (modes: pfree, free, total, used, pused)."
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
@@ -19235,6 +19639,10 @@ msgstr "Super administrador"
 msgid "Support"
 msgstr "Suport"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr "El suport per a Oracle DB és obsolet des de Zabbix 7.0 i s'esborrarà en versions posteriors."
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr "El suport per al tipus numèric antic és obsolet. Si et plau, actualitza a valors numèrics per a un rang estès."
@@ -19406,6 +19814,10 @@ msgstr "Filtre d'etiquetes"
 #: include/views/configuration.triggers.edit.php:550
 msgid "Tag for matching"
 msgstr "Etiqueta per fer coincidir"
+
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr "Llistat d'etiquetes"
 
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
@@ -20194,6 +20606,13 @@ msgstr "El que duem de dia"
 msgid "Top"
 msgstr "Top"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr "Els 100 triggers principals"
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr "Top N"
@@ -20201,6 +20620,10 @@ msgstr "Top N"
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
 msgstr "Els equips top"
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
+msgstr "Triggers principals"
 
 #: app/views/administration.queue.overview.proxy.php:98
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -20410,6 +20833,10 @@ msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "Trigger copiat"
 msgstr[1] "Triggers copiats"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr "Recompte de triggers"
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -20996,6 +21423,10 @@ msgstr "Error inesperat del servidor."
 #: include/views/configuration.item.prototype.edit.php:717
 msgid "Units"
 msgstr "Unitats"
+
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr "Mida de les unitats"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
@@ -22541,6 +22972,10 @@ msgstr "El valor \"%1$s\" no és vàlid per al paràmetre \"grid_show\". Les opc
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "El valor \"%1$s\" és massa llarg per al camp \"%2$s\": %3$d caràcters. La longitud màxima permesa és de %4$d caràcters."
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr "Arc de valor"
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Eficàcia de la memòria cau de valors. Els paràmetres vàlids són: peticions, encerts i errors."
@@ -22610,6 +23045,10 @@ msgstr "Valor de l'etiqueta d'esdeveniment antiga"
 #: include/actions.inc.php:352
 msgid "Value of tag"
 msgstr "Valor de l'etiqueta"
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
+msgstr "Mida del valor"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
 msgid "Value: no data"
@@ -22780,6 +23219,10 @@ msgstr "Avís"
 #: include/func.inc.php:1710 jsLoader.php:229
 msgid "Warning message"
 msgstr "Missatge d'avís"
+
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr "Compte! El suport per a Oracle DB és obsolet des de Zabbix 7.0 i s'esborrarà en versions posteriors."
 
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
@@ -23154,6 +23597,14 @@ msgstr "A-M-D h:m"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i:s"
+msgstr "A-M-D h:m:s"
+
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr "A-M-D h:m"
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
 msgstr "A-M-D h:m:s"
 
 #: include/translateDefines.inc.php:40
@@ -23532,6 +23983,10 @@ msgstr "un caracter especial"
 msgid "a string, number or null value is expected"
 msgstr "s'espera una cadena, un nombre o un valor nul"
 
+#: include/classes/api/services/CDiscoveryRule.php:1718
+msgid "a template ID is expected"
+msgstr "s'espera un ID de plantilla"
+
 #: include/classes/validators/CNewValidator.php:250
 #: include/classes/validators/CNewValidator.php:280
 #: include/classes/widgets/fields/CWidgetFieldDatePicker.php:130
@@ -23622,6 +24077,10 @@ msgstr "s'ha superat el nombre permès d'elements dependents"
 #: include/classes/validators/CApiInputValidator.php:2259
 msgid "an IP address is expected"
 msgstr "s'espera una adreça IP"
+
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
+msgstr "s'esperava una IP o nom DNS"
 
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481
@@ -24017,6 +24476,10 @@ msgstr "no es pot pas desenllaçar"
 msgid "cannot convert to JSON, result value too long"
 msgstr "no es pot convertir a JSON, el valor del resultat és massa llarg"
 
+#: include/classes/api/services/CDiscoveryRule.php:3026
+msgid "cannot delete inherited LLD rule"
+msgstr "No es pot pas esborrar la regla LLD heretada"
+
 #: include/classes/api/services/CItem.php:899
 msgid "cannot delete inherited item"
 msgstr "No es pot pas esborrar l'element heretat"
@@ -24361,6 +24824,14 @@ msgstr "el nom de grup ha de correspondre al nom de grup %1$s"
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
+
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr "H:i"
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr "H:i:s"
 
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
@@ -24724,6 +25195,10 @@ msgstr "m-d"
 msgid "m-d H:i"
 msgstr "m-d H:i"
 
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
+msgstr "m-d H:i"
+
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr "la macro és buida"
@@ -24833,6 +25308,11 @@ msgstr "min() - Valor mínim per al període T"
 msgid "minimum length is %1$s characters"
 msgstr "la longitud mínima és de %1$s caràcters"
 
+#: include/classes/api/services/CDiscoveryRule.php:1630
+#, c-format
+msgid "missing filter condition \"%1$s\""
+msgstr "hi manca la condició de filtre \"%1$s\""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:809
 msgid "mod() - Division remainder"
 msgstr "mod() - Resta de la divisió"
@@ -24915,6 +25395,10 @@ msgstr "n-d"
 
 #: include/translateDefines.inc.php:39
 msgid "n-d H:i"
+msgstr "n-d H:i"
+
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
 msgstr "n-d H:i"
 
 #: include/views/configuration.host.discovery.edit.php:205
@@ -25029,6 +25513,10 @@ msgstr "now() - Nombre de segons des de l'època"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "nombre"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr "l'objecte no existeix pas o pertany a un altre objecte"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
@@ -25819,6 +26307,11 @@ msgid "value must be empty or %1$s"
 msgid_plural "value must be empty or one of %1$s"
 msgstr[0] "el valor ha d'ésser buit o %1$s"
 msgstr[1] "els valors han d'ésser buits o un d'entre %1$s"
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr "el valor ha d'ésser més gran de \"%1$s\""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format

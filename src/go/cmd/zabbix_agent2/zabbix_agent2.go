@@ -621,10 +621,11 @@ func fatalExit(message string, err error) {
 		message = fmt.Sprintf("%s: %s", message, err.Error())
 	}
 
+	fmt.Fprintf(os.Stderr, "zabbix_agent2 [%d]: ERROR: %s\n", os.Getpid(), message)
+
 	if agent.Options.LogType == "file" {
 		log.Critf("%s", message)
 	}
 
-	fmt.Fprintf(os.Stderr, "zabbix_agent2 [%d]: ERROR: %s\n", os.Getpid(), message)
 	os.Exit(1)
 }

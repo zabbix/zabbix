@@ -30,7 +30,8 @@
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->setAttribute('placeholder', '{$MACRO}'),
+					->setAttribute('placeholder', '{$MACRO}')
+					->disableSpellcheck(),
 				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN),
 				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
 					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
@@ -81,7 +82,8 @@
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->setAttribute('placeholder', '{$MACRO}'),
+					->setAttribute('placeholder', '{$MACRO}')
+					->disableSpellcheck(),
 				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
 					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
 				)
@@ -97,9 +99,7 @@
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
 				new CHorList([
-					(new CSimpleButton(_('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove')
+					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 				])
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
@@ -127,7 +127,6 @@
 		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form_name = form_name;
 			this.form = document.getElementById(form_name);
-
 			this.initHostTab(host_interfaces, host_is_discovered);
 			this.initMacrosTab();
 			this.initInventoryTab();
@@ -150,11 +149,11 @@
 			const $groups_ms = $('#groups_');
 			const $template_ms = $('#add_templates_');
 
-			$template_ms.on('change', (e) => {
+			$template_ms.on('change', () => {
 				$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
 			});
 
-			$groups_ms.on('change', (e) => {
+			$groups_ms.on('change', () => {
 				$groups_ms.multiSelect('setDisabledEntries',
 					[... this.form.querySelectorAll('[name^="groups["]')].map((input) => input.value)
 				);
@@ -252,7 +251,9 @@
 		initMacrosTab() {
 			const $show_inherited_macros = $('input[name="show_inherited_macros"]');
 
-			this.macros_manager = new HostMacrosManager({});
+			this.macros_manager = new HostMacrosManager({
+				'container': $('#macros_container .table-forms-td-right')
+			});
 
 			$('#host-tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;

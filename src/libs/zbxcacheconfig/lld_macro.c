@@ -19,8 +19,12 @@
 
 #include "zbxcacheconfig.h"
 
-#include "zbxcommon.h"
-#include "log.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+
+ZBX_PTR_VECTOR_IMPL(lld_macro_path, zbx_lld_macro_path_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -44,7 +48,7 @@ int	zbx_lld_macro_paths_compare(const void *d1, const void *d2)
  *             error           - [OUT] in case json path is invalid           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro_paths, char **error)
+int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -76,11 +80,11 @@ int	zbx_lld_macro_paths_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_macro
 		lld_macro_path->lld_macro = zbx_strdup(NULL, row[0]);
 		lld_macro_path->path = zbx_strdup(NULL, row[1]);
 
-		zbx_vector_ptr_append(lld_macro_paths, lld_macro_path);
+		zbx_vector_lld_macro_path_append(lld_macro_paths, lld_macro_path);
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_ptr_sort(lld_macro_paths, zbx_lld_macro_paths_compare);
+	zbx_vector_lld_macro_path_sort(lld_macro_paths, zbx_lld_macro_paths_compare);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -112,8 +116,8 @@ void	zbx_lld_macro_path_free(zbx_lld_macro_path_t *lld_macro_path)
  *             value           - [OUT] value extracted from jp_row            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths,
-		const char *macro, char **value)
+int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row,
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, const char *macro, char **value)
 {
 	zbx_lld_macro_path_t	lld_macro_path_local, *lld_macro_path;
 	int			index;
@@ -122,10 +126,10 @@ int	zbx_lld_macro_value_by_name(const struct zbx_json_parse *jp_row, const zbx_v
 
 	lld_macro_path_local.lld_macro = (char *)macro;
 
-	if (FAIL != (index = zbx_vector_ptr_bsearch(lld_macro_paths, &lld_macro_path_local,
+	if (FAIL != (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)lld_macro_paths, &lld_macro_path_local,
 			zbx_lld_macro_paths_compare)))
 	{
-		lld_macro_path = (zbx_lld_macro_path_t *)lld_macro_paths->values[index];
+		lld_macro_path = lld_macro_paths->values[index];
 
 		if (SUCCEED == zbx_jsonpath_query(jp_row, lld_macro_path->path, value) && NULL != *value)
 			return SUCCEED;

@@ -22,9 +22,9 @@
 
 #include "zbxnum.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 
-static int	get_cpu_num()
+static int	get_cpu_num(void)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU	/* OpenBSD 4.2,4.3 i386 */
 	size_t	len;

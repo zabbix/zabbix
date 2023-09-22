@@ -62,7 +62,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 	public function getJavaScript(): string {
 		return '
 			jQuery("#tags_table_'.$this->field->getName().'")
-				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl"})
+				.dynamicRows({template: "#'.$this->field->getName().'-row-tmpl", allow_empty: true})
 				.on("afteradd.dynamicRows", function() {
 					const rows = this.querySelectorAll(".form_row");
 					new CTagFilterItem(rows[rows.length - 1]);

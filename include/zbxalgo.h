@@ -21,7 +21,6 @@
 #define ZABBIX_ZBXALGO_H
 
 #include "zbxnum.h"
-#include "log.h"
 
 /* generic */
 
@@ -309,6 +308,7 @@ void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector);					\
 														\
 void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type value);			\
+void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type value, int before_index);	\
 void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __type *value);			\
 void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num);			\
@@ -348,6 +348,7 @@ void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ #
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
 ZBX_VECTOR_DECL(uint32, zbx_uint32_t)
+ZBX_VECTOR_DECL(int32, int)
 ZBX_PTR_VECTOR_DECL(str, char *)
 ZBX_PTR_VECTOR_DECL(ptr, void *)
 ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)
@@ -419,6 +420,20 @@ void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type va
 {														\
 	__vector_ ## __id ## _ensure_free_space(vector);							\
 	vector->values[vector->values_num++] = value;								\
+}														\
+														\
+void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type value, int before_index)	\
+{														\
+	__vector_ ## __id ## _ensure_free_space(vector);							\
+														\
+	if (0 < vector->values_num - before_index)								\
+	{													\
+		memmove(vector->values + before_index + 1, vector->values + before_index,			\
+				(vector->values_num - before_index) * sizeof(__type));				\
+	}													\
+														\
+	vector->values_num++;											\
+	vector->values[before_index] = value;									\
 }														\
 														\
 void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __type *value)			\
@@ -637,6 +652,7 @@ void	zbx_free_tag(zbx_tag_t *tag);
 /* these functions are only for use with zbx_vector_XXX_sort() */
 int	zbx_compare_tags(const void *d1, const void *d2);
 int	zbx_compare_tags_and_values(const void *d1, const void *d2);
+int	zbx_compare_tags_natural(const void *d1, const void *d2);
 
 /* 128 bit unsigned integer handling */
 void	zbx_uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);
@@ -727,16 +743,17 @@ typedef struct
 }
 zbx_list_iterator_t;
 
-void	zbx_list_create(zbx_list_t *queue);
-void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func,
+void	zbx_list_create(zbx_list_t *list);
+void	zbx_list_create_ext(zbx_list_t *list, zbx_mem_malloc_func_t mem_malloc_func,
 		zbx_mem_free_func_t mem_free_func);
 void	zbx_list_destroy(zbx_list_t *list);
-void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
-void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted);
-void	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
+int	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
+int	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted);
+int	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
 int	zbx_list_pop(zbx_list_t *list, void **value);
 int	zbx_list_peek(const zbx_list_t *list, void **value);
 void	zbx_list_iterator_init(zbx_list_t *list, zbx_list_iterator_t *iterator);
+int	zbx_list_iterator_init_with(zbx_list_t *list, zbx_list_item_t *next, zbx_list_iterator_t *iterator);
 int	zbx_list_iterator_next(zbx_list_iterator_t *iterator);
 int	zbx_list_iterator_peek(const zbx_list_iterator_t *iterator, void **value);
 void	zbx_list_iterator_clear(zbx_list_iterator_t *iterator);

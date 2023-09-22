@@ -111,7 +111,7 @@ class CWidgetSvgGraph extends CWidget {
 	getActionsContextMenu({can_paste_widget}) {
 		const menu = super.getActionsContextMenu({can_paste_widget});
 
-		if (this._is_edit_mode) {
+		if (this.isEditMode()) {
 			return menu;
 		}
 
@@ -138,7 +138,7 @@ class CWidgetSvgGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._has_contents,
 			clickCallback: () => {
-				downloadSvgImage(this._svg, 'graph.png');
+				downloadSvgImage(this._svg, 'image.png');
 			}
 		});
 

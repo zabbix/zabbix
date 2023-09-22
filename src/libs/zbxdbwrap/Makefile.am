@@ -6,6 +6,7 @@ libzbxdbwrap_a_SOURCES = \
 	proxy.c \
 	event.c \
 	template_item.c \
+	template_item_audit.c \
 	template.h \
 	trigger.c \
 	trigger_dep_linking.c \
@@ -14,7 +15,9 @@ libzbxdbwrap_a_SOURCES = \
 	trigger_linking.h \
 	graph_linking.c \
 	graph_linking.h \
-	host.c
+	host.c \
+	user.c \
+	permission.c
 
 libzbxdbwrap_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

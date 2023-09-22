@@ -18,10 +18,9 @@
 **/
 
 #include "trapper.h"
-#include "zbxserver.h"
 #include "zbxdbwrap.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxself.h"
 #include "active.h"
 #include "nodecommand.h"
@@ -45,6 +44,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "version.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -54,7 +54,6 @@
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
 static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
-
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 typedef struct
@@ -124,16 +123,20 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
+		if (!ZBX_IS_RUNNING())
+		{
+			info = zbx_strdup(info, "Zabbix server shutdown in progress");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot receive agent history data from \"%s\": %s", sock->peer,
+					info);
+			ret = FAIL;
+		}
+	}
+	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
-	}
-	else if (!ZBX_IS_RUNNING())
-	{
-		info = zbx_strdup(info, "Zabbix server shutdown in progress");
-		zabbix_log(LOG_LEVEL_WARNING, "cannot receive agent history data from \"%s\": %s", sock->peer, info);
-		ret = FAIL;
-	}
+
+	zbx_process_command_results(jp);
 
 	zbx_send_response_same(sock, ret, info, config_timeout);
 
@@ -195,12 +198,12 @@ static void	recv_proxy_heartbeat(zbx_socket_t *sock, struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_proxy_check_permissions(&proxy, sock, &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
-				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
+				" \"%s\": %s", proxy.name, sock->peer, proxy.allowed_addresses, error);
 		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "ignoring heartbeat from active proxy \"%s\" at \"%s\": proxy heartbeats"
-			" are deprecated", proxy.host, sock->peer);
+			" are deprecated", proxy.name, sock->peer);
 out:
 	zbx_free(error);
 
@@ -368,7 +371,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			for (i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
-				zbx_uint64_t		id = item->type;
+				zbx_uint64_t		id = (zbx_uint64_t)item->type;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
@@ -394,7 +397,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			for (i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
-				zbx_uint64_t		id = item->proxy_hostid;
+				zbx_uint64_t		id = item->proxyid;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
@@ -429,7 +432,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			}
 
 			zbx_json_close(&json);
-			zbx_json_adduint64(&json, "total", queue.values_num);
+			zbx_json_addint64(&json, "total", queue.values_num);
 
 			break;
 	}
@@ -985,7 +988,7 @@ static int	process_active_check_heartbeat(struct zbx_json_parse *jp)
 	if (FAIL == zbx_dc_get_host_by_hostid(&dc_host, hostid))
 		return FAIL;
 
-	if (0 != dc_host.proxy_hostid || HOST_STATUS_NOT_MONITORED == dc_host.status)
+	if (0 != dc_host.proxyid || HOST_STATUS_NOT_MONITORED == dc_host.status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
@@ -1133,21 +1136,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
-		{
-			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				zbx_send_task_data(sock, ts, config_comms);
-		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
-		{
-			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-			{
-				zbx_recv_proxy_data(sock, &jp, ts, events_cbs, config_comms->config_timeout,
-						proxydata_frequency);
-			}
-			else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				zbx_send_proxy_data(sock, ts, config_comms);
-		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
@@ -1162,7 +1150,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
-						config_comms->config_source_ip);
+						config_comms->config_trapper_timeout, config_comms->config_source_ip);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1198,9 +1186,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			ret = process_active_check_heartbeat(&jp);
 		}
-		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->config_tls, config_vault,
-				zbx_get_program_type_cb, config_comms->config_timeout, config_comms->config_source_ip,
-				config_comms->server))
+		else if (SUCCEED != trapper_process_request(value, sock, &jp, ts, config_comms, config_vault,
+				proxydata_frequency, zbx_get_program_type_cb, events_cbs))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1289,7 +1276,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 {
 	ssize_t	bytes_received;
 
-	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE)))
+	if (FAIL == (bytes_received = zbx_tcp_recv_ext(sock, config_comms->config_trapper_timeout, ZBX_TCP_LARGE)))
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,

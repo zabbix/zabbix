@@ -52,8 +52,6 @@
  *
  */
 
-extern int	CONFIG_TRAPPER_TIMEOUT;
-
 typedef struct
 {
 	const zbx_db_field_t	*field;
@@ -1609,7 +1607,7 @@ static int	proxyconfig_sync_templates(zbx_table_data_t *hosts_templates, zbx_tab
 		}
 		zbx_db_free_result(result);
 
-		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "status", NULL);
+		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "status", (char *)NULL);
 
 		for (i = 0; i < templateids.values_num; i++)
 		{
@@ -2060,7 +2058,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
-		const zbx_config_vault_t *config_vault, int config_timeout,
+		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *server)
 {
 	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
@@ -2085,14 +2083,14 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 			config_timeout))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
-				sock->peer, zbx_json_strerror());
+				sock->peer, zbx_socket_strerror());
 		goto out;
 	}
 
-	if (FAIL == zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE))
+	if (FAIL == zbx_tcp_recv_ext(sock, config_trapper_timeout, ZBX_TCP_LARGE))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
-				sock->peer, zbx_json_strerror());
+				sock->peer, zbx_socket_strerror());
 		goto out;
 	}
 

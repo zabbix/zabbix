@@ -19,7 +19,7 @@
 
 #include "proxyconfig.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxcachehistory.h"
 #include "zbxself.h"

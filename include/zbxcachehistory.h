@@ -22,7 +22,6 @@
 
 #include "zbxcacheconfig.h"
 #include "zbxshmem.h"
-#include "zbxpreproc.h"
 
 #define ZBX_SYNC_DONE		0
 #define	ZBX_SYNC_MORE		1
@@ -59,13 +58,15 @@ void	zbx_log_sync_history_cache_progress(void);
 #define ZBX_SYNC_NONE	0
 #define ZBX_SYNC_ALL	1
 
-int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_uint64_t history_cache_size,
-		zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size, char **error);
+typedef void (*zbx_history_sync_f)(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
+
+int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history_sync_f sync_history,
+		zbx_uint64_t history_cache_size, zbx_uint64_t history_index_cache_size,zbx_uint64_t *trends_cache_size,
+		char **error);
+
 void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 
-void	zbx_change_proxy_history_count(int change_count);
-void	zbx_reset_proxy_history_count(int reset);
-int	zbx_get_proxy_history_count(void);
+void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
 
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
@@ -90,6 +91,27 @@ int	zbx_get_proxy_history_count(void);
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 #define ZBX_STATS_HISTORY_BIN_COUNTER	22
+
+/* 'zbx_pp_value_opt_t' element 'flags' values */
+#define ZBX_PP_VALUE_OPT_NONE		0x0000	/* 'zbx_pp_value_opt_t' has no data */
+#define ZBX_PP_VALUE_OPT_META		0x0001	/* 'zbx_pp_value_opt_t' has log metadata ('mtime' and 'lastlogsize') */
+#define ZBX_PP_VALUE_OPT_LOG		0x0002	/* 'zbx_pp_value_opt_t' has 'timestamp', 'severity', 'logeventid' and */
+						/* 'source' data */
+
+/* This structure is complementary data if value comes from preprocessing. */
+typedef struct
+{
+	zbx_uint32_t	flags;
+	int		mtime;
+	int		timestamp;
+	int		severity;
+	int		logeventid;
+	zbx_uint64_t	lastlogsize;
+	char		*source;
+}
+zbx_pp_value_opt_t;
+
+void	zbx_pp_value_opt_clear(zbx_pp_value_opt_t *opt);
 
 void	*zbx_dc_get_stats(int request);
 void	zbx_dc_get_stats_all(zbx_wcache_info_t *wcache_info);

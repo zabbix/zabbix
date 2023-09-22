@@ -188,7 +188,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (WidgetForm::hasOverrideTime($this->fields_values)) {
 			$info[] = [
-				'icon' => 'btn-info-clock',
+				'icon' => ZBX_ICON_TIME_PERIOD,
 				'hint' => relativeDateToText($this->fields_values['time_from'], $this->fields_values['time_to'])
 			];
 		}

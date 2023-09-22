@@ -21,7 +21,6 @@
 #include "zbxsysinfo.h"
 
 #include "../sysinfo.h"
-#include "log.h"
 #include "vfs_file.h"
 #include "dir.h"
 #include "net.h"
@@ -45,14 +44,19 @@ static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run_no_remote(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-ZBX_METRIC	parameters_common_local[] =
+static zbx_metric_t	parameters_common_local[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.run",		CF_HAVEPARAMS,	system_run_no_remote, 	"echo test"},
 	{NULL}
 };
 
-ZBX_METRIC	parameters_common[] =
+zbx_metric_t	*get_parameters_common_local(void)
+{
+	return &parameters_common_local[0];
+}
+
+static zbx_metric_t	parameters_common[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.localtime",	CF_HAVEPARAMS,	system_localtime,	"utc"},
@@ -87,11 +91,17 @@ ZBX_METRIC	parameters_common[] =
 	{"logrt",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"logrt.count",		CF_HAVEPARAMS,	only_active,		"logfile"},
 	{"eventlog",		CF_HAVEPARAMS,	only_active,		"system"},
+	{"eventlog.count",	CF_HAVEPARAMS,	only_active,		"system"},
 
 	{"zabbix.stats",	CF_HAVEPARAMS,	zabbix_stats,		"127.0.0.1,10051"},
 
 	{NULL}
 };
+
+zbx_metric_t	*get_parameters_common(void)
+{
+	return &parameters_common[0];
+}
 
 static const char	*user_parameter_dir = NULL;
 
@@ -231,9 +241,7 @@ static int	system_run_local(AGENT_REQUEST *request, AGENT_RESULT *result, int le
 
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	int	level;
-
-	level = LOG_LEVEL_DEBUG;
+	int	level = LOG_LEVEL_DEBUG;
 
 	if (0 != sysinfo_get_config_log_remote_commands())
 		level = LOG_LEVEL_WARNING;

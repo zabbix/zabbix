@@ -65,10 +65,11 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxeval/Makefile
 			tests/libs/zbxhistory/Makefile
 			tests/libs/zbxjson/Makefile
+			tests/libs/zbxmodules/Makefile
 			tests/libs/zbxpreproc/Makefile
 			tests/libs/zbxprometheus/Makefile
 			tests/libs/zbxregexp/Makefile
-			tests/libs/zbxserver/Makefile
+			tests/libs/zbxexpression/Makefile
 			tests/libs/zbxsysinfo/Makefile
 			tests/libs/zbxsysinfo/common/Makefile
 			tests/libs/zbxtagfilter/Makefile

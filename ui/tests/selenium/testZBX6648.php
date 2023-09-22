@@ -75,7 +75,8 @@ class testZBX6648 extends CLegacyWebTest {
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 			case 'enabled' :
-				$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
+				$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')
+					->asMultiselect()->one()->waitUntilVisible();
 				$host->fill([
 					'values' => $zbx_data['host'],
 					'context' => $zbx_data['hostgroup']
@@ -91,7 +92,7 @@ class testZBX6648 extends CLegacyWebTest {
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['hostgroup'].'"]');
 				break;
 			case 'no triggers' :
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-button')->one()->click();
 				COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($zbx_data['hostgroup']);
 				$this->zbxTestLaunchOverlayDialog('Hosts');
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['host'].'"]');

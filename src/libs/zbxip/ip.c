@@ -21,16 +21,15 @@
 
 #include "zbxnum.h"
 #include "zbxstr.h"
-#include "log.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: is string IPv4 address                                            *
+ * Purpose: checks if string is IPv4 address                                  *
  *                                                                            *
- * Parameters: ip - string                                                    *
+ * Parameters: ip - [IN]                                                      *
  *                                                                            *
- * Return value: SUCCEED - is IPv4 address                                    *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - input is IPv4 address                              *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_ip4(const char *ip)
@@ -74,12 +73,12 @@ int	zbx_is_ip4(const char *ip)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: is string IPv6 address                                            *
+ * Purpose: checks if string is IPv6 address                                  *
  *                                                                            *
- * Parameters: ip - string                                                    *
+ * Parameters: ip - [IN]                                                      *
  *                                                                            *
- * Return value: SUCCEED - is IPv6 address                                    *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - input is IPv6 address                              *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_ip6(const char *ip)
@@ -136,12 +135,10 @@ int	zbx_is_ip6(const char *ip)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: is string IP address of supported version                         *
+ * Parameters: ip - [IN]                                                      *
  *                                                                            *
- * Parameters: ip - string                                                    *
- *                                                                            *
- * Return value: SUCCEED - is IP address                                      *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - input is IP address                                *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_supported_ip(const char *ip)
@@ -157,12 +154,10 @@ int	zbx_is_supported_ip(const char *ip)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: is string IP address                                              *
+ * Parameters: ip - [IN]                                                      *
  *                                                                            *
- * Parameters: ip - string                                                    *
- *                                                                            *
- * Return value: SUCCEED - is IP address                                      *
- *               FAIL - otherwise                                             *
+ * Return value: SUCCEED - input is IP address                                *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_ip(const char *ip)
@@ -172,13 +167,13 @@ int	zbx_is_ip(const char *ip)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if ip matches range of ip addresses                         *
+ * Purpose: checks if IP matches range of IP addresses                        *
  *                                                                            *
- * Parameters: list - [IN] comma-separated list of ip ranges                  *
+ * Parameters: list - [IN] comma-separated list of IP ranges                  *
  *                         192.168.0.1-64,192.168.0.128,10.10.0.0/24,12fc::21 *
- *             ip   - [IN] ip address                                         *
+ *             ip   - [IN]                                                    *
  *                                                                            *
- * Return value: FAIL - out of range, SUCCEED - within the range              *
+ * Return value: FAIL - out of range, SUCCEED - within range                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_ip_in_list(const char *list, const char *ip)
@@ -230,7 +225,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse a ServerActive element like "IP<:port>" or "[IPv6]<:port>"  *
+ * Purpose: parses ServerActive element like "IP<:port>" or "[IPv6]<:port>"   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_parse_serveractive_element(const char *str, char **host, unsigned short *port, unsigned short port_default)

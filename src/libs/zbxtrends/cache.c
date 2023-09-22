@@ -20,7 +20,6 @@
 #include "trends.h"
 
 #include "zbxalgo.h"
-#include "log.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxnum.h"

@@ -76,8 +76,9 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_init_agent_request(&request);
 	zbx_init_agent_result(&param_result);
-	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
-		get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters, get_zbx_config_source_ip);
+
+	zbx_init_library_sysinfo(get_zbx_config_timeout, NULL, NULL, NULL, get_zbx_config_source_ip, NULL, NULL, NULL,
+			NULL);
 
 	init_param = zbx_mock_get_parameter_string("in.key");
 

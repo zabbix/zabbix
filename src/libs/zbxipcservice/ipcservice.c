@@ -9,7 +9,6 @@
 
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-#include "log.h"
 #include "zbxstr.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
@@ -1712,6 +1711,11 @@ void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 	zbx_ipc_client_release(client);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+int	zbx_ipc_client_get_fd(zbx_ipc_client_t *client)
+{
+	return client->csocket.fd;
 }
 
 void	zbx_ipc_client_addref(zbx_ipc_client_t *client)

@@ -23,7 +23,7 @@
 #include "../events/events.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
 #include "../actions.h"
@@ -38,9 +38,8 @@
 #include "zbxtime.h"
 #include "zbxversion.h"
 #include "zbx_rtc_constants.h"
-#include "zbx_host_constants.h"
 #include "zbxdbwrap.h"
-#include "zbxserver.h"
+#include "zbxevent.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR
@@ -674,7 +673,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_ptr_t	tasks;
 	zbx_vector_uint64_t	done_taskids, itemids;
-	zbx_uint64_t		taskid, itemid, proxy_hostid, *proxy_hostids;
+	zbx_uint64_t		taskid, itemid, proxyid, *proxyids;
 	zbx_tm_task_t		*task;
 	zbx_tm_check_now_t	*data;
 
@@ -684,7 +683,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_vector_uint64_create(&done_taskids);
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
-			"select t.taskid,t.status,t.proxy_hostid,td.itemid"
+			"select t.taskid,t.status,t.proxyid,td.itemid"
 			" from task t"
 			" left join task_check_now td"
 				" on t.taskid=td.taskid"
@@ -702,8 +701,8 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			continue;
 		}
 
-		ZBX_DBROW2UINT64(proxy_hostid, row[2]);
-		if (0 != proxy_hostid)
+		ZBX_DBROW2UINT64(proxyid, row[2]);
+		if (0 != proxyid)
 		{
 			if (ZBX_TM_STATUS_INPROGRESS == atoi(row[1]))
 			{
@@ -717,7 +716,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 
 		/* zbx_task_t here is used only to store taskid, proxyhostid, data->itemid - */
 		/* the rest of task properties are not used                                  */
-		task = zbx_tm_task_create(taskid, ZBX_TM_TASK_CHECK_NOW, 0, 0, 0, proxy_hostid);
+		task = zbx_tm_task_create(taskid, ZBX_TM_TASK_CHECK_NOW, 0, 0, 0, proxyid);
 		task->data = (void *)zbx_tm_check_now_create(itemid);
 		zbx_vector_ptr_append(&tasks, task);
 	}
@@ -734,8 +733,8 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			zbx_vector_uint64_append(&itemids, data->itemid);
 		}
 
-		proxy_hostids = (zbx_uint64_t *)zbx_malloc(NULL, tasks.values_num * sizeof(zbx_uint64_t));
-		zbx_dc_reschedule_items(&itemids, time(NULL), proxy_hostids);
+		proxyids = (zbx_uint64_t *)zbx_malloc(NULL, tasks.values_num * sizeof(zbx_uint64_t));
+		zbx_dc_reschedule_items(&itemids, time(NULL), proxyids);
 
 		sql_offset = 0;
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -744,26 +743,26 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 		{
 			task = (zbx_tm_task_t *)tasks.values[i];
 
-			if (0 != proxy_hostids[i] && task->proxy_hostid == proxy_hostids[i])
+			if (0 != proxyids[i] && task->proxyid == proxyids[i])
 				continue;
 
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset , "update task set");
 
-			if (0 == proxy_hostids[i])
+			if (0 == proxyids[i])
 			{
 				/* close tasks managed by server -                  */
 				/* items either have been rescheduled or not cached */
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " status=%d", ZBX_TM_STATUS_DONE);
-				if (0 != task->proxy_hostid)
-					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",proxy_hostid=null");
+				if (0 != task->proxyid)
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ",proxyid=null");
 
 				processed_num++;
 			}
 			else
 			{
 				/* update target proxy hostid */
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " proxy_hostid=" ZBX_FS_UI64,
-						proxy_hostids[i]);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " proxyid=" ZBX_FS_UI64,
+						proxyids[i]);
 			}
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where taskid=" ZBX_FS_UI64 ";\n",
@@ -778,7 +777,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 			zbx_db_execute("%s", sql);
 
 		zbx_vector_uint64_destroy(&itemids);
-		zbx_free(proxy_hostids);
+		zbx_free(proxyids);
 
 		zbx_vector_ptr_clear_ext(&tasks, (zbx_clean_func_t)zbx_tm_task_free);
 	}
@@ -869,10 +868,10 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 		return;
 	}
 
-	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXY_HOSTIDS, &jp_data))
+	if (FAIL == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_PROXYIDS, &jp_data))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to parse proxy config cache reload task data: field "
-				ZBX_PROTO_TAG_PROXY_HOSTIDS " not found");
+				ZBX_PROTO_TAG_PROXYIDS " not found");
 		return;
 	}
 
@@ -896,7 +895,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				continue;
 			}
 
-			if (HOST_STATUS_PROXY_ACTIVE == type)
+			if (PROXY_OPERATING_MODE_ACTIVE == type)
 			{
 				zbx_tm_task_t	*task;
 
@@ -904,7 +903,7 @@ static void	tm_process_proxy_config_reload_task(zbx_ipc_async_socket_t *rtc, con
 				zbx_vector_tm_task_append(&tasks_active, task);
 				zbx_vector_str_append(&proxynames_log, name);
 			}
-			else if (HOST_STATUS_PROXY_PASSIVE == type)
+			else if (PROXY_OPERATING_MODE_PASSIVE == type)
 			{
 				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
 				{
@@ -1113,7 +1112,7 @@ static void	tm_process_temp_suppression(const char *data)
 			zbx_db_insert_t	db_insert;
 
 			zbx_db_insert_prepare(&db_insert, "event_suppress", "event_suppressid", "eventid",
-					"suppress_until", "userid", NULL);
+					"suppress_until", "userid", (char *)NULL);
 			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), eventid, ts, userid);
 
 			zbx_db_insert_autoincrement(&db_insert, "event_suppressid");
@@ -1155,7 +1154,7 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 			" from task t"
 			" left join task_data td"
 				" on t.taskid=td.taskid"
-			" where t.proxy_hostid is null"
+			" where t.proxyid is null"
 				" and");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "t.taskid", taskids->values, taskids->values_num);
 	result = zbx_db_select("%s", sql);
@@ -1178,11 +1177,11 @@ static int	tm_process_data(zbx_ipc_async_socket_t *rtc, zbx_vector_uint64_t *tas
 				tm_process_diaginfo(taskid, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
-			case ZBX_TM_DATA_TYPE_PROXY_HOSTIDS:
+			case ZBX_TM_DATA_TYPE_PROXYIDS:
 				tm_process_proxy_config_reload_task(rtc, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
-			case ZBX_TM_DATA_TYPE_PROXY_HOSTNAME:
+			case ZBX_TM_DATA_TYPE_PROXYNAME:
 				tm_process_passive_proxy_cache_reload_request(rtc, row[2]);
 				zbx_vector_uint64_append(&done_taskids, taskid);
 				break;
@@ -1245,19 +1244,19 @@ static int	tm_expire_generic_tasks(zbx_vector_uint64_t *taskids)
  * Purpose: get proxy version compatibility with server version               *
  *                                                                            *
  ******************************************************************************/
-static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_hostid)
+static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxyid)
 {
 	zbx_proxy_compatibility_t	compatibility = ZBX_PROXY_VERSION_UNDEFINED;
 
-	if (0 < proxy_hostid)
+	if (0 < proxyid)
 	{
 		zbx_db_row_t	row;
 		zbx_db_result_t	result;
 
 		result = zbx_db_select(
 				"select compatibility"
-				" from host_rtdata"
-				" where hostid=" ZBX_FS_UI64, proxy_hostid);
+				" from proxy_rtdata"
+				" where proxyid=" ZBX_FS_UI64, proxyid);
 
 		if (NULL != (row = zbx_db_fetch(result)))
 			compatibility = (zbx_proxy_compatibility_t)atoi(row[0]);
@@ -1275,12 +1274,12 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
 	int			type, processed_num = 0, expired_num = 0, clock, ttl;
-	zbx_uint64_t		taskid, proxy_hostid;
+	zbx_uint64_t		taskid, proxyid;
 	zbx_vector_uint64_t	ack_taskids, check_now_taskids, expire_taskids, data_taskids;
 
 	zbx_vector_uint64_create(&ack_taskids);
@@ -1288,7 +1287,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 	zbx_vector_uint64_create(&expire_taskids);
 	zbx_vector_uint64_create(&data_taskids);
 
-	result = zbx_db_select("select taskid,type,clock,ttl,proxy_hostid"
+	result = zbx_db_select("select taskid,type,clock,ttl,proxyid"
 				" from task"
 				" where status in (%d,%d)"
 				" order by taskid",
@@ -1302,7 +1301,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 		ZBX_STR2UCHAR(type, row[1]);
 		clock = atoi(row[2]);
 		ttl = atoi(row[3]);
-		ZBX_DBROW2UINT64(proxy_hostid, row[4]);
+		ZBX_DBROW2UINT64(proxyid, row[4]);
 
 		switch (type)
 		{
@@ -1312,16 +1311,18 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:
-				compatibility = tm_get_proxy_compatibility(proxy_hostid);
+				compatibility = tm_get_proxy_compatibility(proxyid);
 
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
 					zbx_tm_task_t	*task;
 					const char	*error = "Remote commands are disabled on unsupported proxies.";
+					double		t;
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					t = zbx_time();
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
-							ZBX_TM_STATUS_NEW, zbx_time(), 0, 0);
+							ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
 					task->data = zbx_tm_remote_command_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1343,7 +1344,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 				zbx_vector_uint64_append(&ack_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_CHECK_NOW:
-				compatibility = tm_get_proxy_compatibility(proxy_hostid);
+				compatibility = tm_get_proxy_compatibility(proxyid);
 
 				if (ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
 				{
@@ -1357,7 +1358,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_vector_uint64_append(&check_now_taskids, taskid);
 				break;
 			case ZBX_TM_TASK_DATA:
-				compatibility = tm_get_proxy_compatibility(proxy_hostid);
+				compatibility = tm_get_proxy_compatibility(proxyid);
 
 				if (ZBX_PROXY_VERSION_OUTDATED == compatibility ||
 						ZBX_PROXY_VERSION_UNSUPPORTED == compatibility)
@@ -1365,10 +1366,12 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
 					zbx_tm_task_t	*task;
 					const char	*error = "The requested task is disabled. Proxy major"
 							" version does not match server major version.";
+					double		t;
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					t = zbx_time();
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-							zbx_time(), 0, 0);
+							(time_t)t, 0, 0);
 					task->data = zbx_tm_data_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1421,11 +1424,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
  * Purpose: remove old done/expired tasks                                     *
  *                                                                            *
  ******************************************************************************/
-static void	tm_remove_old_tasks(int now)
+static void	tm_remove_old_tasks(time_t now)
 {
 	zbx_db_begin();
-	zbx_db_execute("delete from task where status in (%d,%d) and clock<=%d",
-			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
+	zbx_db_execute("delete from task where status in (%d,%d) and clock<=" ZBX_FS_TIME_T,
+			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, (zbx_fs_time_t)(now - ZBX_TM_CLEANUP_TASK_AGE));
 	zbx_db_commit();
 }
 
@@ -1452,24 +1455,24 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 		proxy = proxies.values[i];
 
-		if (HOST_STATUS_PROXY_ACTIVE == proxy->status)
+		if (PROXY_OPERATING_MODE_ACTIVE == proxy->mode)
 		{
-			task = tm_create_active_proxy_reload_task(proxy->hostid);
+			task = tm_create_active_proxy_reload_task(proxy->proxyid);
 			zbx_vector_tm_task_append(&tasks_active, task);
 		}
-		else if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+		else if (PROXY_OPERATING_MODE_PASSIVE == proxy->mode)
 		{
-			if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxy->hostid))
+			if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxy->proxyid))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "failed to reload configuration cache on proxy "
 						"with id " ZBX_FS_UI64 " [%s]: failed to update nextcheck",
-						proxy->hostid, proxy->name);
+						proxy->proxyid, proxy->name);
 			}
 			else
 				notify_proxypollers = 1;
 		}
 
-		zbx_audit_proxy_config_reload(proxy->hostid, proxy->name);
+		zbx_audit_proxy_config_reload(proxy->proxyid, proxy->name);
 	}
 
 	zbx_audit_flush();
@@ -1540,7 +1543,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 				continue;
 			}
 
-			if (HOST_STATUS_PROXY_ACTIVE == type)
+			if (PROXY_OPERATING_MODE_ACTIVE == type)
 			{
 				zbx_tm_task_t	*task;
 
@@ -1548,7 +1551,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 				zbx_vector_tm_task_append(&tasks_active, task);
 				zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 			}
-			else if (HOST_STATUS_PROXY_PASSIVE == type)
+			else if (PROXY_OPERATING_MODE_PASSIVE == type)
 			{
 				if (FAIL == zbx_dc_update_passive_proxy_nextcheck(proxyid))
 				{
@@ -1609,9 +1612,8 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
-	static int		cleanup_time = 0;
-	double			sec1, sec2;
-	int			tasks_num, sleeptime, nextcheck;
+	static time_t		cleanup_time = 0;
+	int			tasks_num, sleeptime;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -1633,9 +1635,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
 
-	sec1 = zbx_time();
+	double sec1 = zbx_time();
 
-	sleeptime = ZBX_TM_PROCESS_PERIOD - (int)sec1 % ZBX_TM_PROCESS_PERIOD;
+	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
@@ -1663,18 +1665,18 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks(&rtc, (int)sec1);
+		tasks_num = tm_process_tasks(&rtc, (time_t)sec1);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
-			tm_remove_old_tasks((int)sec1);
-			cleanup_time = sec1;
+			tm_remove_old_tasks((time_t)sec1);
+			cleanup_time = (time_t)sec1;
 		}
 
-		sec2 = zbx_time();
+		double sec2 = zbx_time();
 
-		nextcheck = (int)sec1 - (int)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
+		time_t nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
 
-		if (0 > (sleeptime = nextcheck - (int)sec2))
+		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
 
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",

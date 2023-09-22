@@ -29,7 +29,6 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxcomms.h"
-#include "log.h"
 #include "cfg.h"
 
 #ifdef HAVE_LDAP
@@ -39,16 +38,6 @@
 #ifdef HAVE_LBER_H
 #	include <lber.h>
 #endif
-
-ZBX_METRIC	parameters_simple[] =
-/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-{
-	{"net.tcp.service",	CF_HAVEPARAMS,	check_service,		"ssh,127.0.0.1,22"},
-	{"net.tcp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ssh,127.0.0.1,22"},
-	{"net.udp.service",	CF_HAVEPARAMS,	check_service,		"ntp,127.0.0.1,123"},
-	{"net.udp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ntp,127.0.0.1,123"},
-	{NULL}
-};
 
 #ifdef HAVE_LDAP
 static int	check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
@@ -211,8 +200,13 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
+#	if LIBCURL_VERSION_NUM >= 0x075500
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+#	else
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS,
 			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+#	endif
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
 				__func__, (int)opt, curl_easy_strerror(err));
@@ -509,4 +503,19 @@ int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1);
+}
+
+static zbx_metric_t	parameters_simple[] =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+{
+	{"net.tcp.service",	CF_HAVEPARAMS,	check_service,		"ssh,127.0.0.1,22"},
+	{"net.tcp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ssh,127.0.0.1,22"},
+	{"net.udp.service",	CF_HAVEPARAMS,	check_service,		"ntp,127.0.0.1,123"},
+	{"net.udp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ntp,127.0.0.1,123"},
+	{NULL}
+};
+
+zbx_metric_t	*get_parameters_simple(void)
+{
+	return &parameters_simple[0];
 }

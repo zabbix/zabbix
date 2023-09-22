@@ -71,7 +71,7 @@ jQuery(function($) {
 	if ($search.length) {
 		createSuggest('search');
 
-		var $search_icon = $search.siblings('.search-icon');
+		var $search_icon = $search.siblings('.js-search');
 
 		$search.on('keyup', function() {
 			$search_icon.prop('disabled', $.trim($search.val()) === '');

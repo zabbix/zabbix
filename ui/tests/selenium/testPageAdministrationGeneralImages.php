@@ -67,8 +67,8 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider allImages
-	*/
+	 * @dataProvider allImages
+	 */
 	public function testPageAdministrationGeneralImages_IconSimpleUpdate($image) {
 		$sql_image = 'SELECT * FROM images WHERE imageid='.$image['imageid'];
 		$old_image_hash = CDBHelper::getHash($sql_image);
@@ -77,6 +77,7 @@ class testPageAdministrationGeneralImages extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//button[text()="Create icon"]');
 		$this->zbxTestDropdownSelectWait('imagetype', $image['imagetype'] == IMAGE_TYPE_ICON ? 'Icon' : 'Background');
 		$this->zbxTestClickLinkTextWait($image['name']);
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckHeader('Images');
 		$this->zbxTestTextPresent(['Name', 'Upload', 'Image']);
 		$this->zbxTestAssertElementPresentId('update');

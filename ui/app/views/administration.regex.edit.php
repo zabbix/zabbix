@@ -122,7 +122,9 @@ $expr_tab = (new CFormList('exprTab'))
 
 $test_tab = (new CFormList())
 	->addRow(_('Test string'),
-		(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('test_string', $data['test_string']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	)
 	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT))
 	->addRow(_('Result'),

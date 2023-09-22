@@ -1,68 +1,3 @@
-$menu-user-icons-opacity: .75 !default;
-
-$menu-user-arrow-bg-position: -606px -434px !default;
-$menu-user-arrow-hover-bg-position: -606px -434px !default;
-$menu-user-selected-arrow-bg-position: -606px -434px !default;
-
-$menu-user-icons: (
-	support: -247px -48px,
-	integrations: -90px -84px,
-	help: -90px -48px,
-	guest: -247px -156px,
-	profile: -90px -120px,
-	signout: -90px -156px
-) !default;
-
-$menu-user-expanded-icons: (
-	support: -247px -48px,
-	integrations: -90px -84px,
-	help: -90px -48px,
-	guest: -247px -156px,
-	profile: -90px -120px,
-	signout: -90px -156px
-) !default;
-
-%menu-user-icon-common {
-	&::before {
-		content: '';
-		width: 12px;
-		height: 12px;
-		background: url($sprite-path) no-repeat;
-	}
-}
-
-// Dynamically generated classes for icons:
-//  .icon-support
-//  .icon-integrations
-//  .icon-help
-//  .icon-guest
-//  .icon-profile
-//  .icon-signout
-@each $class, $bg-position in $menu-user-icons {
-	.icon-#{$class} {
-		@extend %menu-user-icon-common;
-
-		&::before {
-			background-position: $bg-position;
-		}
-	}
-}
-
-// Dynamically generated classes for icons:
-//  .icon-support
-//  .icon-integrations
-//  .icon-help
-//  .icon-guest
-//  .icon-profile
-//  .icon-signout
-@each $class, $bg-position in $menu-user-expanded-icons {
-	.is-expanded {
-		.icon-#{$class}::before {
-			background-position: $bg-position;
-		}
-	}
-}
-
 .menu-user {
 	padding: 12px 0;
 
@@ -70,27 +5,37 @@ $menu-user-expanded-icons: (
 		line-height: 16px;
 	}
 
+	[class^="zi-"], [class*=" zi-"] {
+		&::before {
+			margin-right: 16px;
+			font-size: $menu-user-icon-size;
+			line-height: 0;
+
+			@if $ui-transitions {
+				transition: color $ui-controls-transition-duration ease-out;
+			}
+		}
+	}
+
 	a,
 	span {
 		position: relative;
 		display: block;
-		padding: 12px 12px 12px 48px;
+		padding: 12px 14px 12px 45px;
 		font-size: 12px;
 		white-space: nowrap;
+		border-left: 3px solid transparent;
 
 		@if $ui-transitions {
 			transition: color $ui-transition-duration ease-out;
 		}
+	}
+
+	[class^="zi-"], [class*=" zi-"] {
+		padding-left: 13px;
 
 		&::before {
-			position: absolute;
-			top: 13px;
-			left: 18px;
-			opacity: .75;
-
-			@if $ui-transitions {
-				transition: opacity $ui-transition-duration ease-out;
-			}
+			color: $menu-user-icon-color;
 		}
 	}
 
@@ -100,10 +45,13 @@ $menu-user-expanded-icons: (
 		&:hover,
 		&:focus {
 			border-bottom: 0;
+			border-color: $menu-user-hover-border-color;
 			color: $menu-user-hover-color;
 
-			&::before {
-				opacity: 1;
+			&[class^="zi-"], &[class*=" zi-"] {
+				&::before {
+					color: inherit;
+				}
 			}
 		}
 	}
@@ -129,6 +77,12 @@ $menu-user-expanded-icons: (
 					border-left-color: $menu-user-expanded-border-color;
 					color: $menu-user-expanded-color;
 				}
+
+				&[class^="zi-"], &[class*=" zi-"] {
+					&::before {
+						color: $menu-user-expanded-icon-color;
+					}
+				}
 			}
 		}
 
@@ -142,32 +96,16 @@ $menu-user-expanded-icons: (
 	.has-submenu {
 		& > a {
 			&::after {
-				content: '';
-				position: absolute;
-				top: 19px;
-				right: 14px;
-				width: 6px;
-				height: 4px;
-				background: url($sprite-path) no-repeat $menu-user-arrow-bg-position;
+				@extend %icons-font;
+				position: relative;
+				float: right;
+				top: 4px;
+				font-size: $icon-medium-size * .5;
+				content: $zi-chevron-down;
 				transform: rotate(0deg);
-				@if $menu-user-icons-opacity < 1 {
-					opacity: $menu-user-icons-opacity;
-				}
 
 				@if $ui-transitions {
-					transition: transform $ui-transition-duration,
-					opacity $ui-transition-duration;
-				}
-			}
-
-			&:hover,
-			&:focus {
-				&::after {
-					background-position: $menu-user-arrow-hover-bg-position;
-
-					@if $menu-user-icons-opacity < 1 {
-						opacity: 1;
-					}
+					transition: transform $ui-transition-duration;
 				}
 			}
 		}
@@ -175,15 +113,7 @@ $menu-user-expanded-icons: (
 		&.is-expanded {
 			& > a {
 				&::after {
-					background-position: $menu-user-selected-arrow-bg-position;
 					transform: rotate(-180deg);
-				}
-
-				@if $menu-user-icons-opacity < 1 {
-					&::before,
-					&::after {
-						opacity: 1;
-					}
 				}
 			}
 		}
@@ -214,6 +144,13 @@ $menu-user-expanded-icons: (
 
 			&:not(:last-child) {
 				border-bottom: 1px solid $menu-user-submenu-border-color;
+			}
+		}
+
+		[class^="zi-"], [class*=" zi-"] {
+			&::before {
+				margin-right: 8px;
+				color: inherit;
 			}
 		}
 
@@ -292,7 +229,6 @@ $menu-user-expanded-icons: (
 		.has-submenu {
 			& > a {
 				&::after {
-					top: 13px;
 					transform: rotate(90deg);
 				}
 			}

@@ -23,11 +23,11 @@
 // specified output interface in json format when requested or cache is full.
 // The cache limits are specified by configuration file (BufferSize). If cache
 // limits are reached the following logic is applied to new results:
-// * non persistent results replaces either oldest result of the same item, or
-//   oldest non persistent result if item was not yet cached.
-// * persistent results replaces oldest non persistent result if the total number
-//   of persistent results is less than half maximum cache size. Otherwise the result
-//   is appended, extending cache beyond configured limit.
+//   - non persistent results replaces either oldest result of the same item, or
+//     oldest non persistent result if item was not yet cached.
+//   - persistent results replaces oldest non persistent result if the total number
+//     of persistent results is less than half maximum cache size. Otherwise the result
+//     is appended, extending cache beyond configured limit.
 //
 // Because of asynchronous nature of the communications it's not possible for
 // result cache to return error if it cannot accept new persistent result. So
@@ -36,7 +36,6 @@
 // can lead to more results written than cache limits allow. However it's not a
 // big problem because cache buffer is not static and will be extended as required.
 // The cache limit (BufferSize) is treated more like recommendation than hard limit.
-//
 package resultcache
 
 import (
@@ -79,12 +78,19 @@ type AgentData struct {
 	persistent     bool
 }
 
+type AgentCommands struct {
+	Id    uint64  `json:"id"`
+	Value *string `json:"value,omitempty"`
+	Error *string `json:"error,omitempty"`
+}
+
 type AgentDataRequest struct {
-	Request string       `json:"request"`
-	Data    []*AgentData `json:"data"`
-	Session string       `json:"session"`
-	Host    string       `json:"host"`
-	Version string       `json:"version"`
+	Request  string           `json:"request"`
+	Data     []*AgentData     `json:"data",omitempty"`
+	Commands []*AgentCommands `json:"commands,omitempty"`
+	Session  string           `json:"session"`
+	Host     string           `json:"host"`
+	Version  string           `json:"version"`
 }
 
 type Uploader interface {
@@ -95,16 +101,28 @@ type Uploader interface {
 	Session() (s string)
 }
 
+type CommandResult struct {
+	ID     uint64
+	Result string
+	Error  error
+}
+
+type Writer interface {
+	plugin.ResultWriter
+	WriteCommand(cr *CommandResult)
+}
+
 // common cache data
 type cacheData struct {
 	log.Logger
-	input      chan interface{}
-	uploader   Uploader
-	clientID   uint64
-	lastDataID uint64
-	lastErrors []error
-	retry      *time.Timer
-	timeout    int
+	input         chan interface{}
+	uploader      Uploader
+	clientID      uint64
+	lastDataID    uint64
+	lastCommandID uint64
+	lastErrors    []error
+	retry         *time.Timer
+	timeout       int
 }
 
 func (c *cacheData) Stop() {
@@ -113,6 +131,10 @@ func (c *cacheData) Stop() {
 
 func (c *cacheData) Write(result *plugin.Result) {
 	c.input <- result
+}
+
+func (c *cacheData) WriteCommand(cr *CommandResult) {
+	c.input <- cr
 }
 
 // TODO: will be used once the runtime configuration reload is implemented
@@ -260,6 +282,9 @@ addressCheck:
 		if _, err = database.Exec(fmt.Sprintf("DROP TABLE log_%d", ids[i])); err != nil {
 			return err
 		}
+		if _, err = database.Exec(fmt.Sprintf("DROP TABLE command_%d", ids[i])); err != nil {
+			return err
+		}
 	}
 
 	for _, c := range combinations {
@@ -295,7 +320,8 @@ addressCheck:
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}
-		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS data_%d_1 ON data_%d (write_clock)", id, id)); err != nil {
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS data_%d_1 ON data_%d (write_clock)",
+			id, id)); err != nil {
 			return err
 		}
 
@@ -309,12 +335,37 @@ addressCheck:
 		if _, err = stmt.Exec(); err != nil {
 			return err
 		}
-		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS log_%d_1 ON log_%d (write_clock)", id, id)); err != nil {
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS log_%d_1 ON log_%d (write_clock)",
+			id, id)); err != nil {
 			return err
 		}
 
 		/* delete gathered logs - they will be rescanned using the lastlogsize received from server */
 		if _, err = database.Exec(fmt.Sprintf("DELETE FROM log_%d", id)); err != nil {
+			return err
+		}
+
+		stmt, err = database.Prepare(fmt.Sprintf(
+			"CREATE TABLE IF NOT EXISTS command_%d ("+
+				"id INTEGER,"+
+				"write_clock INTEGER,"+
+				"cmd_id INTEGER,"+
+				"value TEXT,"+
+				"error TEXT"+
+				")",
+			id))
+
+		if err != nil {
+			return err
+		}
+
+		defer stmt.Close()
+
+		if _, err = stmt.Exec(); err != nil {
+			return err
+		}
+		if _, err = database.Exec(fmt.Sprintf("CREATE INDEX IF NOT EXISTS command_%d_1 ON command_%d (write_clock)",
+			id, id)); err != nil {
 			return err
 		}
 	}

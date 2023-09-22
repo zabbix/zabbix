@@ -19,7 +19,7 @@
 
 #include "zbxwin32.h"
 
-#include "log.h"
+#include "zbxlog.h"
 
 static DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD) = NULL;
 static BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS) = NULL;

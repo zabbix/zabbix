@@ -21,7 +21,7 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcachehistory.h"
 #include "zbxrtc.h"
 #include "zbxtime.h"

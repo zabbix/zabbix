@@ -40,7 +40,6 @@
 #endif
 
 #include "zbxcommon.h"
-#include "log.h"
 
 const char	*get_signal_name(int sig)
 {

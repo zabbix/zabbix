@@ -27,7 +27,7 @@ class CHttpRequest {
 	/**
 	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
 	 */
-	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'Authorization'];
+	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'Authorization', 'PATH-INFO'];
 
 	private $body;
 	private $method;
@@ -128,6 +128,41 @@ class CHttpRequest {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get request PATH-INFO segment by index. Return empty string if non-existing index requested.
+	 *
+	 * @param int $index  PATH-INFO segment index.
+	 *
+	 * @return string
+	 */
+	public function getPathInfoSegment(int $index): string {
+		$pathinfo_segments = explode('/', substr($this->header('PATH-INFO'), 1));
+		return array_key_exists($index, $pathinfo_segments) ? $pathinfo_segments[$index] : '';
+	}
+
+	/**
+	 * Get argument passed in $_GET. Returns default value when argument not set.
+	 *
+	 * @param string $name     Argument's name.
+	 * @param mixed  $default  Default value to return when requested argument not set.
+	 *
+	 * @return mixed
+	 */
+	public function getUrlArgument(string $name, $default = null) {
+		return array_key_exists($name, $_GET) ? $_GET[$name] : $default;
+	}
+
+	/**
+	 * Checks if argument exists in $_GET request.
+	 *
+	 * @param string $name  Argument's name.
+	 *
+	 * @return bool
+	 */
+	public function hasUrlArgument(string $name): bool {
+		return array_key_exists($name, $_GET);
 	}
 
 	/**

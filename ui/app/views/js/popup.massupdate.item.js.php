@@ -110,7 +110,7 @@
 
 // Custom intervals.
 (() => {
-	const custom_elem = document.querySelector('#update_interval_div');
+	const custom_elem = document.querySelector('#update_interval');
 
 	if (!custom_elem) {
 		return false;
@@ -141,8 +141,6 @@
 			}
 		});
 
-	$(obj.querySelector('#custom_intervals')).dynamicRows({
-		template: '#custom-intervals-tmpl'
-	});
+	$(obj.querySelector('#custom_intervals')).dynamicRows({template: '#custom-intervals-tmpl', allow_empty: true});
 })();
 </script>

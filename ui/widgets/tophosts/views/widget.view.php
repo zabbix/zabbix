@@ -62,7 +62,7 @@ else {
 
 			if ($column === null) {
 				if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-					&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+						&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 					$row[] = (new CCol(''))->setColSpan(2);
 				}
 				else {
@@ -75,10 +75,14 @@ else {
 			$color = $column_config['base_color'];
 
 			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
-				&& array_key_exists('thresholds', $column_config)) {
+					&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
+					&& array_key_exists('thresholds', $column_config)) {
 				foreach ($column_config['thresholds'] as $threshold) {
-					if ($column['value'] < $threshold['threshold']) {
+					$threshold_value = $column['is_binary_units']
+						? $threshold['threshold_binary']
+						: $threshold['threshold'];
+
+					if ($column['value'] < $threshold_value) {
 						break;
 					}
 
@@ -90,7 +94,14 @@ else {
 				case CWidgetFieldColumnsList::DATA_HOST_NAME:
 					$row[] = (new CCol(
 						(new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']))
-					))->addStyle($color !== '' ? 'background-color: #' . $color : null);
+					))
+						->addStyle($color !== '' ? 'background-color: #' . $color : null)
+						->addItem($column['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
+							? makeMaintenanceIcon($column['maintenance_type'], $column['maintenance_name'],
+								$column['maintenance_description']
+							)
+							: null
+						);
 
 					break;
 
@@ -135,8 +146,14 @@ else {
 							? '#' . $column_config['base_color']
 							: Widget::DEFAULT_FILL
 						)
-						->setAttribute('min', $column_config['min'])
-						->setAttribute('max', $column_config['max']);
+						->setAttribute('min', $column['is_binary_units']
+							? $column_config['min_binary']
+							: $column_config['min']
+						)
+						->setAttribute('max', $column['is_binary_units']
+							? $column_config['max_binary']
+							: $column_config['max']
+						);
 
 					if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
 						$bar_gauge->setAttribute('solid', 1);
@@ -144,7 +161,11 @@ else {
 
 					if (array_key_exists('thresholds', $column_config)) {
 						foreach ($column_config['thresholds'] as $threshold) {
-							$bar_gauge->addThreshold($threshold['threshold'], '#' . $threshold['color']);
+							$threshold_value = $column['is_binary_units']
+								? $threshold['threshold_binary']
+								: $threshold['threshold'];
+
+							$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);
 						}
 					}
 

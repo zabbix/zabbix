@@ -96,7 +96,6 @@ class CControllerActionEnable extends CController {
 			$actions = API::Action()->get([
 				'output' => [],
 				'actionids' => $actionids,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 

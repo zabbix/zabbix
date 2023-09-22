@@ -475,10 +475,9 @@ else {
 }
 
 $ms_groups = [];
-$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, ['editable' => true],
-	getRequest('context')
-);
+$filter_groupids = getSubGroups(getRequest('filter_groupids', []), $ms_groups, getRequest('context'));
 $filter_hostids = getRequest('filter_hostids');
+
 if (!hasRequest('form') && $filter_hostids) {
 	if (!isset($host)) {
 		$host = API::Host()->get([
@@ -590,7 +589,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'posts' => getRequest('posts', DB::getDefault('items', 'posts')),
 			'headers' => prepareItemHeaders(getRequest('headers', [])),
 			'status_codes' => getRequest('status_codes', DB::getDefault('items', 'status_codes')),
-			'follow_redirects' => getRequest('follow_redirects', DB::getDefault('items', 'follow_redirects')),
+			'follow_redirects' => getRequest('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF),
 			'retrieve_mode' => getRequest('retrieve_mode', $retrieve_mode_default),
 			'output_format' => getRequest('output_format', DB::getDefault('items', 'output_format')),
 			'http_proxy' => getRequest('http_proxy', DB::getDefault('items', 'http_proxy')),
@@ -638,7 +637,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (hasRequest('update')) {
 			$db_items = API::Item()->get([
-				'output' => ['templateid', 'flags', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
+				'output' => ['templateid', 'flags'],
 				'itemids' => $itemid
 			]);
 

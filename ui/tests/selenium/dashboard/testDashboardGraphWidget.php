@@ -141,7 +141,7 @@ class testDashboardGraphWidget extends CWebTest {
 			case 'Data set':
 				// Remove data set.
 				if (CTestArrayHelper::get($data, 'remove_data_set', false)) {
-					$form->query('xpath://button[@class="btn-remove"]')->one()->click();
+					$form->query('xpath:.//button['.CXPathHelper::fromClass('js-remove').']')->one()->click();
 				}
 				break;
 
@@ -151,7 +151,8 @@ class testDashboardGraphWidget extends CWebTest {
 
 				// Remove all override options.
 				if (CTestArrayHelper::get($data, 'remove_override_options', false)) {
-					$form->query('xpath://button[@class="subfilter-disable-btn"]')->all()->click();
+					$form->query("xpath:.//ul[@class='overrides-options-list']//button[".
+							CXPathHelper::fromClass('js-remove')."]")->all()->click();
 				}
 
 				break;
@@ -2430,20 +2431,20 @@ class testDashboardGraphWidget extends CWebTest {
 			'Data set' => [
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'Available memory*',
+					'item' => 'Linux: Available memory*',
 					'Aggregation function' => 'avg',
 					'Aggregate' => 'Data set',
 					'Data set label' => '祝你今天過得愉快'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'CPU guest*',
+					'item' => 'Linux: CPU guest*',
 					'Aggregation function' => 'max',
 					'Data set label' => 'Data set only'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'CPU utilization',
+					'item' => 'Linux: CPU utilization',
 					'Aggregation function' => 'count',
 					'Aggregation interval' => '24h',
 					'Aggregate' => 'Data set'
@@ -2457,7 +2458,7 @@ class testDashboardGraphWidget extends CWebTest {
 				'Data set #3'
 			],
 			'Legend labels' => [
-				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
+				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: Linux: CPU guest nice time)', 'max(ЗАББИКС Сервер: Linux: CPU guest time)',
 				'Data set #3'
 			]
 		];
@@ -2466,7 +2467,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $this->openGraphWidgetConfiguration();
 
 		// Check hint next to the "Data set label" field.
-		$form->query('xpath:.//label[text()="Data set label"]/a')->one()->click();
+		$form->getLabel('Data set label')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
 

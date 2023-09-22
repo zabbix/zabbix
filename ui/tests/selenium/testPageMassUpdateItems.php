@@ -228,6 +228,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 	 */
 	public function getItemChangeData() {
 		return [
+			// #58.
 			[
 				[
 					'names' => [
@@ -242,6 +243,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					]
 				]
 			],
+			// #59.
 			[
 				[
 					'names' => [
@@ -256,6 +258,7 @@ class testPageMassUpdateItems extends testMassUpdateItems {
 					]
 				]
 			],
+			// #60.
 			[
 				[
 					'expected' => TEST_BAD,

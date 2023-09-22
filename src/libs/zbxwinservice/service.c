@@ -21,8 +21,9 @@
 
 #include "zbxstr.h"
 #include "cfg.h"
-#include "log.h"
-#include "zbxconf.h"
+#include "zbxlog.h"
+
+#include <strsafe.h> /* StringCchPrintf */
 
 #define EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
@@ -166,7 +167,7 @@ void	zbx_service_start(int flags)
 		if (ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == GetLastError())
 			zbx_error("use foreground option to run Zabbix agent as console application");
 		else
-			zbx_error("StartServiceCtrlDispatcher() failed: %s", strerror_from_system(GetLastError()));
+			zbx_error("StartServiceCtrlDispatcher() failed: %s", zbx_strerror_from_system(GetLastError()));
 	}
 }
 
@@ -175,7 +176,7 @@ static int	svc_OpenSCManager(SC_HANDLE *mgr)
 	if (NULL != (*mgr = OpenSCManager(NULL, NULL, GENERIC_WRITE)))
 		return SUCCEED;
 
-	zbx_error("ERROR: cannot connect to Service Manager: %s", strerror_from_system(GetLastError()));
+	zbx_error("ERROR: cannot connect to Service Manager: %s", zbx_strerror_from_system(GetLastError()));
 
 	return FAIL;
 }
@@ -190,7 +191,7 @@ static int	svc_OpenService(SC_HANDLE mgr, SC_HANDLE *service, DWORD desired_acce
 	if (NULL == (*service = OpenService(mgr, wservice_name, desired_access)))
 	{
 		zbx_error("ERROR: cannot open service [%s]: %s",
-				ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
+				ZABBIX_SERVICE_NAME, zbx_strerror_from_system(GetLastError()));
 		ret = FAIL;
 	}
 
@@ -248,7 +249,7 @@ static int	svc_install_event_source(const char *path)
 	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_LOCAL_MACHINE, regkey, 0, NULL, REG_OPTION_NON_VOLATILE,
 			KEY_SET_VALUE, NULL, &hKey, NULL))
 	{
-		zbx_error("unable to create registry key: %s", strerror_from_system(GetLastError()));
+		zbx_error("unable to create registry key: %s", zbx_strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 
@@ -284,7 +285,10 @@ int	ZabbixCreateService(const char *path, int multiple_agents, const char *confi
 		if (ERROR_SERVICE_EXISTS == (code = GetLastError()))
 			zbx_error("ERROR: service [%s] already exists", ZABBIX_SERVICE_NAME);
 		else
-			zbx_error("ERROR: cannot create service [%s]: %s", ZABBIX_SERVICE_NAME, strerror_from_system(code));
+		{
+			zbx_error("ERROR: cannot create service [%s]: %s", ZABBIX_SERVICE_NAME,
+					zbx_strerror_from_system(code));
+		}
 	}
 	else
 	{
@@ -297,7 +301,10 @@ int	ZabbixCreateService(const char *path, int multiple_agents, const char *confi
 		{
 			sd.lpDescription = TEXT("Provides system monitoring");
 			if (0 == ChangeServiceConfig2(service, SERVICE_CONFIG_DESCRIPTION, &sd))
-				zbx_error("service description update failed: %s", strerror_from_system(GetLastError()));
+			{
+				zbx_error("service description update failed: %s",
+						zbx_strerror_from_system(GetLastError()));
+			}
 			CloseServiceHandle(service);
 		}
 	}
@@ -330,7 +337,7 @@ static int	svc_RemoveEventSource()
 	else
 	{
 		zbx_error("unable to uninstall event source [%s]: %s",
-				ZABBIX_EVENT_SOURCE, strerror_from_system(GetLastError()));
+				ZABBIX_EVENT_SOURCE, zbx_strerror_from_system(GetLastError()));
 	}
 
 	return ret;
@@ -354,7 +361,7 @@ int	ZabbixRemoveService(void)
 		else
 		{
 			zbx_error("ERROR: cannot remove service [%s]: %s",
-					ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
+					ZABBIX_SERVICE_NAME, zbx_strerror_from_system(GetLastError()));
 		}
 
 		CloseServiceHandle(service);
@@ -386,7 +393,7 @@ int	ZabbixStartService(void)
 		else
 		{
 			zbx_error("ERROR: cannot start service [%s]: %s",
-					ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
+					ZABBIX_SERVICE_NAME, zbx_strerror_from_system(GetLastError()));
 		}
 
 		CloseServiceHandle(service);
@@ -416,7 +423,7 @@ int	ZabbixStopService(void)
 		else
 		{
 			zbx_error("ERROR: cannot stop service [%s]: %s",
-					ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
+					ZABBIX_SERVICE_NAME, zbx_strerror_from_system(GetLastError()));
 		}
 
 		CloseServiceHandle(service);

@@ -33,8 +33,8 @@ class CMessageElement extends CElement {
 	 * @return CMessageElement
 	 */
 	public static function find($selector = null, $strict = false) {
-		$preffix = 'xpath:./'.(!$strict ? '/' : '');
-		$query = new CElementQuery($preffix.'output[@role="contentinfo" or '.CXPathHelper::fromClass('msg-global').']');
+		$prefix = 'xpath:./'.(!$strict ? '/' : '');
+		$query = new CElementQuery($prefix.'output[@role="contentinfo" or '.CXPathHelper::fromClass('msg-global').']');
 		if ($selector) {
 			if (!$selector instanceof CElement) {
 				$selector = (new CElementQuery($selector))->waitUntilPresent()->one();
@@ -78,7 +78,7 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		if ($this->getAttribute('class') === 'msg-bad msg-global'){
+		if ($this->getAttribute('class') === 'msg-global msg-bad'){
 			return strtok($this->getText(), "\n");
 		}
 		else {
@@ -118,7 +118,7 @@ class CMessageElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('xpath:.//button[contains(@class, "overlay-close-btn")]')->one()->click();
+		$this->query('xpath:.//button[contains(@class, "btn-overlay-close")]')->one()->click();
 		return $this->waitUntilNotVisible();
 	}
 }

@@ -3048,8 +3048,10 @@ abstract class CTriggerGeneral extends CApiService {
 				' AND '.dbConditionInt('h.status', [HOST_STATUS_TEMPLATE]).
 				' AND EXISTS('.
 					'SELECT NULL'.
-					' FROM hosts_templates ht'.
-					' WHERE ht.templateid=i.hostid'.
+					' FROM hosts_templates ht,hosts h2'.
+					' WHERE i.hostid=ht.templateid'.
+						' AND ht.hostid=h2.hostid'.
+						' AND '.dbConditionInt('h2.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 				')'
 		), 'triggerid');
 

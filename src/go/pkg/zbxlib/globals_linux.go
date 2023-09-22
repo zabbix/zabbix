@@ -53,16 +53,13 @@ package zbxlib
 
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 
 typedef ZBX_ACTIVE_METRIC* ZBX_ACTIVE_METRIC_LP;
 typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
-
-int CONFIG_MAX_LINES_PER_SECOND = 20;
-char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
@@ -73,8 +70,8 @@ const char	*usage_message[] = {};
 unsigned char	program_type	= 0x80;
 const char	*help_message[] = {};
 
-ZBX_METRIC	parameters_agent[] = {NULL};
-ZBX_METRIC	parameters_specific[] = {NULL};
+zbx_metric_t	parameters_agent[] = {NULL};
+zbx_metric_t	parameters_specific[] = {NULL};
 
 int	zbx_procstat_collector_started(void)
 {
@@ -92,7 +89,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	return SYSINFO_RET_FAIL;
 }
 
-char	*strerror_from_system(zbx_syserror_t error)
+char	*zbx_strerror_from_system(zbx_syserror_t error)
 {
 	return zbx_strerror(errno);
 }

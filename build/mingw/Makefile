@@ -18,6 +18,7 @@ OBJS = \
 	$(OUTPUTDIR)\num.o \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\common_str.o \
+	$(OUTPUTDIR)\common_log.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\libc_wrappers.o \
 	$(OUTPUTDIR)\param.o \
@@ -53,6 +54,8 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_dir.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
+	$(OUTPUTDIR)\process_eventslog.o \
+	$(OUTPUTDIR)\process_eventslog6.o \
 	$(OUTPUTDIR)\symbols.o \
 	$(OUTPUTDIR)\win32_file.o \
 	$(TARGETDIR)\resource.syso
@@ -128,6 +131,9 @@ $(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxstr\str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\common_str.o: $(TOPDIR)\src\libs\zbxcommon\common_str.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\common_log.o: $(TOPDIR)\src\libs\zbxcommon\common_log.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxfile\file.c
@@ -241,14 +247,20 @@ $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
 $(OUTPUTDIR)\active_checks.o: $(TOPDIR)\src\zabbix_agent\active_checks\active_checks.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
+$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog\eventlog.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\process_eventslog.o: $(TOPDIR)\src\zabbix_agent\eventlog\process_eventslog.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\process_eventslog6.o: $(TOPDIR)\src\zabbix_agent\eventlog\process_eventslog6.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
 $(OUTPUTDIR)\persistent_state.o: $(TOPDIR)\src\zabbix_agent\logfiles\persistent_state.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -I$(TOPDIR)\go\win64 -o $@
 
 $(TARGETDIR)\resource.syso: $(TOPDIR)\build\win32\project\resource.rc
 	$(WINDRES) $^ $(RFLAGS) -D _WINDOWS -D ZABBIX_AGENT2 -o $@

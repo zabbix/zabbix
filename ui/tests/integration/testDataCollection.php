@@ -24,7 +24,8 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 /**
  * Test suite for data collection using both active and passive agents.
  *
- * @backup history
+ * @backup history, hosts, host_rtdata, proxy, proxy_rtdata, changelog, config, config_autoreg_tls, expressions
+ * @backup globalmacro, hosts, interface, item_rtdata, items, proxy_history, regexps, ha_node
  */
 class testDataCollection extends CIntegrationTest {
 
@@ -37,11 +38,11 @@ class testDataCollection extends CIntegrationTest {
 	public function prepareData() {
 		// Create proxy "proxy".
 		CDataHelper::call('proxy.create', [
-			'host' => 'proxy',
-			'status' => HOST_STATUS_PROXY_ACTIVE
+			'name' => 'proxy',
+			'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
 		]);
 
-		$proxyids = CDataHelper::getIds('host');
+		$proxyids = CDataHelper::getIds('name');
 
 		// Create host "agent", "custom_agent" and "proxy agent".
 		$interfaces = [
@@ -104,7 +105,7 @@ class testDataCollection extends CIntegrationTest {
 				'host' => 'proxy_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => $proxyids['proxy'],
+				'proxyid' => $proxyids['proxy'],
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
@@ -166,6 +167,7 @@ class testDataCollection extends CIntegrationTest {
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'commit;');
 
 		$this->reloadConfigurationCache();
+		sleep(5);
 
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],

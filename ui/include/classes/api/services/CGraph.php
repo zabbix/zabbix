@@ -418,4 +418,70 @@ class CGraph extends CGraphGeneral {
 
 		return $result;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	protected static function checkDuplicates(array $graphs): void {
+		$_graph_indexes = [];
+
+		foreach ($graphs as $i => $graph) {
+			foreach ($graph['gitems'] as $gitem) {
+				$_graph_indexes[$gitem['itemid']][] = $i;
+			}
+		}
+
+		$options = [
+			'output' => ['itemid', 'hostid'],
+			'itemids' => array_keys($_graph_indexes),
+			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
+		];
+		$result = DBselect(DB::makeSql('items', $options));
+
+		$graph_indexes = [];
+
+		while ($row = DBfetch($result)) {
+			foreach ($_graph_indexes[$row['itemid']] as $i) {
+				if (array_key_exists($row['hostid'], $graph_indexes)
+						&& array_key_exists($graphs[$i]['name'], $graph_indexes[$row['hostid']])
+						&& $graph_indexes[$row['hostid']][$graphs[$i]['name']] != $i) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+						_s('value %1$s already exists', '(name)=('.$graphs[$i]['name'].')')
+					));
+				}
+
+				$graph_indexes[$row['hostid']][$graphs[$i]['name']] = $i;
+			}
+		}
+
+		$result = DBselect(
+			'SELECT DISTINCT g.graphid,g.name,i.hostid'.
+			' FROM graphs g,graphs_items gi,items i'.
+			' WHERE g.graphid=gi.graphid'.
+				' AND gi.itemid=i.itemid'.
+				' AND '.dbConditionString('g.name', array_unique(array_column($graphs, 'name'))).
+				' AND '.dbConditionInt('g.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
+				' AND '.dbConditionId('i.hostid', array_keys($graph_indexes))
+		);
+
+		while ($row = DBfetch($result)) {
+			if (array_key_exists($row['hostid'], $graph_indexes)
+					&& array_key_exists($row['name'], $graph_indexes[$row['hostid']])) {
+				$graph = $graphs[$graph_indexes[$row['hostid']][$row['name']]];
+
+				if (!array_key_exists('graphid', $graph) || bccomp($row['graphid'], $graph['graphid']) != 0) {
+					$hosts = DB::select('hosts', [
+						'output' => ['host', 'status'],
+						'hostids' => $row['hostid']
+					]);
+
+					$error = in_array($hosts[0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+						? _('Graph "%1$s" already exists on the host "%2$s".')
+						: _('Graph "%1$s" already exists on the template "%2$s".');
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $graph['name'], $hosts[0]['host']));
+				}
+			}
+		}
+	}
 }

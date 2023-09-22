@@ -21,7 +21,6 @@
 #include "embed.h"
 
 #include "zbxstr.h"
-#include "log.h"
 #include "zbxjson.h"
 #include "duktape.h"
 

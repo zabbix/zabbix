@@ -119,7 +119,7 @@ else {
 							'popup' => [
 								'filter_preselect' => [
 									'id' => 'filter_groupids_',
-									'submit_as' => 'groupid'
+									'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -238,7 +238,7 @@ foreach ($data['graphs'] as $graph) {
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
 	else if (array_key_exists('ts_delete', $graph['graphDiscovery']) && $graph['graphDiscovery']['ts_delete'] > 0) {
-		$info_icons[] = getGraphLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
+		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
 	}
 
 	$graphTable->addRow([
@@ -285,8 +285,10 @@ $graphForm->addItem([
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'checkbox_hash' => $data['hostid'],
-		'checkbox_object' => 'group_graphid'
+		'checkbox_hash' => $data['parent_discoveryid'] ?? $data['hostid'],
+		'checkbox_object' => 'group_graphid',
+		'context' => $data['context'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

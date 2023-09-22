@@ -30,6 +30,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
+	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/zbxlib"
 )
@@ -51,8 +52,9 @@ type pluginInfo struct {
 // client represents source of items (metrics) to be queried.
 // Each server for active checks is represented by a separate client.
 // There is a predefined clients to handle:
-//    all single passive checks (client id 1)
-//    all internal checks (resolving HostnameItem, HostMetadataItem, HostInterfaceItem) (client id 0)
+//
+//	all single passive checks (client id 1)
+//	all internal checks (resolving HostnameItem, HostMetadataItem, HostInterfaceItem) (client id 0)
 type client struct {
 	// Client id. Predefined clients have ids < 100, while clients active checks servers (ServerActive)
 	// have auto incrementing id starting with 100.
@@ -64,7 +66,9 @@ type client struct {
 	// server global regular expression bundle
 	globalRegexp unsafe.Pointer
 	// plugin result sink, can be nil for bulk passive checks (in future)
-	output plugin.ResultWriter
+	output resultcache.Writer
+	// remote command expiration times
+	commands map[uint64]time.Time
 }
 
 // ClientAccessor interface exports client data required for scheduler tasks.
@@ -271,6 +275,64 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 	return nil
 }
 
+// command registry cleanup
+func (c *client) commandCleanup() {
+	now := time.Now()
+	for id, expire := range c.commands {
+		if now.After(expire) {
+			delete(c.commands, id)
+		}
+	}
+}
+
+func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink resultcache.Writer, now time.Time) {
+	if _, ok := c.commands[id]; ok {
+		return
+	}
+	c.commands[id] = now.Add(time.Hour)
+
+	var info *pluginInfo
+	var ok bool
+	if info, ok = c.pluginsInfo[p]; !ok {
+		info = &pluginInfo{}
+	}
+
+	if p.refcount == 0 {
+		task := &configuratorTask{
+			taskBase: taskBase{plugin: p, active: true},
+			options:  &agent.Options,
+		}
+
+		log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
+
+		_ = task.reschedule(now)
+		p.enqueueTask(task)
+	}
+
+	task := &commandTask{
+		taskBase: taskBase{plugin: p, active: true},
+		id:       id,
+		params:   params,
+		output:   sink,
+	}
+
+	log.Debugf("[%d] created remote command task for plugin '%s' command '%s'", c.id, p.name(), params)
+
+	_ = task.reschedule(now)
+	p.enqueueTask(task)
+
+	// update plugin usage information
+	if info.used.IsZero() {
+		p.refcount++
+		c.pluginsInfo[p] = info
+	}
+
+	// set 'used' time in future to avoid expiring system.run plugin when updating metrics
+	info.used = now.Add(time.Hour)
+
+	log.Debugf("scheduled remote command(%d) '%s'", id, params[0])
+}
+
 // cleanup releases unused uplugins. For external clients it's done after update,
 // while for internal clients once per hour.
 func (c *client) cleanup(plugins map[string]*pluginAgent, now time.Time) (released []*pluginAgent) {
@@ -358,12 +420,13 @@ func (c *client) updateExpressions(expressions []*glexpr.Expression) {
 }
 
 // newClient creates new client
-func newClient(id uint64, output plugin.ResultWriter) (b *client) {
+func newClient(id uint64, output resultcache.Writer) (b *client) {
 	b = &client{
 		id:          id,
 		exporters:   make(map[uint64]exporterTaskAccessor),
 		pluginsInfo: make(map[*pluginAgent]*pluginInfo),
 		output:      output,
+		commands:    make(map[uint64]time.Time),
 	}
 
 	return

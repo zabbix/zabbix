@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"
 #include "zbxmutexs.h"
@@ -129,7 +129,7 @@ int	main(int argc, char **argv)
 	int			ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
 	char			*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL,
 				*error = NULL, *result = NULL, script_error[MAX_STRING_LEN];
-	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
 
 	/* see description of 'optarg' in 'man 3 getopt' */
 	char			*zbx_optarg = NULL;
@@ -140,6 +140,8 @@ int	main(int argc, char **argv)
 	const char		*config_source_ip = NULL;
 
 	progname = get_program_name(argv[0]);
+
+	zbx_init_library_common(zbx_log_impl);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -173,7 +175,7 @@ int	main(int argc, char **argv)
 
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
@@ -192,7 +194,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, loglevel, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;
@@ -248,7 +250,7 @@ int	main(int argc, char **argv)
 	ret = SUCCEED;
 	printf("\n%s\n", result);
 close:
-	zabbix_close_log();
+	zbx_close_log();
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif

@@ -61,19 +61,6 @@ class CTextAreaFlexible extends CTextArea {
 	}
 
 	/**
-	 * Sets textarea maxlength.
-	 *
-	 * @param int $maxlength
-	 *
-	 * @return $this
-	 */
-	public function setMaxlength($maxlength) {
-		$this->setAttribute('maxlength', $maxlength);
-
-		return $this;
-	}
-
-	/**
 	 * Get content of all Javascript code.
 	 *
 	 * @return string  Javascript code.

@@ -21,10 +21,10 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 $table = (new CTable())
-	->setId('valuemap-table')
-	->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE)
+	->setId($data['table_id'])
 	->setColumns([
 		(new CTableColumn(_('Name')))
 			->addStyle('width: '.ZBX_TEXTAREA_MAPPING_VALUE_WIDTH.'px;')
@@ -36,6 +36,13 @@ $table = (new CTable())
 			->addClass('table-col-handle')
 	]);
 
+if (array_key_exists('with_label', $data) && $data['with_label'] === true) {
+	$table->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+}
+else {
+	$table->addClass(ZBX_STYLE_VALUEMAP_LIST_TABLE);
+}
+
 $buttons = [
 	(new CButton('valuemap_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
@@ -44,13 +51,11 @@ $buttons = [
 ];
 
 if ($data['form'] === 'massupdate') {
-	$buttons[] = (new CButton(null, _('Add from template')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-addfrom')
+	$buttons[] = (new CButtonLink(_('Add from template')))
+		->addClass('js-element-table-addfrom')
 		->setAttribute('data-context', 'template');
-	$buttons[] = (new CButton(null, _('Add from host')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-addfrom')
+	$buttons[] = (new CButtonLink(_('Add from host')))
+		->addClass('js-element-table-addfrom')
 		->setAttribute('data-context', 'host');
 }
 
@@ -58,4 +63,7 @@ $table->addItem((new CTag('tfoot', true))->addItem([new CCol($buttons)]));
 
 $table->show();
 
-$this->includeJsFile('configuration.valuemap.js.php', ['valuemaps' => $data['valuemaps']]);
+$this->includeJsFile('configuration.valuemap.js.php', [
+	'valuemaps' => $data['valuemaps'],
+	'table_id' => $data['table_id']
+]);

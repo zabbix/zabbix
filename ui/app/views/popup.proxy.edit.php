@@ -32,41 +32,35 @@ $form = (new CForm('post'))
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Proxy tab.
 
 $interface = (new CTable())
-	->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')])
+	->setHeader([_('Address'), _('Port')])
 	->addRow([
-		(new CTextBox('ip', $data['form']['interface']['ip'], false, DB::getFieldLength('interface', 'ip')))
-			->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
-		(new CTextBox('dns', $data['form']['interface']['dns'], false, DB::getFieldLength('interface', 'dns')))
-			->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
-		(new CRadioButtonList('useip', (int) $data['form']['interface']['useip']))
-			->addValue('IP', INTERFACE_USE_IP)
-			->addValue('DNS', INTERFACE_USE_DNS)
-			->setModern(true),
-		(new CTextBox('port', $data['form']['interface']['port'], false, DB::getFieldLength('interface', 'port')))
+		(new CTextBox('address', $data['form']['address'], false, DB::getFieldLength('proxy', 'address')))
+			->setWidth(336),
+		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->setAriaRequired()
 	]);
 
 $proxy_tab = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Proxy name'), 'host'))->setAsteriskMark(),
+		(new CLabel(_('Proxy name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('host', $data['form']['host'], false, DB::getFieldLength('hosts', 'host')))
+			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 		)
 	])
 	->addItem([
-		new CLabel(_('Proxy mode'), 'status'),
+		new CLabel(_('Proxy mode'), 'operating_mode'),
 		new CFormField(
-			(new CRadioButtonList('status', $data['form']['status']))
-				->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
-				->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+			(new CRadioButtonList('operating_mode', $data['form']['operating_mode']))
+				->addValue(_('Active'), PROXY_OPERATING_MODE_ACTIVE)
+				->addValue(_('Passive'), PROXY_OPERATING_MODE_PASSIVE)
 				->setModern(true)
 		)
 	])
@@ -79,10 +73,10 @@ $proxy_tab = (new CFormGrid())
 		))->addClass('js-interface')
 	])
 	->addItem([
-		(new CLabel(_('Proxy address'), 'proxy_address'))->addClass('js-proxy-address'),
+		(new CLabel(_('Proxy address'), 'allowed_addresses'))->addClass('js-proxy-address'),
 		(new CFormField(
-			(new CTextBox('proxy_address', $data['form']['proxy_address'], false,
-				DB::getFieldLength('hosts', 'proxy_address')
+			(new CTextBox('allowed_addresses', $data['form']['allowed_addresses'], false,
+				DB::getFieldLength('proxy', 'allowed_addresses')
 			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->addClass('js-proxy-address')
 	])
@@ -90,7 +84,7 @@ $proxy_tab = (new CFormGrid())
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
 			(new CTextArea('description', $data['form']['description']))
-				->setMaxlength(DB::getFieldLength('hosts', 'description'))
+				->setMaxlength(DB::getFieldLength('proxy', 'description'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	]);
@@ -136,7 +130,7 @@ $encryption_tab = (new CFormGrid())
 			->setAsteriskMark(),
 		(new CFormField(
 			(new CTextBox('tls_psk_identity', $data['form']['tls_psk_identity'], false,
-				DB::getFieldLength('hosts', 'tls_psk_identity')
+				DB::getFieldLength('proxy', 'tls_psk_identity')
 			))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
@@ -147,7 +141,7 @@ $encryption_tab = (new CFormGrid())
 			->addClass('js-tls-psk')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('tls_psk', $data['form']['tls_psk'], false, DB::getFieldLength('hosts', 'tls_psk')))
+			(new CTextBox('tls_psk', $data['form']['tls_psk'], false, DB::getFieldLength('proxy', 'tls_psk')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->disableAutocomplete()

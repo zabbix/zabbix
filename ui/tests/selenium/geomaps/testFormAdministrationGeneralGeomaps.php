@@ -135,7 +135,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			];
 
 			foreach ($hintboxes as $field => $text) {
-				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
+				$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->asOverlayDialog()->close();

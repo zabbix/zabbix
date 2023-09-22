@@ -37,7 +37,10 @@ class testScimUser extends CAPIScimTest {
 			'ldap_user' => null,
 			'saml_user_active' => null,
 			'saml_user_inactive' => null,
-			'saml_user_only_username' => null
+			'saml_user_only_username' => null,
+			'admin' => null,
+			'user' => null,
+			'guest_user' => null
 		],
 		'username' => [
 			'ldap_user' => 'dwight.schrute@office.com',
@@ -45,8 +48,17 @@ class testScimUser extends CAPIScimTest {
 			'saml_user_inactive' => 'pam.beesly@office.com',
 			'saml_user_only_username' => 'andy.bernard@office.com'
 		],
-		'token' => [
-			'tokenid' => null
+		'tokenids' => [
+			'superadmin' => null,
+			'admin' => null,
+			'user' => null,
+			'guest_user' => null
+		],
+		'tokens' => [
+			'admin' => null,
+			'user' => null,
+			'guest_user' => null,
+			'no_token' => null
 		],
 		'mediatypeid' => '3',
 		'scim_groupids' => [
@@ -187,12 +199,83 @@ class testScimUser extends CAPIScimTest {
 			]
 		]);
 		$this->assertArrayHasKey('tokenids', $tokenid);
-		static::$data['token']['tokenid'] = $tokenid['tokenids'][0];
+		self::$data['tokenids']['superadmin'] = $tokenid['tokenids'][0];
 
-		$token = CDataHelper::call('token.generate', [static::$data['token']['tokenid']]);
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['superadmin']]);
 
 		$this->assertArrayHasKey('token', $token[0]);
 		CAPIScimHelper::setToken($token[0]['token']);
+
+		// Create users with different user roles for authorization testing.
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => 'admin',
+				'passwd' => 'testtest123',
+				'usrgrps' => [['usrgrpid' => 7]],
+				'roleid' => 2
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userid']['admin'] = $user['userids'][0];
+
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => 'user',
+				'passwd' => 'testtest123',
+				'usrgrps' => [['usrgrpid' => 7]],
+				'roleid' => 1
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userid']['user'] = $user['userids'][0];
+
+		$user = CDataHelper::call('user.create', [
+			[
+				'username' => 'guest_user',
+				'passwd' => 'testtest123',
+				'usrgrps' => [['usrgrpid' => 7]],
+				'roleid' => 4
+			]
+		]);
+		$this->assertArrayHasKey('userids', $user);
+		self::$data['userid']['guest_user'] = $user['userids'][0];
+
+		// Create authorization token for each user with different user role for authorization testing.
+		$tokenid = CDataHelper::call('token.create', [
+			[
+				'name' => 'Token for admin',
+				'userid' => self::$data['userid']['admin']
+			]
+		]);
+		$this->assertArrayHasKey('tokenids', $tokenid);
+		self::$data['tokenids']['admin'] = $tokenid['tokenids'][0];
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['admin']]);
+		$this->assertArrayHasKey('token', $token[0]);
+		self::$data['tokens']['admin'] = $token[0]['token'];
+
+		$tokenid = CDataHelper::call('token.create', [
+			[
+				'name' => 'Token for user',
+				'userid' => self::$data['userid']['user']
+			]
+		]);
+		$this->assertArrayHasKey('tokenids', $tokenid);
+		self::$data['tokenids']['user'] = $tokenid['tokenids'][0];
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['user']]);
+		$this->assertArrayHasKey('token', $token[0]);
+		self::$data['tokens']['user'] = $token[0]['token'];
+
+		$tokenid = CDataHelper::call('token.create', [
+			[
+				'name' => 'Token for guest',
+				'userid' => self::$data['userid']['guest_user']
+			]
+		]);
+		$this->assertArrayHasKey('tokenids', $tokenid);
+		self::$data['tokenids']['guest_user'] = $tokenid['tokenids'][0];
+		$token = CDataHelper::call('token.generate', [self::$data['tokenids']['guest_user']]);
+		$this->assertArrayHasKey('token', $token[0]);
+		self::$data['tokens']['guest_user'] = $token[0]['token'];
 	}
 
 	public static function createInvalidGetRequest(): array {
@@ -1196,6 +1279,291 @@ class testScimUser extends CAPIScimTest {
 		$this->assertEquals('9', $db_result_user_groups['usrgrpid']);
 	}
 
+	public function createInvalidGetAuthentication() {
+		return [
+			'Admin tries to call SCIM User GET request' => [
+				'user' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.get".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM User GET request' => [
+				'user' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.get".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM User GET request' => [
+				'user' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.get".',
+					'status' => 403
+				]
+			],
+			'Call SCIM User GET request without token' => [
+				'user' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidGetAuthentication
+	 */
+	public function testScimUser_AuthenticationGetInvalid($user, $expected_error) {
+		$user['token'] = self::$data['tokens'][$user['token']];
+
+		CAPIScimHelper::setToken($user['token']);
+		unset($user['token']);
+
+		$this->call('users.get', $user, $expected_error);
+	}
+
+	public function createInvalidPutAuthentication() {
+		return [
+			'Admin tries to call SCIM User PUT request' => [
+				'user' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.put".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM User PUT request' => [
+				'user' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.put".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM User PUT request' => [
+				'user' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.put".',
+					'status' => 403
+				]
+			],
+			'Call SCIM User PUT request without token' => [
+				'user' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPutAuthentication
+	 */
+	public function testScimUser_AuthenticationPutInvalid($user, $expected_error) {
+		$user['token'] = self::$data['tokens'][$user['token']];
+
+		CAPIScimHelper::setToken($user['token']);
+		unset($user['token']);
+
+		$this->call('users.put', $user, $expected_error);
+	}
+
+	public function createInvalidPostAuthentication() {
+		return [
+			'Admin tries to call SCIM User POST request' => [
+				'user' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.post".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM User POST request' => [
+				'user' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.post".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM User POST request' => [
+				'user' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.post".',
+					'status' => 403
+				]
+			],
+			'Call SCIM User POST request without token' => [
+				'user' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPostAuthentication
+	 */
+	public function testScimUser_AuthenticationPostInvalid($user, $expected_error) {
+		$user['token'] = self::$data['tokens'][$user['token']];
+
+		CAPIScimHelper::setToken($user['token']);
+		unset($user['token']);
+
+		$this->call('users.post', $user, $expected_error);
+	}
+
+	public function createInvalidPatchAuthentication() {
+		return [
+			'Admin tries to call SCIM User PATCH request' => [
+				'user' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.patch".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM User PATCH request' => [
+				'user' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.patch".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM User PATCH request' => [
+				'user' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.patch".',
+					'status' => 403
+				]
+			],
+			'Call SCIM User PATCH request without token' => [
+				'user' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidPatchAuthentication
+	 */
+	public function testScimUser_AuthenticationPatchInvalid($user, $expected_error) {
+		$user['token'] = self::$data['tokens'][$user['token']];
+
+		CAPIScimHelper::setToken($user['token']);
+		unset($user['token']);
+
+		$this->call('users.patch', $user, $expected_error);
+	}
+
+	public function createInvalidDeleteAuthentication() {
+		return [
+			'Admin tries to call SCIM User DELETE request' => [
+				'user' => [
+					'token' => 'admin'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.delete".',
+					'status' => 403
+				]
+			],
+			'User tries to call SCIM User DELETE request' => [
+				'user' => [
+					'token' => 'user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.delete".',
+					'status' => 403
+				]
+			],
+			'Guest tries to call SCIM User DELETE request' => [
+				'user' => [
+					'token' => 'guest_user'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'No permissions to call "users.delete".',
+					'status' => 403
+				]
+			],
+			'Call SCIM User DELETE request without token' => [
+				'user' => [
+					'token' => 'no_token'
+				],
+				'expected_error' => [
+					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
+					'detail' => 'Not authorized.',
+					'status' => 403
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider createInvalidDeleteAuthentication
+	 */
+	public function testScimUser_AuthenticationDeleteInvalid($user, $expected_error) {
+		$user['token'] = self::$data['tokens'][$user['token']];
+
+		CAPIScimHelper::setToken($user['token']);
+		unset($user['token']);
+
+		$this->call('users.delete', $user, $expected_error);
+	}
+
 	/**
 	 * Accepts test data and returns data with substituted ids and userNames from the database.
 	 *
@@ -1228,6 +1596,6 @@ class testScimUser extends CAPIScimTest {
 		DB::delete('scim_group', ['scim_groupid' => array_values(self::$data['scim_groupids'])]);
 
 		// Delete token.
-		CDataHelper::call('token.delete', [self::$data['token']['tokenid']]);
+		CDataHelper::call('token.delete',  [self::$data['tokenids']['superadmin']]);
 	}
 }

@@ -21,7 +21,7 @@
 
 #include "../server.h"
 #include "alerter_protocol.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
@@ -701,9 +701,10 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 			zbx_db_begin();
 			zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value",
+					(char *)NULL);
 			zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value",
-					NULL);
+					(char *)NULL);
 
 			for (i = 0; i < results_num; i++)
 			{
@@ -965,9 +966,9 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 		sec2 = zbx_time();
 
-		nextcheck = sec1 + ZBX_POLL_INTERVAL;
+		nextcheck = (time_t)sec1 + ZBX_POLL_INTERVAL;
 
-		if (0 > (sleeptime = nextcheck - (int)sec2))
+		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
 
 		zbx_setproctitle("%s [queued %d alerts(s), flushed %d result(s) in " ZBX_FS_DBL " sec, idle %d sec]",

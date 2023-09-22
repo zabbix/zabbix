@@ -29,6 +29,7 @@ class CControllerCopyEdit extends CController {
 		$fields = [
 			'itemids' =>	'array_db items.itemid',
 			'triggerids' =>	'array_db triggers.triggerid',
+			'src_hostid' =>	'db hosts.hostid',
 			'graphids' =>	'array_db graphs.graphid',
 			'source' =>		'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
@@ -104,6 +105,10 @@ class CControllerCopyEdit extends CController {
 				$data['graphids'] = $this->getInput('graphids');
 				$data['element_type'] = 'graphs';
 				break;
+		}
+
+		if ($this->hasInput('src_hostid')) {
+			$data['src_hostid'] = $this->getInput('src_hostid');
 		}
 
 		$this->setResponse(new CControllerResponseData($data));

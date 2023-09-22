@@ -82,13 +82,14 @@ typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, H
 typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 typedef struct
 {
-	zbx_uint64_t	total;
-	zbx_uint64_t	not_used;
-	zbx_uint64_t	used;
-	double		pfree;
-	double		pused;
+	zbx_uint64_t		total;
+	zbx_uint64_t		not_used;
+	zbx_uint64_t		used;
+	double			pfree;
+	double			pused;
 }
 zbx_fs_metrics_t;
 
@@ -102,13 +103,27 @@ typedef struct
 }
 zbx_mpoint_t;
 
+typedef struct
+{
+	char			*mpoint;
+	char			*type;
+}
+zbx_fsname_t;
+
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+int	zbx_fsname_compare(const void *fs1, const void *fs2);
+#endif
+
 int	sysinfo_get_config_timeout(void);
 int	sysinfo_get_config_log_remote_commands(void);
 int	sysinfo_get_config_unsafe_user_parameters(void);
 const char	*sysinfo_get_config_source_ip(void);
+const char	*sysinfo_get_config_hostname(void);
+const char	*sysinfo_get_config_hostnames(void);
+const char	*sysinfo_get_config_host_metadata(void);
+const char	*sysinfo_get_config_host_metadata_item(void);
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
-void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 
 #ifndef _WINDOWS
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char **hostname);
@@ -197,5 +212,34 @@ int	registry_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #ifdef _AIX
 int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result);
+typedef struct
+{
+	/* public */
+	unsigned char	enabled;		/* collecting enabled */
+	unsigned char	data_available;		/* data is collected and available */
+	unsigned char	shared_enabled; 	/* partition runs in shared mode */
+	unsigned char	pool_util_authority;	/* pool utilization available */
+	unsigned char	aix52stats;
+	/* - general -- */
+	double		ent;
+	/* --- kthr --- */
+	double		kthr_r, kthr_b/*, kthr_p*/;
+	/* --- page --- */
+	double		fi, fo, pi, po, fr, sr;
+	/* -- faults -- */
+	double		in, sy, cs;
+	/* --- cpu ---- */
+	double		cpu_us, cpu_sy, cpu_id, cpu_wa, cpu_pc, cpu_ec, cpu_lbusy, cpu_app;
+	/* --- disk --- */
+	zbx_uint64_t	disk_bps;
+	double		disk_tps;
+	/* -- memory -- */
+	zbx_uint64_t	mem_avm, mem_fre;
+}
+ZBX_VMSTAT_DATA;
+
+#define VMSTAT_COLLECTOR_STARTED(collector)	(collector)
+
+void	collect_vmstat_data(ZBX_VMSTAT_DATA *vmstat);
 #endif
 #endif /* ZABBIX_SYSINFO_H */

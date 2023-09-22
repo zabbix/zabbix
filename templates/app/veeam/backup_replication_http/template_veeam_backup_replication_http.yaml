@@ -144,13 +144,9 @@ zabbix_export:
                     start_date = new Date((new Date().getTime()) - ms * Veeam.params.created_after).toISOString().replace(/\.\d+/, '');
                     endpoints = {
                         'proxies': 'api/v1/backupInfrastructure/proxies',
-                        'repositories': 'api/v1/backupInfrastructure/repositories',
                         'managedServers': 'api/v1/backupInfrastructure/managedServers',
                         'repositories_states': 'api/v1/backupInfrastructure/repositories/states',
-                        'services': 'api/v1/services',
                         'jobs_states': 'api/v1/jobs/states',
-                        'backups': 'api/v1/backups',
-                        'backupObjects': 'api/v1/backupObjects',
                         'sessions': 'api/v1/sessions?createdAfterFilter=' + encodeURIComponent(start_date)
                     };
             
