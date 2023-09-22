@@ -965,7 +965,9 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_values[$interface['triggerid']][$token['token']] = $value;
+					$macro_values[$interface['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
+						? self::calcMacrofunc($value, $token['macrofunc'])
+						: $value;
 				}
 			}
 		}
@@ -1486,7 +1488,9 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_values[$function['triggerid']][$token['token']] = $value;
+					$macro_values[$function['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
+						? self::calcMacrofunc($value, $token['macrofunc'])
+						: $value;
 				}
 			}
 		}
@@ -1572,7 +1576,9 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_values[$row['triggerid']][$token['token']] = $value;
+					$macro_values[$row['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
+						? self::calcMacrofunc($value, $token['macrofunc'])
+						: $value;
 				}
 			}
 		}

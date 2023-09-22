@@ -391,7 +391,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				]
 			],
 			'macro_funcs_n' => [
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				]
 			],
 			'references' => true,
 			'usermacros' => true
@@ -499,7 +504,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				]
 			],
 			'macro_funcs_n' => [
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
+				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				]
 			],
 			'usermacros' => true
 		];
@@ -630,7 +640,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				]
 			],
 			'macro_funcs_n' => [
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}']
+				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
+				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
+				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
+				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
+					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
+				]
 			],
 			'usermacros' => true
 		];
