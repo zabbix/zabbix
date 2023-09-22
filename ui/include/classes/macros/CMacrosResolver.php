@@ -409,46 +409,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			if (!$options['references_only']) {
 				$functionids = $this->findFunctions($trigger['expression']);
 
-				foreach ($matched_macros['macros_n']['host'] as $token => $data) {
-					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+				foreach ($matched_macros['macros_n'] as $key => $macro_data) {
+					foreach ($macro_data as $token => $data) {
+						$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($data['f_num'], $functionids)) {
-						$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+						if (array_key_exists($data['f_num'], $functionids)) {
+							$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+						}
 					}
 				}
 
-				foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
-					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+				foreach ($matched_macros['macro_funcs_n'] as $key => $macro_data) {
+					foreach ($macro_data as $token => $data) {
+						$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-					if (array_key_exists($data['f_num'], $functionids)) {
-						$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-					}
-				}
-
-				foreach ($matched_macros['macros_n']['item'] as $token => $data) {
-					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-					if (array_key_exists($data['f_num'], $functionids)) {
-						$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-					}
-				}
-
-				foreach ($matched_macros['macros_n']['log'] as $token => $data) {
-					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-					if (array_key_exists($data['f_num'], $functionids)) {
-						$macros['log'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-					}
-				}
-
-				foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
-					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-					if (array_key_exists($data['f_num'], $functionids)) {
-						$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
-							'token' => $token,
-							'macrofunc' => $data['macrofunc']
-						];
+						if (array_key_exists($data['f_num'], $functionids)) {
+							$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = [
+								'token' => $token,
+								'macrofunc' => $data['macrofunc']
+							];
+						}
 					}
 				}
 
@@ -572,46 +552,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			$matched_macros = self::extractMacros($texts, $types);
 
-			foreach ($matched_macros['macros_n']['host'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macros_n'] as $key => $macro_data) {
+				foreach ($macro_data as $token => $data) {
+					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+					}
 				}
 			}
 
-			foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+			foreach ($matched_macros['macro_funcs_n'] as $key => $macro_data) {
+				foreach ($macro_data as $token => $data) {
+					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
-			}
-
-			foreach ($matched_macros['macros_n']['item'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
-			}
-
-			foreach ($matched_macros['macros_n']['log'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['log'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
-			}
-
-			foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
-						'token' => $token,
-						'macrofunc' => $data['macrofunc']
-					];
+					if (array_key_exists($data['f_num'], $functionids)) {
+						$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = [
+							'token' => $token,
+							'macrofunc' => $data['macrofunc']
+						];
+					}
 				}
 			}
 
@@ -750,46 +710,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values[$triggerid][$macro] = $trigger['eventid'];
 		}
 
-		foreach ($matched_macros['macros_n']['host'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macros_n'] as $key => $macro_data) {
+			foreach ($macro_data as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
 			}
 		}
 
-		foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macro_funcs_n'] as $key => $macro_data) {
+			foreach ($macro_data as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-			}
-		}
-
-		foreach ($matched_macros['macros_n']['item'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-			}
-		}
-
-		foreach ($matched_macros['macros_n']['log'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['log'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-			}
-		}
-
-		foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
-					'token' => $token,
-					'macrofunc' => $data['macrofunc']
-				];
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = [
+						'token' => $token,
+						'macrofunc' => $data['macrofunc']
+					];
+				}
 			}
 		}
 
@@ -898,47 +838,26 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$macro_values[$triggerid][$macro] = $trigger['eventid'];
 		}
 
-		foreach ($matched_macros['macros_n']['host'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macros_n'] as $key => $macro_data) {
+			foreach ($macro_data as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['host'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
+				}
 			}
 		}
 
-		foreach ($matched_macros['macros_n']['interface'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
+		foreach ($matched_macros['macro_funcs_n'] as $key => $macro_data) {
+			foreach ($macro_data as $token => $data) {
+				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['interface'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-			}
-		}
-
-		foreach ($matched_macros['macros_n']['item'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-			}
-		}
-
-		foreach ($matched_macros['macros_n']['log'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['log'][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-			}
-		}
-
-		foreach ($matched_macros['macro_funcs_n']['item'] as $token => $data) {
-			$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-			if (array_key_exists($data['f_num'], $functionids)) {
-				$macros['item'][$functionids[$data['f_num']]][$data['macro']][] = [
-					'token' => $token,
-					'function' => $data['function'],
-					'parameters' => $data['parameters']
-				];
+				if (array_key_exists($data['f_num'], $functionids)) {
+					$macros[$key][$functionids[$data['f_num']]][$data['macro']][] = [
+						'token' => $token,
+						'macrofunc' => $data['macrofunc']
+					];
+				}
 			}
 		}
 
