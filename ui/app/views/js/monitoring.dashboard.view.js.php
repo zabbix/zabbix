@@ -177,20 +177,8 @@
 				.addEventListener('click', (e) => {
 					this.cancelEditing();
 					e.preventDefault();
-				});
-
-			// Disable severity filter for Geomap widgets in dashboard edit mode.
-			document
-				.querySelectorAll('.leaflet-bar.leaflet-control')
-				.forEach((el) => {
-					el.classList.add('disabled');
-				});
-
-			document
-				.querySelectorAll('.checkbox-list.geomap-filter')
-				.forEach((el) => {
-					el.classList.remove('collapsed');
-				});
+				}
+			);
 
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_BUSY, this.events.busy);
 			ZABBIX.Dashboard.on(DASHBOARD_EVENT_IDLE, this.events.idle);

@@ -251,6 +251,23 @@ class CWidgetGeoMap extends CWidget {
 		this._map.on('zoomstart movestart resize', () => {
 			this.removeHintBoxes();
 		});
+
+		// Disable severity filter in dashboard edit mode.
+		if(!this._is_edit_mode) {
+			const observer = new MutationObserver((mutationsList) => {
+				mutationsList.forEach((mutation) => {
+					if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+						this._map.severityFilterControl.close();
+						this._map.severityFilterControl.disable();
+					}
+				});
+			});
+
+			observer.observe(document.querySelector('.dashboard'), {
+				attributes: true,
+				attributeFilter: ['class']
+			});
+		}
 	}
 
 	/**
