@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alerter.h"
+#include "zbxalerter.h"
+#include "alerter_defs.h"
 
 #include "alerter_protocol.h"
 #include "zbxipcservice.h"
@@ -502,8 +503,7 @@ void	zbx_alerter_deserialize_mediatypes(const unsigned char *data, zbx_am_db_med
 
 	for (int i = 0; i < *mediatypes_num; i++)
 	{
-		zbx_am_db_mediatype_t	*mt;
-		mt = (zbx_am_db_mediatype_t *)zbx_malloc(NULL, sizeof(zbx_am_db_mediatype_t));
+		zbx_am_db_mediatype_t	*mt = (zbx_am_db_mediatype_t *)zbx_malloc(NULL, sizeof(zbx_am_db_mediatype_t));
 
 		data += alerter_deserialize_mediatype(data, &mt->mediatypeid, &mt->type, &mt->smtp_server,
 				&mt->smtp_helo, &mt->smtp_email, &mt->exec_path, &mt->gsm_modem, &mt->username,
@@ -1073,9 +1073,7 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx
 
 	recipients_len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * recipients->values_num);
 	for (int i = 0; i < recipients->values_num; i++)
-	{
 		zbx_serialize_prepare_str_len(data_len, recipients->values[i], recipients_len[i]);
-	}
 
 	if (data_alloc - data_offset < data_len)
 	{
@@ -1087,9 +1085,7 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx
 	ptr += zbx_serialize_value(ptr, recipients->values_num);
 
 	for (int i = 0; i < recipients->values_num; i++)
-	{
 		ptr += zbx_serialize_str(ptr, recipients->values[i], recipients_len[i]);
-	}
 
 	zbx_free(recipients_len);
 
@@ -1167,7 +1163,6 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 	zbx_vector_alerter_dispatch_result_create(&dispatch->results);
 	dispatch->total_num = 0;
 	ret = SUCCEED;
-
 out:
 	zbx_free(data);
 
@@ -1336,4 +1331,9 @@ void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch)
 
 	zbx_vector_alerter_dispatch_result_clear_ext(&dispatch->results, zbx_alerter_dispatch_result_free);
 	zbx_vector_alerter_dispatch_result_destroy(&dispatch->results);
+}
+
+zbx_uint32_t	zbx_alerter_send_alert_code(void)
+{
+	return ZBX_IPC_ALERTER_SEND_ALERT;
 }

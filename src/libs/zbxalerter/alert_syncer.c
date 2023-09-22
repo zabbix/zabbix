@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "alerter.h"
+#include "zbxalerter.h"
+#include "alerter_defs.h"
 
-#include "../server.h"
 #include "alerter_protocol.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
@@ -121,8 +121,7 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		alertid, mediatypeid, objectid, eventid, p_eventid;
-	int			status, attempts, source, object, ret = SUCCEED;
+	int			ret = SUCCEED;
 	zbx_am_db_alert_t	*alert;
 	zbx_vector_uint64_t	alertids;
 
@@ -150,6 +149,9 @@ static int	am_db_get_alerts(zbx_vector_am_db_alert_ptr_t *alerts)
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
+		zbx_uint64_t	alertid, mediatypeid, objectid, eventid, p_eventid;
+		int		status, attempts, source, object;
+
 		ZBX_STR2UINT64(alertid, row[0]);
 		ZBX_STR2UINT64(mediatypeid, row[1]);
 		ZBX_STR2UINT64(eventid, row[11]);
@@ -312,16 +314,11 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *mediatypeids, int mediatypeids_num,
 		zbx_vector_am_db_mediatype_ptr_t *mediatypes)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-	int			type, maxsessions, maxattempts;
-	zbx_uint64_t		mediatypeid;
-	unsigned short		smtp_port;
-	unsigned char		smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, content_type;
-	zbx_am_db_mediatype_t	*mediatype;
-	time_t			now;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -340,6 +337,13 @@ static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *media
 	now = time(NULL);
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
+		int			type, maxsessions, maxattempts;
+		zbx_uint64_t		mediatypeid;
+		unsigned short		smtp_port;
+		unsigned char		smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
+					content_type;
+		zbx_am_db_mediatype_t	*mediatype;
+
 		if (FAIL == zbx_is_ushort(row[9], &smtp_port))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -487,7 +491,6 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 	struct zbx_json_parse	jp, jp_tags;
 	const char		*pnext = NULL;
 	char			key[ZBX_DB_TAG_NAME_LEN * 4 + 1], value[ZBX_DB_TAG_VALUE_LEN * 4 + 1];
-	zbx_tag_t		*tag, tag_local = {.tag = key, .value = value};
 	int			event_tag_index, need_to_add_problem_tag = 0;
 	zbx_event_tags_t	*event_tags, local_event_tags;
 
@@ -536,6 +539,8 @@ static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zb
 
 	while (NULL != (pnext = zbx_json_pair_next(&jp_tags, pnext, key, sizeof(key))))
 	{
+		zbx_tag_t	*tag, tag_local = {.tag = key, .value = value};
+
 		if (NULL == zbx_json_decodevalue(pnext, value, sizeof(value), NULL))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "invalid tag value starting with %s", pnext);
@@ -581,16 +586,14 @@ out:
 static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_events_tags, zbx_db_insert_t *db_event,
 		zbx_db_insert_t *db_problem)
 {
-	zbx_tag_t		tag_local, *tag;
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_event_tags_t	*local_event_tags;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	for (int i = 0; i < update_events_tags->values_num; i++)
 	{
-		local_event_tags = update_events_tags->values[i];
+		zbx_tag_t		tag_local, *tag;
+		zbx_db_result_t		result;
+		zbx_db_row_t		row;
+		zbx_event_tags_t	*local_event_tags = update_events_tags->values[i];
 
 		/* remove duplicate tags */
 		if (0 != local_event_tags->tags.values_num)
@@ -716,6 +719,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 				if (NULL != result->error)
 				{
 					char	*error_esc;
+
 					error_esc = zbx_db_dyn_escape_field("alerts", "error", result->error);
 					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",error='%s'", error_esc);
 					zbx_free(error_esc);
@@ -840,7 +844,6 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	zbx_db_result_t				result;
 	zbx_db_row_t				row;
 	int					medias_num = 0;
-	zbx_am_media_t				*media;
 	zbx_vector_uint64_t			mediatypeids;
 	zbx_vector_am_db_mediatype_ptr_t	mediatypes;
 	zbx_vector_am_media_ptr_t		medias;
@@ -869,7 +872,8 @@ static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 	/* read watchdog alert recipients */
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		media = (zbx_am_media_t *)zbx_malloc(NULL, sizeof(zbx_am_media_t));
+		zbx_am_media_t	*media = (zbx_am_media_t *)zbx_malloc(NULL, sizeof(zbx_am_media_t));
+
 		ZBX_STR2UINT64(media->mediaid, row[0]);
 		ZBX_STR2UINT64(media->mediatypeid, row[1]);
 		media->sendto = zbx_strdup(NULL, row[2]);
@@ -914,8 +918,7 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 #define ZBX_POLL_INTERVAL		1
 	zbx_thread_alert_syncer_args	*alert_syncer_args_in = (zbx_thread_alert_syncer_args *)
 							(((zbx_thread_args_t *)args)->args);
-	double				sec1, sec2, time_cleanup = 0, time_watchdog = 0;
-	int				alerts_num, sleeptime, nextcheck, freq_watchdog, results_num;
+	int				sleeptime, freq_watchdog;
 	zbx_am_db_t			amdb;
 	char				*error = NULL;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
@@ -945,6 +948,9 @@ ZBX_THREAD_ENTRY(zbx_alert_syncer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
+		double	sec1, sec2, time_cleanup = 0, time_watchdog = 0;
+		int	alerts_num, nextcheck, results_num;
+
 		zbx_sleep_loop(info, sleeptime);
 
 		sec1 = zbx_time();

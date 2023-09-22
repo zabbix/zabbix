@@ -26,37 +26,15 @@
 #include "zbxthreads.h"
 #include "zbxdb.h"
 
+/* media type statuses */
+#define MEDIA_TYPE_STATUS_ACTIVE	0
+#define MEDIA_TYPE_STATUS_DISABLED	1
+
+/* media statuses */
+#define MEDIA_STATUS_ACTIVE	0
+#define MEDIA_STATUS_DISABLED	1
+
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"
-
-/* alerter -> manager */
-#define ZBX_IPC_ALERTER_REGISTER	1000
-#define ZBX_IPC_ALERTER_RESULT		1001
-#define ZBX_IPC_ALERTER_MEDIATYPES	1002
-#define ZBX_IPC_ALERTER_ALERTS		1003
-#define ZBX_IPC_ALERTER_WATCHDOG	1004
-#define ZBX_IPC_ALERTER_RESULTS		1005
-#define ZBX_IPC_ALERTER_DROP_MEDIATYPES	1006
-
-/* manager -> alerter */
-#define ZBX_IPC_ALERTER_EMAIL		1100
-#define ZBX_IPC_ALERTER_SMS		1102
-#define ZBX_IPC_ALERTER_EXEC		1104
-#define ZBX_IPC_ALERTER_WEBHOOK		1105
-
-/* process -> manager */
-#define ZBX_IPC_ALERTER_DIAG_STATS		1200
-#define ZBX_IPC_ALERTER_DIAG_TOP_MEDIATYPES	1201
-#define ZBX_IPC_ALERTER_DIAG_TOP_SOURCES	1202
-#define ZBX_IPC_ALERTER_SEND_ALERT		1203
-#define ZBX_IPC_ALERTER_BEGIN_DISPATCH		1204
-#define ZBX_IPC_ALERTER_SEND_DISPATCH		1205
-#define ZBX_IPC_ALERTER_END_DISPATCH		1206
-
-/* manager -> process */
-#define ZBX_IPC_ALERTER_DIAG_STATS_RESULT		1300
-#define ZBX_IPC_ALERTER_DIAG_TOP_MEDIATYPES_RESULT	1301
-#define ZBX_IPC_ALERTER_DIAG_TOP_SOURCES_RESULT		1302
-#define ZBX_IPC_ALERTER_ABORT_DISPATCH			1303
 
 typedef struct
 {
@@ -135,5 +113,7 @@ int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_med
 int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error);
 void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch);
 void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result);
+
+zbx_uint32_t	zbx_alerter_send_alert_code(void);
 
 #endif
