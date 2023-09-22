@@ -1771,8 +1771,8 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Acknowledgement status',
 							'type' => 'radio_button',
-							'possible_values' => ['all', 'Unacknowledged', 'Acknowledged'],
-							'value' => 'all'
+							'possible_values' => ['All', 'Unacknowledged', 'Acknowledged'],
+							'value' => 'All'
 						],
 						[
 							'field' => 'Sort entries by',
