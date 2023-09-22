@@ -547,7 +547,8 @@ run:
 				)
 				if rerr != nil {
 					plugin.RestoreUserParamMetrics(metrics)
-					v.sink <- "cannot process user parameters request: " + rerr.Error()
+					v.sink <- fmt.Sprintf("cannot process user parameters request: %s", rerr.Error())
+
 					continue
 				}
 
