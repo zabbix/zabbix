@@ -658,17 +658,17 @@ void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize proxy  buffer                                          *
+ * Purpose: create proxy  buffer                                              *
  *                                                                            *
- * Return value: size  - [IN] the cache size in bytes                         *
- *               age   - [IN] the maximum allowed data age                    *
- *               error - [OUT] error message                                  *
+ * Parameters: size  - [IN] the cache size in bytes                           *
+ *             age   - [IN] the maximum allowed data age                      *
+ *             error - [OUT] error message                                    *
  *                                                                            *
- * Return value: SUCCEED - cache was initialized successfully                 *
+ * Return value: SUCCEED - proxy buffer was created successfully              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char **error)
+int	zbx_pb_create(int mode, zbx_uint64_t size, int age, int offline_buffer, char **error)
 {
 	int	ret = FAIL, allow_oom;
 
@@ -709,13 +709,25 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 	pb_data->max_age = age;
 	pb_data->offline_buffer = offline_buffer;
 
-	pb_init_state(pb_data);
-
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s state:%d", __func__, ZBX_NULL2EMPTY_STR(*error), pb_data->state);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(*error));
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize proxy  buffer                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pb_init(void)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	pb_init_state(pb_data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): state:%d", __func__, pb_data->state);
 }
 
 /******************************************************************************

@@ -955,6 +955,76 @@ static int	DBpatch_6050091(void)
 
 static int	DBpatch_6050092(void)
 {
+	return DBrename_table("group_discovery", "group_discovery_tmp");
+}
+
+static int	DBpatch_6050093(void)
+{
+	const zbx_db_table_t	table =
+			{"group_discovery", "groupdiscoveryid", 0,
+				{
+					{"groupdiscoveryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050094(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into group_discovery "
+				"(groupdiscoveryid,groupid,parent_group_prototypeid,name,lastcheck,ts_delete)"
+			" select groupid,groupid,parent_group_prototypeid,name,lastcheck,ts_delete"
+				" from group_discovery_tmp"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050095(void)
+{
+	return DBdrop_table("group_discovery_tmp");
+}
+
+static int	DBpatch_6050096(void)
+{
+	return DBcreate_index("group_discovery", "group_discovery_1", "groupid,parent_group_prototypeid", 1);
+}
+
+static int	DBpatch_6050097(void)
+{
+	return DBcreate_index("group_discovery", "group_discovery_2", "parent_group_prototypeid", 0);
+}
+
+static int	DBpatch_6050098(void)
+{
+	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("group_discovery", 1, &field);
+}
+
+static int	DBpatch_6050099(void)
+{
+	const zbx_db_field_t	field = {"parent_group_prototypeid", NULL, "group_prototype", "group_prototypeid", 0, 0,
+			0, 0};
+
+	return DBadd_foreign_key("group_discovery", 2, &field);
+}
+
+static int	DBpatch_6050100(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -1064,5 +1134,14 @@ DBPATCH_ADD(6050087, 0, 1)
 DBPATCH_ADD(6050090, 0, 1)
 DBPATCH_ADD(6050091, 0, 1)
 DBPATCH_ADD(6050092, 0, 1)
+DBPATCH_ADD(6050093, 0, 1)
+DBPATCH_ADD(6050094, 0, 1)
+DBPATCH_ADD(6050095, 0, 1)
+DBPATCH_ADD(6050096, 0, 1)
+DBPATCH_ADD(6050097, 0, 1)
+DBPATCH_ADD(6050098, 0, 1)
+DBPATCH_ADD(6050099, 0, 1)
+DBPATCH_ADD(6050100, 0, 1)
+
 
 DBPATCH_END()

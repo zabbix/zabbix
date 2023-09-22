@@ -1526,15 +1526,24 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#templategroup-right-table tbody tr')
-			.length > 1;
+		return [...document.querySelectorAll('#templategroup-right-table .form_row')]
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
+			.length;
 	}
 
-	initObserver(element) {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
-		});
+	initObserver() {
+		const target_node = document.getElementById('templategroup-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1545,15 +1554,24 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#group-right-table tbody tr')
-			.length > 1;
+		return [...document.querySelectorAll('#hostgroup-right-table .form_row')]
+			.filter((row) => row.querySelectorAll('.multiselect-list li').length > 0)
+			.length;
 	}
 
 	initObserver() {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes();
-		});
+		const target_node = document.getElementById('hostgroup-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => this.addAttributes());
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 

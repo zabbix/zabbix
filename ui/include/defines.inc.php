@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0alpha5');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050092);
+define('ZABBIX_DB_VERSION',		6050100);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1146,6 +1146,10 @@ define('TAG_OPERATOR_NOT_LIKE',		2);
 define('TAG_OPERATOR_NOT_EQUAL',	3);
 define('TAG_OPERATOR_EXISTS',		4);
 define('TAG_OPERATOR_NOT_EXISTS',	5);
+
+// Problem tag filter constants.
+define('TAG_FILTER_ALL',	0);
+define('TAG_FILTER_LIST',	1);
 
 define('GRAPH_FILTER_ALL',		0);
 define('GRAPH_FILTER_HOST',		1);

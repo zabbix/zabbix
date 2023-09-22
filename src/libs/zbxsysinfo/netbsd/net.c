@@ -21,7 +21,6 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "zbxlog.h"
 
 static struct nlist kernel_symbols[] =
 {

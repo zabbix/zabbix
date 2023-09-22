@@ -158,9 +158,7 @@ window.widget_svggraph_form = new class {
 		jQuery('.<?= CRangeControl::ZBX_STYLE_CLASS ?>', jQuery(this._dataset_wrapper)).rangeControl();
 
 		// Initialize pattern fields.
-		jQuery('.multiselect', jQuery(this._dataset_wrapper)).each(function() {
-			jQuery(this).multiSelect(jQuery(this).data('params'));
-		});
+		jQuery('.multiselect', jQuery(this._dataset_wrapper)).multiSelect();
 
 		for (const colorpicker of jQuery('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			jQuery(colorpicker).colorpicker({
@@ -356,7 +354,7 @@ window.widget_svggraph_form = new class {
 		}
 
 		for (const multiselect of dataset.querySelectorAll('.multiselect')) {
-			jQuery(multiselect).multiSelect(jQuery(multiselect).data('params'));
+			jQuery(multiselect).multiSelect();
 		}
 
 		for (const range_control of dataset.querySelectorAll('.<?= CRangeControl::ZBX_STYLE_CLASS ?>')) {
