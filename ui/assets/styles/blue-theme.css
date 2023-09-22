@@ -6696,6 +6696,16 @@ svg {
 
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
+#preprocessing-test-form .runtime-error-fields {
+  display: flex;
+  justify-content: space-between; }
+  #preprocessing-test-form .runtime-error-fields label {
+    width: auto;
+    padding-inline-end: 8px; }
+  #preprocessing-test-form .runtime-error-fields > div {
+    display: inline-flex; }
+  #preprocessing-test-form .runtime-error-fields .multilineinput-control {
+    width: 250px; }
 
 .totals-list:not(.list-table) {
   display: flex;

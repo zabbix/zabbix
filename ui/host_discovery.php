@@ -689,8 +689,6 @@ if (hasRequest('form')) {
 		unset($step);
 	}
 
-	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
-
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
 		$data['lifetime'] = $item['lifetime'];

@@ -3477,6 +3477,24 @@ svg {
 	.table-forms-separator {
 		margin-top: -2px;
 	}
+
+	.runtime-error-fields {
+		display: flex;
+		justify-content: space-between;
+
+		label {
+			width: auto;
+			padding-inline-end: 8px;
+		}
+
+		> div {
+			display: inline-flex;
+		}
+
+		.multilineinput-control {
+			width: 250px;
+		}
+	}
 }
 
 .totals-list {
