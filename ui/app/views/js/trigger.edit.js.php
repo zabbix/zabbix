@@ -624,7 +624,7 @@ window.trigger_edit_popup = new class {
 	}
 
 	#openRelatedTrigger(data) {
-		if (!this.#isFormModified()) {
+		if (this.#isFormModified() && !this.confirmNavigation()) {
 			return;
 		}
 
@@ -665,58 +665,48 @@ window.trigger_edit_popup = new class {
 	}
 
 	#isFormModified() {
-		let diff = false;
+		if (this.triggerid === null) {
+			return true;
+		}
 
-		if (this.triggerid) {
-			let form_fields = this.#getFormFields();
+		let form_fields = this.#getFormFields();
 
-			// Values are modified to match this.db_trigger values.
-			if (form_fields.tags) {
-				// Remove empty tags and add tags in array instead of object.
-				form_fields.tags = Object.values(form_fields.tags).filter(obj => {
-					for (const key in obj) {
-						if (obj[key] === '') {
-							return false;
-						}
-						return true;
+		// Values are modified to match this.db_trigger values.
+		if (form_fields.tags) {
+			// Remove empty tags and add tags in array instead of object.
+			form_fields.tags = Object.values(form_fields.tags).filter(obj => {
+				for (const key in obj) {
+					if (obj[key] === '') {
+						return false;
 					}
-				});
-			}
-
-			delete form_fields.context;
-			delete form_fields._csrf_token;
-
-			this.db_trigger.dependencies = [];
-
-			if (Object.keys(this.db_dependencies).length > 0) {
-				// Dependencies are sorted alphabetically as in form to appear in the same order for JSON.stringify().
-				let dependencies = this.#prepareDependencies(this.db_dependencies);
-				this.db_trigger.dependencies = dependencies.map(obj => obj.triggerid);
-			}
-
-			if (form_fields.show_inherited_tags == 1) {
-				form_fields.tags = form_fields.tags.filter((tag) => {
-					return tag.type !== '1'; // 'ZBX_PROPERTY_INHERITED'
-				});
-
-				for (const tag of form_fields.tags) {
-					delete tag.type;
+					return true;
 				}
-			}
-
-			delete form_fields.show_inherited_tags;
-
-			let db_trigger_modified = {...form_fields, ...this.db_trigger};
-			diff = JSON.stringify(db_trigger_modified) === JSON.stringify(form_fields);
+			});
 		}
 
-		if (!diff) {
-			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-				return false;
+		delete form_fields.context;
+		delete form_fields._csrf_token;
+
+		if (Object.keys(this.db_dependencies).length > 0) {
+			// Dependencies are sorted alphabetically as in form to appear in the same order for JSON.stringify().
+			let dependencies = this.#prepareDependencies(this.db_dependencies);
+			this.db_trigger.dependencies = dependencies.map(obj => obj.triggerid);
+		}
+
+		if (form_fields.show_inherited_tags == 1) {
+			form_fields.tags = form_fields.tags.filter((tag) => {
+				return tag.type !== '1'; // 'ZBX_PROPERTY_INHERITED'
+			});
+
+			for (const tag of form_fields.tags) {
+				delete tag.type;
 			}
 		}
 
-		return true;
+		delete form_fields.show_inherited_tags;
+		console.log(form_fields);
+		console.log({...form_fields, ...this.db_trigger});
+		return JSON.stringify({...form_fields, ...this.db_trigger}) !== JSON.stringify(form_fields);
 	}
 
 	#disableExpressionConstructorButtons(buttons, target) {
@@ -870,7 +860,7 @@ window.trigger_edit_popup = new class {
 	}
 
 	editTemplate(e, templateid) {
-		if (!this.#isFormModified()) {
+		if (this.#isFormModified() && !this.confirmNavigation()) {
 			return;
 		}
 
@@ -892,6 +882,10 @@ window.trigger_edit_popup = new class {
 		overlay.$dialogue[0].addEventListener('dialogue.submit',
 			this.elementSuccess.bind(this, this.context, this.action !== 'trigger.edit'), {once: true}
 		);
+	}
+
+	confirmNavigation() {
+		return window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
 	elementSuccess(context, discovery, e) {
