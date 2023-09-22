@@ -326,16 +326,16 @@ $form_grid
 	->addItem((new CFormFieldsetCollapsible(_('Advanced configuration')))
 		->setId('advanced-configuration')
 		->addItem([
-			(new CLabel(_('Enable user input'), 'enable-user-input'))->setId('enable-user-input-label'),
-			(new CFormField(
+			(new CLabel(_('Enable user input'), 'enable-user-input')),
+			new CFormField(
 				(new CCheckBox('enable_user_input'))
 					->setChecked($data['enable_user_input'])
 					->setId('enable-user-input')
-			))->setId('enable-user-input-field')
+			)
 		])
 		->addItem([
-			(new CLabel(_('Input prompt'), 'input_prompt'))->setId('prompt-label'),
-			(new CFormField([
+			(new CLabel(_('Input prompt'), 'input_prompt')),
+			new CFormField([
 				(new CTextBox('input_prompt', $data['input_prompt'], false,
 					DB::getFieldLength('scripts', 'manualinput_prompt'))
 				)
@@ -346,18 +346,18 @@ $form_grid
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->setAttribute('disabled', !$data['enable_user_input'])
 					->setId('test-user-input')
-			]))->setId('input-prompt-field')
+			])
 		])
 		->addItem([
-			(new CLabel(_('Input type'), 'input_type'))->setId('input_type_label'),
-			(new CFormField(
+			(new CLabel(_('Input type'), 'input_type')),
+			new CFormField(
 				(new CRadioButtonList('input_type', (int) $data['input_type']))
 					->setReadonly(!$data['enable_user_input'])
 					->addValue(_('String'), SCRIPT_MANUALINPUT_TYPE_STRING)
 					->addValue(_('Dropdow'), SCRIPT_MANUALINPUT_TYPE_LIST)
 					->setModern()
 					->setId('input_type')
-			))->setId('input_type_field')
+			)
 		])
 		->addItem([
 			(new CLabel(_('Default input string'), 'default_input'))->setId('default-input-label'),
@@ -381,7 +381,7 @@ $form_grid
 			]))->setId('dropdown-options-field')
 		])
 		->addItem([
-			(new CLabel(_('Input validation rule'), 'input-validation'))->setId('input-validation-label'),
+			(new CLabel(_('Input validation rule'), 'input_validation'))->setId('input-validation-label'),
 			(new CFormField([
 				(new CTextBox('input_validation', $validation_rule, false,
 					DB::getFieldLength('scripts', 'manualinput_validator'))
@@ -391,27 +391,26 @@ $form_grid
 			]))->setId('input-validation-field')
 		])
 		->addItem([
-			(new CLabel(_('Enable confirmation'), 'enable-confirmation'))->setId('enable-confirmation-label'),
-			(new CFormField(
+			(new CLabel(_('Enable confirmation'), 'enable_confirmation')),
+			new CFormField(
 				(new CCheckBox('enable_confirmation'))
 					->setChecked($data['enable_confirmation'])
-					->setId('enable-confirmation')
-			))->setId('enable-confirmation-field')
+					->setId('enable_confirmation')
+			)
 		])
 		->addItem([
-			(new CLabel(_('Confirmation text'), 'confirmation'))->setId('confirmation-label'),
-			(new CFormField([
+			(new CLabel(_('Confirmation text'), 'confirmation')),
+			new CFormField([
 				(new CTextBox('confirmation', $data['confirmation'], false,
 					DB::getFieldLength('scripts', 'confirmation'))
 				)
 					->setAttribute('disabled', $data['enable_confirmation'])
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 				NBSP(),
-				(new CButton('testConfirmation', _('Test confirmation')))
+				(new CButton('test-confirmation', _('Test confirmation')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->setAttribute('disabled', $data['enable_confirmation'])
-					->setId('test-confirmation')
-			]))->setId('confirmation-field')
+			])
 		])
 	);
 

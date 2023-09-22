@@ -46,7 +46,7 @@ window.script_edit_popup = new class {
 	#initActions() {
 		this.form.querySelector('#scope').dispatchEvent(new Event('change'));
 		this.form.querySelector('#type').dispatchEvent(new Event('change'));
-		this.form.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
+		this.form.querySelector('#enable_confirmation').dispatchEvent(new Event('change'));
 
 		this.form.querySelector('.js-parameter-add').addEventListener('click', () => {
 			const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
@@ -104,7 +104,7 @@ window.script_edit_popup = new class {
 
 
 		// Update confirmation fields.
-		this.form.querySelector('#enable-confirmation').onchange = (e) => this.#loadConfirmationFields(e);
+		this.form.querySelector('#enable_confirmation').onchange = (e) => this.#loadConfirmationFields(e);
 
 		// Test user input button.
 		this.form.querySelector('#test-user-input').addEventListener('click', () =>
@@ -264,8 +264,7 @@ window.script_edit_popup = new class {
 			case <?= ZBX_SCRIPT_SCOPE_EVENT ?>:
 				const show_fields = [
 					'#menu-path', '#menu-path-label', '#usergroup-label', '#usergroup', '#host-access-label',
-					'#host-access-field', '#enable-confirmation-label', '#enable-confirmation-field',
-					'#advanced-configuration'
+					'#host-access-field', '#advanced-configuration'
 				];
 
 				show_fields.forEach((field) => {
@@ -479,10 +478,10 @@ window.script_edit_popup = new class {
 				this.form.querySelector('#dropdown-options-field').style.display = 'none';
 
 				if (this.user_input_checked) {
-					$('label[for=input-validation]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+					$('label[for=input_validation]').addClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 				}
 				else {
-					$('label[for=input-validation]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
+					$('label[for=input_validation]').removeClass(<?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>);
 				}
 
 				const updateTestUserInput = () => {
@@ -591,7 +590,7 @@ window.script_edit_popup = new class {
 				'#password-label', '#password-field', '#port-label', '#port-field', '#publickey-label',
 				'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
 				'#usergroup-label', '#usergroup', '#host-access-label', '#host-access-field',
-				'#enable-confirmation-label', '#enable-confirmation-field', '#advanced-configuration'
+				'#advanced-configuration'
 			];
 		}
 
