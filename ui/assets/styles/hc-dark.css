@@ -2866,6 +2866,9 @@ output {
 
 .radio-list-control {
   display: inline-block;
+  height: 24px;
+  line-height: 22px;
+  vertical-align: top;
   white-space: nowrap; }
   .radio-list-control li {
     position: relative;
