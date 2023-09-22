@@ -616,7 +616,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-07-04 12:53:00',
 						'To' => '2021-07-04 12:52:59'
 					],
-					'error' => 'Invalid parameter "Time period/To": value must be greater than "Time period/From".'
+					'error' => 'Minimum time period to display is 1 minute.'
 				]
 			],
 			[
@@ -626,7 +626,7 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2027-07-04 12:53:00',
 						'To' => 'now'
 					],
-					'error' => 'Invalid parameter "Time period/To": value must be greater than "Time period/From".'
+					'error' => 'Minimum time period to display is 1 minute.'
 				]
 			],
 			[
