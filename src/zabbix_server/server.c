@@ -1288,7 +1288,7 @@ int	main(int argc, char **argv)
 static void	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
-	int		ret = SUCCEED;
+	int		ret;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
 	ret = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, program_type);
