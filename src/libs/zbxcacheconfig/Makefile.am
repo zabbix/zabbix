@@ -13,7 +13,9 @@ libzbxcacheconfig_a_SOURCES = \
 	lld_macro.c \
 	trigger.c \
 	user_macro.c \
-	user_macro.h
+	user_macro.h \
+	vps_tracker.c \
+	vps_tracker.h
 
 libzbxcacheconfig_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \

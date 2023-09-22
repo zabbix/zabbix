@@ -268,6 +268,10 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		SET_TEXT_RESULT(result, nodes);
 	}
+	else if (0 == strcmp(param1, "vps"))
+	{
+		SET_DBL_RESULT(result, zbx_vps_get_avg());
+	}
 	else
 	{
 		ret = FAIL;

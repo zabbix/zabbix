@@ -1467,6 +1467,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
+	/* TODO: pass configuration parameters */
+	zbx_vps_tracker_init(0, 0);
+
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);

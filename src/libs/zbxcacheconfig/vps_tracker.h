@@ -1,0 +1,46 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2023 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+
+#ifndef ZABBIX_VPS_TRACKER_H
+#define ZABBIX_VPS_TRACKER_H
+
+#include "zbxcommon.h"
+
+#define VPS_HISTORY_SIZE	(SEC_PER_MIN + 1)
+
+typedef struct
+{
+	zbx_uint64_t	total_values_num;
+	zbx_uint64_t	values_num;
+	zbx_uint64_t	overcommit_limit;
+	zbx_uint64_t	overcommit_charge;
+	zbx_uint64_t	values_limit;
+
+	time_t		last_flush;
+	time_t		last_hist;
+
+	zbx_uint64_t	history[VPS_HISTORY_SIZE];
+	int		history_tail;
+	int		history_head;
+
+} zbx_vps_tracker_t;
+
+int	vps_tracker_create(zbx_vps_tracker_t *tracker, char **error);
+
+#endif
