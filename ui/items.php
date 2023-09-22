@@ -1018,7 +1018,7 @@ else {
 			}
 			elseif ($filter_type == ITEM_TYPE_TRAPPER || $filter_type == ITEM_TYPE_SNMPTRAP
 					|| $filter_type == ITEM_TYPE_DEPENDENT
-					|| ($filter_type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter_key, 'mqtt.get', 8) === 0)) {
+					|| ($filter_type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter_key, 'mqtt.get', 8) == 0)) {
 				$options['filter']['delay'] = -1;
 			}
 			else {
@@ -1097,7 +1097,7 @@ else {
 
 			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
 					|| $item['type'] == ITEM_TYPE_DEPENDENT
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0)) {
 				$delay = '';
 			}
 			else {

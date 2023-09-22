@@ -280,7 +280,7 @@ function orderItemsByDelay(array &$items, $sortorder, array $options){
 
 	foreach ($items as &$item) {
 		if (in_array($item['type'], [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+				|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0)) {
 			$item['delay_sort'] = '';
 		}
 		elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -2458,12 +2458,12 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 				);
 
 			case 'timeout':
-				return ($input['type'] != ITEM_TYPE_SIMPLE || (strncmp($input['key_'], 'icmpping', 8) !== 0
-						&& strncmp($input['key_'], 'vmware.', 7) !== 0))
-					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'walk[', 5) === 0);
+				return ($input['type'] != ITEM_TYPE_SIMPLE || (strncmp($input['key_'], 'icmpping', 8) != 0
+						&& strncmp($input['key_'], 'vmware.', 7) != 0))
+					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'walk[', 5) == 0);
 
 			case 'delay':
-				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) !== 0;
+				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;
 
 			case 'trapper_hosts':
 				return $input['type'] != ITEM_TYPE_HTTPAGENT || $input['allow_traps'] == HTTPCHECK_ALLOW_TRAPS_ON;

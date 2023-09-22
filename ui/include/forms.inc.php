@@ -461,7 +461,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 		if ($filter_data['filter_delay'] === '' && $filter_data['filter_type'] != ITEM_TYPE_TRAPPER
 				&& $item['type'] != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_SNMPTRAP
 				&& $item['type'] != ITEM_TYPE_DEPENDENT
-				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) !== 0)) {
+				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) != 0)) {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 			$value = $delay;
@@ -1026,7 +1026,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
 							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($data['key'], 'mqtt.get', 8) === 0))) {
+								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}

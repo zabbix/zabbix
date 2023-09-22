@@ -198,7 +198,7 @@ abstract class CItemGeneral extends CApiService {
 				if (in_array($item['type'], $delay_types)) {
 					if (!in_array($db_item['type'], $delay_types)
 							|| ($db_item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($db_item['key_'], 'mqtt.get', 8) === 0)) {
+								&& strncmp($db_item['key_'], 'mqtt.get', 8) == 0)) {
 						$item += array_intersect_key($db_item, array_flip(['delay']));
 					}
 				}
@@ -1322,15 +1322,15 @@ abstract class CItemGeneral extends CApiService {
 			switch ($item['type']) {
 				case ITEM_TYPE_SIMPLE:
 					if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
-							&& (strncmp($item['key_'], 'icmpping', 8) === 0
-								|| strncmp($item['key_'], 'vmware.', 7) === 0)) {
+							&& (strncmp($item['key_'], 'icmpping', 8) == 0
+								|| strncmp($item['key_'], 'vmware.', 7) == 0)) {
 						$item += array_intersect_key($type_field_defaults, array_flip(['timeout']));
 					}
 					break;
 
 				case ITEM_TYPE_ZABBIX_ACTIVE:
 					if (($item['type'] != $db_item['type'] || $item['key_'] !== $db_item['key_'])
-							&& strncmp($item['key_'], 'mqtt.get', 8) === 0) {
+							&& strncmp($item['key_'], 'mqtt.get', 8) == 0) {
 						$item += array_intersect_key($type_field_defaults, array_flip(['delay']));
 					}
 					break;
@@ -1384,7 +1384,7 @@ abstract class CItemGeneral extends CApiService {
 				case ITEM_TYPE_SNMP:
 					if (array_key_exists('snmp_oid', $item)
 							&& ($item['type'] != $db_item['type'] || $item['snmp_oid'] !== $db_item['snmp_oid'])
-							&& strncmp($item['snmp_oid'], 'walk[', 5) !== 0) {
+							&& strncmp($item['snmp_oid'], 'walk[', 5) != 0) {
 						$item += array_intersect_key($type_field_defaults, array_flip(['timeout']));
 					}
 					break;

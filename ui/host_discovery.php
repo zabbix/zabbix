@@ -793,7 +793,7 @@ else {
 			$options['filter']['delay'] = $filter['delay'];
 		}
 		elseif ($filter['type'] == ITEM_TYPE_TRAPPER || $filter['type'] == ITEM_TYPE_DEPENDENT
-				|| ($filter['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) === 0)) {
+				|| ($filter['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($filter['key'], 'mqtt.get', 8) == 0)) {
 			$options['filter']['delay'] = -1;
 		}
 		else {
