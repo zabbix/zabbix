@@ -122,7 +122,8 @@ class CDashboardHelper {
 						'height' => (int) $widget_data['height']
 					],
 					'rf_rate' => 0,
-					'fields' => []
+					'fields' => [],
+					'messages' => []
 				];
 
 				if (array_key_exists($widget_data['widgetid'], $widgets_and_forms)) {
@@ -133,8 +134,7 @@ class CDashboardHelper {
 						'form' => $form
 					] = $widgets_and_forms[$widget_data['widgetid']];
 
-					$form->validate();
-
+					$prepared_widget['messages'] = $form->validate();
 					$prepared_widget['fields'] = $form->getFieldsValues();
 
 					if ($with_rf_rate) {

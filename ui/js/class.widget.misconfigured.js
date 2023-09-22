@@ -18,26 +18,12 @@
 **/
 
 
-class CWidgetInaccessible extends CWidget {
+class CWidgetMisconfigured extends CWidget {
+
+	#messages = [];
 
 	onStart() {
-		this._updateButtons();
-
-		this._body.innerHTML = `<div>${t('No permissions to referred object or it does not exist!')}</div>`;
-	}
-
-	_updateButtons() {
-		for (const button of this._header.querySelectorAll('button')) {
-			button.style.display = !button.classList.contains('js-widget-action') || !this.isEditMode() ? 'none' : '';
-		}
-	}
-
-	onEdit() {
-		const state = this.getState();
-
-		if (state === WIDGET_STATE_ACTIVE || state === WIDGET_STATE_INACTIVE) {
-			this._updateButtons();
-		}
+		this._updateMessages(this.#messages);
 	}
 
 	promiseUpdate() {
@@ -58,6 +44,14 @@ class CWidgetInaccessible extends CWidget {
 		}
 
 		return menu;
+	}
+
+	setMessages(messages) {
+		this.#messages = messages;
+
+		if (this.getState() !== WIDGET_STATE_INITIAL) {
+			this._updateMessages(this.#messages);
+		}
 	}
 
 	hasPadding() {

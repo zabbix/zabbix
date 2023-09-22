@@ -41,6 +41,7 @@ $available_js = [
 	'class.widget.js' => '',
 	'class.widget.inaccessible.js' => '',
 	'class.widget.iterator.js' => '',
+	'class.widget.misconfigured.js' => '',
 	'class.widget.paste-placeholder.js' => '',
 	'class.widget-field.multiselect.js' => '',
 	'class.widget-field.time-period.js' => '',
@@ -165,25 +166,27 @@ $translate_strings = [
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15),
-		'Actions' => _s('Actions'),
-		'Copy' => _s('Copy'),
-		'Delete' => _s('Delete'),
-		'Edit' => _s('Edit'),
+		'Actions' => _('Actions'),
+		'Copy' => _('Copy'),
+		'Delete' => _('Delete'),
+		'Edit' => _('Edit'),
 		'No refresh' => _('No refresh'),
-		'Paste' => _s('Paste'),
-		'Refresh interval' => _s('Refresh interval')
+		'Paste' => _('Paste'),
+		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget.inaccessible.js' => [
-		'Actions' => _s('Actions'),
-		'Copy' => _s('Copy'),
-		'Inaccessible widget' => _('Inaccessible widget'),
-		'Refresh interval' => _s('Refresh interval')
+		'No permissions to referred object or it does not exist!' =>
+			_('No permissions to referred object or it does not exist!'),
+		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget.iterator.js' => [
-		'Next page' => _s('Next page'),
-		'Previous page' => _s('Previous page'),
+		'Next page' => _('Next page'),
+		'Previous page' => _('Previous page'),
 		'Widget is too small for the specified number of columns and rows.' =>
-			_s('Widget is too small for the specified number of columns and rows.')
+			_('Widget is too small for the specified number of columns and rows.')
+	],
+	'class.widget.misconfigured.js' => [
+		'Refresh interval' => _('Refresh interval')
 	],
 	'class.widget-select.popup.js' => [
 		'Name' => _('Name'),

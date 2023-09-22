@@ -295,11 +295,11 @@ class CDashboardPage {
 		}
 	}
 
-	addWidgetFromData({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id}) {
+	addWidgetFromData({type, name, view_mode, fields, widgetid, pos, is_new, rf_rate, unique_id, messages = []}) {
 		let widget;
 
 		if (type in this._widget_defaults) {
-			widget = this._createWidget(eval(this._widget_defaults[type].js_class), {
+			const widget_data = {
 				type,
 				name,
 				view_mode,
@@ -310,7 +310,15 @@ class CDashboardPage {
 				is_new,
 				rf_rate,
 				unique_id
-			});
+			};
+
+			if (messages.length > 0) {
+				widget = this._createWidget(CWidgetMisconfigured, widget_data);
+				widget.setMessages(messages);
+			}
+			else {
+				widget = this._createWidget(eval(this._widget_defaults[type].js_class), widget_data);
+			}
 		}
 		else {
 			widget = this._createInaccessibleWidget({widgetid, pos, unique_id});

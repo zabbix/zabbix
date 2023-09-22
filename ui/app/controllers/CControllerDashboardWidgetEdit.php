@@ -103,7 +103,13 @@ class CControllerDashboardWidgetEdit extends CController {
 		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
 
 		$form = $this->widget->getForm($this->getInput('fields', []), $templateid);
-		$form->validate();
+		$errors = $form->validate();
+
+		if ($this->hasInput('unique_id')) {
+			foreach ($errors as $error) {
+				error($error);
+			}
+		}
 
 		$captions = $this->getValuesCaptions($form->fieldsToApi());
 		$form_fields = $form->getFields();

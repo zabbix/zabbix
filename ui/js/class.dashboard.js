@@ -1485,7 +1485,7 @@ class CDashboard {
 
 				overlayDialogueDestroy(overlay.dialogueid);
 
-				if (widget !== null && widget.getType() === type) {
+				if (widget !== null && widget.getType() === type && !(widget instanceof CWidgetMisconfigured)) {
 					widget.updateProperties({name, view_mode, fields});
 
 					return;

@@ -162,9 +162,13 @@ class CWidgetFormView {
 	 * @throws JsonException
 	 */
 	public function show(): void {
+		$messages = get_and_clear_messages();
+		$message_box = $messages ? makeMessageBox(ZBX_STYLE_MSG_BAD, $messages) : '';
+
 		$output = [
 			'header' => $this->data['unique_id'] !== null ? _('Edit widget') : _('Add widget'),
 			'body' => implode('', [
+				$message_box,
 				(new CForm())
 					->setId('widget-dialogue-form')
 					->setName($this->name)
@@ -190,12 +194,6 @@ class CWidgetFormView {
 				? CDocHelper::getUrl(CDocHelper::DASHBOARDS_WIDGET_EDIT)
 				: $this->data['url']
 		];
-
-		if ($error = get_and_clear_messages()) {
-			$output['error'] = [
-				'messages' => array_column($error, 'message')
-			];
-		}
 
 		if ($this->data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 			CProfiler::getInstance()->stop();
