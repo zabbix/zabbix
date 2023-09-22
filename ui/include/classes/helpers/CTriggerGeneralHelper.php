@@ -422,8 +422,7 @@ class CTriggerGeneralHelper {
 
 		$data = [
 			'description' => $trigger['comments'],
-			'name' => $trigger['description'],
-			'status' => $trigger['status'] == TRIGGER_STATUS_ENABLED ? '1' : '0'
+			'name' => $trigger['description']
 		];
 
 		unset($trigger['comments'], $trigger['hosts'], $trigger['discoveryRule'], $trigger['flags'], $trigger['state'],
