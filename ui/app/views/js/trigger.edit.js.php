@@ -90,7 +90,7 @@ window.trigger_edit_popup = new class {
 				this.#expressionConstructor({'remove_expression': e.target.dataset.id});
 			}
 			else if (e.target.classList.contains('js-expression')) {
-				this.#copy_expression(e.target, <?= json_encode(TRIGGER_EXPRESSION) ?>);
+				this.#copy_expression(e.target);
 			}
 			else if (e.target.id === 'test-expression') {
 				return PopUp('popup.testtriggerexpr', {expression: this.expr_temp.value},
@@ -130,7 +130,7 @@ window.trigger_edit_popup = new class {
 					});
 			}
 			else if (e.target.classList.contains('js-recovery-expression')) {
-				this.#copy_expression(e.target, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
+				this.#copy_expression(e.target);
 			}
 			else if (e.target.id === 'add-dep-trigger' || e.target.id === 'add-dep-template-trigger'
 					|| e.target.id === 'add-dep-host-trigger' || e.target.id === 'add-dep-trigger-prototype') {
@@ -741,8 +741,8 @@ window.trigger_edit_popup = new class {
 		}
 	}
 
-	#copy_expression(target, type) {
-		const element = (type == <?= json_encode(TRIGGER_EXPRESSION) ?>)
+	#copy_expression(target) {
+		const element = (target.classList.contains('js-expression'))
 			? this.expression
 			: this.recovery_expression;
 
