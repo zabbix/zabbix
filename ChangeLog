@@ -1,12 +1,26 @@
 Changes for 7.0.0alpha5
 
 New features:
+A.FG...PST [ZBXNEXT-1096] implemented configurable per-item-type timeouts (abakaldin, agriscenko, dgoloscapov, wiper)
+A.F.....S. [ZBXNEXT-7726] added support for extended error checking in preprocessing (akozlovs, jfreibergs)
+..F.I..... [ZBXNEXT-8331] implemented new Pie chart widget (apoga, ddauksa)
+..F.....S. [ZBXNEXT-8638] implemented new evaluation functions jsonpath and xmlxpath (jfreibergs, kprutkovs)
+.......PS. [ZBXNEXT-8469] increased PostgreSQL maximum supported version to 16 (mprihodko)
+.......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
+A.F.I...S. [ZBXNEXT-8702] added support of group discovery from different prototypes/lld rules (dfofanovs, wiper)
+A.F....... [ZBXNEXT-4165] implemented `selectActions` parameter for API method `mediatype.get` to display all associated actions for media types (ddauksa)
+..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 ..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 .........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
 ..F....... [ZBXNEXT-7687] extended Top Hosts widget column sorting (dfofanovs)
 ..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
 
 Bug fixes:
+..F....... [ZBX-23361] fixed uncapitalized first letter for value 'all' in radio buttons and in filter select fields (dpetra)
+..F....... [ZBX-22841] fixed all date/time displays to match standard US date and time formats (ddauksa)
+........S. [ZBX-23446] fixed nested transaction issue when processing autoregistration data (dimir)
+.......P.. [ZBX-23354] fixed crash on shutdown after unsuccessful database connection on startup (wiper)
+..F....... [ZBX-23358] fixed "Problem hosts" widget without filtering by tags not showing problem host count (agriscenko)
 ..F....... [ZBX-23302] fixed 'access denied' error in template multiselect popup (esekace)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
 ...G...... [ZBX-23110] fixed possible crash on Windows 11 by removing concurrent Win API call for update perfCounters list (MVekslers)
