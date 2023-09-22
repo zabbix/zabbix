@@ -1037,7 +1037,6 @@ static int	DBpatch_6050100(void)
 	return SUCCEED;
 }
 
-
 static int	DBpatch_6050101(void)
 {
 	const zbx_db_field_t	field = {"timeout_zabbix_agent", "3s", NULL, NULL, 255, ZBX_TYPE_CHAR,
