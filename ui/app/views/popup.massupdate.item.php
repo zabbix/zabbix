@@ -94,10 +94,6 @@ $item_form_list
 			->setId('post_type_container')
 			->setModern(true)
 	)
-	->addRow(
-		(new CVisibilityBox('visible[timeout]', 'timeout', _('Original')))->setLabel(_('Timeout')),
-		(new CTextBox('timeout', DB::getDefault('items', 'timeout')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	)
 	// Append ITEM_TYPE_HTTPAGENT Request body.
 	->addRow(
 		(new CVisibilityBox('visible[posts]', 'posts', _('Original')))->setLabel(_('Request body')),
@@ -203,9 +199,15 @@ $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
 		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
-			->setLabel(_('Preprocessing steps')),
-		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))
-			->setId('preprocessing_div')
+			->setLabel([
+				_('Preprocessing steps'),
+				makeHelpIcon([
+					_('Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set.'),
+					BR(), BR(),
+					_('However, if "Check for not supported value" steps are configured, they are always placed and executed first (with "any error" being the last of them).')
+				])
+			]),
+		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))->setId('preprocessing_div')
 	);
 
 $custom_intervals = (new CTable())
@@ -280,6 +282,22 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
 		$update_interval
+	)
+	// Append timeout to form list.
+	->addRow(
+		(new CVisibilityBox('visible[timeout]', 'timeout-field', _('Original')))->setLabel(_('Timeout')),
+		(new CDiv([
+			(new CRadioButtonList('custom_timeout', ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED))
+				->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+				->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+				->setModern(),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CTextBox('timeout', DB::getDefault('items', 'timeout')))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setAriaRequired()
+		]))
+			->setId('timeout-field')
+			->addClass('wrap-multiple-controls')
 	)
 	// Append history to form list.
 	->addRow(

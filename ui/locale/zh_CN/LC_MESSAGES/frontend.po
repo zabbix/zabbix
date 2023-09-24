@@ -1123,6 +1123,14 @@ msgstr "聚合"
 msgid "Aggregate functions"
 msgstr "聚合函数"
 
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:284
+msgid "Aggregates each item in the data set."
+msgstr ""
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:306
+msgid "Aggregates the whole data set."
+msgstr ""
+
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
@@ -2250,6 +2258,10 @@ msgstr "无法添加超过一个 \"图形总计\" 类型的监控项于图形 \"
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "无法在数据图模板\"%1$s\"上添加超过一个\"Graph sum\"类型的监控项目."
+
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:202
+msgid "Cannot add more than one item with type \"Total\" to the chart."
+msgstr ""
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -3731,6 +3743,10 @@ msgstr "在模板 \"%2$s\" 中无法设置 \"%1$s\""
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "无法设置 \"%1$s\" 为监控项 \"%2$s\"."
 
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:208
+msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -4631,6 +4647,10 @@ msgstr "命令"
 msgid "Commands"
 msgstr "命令"
 
+#: app/views/administration.timeouts.edit.php:138
+msgid "Communication"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:133
 msgid "Communication with Zabbix server"
 msgstr "与 Zabbix Server通信"
@@ -4843,6 +4863,10 @@ msgstr "模板组配置"
 msgid "Configuration of templates"
 msgstr "配置模板"
 
+#: app/controllers/CControllerTimeoutsEdit.php:110
+msgid "Configuration of timeouts"
+msgstr ""
+
 #: app/controllers/CControllerTrigDisplayEdit.php:132
 msgid "Configuration of trigger displaying options"
 msgstr "配置触发器显示选项"
@@ -4926,6 +4950,10 @@ msgstr "连接到"
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "已连接"
+
+#: app/views/administration.timeouts.edit.php:148
+msgid "Connection"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:81
 msgid "Connection security"
@@ -5855,6 +5883,10 @@ msgstr "数据概览"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "数据集"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
+msgid "Data set aggregation"
+msgstr ""
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
@@ -7346,6 +7378,10 @@ msgstr "未匹配正则表达式"
 #: include/views/js/monitoring.sysmaps.js.php:895
 msgid "Dot"
 msgstr "点"
+
+#: widgets/piechart/includes/WidgetForm.php:142
+msgid "Doughnut"
+msgstr ""
 
 #: app/views/monitoring.widget.discovery.view.php:34
 msgctxt "discovery results in dashboard"
@@ -8849,10 +8885,21 @@ msgstr "从主机获取值"
 msgid "Given expression is not a macro"
 msgstr "此表达式不是宏"
 
+#: app/views/popup.massupdate.item.php:291 app/views/popup.proxy.edit.php:194
+#: include/views/configuration.host.discovery.edit.php:717
+#: include/views/configuration.item.edit.php:844
+#: include/views/configuration.item.prototype.edit.php:798
+msgid "Global"
+msgstr ""
+
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "找不到全局正则表达式 \"%1$s\" 。"
+
+#: app/views/popup.proxy.edit.php:199
+msgid "Global timeouts"
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:56
 msgid "Global value"
@@ -9926,6 +9973,12 @@ msgstr "时"
 #: include/classes/helpers/CMenuHelper.php:251 include/html.inc.php:891
 msgid "Housekeeping"
 msgstr "管家"
+
+#: app/views/popup.massupdate.item.php:207
+#: include/views/configuration.item.edit.php:1062
+#: include/views/configuration.item.prototype.edit.php:931
+msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
+msgstr ""
 
 #: include/locales.inc.php:46
 msgid "Hungarian (hu_HU)"
@@ -12067,6 +12120,10 @@ msgstr "监控项原型更新"
 msgid "Item tags"
 msgstr "监控项标签"
 
+#: app/views/administration.timeouts.edit.php:178
+msgid "Item test"
+msgstr ""
+
 #: jsLoader.php:397
 msgid "Item type does not use interface"
 msgstr "监控项类型无法使用接口"
@@ -13391,6 +13448,10 @@ msgstr[0] "消息介质类型已启用"
 msgid "Media type mapping"
 msgstr "媒介类型映射"
 
+#: app/views/administration.timeouts.edit.php:158
+msgid "Media type test"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
 msgid "Media type test failed."
@@ -13471,6 +13532,10 @@ msgstr "菜单条目名称在事件内容菜单中用作触发器 URL 的标签�
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr "菜单路径"
+
+#: widgets/piechart/includes/WidgetForm.php:158
+msgid "Merge sectors smaller than "
+msgstr ""
 
 #: app/partials/popup.operations.php:160
 #: app/partials/scheduledreport.formgrid.html.php:178
@@ -14122,6 +14187,10 @@ msgstr "计划报表测试网络超时"
 #: app/views/administration.miscconfig.edit.php:157
 msgid "Network timeout for script execution"
 msgstr "脚本执行网络超时"
+
+#: app/views/administration.timeouts.edit.php:136
+msgid "Network timeouts for UI"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1687
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
@@ -16191,6 +16260,10 @@ msgstr "波斯语 (fa_IR)"
 msgid "Pie"
 msgstr "Pie"
 
+#: widgets/piechart/Widget.php:31
+msgid "Pie chart"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:135
 msgid "Placing algorithm"
 msgstr "置入演算法"
@@ -16344,6 +16417,12 @@ msgstr "预测函数"
 #: include/views/configuration.item.prototype.edit.php:891
 msgid "Preprocessing"
 msgstr "预处理"
+
+#: app/views/popup.massupdate.item.php:205
+#: include/views/configuration.item.edit.php:1060
+#: include/views/configuration.item.prototype.edit.php:929
+msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:209
@@ -18135,6 +18214,10 @@ msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
 msgstr[0] "定时报表已启用"
 
+#: app/views/administration.timeouts.edit.php:188
+msgid "Scheduled report test"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
 msgstr "定时报表已更新"
@@ -18200,6 +18283,10 @@ msgstr[0] "脚本已删除"
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
 msgstr "脚本没有参数"
+
+#: app/views/administration.timeouts.edit.php:168
+msgid "Script execution"
+msgstr ""
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -18774,6 +18861,11 @@ msgstr "精简"
 msgid "Show"
 msgstr "查看"
 
+#: widgets/piechart/includes/WidgetForm.php:234
+#: widgets/svggraph/includes/WidgetForm.php:378
+msgid "Show aggregation function"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
 msgstr ""
@@ -18880,6 +18972,10 @@ msgstr "查看HTML文字"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:218
 msgid "Show timeline"
 msgstr "显示时间线"
+
+#: widgets/piechart/includes/WidgetForm.php:170
+msgid "Show total value"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show triggers"
@@ -19091,6 +19187,10 @@ msgstr "来源 "
 #: include/classes/widgets/forms/CWidgetFormMap.php:40
 msgid "Source type"
 msgstr "源类型"
+
+#: widgets/piechart/includes/WidgetForm.php:152
+msgid "Space between sectors"
+msgstr ""
 
 #: include/locales.inc.php:61
 msgid "Spanish (es_ES)"
@@ -20401,6 +20501,28 @@ msgstr "时区"
 #: include/views/configuration.item.prototype.edit.php:330 items.php:151
 msgid "Timeout"
 msgstr "超时"
+
+#: app/views/administration.timeouts.edit.php:203
+#: app/views/administration.timeouts.edit.php:207
+#: app/views/popup.proxy.edit.php:309
+#: include/classes/helpers/CMenuHelper.php:344 include/html.inc.php:907
+#: include/views/configuration.host.discovery.edit.php:703
+#: include/views/configuration.host.discovery.edit.php:706
+#: include/views/configuration.item.edit.php:830
+#: include/views/configuration.item.edit.php:833
+#: include/views/configuration.item.prototype.edit.php:784
+#: include/views/configuration.item.prototype.edit.php:787
+msgid "Timeouts"
+msgstr ""
+
+#: app/views/popup.proxy.edit.php:186
+msgid "Timeouts are disabled because the proxy and server versions do not match."
+msgstr ""
+
+#: app/views/administration.timeouts.edit.php:42
+#: app/views/popup.proxy.edit.php:191
+msgid "Timeouts for item types"
+msgstr ""
 
 #: app/views/monitoring.widget.plaintext.view.php:32
 #: include/classes/screens/CScreenHistory.php:265
@@ -24010,6 +24132,10 @@ msgstr "一个大写和一个小写拉丁字母"
 msgid "and"
 msgstr "和"
 
+#: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
+msgid "any error"
+msgstr ""
+
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
 msgstr "成蓝"
@@ -24567,9 +24693,25 @@ msgstr "电子邮件"
 msgid "equals"
 msgstr "等于"
 
+#: include/forms.inc.php:1452 include/views/js/item.preprocessing.js.php:239
+msgid "error does not match"
+msgstr ""
+
+#: include/forms.inc.php:1451 include/views/js/item.preprocessing.js.php:238
+msgid "error matches"
+msgstr ""
+
 #: include/views/js/item.preprocessing.js.php:466
 msgid "error message"
 msgstr "错误信息"
+
+#: app/views/js/popup.itemtestedit.view.js.php:479
+msgid "error text"
+msgstr ""
+
+#: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
+msgid "error-matching"
+msgstr ""
 
 #: app/views/popup.lldoverride.php:119
 #: include/views/configuration.host.discovery.edit.php:789
@@ -24937,6 +25079,10 @@ msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:480
 msgid "item with the same UUID already exists"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:688
+msgid "jsonpath() - Returns JSONPath result"
 msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
@@ -25831,6 +25977,10 @@ msgstr "time() - 当前时间"
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft() - 基于周期 T 内达到阈值的时间估计"
 
+#: include/classes/api/services/CProxy.php:835
+msgid "timeouts are disabled because the proxy and server versions do not match"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() - 具有精确周期偏移的周期 T 的平均值"
@@ -26245,6 +26395,10 @@ msgstr "错误的监控项类型"
 #: include/classes/api/services/CTask.php:591
 msgid "wrong master item type"
 msgstr "错误的主监控项类型"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1207
+msgid "xmlxpath() - Returns XML XPath result"
+msgstr ""
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"
