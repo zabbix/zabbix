@@ -490,7 +490,7 @@ class testDataCollection extends CIntegrationTest {
 				'error_handler' => 2,
 				'error_handler_params' => '333'
 			],[
-				'params' => "-1\n",
+				'params' => "-1",
 				'type' => 26,
 				'error_handler' => 2,
 				'error_handler_params' => '444'
