@@ -2599,7 +2599,7 @@ char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type)
 	RDLOCK_CACHE;
 
 	cached_tmt = dc_get_global_item_type_timeout(item_type);
-	tmt = zbx_strdup(NULL, tmt);
+	tmt = zbx_strdup(NULL, cached_tmt);
 
 	UNLOCK_CACHE;
 
@@ -15686,6 +15686,8 @@ void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *ne
 				dheck_out->uniq = dcheck->uniq;
 				dheck_out->type = dcheck->type;
 				dheck_out->allow_redirect = dcheck->allow_redirect;
+				dheck_out->timeout_str = NULL;
+				dheck_out->timeout_sec = 0;
 
 				if (SVC_SNMPv1 == dheck_out->type || SVC_SNMPv2c == dheck_out->type ||
 						SVC_SNMPv3 == dheck_out->type)

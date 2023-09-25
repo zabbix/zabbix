@@ -87,13 +87,10 @@ void	discoverer_job_free(zbx_discoverer_job_t *job)
 {
 	(void)discoverer_job_tasks_free(job);
 
-	zbx_free(job->agent_timeout);
-	zbx_free(job->snmp_timeout);
 	zbx_free(job);
 }
 
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, char *agent_timeout, char *snmp_timeout,
-			int simple_timeout)
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule)
 {
 	zbx_discoverer_job_t	*job;
 
@@ -103,9 +100,6 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, char *agent_t
 	job->workers_used = 0;
 	job->drule_revision = drule->revision;
 	job->status = DISCOVERER_JOB_STATUS_QUEUED;
-	job->agent_timeout = agent_timeout;
-	job->snmp_timeout = snmp_timeout;
-	job->simple_timeout = simple_timeout;
 	zbx_list_create(&job->tasks);
 
 	return job;
