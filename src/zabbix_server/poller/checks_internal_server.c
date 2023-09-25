@@ -33,10 +33,9 @@
  *                                                                            *
  * Purpose: processes program type (server) specific internal checks          *
  *                                                                            *
- * Parameters: param1              - [IN] the first parameter                 *
- *             request             - [IN] the request                         *
- *             config_nvps_limiter - [IN] nvps limiter configuration          *
- *             result              - [OUT] the result                         *
+ * Parameters: param1  - [IN] the first parameter                             *
+ *             request - [IN] the request                                     *
+ *             result  - [OUT] the result                                     *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
@@ -46,8 +45,7 @@
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
-		const zbx_nvps_limiter_t *config_nvps_limiter, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		nparams, ret = NOTSUPPORTED;
 	const char	*param2;
@@ -300,14 +298,70 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 
-		SET_DBL_RESULT(result, config_nvps_limiter->nvps_limit);
+		zbx_vps_tracker_stats_t	stats;
+
+		zbx_vps_tracker_get_stats(&stats);
+		SET_UI64_RESULT(result, stats.values_limit);
+	}
+	else if (0 == strcmp(param1, "limiter"))
+	{
+		param2 = get_rparam(request, 1);
+
+		if (2 == nparams)
+		{
+			if (0 != strcmp(param2, "active"))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				goto out;
+			}
+
+			zbx_uint64_t	value = (SUCCEED == zbx_vps_tracker_is_limited() ? 1 : 0);
+
+			SET_UI64_RESULT(result, value);
+			goto done;
+		}
+
+		if (3 != nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+		else if (0 != strcmp(param2, "overcommit"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+		zbx_vps_tracker_stats_t	stats;
+
+		zbx_vps_tracker_get_stats(&stats);
+
+		param2 = get_rparam(request, 2);
+
+		if (0 == strcmp(param2, "available"))
+		{
+			SET_UI64_RESULT(result, stats.overcommit_charge);
+		}
+		else if (0 == strcmp(param2, "pavailable"))
+		{
+			SET_DBL_RESULT(result, (double)stats.overcommit_charge * 100 / stats.overcommit_limit);
+		}
+		else if (0 == strcmp(param2, "total"))
+		{
+			SET_UI64_RESULT(result, stats.overcommit_limit);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
 	}
 	else
 	{
 		ret = FAIL;
 		goto out;
 	}
-
+done:
 	ret = SUCCEED;
 out:
 	return ret;

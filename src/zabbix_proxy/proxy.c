@@ -1370,7 +1370,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 								config_startup_time, config_unavailable_delay,
 								config_unreachable_period, config_unreachable_delay,
-								config_max_concurrent_checks_per_poller, {0, 0}};
+								config_max_concurrent_checks_per_poller};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,

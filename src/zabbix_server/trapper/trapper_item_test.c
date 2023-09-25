@@ -370,7 +370,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		}
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
-				config_startup_time, NULL);
+				config_startup_time);
 
 		switch (errcode)
 		{

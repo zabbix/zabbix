@@ -1284,11 +1284,18 @@ zbx_maintenance_type_t;
 void	zbx_recalc_time_period(time_t *ts_from, int table_group);
 
 /* vps tracker */
+typedef struct
+{
+	zbx_uint64_t	overcommit_limit;
+	zbx_uint64_t	overcommit_charge;
+	zbx_uint64_t	values_limit;
+}
+zbx_vps_tracker_stats_t;
+
 void	zbx_vps_tracker_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit);
 void	zbx_vps_tracker_add(zbx_uint64_t values_num);
 int	zbx_vps_tracker_is_limited(void);
+void	zbx_vps_tracker_get_stats(zbx_vps_tracker_stats_t *stats);
 double	zbx_vps_get_avg(void);
-
-
 
 #endif

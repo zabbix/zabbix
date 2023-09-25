@@ -23,7 +23,7 @@
 
 static zbx_mutex_t	vps_lock = ZBX_MUTEX_NULL;
 
-#define VPS_FLUSH_PERIOD	10
+#define ZBX_VPS_FLUSH_PERIOD	10
 
 /******************************************************************************
  *                                                                            *
@@ -86,9 +86,9 @@ void	zbx_vps_tracker_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit
 
 	tracker->last_flush = time(NULL);
 
-	tracker->values_limit = nvps_limit * VPS_FLUSH_PERIOD;
-	tracker->overcommit_limit = overcommit_limit;
-	tracker->overcommit_charge = overcommit_limit;
+	tracker->values_limit = nvps_limit * ZBX_VPS_FLUSH_PERIOD;
+	tracker->overcommit_limit = overcommit_limit * nvps_limit / 100;
+	tracker->overcommit_charge = overcommit_limit * nvps_limit / 100;
 }
 
 /******************************************************************************
@@ -108,7 +108,7 @@ void	zbx_vps_tracker_add(zbx_uint64_t values_num)
 
 	zbx_mutex_lock(vps_lock);
 
-	if (VPS_FLUSH_PERIOD <= now - tracker->last_flush)
+	if (ZBX_VPS_FLUSH_PERIOD <= now - tracker->last_flush)
 	{
 		if (tracker->values_limit > tracker->values_num)
 		{
@@ -158,7 +158,7 @@ void	zbx_vps_tracker_add(zbx_uint64_t values_num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the vps limit is reached for current time period        *
+ * Purpose: check if the vps limit is reached for current time period         *
  *                                                                            *
  * Return value: SUCCEED - limit is reached                                   *
  *               FAIL    - otherwise                                          *
@@ -174,9 +174,7 @@ int	zbx_vps_tracker_is_limited(void)
 	int	ret;
 
 	zbx_mutex_lock(vps_lock);
-
 	ret = (tracker->values_num <= tracker->values_limit + tracker->overcommit_charge ? FAIL : SUCCEED);
-
 	zbx_mutex_unlock(vps_lock);
 
 	return ret;
@@ -184,10 +182,25 @@ int	zbx_vps_tracker_is_limited(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the vps limit is reached for current time period        *
+ * Purpose: get available overcommit charge                                   *
  *                                                                            *
- * Return value: SUCCEED - limit is reached                                   *
- *               FAIL    - otherwise                                          *
+ ******************************************************************************/
+void	zbx_vps_tracker_get_stats(zbx_vps_tracker_stats_t *stats)
+{
+	zbx_vps_tracker_t	*tracker = &config->vps_tracker;
+
+	zbx_mutex_lock(vps_lock);
+	stats->overcommit_charge = tracker->overcommit_charge;
+	zbx_mutex_unlock(vps_lock);
+
+	/* preconfigured values, cannot change without restarting server */
+	stats->values_limit = tracker->values_limit / ZBX_VPS_FLUSH_PERIOD;
+	stats->overcommit_limit = tracker->overcommit_limit;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get average vps fro the last minute                               *
  *                                                                            *
  ******************************************************************************/
 double	zbx_vps_get_avg(void)
