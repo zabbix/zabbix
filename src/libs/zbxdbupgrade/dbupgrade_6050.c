@@ -22,6 +22,8 @@
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
+#include "zbxhash.h"
+#include "zbxcrypto.h"
 
 /*
  * 7.0 development database patches
@@ -1221,6 +1223,487 @@ static int	DBpatch_6050122(void)
 	return DBadd_field("proxy", &field);
 }
 
+static int	DBpatch_6050123(void)
+{
+	const zbx_db_table_t table =
+			{"ugset", "ugsetid", 0,
+				{
+					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hash", "", NULL, NULL, 65, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050124(void)
+{
+	return DBcreate_index("ugset", "ugset_1", "hash", 0);
+}
+
+static int	DBpatch_6050125(void)
+{
+	const zbx_db_table_t table =
+			{"ugset_group", "ugsetid,usrgrpid", 0,
+				{
+					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"usrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050126(void)
+{
+	return DBcreate_index("ugset_group", "ugset_group_1", "usrgrpid", 0);
+}
+
+static int	DBpatch_6050127(void)
+{
+	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("ugset_group", 1, &field);
+}
+
+static int	DBpatch_6050128(void)
+{
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("ugset_group", 2, &field);
+}
+
+static int	DBpatch_6050129(void)
+{
+	const zbx_db_table_t table =
+			{"hgset", "hgsetid", 0,
+				{
+					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hash", "", NULL, NULL, 65, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050130(void)
+{
+	return DBcreate_index("hgset", "hgset_1", "hash", 0);
+}
+
+static int	DBpatch_6050131(void)
+{
+	const zbx_db_table_t table =
+			{"hgset_group", "hgsetid,groupid", 0,
+				{
+					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050132(void)
+{
+	return DBcreate_index("hgset_group", "hgset_group_1", "groupid", 0);
+}
+
+static int	DBpatch_6050133(void)
+{
+	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hgset_group", 1, &field);
+}
+
+static int	DBpatch_6050134(void)
+{
+	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("hgset_group", 2, &field);
+}
+
+static int	DBpatch_6050135(void)
+{
+	const zbx_db_table_t table =
+			{"permission", "permissionid", 0,
+				{
+					{"permissionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050136(void)
+{
+	return DBcreate_index("permission", "permission_1", "ugsetid,hgsetid", 1);
+}
+
+static int	DBpatch_6050137(void)
+{
+	return DBcreate_index("permission", "permission_2", "hgsetid", 0);
+}
+
+static int	DBpatch_6050138(void)
+{
+	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("permission", 1, &field);
+}
+
+static int	DBpatch_6050139(void)
+{
+	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("permission", 2, &field);
+}
+
+static int	DBpatch_6050140(void)
+{
+	const zbx_db_field_t	field = {"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("users", &field);
+}
+
+static int	DBpatch_6050141(void)
+{
+	return DBcreate_index("users", "users_4", "ugsetid", 0);
+}
+
+static int	DBpatch_6050142(void)
+{
+	const zbx_db_field_t	field = {"ugsetid", NULL, "ugset", "ugsetid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("users", 3, &field);
+}
+
+static int	DBpatch_6050143(void)
+{
+	const zbx_db_field_t	field = {"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_6050144(void)
+{
+	return DBcreate_index("hosts", "hosts_8", "hgsetid", 0);
+}
+
+static int	DBpatch_6050145(void)
+{
+	const zbx_db_field_t	field = {"hgsetid", NULL, "hgset", "hgsetid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("hosts", 4, &field);
+}
+
+typedef struct
+{
+	zbx_uint64_t		gsetid;
+	char			hash_str[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	zbx_vector_uint64_t	groupids;
+	zbx_vector_uint64_t	ids;
+} zbx_dbu_group_set_t;
+
+static zbx_hash_t	dbupgrade_group_set_hash(const void *data)
+{
+	const zbx_dbu_group_set_t	*group_set = (const zbx_dbu_group_set_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(group_set->hash_str);
+}
+
+static int	dbupgrade_group_set_compare(const void *d1, const void *d2)
+{
+	const zbx_dbu_group_set_t	*group_set1 = (const zbx_dbu_group_set_t *)d1;
+	const zbx_dbu_group_set_t	*group_set2 = (const zbx_dbu_group_set_t *)d2;
+
+	return strcmp(group_set1->hash_str, group_set2->hash_str);
+}
+
+static int	dbupgrade_groupsets_generate(zbx_db_result_t *result_ids, const char *fld_name_id,
+		const char *fld_name_groupid, const char *tbl_name_groups, zbx_hashset_t *group_sets,
+		int allow_empty_groups)
+{
+	int			ret = SUCCEED;
+	char			id_str[MAX_ID_LEN + 2];
+	zbx_db_result_t		result;
+	zbx_db_row_t		row, row_ids;
+	zbx_vector_uint64_t	groupids;
+	zbx_dbu_group_set_t	*gset_ptr;
+
+	id_str[0] = '|';
+	zbx_vector_uint64_create(&groupids);
+
+	while (NULL != (row_ids = zbx_db_fetch(*result_ids)))
+	{
+		zbx_uint64_t		id;
+		char			hash[ZBX_SHA256_DIGEST_SIZE], *id_str_p = id_str + 1;
+		sha256_ctx		ctx;
+		zbx_dbu_group_set_t	gset;
+
+		ZBX_STR2UINT64(id, row_ids[0]);
+
+		zbx_sha256_init(&ctx);
+
+		result = zbx_db_select("select %s from %s where %s=" ZBX_FS_UI64 " order by %s",
+				fld_name_groupid, tbl_name_groups, fld_name_id, id, fld_name_groupid);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	groupid;
+
+			ZBX_STR2UINT64(groupid, row[0]);
+
+			if (1 == groupids.values_num)
+				id_str_p = id_str;
+
+			zbx_snprintf(id_str + 1, MAX_ID_LEN + 1, "%s", row[0]);
+			zbx_sha256_process_bytes(id_str_p, strlen(id_str_p), &ctx);
+			zbx_vector_uint64_append(&groupids, groupid);
+		}
+		zbx_db_free_result(result);
+
+		if (0 == allow_empty_groups && 0 == groupids.values_num)
+		{
+			ret = FAIL;
+			break;
+		}
+
+		zbx_sha256_finish(&ctx, hash);
+		(void)zbx_bin2hex((const unsigned char *)hash, ZBX_SHA256_DIGEST_SIZE, gset.hash_str,
+				ZBX_SHA256_DIGEST_SIZE * 2 + 1);
+
+		if (NULL == (gset_ptr = zbx_hashset_search(group_sets, &gset)))
+		{
+			zbx_vector_uint64_create(&gset.ids);
+			zbx_vector_uint64_create(&gset.groupids);
+			zbx_vector_uint64_append_array(&gset.groupids, groupids.values, groupids.values_num);
+
+			if (NULL == (gset_ptr = zbx_hashset_insert(group_sets, &gset, sizeof(zbx_dbu_group_set_t))))
+			{
+				ret = FAIL;
+				break;
+			}
+		}
+
+		zbx_vector_uint64_append(&gset_ptr->ids, id);
+		zbx_vector_uint64_clear(&groupids);
+	}
+
+	zbx_vector_uint64_create(&groupids);
+
+	return ret;
+}
+
+static int	DBpatch_6050146(void)
+{
+	int			ret = FAIL;
+	zbx_uint64_t		gsetid;
+	zbx_db_result_t		result;
+	zbx_hashset_t		group_sets;
+	zbx_hashset_iter_t	iter;
+	zbx_db_insert_t		db_insert, db_insert_groups;
+	zbx_dbu_group_set_t	*gset_ptr;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_hashset_create(&group_sets, 1, dbupgrade_group_set_hash, dbupgrade_group_set_compare);
+	zbx_db_insert_prepare(&db_insert, "hgset", "hgsetid", "hash", (char*)NULL);
+	zbx_db_insert_prepare(&db_insert_groups, "hgset_group", "hgsetid", "groupid", (char*)NULL);
+
+	result = zbx_db_select("select hostid from hosts where flags<>2");
+
+	if (FAIL == dbupgrade_groupsets_generate(&result, "hostid", "groupid", "hosts_groups", &group_sets, 0))
+	{
+		goto err;
+	}
+
+	gsetid = zbx_db_get_maxid_num("hgset", group_sets.num_data);
+
+	zbx_hashset_iter_reset(&group_sets, &iter);
+
+	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
+	{
+		gset_ptr->gsetid = gsetid++;
+		zbx_db_insert_add_values(&db_insert, gset_ptr->gsetid, gset_ptr->hash_str);
+
+		for (int i = 0; i < gset_ptr->groupids.values_num; i++)
+			zbx_db_insert_add_values(&db_insert_groups, gset_ptr->gsetid, gset_ptr->groupids.values[i]);
+	}
+
+	if (FAIL == zbx_db_insert_execute(&db_insert) || FAIL == zbx_db_insert_execute(&db_insert_groups))
+		goto err;
+
+	zbx_hashset_iter_reset(&group_sets, &iter);
+
+	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
+	{
+		char	*sql;
+
+		sql = zbx_dsprintf(NULL, "update hosts set hgsetid=" ZBX_FS_UI64 " where", gset_ptr->gsetid);
+
+		zbx_vector_uint64_sort(&gset_ptr->ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_db_execute_multiple_query(sql, "hostid", &gset_ptr->ids);
+		zbx_free(sql);
+	}
+
+	ret = SUCCEED;
+err:
+	zbx_db_free_result(result);
+	zbx_db_insert_clean(&db_insert);
+	zbx_db_insert_clean(&db_insert_groups);
+
+	zbx_hashset_iter_reset(&group_sets, &iter);
+
+	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_uint64_destroy(&gset_ptr->groupids);
+		zbx_vector_uint64_destroy(&gset_ptr->ids);
+	}
+
+	zbx_hashset_destroy(&group_sets);
+
+	return ret;
+}
+
+static int	DBpatch_6050147(void)
+{
+	int			ret = FAIL;
+	zbx_uint64_t		gsetid;
+	zbx_db_result_t		result;
+	zbx_hashset_t		group_sets;
+	zbx_hashset_iter_t	iter;
+	zbx_db_insert_t		db_insert, db_insert_groups;
+	zbx_dbu_group_set_t	*gset_ptr;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_hashset_create(&group_sets, 1, dbupgrade_group_set_hash, dbupgrade_group_set_compare);
+	zbx_db_insert_prepare(&db_insert, "ugset", "ugsetid", "hash", (char*)NULL);
+	zbx_db_insert_prepare(&db_insert_groups, "ugset_group", "ugsetid", "usrgrpid", (char*)NULL);
+
+	result = zbx_db_select("select userid from users");
+
+	if (FAIL == dbupgrade_groupsets_generate(&result, "userid", "usrgrpid", "users_groups", &group_sets, 1))
+	{
+		goto err;
+	}
+
+	gsetid = zbx_db_get_maxid_num("ugset", group_sets.num_data);
+
+	zbx_hashset_iter_reset(&group_sets, &iter);
+
+	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
+	{
+		gset_ptr->gsetid = gsetid++;
+		zbx_db_insert_add_values(&db_insert, gset_ptr->gsetid, gset_ptr->hash_str);
+
+		for (int i = 0; i < gset_ptr->groupids.values_num; i++)
+			zbx_db_insert_add_values(&db_insert_groups, gset_ptr->gsetid, gset_ptr->groupids.values[i]);
+	}
+
+	if (FAIL == zbx_db_insert_execute(&db_insert) || FAIL == zbx_db_insert_execute(&db_insert_groups))
+		goto err;
+
+	zbx_hashset_iter_reset(&group_sets, &iter);
+
+	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
+	{
+		char	*sql;
+
+		sql = zbx_dsprintf(NULL, "update users set ugsetid=" ZBX_FS_UI64 " where", gset_ptr->gsetid);
+
+		zbx_vector_uint64_sort(&gset_ptr->ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_db_execute_multiple_query(sql, "userid", &gset_ptr->ids);
+		zbx_free(sql);
+	}
+
+	ret = SUCCEED;
+err:
+	zbx_db_free_result(result);
+	zbx_db_insert_clean(&db_insert);
+	zbx_db_insert_clean(&db_insert_groups);
+
+	zbx_hashset_iter_reset(&group_sets, &iter);
+
+	while (NULL != (gset_ptr = (zbx_dbu_group_set_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_vector_uint64_destroy(&gset_ptr->groupids);
+		zbx_vector_uint64_destroy(&gset_ptr->ids);
+	}
+
+	zbx_hashset_destroy(&group_sets);
+
+	return ret;
+}
+
+static int	DBpatch_6050148(void)
+{
+	int		ret;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "permission", "permissionid", "ugsetid", "hgsetid", "permission",
+			(char*)NULL);
+
+	result = zbx_db_select("select ugs.ugsetid,hgs.hgsetid,MAX(r.permission)"
+			" from hgset hgs"
+			" join hgset_group hgsg"
+				" on hgs.hgsetid=hgsg.hgsetid"
+			" join rights r on hgsg.groupid=r.id"
+			" join ugset_group ugsg"
+				" on r.groupid=ugsg.usrgrpid"
+			" join ugset ugs"
+				" on ugsg.ugsetid=ugs.ugsetid"
+			" group by ugs.ugsetid,hgs.hgsetid"
+			" having min(r.permission)>0"
+			" order by ugs.ugsetid,hgs.hgsetid");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	hgsetid, ugsetid;
+		int		permission;
+
+		ZBX_STR2UINT64(ugsetid, row[0]);
+		ZBX_STR2UINT64(hgsetid, row[1]);
+		permission = atoi(row[2]);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), ugsetid, hgsetid, permission);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "permissionid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1348,5 +1831,31 @@ DBPATCH_ADD(6050119, 0, 1)
 DBPATCH_ADD(6050120, 0, 1)
 DBPATCH_ADD(6050121, 0, 1)
 DBPATCH_ADD(6050122, 0, 1)
+DBPATCH_ADD(6050123, 0, 1)
+DBPATCH_ADD(6050124, 0, 1)
+DBPATCH_ADD(6050125, 0, 1)
+DBPATCH_ADD(6050126, 0, 1)
+DBPATCH_ADD(6050127, 0, 1)
+DBPATCH_ADD(6050128, 0, 1)
+DBPATCH_ADD(6050129, 0, 1)
+DBPATCH_ADD(6050130, 0, 1)
+DBPATCH_ADD(6050131, 0, 1)
+DBPATCH_ADD(6050132, 0, 1)
+DBPATCH_ADD(6050133, 0, 1)
+DBPATCH_ADD(6050134, 0, 1)
+DBPATCH_ADD(6050135, 0, 1)
+DBPATCH_ADD(6050136, 0, 1)
+DBPATCH_ADD(6050137, 0, 1)
+DBPATCH_ADD(6050138, 0, 1)
+DBPATCH_ADD(6050139, 0, 1)
+DBPATCH_ADD(6050140, 0, 1)
+DBPATCH_ADD(6050141, 0, 1)
+DBPATCH_ADD(6050142, 0, 1)
+DBPATCH_ADD(6050143, 0, 1)
+DBPATCH_ADD(6050144, 0, 1)
+DBPATCH_ADD(6050145, 0, 1)
+DBPATCH_ADD(6050146, 0, 1)
+DBPATCH_ADD(6050147, 0, 1)
+DBPATCH_ADD(6050148, 0, 1)
 
 DBPATCH_END()
