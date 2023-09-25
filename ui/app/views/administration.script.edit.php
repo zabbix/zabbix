@@ -366,7 +366,7 @@ $form_grid
 					DB::getFieldLength('scripts', 'manualinput_default_value'))
 				)
 					->setAttribute('disabled', $data['enable_user_input'])
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			]))->setId('default-input-field')
 		])
 		->addItem([
@@ -377,7 +377,7 @@ $form_grid
 				)
 					->setAttribute('disabled', $data['enable_user_input'])
 					->setAttribute('placeholder', 'comma-separated list')
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			]))->setId('dropdown-options-field')
 		])
 		->addItem([

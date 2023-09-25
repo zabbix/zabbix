@@ -70,7 +70,7 @@ else {
 			'title' => $data['confirmation'] ? _('Continue') : _('Execute'),
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'script_userinput_popup.submit();',
+			'action' => 'script_userinput_popup.submit();'
 		]
 	];
 }
