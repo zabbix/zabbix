@@ -883,7 +883,6 @@ class CMacrosResolverGeneral {
 	 * @return array	where key is function id position in expression and value is function id
 	 */
 	protected function findFunctions($expression) {
-		$i = 1;
 		$functionids = [];
 
 		$expression_parser = new CExpressionParser(['usermacros' => true, 'collapsed_expression' => true]);
@@ -894,7 +893,7 @@ class CMacrosResolverGeneral {
 				->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO]);
 
 			foreach ($tokens as $f_num => $token) {
-				$functionids[$i++] = substr($token['match'], 1, -1); // strip curly braces
+				$functionids[$f_num + 1] = substr($token['match'], 1, -1); // strip curly braces
 			}
 		}
 
