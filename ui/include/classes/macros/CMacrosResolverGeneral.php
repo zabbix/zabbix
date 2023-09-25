@@ -883,22 +883,18 @@ class CMacrosResolverGeneral {
 	 * @return array	where key is function id position in expression and value is function id
 	 */
 	protected function findFunctions($expression) {
+		$i = 1;
 		$functionids = [];
 
-		$functionid_parser = new CFunctionIdParser();
-		$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
-		$user_macro_parser = new CUserMacroParser();
+		$expression_parser = new CExpressionParser(['usermacros' => true, 'collapsed_expression' => true]);
 
-		for ($pos = 0, $i = 1; isset($expression[$pos]); $pos++) {
-			if ($functionid_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-				$pos += $functionid_parser->getLength() - 1;
-				$functionids[$i++] = substr($functionid_parser->getMatch(), 1, -1);
-			}
-			elseif ($user_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-				$pos += $user_macro_parser->getLength() - 1;
-			}
-			elseif ($macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
-				$pos += $macro_parser->getLength() - 1;
+		if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
+			$tokens = $expression_parser
+				->getResult()
+				->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO]);
+
+			foreach ($tokens as $f_num => $token) {
+				$functionids[$i++] = substr($token['match'], 1, -1); // strip curly braces
 			}
 		}
 
