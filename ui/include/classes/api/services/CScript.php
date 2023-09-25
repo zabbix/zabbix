@@ -701,7 +701,7 @@ class CScript extends CApiService {
 				'usrgrpid' =>		['type' => API_ID],
 				'host_access' =>	['type' => API_INT32, 'in' => implode(',', [PERM_READ, PERM_READ_WRITE])],
 				'confirmation' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('scripts', 'confirmation')],
-				'manualinput' =>	['type' =>  API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_DISABLED, SCRIPT_MANUALINPUT_ENABLED])],
+				'manualinput' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_DISABLED, SCRIPT_MANUALINPUT_ENABLED])]
 			];
 
 			if ($manualinput_type !== null) {
@@ -720,7 +720,7 @@ class CScript extends CApiService {
 		}
 		else {
 			$common_fields += [
-				'manualinput' => ['type' =>  API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_DISABLED]
+				'manualinput' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => SCRIPT_MANUALINPUT_DISABLED]
 			];
 		}
 
