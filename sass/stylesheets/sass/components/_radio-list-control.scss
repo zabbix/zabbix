@@ -1,7 +1,7 @@
 .radio-list-control {
 	display: inline-block;
 	height: 24px;
-	line-height: 22px;
+	line-height: 0;
 	vertical-align: top;
 	white-space: nowrap;
 
@@ -37,10 +37,13 @@
 
 	label {
 		display: inline-block;
+		max-width: 100px;
 		border: 1px solid $form-border-color;
 		line-height: 14px;
 		padding: 4px 11px;
 		cursor: pointer;
+		text-overflow: ellipsis;
+		overflow: hidden;
 
 		@if $ui-transitions {
 			transition: background-color $ui-controls-transition-duration ease-out;

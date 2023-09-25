@@ -2911,7 +2911,7 @@ output {
 .radio-list-control {
   display: inline-block;
   height: 24px;
-  line-height: 22px;
+  line-height: 0;
   vertical-align: top;
   white-space: nowrap; }
   .radio-list-control li {
@@ -2934,10 +2934,13 @@ output {
         border-bottom-right-radius: 2px; }
   .radio-list-control label {
     display: inline-block;
+    max-width: 100px;
     border: 1px solid #acbbc2;
     line-height: 14px;
     padding: 4px 11px;
     cursor: pointer;
+    text-overflow: ellipsis;
+    overflow: hidden;
     transition: background-color 0.2s ease-out; }
   .radio-list-control input[type="radio"] {
     position: absolute !important;
