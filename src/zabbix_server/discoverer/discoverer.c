@@ -187,7 +187,7 @@ static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint
 	return SUCCEED;
 }
 
-static int	dcheck_get_timeout(unsigned char type, char **timeout)
+static int	dcheck_get_timeout(unsigned char type, char **timeout, int *timeout_sec)
 {
 	char			error_val[MAX_STRING_LEN];
 
@@ -196,7 +196,7 @@ static int	dcheck_get_timeout(unsigned char type, char **timeout)
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			NULL, NULL, timeout, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
-	return zbx_validate_item_timeout(*timeout, NULL, error_val, sizeof(error_val));
+	return zbx_validate_item_timeout(*timeout, timeout_sec, error_val, sizeof(error_val));
 }
 
 /******************************************************************************
@@ -212,7 +212,8 @@ static int	dcheck_get_timeout(unsigned char type, char **timeout)
  * Return value: SUCCEED - service is UP, FAIL - service not discovered       *
  *                                                                            *
  ******************************************************************************/
-static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, char **value, size_t *value_alloc)
+static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, char **value, size_t *value_alloc,
+		char *agent_timeout, char *snmp_timeout, int simple_timeout)
 {
 	int		ret = SUCCEED;
 	const char	*service = NULL;
@@ -269,11 +270,9 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 			break;
 	}
 
-
-
 	if (SUCCEED == ret)
 	{
-		char		**pvalue, *timeout = NULL;
+		char		**pvalue;
 		int		tmt_sec;
 		size_t		value_offset = 0;
 		zbx_dc_item_t	item;
@@ -295,15 +294,13 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (FAIL == dcheck_get_timeout(ITEM_TYPE_SIMPLE, &timeout) ||
-						FAIL == zbx_is_time_suffix(timeout, &tmt_sec, ZBX_LENGTH_UNLIMITED) ||
-						SUCCEED != zbx_execute_agent_check(key, 0, &result, tmt_sec) ||
+				zabbix_log(1, "simple timeout is %d", simple_timeout);
+				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, simple_timeout) ||
 						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
 					ret = FAIL;
 				}
 
-				zbx_free(timeout);
 				break;
 			/* agent and SNMP checks */
 			case SVC_AGENT:
@@ -343,9 +340,10 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				if (SVC_AGENT == dcheck->type)
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
+					item.timeout = agent_timeout;
 
-					if (SUCCEED == dcheck_get_timeout(ITEM_TYPE_ZABBIX, &item.timeout) &&
-							SUCCEED == get_value_agent(&item, source_ip, &result) &&
+					zabbix_log(1, "agent timeout is %s", item.timeout);
+					if (SUCCEED == get_value_agent(&item, source_ip, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -358,7 +356,9 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 				{
 					item.snmp_community = dcheck->snmp_community;
 					item.snmp_oid = dcheck->key_;
+					item.timeout = snmp_timeout;
 
+					zabbix_log(1, "snmp timeout is %s", item.timeout);
 					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
 						item.snmpv3_securityname = dcheck->snmpv3_securityname;
@@ -370,8 +370,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 						item.snmpv3_contextname = dcheck->snmpv3_contextname;
 					}
 
-					if (SUCCEED == dcheck_get_timeout(ITEM_TYPE_SNMP, &item.timeout) &&
-							SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER,
+					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER,
 							source_ip) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -382,8 +381,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 #else
 					ret = FAIL;
 #endif	/* HAVE_NETSNMP */
-				zbx_free(item.timeout);
-
 				if (FAIL == ret && ZBX_ISSET_MSG(&result))
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "discovery: item [%s] error: %s",
@@ -979,6 +976,11 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 	zbx_uint64_t			queue_checks_count = 0;
 	zbx_dc_um_handle_t		*um_handle;
 	time_t				now;
+
+	char	*tmt_agent = NULL, *tmt_snmp = NULL, *tmt_tmp = NULL;
+	int	tmt_agent_bad = 0, tmt_snmp_bad = 0;
+	int	tmt_simple = 0;
+
 	zbx_vector_dc_drule_ptr_t	drules;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1032,6 +1034,41 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 		{
 			zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 
+			if (SVC_AGENT == dcheck->type)
+			{
+				if (tmt_agent_bad == -1 ||
+						dcheck_get_timeout(ITEM_TYPE_ZABBIX, &tmt_agent, NULL))
+				{
+					tmt_agent_bad = -1;
+					zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid global timeout "
+							"\"%s\" for Zabbix Agent checks", drule->name, tmt_agent);
+					goto next;
+				}
+			}
+			else if (SVC_SNMPv1 == dcheck->type || SVC_SNMPv2c == dcheck->type ||
+					SVC_SNMPv3 == dcheck->type)
+			{
+				if (tmt_snmp_bad == -1 ||
+						FAIL == dcheck_get_timeout(ITEM_TYPE_SNMP, &tmt_snmp, NULL))
+				{
+					tmt_snmp_bad = -1;
+					zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid global timeout "
+							"\"%s\" for SNMP checks", drule->name, tmt_snmp);
+					goto next;
+				}
+			}
+			else
+			{
+				if (tmt_simple == -1 ||
+						FAIL == dcheck_get_timeout(ITEM_TYPE_SIMPLE, &tmt_tmp, &tmt_simple))
+				{
+					tmt_simple = -1;
+					zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": invalid global timeout "
+							"\"%s\" for simple checks", drule->name, tmt_tmp);
+					goto next;
+				}
+			}
+
 			if (0 != dcheck->uniq)
 			{
 				drule->unique_dcheckid = dcheck->dcheckid;
@@ -1060,7 +1097,7 @@ static int	process_discovery(time_t *nextcheck, zbx_hashset_t *incomplete_drulei
 
 		queue_checks_count = queue_capacity - queue_capacity_local;
 
-		job = discoverer_job_create(drule);
+		job = discoverer_job_create(drule, tmt_agent, tmt_snmp, tmt_simple);
 
 		while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 		{
@@ -1292,7 +1329,7 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_
 	zbx_vector_discoverer_results_ptr_destroy(&results);
 }
 
-static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task)
+static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task, char *agent_timeout, char *snmp_timeout, int simple_timeout)
 {
 	int					i;
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
@@ -1314,7 +1351,7 @@ static void	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_tas
 		zbx_discoverer_dservice_t	*service;
 
 		service = result_dservice_create(task, dcheck);
-		service->status = (SUCCEED == discover_service(dcheck, task->ip, task->port, &value, &value_alloc))
+		service->status = (SUCCEED == discover_service(dcheck, task->ip, task->port, &value, &value_alloc, agent_timeout, snmp_timeout, simple_timeout))
 			? DOBJECT_STATUS_UP : DOBJECT_STATUS_DOWN;
 
 		zbx_strlcpy_utf8(service->value, value, ZBX_MAX_DISCOVERED_VALUE_SIZE);
@@ -1427,7 +1464,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_BUSY);
 
 			if (NULL == task->ips)
-				discoverer_net_check_common(druleid, task);
+				discoverer_net_check_common(druleid, task, job->agent_timeout, job->snmp_timeout, job->simple_timeout);
 			else
 				discoverer_net_check_icmp(druleid, task, worker_max);
 

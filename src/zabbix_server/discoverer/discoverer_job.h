@@ -45,6 +45,9 @@ typedef struct
 	int				workers_used;
 	int				workers_max;
 	unsigned char			status;
+	char				*agent_timeout;
+	char				*snmp_timeout;
+	char				simple_timeout;
 }
 zbx_discoverer_job_t;
 
@@ -55,6 +58,6 @@ void			discoverer_task_free(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_task_check_count_get(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_job_tasks_free(zbx_discoverer_job_t *job);
 void			discoverer_job_free(zbx_discoverer_job_t *job);
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule);
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, char *agent_timeout, char *snmp_timeout, int simple_timeout);
 
 #endif
