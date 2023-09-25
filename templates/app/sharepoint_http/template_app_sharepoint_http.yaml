@@ -136,14 +136,14 @@ zabbix_export:
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"status":520,"data":{},"time":0}'
           parameters:
+            - name: password
+              value: '{$SHAREPOINT.PASSWORD}'
             - name: root
               value: '{$SHAREPOINT.ROOT}'
             - name: url
               value: '{$SHAREPOINT.URL}'
             - name: user
               value: '{$SHAREPOINT.USER}'
-            - name: password
-              value: '{$SHAREPOINT.PASSWORD}'
           tags:
             - tag: component
               value: raw
@@ -327,13 +327,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SHAREPOINT.LLD.NAME}'
-                value: '{$SHAREPOINT.LLD.FILTER.NAME.MATCHES}'
-                formulaid: C
-              - macro: '{#SHAREPOINT.LLD.NAME}'
-                value: '{$SHAREPOINT.LLD.FILTER.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#SHAREPOINT.LLD.FULL_PATH}'
                 value: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.MATCHES}'
                 formulaid: A
@@ -341,6 +334,13 @@ zabbix_export:
                 value: '{$SHAREPOINT.LLD.FILTER.FULL_PATH.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#SHAREPOINT.LLD.NAME}'
+                value: '{$SHAREPOINT.LLD.FILTER.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#SHAREPOINT.LLD.NAME}'
+                value: '{$SHAREPOINT.LLD.FILTER.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#SHAREPOINT.LLD.TYPE}'
                 value: '{$SHAREPOINT.LLD.FILTER.TYPE.MATCHES}'
                 formulaid: E
@@ -500,40 +500,40 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'Microsoft SharePoint by HTTP'
                         key: sharepoint.get_dir.status
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
                     - type: INTEGER
                       name: source_type
                       value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Microsoft SharePoint by HTTP'
-                        key: sharepoint.health_score
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'Microsoft SharePoint by HTTP'
                         key: sharepoint.get_dir.time
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Microsoft SharePoint by HTTP'
+                        key: sharepoint.health_score
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
       valuemaps:
         - uuid: 70add725d6a84f6f9ed0917107dfffc9
           name: 'HTTP response status code'

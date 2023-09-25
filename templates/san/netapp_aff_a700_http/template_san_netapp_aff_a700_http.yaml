@@ -2153,7 +2153,7 @@ zabbix_export:
           value: netapp-aff-a700
       macros:
         - macro: '{$HTTP.AGENT.TIMEOUT}'
-          value: 3s
+          value: 5s
           description: 'The HTTP agent timeout to wait for a response from AFF700.'
         - macro: '{$PASSWORD}'
           description: 'AFF700 user password.'

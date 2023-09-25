@@ -39,7 +39,7 @@ int	zbx_get_value_ssh_test_run(zbx_dc_item_t *item, char **error)
 	int		ret;
 
 	zbx_init_agent_result(&result);
-	ret = get_value_ssh(item, SEC_PER_MIN, get_zbx_config_source_ip(), &result);
+	ret = get_value_ssh(item, get_zbx_config_source_ip(), &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
 	{

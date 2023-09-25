@@ -48,7 +48,6 @@ This template has been tested on:
 |{$LOCATION}|<p>Locations can be set by few ways:</p><p>1. by geo coordinates (for example: 56.95,24.0833)</p><p>2. by location name (for example: Riga)</p><p>3. by location ID. Link to the list of city ID: http://bulk.openweathermap.org/sample/city.list.json.gz</p><p>4. by zip/post code with a country code (for example: 94040,us)</p><p>A few locations can be added to the macro at the same time by `\|` delimiter. </p><p>For example: `43.81821,7.76115\|Riga\|2643743\|94040,us`.</p><p>Please note that API requests by city name, zip-codes and city id will be deprecated soon.</p>|`Riga`|
 |{$OPENWEATHERMAP.API.ENDPOINT}|<p>OpenWeatherMap API endpoint.</p>|`api.openweathermap.org/data/2.5/weather?`|
 |{$UNITS}|<p>Available units of measurement are standard, metric and imperial https://openweathermap.org/current#data.</p>|`metric`|
-|{$OPENWEATHERMAP.DATA.TIMEOUT}|<p>Response timeout for OpenWeatherMap API.</p>|`3s`|
 |{$TEMP.CRIT.HIGH}|<p>Threshold for high temperature trigger.</p>|`30`|
 |{$TEMP.CRIT.LOW}|<p>Threshold for low temperature trigger.</p>|`-20`|
 

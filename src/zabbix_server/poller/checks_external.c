@@ -21,6 +21,7 @@
 
 #include "zbxexec.h"
 #include "zbxsysinfo.h"
+#include "zbxtime.h"
 
 extern char	*CONFIG_EXTERNALSCRIPTS;
 
@@ -29,7 +30,6 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  * Purpose: retrieve data from script executed on Zabbix server               *
  *                                                                            *
  * Parameters: item           - [IN] item we are interested in                *
- *             config_timeout - [IN]                                          *
  *             result         - [OUT]                                         *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
@@ -37,11 +37,11 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result)
+int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		i, ret = NOTSUPPORTED;
+	int		i, ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
@@ -75,7 +75,14 @@ int	get_value_external(const zbx_dc_item_t *item, int config_timeout, AGENT_RESU
 		zbx_free(param_esc);
 	}
 
-	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), config_timeout,
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
+		/* failures are handled there */
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (SUCCEED == (ret = zbx_execute(cmd, &buf, error, sizeof(error), timeout_sec,
 			ZBX_EXIT_CODE_CHECKS_DISABLED, NULL)))
 	{
 		zbx_rtrim(buf, ZBX_WHITESPACE);
