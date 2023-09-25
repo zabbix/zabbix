@@ -2939,13 +2939,10 @@ output {
         border-bottom-right-radius: 2px; }
   .radio-list-control label {
     display: inline-block;
-    max-width: 100px;
     border: 1px solid #4f4f4f;
     line-height: 14px;
     padding: 4px 11px;
     cursor: pointer;
-    text-overflow: ellipsis;
-    overflow: hidden;
     transition: background-color 0.2s ease-out; }
   .radio-list-control input[type="radio"] {
     position: absolute !important;
@@ -5305,6 +5302,11 @@ z-select .list, .multiselect, input[type="text"], input[type="password"], input[
     color: #9d9d9d;
     -webkit-text-fill-color: #9d9d9d;
     opacity: 1; }
+
+.radio-list-control.severity label {
+  max-width: 100px;
+  text-overflow: ellipsis;
+  overflow: hidden; }
 
 .filter-space {
   box-sizing: border-box; }

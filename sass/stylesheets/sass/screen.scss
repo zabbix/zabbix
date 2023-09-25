@@ -1379,6 +1379,16 @@ select {
 	}
 }
 
+.radio-list-control {
+	&.severity {
+		label {
+			max-width: 100px;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+	}
+}
+
 .filter-space {
 	box-sizing: border-box;
 

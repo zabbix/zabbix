@@ -2891,13 +2891,10 @@ output {
         border-bottom-right-radius: 2px; }
   .radio-list-control label {
     display: inline-block;
-    max-width: 100px;
     border: 1px solid #666666;
     line-height: 14px;
     padding: 4px 11px;
-    cursor: pointer;
-    text-overflow: ellipsis;
-    overflow: hidden; }
+    cursor: pointer; }
   .radio-list-control input[type="radio"] {
     position: absolute !important;
     top: auto !important;
@@ -5280,6 +5277,11 @@ z-select .list, .multiselect, input[type="text"], input[type="password"], input[
     color: #bbbbbb;
     -webkit-text-fill-color: #bbbbbb;
     opacity: 1; }
+
+.radio-list-control.severity label {
+  max-width: 100px;
+  text-overflow: ellipsis;
+  overflow: hidden; }
 
 .filter-space {
   box-sizing: border-box; }

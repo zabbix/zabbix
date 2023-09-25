@@ -2080,6 +2080,7 @@ define('ZBX_STYLE_SETUP_LEFT_CURRENT', 'setup-left-current');
 define('ZBX_STYLE_SETUP_RIGHT', 'setup-right');
 define('ZBX_STYLE_SETUP_RIGHT_BODY', 'setup-right-body');
 define('ZBX_STYLE_SETUP_TITLE', 'setup-title');
+define('ZBX_STYLE_SEVERITY', 'severity');
 define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
 define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
