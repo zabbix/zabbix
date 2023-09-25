@@ -164,10 +164,14 @@ void	zbx_vps_tracker_add(zbx_uint64_t values_num)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vps_tracker_limit(void)
+int	zbx_vps_tracker_is_limited(void)
 {
 	zbx_vps_tracker_t	*tracker = &config->vps_tracker;
-	int			ret;
+
+	if (0 == tracker->values_limit)
+		return FAIL;
+
+	int	ret;
 
 	zbx_mutex_lock(vps_lock);
 

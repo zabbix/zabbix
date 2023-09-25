@@ -270,7 +270,36 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 	}
 	else if (0 == strcmp(param1, "vps"))
 	{
+		if (2 < nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		if (NULL != (param2 = get_rparam(request, 1)) && 0 != strcmp(param2, "avg"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
 		SET_DBL_RESULT(result, zbx_vps_get_avg());
+	}
+	else if (0 == strcmp(param1, "nvps"))
+	{
+		if (2 < nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		if (NULL != (param2 = get_rparam(request, 1)) && 0 != strcmp(param2, "limit"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+
+		SET_DBL_RESULT(result, 0);
 	}
 	else
 	{

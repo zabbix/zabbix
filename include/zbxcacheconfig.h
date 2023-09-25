@@ -1286,7 +1286,7 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group);
 /* vps tracker */
 void	zbx_vps_tracker_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit);
 void	zbx_vps_tracker_add(zbx_uint64_t values_num);
-int	zbx_vps_tracker_limit(void);
+int	zbx_vps_tracker_is_limited(void);
 double	zbx_vps_get_avg(void);
 
 
