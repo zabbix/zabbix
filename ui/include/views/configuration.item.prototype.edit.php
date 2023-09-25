@@ -616,7 +616,7 @@ $item_tab->addItem([
 				new CListItem([
 					(new CSpan('OID'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
 					' - ',
-					_('to retrieve a single value (legacy)')
+					_('(legacy) to retrieve a single value synchronously, optionally combined with other values')
 				])
 			]))->addClass(ZBX_STYLE_LIST_DASHED)
 		])

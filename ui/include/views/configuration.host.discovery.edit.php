@@ -550,7 +550,7 @@ $item_tab
 					new CListItem([
 						(new CSpan('discovery[{#MACRO1},OID1,{#MACRO2},OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
 						' - ',
-						_('to retrieve a subtree for low level discovery (legacy)')
+						_('(legacy) to retrieve a subtree in JSON')
 					])
 				]))->addClass(ZBX_STYLE_LIST_DASHED)
 			])
