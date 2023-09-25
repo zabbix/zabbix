@@ -1117,6 +1117,7 @@ footer {
       padding: 0; }
   .form-grid td {
     padding: 0 5px 5px 0; }
+  .form-grid a:not(:first-child),
   .form-grid .btn-icon:not(:first-child),
   .form-grid .btn-link:not(:first-child) {
     margin-left: 5px; }
@@ -1174,7 +1175,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
 
 .form-grid table .btn-icon,
 .form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
-.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
+.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-piechart .list-item-actions .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
 .table-forms .table-forms-td-right table .icon, .overlay-dialogue .dashboard-widget-head .btn-icon {
   min-width: 18px;
   height: 18px; }
@@ -3287,6 +3288,60 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column: 1; }
 
+.svg-pie-chart {
+  fill: #000000; }
+  .svg-pie-chart .svg-pie-chart-arcs {
+    stroke-linejoin: round; }
+    .svg-pie-chart .svg-pie-chart-arcs path {
+      vector-effect: non-scaling-stroke;
+      stroke: #ffffff; }
+    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-placeholder {
+      stroke-width: 0;
+      fill: transparent; }
+    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-outer {
+      fill: #f3f3f3; }
+    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data-inner {
+      fill: #ffffff; }
+  .svg-pie-chart .svg-pie-chart-total-value {
+    text-anchor: middle; }
+  .svg-pie-chart .svg-pie-chart-total-value-no-data {
+    text-anchor: middle;
+    fill: #333333; }
+
+.svg-pie-chart-legend {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 4), auto);
+  grid-gap: 0 10px;
+  justify-content: start;
+  max-height: calc(var(--lines) * 18px);
+  margin: 0 10px;
+  overflow: hidden;
+  line-height: 18px; }
+  .svg-pie-chart-legend .svg-pie-chart-legend-item {
+    min-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+    .svg-pie-chart-legend .svg-pie-chart-legend-item::before {
+      position: relative;
+      top: -3px;
+      content: ' ';
+      display: inline-block;
+      width: 10px;
+      height: 4px;
+      margin-right: 4px;
+      background: var(--color); }
+
+.svg-pie-chart-hintbox {
+  display: flex;
+  align-items: center;
+  white-space: pre; }
+  .svg-pie-chart-hintbox .svg-pie-chart-hintbox-color {
+    width: 10px;
+    height: 10px;
+    margin-right: 10px; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
@@ -4125,6 +4180,115 @@ div.dashboard-widget-navtree .treeview {
 
 div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   min-width: 378px; }
+
+form.dashboard-widget-piechart {
+  width: 1110px; }
+  form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
+    grid-column: 1 / -1; }
+  form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
+    border-top: 1px solid #9f9f9f; }
+  form.dashboard-widget-piechart .pie-chart-widget-config-tabs .ui-tabs-nav {
+    position: sticky;
+    top: 0;
+    background: #f3f3f3;
+    z-index: 3; }
+  form.dashboard-widget-piechart .table-forms-container, form.dashboard-widget-piechart .browser-warning-container {
+    margin: 0;
+    border: 1px solid #9f9f9f;
+    border-top: none; }
+  form.dashboard-widget-piechart .table-forms-separator {
+    padding: 0; }
+  form.dashboard-widget-piechart .dataset-head,
+  form.dashboard-widget-piechart .dataset-body.list-accordion-item-body {
+    display: contents; }
+  form.dashboard-widget-piechart .dataset-head .multiselect {
+    width: 100%; }
+  form.dashboard-widget-piechart .dataset-body .form-grid {
+    padding-top: 0; }
+    form.dashboard-widget-piechart .dataset-body .form-grid:first-child {
+      grid-column-start: 5; }
+  form.dashboard-widget-piechart .list-item-actions {
+    grid-column: span 1 / -1;
+    text-align: right; }
+  form.dashboard-widget-piechart .items-list {
+    grid-column: 4 / span 3; }
+  form.dashboard-widget-piechart .list-vertical-accordion {
+    position: relative; }
+    form.dashboard-widget-piechart .list-vertical-accordion.sortable {
+      overflow: visible;
+      margin-top: -5px;
+      margin-bottom: 5px; }
+  form.dashboard-widget-piechart .list-accordion-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
+    grid-gap: 10px;
+    align-items: start;
+    padding: 5px 0; }
+    form.dashboard-widget-piechart .list-accordion-item > .drag-icon {
+      height: 24px;
+      margin-left: -2px; }
+    form.dashboard-widget-piechart .list-accordion-item > label {
+      pointer-events: initial;
+      overflow: hidden;
+      line-height: 24px;
+      text-align: left;
+      text-overflow: ellipsis; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-opened::before {
+      content: ' ';
+      position: absolute;
+      top: 24px;
+      bottom: 0;
+      left: 136px;
+      width: 2px;
+      background: #9f9f9f; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-opened .single-item-table .table-col-name {
+      width: 1%; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .multiselect {
+      height: 24px;
+      overflow: hidden; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .table-forms-separator {
+      border: none; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-type,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
+      display: none; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-body {
+      display: none; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .items-list {
+      padding-left: 0; }
+  form.dashboard-widget-piechart .single-item-table .table-col-handle {
+    width: 12px; }
+  form.dashboard-widget-piechart .single-item-table .table-col-no {
+    width: 20px; }
+  form.dashboard-widget-piechart .single-item-table .table-col-color {
+    width: 24px; }
+  form.dashboard-widget-piechart .single-item-table .table-col-action {
+    width: 55px; }
+  form.dashboard-widget-piechart .single-item-table th {
+    padding: 5px 5px 5px 0; }
+  form.dashboard-widget-piechart .single-item-table .single-item-table-row td {
+    padding: 0 5px 5px 0; }
+    form.dashboard-widget-piechart .single-item-table .single-item-table-row td.table-col-name {
+      padding-right: 10px; }
+  form.dashboard-widget-piechart .single-item-table th:first-child,
+  form.dashboard-widget-piechart .single-item-table td:first-child {
+    padding-left: 5px; }
+  form.dashboard-widget-piechart .single-item-table .single-item-table-row:last-child td {
+    padding-bottom: 0; }
+  form.dashboard-widget-piechart .single-item-table tfoot td {
+    padding: 5px 5px 5px 10px; }
+  form.dashboard-widget-piechart .no-items-message {
+    display: none;
+    line-height: 24px;
+    color: #333333; }
+
+div.dashboard-widget-piechart {
+  overflow-x: hidden; }
+  div.dashboard-widget-piechart .dashboard-grid-widget-body svg {
+    display: block; }
 
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;
@@ -5518,9 +5682,9 @@ z-select[disabled] .focusable, .multiselect[aria-disabled], input[disabled], tex
     z-index: 4;
     margin: 0 0 10px; }
   .overlay-dialogue .form-grid {
-    grid-template-columns: minmax(var(--label-width, 100px), max-content) auto; }
+    grid-template-columns: minmax(var(--label-width, 100px), max-content) 1fr; }
     .overlay-dialogue .form-grid.form-grid-1-1 {
-      grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
+      grid-template-columns: repeat(2, minmax(100px, max-content) 1fr); }
     .overlay-dialogue .form-grid.form-grid-3-1 {
       grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
   .overlay-dialogue .list-table {
@@ -6216,7 +6380,7 @@ z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, .mu
 .drag-icon, .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .dashboard-widget-head {
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > .drag-icon:not(.disabled) + label, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .dashboard-widget-head {
   cursor: move;
   cursor: grab; }
 
@@ -6498,6 +6662,16 @@ svg {
 
 #preprocessing-test-form .table-forms-separator {
   margin-top: -2px; }
+#preprocessing-test-form .runtime-error-fields {
+  display: flex;
+  justify-content: space-between; }
+  #preprocessing-test-form .runtime-error-fields label {
+    width: auto;
+    padding-inline-end: 8px; }
+  #preprocessing-test-form .runtime-error-fields > div {
+    display: inline-flex; }
+  #preprocessing-test-form .runtime-error-fields .multilineinput-control {
+    width: 250px; }
 
 .totals-list:not(.list-table) {
   display: flex;

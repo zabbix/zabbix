@@ -405,14 +405,13 @@ zabbix_export:
                 throw 'Requesting failed: ' + error;
             }
           description: 'The JSON with result of Cloudflare API request.'
-          timeout: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
           parameters:
+            - name: api_endpoint
+              value: '{$CLOUDFLARE.API.URL}'
             - name: token
               value: '{$CLOUDFLARE.API.TOKEN}'
             - name: zone
               value: '{$CLOUDFLARE.ZONE_ID}'
-            - name: api_endpoint
-              value: '{$CLOUDFLARE.API.URL}'
           tags:
             - tag: component
               value: raw
@@ -718,9 +717,6 @@ zabbix_export:
         - macro: '{$CLOUDFLARE.ERRORS.MAX.WARN}'
           value: '30'
           description: 'Maximum responses with errors in %.'
-        - macro: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
-          value: 3s
-          description: 'Response timeout for Cloudflare API.'
         - macro: '{$CLOUDFLARE.ZONE_ID}'
           value: '<change>'
           description: 'Your Cloudflare Site Zone ID.'
@@ -739,16 +735,6 @@ zabbix_export:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Bandwidth'
                 - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Cloudflare by HTTP'
-                        name: 'Cloudflare: Web requests'
-                - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -758,6 +744,36 @@ zabbix_export:
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: DNS requests'
+                - type: graph
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Cloudflare by HTTP'
+                        name: 'Cloudflare: HTTP responses ratio over time'
+                - type: graph
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Cloudflare by HTTP'
+                        name: 'Cloudflare: HTTP response codes over time'
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Cloudflare by HTTP'
+                        name: 'Cloudflare: Web requests'
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -770,16 +786,6 @@ zabbix_export:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Caching'
                 - type: graph
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Cloudflare by HTTP'
-                        name: 'Cloudflare: HTTP responses ratio over time'
-                - type: graph
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -790,16 +796,6 @@ zabbix_export:
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: IPs and threats'
-                - type: graph
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Cloudflare by HTTP'
-                        name: 'Cloudflare: HTTP response codes over time'
   graphs:
     - uuid: 09e113216680490c9dd15805474bcac7
       name: 'Cloudflare: Bandwidth'

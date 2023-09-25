@@ -346,16 +346,16 @@ zabbix_export:
             return JSON.stringify(output);
           description: 'Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".'
           parameters:
-            - name: host
-              value: '{$VAULT.HOST}'
             - name: accessors
               value: '{$VAULT.TOKEN.ACCESSORS}'
-            - name: token
-              value: '{$VAULT.TOKEN}'
-            - name: scheme
-              value: '{$VAULT.API.SCHEME}'
+            - name: host
+              value: '{$VAULT.HOST}'
             - name: port
               value: '{$VAULT.API.PORT}'
+            - name: scheme
+              value: '{$VAULT.API.SCHEME}'
+            - name: token
+              value: '{$VAULT.TOKEN}'
           tags:
             - tag: component
               value: raw

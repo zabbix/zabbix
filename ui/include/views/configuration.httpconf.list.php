@@ -68,7 +68,7 @@ $filter_column_left = (new CFormList())
 	)
 	->addRow(_('Status'),
 		(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 			->setModern(true)

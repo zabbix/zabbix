@@ -795,15 +795,16 @@ function toggleMessageBoxDetails(element) {
 }
 
 /**
- * Download svg graph as .png image.
+ * Download svg as .png image.
  *
  * @param {SVGElement} svg
  * @param {string}     file_name
+ * @param {string}     legend_class
  */
-function downloadSvgImage(svg, file_name) {
+function downloadSvgImage(svg, file_name, legend_class = '') {
 	var $dom_node = jQuery(svg),
 		canvas = document.createElement('canvas'),
-		labels = $dom_node.next('.svg-graph-legend'),
+		labels = $dom_node.next(legend_class),
 		$clone = $dom_node.clone(),
 		$container = $dom_node.closest('.dashboard-grid-widget-contents'),
 		image = new Image,
@@ -813,7 +814,7 @@ function downloadSvgImage(svg, file_name) {
 		labels_height = labels.length ? labels.height() : 0,
 		context2d;
 
-	// Clone only svg graph styles.
+	// Clone only svg styles.
 	style.innerText = jQuery.map(document.styleSheets[0].cssRules, function (rule) {
 		return rule.selectorText && rule.selectorText.substr(0, 5) == '.svg-' ? rule.cssText : '';
 	}).join('');

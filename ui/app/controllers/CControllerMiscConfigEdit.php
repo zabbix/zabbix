@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,11 +21,11 @@
 
 class CControllerMiscConfigEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'url' =>							'db config.url',
 			'discovery_groupid' =>				'db config.discovery_groupid',
@@ -39,12 +39,6 @@ class CControllerMiscConfigEdit extends CController {
 			'x_frame_options' =>				'db config.x_frame_options',
 			'iframe_sandboxing_enabled' =>		'db config.iframe_sandboxing_enabled',
 			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
-			'socket_timeout' =>					'db config.socket_timeout',
-			'connect_timeout' =>				'db config.connect_timeout',
-			'media_type_test_timeout' =>		'db config.media_type_test_timeout',
-			'script_timeout' =>					'db config.script_timeout',
-			'item_test_timeout' =>				'db config.item_test_timeout',
-			'report_test_timeout' =>			'db config.report_test_timeout',
 			'vault_provider' =>					'db config.vault_provider'
 		];
 
@@ -57,11 +51,11 @@ class CControllerMiscConfigEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'url' => $this->getInput('url', CSettingsHelper::get(CSettingsHelper::URL)),
 			'discovery_groupid' => $this->getInput('discovery_groupid', CSettingsHelper::get(
@@ -95,29 +89,8 @@ class CControllerMiscConfigEdit extends CController {
 			'iframe_sandboxing_exceptions' => $this->getInput('iframe_sandboxing_exceptions', CSettingsHelper::get(
 				CSettingsHelper::IFRAME_SANDBOXING_EXCEPTIONS
 			)),
-			'socket_timeout' => $this->getInput('socket_timeout', CSettingsHelper::get(
-				CSettingsHelper::SOCKET_TIMEOUT
-			)),
-			'connect_timeout' => $this->getInput('connect_timeout', CSettingsHelper::get(
-				CSettingsHelper::CONNECT_TIMEOUT
-			)),
-			'media_type_test_timeout' => $this->getInput('media_type_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT
-			)),
-			'script_timeout' => $this->getInput('script_timeout', CSettingsHelper::get(
-				CSettingsHelper::SCRIPT_TIMEOUT
-			)),
-			'item_test_timeout' => $this->getInput('item_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::ITEM_TEST_TIMEOUT
-			)),
-			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
-			))
+			'vault_provider' => $this->getInput('vault_provider', CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER))
 		];
-
-		$data['vault_provider'] = $this->getInput('vault_provider',
-			CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)
-		);
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
