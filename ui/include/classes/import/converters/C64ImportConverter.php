@@ -159,7 +159,6 @@ class C64ImportConverter extends CConverter {
 		return $item_prototypes;
 	}
 
-
 	/**
 	 * @param array $item Item or item prototype.
 	 */
@@ -169,8 +168,8 @@ class C64ImportConverter extends CConverter {
 		}
 
 		foreach ($item['preprocessing'] as &$step) {
-			if ($step['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED && $step['parameters'][0] === '') {
-				$step['parameters'][0] = (string) ZBX_PREPROC_MATCH_ERROR_ANY;
+			if ($step['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED) {
+				$step['parameters'] = [(string) ZBX_PREPROC_MATCH_ERROR_ANY];
 			}
 		}
 		unset($step);

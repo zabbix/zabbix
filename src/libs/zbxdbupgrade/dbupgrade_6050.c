@@ -1223,11 +1223,8 @@ static int	DBpatch_6050122(void)
 
 static int	DBpatch_6050123(void)
 {
-	if (ZBX_DB_OK > zbx_db_execute("update item_preproc set params='-1' where type=%d",
-			ZBX_PREPROC_VALIDATE_NOT_SUPPORTED))
-	{
+	if (ZBX_DB_OK > zbx_db_execute("update item_preproc set params='-1' where type=%d", 26))
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
