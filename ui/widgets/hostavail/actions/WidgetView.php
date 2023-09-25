@@ -57,7 +57,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$interface_type_count = array_fill_keys($interface_types, array_fill_keys(self::INTERFACE_STATUSES, 0));
 		$total_hosts = array_fill_keys(self::INTERFACE_STATUSES, 0);
 
-		if ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid') || !$this->isTemplateDashboard()) {
+		if (!$this->isTemplateDashboard() || ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid'))) {
 			$options = [
 				'output' => in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types) ? ['active_available'] : [],
 				'selectInterfaces' => ['type', 'available'],
