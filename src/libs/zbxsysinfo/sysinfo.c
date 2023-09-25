@@ -2123,6 +2123,7 @@ char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
 
 	return dst_string;
 }
+#endif
 
 int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len)
 {
@@ -2142,4 +2143,3 @@ int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error
 	return SUCCEED;
 #undef ZBX_ITEM_TIMEOUT_MAX
 }
-#endif

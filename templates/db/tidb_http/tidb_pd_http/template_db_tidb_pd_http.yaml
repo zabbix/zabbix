@@ -53,7 +53,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - ''
@@ -72,7 +72,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"status": "0"}'
           url: '{$PD.URL}:{$PD.PORT}/pd/api/v1/status'

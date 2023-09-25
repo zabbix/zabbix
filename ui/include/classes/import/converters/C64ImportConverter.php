@@ -107,6 +107,8 @@ class C64ImportConverter extends CConverter {
 			if ($item['type'] !== CXmlConstantName::HTTP_AGENT && $item['type'] !== CXmlConstantName::SCRIPT) {
 				unset($item['timeout']);
 			}
+
+			self::convertPreprocessing($item);
 		}
 		unset($item);
 
@@ -153,10 +155,28 @@ class C64ImportConverter extends CConverter {
 					&& $item_prototype['type'] !== CXmlConstantName::SCRIPT) {
 				unset($item_prototype['timeout']);
 			}
+
+			self::convertPreprocessing($item_prototype);
 		}
 		unset($item_prototype);
 
 		return $item_prototypes;
+	}
+
+	/**
+	 * @param array $item Item or item prototype.
+	 */
+	private static function convertPreprocessing(array &$item): void {
+		if (!array_key_exists('preprocessing', $item)) {
+			return;
+		}
+
+		foreach ($item['preprocessing'] as &$step) {
+			if ($step['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED) {
+				$step['parameters'] = [(string) ZBX_PREPROC_MATCH_ERROR_ANY];
+			}
+		}
+		unset($step);
 	}
 
 	/**

@@ -1224,6 +1224,14 @@ static int	DBpatch_6050122(void)
 
 static int	DBpatch_6050123(void)
 {
+	if (ZBX_DB_OK > zbx_db_execute("update item_preproc set params='-1' where type=26"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050124(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
@@ -1238,7 +1246,7 @@ static int	DBpatch_6050123(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050124(void)
+static int	DBpatch_6050125(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1255,7 +1263,7 @@ static int	DBpatch_6050124(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050125(void)
+static int	DBpatch_6050126(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1273,7 +1281,7 @@ static int	DBpatch_6050125(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050126(void)
+static int	DBpatch_6050127(void)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -1324,7 +1332,7 @@ static int	DBpatch_6050126(void)
 	return ret;
 }
 
-static int	DBpatch_6050127(void)
+static int	DBpatch_6050128(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1341,7 +1349,7 @@ static int	DBpatch_6050127(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050128(void)
+static int	DBpatch_6050129(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1358,7 +1366,7 @@ static int	DBpatch_6050128(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050129(void)
+static int	DBpatch_6050130(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1374,7 +1382,7 @@ static int	DBpatch_6050129(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050130(void)
+static int	DBpatch_6050131(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1391,7 +1399,7 @@ static int	DBpatch_6050130(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050131(void)
+static int	DBpatch_6050132(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -1408,7 +1416,7 @@ static int	DBpatch_6050131(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050132(void)
+static int	DBpatch_6050133(void)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -1525,7 +1533,7 @@ static char	*create_widget_reference(const zbx_vector_str_t *references)
 #undef FIRST_LETTER
 #undef REFERENCE_LEN
 
-static int	DBpatch_6050133(void)
+static int	DBpatch_6050134(void)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1713,5 +1721,6 @@ DBPATCH_ADD(6050130, 0, 1)
 DBPATCH_ADD(6050131, 0, 1)
 DBPATCH_ADD(6050132, 0, 1)
 DBPATCH_ADD(6050133, 0, 1)
+DBPATCH_ADD(6050134, 0, 1)
 
 DBPATCH_END()

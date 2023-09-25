@@ -594,8 +594,33 @@ sub process_row($)
 	print "INSERT INTO $table_name VALUES $values;${eol}\n";
 }
 
+sub timescaledb_get_version($)
+{
+	my $constant_name = shift;
+
+	my $version_file = dirname($0) . "/../../include/zbx_dbversion_constants.h";
+
+	if (! -r $version_file)
+	{
+		print "Expected file \"$version_file\" not found\n";
+		exit;
+	}
+
+	my $ver = `grep $constant_name $version_file`;
+	chomp($ver);
+	(undef, undef, $ver) = split(' ', $ver);
+	$ver =~ m/"([^\.]+)\.([^\.]+)[\."]/;
+
+	return ($1, $2);
+}
+
 sub timescaledb()
 {
+	my ($minimum_postgres_version_major, $minimum_postgres_version_minor) =
+		timescaledb_get_version("ZBX_POSTGRESQL_MIN_VERSION_STR");
+	my ($minimum_timescaledb_version_major, $minimum_timescaledb_version_minor) =
+		timescaledb_get_version("ZBX_TIMESCALE_MIN_VERSION_STR");
+
 	print<<EOF
 DROP FUNCTION IF EXISTS base36_decode(character varying);
 CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
@@ -647,10 +672,10 @@ DECLARE
 
 	current_db_extension			VARCHAR;
 BEGIN
-	SELECT 10 INTO minimum_postgres_version_major;
-	SELECT 2 INTO minimum_postgres_version_minor;
-	SELECT 1 INTO minimum_timescaledb_version_major;
-	SELECT 5 INTO minimum_timescaledb_version_minor;
+	SELECT $minimum_postgres_version_major INTO minimum_postgres_version_major;
+	SELECT $minimum_postgres_version_minor INTO minimum_postgres_version_minor;
+	SELECT $minimum_timescaledb_version_major INTO minimum_timescaledb_version_major;
+	SELECT $minimum_timescaledb_version_minor INTO minimum_timescaledb_version_minor;
 
 	SHOW server_version INTO current_postgres_version_full;
 
