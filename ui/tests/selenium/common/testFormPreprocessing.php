@@ -2344,6 +2344,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			$case['preprocessing'] = array_merge([
 				[
 					'type' => 'Check for not supported value',
+					'parameter_1' => 'any error',
 					'on_fail' => true
 				],
 				[
@@ -2450,8 +2451,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			$expected = CTestArrayHelper::get($options, 'on_fail', false) === false
 				? (($options['type'] === 'Check for not supported value') ? 1 : ZBX_PREPROC_FAIL_DEFAULT)
 				: $data['value'];
-
-			$this->assertEquals($expected, $lld ? $rows[$i+1] : $rows[$i]);
+			$this->assertEquals($expected, $rows[$i+1]);
 
 			if (in_array($options['type'], [
 				'Trim',
