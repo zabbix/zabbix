@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-20T15:16:21Z'
+  date: '2023-09-25T14:28:41Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -66,13 +66,10 @@ zabbix_export:
             
                     if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
                         request.setProxy(ilo.params.http_proxy);
+                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
                     }
             
                     Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
-            
-                    if (ilo.params.http_proxy) {
-                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
-                    }
             
                     response = request.post(url, JSON.stringify(auth_data));
             
@@ -116,13 +113,10 @@ zabbix_export:
             
                     if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
                         request.setProxy(ilo.params.http_proxy);
+                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
                     }
             
                     Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
-            
-                    if (ilo.params.http_proxy) {
-                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
-                    }
             
                     response = request.delete(url);
             
@@ -142,15 +136,12 @@ zabbix_export:
             
                     if (typeof ilo.params.http_proxy !== 'undefined' && ilo.params.http_proxy !== '') {
                         request.setProxy(ilo.params.http_proxy);
+                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
                     }
             
                     request.addHeader('X-Auth-Token: ' + ilo.session_token);
             
                     Zabbix.log(4, '[ HPE iLO ] Sending request: ' + url);
-            
-                    if (ilo.params.http_proxy) {
-                        Zabbix.log(4, '[ HPE iLO ] Using HTTP proxy: ' + ilo.params.http_proxy);
-                    }
             
                     response = request.get(url);
             
@@ -170,13 +161,17 @@ zabbix_export:
                     delete request;
             
                     return response;
+                },
+            
+                checkArray: function (array) {
+                    return typeof array !== 'undefined' && Array.isArray(array) && array.length > 0 ? true : false;
                 }
             };
             
             try {
                 ilo.setParams(JSON.parse(value));
                 ilo.apiAuth();
-                var ilo_systems = [], // probably would be better to declare one object and add these as new properties
+                var systems = [],
                     storages = [],
                     controllers = [],
                     drives = [],
@@ -187,61 +182,61 @@ zabbix_export:
                     psu = [],
                     managers = [];
             
-                var systems = ilo.apiRequest('redfish/v1/Systems?$expand=.');
+                var get_systems = ilo.apiRequest('redfish/v1/Systems?$expand=.');
             
-                if (Array.isArray(systems.Members) && systems.Members.length > 0) {
-                    for (i in systems.Members) {
-                        if ('Id' in systems.Members[i]) {
-                            if (systems.Members[i].HostName === null) {
-                                systems.Members[i].HostName = systems.Members[i].Id;
+                if (ilo.checkArray(get_systems.Members)) {
+                    for (i in get_systems.Members) {
+                        if ('Id' in get_systems.Members[i]) {
+                            if (get_systems.Members[i].HostName === null) {
+                                get_systems.Members[i].HostName = get_systems.Members[i].Id;
                             }
             
-                            ilo_systems.push(systems.Members[i]);
+                            systems.push(get_systems.Members[i]);
             
-                            var system_storages = ilo.apiRequest('redfish/v1/Systems/' + systems.Members[i].Id + '/Storage?$expand=.');
+                            var system_storages = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage?$expand=.');
             
-                            if (Array.isArray(system_storages.Members) && system_storages.Members.length > 0) {
+                            if (ilo.checkArray(system_storages.Members)) {
                                 for (j in system_storages.Members) {
-                                    system_storages.Members[j].systemHostname = systems.Members[i].HostName;
-                                    system_storages.Members[j].systemType = systems.Members[i].SystemType;
-                                    system_storages.Members[j].systemId = systems.Members[i].Id;
+                                    system_storages.Members[j].systemHostname = get_systems.Members[i].HostName;
+                                    system_storages.Members[j].systemType = get_systems.Members[i].SystemType;
+                                    system_storages.Members[j].systemId = get_systems.Members[i].Id;
             
                                     storages.push(system_storages.Members[j]);
             
                                     if ('Id' in system_storages.Members[j]) {
-                                        var storage_controllers = ilo.apiRequest('redfish/v1/Systems/' + systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Controllers?$expand=.');
+                                        var storage_controllers = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Controllers?$expand=.');
             
-                                        if (Array.isArray(storage_controllers.Members) && storage_controllers.Members.length > 0) {
+                                        if (ilo.checkArray(storage_controllers.Members)) {
                                             for (k in storage_controllers.Members) {
-                                                storage_controllers.Members[k].systemHostname = systems.Members[i].HostName;
-                                                storage_controllers.Members[k].systemType = systems.Members[i].SystemType;
-                                                storage_controllers.Members[k].systemId = systems.Members[i].Id;
+                                                storage_controllers.Members[k].systemHostname = get_systems.Members[i].HostName;
+                                                storage_controllers.Members[k].systemType = get_systems.Members[i].SystemType;
+                                                storage_controllers.Members[k].systemId = get_systems.Members[i].Id;
                                                 storage_controllers.Members[k].storageId = system_storages.Members[j].Id;
             
                                                 controllers.push(storage_controllers.Members[k]);
                                             }
                                         }
             
-                                        var storage_drives = ilo.apiRequest('redfish/v1/Systems/' + systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '?$expand=.');
+                                        var storage_drives = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '?$expand=.');
             
-                                        if (Array.isArray(storage_drives.Drives) && storage_drives.Drives.length > 0) {
+                                        if (ilo.checkArray(storage_drives.Drives)) {
                                             for (k in storage_drives.Drives) {
-                                                storage_drives.Drives[k].systemHostname = systems.Members[i].HostName;
-                                                storage_drives.Drives[k].systemType = systems.Members[i].SystemType;
-                                                storage_drives.Drives[k].systemId = systems.Members[i].Id;
+                                                storage_drives.Drives[k].systemHostname = get_systems.Members[i].HostName;
+                                                storage_drives.Drives[k].systemType = get_systems.Members[i].SystemType;
+                                                storage_drives.Drives[k].systemId = get_systems.Members[i].Id;
                                                 storage_drives.Drives[k].storageId = system_storages.Members[j].Id;
             
                                                 drives.push(storage_drives.Drives[k]);
                                             }
                                         }
             
-                                        var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
+                                        var storage_volumes = ilo.apiRequest('redfish/v1/Systems/' + get_systems.Members[i].Id + '/Storage/' + system_storages.Members[j].Id + '/Volumes?$expand=.');
             
-                                        if (Array.isArray(storage_volumes.Members) && storage_volumes.Members.length > 0) {
+                                        if (ilo.checkArray(storage_volumes.Members)) {
                                             for (k in storage_volumes.Members) {
-                                                storage_volumes.Members[k].systemHostname = systems.Members[i].HostName;
-                                                storage_volumes.Members[k].systemType = systems.Members[i].SystemType;
-                                                storage_volumes.Members[k].systemId = systems.Members[i].Id;
+                                                storage_volumes.Members[k].systemHostname = get_systems.Members[i].HostName;
+                                                storage_volumes.Members[k].systemType = get_systems.Members[i].SystemType;
+                                                storage_volumes.Members[k].systemId = get_systems.Members[i].Id;
                                                 storage_volumes.Members[k].storageId = system_storages.Members[j].Id;
             
                                                 volumes.push(storage_volumes.Members[k]);
@@ -256,14 +251,14 @@ zabbix_export:
             
                 var get_chassis = ilo.apiRequest('redfish/v1/Chassis?$expand=.');
             
-                if (Array.isArray(get_chassis.Members) && get_chassis.Members.length > 0) {
+                if (ilo.checkArray(get_chassis.Members)) {
                     for (i in get_chassis.Members) {
                         if ('Id' in get_chassis.Members[i]) {
                             chassis.push(get_chassis.Members[i]);
             
                             chassis_thermal = ilo.apiRequest('redfish/v1/Chassis/' + get_chassis.Members[i].Id + '/Thermal/');
             
-                            if (Array.isArray(chassis_thermal.Fans) && chassis_thermal.Fans.length > 0) {
+                            if (ilo.checkArray(chassis_thermal.Fans)) {
                                 for (j in chassis_thermal.Fans) {
                                     chassis_thermal.Fans[j].chassisId = get_chassis.Members[i].Id;
             
@@ -271,7 +266,7 @@ zabbix_export:
                                 }
                             }
             
-                            if (Array.isArray(chassis_thermal.Temperatures) && chassis_thermal.Temperatures.length > 0) {
+                            if (ilo.checkArray(chassis_thermal.Temperatures)) {
                                 for (j in chassis_thermal.Temperatures) {
                                     chassis_thermal.Temperatures[j].chassisId = get_chassis.Members[i].Id;
             
@@ -281,7 +276,7 @@ zabbix_export:
             
                             chassis_power = ilo.apiRequest('redfish/v1/Chassis/' + get_chassis.Members[i].Id + '/Power/');
             
-                            if (Array.isArray(chassis_power.PowerSupplies) && chassis_power.PowerSupplies.length > 0) {
+                            if (ilo.checkArray(chassis_power.PowerSupplies)) {
                                 for (j in chassis_power.PowerSupplies) {
                                     chassis_power.PowerSupplies[j].chassisId = get_chassis.Members[i].Id;
             
@@ -294,7 +289,7 @@ zabbix_export:
             
                 var get_managers = ilo.apiRequest('redfish/v1/Managers?$expand=.');
             
-                if (Array.isArray(get_managers.Members) && get_managers.Members.length > 0) {
+                if (ilo.checkArray(get_managers.Members)) {
                     for (i in get_managers.Members) {
                         if ('Id' in get_managers.Members[i]) {
                             managers.push(get_managers.Members[i]);
@@ -305,7 +300,7 @@ zabbix_export:
                 ilo.apiLogout();
             
                 return JSON.stringify({
-                    'systems': ilo_systems,
+                    'systems': systems,
                     'storages': storages,
                     'controllers': controllers,
                     'drives': drives,
@@ -2608,6 +2603,7 @@ zabbix_export:
           value: 1m
           description: 'The update interval for the script item that retrieves data from API.'
         - macro: '{$ILO.PASSWORD}'
+          type: SECRET_TEXT
           description: 'The password of the user that is used for monitoring.'
         - macro: '{$ILO.SENSOR.DISCOVERY.CONTEXT.MATCHES}'
           value: .+
