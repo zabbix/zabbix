@@ -4161,4 +4161,75 @@ in:
     params: "return sign('q', 'pkey');"
 out:
   return: FAIL
+---
+test case: Check for not supported without parameter (false)
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "no error"
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+    params: ""
+    error_handler: ZBX_PREPROC_FAIL_SET_VALUE
+    error_handler_params: error_value
+out:
+  return: SUCCEED
+  value: "no error"
+---
+test case: Check for not supported without parameter
+in:
+  error:
+    time: 2017-10-29 03:15:00 +03:00
+    data: "error any"
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+    params: ""
+    error_handler: ZBX_PREPROC_FAIL_SET_VALUE
+    error_handler_params: error_value
+out:
+  return: SUCCEED
+  value: error_value
+---
+test case: Check for not supported with parameter (false)
+in:
+  error:
+    time: 2017-10-29 03:15:00 +03:00
+    data: "error any"
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+    params: "0\n123"
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
+out:
+  return: SUCCEED
+  value: "error any"
+---
+test case: Check for not supported with parameter
+in:
+  error:
+    time: 2017-10-29 03:15:00 +03:00
+    data: "error 123"
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+    params: "0\n123"
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error
+out:
+  return: FAIL
+  error: custom error
+---
+test case: Check for not supported with parameter and capturing group
+in:
+  error:
+    time: 2017-10-29 03:15:00 +03:00
+    data: "error 123"
+  step:
+    type: ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
+    params: "0\n123"
+    error_handler: ZBX_PREPROC_FAIL_SET_ERROR
+    error_handler_params: custom error \0
+out:
+  return: FAIL
+  error: custom error 123
 ...

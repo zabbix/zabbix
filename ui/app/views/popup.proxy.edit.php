@@ -180,10 +180,133 @@ $encryption_tab
 		))->addClass('js-tls-subject')
 	]);
 
-$tabs = (new CTabView())
+// Timeouts tab.
+$custom_timeouts_enabled = $data['form']['custom_timeouts'] == ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED;
+$version_mismatch_hint = $data['version_mismatch']
+	? new CSpan(makeWarningIcon(_('Timeouts are disabled because the proxy and server versions do not match.')))
+	: null;
+
+$timeouts_tab = (new CFormGrid())
+	->addItem([
+		new CLabel([_('Timeouts for item types'), $version_mismatch_hint], 'custom_timeouts'),
+		new CFormField([
+			(new CRadioButtonList('custom_timeouts', $data['form']['custom_timeouts']))
+				->addValue(_('Global'), ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED)
+				->addValue(_('Override'), ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED)
+				->setModern()
+				->setEnabled(!$data['version_mismatch']),
+			$data['user']['can_edit_global_timeouts']
+				? (new CLink(_('Global timeouts'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+				))->setTarget('_blank')
+				: null
+		])
+	])
+	->addItem([
+		(new CLabel(_('Zabbix agent'), 'timeout_zabbix_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_zabbix_agent', $data['form']['timeout_zabbix_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_zabbix_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Simple check'), 'timeout_simple_check'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_simple_check', $data['form']['timeout_simple_check'], false,
+				DB::getFieldLength('proxy', 'timeout_simple_check')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('SNMP agent'), 'timeout_snmp_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_snmp_agent', $data['form']['timeout_snmp_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_snmp_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('External check'), 'timeout_external_check'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_external_check', $data['form']['timeout_external_check'], false,
+				DB::getFieldLength('proxy', 'timeout_external_check')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Database monitor'), 'timeout_db_monitor'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_db_monitor', $data['form']['timeout_db_monitor'], false,
+				DB::getFieldLength('proxy', 'timeout_db_monitor')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('HTTP agent'), 'timeout_http_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_http_agent', $data['form']['timeout_http_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_http_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('SSH agent'), 'timeout_ssh_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_ssh_agent', $data['form']['timeout_ssh_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_ssh_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('TELNET agent'), 'timeout_telnet_agent'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_telnet_agent', $data['form']['timeout_telnet_agent'], false,
+				DB::getFieldLength('proxy', 'timeout_telnet_agent')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Script'), 'timeout_script'))->setAsteriskMark(),
+		new CFormField(
+			(new CTextBox('timeout_script', $data['form']['timeout_script'], false,
+				DB::getFieldLength('proxy', 'timeout_script')
+			))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setEnabled($custom_timeouts_enabled)
+				->setAriaRequired()
+		)
+	]);
+
+$tabs = (new CTabView(['id' => 'proxy-tabs']))
 	->setSelected(0)
 	->addTab('proxy-tab', _('Proxy'), $proxy_tab)
-	->addTab('proxy-encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_PROXY_ENCRYPTION);
+	->addTab('proxy-encryption-tab', _('Encryption'), $encryption_tab, TAB_INDICATOR_PROXY_ENCRYPTION)
+	->addTab('proxy-timeouts-tab', _('Timeouts'), $timeouts_tab, TAB_INDICATOR_PROXY_TIMEOUTS);
 
 // Output.
 

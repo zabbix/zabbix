@@ -164,7 +164,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Show operational data' => ['value' => 'None', 'enabled' => true],
 			'Show symptoms' => ['value' => false, 'enabled' => true],
 			'Show suppressed problems' => ['value' => false, 'enabled' => true],
-			'id:acknowledgement_status' => ['value' => 'all', 'enabled' => true],
+			'id:acknowledgement_status' => ['value' => 'All', 'enabled' => true],
 			'Sort entries by' => ['value' => 'Time (descending)', 'enabled' => true],
 			'Show timeline' => ['value' => true, 'enabled' => true],
 			'Show lines' => ['value' => 25, 'enabled' => true, 'maxlength' => 3]
@@ -433,7 +433,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Show tags' => 'None',
 						'Show operational data' => 'None',
 						'Show suppressed problems' => false,
-						'Acknowledgement status' => 'all',
+						'Acknowledgement status' => 'All',
 						'Sort entries by' => 'Time (descending)',
 						'Show timeline' => false,
 						'Show lines' => 1

@@ -34,8 +34,6 @@ use Zabbix\Widgets\{
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldDatePicker,
-	CWidgetFieldGraphDataSet,
-	CWidgetFieldGraphOverride,
 	CWidgetFieldHostPatternSelect,
 	CWidgetFieldNumericBox,
 	CWidgetFieldRadioButtonList,
@@ -250,7 +248,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initDataSetFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 
@@ -377,6 +375,10 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
+				(new CWidgetFieldCheckBox('legend_aggregation', _('Show aggregation function')))
+					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
+			)
+			->addField(
 				(new CWidgetFieldRangeControl('legend_lines', _('Number of rows'),
 					SVG_GRAPH_LEGEND_LINES_MIN, SVG_GRAPH_LEGEND_LINES_MAX
 				))
@@ -430,7 +432,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initOverridesFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 

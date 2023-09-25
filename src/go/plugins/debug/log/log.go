@@ -23,17 +23,18 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"zabbix.com/internal/agent/scheduler"
 )
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
 	input   chan *watchRequest
-	clients map[plugin.ResultWriter][]*plugin.Request
+	clients map[plugin.ResultWriter][]*scheduler.Request
 }
 
 type watchRequest struct {
-	requests []*plugin.Request
+	requests []*scheduler.Request
 	sink     plugin.ResultWriter
 }
 
@@ -75,7 +76,7 @@ run:
 func (p *Plugin) Start() {
 	p.Debugf("start")
 	p.input = make(chan *watchRequest)
-	p.clients = make(map[plugin.ResultWriter][]*plugin.Request)
+	p.clients = make(map[plugin.ResultWriter][]*scheduler.Request)
 	go p.run()
 }
 
@@ -84,7 +85,7 @@ func (p *Plugin) Stop() {
 	close(p.input)
 }
 
-func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
+func (p *Plugin) Watch(requests []*scheduler.Request, ctx plugin.ContextProvider) {
 	p.Debugf("watch")
 	p.input <- &watchRequest{sink: ctx.Output(), requests: requests}
 }

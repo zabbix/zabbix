@@ -277,16 +277,6 @@ $item_tab
 			->setValue($data['request_method'])
 		))->setId('js-item-request-method-field')
 	])
-	// Append ITEM_TYPE_HTTPAGENT and ITEM_TYPE_SCRIPT timeout field to form list.
-	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->setAsteriskMark()
-			->setId('js-item-timeout-label'),
-		(new CFormField((new CTextBox('timeout', $data['timeout'], $data['limited']))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-		))->setId('js-item-timeout-field')
-	])
 	// Append ITEM_TYPE_HTTPAGENT Request body type to form list.
 	->addItem([
 		(new CLabel(_('Request body type'), 'post_type'))->setId('js-item-post-type-label'),
@@ -709,14 +699,53 @@ $delayFlexTable->addRow([(new CButton('interval_add', _('Add')))
 	->addClass('element-table-add')
 ]);
 
+$item_tab->addItem([
+	(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
+	(new CFormField((new CDiv($delayFlexTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	))->setId('js-item-flex-intervals-field')
+]);
+
+/**
+ * Append timeout field to form list for item types:
+ * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ */
+$edit_source_timeouts_link = null;
+
+if ($data['can_edit_source_timeouts']
+		&& (($data['limited'] && $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) || !$data['limited'])) {
+	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
+		? (new CLink(_('Timeouts')))
+			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
+			->onClick('view.editProxy(event, this.dataset.proxyid);')
+		: (new CLink(_('Timeouts'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+		))->setTarget('_blank');
+}
+
+$item_tab->addItem([
+	(new CLabel(_('Timeout'), 'timeout'))
+		->setAsteriskMark()
+		->setId('js-item-timeout-label'),
+	(new CFormField([
+		(new CRadioButtonList('custom_timeout', $data['custom_timeout']))
+			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+			->setReadonly($data['limited'])
+			->setModern(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('timeout', $data['timeout'],
+			$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+		)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAriaRequired(),
+		$edit_source_timeouts_link
+	]))->setId('js-item-timeout-field')
+]);
+
 $item_tab
-	->addItem([
-		(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
-		(new CFormField((new CDiv($delayFlexTable))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		))->setId('js-item-flex-intervals-field')
-	])
 	->addItem([
 		(new CLabel(_('Keep lost resources period'), 'lifetime'))->setAsteriskMark(),
 		new CFormField((new CTextBox('lifetime', $data['lifetime']))
@@ -1038,7 +1067,8 @@ $html_page->show();
 		'interfaces' => $data['interfaces'],
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'inherited_timeouts' => $data['inherited_timeouts']['timeouts']
 	]).');
 '))->show();
 

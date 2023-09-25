@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-28 18:59+0000\n"
-"Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
+"PO-Revision-Date: 2023-09-22 06:01+0000\n"
+"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -916,7 +916,7 @@ msgstr "Ajouter (limite de type de message atteinte)"
 
 #: widgets/tophosts/views/widget.edit.php:63
 msgid "Add a column"
-msgstr ""
+msgstr "Ajouter une colonne"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
@@ -1141,6 +1141,14 @@ msgstr "Agrégat"
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr "Fonctions d'agrégation"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:284
+msgid "Aggregates each item in the data set."
+msgstr ""
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:306
+msgid "Aggregates the whole data set."
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
@@ -1495,6 +1503,30 @@ msgstr "Assertions"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Tag caractéristique"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr ""
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -2250,6 +2282,10 @@ msgstr "Impossible d'ajouter plus d'un élément de type \"Somme du graphique\" 
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "Impossible d'ajouter plus d'un élément de type \"Somme de graphique\" sur le prototype de graphique \"%1$s\"."
+
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:202
+msgid "Cannot add more than one item with type \"Total\" to the chart."
+msgstr ""
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -3791,6 +3827,10 @@ msgstr "Impossible de configurer \"%1$s\" pour le prototype de graphique \"%2$s\
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Impossible de configurer \"%1$s\" pour l'élément \"%2$s\"."
 
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:208
+msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -4697,6 +4737,10 @@ msgstr "Commande"
 msgid "Commands"
 msgstr "Commandes"
 
+#: app/views/administration.timeouts.edit.php:138
+msgid "Communication"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:133
 msgid "Communication with Zabbix server"
 msgstr "Communication avec le serveur Zabbix"
@@ -4909,6 +4953,10 @@ msgstr "Configuration des groupes de modèles"
 msgid "Configuration of templates"
 msgstr "Configuration des modèles"
 
+#: app/controllers/CControllerTimeoutsEdit.php:110
+msgid "Configuration of timeouts"
+msgstr ""
+
 #: app/controllers/CControllerTrigDisplayEdit.php:132
 msgid "Configuration of trigger displaying options"
 msgstr "Configuration des options d'affichage des déclencheurs"
@@ -4992,6 +5040,10 @@ msgstr "Connexion à"
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "Connectée"
+
+#: app/views/administration.timeouts.edit.php:148
+msgid "Connection"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:81
 msgid "Connection security"
@@ -5931,6 +5983,10 @@ msgstr "Aperçu des données"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "Jeu de données"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
+msgid "Data set aggregation"
+msgstr ""
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
@@ -7425,6 +7481,10 @@ msgstr "Ne correspond pas à l'expression régulière"
 #: include/views/js/monitoring.sysmaps.js.php:895
 msgid "Dot"
 msgstr "Point"
+
+#: widgets/piechart/includes/WidgetForm.php:142
+msgid "Doughnut"
+msgstr ""
 
 #: app/views/monitoring.widget.discovery.view.php:34
 msgctxt "discovery results in dashboard"
@@ -8932,10 +8992,21 @@ msgstr "Obtenir de la valeur depuis l'hôte"
 msgid "Given expression is not a macro"
 msgstr "L'expression fournie n'est pas une macro"
 
+#: app/views/popup.massupdate.item.php:291 app/views/popup.proxy.edit.php:194
+#: include/views/configuration.host.discovery.edit.php:717
+#: include/views/configuration.item.edit.php:844
+#: include/views/configuration.item.prototype.edit.php:798
+msgid "Global"
+msgstr ""
+
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "L'expression régulière globale \"%1$s\" n'existe pas."
+
+#: app/views/popup.proxy.edit.php:199
+msgid "Global timeouts"
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:56
 msgid "Global value"
@@ -10015,6 +10086,12 @@ msgstr "Heures"
 #: include/classes/helpers/CMenuHelper.php:251 include/html.inc.php:891
 msgid "Housekeeping"
 msgstr "Nettoyage"
+
+#: app/views/popup.massupdate.item.php:207
+#: include/views/configuration.item.edit.php:1062
+#: include/views/configuration.item.prototype.edit.php:931
+msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
+msgstr ""
 
 #: include/locales.inc.php:46
 msgid "Hungarian (hu_HU)"
@@ -12162,6 +12239,10 @@ msgstr "Prototypes d'élément mis à jour"
 msgid "Item tags"
 msgstr "Tags d'élément"
 
+#: app/views/administration.timeouts.edit.php:178
+msgid "Item test"
+msgstr ""
+
 #: jsLoader.php:397
 msgid "Item type does not use interface"
 msgstr "Le type d'élément n'utilise pas l'interface"
@@ -13497,6 +13578,10 @@ msgstr[1] "Types de média activés"
 msgid "Media type mapping"
 msgstr "Correspondance des types de médias"
 
+#: app/views/administration.timeouts.edit.php:158
+msgid "Media type test"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
 msgid "Media type test failed."
@@ -13577,6 +13662,10 @@ msgstr "Le nom de l'entrée du menu est utilisé comme étiquette pour l'URL du 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr "Chemin du menu"
+
+#: widgets/piechart/includes/WidgetForm.php:158
+msgid "Merge sectors smaller than "
+msgstr ""
 
 #: app/partials/popup.operations.php:160
 #: app/partials/scheduledreport.formgrid.html.php:178
@@ -14236,6 +14325,10 @@ msgstr "Délai réseau dépassé pour le test de rapport planifié"
 msgid "Network timeout for script execution"
 msgstr "Délai réseau dépassé pour l'exécution du script"
 
+#: app/views/administration.timeouts.edit.php:136
+msgid "Network timeouts for UI"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1687
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
 msgstr "Utilisation du réseau (taux de transmission et taux de réception combinés) pendant l'intervalle, \"url\" - URL du service VMware, \"uuid\" - Identifiant unique global de la machine virtuelle VMware, \"instance\" - instance d'interface réseau"
@@ -14365,6 +14458,10 @@ msgstr "Nouveau service"
 #: app/views/webscenario.step.edit.php:286
 msgid "New step of web scenario"
 msgstr "Nouvelle étape du scénario web"
+
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr ""
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -16301,6 +16398,10 @@ msgstr "Persan (fa_IR)"
 msgid "Pie"
 msgstr "Camembert"
 
+#: widgets/piechart/Widget.php:31
+msgid "Pie chart"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:135
 msgid "Placing algorithm"
 msgstr "Algorithme de placement"
@@ -16454,6 +16555,12 @@ msgstr "Fonctions de prédiction"
 #: include/views/configuration.item.prototype.edit.php:891
 msgid "Preprocessing"
 msgstr "Prétraitement"
+
+#: app/views/popup.massupdate.item.php:205
+#: include/views/configuration.item.edit.php:1060
+#: include/views/configuration.item.prototype.edit.php:929
+msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:209
@@ -18253,6 +18360,10 @@ msgid_plural "Scheduled reports enabled"
 msgstr[0] "Rapport planifié activé"
 msgstr[1] "Rapports planifiés activés"
 
+#: app/views/administration.timeouts.edit.php:188
+msgid "Scheduled report test"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
 msgstr "Rapport planifié mis à jour"
@@ -18319,6 +18430,10 @@ msgstr[1] "Script supprimé"
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
 msgstr "Le script n'a pas de paramètres."
+
+#: app/views/administration.timeouts.edit.php:168
+msgid "Script execution"
+msgstr ""
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -18894,6 +19009,11 @@ msgstr "Raccourci"
 msgid "Show"
 msgstr "Afficher"
 
+#: widgets/piechart/includes/WidgetForm.php:234
+#: widgets/svggraph/includes/WidgetForm.php:378
+msgid "Show aggregation function"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
 msgstr "Afficher l'arc"
@@ -19000,6 +19120,10 @@ msgstr "Afficher le texte en HTML"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:218
 msgid "Show timeline"
 msgstr "Afficher la chronologie"
+
+#: widgets/piechart/includes/WidgetForm.php:170
+msgid "Show total value"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show triggers"
@@ -19211,6 +19335,10 @@ msgstr "Source"
 #: include/classes/widgets/forms/CWidgetFormMap.php:40
 msgid "Source type"
 msgstr "Type de source"
+
+#: widgets/piechart/includes/WidgetForm.php:152
+msgid "Space between sectors"
+msgstr ""
 
 #: include/locales.inc.php:61
 msgid "Spanish (es_ES)"
@@ -19787,6 +19915,10 @@ msgstr "Filtre de tag"
 #: include/views/configuration.triggers.edit.php:550
 msgid "Tag for matching"
 msgstr "Tag pour la concordance"
+
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
@@ -20520,6 +20652,28 @@ msgstr "Fuseau horaire"
 #: include/views/configuration.item.prototype.edit.php:330 items.php:151
 msgid "Timeout"
 msgstr "Expiration"
+
+#: app/views/administration.timeouts.edit.php:203
+#: app/views/administration.timeouts.edit.php:207
+#: app/views/popup.proxy.edit.php:309
+#: include/classes/helpers/CMenuHelper.php:344 include/html.inc.php:907
+#: include/views/configuration.host.discovery.edit.php:703
+#: include/views/configuration.host.discovery.edit.php:706
+#: include/views/configuration.item.edit.php:830
+#: include/views/configuration.item.edit.php:833
+#: include/views/configuration.item.prototype.edit.php:784
+#: include/views/configuration.item.prototype.edit.php:787
+msgid "Timeouts"
+msgstr ""
+
+#: app/views/popup.proxy.edit.php:186
+msgid "Timeouts are disabled because the proxy and server versions do not match."
+msgstr ""
+
+#: app/views/administration.timeouts.edit.php:42
+#: app/views/popup.proxy.edit.php:191
+msgid "Timeouts for item types"
+msgstr ""
 
 #: app/views/monitoring.widget.plaintext.view.php:32
 #: include/classes/screens/CScreenHistory.php:265
@@ -23568,6 +23722,14 @@ msgstr "d/m/Y H:i"
 msgid "Y-m-d H:i:s"
 msgstr "d/m/Y H:i:s"
 
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr "d/m/Y H:i"
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
+msgstr "d/m/Y H:i:s"
+
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
 msgstr "d/n/Y"
@@ -24133,6 +24295,10 @@ msgstr "une lettre Latine majuscule et minuscule"
 msgid "and"
 msgstr "et"
 
+#: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
+msgid "any error"
+msgstr ""
+
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
 msgstr "en Bleu"
@@ -24690,9 +24856,25 @@ msgstr "courriel"
 msgid "equals"
 msgstr "égal"
 
+#: include/forms.inc.php:1452 include/views/js/item.preprocessing.js.php:239
+msgid "error does not match"
+msgstr ""
+
+#: include/forms.inc.php:1451 include/views/js/item.preprocessing.js.php:238
+msgid "error matches"
+msgstr ""
+
 #: include/views/js/item.preprocessing.js.php:466
 msgid "error message"
 msgstr "message d'erreur"
+
+#: app/views/js/popup.itemtestedit.view.js.php:479
+msgid "error text"
+msgstr ""
+
+#: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
+msgid "error-matching"
+msgstr ""
 
 #: app/views/popup.lldoverride.php:119
 #: include/views/configuration.host.discovery.edit.php:789
@@ -24785,6 +24967,14 @@ msgstr "le nom du groupe doit correspondre au nom du groupe %1$s"
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
+
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr "H:i"
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr "H:i:s"
 
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
@@ -25054,6 +25244,10 @@ msgstr "un prototype d'élément avec le même UUID existe déjà"
 msgid "item with the same UUID already exists"
 msgstr "un élément avec le même UUID existe déjà"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:688
+msgid "jsonpath() - Returns JSONPath result"
+msgstr ""
+
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "la clé est vide"
@@ -25146,6 +25340,10 @@ msgstr "d-m"
 
 #: include/translateDefines.inc.php:33
 msgid "m-d H:i"
+msgstr "d-m H:i"
+
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
 msgstr "d-m H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:37
@@ -25346,6 +25544,10 @@ msgstr "d/n"
 msgid "n-d H:i"
 msgstr "d/n H:i"
 
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr "d/n H:i"
+
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
 #: include/views/configuration.item.edit.php:262
@@ -25461,7 +25663,7 @@ msgstr "nombre"
 
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
-msgstr ""
+msgstr "l'objet n'existe pas ou appartient à un autre objet"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
@@ -25938,6 +26140,10 @@ msgstr "time () - Heure actuelle"
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft () - Temps nécessaire pour atteindre le seuil estimé en fonction de la période T"
 
+#: include/classes/api/services/CProxy.php:835
+msgid "timeouts are disabled because the proxy and server versions do not match"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() - Valeur moyenne pour la période T avec décalage de période exact"
@@ -26354,6 +26560,10 @@ msgstr "mauvais type d'élément"
 #: include/classes/api/services/CTask.php:591
 msgid "wrong master item type"
 msgstr "mauvais type d'élément principal"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1207
+msgid "xmlxpath() - Returns XML XPath result"
+msgstr ""
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"
