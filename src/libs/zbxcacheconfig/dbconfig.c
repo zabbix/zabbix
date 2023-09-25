@@ -2593,16 +2593,17 @@ static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 
 char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type)
 {
-	const char	*tmt;
+	const char	*cached_tmt;
+	char		*tmt;
 
 	RDLOCK_CACHE;
 
-	tmt = dc_get_global_item_type_timeout(item_type);
+	cached_tmt = dc_get_global_item_type_timeout(item_type);
+	tmt = zbx_strdup(NULL, tmt);
 
 	UNLOCK_CACHE;
 
-	return zbx_strdup(NULL, tmt);
-
+	return tmt;
 }
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
