@@ -61,6 +61,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/subfilter";
 @import "components/svg-gauge";
 @import "components/svg-graph";
+@import "components/svg-piechart";
 @import "components/tabfilter";
 @import "components/tabs";
 @import "components/toc";
@@ -74,6 +75,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-map";
 @import "components/dashboard/widget-navtree";
+@import "components/dashboard/widget-piechart";
 @import "components/dashboard/widget-problemsbysv";
 @import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
@@ -1849,10 +1851,10 @@ select {
 
 	.form-grid {
 		// 100px label column width for use in popup forms.
-		grid-template-columns: minmax(var(--label-width, 100px), max-content) auto;
+		grid-template-columns: minmax(var(--label-width, 100px), max-content) 1fr;
 
 		&.form-grid-1-1 {
-			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+			grid-template-columns: repeat(2, minmax(100px, max-content) 1fr);
 		}
 
 		&.form-grid-3-1 {
@@ -3280,6 +3282,24 @@ svg {
 #preprocessing-test-form {
 	.table-forms-separator {
 		margin-top: -2px;
+	}
+
+	.runtime-error-fields {
+		display: flex;
+		justify-content: space-between;
+
+		label {
+			width: auto;
+			padding-inline-end: 8px;
+		}
+
+		> div {
+			display: inline-flex;
+		}
+
+		.multilineinput-control {
+			width: 250px;
+		}
 	}
 }
 

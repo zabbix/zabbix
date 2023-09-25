@@ -1531,15 +1531,9 @@ class CWidgetBase {
 			li_button.type = 'button';
 			li_button.setAttribute('data-hintbox', '1');
 			li_button.setAttribute('data-hintbox-static', '1');
+			li_button.setAttribute('data-hintbox-contents', info[i].hint);
 			li_button.classList.add(ZBX_STYLE_BTN_ICON, info[i].icon);
 			li.appendChild(li_button);
-
-			const li_div = document.createElement('div');
-
-			li_div.innerHTML = info[i].hint;
-			li_div.classList.add('hint-box');
-			li_div.style.display = 'none';
-			li.appendChild(li_div);
 
 			this._actions.prepend(li);
 		}

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-08-28 07:45+0000\n"
+"PO-Revision-Date: 2023-09-22 05:58+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -913,6 +913,10 @@ msgstr "Afegeix"
 msgid "Add (message type limit reached)"
 msgstr "Afegeix (s'ha arribat al límit de tipus de missatge)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr "Afegeix una columna"
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "Afegeix un giny nou"
@@ -1490,6 +1494,30 @@ msgstr "Afirmacions"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Etiqueta d'actiu"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] "%1$s %2$s de cada setmana"
+msgstr[1] "%1$s %2$s de cada  %3$s setmanes"
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] "A %1$s cada dia"
+msgstr[1] "A %1$s cada %2$s dies"
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr "A %1$s el %2$s %3$s de cada %4$s"
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr "A %1$s el dia %2$s de cada %3$s"
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -14361,6 +14389,10 @@ msgstr "Nou servei"
 msgid "New step of web scenario"
 msgstr "Nova passa d'escenari web"
 
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr "Nou filtre d'etiquetes"
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
 msgstr "Nou nom d'etiqueta"
@@ -19783,6 +19815,10 @@ msgstr "Filtre d'etiquetes"
 msgid "Tag for matching"
 msgstr "Etiqueta per fer coincidir"
 
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr "Llistat d'etiquetes"
+
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
 #: include/classes/widgets/forms/CWidgetFormProblems.php:137
@@ -23563,6 +23599,14 @@ msgstr "A-M-D h:m"
 msgid "Y-m-d H:i:s"
 msgstr "A-M-D h:m:s"
 
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr "A-M-D h:m"
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
+msgstr "A-M-D h:m:s"
+
 #: include/translateDefines.inc.php:40
 msgid "Y-n-d"
 msgstr "A-N-D"
@@ -24781,6 +24825,14 @@ msgctxt "hour short"
 msgid "h"
 msgstr "h"
 
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr "H:i"
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr "H:i:s"
+
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
 msgid "hh.mm"
@@ -25143,6 +25195,10 @@ msgstr "m-d"
 msgid "m-d H:i"
 msgstr "m-d H:i"
 
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
+msgstr "m-d H:i"
+
 #: include/classes/parsers/CUserMacroParser.php:37
 msgid "macro is empty"
 msgstr "la macro és buida"
@@ -25341,6 +25397,10 @@ msgstr "n-d"
 msgid "n-d H:i"
 msgstr "n-d H:i"
 
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr "n-d H:i"
+
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
 #: include/views/configuration.item.edit.php:262
@@ -25453,6 +25513,10 @@ msgstr "now() - Nombre de segons des de l'època"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "nombre"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr "l'objecte no existeix pas o pertany a un altre objecte"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

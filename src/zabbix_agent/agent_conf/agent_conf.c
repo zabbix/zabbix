@@ -22,6 +22,7 @@
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
+#include "zbxparam.h"
 
 /******************************************************************************
  *                                                                            *

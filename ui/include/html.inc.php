@@ -863,6 +863,10 @@ function getAdministrationGeneralSubmenu(): array {
 		->setArgument('action', 'autoreg.edit')
 		->getUrl();
 
+	$timeouts_url = (new CUrl('zabbix.php'))
+		->setArgument('action', 'timeouts.edit')
+		->getUrl();
+
 	$image_url = (new CUrl('zabbix.php'))
 		->setArgument('action', 'image.list')
 		->getUrl();
@@ -900,6 +904,7 @@ function getAdministrationGeneralSubmenu(): array {
 			'items' => array_filter([
 				$gui_url            => _('GUI'),
 				$autoreg_url        => _('Autoregistration'),
+				$timeouts_url       => _('Timeouts'),
 				$image_url          => _('Images'),
 				$iconmap_url        => _('Icon mapping'),
 				$regex_url          => _('Regular expressions'),

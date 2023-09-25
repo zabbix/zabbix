@@ -137,21 +137,30 @@ class CWidgetFieldTimePeriod {
 
 	#initField() {
 		if (this.#widget_accepted) {
-			this.#reference_multiselect = jQuery(`#${this.#field_name}_reference`).multiSelect({
+			const $multiselect = jQuery(`#${this.#field_name}_reference`);
+
+			$multiselect[0].dataset.params = JSON.stringify({
 				name: `${this.#field_name}[${CWidgetBase.FOREIGN_REFERENCE_KEY}]`,
 				selectedLimit: 1,
-				custom_select: true,
-				custom_suggest_list: (entities) => this.#getSuggestedList(entities),
-				custom_suggest_select_handler: (entity) => this.#selectTypedReference(entity.id)
+				custom_select: true
 			});
 
-			this.#reference_multiselect.multiSelect('getSelectButton').addEventListener('click', () => {
-				const popup = new ClassWidgetSelectPopup(this.#getWidgets());
+			this.#reference_multiselect = $multiselect.multiSelect();
 
-				popup.on('dialogue.submit', (e) => {
-					this.#selectTypedReference(e.detail.reference);
+			this.#reference_multiselect
+				.multiSelect('setCustomSuggestList', () => this.#getSuggestedList());
+
+			this.#reference_multiselect
+				.multiSelect('customSuggestSelectHandler', (entity) => this.#selectTypedReference(entity.id));
+
+			this.#reference_multiselect
+				.multiSelect('getSelectButton').addEventListener('click', () => {
+					const popup = new ClassWidgetSelectPopup(this.#getWidgets());
+
+					popup.on('dialogue.submit', (e) => {
+						this.#selectTypedReference(e.detail.reference);
+					});
 				});
-			});
 		}
 
 		this.#date_from_input = document.getElementById(`${this.#field_name}_from`);

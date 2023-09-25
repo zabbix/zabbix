@@ -701,7 +701,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Timeout' => ['id' => 'timeout', 'value' => '0']
 					],
-					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
 			// #33.
@@ -713,9 +713,9 @@ class testMassUpdateItems extends CWebTest{
 						'18_Script'
 					],
 					'change' => [
-						'Timeout' => ['id' => 'timeout', 'value' => '61']
+						'Timeout' => ['id' => 'timeout', 'value' => '601']
 					],
-					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'details' => 'Invalid parameter "/1/timeout": value must be one of 1-600.'
 				]
 			],
 			// #34.
@@ -729,7 +729,7 @@ class testMassUpdateItems extends CWebTest{
 					'change' => [
 						'Timeout' => ['id' => 'timeout', 'value' => '']
 					],
-					'details' => 'Invalid parameter "/1/timeout": cannot be empty.'
+					'details' => 'Incorrect value for field "timeout": cannot be empty.'
 				]
 			],
 			// #35.

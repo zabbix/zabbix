@@ -139,7 +139,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$prev_value = array_key_exists(1, $history[$itemid]) ? $history[$itemid][1]['value'] : null;
 
 				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = date(ZBX_FULL_DATE_TIME, (int) $history[$itemid][0]['clock']);
+					$time = date(DATE_TIME_FORMAT_SECONDS, (int) $history[$itemid][0]['clock']);
 				}
 
 				switch ($value_type) {
@@ -215,7 +215,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				// Since there is no value, we can still show time.
 				if (array_key_exists(Widget::SHOW_TIME, $show)) {
-					$time = date(ZBX_FULL_DATE_TIME);
+					$time = date(DATE_TIME_FORMAT_SECONDS);
 				}
 			}
 

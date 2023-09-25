@@ -46,7 +46,9 @@
 		options.url = curl.getUrl();
 
 		return this.each(function() {
-			$(this).empty().multiSelect(options);
+			$(this).empty();
+			this.dataset.params = JSON.stringify(options);
+			$(this).multiSelect();
 		});
 	};
 
@@ -352,53 +354,81 @@
 				}
 			});
 		},
+
+		setCustomSuggestList: function(callback) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
+
+				ms.options.custom_suggest_list = callback;
+			});
+		},
+
+		setSuggestListModifier: function(callback) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
+
+				ms.options.suggest_list_modifier = callback;
+			});
+		},
+
+		customSuggestSelectHandler: function(callback) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
+
+				ms.options.custom_suggest_select_handler = callback;
+			});
+		}
 	};
 
 	/**
-	 * Create multi select input element.
+	 * Initialize and interact with multi select input element.
 	 *
-	 * @param string options['url']					backend url
-	 * @param string options['name']				input element name
-	 * @param object options['labels']				translated labels (optional)
-	 * @param object options['data']				preload data {id, name, prefix} (optional)
-	 * @param string options['data'][id]
-	 * @param string options['data'][name]
-	 * @param string options['data'][prefix]		(optional)
-	 * @param bool   options['data'][inaccessible]	(optional)
-	 * @param bool   options['data'][disabled]		(optional)
-	 * @param string options['placeholder']			set custom placeholder (optional)
-	 * @param array  options['excludeids']			the list of excluded ids (optional)
-	 * @param string options['defaultValue']		default value for input element (optional)
-	 * @param bool   options['disabled']			turn on/off readonly state (optional)
-	 * @param bool   options['hidden']				hide element (optional)
-	 * @param bool   options['addNew']				allow user to create new names (optional)
-	 * @param int    options['selectedLimit']		how many items can be selected (optional)
-	 * @param int    options['limit']				how many available items can be received from backend (optional)
-	 * @param object options['popup']				popup data {parameters, width, height} (optional)
-	 * @param string options['popup']['parameters']
-	 * @param string options['popup']['filter_preselect']
-	 * @param string options['popup']['filter_preselect']['id']
-	 * @param string options['popup']['filter_preselect']['submit_as']
-	 * @param object options['popup']['filter_preselect']['submit_parameters']
-	 * @param bool   options['popup']['filter_preselect']['multiple']
-	 * @param int    options['popup']['width']
-	 * @param int    options['popup']['height']
-	 * @param object options['autosuggest']         autosuggest options (optional)
-	 * @param object options['autosuggest']['filter_preselect']
-	 * @param string options['autosuggest']['filter_preselect']['id']
-	 * @param string options['autosuggest']['filter_preselect']['submit_as']
-	 * @param object options['autosuggest']['filter_preselect']['submit_parameters']
-	 * @param bool   options['autosuggest']['filter_preselect']['multiple']
-	 * @param string options['styles']				additional style for multiselect wrapper HTML element (optional)
-	 * @param string options['styles']['property']
-	 * @param string options['styles']['value']
+	 * Function can either accept a method from supported methods or expects the multiselect element to contain
+	 * a 'data-params' attribute with the following possible properties:
+	 *     string url                   backend url
+	 *     string name                  input element name
+	 *     object labels                translated labels (optional)
+	 *     array  data                  preload data {id, name, prefix} (optional)
+	 *     string data[][id]
+	 *     string data[][name]
+	 *     string data[][prefix]        (optional)
+	 *     bool   data[][inaccessible]  (optional)
+	 *     bool   data[][disabled]      (optional)
+	 *     string placeholder           set custom placeholder (optional)
+	 *     array  excludeids            the list of excluded ids (optional)
+	 *     string defaultValue          default value for input element (optional)
+	 *     bool   disabled              turn on/off readonly state (optional)
+	 *     bool   hidden                hide element (optional)
+	 *     bool   addNew                allow user to create new names (optional)
+	 *     int    selectedLimit         how many items can be selected (optional)
+	 *     int    limit                 how many available items can be received from backend (optional)
+	 *     object popup                 popup data {parameters, width, height} (optional)
+	 *     string popup[parameters]
+	 *     string popup[filter_preselect]
+	 *     string popup[filter_preselect][id]
+	 *     string popup[filter_preselect][submit_as]
+	 *     object popup[filter_preselect][submit_parameters]
+	 *     bool   popup[filter_preselect][multiple]
+	 *     int    popup[width]
+	 *     int    popup[height]
+	 *     object autosuggest           autosuggest options (optional)
+	 *     object autosuggest[filter_preselect]
+	 *     string autosuggest[filter_preselect][id]
+	 *     string autosuggest[filter_preselect][submit_as]
+	 *     object autosuggest[filter_preselect][submit_parameters]
+	 *     bool   autosuggest[filter_preselect][multiple]
+	 *     string styles                additional style for multiselect wrapper HTML element (optional)
+	 *     string styles[property]
+	 *     string styles[value]
 	 *
 	 * @return object
 	 */
-	$.fn.multiSelect = function(options) {
-		// Call a public method.
-		if (methods[options]) {
-			return methods[options].apply(this, Array.prototype.slice.call(arguments, 1));
+	$.fn.multiSelect = function(method) {
+		if (method !== undefined) {
+			return methods[method].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 
 		var defaults = {
@@ -428,14 +458,14 @@
 			styles: {}
 		};
 
-		options = $.extend({}, defaults, options);
-
 		return this.each(function() {
 			var $obj = $(this);
 
 			if ($obj.data('multiSelect') !== undefined) {
 				return;
 			}
+
+			const options = $.extend({}, defaults, JSON.parse(this.dataset.params));
 
 			options.required_str = $obj.attr('aria-required') === undefined ? 'false' : $obj.attr('aria-required');
 			$obj.removeAttr('aria-required');

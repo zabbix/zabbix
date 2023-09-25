@@ -121,13 +121,15 @@ INDEX		|1		|hostid
 INDEX		|2		|groupid
 INDEX		|3		|templateid
 
-TABLE|group_discovery|groupid|ZBX_TEMPLATE
+TABLE|group_discovery|groupdiscoveryid|ZBX_TEMPLATE
+FIELD		|groupdiscoveryid|t_id		|	|NOT NULL	|0
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|1|hstgrp
 FIELD		|parent_group_prototypeid|t_id	|	|NOT NULL	|0			|2|group_prototype|group_prototypeid|RESTRICT
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
-INDEX		|1		|parent_group_prototypeid
+UNIQUE		|1		|groupid,parent_group_prototypeid
+INDEX		|2		|parent_group_prototypeid
 
 TABLE|drules|druleid|ZBX_DATA
 FIELD		|druleid	|t_id		|	|NOT NULL	|0
@@ -259,7 +261,7 @@ FIELD		|lifetime	|t_varchar(255)	|'30d'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|jmx_endpoint	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|master_itemid	|t_id		|	|NULL		|ZBX_PROXY		|5|items	|itemid		|RESTRICT
-FIELD		|timeout	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY
+FIELD		|timeout	|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|url		|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|query_fields	|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|posts		|t_text		|''	|NOT NULL	|ZBX_PROXY
@@ -615,6 +617,15 @@ FIELD		|jit_provision_interval		|t_varchar(32)	|'1h'	|NOT NULL	|ZBX_NODATA
 FIELD		|saml_jit_status			|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_jit_status			|t_integer		|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|disabled_usrgrpid			|t_id			|NULL	|NULL		|ZBX_NODATA	|4|usrgrp	|usrgrpid|RESTRICT
+FIELD		|timeout_zabbix_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_simple_check	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_snmp_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_external_check	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_db_monitor	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_http_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_ssh_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_telnet_agent	|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
+FIELD		|timeout_script		|t_varchar(255)	|'3s'	|NOT NULL	|ZBX_PROXY,ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 INDEX		|3		|ldap_userdirectoryid
@@ -2156,6 +2167,16 @@ FIELD		|tls_psk		|t_varchar(512)	|''		|NOT NULL	|0
 FIELD		|allowed_addresses	|t_varchar(255)	|''		|NOT NULL	|0
 FIELD		|address		|t_varchar(255)	|'127.0.0.1'	|NOT NULL	|0
 FIELD		|port			|t_varchar(64)	|'10051'	|NOT NULL	|0
+FIELD		|custom_timeouts	|t_integer	|'0'		|NOT NULL	|0
+FIELD		|timeout_zabbix_agent	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_simple_check	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_snmp_agent	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_external_check	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_db_monitor	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_http_agent	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_ssh_agent	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_telnet_agent	|t_varchar(255)	|''		|NOT NULL	|0
+FIELD		|timeout_script		|t_varchar(255)	|''		|NOT NULL	|0
 UNIQUE		|1		|name
 CHANGELOG	|19
 
@@ -2169,4 +2190,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050102	|6050102
+ROW		|1		|6050133	|6050133

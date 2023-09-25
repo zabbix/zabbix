@@ -150,11 +150,21 @@ class CWidgetFieldMultiselect {
 	#initField() {
 		const has_optional_sources = this.#widget_accepted && (!this.#default_prevented || this.#dashboard_accepted);
 
-		this.#multiselect = jQuery(`#${this.#field_name}${this.#is_multiple ? '_' : ''}`).multiSelect({
-			...this.#multiselect_params,
-			suggest_list_modifier: has_optional_sources ? (entities) => this.#modifySuggestedList(entities) : null,
-			custom_suggest_select_handler: has_optional_sources ? (entity) => this.#selectSuggested(entity) : null
-		})
+		const $multiselect = jQuery(`#${this.#field_name}${this.#is_multiple ? '_' : ''}`);
+
+		$multiselect[0].dataset.params = JSON.stringify(this.#multiselect_params);
+
+		this.#multiselect = $multiselect.multiSelect();
+
+		if (has_optional_sources) {
+			this.#multiselect
+				.multiSelect('setSuggestListModifier', (entities) => this.#modifySuggestedList(entities));
+
+			this.#multiselect
+				.multiSelect('customSuggestSelectHandler', (entity) => this.#selectSuggested(entity));
+		}
+
+		this.#multiselect
 			.on('before-add', () => {
 				if (this.#is_selecting_typed_reference !== this.#is_selected_typed_reference) {
 					for (const item of this.#multiselect.multiSelect('getData')) {

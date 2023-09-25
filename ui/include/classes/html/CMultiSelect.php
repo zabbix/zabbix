@@ -60,7 +60,7 @@ class CMultiSelect extends CTag {
 			$this->setAttribute('aria-disabled', 'true');
 		}
 
-		$params = [
+		$this->params = [
 			'name' => $options['name'],
 			'labels' => [
 				'No matches found' => _('No matches found'),
@@ -84,34 +84,34 @@ class CMultiSelect extends CTag {
 				}
 			}
 
-			$params['url'] = $url->getUrl();
+			$this->params['url'] = $url->getUrl();
 		}
 
 		if (array_key_exists('data', $options)) {
-			$params['data'] = zbx_cleanHashes($options['data']);
+			$this->params['data'] = zbx_cleanHashes($options['data']);
 		}
 
 		foreach (['defaultValue', 'disabled', 'selectedLimit', 'addNew', 'styles', 'placeholder', 'hidden'] as $option) {
 			if (array_key_exists($option, $options)) {
-				$params[$option] = $options[$option];
+				$this->params[$option] = $options[$option];
 			}
 		}
 
 		if (array_key_exists('autosuggest', $options)
 				&& array_key_exists('filter_preselect', $options['autosuggest'])) {
-			$params['autosuggest']['filter_preselect'] = $options['autosuggest']['filter_preselect'];
+			$this->params['autosuggest']['filter_preselect'] = $options['autosuggest']['filter_preselect'];
 		}
 
 		if (array_key_exists('custom_select', $options)) {
-			$params['custom_select'] = $options['custom_select'];
+			$this->params['custom_select'] = $options['custom_select'];
 		}
 		elseif (array_key_exists('popup', $options)) {
 			if (array_key_exists('filter_preselect', $options['popup'])) {
-				$params['popup']['filter_preselect'] = $options['popup']['filter_preselect'];
+				$this->params['popup']['filter_preselect'] = $options['popup']['filter_preselect'];
 			}
 
 			if (array_key_exists('parameters', $options['popup'])) {
-				$params['popup']['parameters'] = $options['popup']['parameters'];
+				$this->params['popup']['parameters'] = $options['popup']['parameters'];
 
 				$excludeids = array_key_exists('excludeids', $options['popup']['parameters'])
 					? $options['popup']['parameters']['excludeids']
@@ -122,12 +122,12 @@ class CMultiSelect extends CTag {
 					: []);
 
 				if ($excludeids) {
-					$params['excludeids'] = $excludeids;
+					$this->params['excludeids'] = $excludeids;
 				}
 			}
 		}
 
-		$this->params = $params;
+		$this->setAttribute('data-params', $this->params);
 
 		if (!array_key_exists('add_post_js', $options) || $options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());
@@ -144,7 +144,7 @@ class CMultiSelect extends CTag {
 	}
 
 	public function getPostJS() {
-		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect('.json_encode($this->params).');';
+		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect();';
 	}
 
 	/**

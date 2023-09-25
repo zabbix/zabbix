@@ -22,16 +22,14 @@
 
 #include "zbxthreads.h"
 
-extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
-extern int	CONFIG_MAX_HOUSEKEEPER_DELETE;
-
 typedef struct
 {
 	struct zbx_db_version_info_t	*db_version_info;
 	int				config_timeout;
+	int				config_housekeeping_frequency;
+	int				config_max_housekeeper_delete;
 }
 zbx_thread_housekeeper_args;
-
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args);
 

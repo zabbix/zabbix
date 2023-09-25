@@ -358,6 +358,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Top triggers widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -401,6 +407,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Gauge widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Top triggers widget',
 					'copy to' => 'another template'
 				]
 			]
