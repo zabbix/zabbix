@@ -674,7 +674,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://table[@class="list-table"]//tr[1]/td[3]/a'
+							'element' => 'link:testInheritanceTrigger1'
 						]
 					],
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
@@ -1121,7 +1121,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://table[@class="list-table"]//tr[1]/td[4]/a'
+							'element' => 'link:testFormTrigger1'
 						]
 					],
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
@@ -1260,7 +1260,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://table[@class="list-table"]//tr[1]/td[3]/a'
+							'element' => 'link:testFormTriggerPrototype1'
 						]
 					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'

@@ -262,18 +262,29 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 		else {
 			$this->zbxTestTextPresent('Expression');
-			$this->zbxTestAssertVisibleId('expression');
-			$this->zbxTestAssertAttribute("//textarea[@id='expression']", 'rows', 7);
-			$this->zbxTestAssertAttribute("//textarea[@id='expression']", 'readonly');
+			$this->zbxTestAssertVisibleId('expr_temp');
+			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'rows', 7);
+			$this->zbxTestAssertAttribute("//textarea[@id='expr_temp']", 'readonly');
 			$this->zbxTestTextPresent('Close expression constructor');
 			$this->zbxTestAssertNotVisibleXpath('//input[@name="expression"]');
 
-			if (!isset($data['form']) || isset($data['templatedHost'])) {
-				$this->zbxTestAssertVisibleXpath("//button[@id='insert-expression']");
+			if (!isset($data['form'])) {
+				$this->zbxTestAssertVisibleXpath("//div[@id='expression-row']//button[@id='add_expression']");
+			}
+			elseif ((isset($data['templatedHost']))) {
+				$this->assertEquals(0, $dialog->query('button', ['And', 'Or', 'Replace', 'Edit', 'Insert expression'])
+					->all()->filter(CElementFilter::CLICKABLE)->count()
+				);
 			}
 			else {
-				$this->assertEquals(2, $dialog->query('button',['And', 'Or', 'Replace', 'Edit', 'Insert expression'])->all()
-					->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				$this->assertFalse($this->query("xpath://div[@id='expression-row']//button[@id='add_expression']")
+					->one()->isDisplayed()
+				);
+				$this->assertEquals(2, $dialog->query('button', ['Edit', 'Insert expression'])
+					->all()->filter(CElementFilter::CLICKABLE)->count()
+				);
+				$this->assertEquals(0, $dialog->query('button', ['And', 'Or', 'Replace'])->all()
+					->filter(CElementFilter::CLICKABLE)->count()
 				);
 			}
 
@@ -377,16 +388,14 @@ class testFormTrigger extends CLegacyWebTest {
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
 			$this->assertEquals(4, $dialog_footer->query('button',['Update', 'Clone', 'Delete', 'Cancel'])->all()
-				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 		elseif (isset($data['templatedHost'])) {
 			$this->assertEquals(3, $dialog_footer->query('button',['Update', 'Clone', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 			);
-			$this->assertEquals(1, $dialog_footer->query('button:Delete')->all()
-				->filter(new CElementFilter(CElementFilter::NOT_CLICKABLE))->count()
-			);
+			$this->assertFalse($dialog_footer->query('button:Delete')->one()->isClickable());
 			$this->assertTrue($this->zbxTestCheckboxSelected('recovery_mode_0'));
 			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		}
@@ -400,13 +409,10 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Dependencies', 'Name', 'Action']);
 
 		if (!isset($data['template'])) {
-			$this->zbxTestAssertElementPresentId('add-dep-trigger');
 			$this->zbxTestAssertElementText("//button[@id='add-dep-trigger']", 'Add');
 		}
 		else {
-			$this->zbxTestAssertElementPresentId('add-dep-template-trigger');
 			$this->zbxTestAssertElementText("//button[@id='add-dep-template-trigger']", 'Add');
-			$this->zbxTestAssertElementPresentId('add-dep-host-trigger');
 			$this->zbxTestAssertElementText("//button[@id='add-dep-host-trigger']", 'Add host trigger');
 		}
 
@@ -1072,7 +1078,7 @@ class testFormTrigger extends CLegacyWebTest {
 
 				if (isset($constructor['text'])) {
 					foreach($constructor['text'] as $txt) {
-						$this->query('xpath://*[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
+						$this->query('xpath://div[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
 						$this->zbxTestTextPresent($txt);
 					}
 				}
