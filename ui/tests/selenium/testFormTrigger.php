@@ -75,18 +75,16 @@ class testFormTrigger extends CLegacyWebTest {
 			];
 		}
 
-		CDataHelper::call('item.create', $items_data	);
+		CDataHelper::call('item.create', $items_data);
 
-		// Create triggers based on items.
-		$triggers_data = [];
-		for ($i = 1; $i < 5; $i++) {
-			$triggers_data[] = [
-				'description' => 'testFormTrigger'.$i,
+		// Create trigger based on item.
+		CDataHelper::call('trigger.create',
+			[
+				'description' => 'testFormTrigger1',
 				'expression' => 'last(/'.self::HOST.'/Float,#1)=0',
 				'priority' => 0
-			];
-		}
-		CDataHelper::call('trigger.create', $triggers_data);
+			]
+		);
 	}
 
 	// Returns layout data
