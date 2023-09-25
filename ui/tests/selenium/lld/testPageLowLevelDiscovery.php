@@ -73,9 +73,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'Type' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 						'SNMP agent', 'Zabbix internal','Zabbix trapper', 'External check',
 						'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent',
-						'TELNET agent', 'JMX agent', 'Dependent item', 'all'],
-				'State' => ['Normal', 'Not supported', 'all'],
-				'Status' => ['all', 'Enabled', 'Disabled']
+						'TELNET agent', 'JMX agent', 'Dependent item', 'All'],
+				'State' => ['Normal', 'Not supported', 'All'],
+				'Status' => ['All', 'Enabled', 'Disabled']
 		];
 		foreach ($dropdowns as $name => $values) {
 			foreach ($values as $value) {
@@ -91,7 +91,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					case 'Normal':
 					case 'Not supported':
 						$this->assertFalse($form->getField('Status')->isEnabled());
-						$this->assertEquals('all', $form->getField('Status')->getText());
+						$this->assertEquals('All', $form->getField('Status')->getText());
 						break;
 				}
 			}
@@ -547,7 +547,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Update interval' => '0',
 						'Keep lost resources period' => '30d',
-						'State' => 'all',
+						'State' => 'All',
 						'Status' => 'Enabled'
 					],
 					'expected' => [

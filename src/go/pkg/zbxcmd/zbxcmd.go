@@ -22,7 +22,7 @@ package zbxcmd
 import "time"
 
 //MaxExecuteOutputLenB maximum output length for Execute and ExecuteStrict in bytes.
-const MaxExecuteOutputLenB = 512 * 1024
+const MaxExecuteOutputLenB = 16 * 1024 * 1024
 
 // Execute runs the 's' command without checking cmd.Wait error.
 // This means that non zero exit status code will not return an error.

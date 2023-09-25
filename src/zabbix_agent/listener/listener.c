@@ -45,13 +45,20 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, config_timeout)))
 	{
+		zbx_uint32_t	timeout;
+
 		zbx_rtrim(s->buffer, "\r\n");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
+		if (0 != s->reserved_payload)
+			timeout = s->reserved_payload;
+		else
+			timeout = (zbx_uint32_t)config_timeout;
+
 		zbx_init_agent_result(&result);
 
-		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result))
+		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result, (int)timeout))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
 			{
@@ -84,7 +91,6 @@ static void	process_listener(zbx_socket_t *s, int config_timeout)
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED "]");
-
 				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, config_timeout);
 			}
 		}

@@ -286,11 +286,11 @@ static int	zbx_config_listen_port		= ZBX_DEFAULT_SERVER_PORT;
 static char	*zbx_config_listen_ip		= NULL;
 static char	*config_server		= NULL;		/* not used in zabbix_server, required for linking */
 
-int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
+static int	config_housekeeping_frequency	= 1;
+static int	config_max_housekeeper_delete	= 5000;		/* applies for every separate field value */
 int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
 
-int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
+static int	config_problemhousekeeping_frequency = 60;
 
 static int	config_vmware_frequency		= 60;
 static int	config_vmware_perf_frequency	= 60;
@@ -627,7 +627,7 @@ static void	zbx_set_defaults(void)
 #endif
 
 #ifdef HAVE_SQLITE3
-	CONFIG_MAX_HOUSEKEEPER_DELETE = 0;
+	config_max_housekeeper_delete = 0;
 #endif
 
 	if (NULL == log_file_cfg.log_type_str)
@@ -849,9 +849,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
 		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
-		{"HousekeepingFrequency",	&CONFIG_HOUSEKEEPING_FREQUENCY,		TYPE_INT,
+		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
-		{"MaxHousekeeperDelete",	&CONFIG_MAX_HOUSEKEEPER_DELETE,		TYPE_INT,
+		{"MaxHousekeeperDelete",	&config_max_housekeeper_delete,		TYPE_INT,
 			PARM_OPT,	0,			1000000},
 		{"TmpDir",			&zbx_config_tmpdir,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1011,7 +1011,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			100},
 		{"WebServiceURL",		&zbx_config_webservice_url,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ProblemHousekeepingFrequency",	&CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY,	TYPE_INT,
+		{"ProblemHousekeepingFrequency",	&config_problemhousekeeping_frequency,	TYPE_INT,
 			PARM_OPT,	1,			3600},
 		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
 			PARM_OPT,	1,			3600},
@@ -1248,7 +1248,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
-	zbx_init_library_dbupgrade(get_program_type);
+	zbx_init_library_dbupgrade(get_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(zbx_lld_process_agent_result, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
@@ -1412,8 +1412,10 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_report_writer_args	report_writer_args = {zbx_config_tls->ca_file, zbx_config_tls->cert_file,
 							zbx_config_tls->key_file, zbx_config_source_ip,
 							zbx_config_webservice_url};
-	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout};
-	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout};
+	zbx_thread_housekeeper_args	housekeeper_args = {&db_version_info, zbx_config_timeout,
+							config_housekeeping_frequency, config_max_housekeeper_delete};
+	zbx_thread_server_trigger_housekeeper_args	trigger_housekeeper_args = {zbx_config_timeout,
+							config_problemhousekeeping_frequency};
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout,
 							config_proxyconfig_frequency, config_proxydata_frequency,
@@ -1438,6 +1440,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
+	zbx_thread_timer_args		timer_args = {get_config_forks};
 
 	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -1609,6 +1612,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(housekeeper_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TIMER:
+				thread_args.args = &timer_args;
 				zbx_thread_start(timer_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_HTTPPOLLER:
