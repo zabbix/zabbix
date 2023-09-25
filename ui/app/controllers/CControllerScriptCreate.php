@@ -132,7 +132,7 @@ class CControllerScriptCreate extends CController {
 					$user_input_values = array_map('trim', explode(",", $this->getInput('dropdown_options')));
 
 					if (array_unique($user_input_values) !== $user_input_values) {
-						error(_('Default user input values must be unique.'));
+						error(_('Dropdown options must be unique.'));
 					}
 
 					$script['manualinput_validator'] = implode(',', $user_input_values);
