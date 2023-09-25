@@ -3138,10 +3138,10 @@ static void	process_snmp_result(void *data)
 void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
 		unsigned char poller_type, int config_timeout, const char *config_source_ip)
 {
-	zbx_snmp_sess_t	ssp;
-	char		error[MAX_STRING_LEN];
-	int		i, j, err = SUCCEED, max_succeed = 0, min_fail = ZBX_MAX_SNMP_ITEMS + 1,
-			bulk = SNMP_BULK_ENABLED, timeout_sec;
+	zbx_snmp_sess_t		ssp;
+	char			error[MAX_STRING_LEN];
+	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = ZBX_MAX_SNMP_ITEMS + 1,
+				bulk = SNMP_BULK_ENABLED, timeout_sec;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__func__, items[0].host.host, items[0].interface.addr, num);
