@@ -289,7 +289,7 @@ $button_list = [
 
 if ($data['context'] === 'host') {
 	$massclearhistory = [
-		'name' => _('Clear history'),
+		'name' => _('Clear history and trends'),
 		'confirm' => _('Delete history of selected items?'),
 		'disabled' => $data['is_template']
 	];
