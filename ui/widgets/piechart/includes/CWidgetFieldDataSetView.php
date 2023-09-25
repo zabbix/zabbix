@@ -207,8 +207,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			}
 
 			$dataset_head = array_merge($dataset_head, [
-				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
-					->appendColorPickerJs(false),
+				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))->appendColorPickerJs(false),
 				$host_pattern_field,
 				$item_pattern_field
 			]);
@@ -220,8 +219,8 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 					? $value['item_names'][$itemid]
 					: '';
 
-				$item_rows[] = $this->getItemRowTemplate($row_num, ($i + 1), $itemid, $item_name, $value['color'][$i],
-															$value['type'][$i]
+				$item_rows[] = $this->getItemRowTemplate($row_num, $i + 1, $itemid, $item_name, $value['color'][$i],
+					$value['type'][$i]
 				);
 			}
 

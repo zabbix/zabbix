@@ -240,8 +240,8 @@ class TabIndicatorFactory {
 				return new PieDisplayOptionsTabIndicatorItem;
 			case 'PieLegend':
 				return new PieLegendTabIndicatorItem;
-			case 'PieTime':
-				return new PieTimeTabIndicatorItem;
+			case 'PieTimePeriod':
+				return new PieTimePeriodTabIndicatorItem;
 			case 'Preprocessing':
 				return new PreprocessingTabIndicatorItem;
 			case 'ProxyEncryption':
@@ -1718,17 +1718,17 @@ class PieDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-class PieTimeTabIndicatorItem extends TabIndicatorItem {
+class PieTimePeriodTabIndicatorItem extends TabIndicatorItem {
 
 	constructor() {
 		super(TAB_INDICATOR_TYPE_MARK);
 	}
 
 	getValue() {
-		const element = document.getElementById('graph_time');
+		const element = document.querySelector('input[name="time_period[data_source]"]');
 
 		if (element !== null) {
-			return element.checked;
+			return !element.checked;
 		}
 
 		return false;

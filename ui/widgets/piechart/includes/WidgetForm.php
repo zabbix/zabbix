@@ -21,8 +21,7 @@
 
 namespace Widgets\PieChart\Includes;
 
-use CRangeTimeParser,
-	CSettingsHelper;
+use CWidgetsData;
 
 use Zabbix\Widgets\{
 	CWidgetField,
@@ -32,11 +31,12 @@ use Zabbix\Widgets\{
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldColor,
-	CWidgetFieldDatePicker,
 	CWidgetFieldIntegerBox,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldRangeControl,
-	CWidgetFieldTextBox
+	CWidgetFieldTextBox,
+	CWidgetFieldTimePeriod
 };
 
 /**
@@ -50,8 +50,6 @@ class WidgetForm extends CWidgetForm {
 
 	public const DRAW_TYPE_DOUGHNUT = 1;
 	private const DRAW_TYPE_PIE = 0;
-
-	private const CUSTOM_TIME_ON = 1;
 
 	public const LEGEND_ON = 1;
 	private const LEGEND_COLUMNS_MAX = 4;
@@ -80,31 +78,10 @@ class WidgetForm extends CWidgetForm {
 	private const WIDTH_MIN = 20;
 	private const WIDTH_STEP = 10;
 
-	private bool $graph_time_on = false;
 	private bool $legend_on = true;
-
-	public function validate(bool $strict = false): array {
-		$errors = parent::validate($strict);
-
-		if ($this->getFieldValue('graph_time') == self::CUSTOM_TIME_ON) {
-			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
-				$this->getFieldValue('time_to')
-			));
-		}
-
-		return $errors;
-	}
 
 	protected function normalizeValues(array $values): array {
 		$values = parent::normalizeValues($values);
-
-		if (array_key_exists('graph_time', $values)) {
-			$this->graph_time_on = $values['graph_time'] == self::CUSTOM_TIME_ON;
-		}
-
-		if (!$this->graph_time_on) {
-			unset($values['time_from'], $values['time_to']);
-		}
 
 		if (array_key_exists('legend', $values)) {
 			$this->legend_on = $values['legend'] == self::LEGEND_ON;
@@ -118,7 +95,10 @@ class WidgetForm extends CWidgetForm {
 			->initDataSetFields()
 			->initDisplayingOptionsFields()
 			->initTimePeriodFields()
-			->initLegendFields();
+			->initLegendFields()
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
+			);
 	}
 
 	private function initDataSetFields(): self {
@@ -205,23 +185,14 @@ class WidgetForm extends CWidgetForm {
 	private function initTimePeriodFields(): self {
 		return $this
 			->addField(
-				new CWidgetFieldCheckBox('graph_time', _('Set custom time period'))
-			)
-			->addField(
-				(new CWidgetFieldDatePicker('time_from', _('From')))
-					->setDefault('now-1h')
-					->setFlags($this->graph_time_on
-						? CWidgetField::FLAG_NOT_EMPTY
-						: CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_DISABLED
-					)
-			)
-			->addField(
-				(new CWidgetFieldDatePicker('time_to', _('To')))
-					->setDefault('now')
-					->setFlags($this->graph_time_on
-						? CWidgetField::FLAG_NOT_EMPTY
-						: CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_DISABLED
-					)
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			);
 	}
 
@@ -248,43 +219,5 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::LEGEND_COLUMNS_MAX)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			);
-	}
-
-
-	/**
-	 * Check if widget configuration is set to use custom time.
-	 */
-	public static function hasOverrideTime(array $fields_values): bool {
-		return array_key_exists('graph_time', $fields_values)
-			&& $fields_values['graph_time'] == self::CUSTOM_TIME_ON;
-	}
-
-	private static function validateTimeSelectorPeriod(string $from, string $to): array {
-		$errors = [];
-		$ts = [];
-		$ts['now'] = time();
-		$range_time_parser = new CRangeTimeParser();
-
-		foreach (['from' => $from, 'to' => $to] as $field => $value) {
-			$range_time_parser->parse($value);
-			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
-		}
-
-		$period = $ts['to'] - $ts['from'] + 1;
-		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-		$max_period = 1 + $ts['now'] - $range_time_parser->getDateTime(true)->getTimestamp();
-
-		if ($period < ZBX_MIN_PERIOD) {
-			$errors[] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
-			);
-		}
-		elseif ($period > $max_period) {
-			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
-			);
-		}
-
-		return $errors;
 	}
 }
