@@ -1838,9 +1838,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						'triggers' => self::aggr_triggers_macros
 					],
 					'macros_n' => [
-						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
-						'inventory' => array_keys($inventory_macros)
+						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory_n' => array_keys($inventory_macros)
+					],
+					'macro_funcs_n' => [
+						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory_n' => array_keys($inventory_macros)
 					]
 				]
 			],
@@ -1867,9 +1872,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						'trigger' => ['{TRIGGER.ID}']
 					],
 					'macros_n' => [
-						'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
-						'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
-						'inventory' => array_keys($inventory_macros)
+						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
+						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory_n' => array_keys($inventory_macros)
+					],
+					'macro_funcs_n' => [
+						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
+						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+						'inventory_n' => array_keys($inventory_macros)
 					]
 				]
 			]
@@ -1973,24 +1983,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				if (array_key_exists('macros_n', $matched_macros)) {
-					if (array_key_exists('host', $matched_macros['macros_n'])) {
-						foreach ($matched_macros['macros_n']['host'] as $macro => $data) {
-							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-							$macros['host_n'][$selement['elements'][0]['triggerid']][$key][$macro] = $data;
+					foreach ($matched_macros['macros_n'] as $sub_type => $macro_data) {
+						foreach ($macro_data as $token => $data) {
+							$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+							$macros[$sub_type][$selement['elements'][0]['triggerid']][$key][$token] = $data;
 						}
 					}
+				}
 
-					if (array_key_exists('interface', $matched_macros['macros_n'])) {
-						foreach ($matched_macros['macros_n']['interface'] as $macro => $data) {
-							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-							$macros['interface_n'][$selement['elements'][0]['triggerid']][$key][$macro] = $data;
-						}
-					}
-
-					if (array_key_exists('inventory', $matched_macros['macros_n'])) {
-						foreach ($matched_macros['macros_n']['inventory'] as $macro => $data) {
-							$macro_values[$key][$macro] = UNRESOLVED_MACRO_STRING;
-							$macros['inventory_n'][$selement['elements'][0]['triggerid']][$key][$macro] = $data;
+				if (array_key_exists('macro_funcs_n', $matched_macros)) {
+					foreach ($matched_macros['macro_funcs_n'] as $sub_type => $macro_data) {
+						foreach ($macro_data as $token => $data) {
+							$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
+							$macros[$sub_type][$selement['elements'][0]['triggerid']][$key][$token] = $data;
 						}
 					}
 				}
@@ -2525,129 +2530,74 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}']
 			],
 			'macros_n' => [
-				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
-				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap())
+				'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
+				'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+				'inventory_n' => array_keys(self::getSupportedHostInventoryMacrosMap())
+			],
+			'macro_funcs_n' => [
+				'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
+				'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
+				'inventory_n' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],
 			'usermacros' => true
 		];
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'event' => [], 'user_data' => [],
-			'host_n' => [], 'interface_n' => [], 'inventory_n' => []
-		];
+		$macros = ['host_n' => [], 'interface_n' => [], 'inventory_n' => []];
 		$usermacros = [];
 
 		foreach ($data as $eventid => $script) {
-			$event = $events[$eventid];
-			$triggerid = $event['objectid'];
-			$matched_macros = [
-				'macros' => ['host' => [], 'interface' => [], 'inventory' => [], 'event' => [], 'user_data' => []],
-				'macros_n' => ['host' => [], 'interface' => [], 'inventory' => []],
-				'usermacros' => []
-			];
-
+			$texts = [];
 			foreach ($script as $fields) {
-				$exctracted_macros = self::extractMacros($fields, $types);
+				$texts = array_merge($texts, array_values($fields));
+			}
 
-				// $type = 'macros' and 'usermacros'
-				foreach ($exctracted_macros as $type => $_macros) {
-					switch ($type) {
-						case 'usermacros':
-							foreach ($_macros as $macro => $value) {
-								$matched_macros[$type][$macro] = null;
-							}
-							break;
+			$matched_macros = self::extractMacros($fields, $types);
 
-						case 'macros':
-							foreach ($_macros as $key => $macro_data) {
-								foreach ($macro_data as $token => $foo) {
-									if (!in_array($token, $matched_macros[$type][$key])) {
-										$matched_macros[$type][$key][] = $token;
-									}
-								}
-							}
-							break;
+			$event = $events[$eventid];
 
-						case 'macros_n':
-							// $key = 'host', 'interface', 'inventory'
-							foreach ($_macros as $key => $__macros) {
-								foreach ($__macros as $macro => $_macro) {
-									$matched_macros[$type][$key][$macro] = $_macro;
-								}
-							}
-							break;
-					}
+			foreach ($matched_macros['macros']['user_data'] as $token => $_data) {
+				$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
+			}
+
+			foreach ($matched_macros['macros_n'] as $sub_type => $macro_data) {
+				foreach ($macro_data as $token => $_data) {
+					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros[$sub_type][$event['objectid']][$eventid][$token] = $_data;
 				}
 			}
 
-			$hostid = $event['hosts'][0]['hostid'];
-
-			foreach ($matched_macros['macros']['host'] as $macro) {
-				if ($macro === '{HOST.ID}') {
-					$macro_values[$eventid][$macro] = $hostid;
+			foreach ($matched_macros['macro_funcs_n'] as $sub_type => $macro_data) {
+				foreach ($macro_data as $token => $_data) {
+					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros[$sub_type][$event['objectid']][$eventid][$token] = $_data;
 				}
-				else {
-					$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
-					$macros['host'][$hostid][$eventid] = true;
-				}
-			}
-
-			foreach ($matched_macros['macros']['interface'] as $macro) {
-				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
-				$macros['interface'][$hostid][$eventid] = true;
-			}
-
-			foreach ($matched_macros['macros']['inventory'] as $macro) {
-				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
-				$macros['inventory'][$hostid][$eventid] = true;
-			}
-
-			foreach ($matched_macros['macros']['user_data'] as $macro) {
-				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
-				$macros['user_data'][$hostid] = true;
-			}
-
-			// Numeric index macros.
-			foreach ($matched_macros['macros_n']['host'] as $macro => $_data) {
-				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
-				$macros['host_n'][$triggerid][$eventid][$macro] = $_data;
-			}
-
-			foreach ($matched_macros['macros_n']['interface'] as $macro => $_data) {
-				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
-				$macros['interface_n'][$triggerid][$eventid][$macro] = $_data;
-			}
-
-			foreach ($matched_macros['macros_n']['inventory'] as $macro => $_data) {
-				$macro_values[$eventid][$macro] = UNRESOLVED_MACRO_STRING;
-				$macros['inventory_n'][$triggerid][$eventid][$macro] = $_data;
 			}
 
 			// Event macros.
-			foreach ($matched_macros['macros']['event'] as $macro) {
-				switch ($macro) {
+			foreach ($matched_macros['macros']['event'] as $token => $_data) {
+				switch ($token) {
 					case '{EVENT.ID}':
-						$macro_values[$eventid][$macro] = $eventid;
+						$macro_values[$eventid][$token] = $eventid;
 						break;
 
 					case '{EVENT.NAME}':
-						$macro_values[$eventid][$macro] = $event['name'];
+						$macro_values[$eventid][$token] = $event['name'];
 						break;
 
 					case '{EVENT.NSEVERITY}':
-						$macro_values[$eventid][$macro] = $event['severity'];
+						$macro_values[$eventid][$token] = $event['severity'];
 						break;
 
 					case '{EVENT.SEVERITY}':
-						$macro_values[$eventid][$macro] = CSeverityHelper::getName($event['severity']);
+						$macro_values[$eventid][$token] = CSeverityHelper::getName($event['severity']);
 						break;
 
 					case '{EVENT.STATUS}':
-						$macro_values[$eventid][$macro] = trigger_value2str($event['value']);
+						$macro_values[$eventid][$token] = trigger_value2str($event['value']);
 						break;
 
 					case '{EVENT.VALUE}':
-						$macro_values[$eventid][$macro] = $event['value'];
+						$macro_values[$eventid][$token] = $event['value'];
 						break;
 
 					/*
@@ -2655,37 +2605,37 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					 * *UNKNOWN*.
 					 */
 					case '{EVENT.CAUSE.ID}':
-						$macro_values[$eventid][$macro] = $event['cause_eventid'] == 0
+						$macro_values[$eventid][$token] = $event['cause_eventid'] == 0
 							? UNRESOLVED_MACRO_STRING
 							: $event['cause_eventid'];
 						break;
 
 					case '{EVENT.CAUSE.NAME}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
+						$macro_values[$eventid][$token] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['name']
 							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.NSEVERITY}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
+						$macro_values[$eventid][$token] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['severity']
 							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.SEVERITY}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
+						$macro_values[$eventid][$token] = array_key_exists('cause', $event) && $event['cause']
 							? CSeverityHelper::getName($event['cause']['severity'])
 							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.STATUS}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
+						$macro_values[$eventid][$token] = array_key_exists('cause', $event) && $event['cause']
 							? trigger_value2str($event['cause']['value'])
 							: UNRESOLVED_MACRO_STRING;
 						break;
 
 					case '{EVENT.CAUSE.VALUE}':
-						$macro_values[$eventid][$macro] = array_key_exists('cause', $event) && $event['cause']
+						$macro_values[$eventid][$token] = array_key_exists('cause', $event) && $event['cause']
 							? $event['cause']['value']
 							: UNRESOLVED_MACRO_STRING;
 						break;
@@ -2700,9 +2650,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		$macro_values = self::getHostMacrosByHostId($macros['host'], $macro_values);
-		$macro_values = self::getInterfaceMacrosByHostId($macros['interface'], $macro_values);
-		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macro_values);
 
 		$trigger_hosts_by_f_num = self::getExpressionHosts(
@@ -2723,7 +2670,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value.
 		foreach ($data as $eventid => &$scripts) {
 			$event = $events[$eventid];
-			$triggerid = $event['objectid'];
 
 			foreach ($scripts as &$fields) {
 				foreach ($fields as &$value) {

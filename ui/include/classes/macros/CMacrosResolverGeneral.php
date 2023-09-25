@@ -2244,12 +2244,12 @@ class CMacrosResolverGeneral {
 		}
 
 		$db_hosts = API::Host()->get([
-			'output' => ['host', 'name', 'description'],
+			'output' => ['hostid', 'host', 'name', 'description'],
 			'hostids' => array_keys($hostids),
 			'preservekeys' => true
 		]);
 
-		$host_macros = ['HOST.ID' => null, 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
+		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name',
 			'HOST.DESCRIPTION' => 'description'
 		];
 
@@ -2273,11 +2273,11 @@ class CMacrosResolverGeneral {
 
 						$hostid = $trigger_hosts_by_f_num[$triggerid][$data['f_num']];
 
-						if ($data['macro'] === 'HOST.ID') {
-							$value = $hostid;
-						}
-						elseif (array_key_exists($hostid, $db_hosts)) {
+						if (array_key_exists($hostid, $db_hosts)) {
 							$value = $db_hosts[$hostid][$host_macros[$data['macro']]];
+							if (array_key_exists('macrofunc', $data)) {
+								$value = self::calcMacrofunc($value, $data['macrofunc']);
+							}
 						}
 					}
 				}
@@ -2366,6 +2366,9 @@ class CMacrosResolverGeneral {
 
 						if (array_key_exists($hostid, $host_interfaces)) {
 							$value = $host_interfaces[$hostid][$interface_macros[$data['macro']]];
+							if (array_key_exists('macrofunc', $data)) {
+								$value = self::calcMacrofunc($value, $data['macrofunc']);
+							}
 						}
 					}
 				}
@@ -2437,6 +2440,9 @@ class CMacrosResolverGeneral {
 						if (array_key_exists($hostid, $db_hosts)
 								&& $db_hosts[$hostid]['inventory_mode'] != HOST_INVENTORY_DISABLED) {
 							$value = $db_hosts[$hostid]['inventory'][$inventory_macros['{'.$data['macro'].'}']];
+							if (array_key_exists('macrofunc', $data)) {
+								$value = self::calcMacrofunc($value, $data['macrofunc']);
+							}
 						}
 					}
 				}
