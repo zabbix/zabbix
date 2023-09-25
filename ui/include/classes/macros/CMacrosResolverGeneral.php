@@ -111,7 +111,7 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function transformToPositionTypes(array $types) {
-		foreach (['macros', 'macro_funcs', 'macros_n', 'macros_an', 'macro_funcs_n'] as $type) {
+		foreach (['macros', 'macro_funcs', 'macros_n', 'macros_an'] as $type) {
 			if (array_key_exists($type, $types)) {
 				$patterns = [];
 				foreach ($types[$type] as $key => $_patterns) {
@@ -134,7 +134,6 @@ class CMacrosResolverGeneral {
 	 * @param array  $types['macro_funcs'][<macro_patterns>]
 	 * @param array  $types['macros_n'][<macro_patterns>]
 	 * @param array  $types['macros_an'][<macro_patterns>]
-	 * @param array  $types['macro_funcs_n'][<macro_patterns>]
 	 * @param bool   $types['references']
 	 * @param bool   $types['lldmacros']
 	 * @param bool   $types['functionids']
@@ -149,7 +148,6 @@ class CMacrosResolverGeneral {
 		$extract_macro_funcs = array_key_exists('macro_funcs', $types);
 		$extract_macros_n = array_key_exists('macros_n', $types);
 		$extract_macros_an = array_key_exists('macros_an', $types);
-		$extract_macro_funcs_n = array_key_exists('macro_funcs_n', $types);
 		$extract_references = array_key_exists('references', $types);
 		$extract_lldmacros = array_key_exists('lldmacros', $types);
 		$extract_functionids = array_key_exists('functionids', $types);
@@ -172,19 +170,16 @@ class CMacrosResolverGeneral {
 				'macros' => $types['macros_n'],
 				'ref_type' => CMacroParser::REFERENCE_NUMERIC
 			]);
+			$macro_func_n_parser = new CMacroFunctionParser([
+				'macros' => $types['macros_n'],
+				'ref_type' => CMacroParser::REFERENCE_NUMERIC
+			]);
 		}
 
 		if ($extract_macros_an) {
 			$macro_an_parser = new CMacroParser([
 				'macros' => $types['macros_an'],
 				'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
-			]);
-		}
-
-		if ($extract_macro_funcs_n) {
-			$macro_func_n_parser = new CMacroFunctionParser([
-				'macros' => $types['macro_funcs_n'],
-				'ref_type' => CMacroParser::REFERENCE_NUMERIC
 			]);
 		}
 
@@ -222,13 +217,13 @@ class CMacrosResolverGeneral {
 				$macros[$pos] = $macro_n_parser->getMatch();
 				$pos += $macro_n_parser->getLength() - 1;
 			}
+			elseif ($extract_macros_n && $macro_func_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $macro_func_n_parser->getMatch();
+				$pos += $macro_func_n_parser->getLength() - 1;
+			}
 			elseif ($extract_macros_an && $macro_an_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 				$macros[$pos] = $macro_an_parser->getMatch();
 				$pos += $macro_an_parser->getLength() - 1;
-			}
-			elseif ($extract_macro_funcs_n && $macro_func_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-				$macros[$pos] = $macro_func_n_parser->getMatch();
-				$pos += $macro_func_n_parser->getLength() - 1;
 			}
 			elseif ($extract_references && $reference_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 				$macros[$pos] = $reference_parser->getMatch();
@@ -297,13 +292,12 @@ class CMacrosResolverGeneral {
 	 * @param array  $types['macros'][][<macro_patterns>]         Extract macros. For example, "{HOST.HOST}".
 	 * @param array  $types['macro_funcs'][][<macro_patterns>]    Extract macros with macro function.
 	 *                                                              For example, "{{ITEM.VALUE}.func(param)}".
-	 * @param array  $types['macros_n'][][<macro_patterns>]       Extract macros with optional numeric index.
-	 *                                                              For example, "{HOST.HOST<1-9>}".
+	 * @param array  $types['macros_n'][][<macro_patterns>]       Extract macros with optional numeric index and macro
+	 *                                                              function.
+	 *                                                              For example, "{HOST.HOST<1-9>}",
+	 *                                                                "{{ITEM.VALUE<1-9>}.func(param)}".
 	 * @param array  $types['macros_an'][][<macro_patterns>]      Extract macros with optional numeric or alphabetic
 	 *                                                              index. For example, "{EVENT.TAGS.Service}".
-	 * @param array  $types['macro_funcs_n'][][<macro_patterns>]  Extract macros with optional numeric index and macro
-	 *                                                              function.
-	 *                                                              For example, "{{ITEM.VALUE<1-9>}.func(param)}".
 	 * @param bool   $types['references']                         Extract dollar-sign references. For example, "$5".
 	 * @param bool   $types['lldmacros']                          Extract low-level discovery macros.
 	 *                                                              For example, "{#LLD.MACRO}".
@@ -335,7 +329,6 @@ class CMacrosResolverGeneral {
 		$extract_macro_funcs = array_key_exists('macro_funcs', $types);
 		$extract_macros_n = array_key_exists('macros_n', $types);
 		$extract_macros_an = array_key_exists('macros_an', $types);
-		$extract_macro_funcs_n = array_key_exists('macro_funcs_n', $types);
 		$extract_references = array_key_exists('references', $types);
 		$extract_lldmacros = array_key_exists('lldmacros', $types);
 		$extract_functionids = array_key_exists('functionids', $types);
@@ -371,7 +364,11 @@ class CMacrosResolverGeneral {
 			$macros['macros_n'] = [];
 
 			foreach ($types['macros_n'] as $key => $macro_patterns) {
-				$types['macros_n'][$key] = new CMacroParser([
+				$macro_parsers['macros_n'][$key] = new CMacroParser([
+					'macros' => $macro_patterns,
+					'ref_type' => CMacroParser::REFERENCE_NUMERIC
+				]);
+				$macro_function_parsers['macros_n'][$key] = new CMacroFunctionParser([
 					'macros' => $macro_patterns,
 					'ref_type' => CMacroParser::REFERENCE_NUMERIC
 				]);
@@ -388,18 +385,6 @@ class CMacrosResolverGeneral {
 					'ref_type' => CMacroParser::REFERENCE_ALPHANUMERIC
 				]);
 				$macros['macros_an'][$key] = [];
-			}
-		}
-
-		if ($extract_macro_funcs_n) {
-			$macros['macro_funcs_n'] = [];
-
-			foreach ($types['macro_funcs_n'] as $key => $macro_patterns) {
-				$types['macro_funcs_n'][$key] = new CMacroFunctionParser([
-					'macros' => $macro_patterns,
-					'ref_type' => CMacroParser::REFERENCE_NUMERIC
-				]);
-				$macros['macro_funcs_n'][$key] = [];
 			}
 		}
 
@@ -485,13 +470,31 @@ class CMacrosResolverGeneral {
 				}
 
 				if ($extract_macros_n) {
-					foreach ($types['macros_n'] as $key => $macro_n_parser) {
-						if ($macro_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-							$macros['macros_n'][$key][$macro_n_parser->getMatch()] = [
-								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => $macro_n_parser->getReference()
+					foreach ($macro_parsers['macros_n'] as $key => $macro_parser) {
+						if ($macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+							$macros['macros_n'][$key][$macro_parser->getMatch()] = [
+								'macro' => $macro_parser->getMacro(),
+								'f_num' => $macro_parser->getReference()
 							];
-							$pos += $macro_n_parser->getLength() - 1;
+							$pos += $macro_parser->getLength() - 1;
+							continue 2;
+						}
+					}
+
+					foreach ($macro_function_parsers['macros_n'] as $key => $macro_function_parser) {
+						if ($macro_function_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+							$macro_parser = $macro_function_parser->getMacroParser();
+							$function_parser = $macro_function_parser->getFunctionParser();
+
+							$macros['macros_n'][$key][$macro_function_parser->getMatch()] = [
+								'macro' => $macro_parser->getMacro(),
+								'f_num' => $macro_parser->getReference(),
+								'macrofunc' => [
+									'function' => $function_parser->getFunction(),
+									'parameters' => $function_parser->getParams()
+								]
+							];
+							$pos += $macro_function_parser->getLength() - 1;
 							continue 2;
 						}
 					}
@@ -505,26 +508,6 @@ class CMacrosResolverGeneral {
 								'f_num' => $macro_an_parser->getReference()
 							];
 							$pos += $macro_an_parser->getLength() - 1;
-							continue 2;
-						}
-					}
-				}
-
-				if ($extract_macro_funcs_n) {
-					foreach ($types['macro_funcs_n'] as $key => $macro_func_n_parser) {
-						if ($macro_func_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
-							$macro_n_parser = $macro_func_n_parser->getMacroParser();
-							$function_parser = $macro_func_n_parser->getFunctionParser();
-
-							$macros['macro_funcs_n'][$key][$macro_func_n_parser->getMatch()] = [
-								'macro' => $macro_n_parser->getMacro(),
-								'f_num' => $macro_n_parser->getReference(),
-								'macrofunc' => [
-									'function' => $function_parser->getFunction(),
-									'parameters' => $function_parser->getParams()
-								]
-							];
-							$pos += $macro_func_n_parser->getLength() - 1;
 							continue 2;
 						}
 					}

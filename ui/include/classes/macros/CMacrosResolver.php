@@ -390,14 +390,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
 			],
-			'macro_funcs_n' => [
-				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
-				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
-					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
-				]
-			],
 			'references' => true,
 			'usermacros' => true
 		];
@@ -419,20 +411,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
 						if (array_key_exists($data['f_num'], $functionids)) {
-							$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-						}
-					}
-				}
-
-				foreach ($matched_macros['macro_funcs_n'] as $sub_type => $macro_data) {
-					foreach ($macro_data as $token => $data) {
-						$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-						if (array_key_exists($data['f_num'], $functionids)) {
-							$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = [
-								'token' => $token,
-								'macrofunc' => $data['macrofunc']
-							];
+							$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token]
+								+ (array_key_exists('macrofunc', $data) ? ['macrofunc' => $data['macrofunc']] : []);
 						}
 					}
 				}
@@ -503,14 +483,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
 			],
-			'macro_funcs_n' => [
-				'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
-				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
-					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
-				]
-			],
 			'usermacros' => true
 		];
 
@@ -530,20 +502,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
 					if (array_key_exists($data['f_num'], $functionids)) {
-						$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-					}
-				}
-			}
-
-			foreach ($matched_macros['macro_funcs_n'] as $sub_type => $macro_data) {
-				foreach ($macro_data as $token => $data) {
-					$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-					if (array_key_exists($data['f_num'], $functionids)) {
-						$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = [
-							'token' => $token,
-							'macrofunc' => $data['macrofunc']
-						];
+						$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token]
+							+ (array_key_exists('macrofunc', $data) ? ['macrofunc' => $data['macrofunc']] : []);
 					}
 				}
 			}
@@ -639,14 +599,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
 				]
 			],
-			'macro_funcs_n' => [
-				'host' => ['{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface' => ['{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
-				'item' => ['{ITEM.LASTVALUE}', '{ITEM.VALUE}'],
-				'log' => ['{ITEM.LOG.DATE}', '{ITEM.LOG.TIME}', '{ITEM.LOG.AGE}', '{ITEM.LOG.SOURCE}',
-					'{ITEM.LOG.SEVERITY}', '{ITEM.LOG.NSEVERITY}', '{ITEM.LOG.EVENTID}'
-				]
-			],
 			'usermacros' => true
 		];
 
@@ -672,20 +624,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
 
 				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token];
-				}
-			}
-		}
-
-		foreach ($matched_macros['macro_funcs_n'] as $sub_type => $macro_data) {
-			foreach ($macro_data as $token => $data) {
-				$macro_values[$triggerid][$token] = UNRESOLVED_MACRO_STRING;
-
-				if (array_key_exists($data['f_num'], $functionids)) {
-					$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = [
-						'token' => $token,
-						'macrofunc' => $data['macrofunc']
-					];
+					$macros[$sub_type][$functionids[$data['f_num']]][$data['macro']][] = ['token' => $token]
+						+ (array_key_exists('macrofunc', $data) ? ['macrofunc' => $data['macrofunc']] : []);
 				}
 			}
 		}
@@ -1841,11 +1781,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
 						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
 						'inventory_n' => array_keys($inventory_macros)
-					],
-					'macro_funcs_n' => [
-						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
-						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
-						'inventory_n' => array_keys($inventory_macros)
 					]
 				]
 			],
@@ -1873,11 +1808,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					],
 					'macros_n' => [
 						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
-						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
-						'inventory_n' => array_keys($inventory_macros)
-					],
-					'macro_funcs_n' => [
-						'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
 						'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
 						'inventory_n' => array_keys($inventory_macros)
 					]
@@ -1984,15 +1914,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 				if (array_key_exists('macros_n', $matched_macros)) {
 					foreach ($matched_macros['macros_n'] as $sub_type => $macro_data) {
-						foreach ($macro_data as $token => $data) {
-							$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
-							$macros[$sub_type][$selement['elements'][0]['triggerid']][$key][$token] = $data;
-						}
-					}
-				}
-
-				if (array_key_exists('macro_funcs_n', $matched_macros)) {
-					foreach ($matched_macros['macro_funcs_n'] as $sub_type => $macro_data) {
 						foreach ($macro_data as $token => $data) {
 							$macro_values[$key][$token] = UNRESOLVED_MACRO_STRING;
 							$macros[$sub_type][$selement['elements'][0]['triggerid']][$key][$token] = $data;
@@ -2534,11 +2455,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
 				'inventory_n' => array_keys(self::getSupportedHostInventoryMacrosMap())
 			],
-			'macro_funcs_n' => [
-				'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
-				'interface_n' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
-				'inventory_n' => array_keys(self::getSupportedHostInventoryMacrosMap())
-			],
 			'usermacros' => true
 		];
 		$macro_values = [];
@@ -2560,13 +2476,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			foreach ($matched_macros['macros_n'] as $sub_type => $macro_data) {
-				foreach ($macro_data as $token => $_data) {
-					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
-					$macros[$sub_type][$event['objectid']][$eventid][$token] = $_data;
-				}
-			}
-
-			foreach ($matched_macros['macro_funcs_n'] as $sub_type => $macro_data) {
 				foreach ($macro_data as $token => $_data) {
 					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
 					$macros[$sub_type][$event['objectid']][$eventid][$token] = $_data;
