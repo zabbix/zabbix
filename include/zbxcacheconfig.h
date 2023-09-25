@@ -1315,5 +1315,6 @@ typedef struct
 zbx_dc_item_type_timeouts_t;
 
 void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts);
+char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
 
 #endif
