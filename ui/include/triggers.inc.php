@@ -1341,6 +1341,7 @@ function get_item_function_info(string $expr) {
 		'floor' => ['any' => $rule_int],
 		'in' => ['any' => $rule_0or1],
 		'insert' => ['any' => $rule_str],
+		'jsonpath' => ['any' => $rule_str],
 		'left' => ['any' => $rule_str],
 		'length' => ['any' => $rule_int],
 		'log' => ['any' => $rule_float],
@@ -1370,7 +1371,8 @@ function get_item_function_info(string $expr) {
 			'any' => ['value_type' => 'HHMMSS', 'values' => null]
 		],
 		'trim' => ['any' => $rule_str],
-		'truncate' => ['any' => $rule_float]
+		'truncate' => ['any' => $rule_float],
+		'xmlxpath' => ['any' => $rule_str]
 	];
 
 	$expression_parser = new CExpressionParser(['usermacros' => true, 'lldmacros' => true]);

@@ -20,7 +20,6 @@
 #include "zbxcommon.h"
 
 #include "string.h"
-#include "zbxsysinfo.h"
 #include <time.h>
 #include <stdlib.h>
 

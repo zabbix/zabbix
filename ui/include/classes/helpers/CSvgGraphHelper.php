@@ -19,7 +19,7 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+use Widgets\SvgGraph\Includes\CWidgetFieldDataSet;
 
 /**
  * Class calculates graph data and makes SVG graph.
@@ -62,7 +62,8 @@ class CSvgGraphHelper {
 		// Load Data for each metric.
 		self::getMetricsData($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width, $options['data_sets']);
+		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'],
+				$options['legend']['show_aggregation']);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -115,7 +116,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				continue;
 			}
 
@@ -205,7 +206,7 @@ class CSvgGraphHelper {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
-			if ($data_set['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
+			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM) {
 				continue;
 			}
 
@@ -461,7 +462,11 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+					if ($metric['history'] != 0) {
+						$metric['history'] = timeUnitToSeconds(
+							CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)
+						);
+					}
 				}
 				unset($metric);
 			}
@@ -471,7 +476,9 @@ class CSvgGraphHelper {
 
 			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
 				foreach ($metrics as &$metric) {
-					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					if ($metric['trends'] != 0) {
+						$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+					}
 				}
 				unset($metric);
 			}
@@ -607,7 +614,8 @@ class CSvgGraphHelper {
 	/**
 	 * Select aggregated data to show in graph for each metric.
 	 */
-	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets): void {
+	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets,
+			bool $legend_aggregation_show): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -618,8 +626,13 @@ class CSvgGraphHelper {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
-				$name = graph_item_aggr_fnc2str($metric['options']['aggregate_function']).
-					'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
+				if ($legend_aggregation_show) {
+					$name = graph_item_aggr_fnc2str($metric['options']['aggregate_function']).
+						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
+				}
+				else {
+					$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+				}
 			}
 			else {
 				$name = $data_sets[$dataset_num]['data_set_label'] !== ''

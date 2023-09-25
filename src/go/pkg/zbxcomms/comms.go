@@ -55,6 +55,7 @@ type Connection struct {
 	compress    bool
 	timeout     time.Duration
 	timeoutMode int
+	reserved    uint32
 }
 
 type Listener struct {
@@ -130,6 +131,10 @@ func (c *Connection) WriteString(s string) error {
 	return c.Write([]byte(s))
 }
 
+func (c *Connection) ReservedData() uint32 {
+	return c.reserved
+}
+
 func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 	const maxRecvDataSize = 128 * 1048576
 	var total int
@@ -184,9 +189,8 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 		return nil, fmt.Errorf("Message is longer than expected.")
 	}
 
-	if 0 != (flags & zlibCompress) {
-		reservedSize = binary.LittleEndian.Uint32(s[9:13])
-	}
+	reservedSize = binary.LittleEndian.Uint32(s[9:13])
+	c.reserved = reservedSize
 
 	if int(expectedSize) == total-headerSize {
 		if 0 != (flags & zlibCompress) {

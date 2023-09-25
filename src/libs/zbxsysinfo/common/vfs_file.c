@@ -20,14 +20,16 @@
 #include "vfs_file.h"
 #include "../sysinfo.h"
 
+#include "dir.h"
+
 #include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxhash.h"
 #include "zbxregexp.h"
-#include "dir.h"
 #include "zbxalgo.h"
 #include "zbxfile.h"
+#include "zbxjson.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "aclapi.h"
@@ -65,9 +67,7 @@ int	vfs_file_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 		char		cbuf[MAX_BUFFER_LEN];
 		zbx_uint64_t	lines_num = 0;
 		int		f;
-		double		ts;
-
-		ts = zbx_time();
+		double		ts = zbx_time();
 
 		if (-1 == (f = zbx_open(filename, O_RDONLY)))
 		{
@@ -360,9 +360,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 	size_t		contents_alloc = 0, contents_offset = 0;
 	int		nbytes, flen, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_stat_t	stat_buf;
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
 
 	if (2 < request->nparam)
 	{
@@ -476,9 +474,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
 	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
 
 	if (6 < request->nparam)
 	{
@@ -609,9 +605,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
 	int		nbytes, res, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
 
 	if (5 < request->nparam)
 	{
@@ -729,15 +723,13 @@ err:
 
 static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 {
-	int		i, nbytes, f, ret = SYSINFO_RET_FAIL;
+	int		nbytes, f, ret = SYSINFO_RET_FAIL;
 	md5_state_t	state;
 	u_char		buf[16 * ZBX_KIBIBYTE];
 	char		*hash_text = NULL;
 	size_t		sz;
 	md5_byte_t	hash[ZBX_MD5_DIGEST_SIZE];
-	double		ts;
-
-	ts = zbx_time();
+	double		ts = zbx_time();
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
 	{
@@ -777,7 +769,7 @@ static int	vfs_file_cksum_md5(char *filename, AGENT_RESULT *result)
 	sz = ZBX_MD5_DIGEST_SIZE * 2 + 1;
 	hash_text = (char *)zbx_malloc(hash_text, sz);
 
-	for (i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
+	for (int i = 0; i < ZBX_MD5_DIGEST_SIZE; i++)
 		zbx_snprintf(&hash_text[i << 1], sz - (i << 1), "%02x", hash[i]);
 
 	SET_STR_RESULT(result, hash_text);
@@ -1306,7 +1298,7 @@ static char	*get_print_time(time_t st_raw)
 
 static char	*canonicalize_path(const char *fullname)
 {
-	int			i, up_level = 0;
+	int			up_level = 0;
 	char			*name;
 	const char		*p_start = &fullname[1], *p_to_delimiter;
 	size_t			name_alloc = 0, name_offset = 0;
@@ -1330,9 +1322,9 @@ static char	*canonicalize_path(const char *fullname)
 
 	name = NULL;
 
-	for (i = names.values_num - 1; 0 <= i; i--)
+	for (int i = names.values_num - 1; 0 <= i; i--)
 	{
-		char *ptr = names.values[i];
+		char	*ptr = names.values[i];
 
 		if (0 == strcmp(ptr, ".") || 0 == strlen(ptr))
 		{
@@ -1355,7 +1347,7 @@ static char	*canonicalize_path(const char *fullname)
 
 	if (0 < names.values_num)
 	{
-		for (i = 0; i < names.values_num; i++)
+		for (int i = 0; i < names.values_num; i++)
 			zbx_snprintf_alloc(&name, &name_alloc, &name_offset, "/%s", names.values[i]);
 	}
 	else

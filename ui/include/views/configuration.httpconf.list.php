@@ -54,7 +54,7 @@ $filter_column_left = (new CFormList())
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -68,7 +68,7 @@ $filter_column_left = (new CFormList())
 	)
 	->addRow(_('Status'),
 		(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_ACTIVE), HTTPTEST_STATUS_ACTIVE)
 			->addValue(httptest_status2str(HTTPTEST_STATUS_DISABLED), HTTPTEST_STATUS_DISABLED)
 			->setModern(true)

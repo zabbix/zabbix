@@ -29,9 +29,9 @@ import (
 	"zabbix.com/pkg/zbxcmd"
 )
 
-func (p *Plugin) getUsersNum() (num int, err error) {
+func (p *Plugin) getUsersNum(timeout int) (num int, err error) {
 	var out string
-	out, err = zbxcmd.Execute("who | wc -l", time.Second*time.Duration(p.options.Timeout), "")
+	out, err = zbxcmd.Execute("who | wc -l", time.Second*time.Duration(timeout), "")
 	if err != nil {
 		return
 	}

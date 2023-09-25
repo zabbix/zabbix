@@ -61,7 +61,7 @@ $filter_column1 = (new CFormGrid())
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -90,7 +90,7 @@ $filter_column1 = (new CFormGrid())
 if ($data['context'] === 'host') {
 	$filter_column1->addItem([new CLabel(_('State'), 'filter_state'),
 		new CFormField((new CRadioButtonList('filter_state', (int) $data['filter_state']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
 			->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
 			->setModern()
@@ -100,7 +100,7 @@ if ($data['context'] === 'host') {
 
 $filter_column1->addItem([new CLabel(_('Status'), 'filter_status'),
 	new CFormField((new CRadioButtonList('filter_status', (int) $data['filter_status']))
-		->addValue(_('all'), -1)
+		->addValue(_('All'), -1)
 		->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
 		->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
 		->setModern()
@@ -110,7 +110,7 @@ $filter_column1->addItem([new CLabel(_('Status'), 'filter_status'),
 if ($data['context'] === 'host') {
 	$filter_column1->addItem([new CLabel(_('Value'), 'filter_value'),
 		new CFormField((new CRadioButtonList('filter_value', (int) $data['filter_value']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
 			->addValue(_('Problem'), TRIGGER_VALUE_TRUE)
 			->setModern()
@@ -132,7 +132,7 @@ $filter_column2 = (new CFormGrid())
 	->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
 	->addItem([new CLabel(_('Inherited'), 'filter_inherited'),
 		new CFormField((new CRadioButtonList('filter_inherited', (int) $data['filter_inherited']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern())
@@ -141,7 +141,7 @@ $filter_column2 = (new CFormGrid())
 if ($data['context'] === 'host') {
 	$filter_column2->addItem([new CLabel(_('Discovered'), 'filter_discovered'),
 		new CFormField((new CRadioButtonList('filter_discovered', (int) $data['filter_discovered']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern())
@@ -150,7 +150,7 @@ if ($data['context'] === 'host') {
 
 $filter_column2->addItem([new CLabel(_('With dependencies'), 'filter_dependent'),
 	new CFormField((new CRadioButtonList('filter_dependent', (int) $data['filter_dependent']))
-		->addValue(_('all'), -1)
+		->addValue(_('All'), -1)
 		->addValue(_('Yes'), 1)
 		->addValue(_('No'), 0)
 		->setModern())

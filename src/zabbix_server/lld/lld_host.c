@@ -280,28 +280,61 @@ static void	lld_group_prototype_free(zbx_lld_group_prototype_t *group_prototype)
 
 typedef struct
 {
-	zbx_uint64_t		groupid;
-	zbx_uint64_t		group_prototypeid;
-	zbx_vector_ptr_t	hosts;
-	char			*name_proto;
-	char			*name;
-	char			*name_orig;
-	int			lastcheck;
-	int			ts_delete;
+	zbx_uint64_t			groupdiscoveryid;
+	zbx_uint64_t			parent_group_prototypeid;
+	char				*name;
+	int				ts_delete;
+	int				lastcheck;
+	const struct zbx_json_parse	*lld_row;
+
+#define ZBX_FLAG_LLD_GROUP_DISCOVERY_DISCOVERED		__UINT64_C(0x00000001)
+#define ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_NAME	__UINT64_C(0x00000002)
+#define ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_GROUPID	__UINT64_C(0x00000004)
+#define ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE		(ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_NAME |	\
+							ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_GROUPID)
+	zbx_uint64_t	flags;
+}
+zbx_lld_group_discovery_t;
+
+static void	lld_group_discovery_free(zbx_lld_group_discovery_t *group_discovery)
+{
+	zbx_free(group_discovery->name);
+	zbx_free(group_discovery);
+}
+
+ZBX_PTR_VECTOR_DECL(lld_group_discovery_ptr, zbx_lld_group_discovery_t *)
+ZBX_PTR_VECTOR_IMPL(lld_group_discovery_ptr, zbx_lld_group_discovery_t *)
+
+typedef struct
+{
+	zbx_uint64_t				groupid;
+	zbx_vector_lld_group_discovery_ptr_t	discovery;
+	zbx_vector_ptr_t			hosts;
+	char					*name;
+	char					*name_orig;
+	char					*name_inherit;	/* name of a group to inherit rights from */
 #define ZBX_FLAG_LLD_GROUP_DISCOVERED		__UINT64_C(0x00000001)	/* groups which should be updated or added */
 #define ZBX_FLAG_LLD_GROUP_UPDATE_NAME		__UINT64_C(0x00000002)	/* groups.name field should be updated */
+#define ZBX_FLAG_LLD_GROUP_BLOCK_UPDATE		__UINT64_C(0x80000000)	/* group is discovered by other prototypes */
+									/* and cannot be changed                   */
 #define ZBX_FLAG_LLD_GROUP_UPDATE		ZBX_FLAG_LLD_GROUP_UPDATE_NAME
-	zbx_uint64_t		flags;
+	zbx_uint64_t				flags;
 }
 zbx_lld_group_t;
 
+ZBX_PTR_VECTOR_DECL(lld_group_ptr, zbx_lld_group_t *)
+ZBX_PTR_VECTOR_IMPL(lld_group_ptr, zbx_lld_group_t *)
+
 static void	lld_group_free(zbx_lld_group_t *group)
 {
+	zbx_vector_lld_group_discovery_ptr_clear_ext(&group->discovery, lld_group_discovery_free);
+	zbx_vector_lld_group_discovery_ptr_destroy(&group->discovery);
+
 	/* zbx_vector_ptr_clear_ext(&group->hosts, (zbx_clean_func_t)lld_host_free); is not missing here */
 	zbx_vector_ptr_destroy(&group->hosts);
-	zbx_free(group->name_proto);
 	zbx_free(group->name);
 	zbx_free(group->name_orig);
+	zbx_free(group->name_inherit);
 	zbx_free(group);
 }
 
@@ -310,8 +343,6 @@ typedef struct
 	char				*name;
 	/* permission pair (usrgrpid, permission) */
 	zbx_vector_uint64_pair_t	rights;
-	/* reference to the inherited rights */
-	zbx_vector_uint64_pair_t	*prights;
 }
 zbx_lld_group_rights_t;
 
@@ -750,7 +781,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 != tnames.values_num)
 		{
 			zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
-					(const char **)tnames.values, tnames.values_num);
+					(const char * const *)tnames.values, tnames.values_num);
 		}
 
 		if (0 != tnames.values_num && 0 != vnames.values_num)
@@ -759,7 +790,7 @@ static void	lld_hosts_validate(zbx_vector_ptr_t *hosts, char **error)
 		if (0 != vnames.values_num)
 		{
 			zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
-					(const char **)vnames.values, vnames.values_num);
+					(const char * const *)vnames.values, vnames.values_num);
 		}
 
 		if (0 != tnames.values_num && 0 != vnames.values_num)
@@ -1081,7 +1112,7 @@ static void	lld_simple_groups_get(zbx_uint64_t parent_hostid, zbx_vector_uint64_
  *                                                                            *
  ******************************************************************************/
 static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_ptr_t *hosts,
-		const zbx_vector_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
+		const zbx_vector_lld_group_ptr_t *groups, zbx_vector_uint64_t *del_hostgroupids)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1091,7 +1122,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 	zbx_lld_host_t		*host;
 	const zbx_lld_group_t	*group;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groupids:%d hosts:%d", __func__, groupids->values_num, hosts->values_num);
 
 	zbx_vector_uint64_create(&hostids);
 
@@ -1102,7 +1133,7 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_uint64_reserve(&host->new_groupids, groupids->values_num);
+		zbx_vector_uint64_reserve(&host->new_groupids, (size_t)groupids->values_num);
 		for (j = 0; j < groupids->values_num; j++)
 			zbx_vector_uint64_append(&host->new_groupids, groupids->values[j]);
 
@@ -1112,9 +1143,9 @@ static void	lld_hostgroups_make(const zbx_vector_uint64_t *groupids, zbx_vector_
 
 	for (i = 0; i < groups->values_num; i++)
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
+		group = groups->values[i];
 
-		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED) || 0 == group->groupid)
+		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
 		for (j = 0; j < group->hosts.values_num; j++)
@@ -1226,6 +1257,16 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static int	lld_group_compare(const void *d1, const void *d2)
+{
+	const zbx_lld_group_t	*g1 = *(const zbx_lld_group_t * const *)d1;
+	const zbx_lld_group_t	*g2 = *(const zbx_lld_group_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(g1->groupid, g2->groupid);
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves existing groups for the specified host prototype        *
@@ -1234,145 +1275,149 @@ static void	lld_group_prototypes_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_
  *             groups        - [OUT] list of groups                           *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *groups)
+static void	lld_groups_get(zbx_uint64_t parent_hostid, zbx_vector_lld_group_ptr_t *groups)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	zbx_lld_group_t	*group;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_lld_group_t		*group = NULL;
+	zbx_vector_uint64_t	groupids, discoveryids;
+	zbx_uint64_t		groupid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_uint64_create(&groupids);
+	zbx_vector_uint64_create(&discoveryids);
+
 	result = zbx_db_select(
-			"select gd.groupid,gp.group_prototypeid,gd.name,gd.lastcheck,gd.ts_delete,g.name"
+			"select gd.groupid,gp.group_prototypeid,gd.name,gd.lastcheck,gd.ts_delete,g.name,"
+				"gd.groupdiscoveryid"
 			" from group_prototype gp,group_discovery gd"
 				" join hstgrp g"
 					" on gd.groupid=g.groupid"
 			" where gp.group_prototypeid=gd.parent_group_prototypeid"
-				" and gp.hostid=" ZBX_FS_UI64,
+				" and gp.hostid=" ZBX_FS_UI64
+			" order by gd.groupid",
 			parent_hostid);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		group = (zbx_lld_group_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_t));
+		zbx_lld_group_discovery_t	*discovery;
 
-		ZBX_STR2UINT64(group->groupid, row[0]);
-		ZBX_STR2UINT64(group->group_prototypeid, row[1]);
-		zbx_vector_ptr_create(&group->hosts);
-		group->name_proto = zbx_strdup(NULL, row[2]);
-		group->lastcheck = atoi(row[3]);
-		group->ts_delete = atoi(row[4]);
-		group->name = zbx_strdup(NULL, row[5]);
-		group->name_orig = NULL;
-		group->flags = 0x00;
+		ZBX_DBROW2UINT64(groupid, row[0]);
+		if (NULL == group || group->groupid != groupid)
+		{
+			group = (zbx_lld_group_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_t));
 
-		zbx_vector_ptr_append(groups, group);
+			group->groupid = groupid;
+			group->name_inherit = NULL;
+			group->name = zbx_strdup(NULL, row[5]);
+			group->name_orig = NULL;
+			group->flags = 0x0;
+			zbx_vector_ptr_create(&group->hosts);
+			zbx_vector_lld_group_discovery_ptr_create(&group->discovery);
+
+			zbx_vector_lld_group_ptr_append(groups, group);
+
+			zbx_vector_uint64_append(&groupids, groupid);
+		}
+
+		discovery = (zbx_lld_group_discovery_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_discovery_t));
+		ZBX_DBROW2UINT64(discovery->groupdiscoveryid, row[6]);
+		ZBX_DBROW2UINT64(discovery->parent_group_prototypeid, row[1]);
+		discovery->name = zbx_strdup(NULL, row[2]);
+		discovery->lastcheck = atoi(row[3]);
+		discovery->ts_delete = atoi(row[4]);
+		discovery->flags = 0x0;
+		discovery->lld_row = NULL;
+
+		zbx_vector_lld_group_discovery_ptr_append(&group->discovery, discovery);
+
+		zbx_vector_uint64_append(&discoveryids, discovery->groupdiscoveryid);
 	}
 	zbx_db_free_result(result);
 
-	zbx_vector_ptr_sort(groups, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_lld_group_ptr_sort(groups, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+
+	/* mark groups linked also to other prototypes as discovered */
+	if (0 != groupids.values_num)
+	{
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
+		int		i;
+
+		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&discoveryids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select distinct groupid from group_discovery where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values, groupids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid", discoveryids.values,
+				discoveryids.values_num);
+
+		result = zbx_db_select("%s", sql);
+		zbx_free(sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_lld_group_t	group_local;
+
+			ZBX_DBROW2UINT64(group_local.groupid, row[0]);
+
+			if (FAIL == (i = zbx_vector_lld_group_ptr_bsearch(groups, &group_local,
+					lld_group_compare)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			groups->values[i]->flags |= ZBX_FLAG_LLD_GROUP_BLOCK_UPDATE;
+		}
+		zbx_db_free_result(result);
+	}
+
+	zbx_vector_uint64_destroy(&discoveryids);
+	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static zbx_lld_group_t	*lld_group_make(zbx_vector_ptr_t *groups, zbx_uint64_t group_prototypeid,
-		const char *name_proto, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macros)
+static zbx_lld_group_t	*lld_group_make(zbx_uint64_t group_prototypeid, const char *name_proto,
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macros)
 {
-	char		*buffer = NULL;
-	int		i, group_found = 0;
-	zbx_lld_group_t	*group = NULL;
+	zbx_lld_group_t			*group;
+	zbx_lld_group_discovery_t	*discovery;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < groups->values_num; i++)
-	{
-		group = (zbx_lld_group_t *)groups->values[i];
+	group = (zbx_lld_group_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_t));
 
-		if (group->group_prototypeid != group_prototypeid)
-			continue;
+	group->groupid = 0;
+	group->name_inherit = NULL;
+	zbx_vector_ptr_create(&group->hosts);
+	zbx_vector_lld_group_discovery_ptr_create(&group->discovery);
+	group->name = zbx_strdup(NULL, name_proto);
+	zbx_substitute_lld_macros(&group->name, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(group->name, ZBX_WHITESPACE);
+	group->name_orig = NULL;
+	group->flags = ZBX_FLAG_LLD_GROUP_DISCOVERED;
 
-		if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-			continue;
+	discovery = (zbx_lld_group_discovery_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_discovery_t));
+	discovery->groupdiscoveryid = 0;
+	discovery->parent_group_prototypeid = group_prototypeid;
+	discovery->name = zbx_strdup(NULL, name_proto);
+	discovery->ts_delete = 0;
+	discovery->lastcheck = 0;
+	discovery->flags = ZBX_FLAG_LLD_GROUP_DISCOVERED;
+	discovery->lld_row = jp_row;
 
-		buffer = zbx_strdup(buffer, group->name_proto);
-		zbx_substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-
-		if (0 == strcmp(group->name, buffer))
-		{
-			group_found = 1;
-			break;
-		}
-	}
-
-	if (0 == group_found)
-	{
-		/* trying to find an already existing group */
-
-		buffer = zbx_strdup(buffer, name_proto);
-		zbx_substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-
-		for (i = 0; i < groups->values_num; i++)
-		{
-			group = (zbx_lld_group_t *)groups->values[i];
-
-			if (group->group_prototypeid != group_prototypeid)
-				continue;
-
-			if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-				continue;
-
-			if (0 == strcmp(group->name, buffer))
-				goto out;
-		}
-
-		/* otherwise create a new group */
-
-		group = (zbx_lld_group_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_t));
-
-		group->groupid = 0;
-		group->group_prototypeid = group_prototypeid;
-		zbx_vector_ptr_create(&group->hosts);
-		group->name_proto = NULL;
-		group->name = zbx_strdup(NULL, name_proto);
-		zbx_substitute_lld_macros(&group->name, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(group->name, ZBX_WHITESPACE);
-		group->name_orig = NULL;
-		group->lastcheck = 0;
-		group->ts_delete = 0;
-		group->flags = 0x00;
-		group->flags = ZBX_FLAG_LLD_GROUP_DISCOVERED;
-
-		zbx_vector_ptr_append(groups, group);
-	}
-	else
-	{
-		/* update an already existing group */
-
-		/* group name */
-		buffer = zbx_strdup(buffer, name_proto);
-		zbx_substitute_lld_macros(&buffer, jp_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(group->name, buffer))
-		{
-			group->name_orig = group->name;
-			group->name = buffer;
-			buffer = NULL;
-			group->flags |= ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
-		}
-
-		group->flags |= ZBX_FLAG_LLD_GROUP_DISCOVERED;
-	}
-out:
-	zbx_free(buffer);
+	zbx_vector_lld_group_discovery_ptr_append(&group->discovery, discovery);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __func__, (void *)group);
 
 	return group;
 }
 
-static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups,
+static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_lld_group_ptr_t *groups,
 		const zbx_vector_ptr_t *group_prototypes, const struct zbx_json_parse *jp_row,
 		const zbx_vector_lld_macro_path_t *lld_macros)
 {
@@ -1387,10 +1432,11 @@ static void	lld_groups_make(zbx_lld_host_t *host, zbx_vector_ptr_t *groups,
 
 		group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[i];
 
-		group = lld_group_make(groups, group_prototype->group_prototypeid, group_prototype->name, jp_row,
-				lld_macros);
+		group = lld_group_make(group_prototype->group_prototypeid, group_prototype->name, jp_row, lld_macros);
 
 		zbx_vector_ptr_append(&group->hosts, host);
+
+		zbx_vector_lld_group_ptr_append(groups, group);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1429,147 +1475,222 @@ static int	lld_validate_group_name(const char *name)
 
 /******************************************************************************
  *                                                                            *
- * Parameters: groups - [IN] list of groups; should be sorted by groupid      *
- *             error  - [OUT]                                                 *
+ * Purpose: merge old discovery links with discovered ones                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
+static  void	lld_group_merge_group_discovery(zbx_vector_lld_group_discovery_ptr_t *dst,
+		zbx_vector_lld_group_discovery_ptr_t *src)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	int			i, j;
-	zbx_lld_group_t		*group, *group_b;
-	zbx_vector_uint64_t	groupids;
-	zbx_vector_str_t	names;
+	int	i, j;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_uint64_create(&groupids);
-	zbx_vector_str_create(&names);		/* list of group names */
-
-	/* checking a group name validity */
-	for (i = 0; i < groups->values_num; i++)
+	for (i = 0; i < src->values_num; i++)
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
-
-		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-			continue;
-
-		/* only new groups or groups with changed group name will be validated */
-		if (0 != group->groupid && 0 == (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-			continue;
-
-		if (SUCCEED == lld_validate_group_name(group->name))
-			continue;
-
-		zbx_replace_invalid_utf8(group->name);
-		*error = zbx_strdcatf(*error, "Cannot %s group: invalid group name \"%s\".\n",
-				(0 != group->groupid ? "update" : "create"), group->name);
-
-		if (0 != group->groupid)
+		for (j = 0; j < dst->values_num; j++)
 		{
-			lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
-					ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
+			if (src->values[i]->parent_group_prototypeid == dst->values[j]->parent_group_prototypeid)
+			{
+				dst->values[j]->groupdiscoveryid = src->values[i]->groupdiscoveryid;
+				dst->values[j]->lastcheck = src->values[i]->lastcheck;
+				dst->values[j]->ts_delete = src->values[i]->ts_delete;
+
+				lld_group_discovery_free(src->values[i]);
+				zbx_vector_lld_group_discovery_ptr_remove_noorder(src, i--);
+				break;
+			}
 		}
-		else
-			group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
+	}
+}
+
+static int	lld_group_add_group_discovery(zbx_lld_group_t *group, zbx_lld_group_discovery_t *discovery)
+{
+	for (int i = 0; i < group->discovery.values_num; i++)
+	{
+		if (group->discovery.values[i]->parent_group_prototypeid == discovery->parent_group_prototypeid)
+			return FAIL;
 	}
 
-	/* checking duplicated group names */
-	for (i = 0; i < groups->values_num; i++)
+	zbx_vector_lld_group_discovery_ptr_append(&group->discovery, discovery);
+
+	return SUCCEED;
+}
+
+static void 	lld_group_add_host(zbx_vector_ptr_t *hosts, zbx_lld_host_t *host)
+{
+	for (int i = 0; i < hosts->values_num; i++)
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
+		if (hosts->values[i] == host)
+			return;
+	}
 
-		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-			continue;
+	zbx_vector_ptr_append(hosts, host);
+}
 
-		/* only new groups or groups with changed group name will be validated */
-		if (0 != group->groupid && 0 == (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-			continue;
+/******************************************************************************
+ *                                                                            *
+ * Purpose: merge group candidates with the same name by combining their      *
+ *          host and discovery lists                                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_group_candidates_merge_by_name(zbx_vector_lld_group_ptr_t *groups_in)
+{
+	for (int i = 0; i < groups_in->values_num; i++)
+	{
+		zbx_lld_group_t	*left = groups_in->values[i];
 
-		for (j = 0; j < groups->values_num; j++)
+		for (int j = i + 1; j < groups_in->values_num; )
 		{
-			group_b = (zbx_lld_group_t *)groups->values[j];
+			zbx_lld_group_t	*right = groups_in->values[j];
 
-			if (0 == (group_b->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED) || i == j)
-				continue;
-
-			if (0 != strcmp(group->name, group_b->name))
-				continue;
-
-			*error = zbx_strdcatf(*error, "Cannot %s group:"
-					" group with the same name \"%s\" already exists.\n",
-					(0 != group->groupid ? "update" : "create"), group->name);
-
-			if (0 != group->groupid)
+			if (0 == strcmp(left->name, right->name))
 			{
-				lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
-						ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
+				/* unmerged group candidates have only one discovery link */
+				if (FAIL == lld_group_add_group_discovery(left, right->discovery.values[0]))
+					lld_group_discovery_free(right->discovery.values[0]);
+
+				zbx_vector_lld_group_discovery_ptr_clear(&right->discovery);
+
+				lld_group_add_host(&left->hosts, right->hosts.values[0]);
+
+				lld_group_free(right);
+				zbx_vector_lld_group_ptr_remove_noorder(groups_in, j);
 			}
 			else
-				group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
+				j++;
 		}
 	}
+}
 
-	/* checking duplicated group names and group names in DB */
-
-	for (i = 0; i < groups->values_num; i++)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate group candidate names                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_group_candidates_validate(zbx_vector_lld_group_ptr_t *groups_in, char **error)
+{
+	/* validate syntax of group candidate names */
+	for (int i = 0; i < groups_in->values_num; )
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
+		zbx_lld_group_t		*group = groups_in->values[i];
 
-		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-			continue;
+		if (SUCCEED != lld_validate_group_name(group->name))
+		{
+			zbx_replace_invalid_utf8(group->name);
 
-		if (0 != group->groupid)
-			zbx_vector_uint64_append(&groupids, group->groupid);
+			*error = zbx_strdcatf(*error, "Cannot discover group: invalid group name \"%s\".\n",
+					group->name);
 
-		if (0 == group->groupid || 0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-			zbx_vector_str_append(&names, group->name);
+			zbx_vector_lld_group_ptr_remove_noorder(groups_in, i);
+			lld_group_free(group);
+		}
+		else
+			i++;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: merge groups with candidates by names and add merged groups to    *
+ *          discovered groups                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_groups_merge_with_candidates(zbx_vector_lld_group_ptr_t *groups,
+		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out)
+{
+	for (int i = 0; i < groups->values_num; i++)
+	{
+		zbx_lld_group_t	*left = groups->values[i];
+
+		for (int j = 0; j < groups_in->values_num; j++)
+		{
+			zbx_lld_group_t	*right = groups_in->values[j];
+
+			if (0 == (strcmp(left->name, right->name)))
+			{
+				right->groupid = left->groupid;
+				lld_group_merge_group_discovery(&right->discovery, &left->discovery);
+
+				zbx_vector_lld_group_ptr_append(groups_out, right);
+				zbx_vector_lld_group_ptr_remove_noorder(groups_in, j);
+
+				/* The matched group_discovery links were removed from original group    */
+				/* during merge. If there are more group_discovery link left - leave the */
+				/* original group with group_discovery leftovers as undiscovered to      */
+				/* track possible prototype renames.                                     */
+				if (0 == left->discovery.values_num)
+				{
+					zbx_vector_lld_group_ptr_remove_noorder(groups, i--);
+					lld_group_free(left);
+				}
+				else
+					left->flags |= ZBX_FLAG_LLD_GROUP_BLOCK_UPDATE;
+
+				break;
+			}
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check database for groups having conflicting names with           *
+ *          candidates                                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_group_candidates_validate_db(zbx_vector_lld_group_ptr_t *groups_in,
+		zbx_vector_lld_group_ptr_t *groups_out, char **error)
+{
+
+	zbx_vector_str_t	names;
+
+	zbx_vector_str_create(&names);
+
+	for (int i = 0; i < groups_in->values_num; i++)
+		zbx_vector_str_append(&names, groups_in->values[i]->name);
 
 	if (0 != names.values_num)
 	{
-		char	*sql = NULL;
-		size_t	sql_alloc = 0, sql_offset = 0;
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+		char		*sql = NULL;
+		size_t		sql_alloc = 0, sql_offset = 0;
 
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select name from hstgrp where type=%d and",
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select name,flags,groupid from hstgrp"
+				" where type=%d"
+					" and",
 				HOSTGROUP_TYPE_HOST);
 
 		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name",
-				(const char **)names.values, names.values_num);
-
-		if (0 != groupids.values_num)
-		{
-			zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid",
-					groupids.values, groupids.values_num);
-		}
+				(const char * const *)names.values, names.values_num);
 
 		result = zbx_db_select("%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			for (i = 0; i < groups->values_num; i++)
+			for (int i = 0; i < groups_in->values_num; i++)
 			{
-				group = (zbx_lld_group_t *)groups->values[i];
-
-				if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-					continue;
+				zbx_lld_group_t	*group = groups_in->values[i];
 
 				if (0 == strcmp(group->name, row[0]))
 				{
-					*error = zbx_strdcatf(*error, "Cannot %s group:"
-							" group with the same name \"%s\" already exists.\n",
-							(0 != group->groupid ? "update" : "create"), group->name);
-
-					if (0 != group->groupid)
+					if (ZBX_FLAG_DISCOVERY_NORMAL == atoi(row[1]))
 					{
-						lld_field_str_rollback(&group->name, &group->name_orig, &group->flags,
-								ZBX_FLAG_LLD_GROUP_UPDATE_NAME);
+						*error = zbx_strdcatf(*error, "Cannot discover group:"
+							" group with the same name \"%s\" already exists.\n",
+							group->name);
+
+						lld_group_free(group);
 					}
 					else
-						group->flags &= ~ZBX_FLAG_LLD_GROUP_DISCOVERED;
+					{
+						ZBX_STR2UINT64(group->groupid, row[2]);
+						group->flags |= ZBX_FLAG_LLD_GROUP_BLOCK_UPDATE;
+						zbx_vector_lld_group_ptr_append(groups_out, group);
+					}
+
+					zbx_vector_lld_group_ptr_remove_noorder(groups_in, i);
+
+					break;
 				}
 			}
 		}
@@ -1579,7 +1700,172 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
 	}
 
 	zbx_vector_str_destroy(&names);
-	zbx_vector_uint64_destroy(&groupids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy renamed discovery link to a new group                        *
+ *                                                                            *
+ * Return value: SUCCEED - discovery link was copied                          *
+ *               FAIL   - otherwise                                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_group_rename_discovery_link(zbx_lld_group_t *dst, const zbx_lld_group_t *src,
+		zbx_lld_group_discovery_t *gd_src, const zbx_vector_lld_macro_path_t *lld_macros)
+{
+	int	ret = FAIL;
+	char	*name = NULL;
+
+	for (int i = 0; i < dst->discovery.values_num; i++)
+	{
+		zbx_lld_group_discovery_t	*gd_dst = dst->discovery.values[i];
+
+		if (gd_src->parent_group_prototypeid == gd_dst->parent_group_prototypeid &&
+				0 == gd_dst->groupdiscoveryid)
+		{
+			name = zbx_strdup(name, gd_src->name);
+			zbx_substitute_lld_macros(&name, gd_dst->lld_row, lld_macros, ZBX_MACRO_ANY, NULL, 0);
+
+			if (0 == strcmp(name, src->name))
+			{
+				gd_dst->groupdiscoveryid = gd_src->groupdiscoveryid;
+				gd_dst->lastcheck = gd_src->lastcheck;
+				gd_dst->ts_delete = gd_src->ts_delete;
+				gd_dst->flags |= ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_NAME;
+
+				if (dst->groupid != src->groupid)
+					gd_dst->flags |= ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_GROUPID;
+
+				ret = SUCCEED;
+				goto out;
+			}
+		}
+	}
+out:
+	zbx_free(name);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copy renamed discovery link to a new group                        *
+ *                                                                            *
+ * Return value: index of target group or FAIL                                *
+ *                                                                            *
+ * Comments: This function iterates through specified groups and looks for    *
+ *           possible rename candidate. If found it copies the link to that   *
+ *           group and returns.                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_groups_rename_discovery_link(zbx_vector_lld_group_ptr_t *groups, const zbx_lld_group_t *src,
+		zbx_lld_group_discovery_t *discovery, const zbx_vector_lld_macro_path_t *lld_macros)
+{
+	for (int i = 0; i < groups->values_num; i++)
+	{
+		zbx_lld_group_t	*group = groups->values[i];
+
+		if (SUCCEED == lld_group_rename_discovery_link(group, src, discovery, lld_macros))
+			return i;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: detect prototype renames in group discovery links and copy the    *
+ *          old links to new groups                                           *
+ *                                                                            *
+ * Comments: If possible the old group is renamed.                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_groups_merge_renames(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
+		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
+		const zbx_vector_lld_macro_path_t *lld_macros)
+{
+	for (int i = 0; i < groups->values_num; i++)
+	{
+		zbx_lld_group_t	*left = groups->values[i];
+		int			k;
+
+		for (int j = 0; j < left->discovery.values_num; j++)
+		{
+			zbx_lld_group_discovery_t	*discovery = left->discovery.values[j];
+
+			if (FAIL == (k = zbx_vector_ptr_bsearch(group_prototypes, &discovery->parent_group_prototypeid,
+					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				continue;
+			}
+
+			if (0 == strcmp(((zbx_lld_group_prototype_t *)group_prototypes->values[k])->name,
+					discovery->name))
+			{
+				continue;
+			}
+
+			if (FAIL != lld_groups_rename_discovery_link(groups_out, left, discovery, lld_macros))
+			{
+				lld_group_discovery_free(discovery);
+				zbx_vector_lld_group_discovery_ptr_remove_noorder(&left->discovery, j--);
+			}
+			else if (FAIL != (k = lld_groups_rename_discovery_link(groups_in, left, discovery, lld_macros)))
+			{
+				zbx_lld_group_t	*right = groups_in->values[k];
+
+				lld_group_discovery_free(discovery);
+				zbx_vector_lld_group_discovery_ptr_remove_noorder(&left->discovery, j--);
+
+				if (0 == (left->flags & ZBX_FLAG_LLD_GROUP_BLOCK_UPDATE))
+				{
+					left->flags |= ZBX_FLAG_LLD_GROUP_BLOCK_UPDATE;
+
+					right->flags |= ZBX_FLAG_LLD_GROUP_UPDATE_NAME;
+					right->name_orig = zbx_strdup(NULL, left->name);
+					right->groupid = left->groupid;
+
+					zbx_vector_lld_group_ptr_append(groups_out, right);
+					zbx_vector_lld_group_ptr_remove_noorder(groups_in, k);
+				}
+				else
+					right->name_inherit = zbx_strdup(NULL, left->name);
+			}
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters:                                                                *
+ *             group_prototypes - [IN] group prototypes                       *
+ *             groups           - [IN] list of existing groups                *
+ *             groups_in        - [IN] list of group candidates               *
+ *             groups_out       - [IN] list of discovered groups              *
+ *             lld_macros       - [IN] lld macros defined in lld rule         *
+ *             error            - [OUT]                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	lld_groups_validate(const zbx_vector_ptr_t *group_prototypes, zbx_vector_lld_group_ptr_t *groups,
+		zbx_vector_lld_group_ptr_t *groups_in, zbx_vector_lld_group_ptr_t *groups_out,
+		const zbx_vector_lld_macro_path_t *lld_macros, char **error)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	lld_group_candidates_merge_by_name(groups_in);
+	lld_group_candidates_validate(groups_in, error);
+	lld_groups_merge_with_candidates(groups, groups_in, groups_out);
+	lld_group_candidates_validate_db(groups_in, groups_out, error);
+	lld_groups_merge_renames(group_prototypes, groups, groups_in, groups_out, lld_macros);
+
+	/* at this point candidate leftovers contains newly discovered groups */
+	zbx_vector_lld_group_ptr_append_array(groups_out, groups_in->values, groups_in->values_num);
+	zbx_vector_lld_group_ptr_clear(groups_in);
+
+	/* at this point group leftovers contains lost groups and discovery links */
+	zbx_vector_lld_group_ptr_append_array(groups_out, groups->values, groups->values_num);
+	zbx_vector_lld_group_ptr_clear(groups);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1591,8 +1877,8 @@ static void	lld_groups_validate(zbx_vector_ptr_t *groups, char **error)
  ******************************************************************************/
 static int	lld_group_rights_compare(const void *d1, const void *d2)
 {
-	const zbx_lld_group_rights_t	*r1 = *(const zbx_lld_group_rights_t **)d1;
-	const zbx_lld_group_rights_t	*r2 = *(const zbx_lld_group_rights_t **)d2;
+	const zbx_lld_group_rights_t	*r1 = *(const zbx_lld_group_rights_t * const *)d1;
+	const zbx_lld_group_rights_t	*r2 = *(const zbx_lld_group_rights_t * const *)d2;
 
 	return strcmp(r1->name, r2->name);
 }
@@ -1611,7 +1897,6 @@ static int	lld_group_rights_append(zbx_vector_ptr_t *group_rights, const char *n
 	rights = (zbx_lld_group_rights_t *)zbx_malloc(NULL, sizeof(zbx_lld_group_rights_t));
 	rights->name = zbx_strdup(NULL, name);
 	zbx_vector_uint64_pair_create(&rights->rights);
-	rights->prights = NULL;
 
 	zbx_vector_ptr_append(group_rights, rights);
 
@@ -1635,18 +1920,18 @@ static void	lld_group_rights_free(zbx_lld_group_rights_t *rights)
  * Parameters: groups - [IN] list of new groups                               *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
+static void	lld_groups_save_rights(zbx_vector_lld_group_ptr_t *groups)
 {
 	int			i, j;
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
 	char			*ptr, *name, *sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0, offset;
+	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_lld_group_t		*group;
 	zbx_vector_str_t	group_names;
 	zbx_vector_ptr_t	group_rights;
 	zbx_db_insert_t		db_insert;
-	zbx_lld_group_rights_t	*rights, rights_local, *parent_rights;
+	zbx_lld_group_rights_t	*rights, rights_local;
 	zbx_uint64_pair_t	pair;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1654,18 +1939,21 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 	zbx_vector_str_create(&group_names);
 	zbx_vector_ptr_create(&group_rights);
 
-	/* make a list of direct parent group names and a list of new group rights */
+	/* make a list of direct parent group rights */
 	for (i = 0; i < groups->values_num; i++)
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
+		group = groups->values[i];
 
-		if (NULL == (ptr = strrchr(group->name, '/')))
-			continue;
+		if (NULL == group->name_inherit)
+		{
+			if (NULL == (ptr = strrchr(group->name, '/')))
+				continue;
 
-		lld_group_rights_append(&group_rights, group->name);
-
-		name = zbx_strdup(NULL, group->name);
-		name[ptr - group->name] = '\0';
+			name = zbx_strdup(NULL, group->name);
+			name[ptr - group->name] = '\0';
+		}
+		else
+			name = zbx_strdup(NULL, group->name_inherit);
 
 		if (FAIL != zbx_vector_str_search(&group_names, name, ZBX_DEFAULT_STR_COMPARE_FUNC))
 		{
@@ -1687,21 +1975,21 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 				" where r.id=g.groupid"
 				" and");
 
-	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name", (const char **)group_names.values,
+	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.name", (const char * const *)group_names.values,
 			group_names.values_num);
 	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		rights_local.name = row[0];
+
 		if (FAIL == (i = zbx_vector_ptr_search(&group_rights, &rights_local, lld_group_rights_compare)))
 			i = lld_group_rights_append(&group_rights, row[0]);
 
 		rights = (zbx_lld_group_rights_t *)group_rights.values[i];
-		rights->prights = &rights->rights;
 
 		ZBX_STR2UINT64(pair.first, row[2]);
-		pair.second = atoi(row[1]);
+		pair.second = (zbx_uint64_t)atoi(row[1]);
 
 		zbx_vector_uint64_pair_append(&rights->rights, pair);
 	}
@@ -1709,53 +1997,35 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 
 	zbx_vector_ptr_sort(&group_rights, lld_group_rights_compare);
 
-	/* assign rights for the new groups */
-	for (i = 0; i < group_rights.values_num; i++)
-	{
-		rights = (zbx_lld_group_rights_t *)group_rights.values[i];
-
-		if (NULL != rights->prights)
-			continue;
-
-		if (NULL == (ptr = strrchr(rights->name, '/')))
-			continue;
-
-		offset = ptr - rights->name;
-
-		for (j = 0; j < i; j++)
-		{
-			parent_rights = (zbx_lld_group_rights_t *)group_rights.values[j];
-
-			if (strlen(parent_rights->name) != offset)
-				continue;
-
-			if (0 != strncmp(parent_rights->name, rights->name, offset))
-				continue;
-
-			rights->prights = parent_rights->prights;
-			break;
-		}
-	}
-
 	/* save rights for the new groups */
 	for (i = 0; i < groups->values_num; i++)
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
+		group = groups->values[i];
 
-		rights_local.name = group->name;
-		if (FAIL == (j = zbx_vector_ptr_bsearch(&group_rights, &rights_local, lld_group_rights_compare)))
-			continue;
-
-		rights = (zbx_lld_group_rights_t *)group_rights.values[j];
-
-		if (NULL == rights->prights)
-			continue;
-
-		for (j = 0; j < rights->prights->values_num; j++)
+		if (NULL == group->name_inherit)
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), group->groupid,
-					(int)rights->prights->values[j].second, rights->prights->values[j].first);
+			if (NULL == (ptr = strrchr(group->name, '/')))
+				continue;
+
+			name = zbx_strdup(NULL, group->name);
+			name[ptr - group->name] = '\0';
 		}
+		else
+			name = zbx_strdup(NULL, group->name_inherit);
+
+		rights_local.name = name;
+		if (FAIL != (j = zbx_vector_ptr_bsearch(&group_rights, &rights_local, lld_group_rights_compare)))
+		{
+			rights = (zbx_lld_group_rights_t *)group_rights.values[j];
+
+			for (j = 0; j < rights->rights.values_num; j++)
+			{
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), group->groupid,
+						(int)rights->rights.values[j].second, rights->rights.values[j].first);
+			}
+		}
+
+		zbx_free(name);
 	}
 
 	zbx_db_insert_autoincrement(&db_insert, "rightid");
@@ -1778,173 +2048,334 @@ out:
  *                                         by groupid                         *
  *             group_prototypes - [IN] list of group prototypes; should be    *
  *                                     sorted by group_prototypeid            *
+ *             error            - [OUT] error message                         *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes)
+static void	lld_groups_save(zbx_vector_lld_group_ptr_t *groups, const zbx_vector_ptr_t *group_prototypes,
+		char **error)
 {
-	int				i, j, upd_groups_num = 0;
-	zbx_lld_group_t			*group;
-	const zbx_lld_group_prototype_t	*group_prototype;
-	zbx_lld_host_t			*host;
-	zbx_uint64_t			groupid = 0;
-	char				*sql = NULL, *name_esc, *name_proto_esc;
+	int				i, j, groups_insert_num = 0, groups_update_num = 0, gd_insert_num = 0,
+					gd_update_num = 0;
+	zbx_db_insert_t			db_insert_group, db_insert_gdiscovery;
+	zbx_vector_uint64_t		groupids;
+	zbx_uint64_t			next_groupid, next_gdid;
+	char				*sql = NULL;
 	size_t				sql_alloc = 0, sql_offset = 0;
-	zbx_db_insert_t			db_insert, db_insert_gdiscovery;
-	zbx_vector_ptr_t		new_groups;
-	zbx_vector_uint64_t		new_group_prototype_ids;
+	zbx_vector_lld_group_ptr_t	new_groups;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_uint64_create(&new_group_prototype_ids);
+	/* check groups for any changed to be flushed to database */
+
+	zbx_vector_uint64_create(&groupids);
 
 	for (i = 0; i < groups->values_num; i++)
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
-
-		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-			continue;
-
-		if (0 == group->groupid)
-			zbx_vector_uint64_append(&new_group_prototype_ids, group->group_prototypeid);
-		else if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
-			upd_groups_num++;
-	}
-
-	if (0 == new_group_prototype_ids.values_num && 0 == upd_groups_num)
-		goto out;
-
-	zbx_db_begin();
-
-	if (0 != new_group_prototype_ids.values_num)
-	{
-		if (SUCCEED != zbx_db_lock_group_prototypeids(&new_group_prototype_ids))
-		{
-			/* the host group prototype was removed while processing lld rule */
-			zbx_db_rollback();
-			goto out;
-		}
-
-		groupid = zbx_db_get_maxid_num("hstgrp", new_group_prototype_ids.values_num);
-
-		zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "flags", (char *)NULL);
-
-		zbx_db_insert_prepare(&db_insert_gdiscovery, "group_discovery", "groupid", "parent_group_prototypeid",
-				"name", (char *)NULL);
-
-		zbx_vector_ptr_create(&new_groups);
-	}
-
-	if (0 != upd_groups_num)
-	{
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	}
-
-	for (i = 0; i < groups->values_num; i++)
-	{
-		group = (zbx_lld_group_t *)groups->values[i];
+		zbx_lld_group_t	*group = groups->values[i];
 
 		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
 			continue;
 
 		if (0 == group->groupid)
 		{
-			group->groupid = groupid++;
-
-			zbx_db_insert_add_values(&db_insert, group->groupid, group->name,
-					(int)ZBX_FLAG_DISCOVERY_CREATED);
-			zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_ADD, group->groupid, group->name);
-
-			zbx_audit_host_group_update_json_add_details(group->groupid, group->name,
-					(int)ZBX_FLAG_DISCOVERY_CREATED);
-
-			if (FAIL != (j = zbx_vector_ptr_bsearch(group_prototypes, &group->group_prototypeid,
-					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-			{
-				group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[j];
-
-				zbx_db_insert_add_values(&db_insert_gdiscovery, group->groupid,
-						group->group_prototypeid, group_prototype->name);
-			}
-			else
-				THIS_SHOULD_NEVER_HAPPEN;
-
-			for (j = 0; j < group->hosts.values_num; j++)
-			{
-				host = (zbx_lld_host_t *)group->hosts.values[j];
-
-				/* hosts will be linked to a new host groups */
-				zbx_vector_uint64_append(&host->new_groupids, group->groupid);
-			}
-
-			zbx_vector_ptr_append(&new_groups, group);
+			groups_insert_num++;
 		}
 		else
 		{
+			zbx_vector_uint64_append(&groupids, group->groupid);
+
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
+				groups_update_num++;
+		}
+
+		for (j = 0; j < group->discovery.values_num; j++)
+		{
+			zbx_lld_group_discovery_t	*discovery = group->discovery.values[j];
+
+			if (0 == (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_DISCOVERED))
+				continue;
+
+			if (0 == discovery->groupdiscoveryid)
+				gd_insert_num++;
+			else if (0 != (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE))
+				gd_update_num++;
+		}
+	}
+
+	if (0 == groups_insert_num && 0 == groups_update_num && 0 == gd_insert_num && 0 == gd_update_num)
+		goto out;
+
+	/* flush discovery changes */
+
+	zbx_db_begin();
+
+	/* lock the groups so their discovery records can be safely added */
+	if (0 != groupids.values_num)
+	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+		int		index;
+
+		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select groupid from hstgrp where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids.values,
+				groupids.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FOR_UPDATE);
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	groupid;
+
+			ZBX_STR2UINT64(groupid, row[0]);
+
+			if (FAIL != (index = zbx_vector_uint64_search(&groupids, groupid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			{
-				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp set ");
-				zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_UPDATE, group->groupid, group->name);
-
-				if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
-				{
-					name_esc = zbx_db_dyn_escape_string(group->name);
-
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
-
-					zbx_audit_host_group_update_json_update_name(group->groupid,group->name_orig,
-							name_esc);
-
-					zbx_free(name_esc);
-				}
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						" where groupid=" ZBX_FS_UI64 ";\n", group->groupid);
+				zbx_vector_uint64_remove_noorder(&groupids, index);
 			}
+		}
+		zbx_db_free_result(result);
+
+		/* if existing discovered groups were removed convert them to newly discovered - */
+		for (i = 0; i < groupids.values_num; i++)
+		{
+			for (j = 0; j < groups->values_num; j++)
+			{
+				zbx_lld_group_t	*group = groups->values[j];
+
+				if (group->groupid == groupids.values[i])
+				{
+					for (int k = 0; k > group->discovery.values_num; k++)
+					{
+						zbx_lld_group_discovery_t	*discovery = group->discovery.values[k];
+
+						discovery->groupdiscoveryid = 0;
+						gd_insert_num++;
+					}
+
+					group->groupid = 0;
+					groups_insert_num++;
+
+					if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
+					{
+						groups_update_num--;
+						group->flags = ZBX_FLAG_LLD_GROUP_DISCOVERED;
+					}
+
+					break;
+				}
+			}
+		}
+
+		sql_offset = 0;
+	}
+
+	if (0 != groups_insert_num)
+	{
+		next_groupid = zbx_db_get_maxid_num("hstgrp", groups_insert_num);
+		zbx_db_insert_prepare(&db_insert_group, "hstgrp", "groupid", "name", "flags", NULL);
+
+		zbx_vector_lld_group_ptr_create(&new_groups);
+
+		/* check if other process has not already created a group with the same name */
+
+		zbx_vector_str_t	names;
+		zbx_db_result_t		result;
+		zbx_db_row_t		row;
+
+		zbx_vector_str_create(&names);
+
+		for (i = 0; i < groups->values_num; i++)
+		{
+			if (0 == groups->values[i]->groupid)
+				zbx_vector_str_append(&names, groups->values[i]->name);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"select groupid,name,flags from hstgrp"
+					" where type=%d"
+						" and",
+				HOSTGROUP_TYPE_HOST);
+		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name", (const char * const *)names.values,
+				names.values_num);
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FOR_UPDATE);
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			for (i = 0; i < groups->values_num; i++)
+			{
+				zbx_lld_group_t	*group = groups->values[i];
+
+				if (0 == group->groupid && 0 == strcmp(group->name, row[1]))
+				{
+					if (0 == (atoi(row[2]) & ZBX_FLAG_DISCOVERY_CREATED))
+					{
+						group->flags &= (~ZBX_FLAG_LLD_GROUP_DISCOVERED);
+
+						*error = zbx_strdcatf(*error, "Cannot discover group:"
+								" group with the same name \"%s\" already exists.\n",
+								group->name);
+					}
+					else
+						ZBX_STR2UINT64(group->groupid, row[0]);
+				}
+			}
+		}
+		zbx_db_free_result(result);
+
+		zbx_vector_str_destroy(&names);
+		sql_offset = 0;
+	}
+
+	if (0 != gd_insert_num)
+	{
+		next_gdid = zbx_db_get_maxid_num("group_discovery", gd_insert_num);
+
+		zbx_db_insert_prepare(&db_insert_gdiscovery, "group_discovery", "groupdiscoveryid", "groupid",
+				"parent_group_prototypeid", "name", NULL);
+	}
+
+	if (0 != groups_update_num || 0 != gd_update_num)
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* first handle groups before inserting group_discovery links */
+
+	for (i = 0; i < groups->values_num; i++)
+	{
+		zbx_lld_group_t	*group = groups->values[i];
+
+		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
+			continue;
+
+		if (0 == group->groupid)
+		{
+			group->groupid = next_groupid++;
+			zbx_db_insert_add_values(&db_insert_group, group->groupid, group->name,
+								(int)ZBX_FLAG_DISCOVERY_CREATED);
+
+			zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_ADD, group->groupid, group->name);
+			zbx_audit_host_group_update_json_add_details(group->groupid, group->name,
+					(int)ZBX_FLAG_DISCOVERY_CREATED);
+
+			zbx_vector_lld_group_ptr_append(&new_groups, group);
+		}
+		else if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE))
+		{
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hstgrp set ");
+			zbx_audit_host_group_create_entry(ZBX_AUDIT_ACTION_UPDATE, group->groupid, group->name);
 
 			if (0 != (group->flags & ZBX_FLAG_LLD_GROUP_UPDATE_NAME))
 			{
-				if (FAIL != (j = zbx_vector_ptr_bsearch(group_prototypes, &group->group_prototypeid,
+				char	*name_esc = zbx_db_dyn_escape_string(group->name);
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "name='%s'", name_esc);
+				zbx_audit_host_group_update_json_update_name(group->groupid, group->name_orig,
+						name_esc);
+
+				zbx_free(name_esc);
+			}
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where groupid=" ZBX_FS_UI64 ";\n",
+					group->groupid);
+
+			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+	}
+
+	if (0 != groups_insert_num)
+	{
+		zbx_db_insert_execute(&db_insert_group);
+		zbx_db_insert_clean(&db_insert_group);
+
+		lld_groups_save_rights(&new_groups);
+		zbx_vector_lld_group_ptr_destroy(&new_groups);
+	}
+
+	for (i = 0; i < groups->values_num; i++)
+	{
+		zbx_lld_group_t	*group = groups->values[i];
+
+		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
+			continue;
+
+		for (j = 0; j < group->discovery.values_num; j++)
+		{
+			zbx_lld_group_discovery_t	*discovery = group->discovery.values[j];
+
+			if (0 == (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_DISCOVERED))
+				continue;
+
+			if (0 == discovery->groupdiscoveryid)
+			{
+				zbx_lld_group_prototype_t	*group_prototype;
+				int				k;
+
+				if (FAIL != (k = zbx_vector_ptr_bsearch(group_prototypes,
+						&discovery->parent_group_prototypeid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
-					group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[j];
+					discovery->groupdiscoveryid = next_gdid++;
+					group_prototype = (zbx_lld_group_prototype_t *)group_prototypes->values[k];
 
-					name_proto_esc = zbx_db_dyn_escape_string(group_prototype->name);
-
-					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-							"update group_discovery"
-							" set name='%s'"
-							" where groupid=" ZBX_FS_UI64 ";\n",
-							name_proto_esc, group->groupid);
-
-					zbx_free(name_proto_esc);
+					zbx_db_insert_add_values(&db_insert_gdiscovery, discovery->groupdiscoveryid,
+							group->groupid, discovery->parent_group_prototypeid,
+							group_prototype->name);
 				}
 				else
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
+			else if (0 != (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE))
+			{
+				char	delim = ' ';
+
+				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update group_discovery set");
+
+				if (0 != (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_NAME))
+				{
+					char	*name_esc = zbx_db_dyn_escape_string(discovery->name);
+
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cname='%s'", delim,
+							name_esc);
+
+					zbx_free(name_esc);
+					delim = ',';
+				}
+
+				if (0 != (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_UPDATE_NAME))
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cgroupid=" ZBX_FS_UI64,
+							delim, group->groupid);
+				}
+
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where groupdiscoveryid="
+						ZBX_FS_UI64 ";\n", discovery->groupdiscoveryid);
+
+				zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			}
 		}
 	}
 
-	if (0 != upd_groups_num)
+	if (0 != gd_insert_num)
+	{
+		zbx_db_insert_execute(&db_insert_gdiscovery);
+		zbx_db_insert_clean(&db_insert_gdiscovery);
+	}
+
+	if (0 != groups_update_num || 0 != gd_update_num)
 	{
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 		zbx_db_execute("%s", sql);
-		zbx_free(sql);
-	}
-
-	if (0 != new_group_prototype_ids.values_num)
-	{
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-
-		zbx_db_insert_execute(&db_insert_gdiscovery);
-		zbx_db_insert_clean(&db_insert_gdiscovery);
-
-		lld_groups_save_rights(&new_groups);
-		zbx_vector_ptr_destroy(&new_groups);
 	}
 
 	zbx_db_commit();
+
+	zbx_free(sql);
 out:
-	zbx_vector_uint64_destroy(&new_group_prototype_ids);
+	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2007,8 +2438,8 @@ static void	lld_masterhostmacros_get(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *
  ******************************************************************************/
 static int	macro_str_compare_func(const void *d1, const void *d2)
 {
-	const zbx_lld_hostmacro_t *hostmacro1 = *(const zbx_lld_hostmacro_t **)d1;
-	const zbx_lld_hostmacro_t *hostmacro2 = *(const zbx_lld_hostmacro_t **)d2;
+	const zbx_lld_hostmacro_t *hostmacro1 = *(const zbx_lld_hostmacro_t * const *)d1;
+	const zbx_lld_hostmacro_t *hostmacro2 = *(const zbx_lld_hostmacro_t * const *)d2;
 
 	return strcmp(hostmacro1->macro, hostmacro2->macro);
 }
@@ -2322,7 +2753,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
 		if (0 == (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
 			continue;
 
-		zbx_vector_uint64_reserve(&host->lnk_templateids, templateids.values_num);
+		zbx_vector_uint64_reserve(&host->lnk_templateids, (size_t)templateids.values_num);
 		for (j = 0; j < templateids.values_num; j++)
 			zbx_vector_uint64_append(&host->lnk_templateids, templateids.values[j]);
 
@@ -3620,69 +4051,89 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, int lifetime, int la
  *          fields; removes lost resources                                    *
  *                                                                            *
  ******************************************************************************/
-static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int lastcheck)
+static void	lld_groups_remove(const zbx_vector_lld_group_ptr_t *groups, int lifetime, int lastcheck)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	const zbx_lld_group_t	*group;
-	zbx_vector_uint64_t	del_groupids, lc_groupids, ts_groupids;
-	int			i;
+	zbx_vector_uint64_t	del_ids, lc_ids, ts_ids, groupids;
+	int			i, j;
 
 	if (0 == groups->values_num)
 		return;
 
-	zbx_vector_uint64_create(&del_groupids);
-	zbx_vector_uint64_create(&lc_groupids);
-	zbx_vector_uint64_create(&ts_groupids);
+	zbx_vector_uint64_create(&del_ids);
+	zbx_vector_uint64_create(&lc_ids);
+	zbx_vector_uint64_create(&ts_ids);
+	zbx_vector_uint64_create(&groupids);
+
+	zbx_db_begin();
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	for (i = 0; i < groups->values_num; i++)
 	{
-		group = (zbx_lld_group_t *)groups->values[i];
+		group = groups->values[i];
 
-		if (0 == group->groupid)
+		if (0 == group->discovery.values_num)
+		{
+			zbx_vector_uint64_append(&groupids, group->groupid);
 			continue;
-
-		if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
-		{
-			int	ts_delete = lld_end_of_life(group->lastcheck, lifetime);
-
-			if (lastcheck > ts_delete)
-			{
-				zbx_vector_uint64_append(&del_groupids, group->groupid);
-			}
-			else if (group->ts_delete != ts_delete)
-			{
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-						"update group_discovery"
-						" set ts_delete=%d"
-						" where groupid=" ZBX_FS_UI64 ";\n",
-						ts_delete, group->groupid);
-			}
 		}
-		else
+
+		for (j = 0; j < group->discovery.values_num; j++)
 		{
-			zbx_vector_uint64_append(&lc_groupids, group->groupid);
-			if (0 != group->ts_delete)
-				zbx_vector_uint64_append(&ts_groupids, group->groupid);
+			zbx_lld_group_discovery_t	*discovery = group->discovery.values[j];
+
+			if (0 == discovery->groupdiscoveryid)
+				continue;
+
+			if (0 == (discovery->flags & ZBX_FLAG_LLD_GROUP_DISCOVERY_DISCOVERED))
+			{
+				int	ts_delete;
+
+				if (0 == (group->flags & ZBX_FLAG_LLD_GROUP_DISCOVERED))
+					ts_delete = lld_end_of_life(discovery->lastcheck, lifetime);
+				else
+					ts_delete = 0;
+
+				if (lastcheck > ts_delete)
+				{
+					zbx_vector_uint64_append(&del_ids, discovery->groupdiscoveryid);
+					zbx_vector_uint64_append(&groupids, group->groupid);
+				}
+				else if (discovery->ts_delete != ts_delete)
+				{
+					zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+							"update group_discovery"
+							" set ts_delete=%d"
+							" where groupdiscoveryid=" ZBX_FS_UI64 ";\n",
+							ts_delete, discovery->groupdiscoveryid);
+				}
+			}
+			else
+			{
+				zbx_vector_uint64_append(&lc_ids, discovery->groupdiscoveryid);
+				if (0 != discovery->ts_delete)
+					zbx_vector_uint64_append(&ts_ids, discovery->groupdiscoveryid);
+			}
 		}
 	}
 
-	if (0 != lc_groupids.values_num)
+	if (0 != lc_ids.values_num)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update group_discovery set lastcheck=%d where",
 				lastcheck);
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid",
-				lc_groupids.values, lc_groupids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid",
+				lc_ids.values, lc_ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
-	if (0 != ts_groupids.values_num)
+	if (0 != ts_ids.values_num)
 	{
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update group_discovery set ts_delete=0 where");
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid",
-				ts_groupids.values, ts_groupids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid",
+				ts_ids.values, ts_ids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 	}
 
@@ -3690,29 +4141,71 @@ static void	lld_groups_remove(const zbx_vector_ptr_t *groups, int lifetime, int 
 	{
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		zbx_db_begin();
-
 		zbx_db_execute("%s", sql);
-
-		zbx_db_commit();
 	}
+
+	if (0 != del_ids.values_num)
+	{
+		zbx_vector_uint64_sort(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		/* remove group discovery records */
+
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from group_discovery where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupdiscoveryid", del_ids.values,
+				del_ids.values_num);
+		zbx_db_execute("%s", sql);
+	}
+
+	/* remove groups without group discovery records */
+
+	if (0 != groupids.values_num)
+	{
+		zbx_vector_uint64_sort(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
+		zbx_vector_uint64_clear(&del_ids);
+		sql_offset = 0;
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "select groupid from hstgrp g where");
+
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "g.groupid", groupids.values,
+				groupids.values_num);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+				" and not exists"
+					" (select null from group_discovery gd"
+						" where g.groupid=gd.groupid)");
+
+		result = zbx_db_select("%s", sql);
+
+		while (NULL != (row = zbx_db_fetch(result)))
+		{
+			zbx_uint64_t	groupid;
+
+			ZBX_DBROW2UINT64(groupid, row[0]);
+			zbx_vector_uint64_append(&del_ids, groupid);
+		}
+		zbx_db_free_result(result);
+
+		if (0 != del_ids.values_num)
+		{
+			zbx_vector_uint64_uniq(&del_ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_db_delete_groups(&del_ids);
+		}
+	}
+
+	zbx_db_commit();
 
 	zbx_free(sql);
 
-	if (0 != del_groupids.values_num)
-	{
-		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		zbx_db_begin();
-
-		zbx_db_delete_groups(&del_groupids);
-
-		zbx_db_commit();
-	}
-
-	zbx_vector_uint64_destroy(&ts_groupids);
-	zbx_vector_uint64_destroy(&lc_groupids);
-	zbx_vector_uint64_destroy(&del_groupids);
+	zbx_vector_uint64_destroy(&groupids);
+	zbx_vector_uint64_destroy(&ts_ids);
+	zbx_vector_uint64_destroy(&lc_ids);
+	zbx_vector_uint64_destroy(&del_ids);
 }
 
 /******************************************************************************
@@ -4501,7 +4994,8 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
-	zbx_vector_ptr_t		hosts, group_prototypes, groups, interfaces, masterhostmacros, hostmacros;
+	zbx_vector_ptr_t		hosts, group_prototypes, interfaces, masterhostmacros, hostmacros;
+	zbx_vector_lld_group_ptr_t	groups, groups_in, groups_out;
 	zbx_vector_db_tag_ptr_t	tags;
 	zbx_vector_uint64_t		groupids;		/* list of host groups which should be added */
 	zbx_vector_uint64_t		del_hostgroupids;	/* list of host groups which should be deleted */
@@ -4547,7 +5041,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 	zbx_vector_ptr_create(&hosts);
 	zbx_vector_uint64_create(&groupids);
 	zbx_vector_ptr_create(&group_prototypes);
-	zbx_vector_ptr_create(&groups);
+	zbx_vector_lld_group_ptr_create(&groups);
+	zbx_vector_lld_group_ptr_create(&groups_in);
+	zbx_vector_lld_group_ptr_create(&groups_out);
 	zbx_vector_uint64_create(&del_hostgroupids);
 	zbx_vector_ptr_create(&interfaces);
 	zbx_vector_ptr_create(&masterhostmacros);
@@ -4615,12 +5111,12 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 				continue;
 			}
 
-			lld_groups_make(host, &groups, &group_prototypes, &lld_row->jp_row, lld_macro_paths);
+			lld_groups_make(host, &groups_in, &group_prototypes, &lld_row->jp_row, lld_macro_paths);
 		}
 
 		zbx_vector_ptr_sort(&hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		lld_groups_validate(&groups, error);
+		lld_groups_validate(&group_prototypes, &groups, &groups_in, &groups_out, lld_macro_paths, error);
 		lld_hosts_validate(&hosts, error);
 
 		if (ZBX_HOST_PROT_INTERFACES_CUSTOM == use_custom_interfaces)
@@ -4634,12 +5130,14 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 
 		lld_interfaces_validate(&hosts, error);
 
-		lld_hostgroups_make(&groupids, &hosts, &groups, &del_hostgroupids);
+		/* save groups before making hosts_groups links because groupids could be updated during save */
+		lld_groups_save(&groups_out, &group_prototypes, error);
+
+		lld_hostgroups_make(&groupids, &hosts, &groups_out, &del_hostgroupids);
 		lld_templates_make(parent_hostid, &hosts);
 
 		lld_hostmacros_make(&hostmacros, &hosts, lld_macro_paths);
 
-		lld_groups_save(&groups, &group_prototypes);
 		lld_hosts_save(parent_hostid, &hosts, host_proto, proxyid, ipmi_authtype, ipmi_privilege,
 				ipmi_username, ipmi_password, tls_connect, tls_accept,
 				tls_issuer, tls_subject, tls_psk_identity, tls_psk, &del_hostgroupids);
@@ -4648,11 +5146,13 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 		lld_templates_link(&hosts, error);
 
 		lld_hosts_remove(&hosts, lifetime, lastcheck);
-		lld_groups_remove(&groups, lifetime, lastcheck);
+		lld_groups_remove(&groups_out, lifetime, lastcheck);
 
 		zbx_vector_db_tag_ptr_clear_ext(&tags, zbx_db_tag_free);
 		zbx_vector_ptr_clear_ext(&hostmacros, (zbx_clean_func_t)lld_hostmacro_free);
-		zbx_vector_ptr_clear_ext(&groups, (zbx_clean_func_t)lld_group_free);
+		zbx_vector_lld_group_ptr_clear_ext(&groups, lld_group_free);
+		zbx_vector_lld_group_ptr_clear_ext(&groups_in, lld_group_free);
+		zbx_vector_lld_group_ptr_clear_ext(&groups_out, lld_group_free);
 		zbx_vector_ptr_clear_ext(&group_prototypes, (zbx_clean_func_t)lld_group_prototype_free);
 		zbx_vector_ptr_clear_ext(&hosts, (zbx_clean_func_t)lld_host_free);
 
@@ -4676,7 +5176,9 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 	zbx_vector_ptr_destroy(&masterhostmacros);
 	zbx_vector_ptr_destroy(&interfaces);
 	zbx_vector_uint64_destroy(&del_hostgroupids);
-	zbx_vector_ptr_destroy(&groups);
+	zbx_vector_lld_group_ptr_destroy(&groups);
+	zbx_vector_lld_group_ptr_destroy(&groups_in);
+	zbx_vector_lld_group_ptr_destroy(&groups_out);
 	zbx_vector_ptr_destroy(&group_prototypes);
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_vector_ptr_destroy(&hosts);

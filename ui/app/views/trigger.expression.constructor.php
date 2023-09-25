@@ -51,7 +51,7 @@ else {
 						if ($errors) {
 							$errors[] = BR();
 						}
-						$errors[] = $expVal.':'.$errTxt;
+						$errors[] = $expVal.': '.$errTxt;
 					}
 				}
 

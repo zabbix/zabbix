@@ -27,7 +27,7 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 /**
  * @backup dashboard, hosts
  *
- * @dataSource Services, Sla
+ * @dataSource Services, Sla, Proxies
  *
  * @onBefore prepareTemplateDashboardsData
  */
@@ -376,7 +376,7 @@ class testFormTemplateDashboards extends CWebTest {
 									[
 										'type' => 1,
 										'name' => 'columns.name.0',
-										'value' => ''
+										'value' => 'Column 1'
 									],
 									[
 										'type' => 1,
@@ -717,7 +717,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'mandatory' => true
 						],
 						[
-							'field' => 'Background color',
+							'field' => 'Background colour',
 							'type' => 'color_picker'
 						],
 						[
@@ -740,7 +740,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -767,7 +767,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								],
 								[
@@ -806,7 +806,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -882,7 +882,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'mandatory' => true
 						],
 						[
-							'field' => 'Colors',
+							'field' => 'Colours',
 							'contents' => [
 								[
 									'field' => 'Value arc',
@@ -942,7 +942,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -976,7 +976,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_value_color',
 									'type' => 'color_picker'
 								],
@@ -1035,7 +1035,7 @@ class testFormTemplateDashboards extends CWebTest {
 								],
 
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_units_color',
 									'type' => 'color_picker'
 								]
@@ -1126,7 +1126,7 @@ class testFormTemplateDashboards extends CWebTest {
 					 */
 					'disabled' => [
 						[
-							'field' => 'Color',
+							'field' => 'Colour',
 							'fieldid' => 'lbl_needle_color',
 							'disabled_locator' => 'id:needle_color',
 							'type' => 'color_picker'
@@ -1379,7 +1379,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -1434,7 +1434,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => true
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_value_color',
 									'type' => 'color_picker'
 								],
@@ -1477,7 +1477,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => true
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'field_locator' => 'id:lbl_units_color',
 									'type' => 'color_picker'
 								]
@@ -1515,7 +1515,7 @@ class testFormTemplateDashboards extends CWebTest {
 									'value' => false
 								],
 								[
-									'field' => 'Color',
+									'field' => 'Colour',
 									'type' => 'color_picker'
 								]
 							]
@@ -1552,7 +1552,7 @@ class testFormTemplateDashboards extends CWebTest {
 							]
 						],
 						[
-							'field' => 'Background color',
+							'field' => 'Background colour',
 							'type' => 'color_picker'
 						],
 						[
@@ -1771,8 +1771,8 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Acknowledgement status',
 							'type' => 'radio_button',
-							'possible_values' => ['all', 'Unacknowledged', 'Acknowledged'],
-							'value' => 'all'
+							'possible_values' => ['All', 'Unacknowledged', 'Acknowledged'],
+							'value' => 'All'
 						],
 						[
 							'field' => 'Sort entries by',
@@ -4344,8 +4344,8 @@ class testFormTemplateDashboards extends CWebTest {
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
-					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map',
-					'Map navigation tree', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
+					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
+					'Pie chart', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
 					'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());

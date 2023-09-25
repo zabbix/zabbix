@@ -187,6 +187,12 @@ class CMathFunctionValidatorTest extends TestCase {
 			['insert("a", 1, 1, "a")', ['rc' => true, 'error' => null]],
 			['insert("a", 1, 1, "a", 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "insert"']],
 
+			['jsonpath()', ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+			['jsonpath("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+			['jsonpath("a", "a")', ['rc' => true, 'error' => null]],
+			['jsonpath("a", "a", "a")', ['rc' => true, 'error' => null]],
+			['jsonpath("a", "a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+
 			['kurtosis()', ['rc' => false, 'error' => 'invalid number of parameters in function "kurtosis"']],
 			['kurtosis(1)', ['rc' => true, 'error' => null]],
 			['kurtosis(1, 1)', ['rc' => true, 'error' => null]],
@@ -350,7 +356,13 @@ class CMathFunctionValidatorTest extends TestCase {
 			['varsamp()', ['rc' => false, 'error' => 'invalid number of parameters in function "varsamp"']],
 			['varsamp(1)', ['rc' => true, 'error' => null]],
 			['varsamp(1, 1)', ['rc' => true, 'error' => null]],
-			['varsamp(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "varsamp"']]
+			['varsamp(1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "varsamp"']],
+
+			['xmlxpath()', ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']],
+			['xmlxpath("a")', ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']],
+			['xmlxpath("a", "a")', ['rc' => true, 'error' => null]],
+			['xmlxpath("a", "a", "a")', ['rc' => true, 'error' => null]],
+			['xmlxpath("a", "a", "a", "a")', ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']]
 		];
 	}
 

@@ -133,8 +133,8 @@ foreach ($data['mediatypes'] as $media_type) {
 	// action list
 	$action_links = [];
 
-	if (count($media_type['list_of_actions']) > 0) {
-		foreach ($media_type['list_of_actions'] as $action) {
+	if (count($media_type['actions']) > 0) {
+		foreach ($media_type['actions'] as $action) {
 			$action_links[] = (new CLink($action['name']))
 				->addClass('js-action-edit')
 				->setAttribute('data-actionid', $action['actionid'])
