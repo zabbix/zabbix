@@ -136,7 +136,7 @@ class CImportDataAdapter {
 			foreach ($this->data['hosts'] as $host) {
 				if (array_key_exists('items', $host)) {
 					foreach ($host['items'] as $item) {
-						$items[$host['host']][$item['key']] = $this->normalizeItemFields($item);
+						$items[$host['host']][$item['key']] = $this->renameItemFields($item);
 					}
 				}
 			}
@@ -146,7 +146,7 @@ class CImportDataAdapter {
 			foreach ($this->data['templates'] as $template) {
 				if (array_key_exists('items', $template)) {
 					foreach ($template['items'] as $item) {
-						$items[$template['template']][$item['key']] = $this->normalizeItemFields($item);
+						$items[$template['template']][$item['key']] = $this->renameItemFields($item);
 					}
 				}
 			}
@@ -420,7 +420,7 @@ class CImportDataAdapter {
 			unset($discovery_rule['filter']);
 		}
 
-		$discovery_rule = $this->normalizeItemFields($discovery_rule);
+		$discovery_rule = $this->renameItemFields($discovery_rule);
 		$discovery_rule = $this->formatDiscoveryRuleOverrideFields($discovery_rule);
 
 		foreach ($discovery_rule['item_prototypes'] as &$item_prototype) {
@@ -430,7 +430,7 @@ class CImportDataAdapter {
 				);
 			}
 
-			$item_prototype = $this->normalizeItemFields($item_prototype);
+			$item_prototype = $this->renameItemFields($item_prototype);
 		}
 		unset($item_prototype);
 
@@ -565,17 +565,8 @@ class CImportDataAdapter {
 	 *
 	 * @return array
 	 */
-	protected function normalizeItemFields(array $item) {
-		$item = CArrayHelper::renameKeys($item, ['key' => 'key_', 'allowed_hosts' => 'trapper_hosts']);
-
-		foreach ($item['preprocessing'] as &$step) {
-			if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED && $step['parameters'][0] === '') {
-				$step['parameters'][0] = ZBX_PREPROC_MATCH_ERROR_ANY;
-			}
-		}
-		unset($step);
-
-		return $item;
+	protected function renameItemFields(array $item) {
+		return CArrayHelper::renameKeys($item, ['key' => 'key_', 'allowed_hosts' => 'trapper_hosts']);
 	}
 
 	/**

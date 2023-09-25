@@ -1221,6 +1221,17 @@ static int	DBpatch_6050122(void)
 	return DBadd_field("proxy", &field);
 }
 
+static int	DBpatch_6050123(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update item_preproc set params='-1' where type=%d",
+			ZBX_PREPROC_VALIDATE_NOT_SUPPORTED))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1348,5 +1359,6 @@ DBPATCH_ADD(6050119, 0, 1)
 DBPATCH_ADD(6050120, 0, 1)
 DBPATCH_ADD(6050121, 0, 1)
 DBPATCH_ADD(6050122, 0, 1)
+DBPATCH_ADD(6050123, 0, 1)
 
 DBPATCH_END()
