@@ -1711,32 +1711,32 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'top trigger tag1'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => 'top trigger tag value1'
 									],
 									[
 										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.tag.1',
+										'name' => 'tags.1.tag',
 										'value' => 'top trigger tag2'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'tags.operator.1',
+										'name' => 'tags.1.operator',
 										'value' => 2
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.value.1',
+										'name' => 'tags.1.value',
 										'value' => 'top trigger tag value2'
 									]
 								]
@@ -2091,32 +2091,32 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'top trigger tag1'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => 'top trigger tag value1'
 									],
 									[
 										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.tag.1',
+										'name' => 'tags.1.tag',
 										'value' => 'top trigger tag2'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'tags.operator.1',
+										'name' => 'tags.1.operator',
 										'value' => 2
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'tags.value.1',
+										'name' => 'tags.1.value',
 										'value' => 'top trigger tag value2'
 									]
 								]

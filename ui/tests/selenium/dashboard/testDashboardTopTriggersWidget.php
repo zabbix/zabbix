@@ -700,7 +700,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 		}
 
 		if ($expected === TEST_GOOD) {
-			$values = $form->getValues();
+			$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		}
 
 		$form->submit();
@@ -737,7 +737,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $widget->edit();
-			$this->assertEquals($values, $saved_form->getValues());
+			$this->assertEquals($values, $saved_form->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 			$saved_form->checkValue($data['fields']);
 
 			if (array_key_exists('tags', $data)) {
