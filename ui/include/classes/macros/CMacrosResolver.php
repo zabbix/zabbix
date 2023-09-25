@@ -27,52 +27,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @var array
 	 */
 	protected $configs = [
-		'httpTestName' => [
-			'types' => ['host', 'interfaceWithoutPort', 'user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfaceIpDns' => [
-			'types' => ['host', 'agentInterface', 'user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfaceIpDnsAgentPrimary' => [
-			'types' => ['host', 'user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfaceDetailsSecurityname' => [
-			'types' => ['user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfaceDetailsAuthPassphrase' => [
-			'types' => ['user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfaceDetailsPrivPassphrase' => [
-			'types' => ['user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfaceDetailsContextName' => [
-			'types' => ['user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfaceDetailsCommunity' => [
-			'types' => ['user'],
-			'method' => 'resolveTexts'
-		],
-		'hostInterfacePort' => [
-			'types' => ['user'],
-			'method' => 'resolveTexts'
-		],
-		'widgetURL' => [
-			'types' => ['host', 'hostId', 'interfaceWithoutPort', 'user'],
-			'source' => 'url',
-			'method' => 'resolveTexts'
-		],
-		'widgetURLUser' => [
-			'types' => ['user'],
-			'source' => 'url',
-			'method' => 'resolveTexts'
-		]
+		'httpTestName' => ['host', 'interfaceWithoutPort', 'user'],
+		'hostInterfaceIpDns' => ['host', 'agentInterface', 'user'],
+		'hostInterfaceIpDnsAgentPrimary' => ['host', 'user'],
+		'hostInterfaceDetailsSecurityname' => ['user'],
+		'hostInterfaceDetailsAuthPassphrase' => ['user'],
+		'hostInterfaceDetailsPrivPassphrase' => ['user'],
+		'hostInterfaceDetailsContextName' => ['user'],
+		'hostInterfaceDetailsCommunity' => ['user'],
+		'hostInterfacePort' => ['user'],
+		'widgetURL' => ['host', 'hostId', 'interfaceWithoutPort', 'user'],
+		'widgetURLUser' => ['user']
 	];
 
 	/**
@@ -98,10 +63,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$this->config = $options['config'];
 
-		// Call method.
-		$method = $this->configs[$this->config]['method'];
-
-		return $this->$method($options['data']);
+		return $this->resolveTexts($options['data']);
 	}
 
 	/**
@@ -167,8 +129,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$interface_hostids[$hostid] = true;
 				}
 
-				if (array_key_exists('user_data', $matched_macros['macros'])
-						&& $matched_macros['macros']['user_data']) {
+				if (array_key_exists('user_data', $matched_macros['macros'])) {
 					foreach ($matched_macros['macros']['user_data'] as $token => $foo) {
 						switch ($token) {
 							case '{USER.ALIAS}': // Deprecated in version 5.4.

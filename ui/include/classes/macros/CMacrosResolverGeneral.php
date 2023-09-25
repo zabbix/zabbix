@@ -2557,7 +2557,7 @@ class CMacrosResolverGeneral {
 	 * @return bool
 	 */
 	protected function isTypeAvailable($type) {
-		return in_array($type, $this->configs[$this->config]['types']);
+		return in_array($type, $this->configs[$this->config]);
 	}
 
 	/**
