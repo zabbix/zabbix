@@ -55,89 +55,51 @@ class CControllerScriptUserInputCheck extends CController {
 	}
 
 	protected function doAction(): void {
-		$input_type = $this->getInput('input_type');
 		$manual_input = $this->getInput('manual_input');
 		$output = [];
 		$result = false;
 		$test = $this->hasInput('test');
 
-		if ($test) {
-			if ($input_type == SCRIPT_MANUALINPUT_TYPE_LIST) {
-				$dropdown_values = explode(",", $this->getInput('input_validation'));
+		if ($this->getInput('input_type') == SCRIPT_MANUALINPUT_TYPE_LIST) {
+			$dropdown_values = explode(",", $this->getInput('input_validation'));
 
-				if (in_array($manual_input, $dropdown_values)) {
-					$result = true;
-				}
-				else {
-					error(
-						_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
-							_s('value must be one of: %1$s', implode(', ', $dropdown_values))
-						)
-					);
-				}
+			if (in_array($manual_input, $dropdown_values)) {
+				$result = true;
 			}
 			else {
-				$input_validation = $this->getInput('input_validation');
-
-				if (preg_match('/' . str_replace('/', '\/', $input_validation) . '/', $manual_input) == false) {
-					error(
-						_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
-							_s('input does not match the provided pattern: %1$s', $input_validation)
-						)
-					);
-				} else {
-					$result = true;
-				}
+				error(
+					_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
+						_s('value must be one of: %1$s', implode(', ', $dropdown_values))
+					)
+				);
 			}
+		}
+		else{
+			$input_validation = $this->getInput('input_validation');
 
-			if ($result) {
+			if (!preg_match('/' . str_replace('/', '\/', $input_validation) . '/', $manual_input)) {
+				error(
+					_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
+						_s('input does not match the provided pattern: %1$s', $input_validation)
+					)
+				);
+			}
+			else {
+				$result = true;
+			}
+		}
+
+		if ($result) {
+			if ($test) {
 				$output['success']['messages'] = ['User input has been successfully tested.'];
 				$output['success']['test'] = true;
 			}
 			else {
-				if ($messages = get_and_clear_messages()) {
-					$output['error']['messages'] = array_column($messages, 'message');
-				}
-			}
-		}
-
-		if (!$test) {
-			if ($input_type == SCRIPT_MANUALINPUT_TYPE_LIST) {
-				$dropdown_values = explode(",", $this->getInput('input_validation'));
-
-				if (in_array($manual_input, $dropdown_values)) {
-					$result = true;
-				} else {
-					error(
-						_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
-							_s('value must be one of: %1$s', implode(', ', $dropdown_values))
-						)
-					);
-				}
-			}
-			else {
-				$input_validation = $this->getInput('input_validation');
-
-				if (!preg_match('/' . str_replace('/', '\/', $input_validation) . '/', $manual_input)) {
-					error(
-						_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
-							_s('input does not match the provided pattern: %1$s', $input_validation)
-						)
-					);
-				}
-				else {
-					$result = true;
-				}
-			}
-
-			if ($result) {
 				$output = ['data' => ['manualinput' => $manual_input]];
 			}
-			else {
-				if ($messages = get_and_clear_messages()) {
-					$output['error']['messages'] = array_column($messages, 'message');
-				}
-			}
+		}
+		elseif ($messages = get_and_clear_messages()) {
+			$output['error']['messages'] = array_column($messages, 'message');
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output, JSON_THROW_ON_ERROR)]));
