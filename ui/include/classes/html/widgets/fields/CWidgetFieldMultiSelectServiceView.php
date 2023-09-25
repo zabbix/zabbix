@@ -23,13 +23,17 @@ use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectService;
 
 class CWidgetFieldMultiSelectServiceView extends CWidgetFieldMultiSelectView {
 
-	public function __construct(CWidgetFieldMultiSelectService $field, array $data) {
-		parent::__construct($field, $data);
+	public function __construct(CWidgetFieldMultiSelectService $field) {
+		parent::__construct($field);
 
 		$this->custom_select = true;
 	}
 
 	protected function getObjectName(): string {
 		return 'services';
+	}
+
+	protected function getObjectLabels(): array {
+		return ['object' => _('Service'), 'objects' => _('Services')];
 	}
 }

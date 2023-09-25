@@ -61,6 +61,10 @@ class C64ImportConverter extends CConverter {
 			if (array_key_exists('discovery_rules', $template)) {
 				$template['discovery_rules'] = self::convertDiscoveryRules($template['discovery_rules']);
 			}
+
+			if (array_key_exists('dashboards', $template)) {
+				$template['dashboards'] = self::convertDashboards($template['dashboards']);
+			}
 		}
 		unset($template);
 
@@ -173,5 +177,85 @@ class C64ImportConverter extends CConverter {
 			}
 		}
 		unset($step);
+	}
+
+	/**
+	 * Convert dashboards.
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	private static function convertDashboards(array $dashboards): array {
+		foreach ($dashboards as &$dashboard) {
+			if (!array_key_exists('pages', $dashboard)) {
+				continue;
+			}
+
+			$reference_index = 0;
+
+			foreach ($dashboard['pages'] as &$dashboard_page) {
+				if (!array_key_exists('widgets', $dashboard_page)) {
+					continue;
+				}
+
+				foreach ($dashboard_page['widgets'] as &$widget) {
+					if (in_array($widget['type'], ['graph', 'svggraph', 'graphprototype'])) {
+						$reference = self::createWidgetReference($reference_index++);
+
+						if (!array_key_exists('fields', $widget)) {
+							$widget['fields'] = [];
+						}
+
+						$widget['fields'][] = [
+							'type' => 'STRING',
+							'name' => 'reference',
+							'value' => $reference
+						];
+
+						usort($widget['fields'],
+							static function(array $widget_field_a, array $widget_field_b): int {
+								return strnatcasecmp($widget_field_a['name'], $widget_field_b['name']);
+							}
+						);
+					}
+
+					if (array_key_exists('fields', $widget)) {
+						foreach ($widget['fields'] as &$field) {
+							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/',
+								'$1.$3.$2.$4', $field['name']
+							);
+							$field['name'] = preg_replace('/^([a-z]+)\.([a-z_]+)\.(\d+)$/',
+								'$1.$3.$2', $field['name']
+							);
+						}
+						unset($field);
+					}
+				}
+				unset($widget);
+			}
+			unset($dashboard_page);
+		}
+		unset($dashboard);
+
+		return $dashboards;
+	}
+
+	/**
+	 * Create a unique widget reference (required for broadcasting widgets).
+	 *
+	 * @param int $index  Unique reference index
+	 *
+	 * @return string
+	 */
+	private static function createWidgetReference(int $index): string {
+		$reference = '';
+
+		for ($i = 0; $i < 5; $i++) {
+			$reference = chr(65 + $index % 26).$reference;
+			$index = floor($index / 26);
+		}
+
+		return $reference;
 	}
 }

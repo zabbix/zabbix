@@ -562,18 +562,16 @@ a.link-action {
 }
 
 .multiselect-suggest {
-	li {
-		&.suggest-hover {
-			color: #ffffff;
-			background-color: #000000;
+	.suggest-hover {
+		color: #ffffff;
+		background-color: #000000;
 
-			.grey {
-				color: #dcdcdc;
-			}
+		.grey {
+			color: #dcdcdc;
+		}
 
-			.suggest-found {
-				color: lighten($alt-yellow, 10%);
-			}
+		.suggest-found {
+			color: lighten($alt-yellow, 10%);
 		}
 	}
 }

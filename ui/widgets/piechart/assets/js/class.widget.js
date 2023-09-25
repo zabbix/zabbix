@@ -34,19 +34,10 @@ class CWidgetPieChart extends CWidget {
 		}
 	}
 
-	setTimePeriod(time_period) {
-		super.setTimePeriod(time_period);
-
-		if (this.getState() === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
-	}
-
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			from: this._time_period.from,
-			to: this._time_period.to,
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1,
 			with_config: this.#pie_chart === null ? 1 : undefined
 		};
 	}
@@ -171,8 +162,8 @@ class CWidgetPieChart extends CWidget {
 		return size;
 	}
 
-	getActionsContextMenu({can_paste_widget}) {
-		const menu = super.getActionsContextMenu({can_paste_widget});
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_copy_widget, can_paste_widget});
 
 		if (this.isEditMode()) {
 			return menu;

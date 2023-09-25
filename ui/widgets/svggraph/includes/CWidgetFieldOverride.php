@@ -28,6 +28,7 @@ use Zabbix\Widgets\CWidgetField;
  */
 class CWidgetFieldOverride extends CWidgetField {
 
+	public const DEFAULT_VIEW = CWidgetFieldOverrideView::class;
 	public const DEFAULT_VALUE = [];
 
 	public function __construct(string $name, string $label = null) {
@@ -35,7 +36,6 @@ class CWidgetFieldOverride extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
 			->setValidationRules(['type' => API_OBJECTS, 'fields' => [
 				'hosts'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
 				'items'				=> ['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED],
@@ -72,48 +72,21 @@ class CWidgetFieldOverride extends CWidgetField {
 		];
 	}
 
-	public function setFlags(int $flags): self {
-		parent::setFlags($flags);
-
-		if (($flags & self::FLAG_NOT_EMPTY) !== 0) {
-			$strict_validation_rules = $this->getValidationRules();
-
-			if (!$this->isTemplateDashboard()) {
-				self::setValidationRuleFlag($strict_validation_rules['fields']['hosts'], API_NOT_EMPTY);
-			}
-
-			self::setValidationRuleFlag($strict_validation_rules['fields']['items'], API_NOT_EMPTY);
-			self::setValidationRuleFlag($strict_validation_rules['fields']['color'], API_NOT_EMPTY);
-			self::setValidationRuleFlag($strict_validation_rules['fields']['timeshift'], API_NOT_EMPTY);
-			$this->setStrictValidationRules($strict_validation_rules);
-		}
-		else {
-			$this->setStrictValidationRules();
-		}
-
-		return $this;
-	}
-
-	public function setTemplateId($templateid): self {
-		parent::setTemplateId($templateid);
-
-		return $this->setFlags($this->getFlags());
-	}
-
 	public function validate(bool $strict = false): array {
-		$errors = parent::validate($strict);
-		$value = $this->getValue();
-		$label = $this->label ?? $this->name;
+		if (!$strict) {
+			return [];
+		}
 
-		// Validate options.
-		if (!$errors && $strict) {
-			foreach ($value as $index => $overrides) {
-				if (!array_intersect($this->getOverrideOptions(), array_keys($overrides))) {
-					$errors[] = _s('Invalid parameter "%1$s": %2$s.', $label.'/'.($index + 1),
-						_('at least one override option must be specified')
-					);
-					break;
-				}
+		if ($errors = parent::validate($strict)) {
+			return $errors;
+		}
+
+		foreach ($this->getValue() as $index => $overrides) {
+			if (!array_intersect($this->getOverrideOptions(), array_keys($overrides))) {
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->label ?? $this->name.'/'.($index + 1),
+					_('at least one override option must be specified')
+				);
+				break;
 			}
 		}
 
@@ -121,36 +94,51 @@ class CWidgetFieldOverride extends CWidgetField {
 	}
 
 	public function toApi(array &$widget_fields = []): void {
-		$value = $this->getValue();
+		foreach ($this->getValue() as $index => $value) {
 
-		foreach ($value as $index => $val) {
-			// Hosts and items fields are stored as arrays to bypass length limit.
-			foreach ($val['hosts'] as $num => $pattern_item) {
+			foreach ($value['hosts'] as $host_index => $pattern_item) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.hosts.'.$index.'.'.$num,
-					'value' => $pattern_item
-				];
-			}
-			foreach ($val['items'] as $num => $pattern_item) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.items.'.$index.'.'.$num,
+					'name' => $this->name.'.'.$index.'.hosts.'.$host_index,
 					'value' => $pattern_item
 				];
 			}
 
-			foreach ($this->getOverrideOptions() as $opt) {
-				if (array_key_exists($opt, $val)) {
+			foreach ($value['items'] as $item_index => $pattern_item) {
+				$widget_fields[] = [
+					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+					'name' => $this->name.'.'.$index.'.items.'.$item_index,
+					'value' => $pattern_item
+				];
+			}
+
+			foreach ($this->getOverrideOptions() as $option) {
+				if (array_key_exists($option, $value)) {
 					$widget_fields[] = [
-						'type' => ($opt === 'color' || $opt === 'timeshift')
+						'type' => ($option === 'color' || $option === 'timeshift')
 							? ZBX_WIDGET_FIELD_TYPE_STR
 							: ZBX_WIDGET_FIELD_TYPE_INT32,
-						'name' => $this->name.'.'.$opt.'.'.$index,
-						'value' => $val[$opt]
+						'name' => $this->name.'.'.$index.'.'.$option,
+						'value' => $value[$option]
 					];
 				}
 			}
 		}
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		$validation_rules = parent::getValidationRules($strict);
+
+		if (($this->getFlags() & self::FLAG_NOT_EMPTY) !== 0) {
+			if (!$this->isTemplateDashboard()) {
+				self::setValidationRuleFlag($validation_rules['fields']['hosts'], API_NOT_EMPTY);
+			}
+
+			self::setValidationRuleFlag($validation_rules['fields']['items'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($validation_rules['fields']['color'], API_NOT_EMPTY);
+			self::setValidationRuleFlag($validation_rules['fields']['timeshift'], API_NOT_EMPTY);
+		}
+
+		return $validation_rules;
 	}
 }

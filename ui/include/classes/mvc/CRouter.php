@@ -309,6 +309,7 @@ class CRouter {
 		'templategroup.update'						=> ['CControllerTemplateGroupUpdate',					'layout.json',			null],
 		'timeouts.edit'								=> ['CControllerTimeoutsEdit',							'layout.htmlpage',		'administration.timeouts.edit'],
 		'timeouts.update'							=> ['CControllerTimeoutsUpdate',						null,					null],
+		'timeselector.calc'							=> ['CControllerTimeSelectorCalc',						'layout.json',			null],
 		'timeselector.update'						=> ['CControllerTimeSelectorUpdate',					'layout.json',			null],
 		'token.create'								=> ['CControllerTokenCreate',							'layout.json',			null],
 		'token.delete'								=> ['CControllerTokenDelete',							'layout.json',			null],

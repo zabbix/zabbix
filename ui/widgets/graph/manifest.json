@@ -10,7 +10,16 @@
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_classic",
 	"widget": {
 		"js_class": "CWidgetGraph",
-		"use_time_selector": true
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		},
+		"out": [
+			{
+				"type": "_timeperiod"
+			}
+		]
 	},
 	"actions": {
 		"widget.graph.view": {

@@ -671,10 +671,8 @@ a.link-action {
 }
 
 .multiselect-suggest {
-	li {
-		&.suggest-hover {
-			background-color: $ui-bg-color;
-		}
+	.suggest-hover {
+		background-color: $ui-bg-color;
 	}
 }
 
