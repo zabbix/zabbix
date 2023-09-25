@@ -1144,12 +1144,11 @@ class CWidgetBase {
 		let menu = [];
 		let menu_actions = [];
 
-		if (can_copy_widget) {
-			menu_actions.push({
-				label: t('Copy'),
-				clickCallback: () => this.fire(WIDGET_EVENT_COPY)
-			});
-		}
+		menu_actions.push({
+			label: t('Copy'),
+			disabled: can_copy_widget === false,
+			clickCallback: () => this.fire(WIDGET_EVENT_COPY)
+		});
 
 		if (this._is_edit_mode) {
 			menu_actions.push({
