@@ -566,10 +566,7 @@ static void	hk_drop_partition(const char *table_name, int history_seconds, int n
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s delete all", __func__, table_name);
 
-		result = zbx_db_select(1 == ZBX_DB_TSDB_V1 ?
-				"select drop_chunks(table_name=>'%s',newer_than=>0)" :
-				"select drop_chunks(relation=>'%s',newer_than=>0)",
-				table_name);
+		result = zbx_db_select("select drop_chunks(relation=>'%s',newer_than=>0)", table_name);
 	}
 	else
 	{
@@ -585,10 +582,7 @@ static void	hk_drop_partition(const char *table_name, int history_seconds, int n
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, table_name, keep_from);
 
-		result = zbx_db_select(1 == ZBX_DB_TSDB_V1 ?
-				"select drop_chunks(table_name=>'%s',older_than=>%d)" :
-				"select drop_chunks(relation=>'%s',older_than=>%d)",
-				table_name, keep_from);
+		result = zbx_db_select("select drop_chunks(relation=>'%s',older_than=>%d)", table_name, keep_from);
 	}
 
 	if (NULL == result)
