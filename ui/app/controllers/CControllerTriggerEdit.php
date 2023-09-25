@@ -29,7 +29,6 @@ class CControllerTriggerEdit extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
