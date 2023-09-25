@@ -251,10 +251,11 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 			return FAIL;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, CONFIG_GET_TIMEOUT,
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, CONFIG_GET_TIMEOUT + 1,
 			zbx_config_tls->connect_mode, tls_arg1, tls_arg2)))
 	{
-		if (SUCCEED == (ret = zbx_tcp_send(&s, key)))
+		if (SUCCEED == (ret = zbx_tcp_send_ext(&s, key, strlen(key), (zbx_uint32_t)CONFIG_GET_TIMEOUT,
+				ZBX_TCP_PROTOCOL, 0)))
 		{
 			if (0 < (bytes_received = zbx_tcp_recv_ext(&s, 0, 0)))
 			{

@@ -491,8 +491,8 @@ static void	zbx_set_defaults(void)
 
 		zbx_init_agent_result(&result);
 
-		if (SUCCEED == zbx_execute_agent_check(config_hostname_item, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
-				NULL != (value = ZBX_GET_STR_RESULT(&result)))
+		if (SUCCEED == zbx_execute_agent_check(config_hostname_item, ZBX_PROCESS_LOCAL_COMMAND, &result,
+				ZBX_CHECK_TIMEOUT_UNDEFINED) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 
@@ -1239,7 +1239,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
-	zbx_init_library_dbupgrade(get_zbx_program_type);
+	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(NULL, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(zbx_program_type);
@@ -1584,15 +1584,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	proxy_db_init();
-
-	if (FAIL == zbx_pb_init(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
+	if (FAIL == zbx_pb_create(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
 			config_proxy_memory_buffer_age, config_proxy_offline_buffer * SEC_PER_HOUR, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy buffer: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	proxy_db_init();
+
+	zbx_pb_init();
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();

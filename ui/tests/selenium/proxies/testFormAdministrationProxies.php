@@ -504,7 +504,7 @@ class testFormAdministrationProxies extends CWebTest {
 				}
 
 				// Check form tabs.
-				$this->assertEquals(['Proxy', 'Encryption'], $form->getTabs());
+				$this->assertEquals(['Proxy', 'Encryption', 'Timeouts'], $form->getTabs());
 				$form->checkValue(['Proxy mode' => 'Active']);
 			}
 			else{

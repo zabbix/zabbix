@@ -179,9 +179,9 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 }
 
 // Watch MQTT plugin
-func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
+func (p *Plugin) Watch(items []*plugin.Item, ctx plugin.ContextProvider) {
 	impl.manager.Lock()
-	impl.manager.Update(ctx.ClientID(), ctx.Output(), requests)
+	impl.manager.Update(ctx.ClientID(), ctx.Output(), items)
 	impl.manager.Unlock()
 }
 

@@ -37,14 +37,16 @@ typedef struct zbx_snmp_context	zbx_snmp_context_t;
 
 void	zbx_init_library_mt_snmp(const char *progname);
 void	zbx_shutdown_library_mt_snmp(void);
-int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
+
+int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
 		const char *config_source_ip, const char *progname);
 void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, int config_timeout, const char *config_source_ip, const char *progname);
+		unsigned char poller_type, const char *config_source_ip, const char *progname);
+
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname);
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
-		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase, int config_timeout,
+		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip);
 zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context);
 void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context);

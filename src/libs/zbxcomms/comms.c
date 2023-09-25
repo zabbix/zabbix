@@ -2024,6 +2024,11 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 				memcpy(&len32_le, s->buf_stat + context->offset, sizeof(len32_le));
 				context->offset += sizeof(len32_le);
 				context->reserved = zbx_letoh_uint32(len32_le);
+
+				if (0 == flags && ZBX_TCP_PROTOCOL == context->protocol_version)
+					s->reserved_payload = context->reserved;
+				else
+					s->reserved_payload = 0;
 			}
 
 			if (context->max_len < context->expected_len)

@@ -324,7 +324,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		$this->assertTrue($form->getField('id:th_arc_size')->isEnabled());
 
 		// Check fields' labels and required fields.
-		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colors',
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colours',
 				'Advanced configuration', 'Angle', 'Description', 'Value', 'Needle', 'Scale', 'Thresholds',
 				'Enable host selection'],
 				$form->getLabels()->asText()
@@ -501,7 +501,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					],
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
-						'Invalid parameter "Thresholds/1/color": a hexadecimal color code (6 symbols) is expected.'
+						'Invalid parameter "Thresholds/1/color": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],

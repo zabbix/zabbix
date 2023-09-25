@@ -34,6 +34,7 @@
 #include "zbxexpr.h"
 #include "zbxfile.h"
 #include "zbxthreads.h"
+#include "zbxtime.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -985,7 +986,7 @@ void	zbx_test_parameter(const char *key)
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result))
+	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, ZBX_CHECK_TIMEOUT_UNDEFINED))
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -1149,6 +1150,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
  *                     ZBX_PROCESS_LOCAL_COMMAND, allow execution of system.run   *
  *                     ZBX_PROCESS_MODULE_COMMAND, execute item from a module     *
  *                     ZBX_PROCESS_WITH_ALIAS, substitute agent Alias             *
+ *             timeout    - [IN] check execution timeout                          *
  *             result     - [OUT]                                                 *
  *                                                                                *
  * Return value: SUCCEED - successful execution                                   *
@@ -1156,7 +1158,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
  *               result - contains item value or error message                    *
  *                                                                                *
  **********************************************************************************/
-int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result)
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout)
 {
 	int		ret = NOTSUPPORTED;
 	zbx_metric_t	*command = NULL;
@@ -1249,6 +1251,8 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 					REQUEST_PARAMETER_TYPE_STRING);
 		}
 	}
+
+	request.timeout = (0 == timeout ? sysinfo_get_config_timeout() : timeout);
 
 	if (SYSINFO_RET_OK != command->function(&request, result))
 	{
@@ -1765,7 +1769,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	close(fds[1]);
 
-	zbx_alarm_on(sysinfo_get_config_timeout());
+	zbx_alarm_on(request->timeout);
 
 	while (0 != (n = read(fds[0], buffer, sizeof(buffer))))
 	{
@@ -1943,7 +1947,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	}
 
 	/* 1000 is multiplier for converting seconds into milliseconds */
-	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, sysinfo_get_config_timeout() * 1000)))
+	if (WAIT_FAILED == (rc = WaitForSingleObject(thread, request->timeout * 1000)))
 	{
 		/* unexpected error */
 
@@ -2120,3 +2124,22 @@ char	*zbx_format_mntopt_string(zbx_mntopt_t mntopts[], int flags)
 	return dst_string;
 }
 #endif
+
+int	zbx_validate_item_timeout(const char *timeout_str, int *sec_out, char *error, size_t error_len)
+{
+#define ZBX_ITEM_TIMEOUT_MAX	600
+	int	sec;
+
+	if (SUCCEED != zbx_is_time_suffix(timeout_str, &sec, ZBX_LENGTH_UNLIMITED) ||
+			ZBX_ITEM_TIMEOUT_MAX < sec || 1 > sec)
+	{
+		zbx_strlcpy(error, "Unsupported timeout value.", error_len);
+		return FAIL;
+	}
+
+	if (NULL != sec_out)
+		*sec_out = sec;
+
+	return SUCCEED;
+#undef ZBX_ITEM_TIMEOUT_MAX
+}

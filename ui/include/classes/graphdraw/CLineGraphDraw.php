@@ -989,7 +989,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// Date and time label formats.
 		$formats = [
-			'PT1M' => ['main' => TIME_FORMAT, 'sub' => _('H:i:s')],
+			'PT1M' => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT_SECONDS],
 			'PT1H' => ['main' => TIME_FORMAT, 'sub' => TIME_FORMAT],
 			'P1D' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => TIME_FORMAT],
 			'P1W' => ['main' => $magnitude === 'Y' ? DATE_FORMAT : _('m-d'), 'sub' => _('m-d')],

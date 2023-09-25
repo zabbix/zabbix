@@ -55,6 +55,8 @@ void	__wrap_zbx_user_init(zbx_user_t *user);
 void	__wrap_zbx_user_free(zbx_user_t *user);
 void	__wrap_zbx_init_agent_result(AGENT_RESULT *result);
 void	__wrap_zbx_free_agent_result(AGENT_RESULT *result);
+int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, unsigned char env, char **error);
 
 int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, const zbx_timespec_t *ts,
 		unsigned char state, const zbx_vector_pp_step_ptr_t *steps, zbx_vector_pp_result_ptr_t *results,
@@ -95,6 +97,13 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 
 	pp_execute(&ctx, preproc, NULL, NULL, &value_in, *ts, get_zbx_config_source_ip(), &value_out, &results_out,
 			&results_num);
+	for (i = 0; i < steps->values_num; i++)
+	{
+		zbx_pp_step_t	*pstep = steps->values[i];
+
+		if (pstep->error_handler_params != preproc->steps[i].error_handler_params)
+			pstep->error_handler_params = preproc->steps[i].error_handler_params;
+	}
 
 	/* copy results */
 	for (i = 0; i < results_num; i++)
@@ -180,7 +189,7 @@ void	__wrap_zbx_free_agent_result(AGENT_RESULT *result)
 int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
 		int hostids_num, char **error);
 int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error)
+		int hostids_num, unsigned char env, char **error)
 {
 	ZBX_UNUSED(um_cache);
 	ZBX_UNUSED(text);
