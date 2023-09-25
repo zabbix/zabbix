@@ -2869,7 +2869,6 @@ output {
   display: inline-block;
   height: 24px;
   line-height: 0;
-  vertical-align: top;
   white-space: nowrap; }
   .radio-list-control li {
     position: relative;
@@ -5278,10 +5277,15 @@ z-select .list, .multiselect, input[type="text"], input[type="password"], input[
     -webkit-text-fill-color: #bbbbbb;
     opacity: 1; }
 
-.radio-list-control.severity label {
-  max-width: 110px;
-  text-overflow: ellipsis;
-  overflow: hidden; }
+.radio-list-control.severity {
+  vertical-align: top; }
+  .radio-list-control.severity label {
+    max-width: 110px;
+    text-overflow: ellipsis;
+    overflow: hidden; }
+
+.table-forms .radio-list-control.severity {
+  vertical-align: middle; }
 
 .filter-space {
   box-sizing: border-box; }
