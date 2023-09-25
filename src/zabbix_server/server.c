@@ -359,6 +359,9 @@ static char	*zbx_config_webservice_url	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
+static int	config_nvps_limit	= 0;
+static int	config_nvps_overcommit	= 100;
+
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
@@ -1033,7 +1036,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{NULL}
+		{"NVPSLimit",			&config_nvps_limit,	TYPE_INT,
+			PARM_OPT,	1,			1000},
+		{"NVPSOvercommit",		&config_nvps_overcommit,	TYPE_INT,
+			PARM_OPT,	1,			1000},
+	{NULL}
 	};
 
 	/* initialize multistrings */
@@ -1405,7 +1412,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 							config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
-							config_max_concurrent_checks_per_poller};
+							config_max_concurrent_checks_per_poller,
+							{config_nvps_limit, config_nvps_overcommit}
+							};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 							&events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency};

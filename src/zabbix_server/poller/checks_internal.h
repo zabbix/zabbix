@@ -22,10 +22,12 @@
 
 #include "zbxcachehistory.h"
 #include "zbxcomms.h"
+#include "poller.h"
 
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time);
+		int config_startup_time, const zbx_nvps_limiter_t *config_nvps_limiter);
 
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
+int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
+		const zbx_nvps_limiter_t *config_nvps_limiter, AGENT_RESULT *result);
 
 #endif

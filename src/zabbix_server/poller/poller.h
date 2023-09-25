@@ -26,6 +26,13 @@
 
 typedef struct
 {
+	int	nvps_limit;
+	int	overcommit_limit;
+}
+zbx_nvps_limiter_t;
+
+typedef struct
+{
 	zbx_config_comms_args_t	*config_comms;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	unsigned char		poller_type;
@@ -34,6 +41,7 @@ typedef struct
 	int			config_unreachable_period;
 	int			config_unreachable_delay;
 	int			config_max_concurrent_checks_per_poller;
+	zbx_nvps_limiter_t	nvps_limiter;
 }
 zbx_thread_poller_args;
 
@@ -50,7 +58,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		unsigned char expand_macros);
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time);
+		int config_startup_time, const zbx_nvps_limiter_t *config_nvps_limiter);
 void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 

@@ -251,7 +251,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, const zbx_nvps_limiter_t *config_nvps_limiter)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -278,7 +278,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		goto out;
 	}
 
-	if (FAIL != (ret = zbx_get_value_internal_ext(tmp, &request, result)))
+	if (FAIL != (ret = zbx_get_value_internal_ext(tmp, &request, config_nvps_limiter, result)))
 		goto out;
 
 	ret = NOTSUPPORTED;

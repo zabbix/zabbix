@@ -26,9 +26,10 @@
  *                                                                            *
  * Purpose: processes program type (proxy) specific internal checks           *
  *                                                                            *
- * Parameters: param1  - [IN] the first parameter                             *
- *             request - [IN] the request                                     *
- *             result  - [OUT] the result                                     *
+ * Parameters: param1              - [IN] the first parameter                 *
+ *             request             - [IN] the request                         *
+ *             config_nvps_limiter - [IN] nvps limiter configuration          *
+ *             result              - [OUT] the result                         *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
@@ -38,8 +39,11 @@
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
+		const zbx_nvps_limiter_t *config_nvps_limiter, AGENT_RESULT *result)
 {
+	ZBX_UNUSED(config_nvps_limiter);
+
 	if (0 == strcmp(param1, "proxy_history"))
 	{
 		if (1 != get_rparams_num(request))
