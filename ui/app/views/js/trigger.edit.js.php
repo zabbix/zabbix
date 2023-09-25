@@ -133,7 +133,7 @@ window.trigger_edit_popup = new class {
 			}
 			else if (e.target.id === 'test-recovery-expression') {
 				return PopUp('popup.testtriggerexpr',
-					{expression: this.form.querySelector('#recovery_expr_temp').value}, {
+					{expression: this.recovery_expr_temp.value}, {
 						dialogue_class: 'modal-popup-generic'
 					});
 			}

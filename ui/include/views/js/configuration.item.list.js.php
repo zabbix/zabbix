@@ -87,7 +87,7 @@
 						triggerid: e.target.dataset.triggerid,
 						hostid: e.target.dataset.hostid,
 						context: e.target.dataset.context
-					})
+					});
 				}
 			});
 
