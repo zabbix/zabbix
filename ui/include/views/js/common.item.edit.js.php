@@ -129,7 +129,8 @@
 				'js-item-timeout-label',
 				'js-item-timeout-field'
 			];
-			const set_hidden = document.getElementById('snmp_oid').value.substring(0, 5) !== 'walk[';
+			const snmp_oid = document.getElementById('snmp_oid').value''
+			const set_hidden = snmp_oid.substring(0, 4) !== 'get[' && snmp_oid.substring(0, 5) !== 'walk[';
 			const object_switcher = globalAllObjForViewSwitcher['type'];
 
 			toggle_fields.forEach((element_id) =>

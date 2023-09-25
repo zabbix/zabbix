@@ -2473,7 +2473,8 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 			case 'timeout':
 				return ($input['type'] != ITEM_TYPE_SIMPLE || (strncmp($input['key_'], 'icmpping', 8) != 0
 						&& strncmp($input['key_'], 'vmware.', 7) != 0))
-					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'walk[', 5) == 0);
+					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'get[', 4) == 0
+						|| strncmp($input['snmp_oid'], 'walk[', 5) == 0);
 
 			case 'delay':
 				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;

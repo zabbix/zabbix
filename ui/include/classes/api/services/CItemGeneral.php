@@ -1424,6 +1424,7 @@ abstract class CItemGeneral extends CApiService {
 				case ITEM_TYPE_SNMP:
 					if (array_key_exists('snmp_oid', $item)
 							&& ($item['type'] != $db_item['type'] || $item['snmp_oid'] !== $db_item['snmp_oid'])
+							&& strncmp($item['snmp_oid'], 'get[', 4) != 0
 							&& strncmp($item['snmp_oid'], 'walk[', 5) != 0) {
 						$item += array_intersect_key($type_field_defaults, array_flip(['timeout']));
 					}
