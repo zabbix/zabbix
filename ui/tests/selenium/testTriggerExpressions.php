@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 
 class testTriggerExpressions extends CWebTest {
 
-	const TRIGGER_ID = 17094;		//'Lack of available memory on server {HOST.NAME}'
+	const TRIGGER_ID = 17094;		//'PHP-FPM: Pool has been restarted'
 
 	public function testTriggerExpressions_SimpleTest() {
 		// Open advanced editor for testing trigger expression results.
@@ -30,7 +30,7 @@ class testTriggerExpressions extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&context=template');
 		$form = CFilterElement::find()->one()->getForm();
 		$form->fill(['Name' => $description])->submit();
-		$this->query('link:'.$description)->one()->click();
+		$this->query('link', $description)->one()->click();
 		COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->query('button:Expression constructor')->waitUntilPresent()->one()->click();
 		$this->query('button:Test')->waitUntilPresent()->one()->click();

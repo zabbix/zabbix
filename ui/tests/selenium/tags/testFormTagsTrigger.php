@@ -169,7 +169,7 @@ class testFormTagsTrigger extends testFormTags {
 	// TODO: uncomment after fix ZBX-19485
 //	public function testFormTagsTrigger_InheritedTemplateTags($data) {
 //		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
-//		$this->link = 'triggers.php?filter_set=1&filter_hostids[0]='.$templateid.'&context=template';
+//		$this->link = 'zabbix.php?action=trigger.list&filter_set=1&context=template&filter_hostids[0]='.$templateid';
 //		$expression = 'last(/Template for tags testing/trap.template)=0';
 //		$this->checkInheritedTags($data, 'trigger', 'Template', $expression);
 //	}

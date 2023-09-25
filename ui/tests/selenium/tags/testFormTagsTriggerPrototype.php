@@ -30,7 +30,6 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	public $clone_name = 'Trigger prototype with tags for cloning';
 	public $remove_name = 'Trigger prototype for removing tags';
 	public $link;
-	public $saved_link;
 	public $host = 'Host for tags testing';
 	public $template = 'Template for tags testing';
 
@@ -42,7 +41,6 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	public function testFormTagsTriggerPrototype_Create($data) {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
 		$this->link = 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.$discoveryruleid;
 		$expression = 'last(/Host for tags testing/itemprototype_trap[{#KEY}])=0';
 		$this->checkTagsCreate($data, 'trigger prototype', $expression);
 	}
@@ -55,7 +53,6 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	public function testFormTagsTriggerPrototype_Update($data) {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
 		$this->link = 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.$discoveryruleid;
 		$this->checkTagsUpdate($data, 'trigger prototype');
 	}
 
@@ -96,7 +93,6 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	public function testFormTagsTriggerPrototype_InheritedHostTags($data) {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
 		$this->link = 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.$discoveryruleid;
 		$expression = 'last(/Host for tags testing/itemprototype_trap[{#KEY}])=0';
 		$this->checkInheritedTags($data, 'trigger prototype', 'Host', $expression);
 	}
@@ -109,8 +105,7 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	// TODO: uncomment after fix ZBX-19485
 //	public function testFormTagsTriggerPrototype_InheritedTemplateTags($data) {
 //		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
-//		$this->link = 'trigger_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
-//		$this->saved_link = 'trigger_prototypes.php?form=update&context=host&parent_discoveryid='.$discoveryruleid.'&triggerid=';
+//		$this->link = 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=template';
 //		$expression = 'last(/Template for tags testing/template.itemprototype_trap[{#KEY}])=0';
 //		$this->checkInheritedTags($data, 'trigger prototype', 'Template', $expression);
 //	}
@@ -125,7 +120,6 @@ class testFormTagsTriggerPrototype extends testFormTags {
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
 		$this->link = 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=template';
-		$this->saved_link = 'zabbix.php?action=trigger.prototype.list&context=template&parent_discoveryid='.$discoveryruleid;
 		$host_link = 'host_discovery.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
 
 		$this->checkInheritedElementTags($data, 'trigger prototype', $host_link, $expression);
@@ -137,7 +131,6 @@ class testFormTagsTriggerPrototype extends testFormTags {
 	public function testFormTagsTriggerPrototype_RemoveTags() {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.Host for tags testing:trap_discovery');
 		$this->link = 'zabbix.php?action=trigger.prototype.list&parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->saved_link = 'zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.$discoveryruleid;
 		$this->clearTags('trigger prototype');
 	}
 }

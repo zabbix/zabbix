@@ -96,7 +96,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 			'context' => 'Templates'
 		]);
 		$second_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
-		$second_dialog->query('link:'.$data['dependency'])->one()->click();
+		$second_dialog->query('link', $data['dependency'])->one()->click();
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('add-dep-template-trigger'));
 		$this->query('button:Update')->one()->click();
 		if ($data['expected'] === TEST_BAD) {
