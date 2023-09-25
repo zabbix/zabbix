@@ -94,7 +94,6 @@ var (
 	listeners        []*serverlistener.ServerListener
 	serverConnectors []*serverconnector.Connector
 	closeChan        = make(chan bool)
-	stopChan         = make(chan bool)
 	pidFile          *pidfile.File
 	pluginsocket     string
 )
@@ -115,7 +114,7 @@ type Arguments struct {
 	help           bool
 }
 
-func main() {
+func main() { //nolint:funlen,gocognit,gocyclo
 	version.Init(
 		applicationName,
 		tls.CopyrightMessage(),
@@ -223,56 +222,10 @@ func main() {
 	defer cleanUpExternal()
 
 	if args.test != "" || args.print {
-		level := log.None
-
-		if args.verbose {
-			level = log.Trace
-		}
-
-		err = log.Open(log.Console, level, "", 0)
+		m, err := prepareMetricPrintManager(args.verbose)
 		if err != nil {
-			fatalExit("cannot initialize logger", err)
+			fatalExit("failed to prepare metric print", err)
 		}
-
-		err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey)
-		if err != nil {
-			fatalExit("failed to load key access rules", err)
-		}
-
-		_, err = agent.InitUserParameterPlugin(
-			agent.Options.UserParameter,
-			agent.Options.UnsafeUserParameters,
-			agent.Options.UserParameterDir,
-		)
-		if err != nil {
-			fatalExit("cannot initialize user parameters", err)
-		}
-
-		m, err := scheduler.NewManager(&agent.Options)
-		if err != nil {
-			fatalExit("cannot create scheduling manager", err)
-		}
-
-		m.Start()
-
-		err = configUpdateItemParameters(m, &agent.Options)
-		if err != nil {
-			fatalExit("cannot process configuration", err)
-		}
-
-		hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
-		if err != nil {
-			fatalExit("cannot parse the \"Hostname\" parameter", err)
-		}
-
-		agent.FirstHostname = hostnames[0]
-
-		err = configUpdateItemParameters(m, &agent.Options)
-		if err != nil {
-			fatalExit("cannot process configuration", err)
-		}
-
-		agent.SetPerformTask(scheduler.Scheduler(m).PerformTask)
 
 		if args.test != "" {
 			checkMetric(m, args.test)
@@ -589,6 +542,61 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 	return args, nil
 }
 
+func prepareMetricPrintManager(verbose bool) (*scheduler.Manager, error) {
+	level := log.None
+
+	if verbose {
+		level = log.Trace
+	}
+
+	err := log.Open(log.Console, level, "", 0)
+	if err != nil {
+		return nil, zbxerr.New("failed to initialize logger").Wrap(err)
+	}
+
+	err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey)
+	if err != nil {
+		return nil, zbxerr.New("failed to load key access rules").Wrap(err)
+	}
+
+	_, err = agent.InitUserParameterPlugin(
+		agent.Options.UserParameter,
+		agent.Options.UnsafeUserParameters,
+		agent.Options.UserParameterDir,
+	)
+	if err != nil {
+		return nil, zbxerr.New("failed to initialize user parameters").Wrap(err)
+	}
+
+	m, err := scheduler.NewManager(&agent.Options)
+	if err != nil {
+		return nil, zbxerr.New("failed to create scheduling manager").Wrap(err)
+	}
+
+	m.Start()
+
+	err = configUpdateItemParameters(m, &agent.Options)
+	if err != nil {
+		return nil, zbxerr.New("failed to process configuration").Wrap(err)
+	}
+
+	hostnames, err := agent.ValidateHostnames(agent.Options.Hostname)
+	if err != nil {
+		return nil, zbxerr.New(`failed to parse "Hostname" parameter`).Wrap(err)
+	}
+
+	agent.FirstHostname = hostnames[0]
+
+	err = configUpdateItemParameters(m, &agent.Options)
+	if err != nil {
+		return nil, zbxerr.New("failed to uptade item parameters").Wrap(err)
+	}
+
+	agent.SetPerformTask(scheduler.Scheduler(m).PerformTask)
+
+	return m, nil
+}
+
 func fatalExit(message string, err error) {
 	fatalCloseOSItems()
 
@@ -616,6 +624,7 @@ func processLoglevelIncreaseCommand(c *runtimecontrol.Client) (err error) {
 		message := fmt.Sprintf("Increased log level to %s", log.Level())
 		log.Infof(message)
 		err = c.Reply(message)
+
 		return
 	}
 	err = fmt.Errorf("Cannot increase log level above %s", log.Level())
@@ -629,6 +638,7 @@ func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
 		message := fmt.Sprintf("Decreased log level to %s", log.Level())
 		log.Infof(message)
 		err = c.Reply(message)
+
 		return
 	}
 	err = fmt.Errorf("Cannot decrease log level below %s", log.Level())
@@ -639,11 +649,13 @@ func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
 
 func processMetricsCommand(c *runtimecontrol.Client) (err error) {
 	data := manager.Query("metrics")
+
 	return c.Reply(data)
 }
 
 func processVersionCommand(c *runtimecontrol.Client) (err error) {
 	data := version.Long()
+
 	return c.Reply(data)
 }
 
@@ -651,8 +663,9 @@ func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
 	var userparams AgentUserParamOption
 
 	if err = conf.LoadUserParams(&userparams); err != nil {
-		err = fmt.Errorf("Cannot load user parameters: %s", err)
+		err = fmt.Errorf("Cannot load user parameters: %s", err.Error())
 		log.Infof(err.Error())
+
 		return
 	}
 
@@ -661,6 +674,7 @@ func processUserParamReloadCommand(c *runtimecontrol.Client) (err error) {
 	if res := manager.QueryUserParams(); res != "ok" {
 		err = fmt.Errorf("Failed to reload user parameters: %s", res)
 		log.Infof(err.Error())
+
 		return
 	}
 
@@ -676,7 +690,7 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	switch len(params) {
 	case 0:
 		return errors.New("Empty command")
-	case 2:
+	case 2: //nolint:gomnd
 		return errors.New("Too many commands")
 	default:
 	}
@@ -695,6 +709,7 @@ func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	default:
 		return errors.New("Unknown command")
 	}
+
 	return
 }
 
@@ -730,6 +745,8 @@ loop:
 			}
 		}
 	}
+
 	control.Stop()
+
 	return nil
 }
