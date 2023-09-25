@@ -1,7 +1,17 @@
-// Widget view.
+// Widget colors.
+$host-avail-true-bg-color: $status-green-bg-color !default;
+$host-avail-false-bg-color: $status-red-bg-color !default;
+$host-avail-mixed-bg-color: $status-yellow-bg-color !default;
+$host-avail-unknown-bg-color: $status-grey-bg-color !default;
+$host-avail-total-bg-color: transparent !default;
 
+@if $theme-name == 'dark' {
+	$host-avail-unknown-bg-color: #737373;
+}
+
+// Widget view.
 div.dashboard-widget-hostavail {
-	.host-avail-widget {
+	.host-avail-table {
 		thead {
 			th.host-avail-total {
 				border-top: 1px solid $table-border-color;
@@ -60,10 +70,9 @@ div.dashboard-widget-hostavail {
 }
 
 // Modifications by themes.
-
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-hostavail {
-		.host-avail-widget {
+		.host-avail-table {
 			thead {
 				th {
 					color: $font-color;

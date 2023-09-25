@@ -147,9 +147,6 @@ $status-grey-border-color: #3d3d3d;
 // Multiselect
 $multiselect-selected-bg-color: #696969;
 
-// Host Status.
-$host-avail-unknown-bg-color: #737373;
-
 // List table.
 $compact-view-color: #000000;
 $compact-view-tag-color: #ffffff;
@@ -341,22 +338,6 @@ $toc-title-bg-color: #4f4f4f;
 
 .totals-list {
 	color: darken($font-color, 85%);
-}
-
-// Widget "Host availability".
-.host-avail-widget {
-
-	&.list-table {
-		color: darken($font-color, 85%);
-
-		tbody th {
-			color: $font-color;
-		}
-	}
-
-	.host-avail-total {
-		color: $font-color;
-	}
 }
 
 .breadcrumbs {

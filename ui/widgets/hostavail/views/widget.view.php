@@ -78,7 +78,7 @@ if (count($data['interface_types']) == 1 || $data['only_totals'] == 1) {
 	$counts = $data['total_hosts'];
 
 	$table = (new CDiv())
-		->addClass(ZBX_STYLE_HOST_AVAIL_WIDGET)
+		->addClass(ZBX_STYLE_HOST_AVAIL_TABLE)
 		->addClass(ZBX_STYLE_TOTALS_LIST)
 		->addClass(($data['layout'] == STYLE_HORIZONTAL)
 			? ZBX_STYLE_TOTALS_LIST_HORIZONTAL
@@ -99,7 +99,7 @@ else {
 	$table = (new CTableInfo)
 		->setHeader($header[$data['layout']])
 		->setHeadingColumn(0)
-		->addClass(ZBX_STYLE_HOST_AVAIL_WIDGET);
+		->addClass(ZBX_STYLE_HOST_AVAIL_TABLE);
 
 	foreach ($type_field_names as $type => $interface_name) {
 		if (!in_array($type, $data['interface_types']) && $type !== 'total_hosts') {

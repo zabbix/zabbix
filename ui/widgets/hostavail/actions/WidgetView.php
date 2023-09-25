@@ -27,6 +27,7 @@ use API,
 	CItemGeneral;
 
 class WidgetView extends CControllerDashboardWidgetView {
+
 	const INTERFACE_STATUSES = [
 		INTERFACE_AVAILABLE_UNKNOWN,
 		INTERFACE_AVAILABLE_TRUE,
@@ -43,8 +44,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	protected function doAction(): void {
-		$interface_types[] = INTERFACE_TYPE_AGENT_ACTIVE;
-		$interface_types = array_merge($interface_types, CItemGeneral::INTERFACE_TYPES_BY_PRIORITY);
+		$interface_types = array_merge([INTERFACE_TYPE_AGENT_ACTIVE], CItemGeneral::INTERFACE_TYPES_BY_PRIORITY);
 
 		// Sanitize non-existing interface types.
 		$this->fields_values['interface_type'] = array_values(
