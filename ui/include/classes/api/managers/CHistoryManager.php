@@ -1227,51 +1227,27 @@ class CHistoryManager {
 			]
 		];
 
-		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-			switch ($aggregation) {
-				case AGGREGATE_MIN:
-					$aggs['value'] = ['min' => ['field' => 'value']];
-					break;
-				case AGGREGATE_MAX:
-					$aggs['value'] = ['max' => ['field' => 'value']];
-					break;
-				case AGGREGATE_AVG:
-					$aggs['value'] = ['avg' => ['field' => 'value']];
-					break;
-				case AGGREGATE_SUM:
-					$aggs['value'] = ['sum' => ['field' => 'value']];
-					break;
-				case AGGREGATE_FIRST:
-					$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'asc']]]];
-					$aggs['clock'] = ['min' => ['field' => 'clock']];
-					break;
-				case AGGREGATE_LAST:
-					$aggs['value'] = ['top_hits' => ['size' => 1, 'sort' => ['clock' => ['order' => 'desc']]]];
-					break;
-			}
+		if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] ==  ITEM_VALUE_TYPE_UINT64) {
+			$query['aggs'] = [
+				$aggregation . '_value' => [
+					$aggregation => [
+						'field' => 'value'
+					]
+				]
+			];
 
-			$query['aggs'] = $aggs;
 			$query['size'] = 0;
 		}
-		else {
-			if ($aggregation == AGGREGATE_LAST) {
-				$query['size'] = 1;
-				$query['sort'] = [
-					'clock' => 'desc'
-				];
-			}
-			if ($aggregation == AGGREGATE_FIRST) {
-				$query['size'] = 1;
-				$query['sort'] = [
-					'clock' => 'asc'
-				];
-			}
+		elseif ($aggregation === 'last' || $aggregation === 'first') {
+			$query['size'] = 1;
+			$query['sort'] = ['clock' => ($aggregation === 'last') ? 'desc' : 'asc'];
 		}
 
 		$endpoints = self::getElasticsearchEndpoints($item['value_type']);
 
 		if ($endpoints) {
 			$data = CElasticsearchHelper::query('POST', reset($endpoints), $query);
+
 			if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 				if (array_key_exists($aggregation . '_value', $data)
 					&& array_key_exists('value', $data[$aggregation . '_value'])) {
@@ -1279,7 +1255,7 @@ class CHistoryManager {
 				}
 			}
 			else {
-				if ($data && $aggregation == AGGREGATE_COUNT) {
+				if ($data && $aggregation === 'count') {
 					return count($data);
 				}
 				if ($data) {
@@ -1302,30 +1278,29 @@ class CHistoryManager {
 			$time_from = max($time_from, time() - $hk_history);
 		}
 
-		if ($item['value_type'] == ITEM_VALUE_TYPE_TEXT || $item['value_type'] == ITEM_VALUE_TYPE_STR) {
-			$sql = 'SELECT '.($aggregation == AGGREGATE_COUNT ? 'COUNT(*) AS value' : 'value').
-				' FROM '.self::getTableName($item['value_type']).
-				' WHERE itemid='.zbx_dbstr($item['itemid']).
-				' AND clock>='.zbx_dbstr($time_from).
-				' AND clock<='.zbx_dbstr($time_to);
-
-			if ($aggregation == AGGREGATE_COUNT) {
-				$sql .= ' HAVING COUNT(*)>0';
-			}
-			elseif ($aggregation == AGGREGATE_LAST) {
-				$sql .= ' ORDER BY clock DESC LIMIT 1';
-			}
-			elseif ($aggregation == AGGREGATE_FIRST) {
-				$sql .= ' ORDER BY clock ASC LIMIT 1';
-			}
-		}
-		else {
-			$sql = 'SELECT '.$aggregation.' (value) AS value'.
+		if (($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
+				|| $aggregation === 'count') {
+			$select = $aggregation === 'count' ? 'SELECT COUNT(*) value' : 'SELECT '.$aggregation.' (value) AS value';
+			$sql = $select.
 				' FROM '.self::getTableName($item['value_type']).
 				' WHERE itemid='.zbx_dbstr($item['itemid']).
 				' AND clock>='.zbx_dbstr($time_from).
 				' AND clock<='.zbx_dbstr($time_to).
 				' HAVING COUNT(*)>0'; // Necessary because DBselect() return 0 if empty data set, for graph templates.
+		}
+		else {
+			$sql = 'SELECT value'.
+				' FROM '.self::getTableName($item['value_type']).
+				' WHERE itemid='.zbx_dbstr($item['itemid']).
+				' AND clock>='.zbx_dbstr($time_from).
+				' AND clock<='.zbx_dbstr($time_to);
+
+			if ($aggregation == 'last') {
+				$sql .= ' ORDER BY clock DESC LIMIT 1';
+			}
+			elseif ($aggregation == 'first') {
+				$sql .= ' ORDER BY clock ASC LIMIT 1';
+			}
 		}
 
 		$result = DBselect($sql);

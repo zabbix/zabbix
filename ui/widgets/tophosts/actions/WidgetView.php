@@ -514,8 +514,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($aggregate_function == AGGREGATE_LAST || $aggregate_function == AGGREGATE_FIRST
 						|| $aggregate_function == AGGREGATE_COUNT) {
-					$non_numeric_history = Manager::History()->getAggregatedValue($item, $aggregate_function,
-						$time_from, $time_to);
+					$non_numeric_history = Manager::History()->getAggregatedValue($item,
+						item_aggr_fnc2str($aggregate_function), $time_from, $time_to);
 				}
 
 				if ($aggregate_function == AGGREGATE_COUNT) {

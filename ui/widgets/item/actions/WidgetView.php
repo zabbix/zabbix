@@ -249,8 +249,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				if ($aggregate_function == AGGREGATE_LAST
 						|| $aggregate_function == AGGREGATE_FIRST
 						|| $aggregate_function == AGGREGATE_COUNT) {
-					$non_numeric_history = Manager::History()->getAggregatedValue($item, $aggregate_function,
-						$time_from, $time_to);
+					$non_numeric_history = Manager::History()->getAggregatedValue($item,
+						item_aggr_fnc2str($aggregate_function), $time_from, $time_to);
 
 					if ($non_numeric_history) {
 						$history = [
@@ -269,9 +269,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$previous_time_to = $time_to - 1 - $interval;
 						$previous_time_from = $previous_time_to - $interval;
 
-						$prev_value = Manager::History()->getAggregatedValue(
-							$item, $aggregate_function, $previous_time_from, $previous_time_to
-						);
+						$prev_value = Manager::History()->getAggregatedValue($item,
+							item_aggr_fnc2str($aggregate_function), $previous_time_from, $previous_time_to);
 
 						if ($non_numeric_history && $prev_value) {
 							$history[$item['itemid']] += [
