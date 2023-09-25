@@ -92,8 +92,8 @@
 		/**
 		 * Insert outside data
 		 *
-		 * @param {array} items           Multiselect value object.
-		 * @param {bool}  trigger_change  (optional) Either to trigger element on-change event once data added. True by default.
+		 * @param {array}   items           Multiselect value object.
+		 * @param {boolean} trigger_change  (optional) Either to trigger element on-change event once data added. True by default.
 		 *
 		 * @return jQuery
 		 */
@@ -112,12 +112,26 @@
 					}
 				}
 
+				$obj.trigger('before-add', ms);
+
 				for (var i = 0, l = items.length; i < l; i++) {
 					addSelected($obj, items[i]);
 				}
 
 				trigger_change && $obj.trigger('change', ms);
 			});
+		},
+
+		getSearch: function() {
+			let search = '';
+
+			this.each(function() {
+				const ms = $(this).data('multiSelect');
+
+				search = ms.values.search.toLowerCase().replace(/[*]+/g, '')
+			});
+
+			return search;
 		},
 
 		/**
@@ -133,7 +147,9 @@
 				if (ms.options.disabled === true) {
 					$obj.removeAttr('aria-disabled');
 					$('.multiselect-list', $obj).removeClass('disabled');
-					$('.multiselect-button > button', $obj.parent()).prop('disabled', false);
+					$('.multiselect-button', $obj.parent()).prop('disabled', false);
+					$('.multiselect-optional-select-button', $obj.parent()).prop('disabled', false);
+					$('input', $obj).prop('disabled', false);
 					$obj.append(makeMultiSelectInput($obj));
 
 					ms.options.disabled = false;
@@ -156,13 +172,35 @@
 				if (ms.options.disabled === false) {
 					$obj.attr('aria-disabled', true);
 					$('.multiselect-list', $obj).addClass('disabled');
-					$('.multiselect-button > button', $obj.parent()).prop('disabled', true);
+					$('.multiselect-button', $obj.parent()).prop('disabled', true);
+					$('.multiselect-optional-select-button', $obj.parent()).prop('disabled', true);
 					$('input[type="text"]', $obj).remove();
+					$('input', $obj).prop('disabled', true);
 
 					ms.options.disabled = true;
 
 					cleanSearch($obj);
 				}
+			});
+		},
+
+		/**
+		 * Remove select object value.
+		 *
+		 * @param {string} id
+		 *
+		 * @return jQuery
+		 */
+		removeSelected: function(id) {
+			return this.each(function() {
+				var $obj = $(this),
+					ms = $obj.data('multiSelect');
+
+				removeSelected($obj, id);
+
+				cleanSearch($obj);
+
+				$obj.trigger('change', ms);
 			});
 		},
 
@@ -204,6 +242,8 @@
 					}
 				}
 
+				cleanSearch($obj);
+
 				if (addNew_modified) {
 					/*
 					 * When modifying the "addNew" option, few things must be done:
@@ -212,8 +252,6 @@
 					 *      Note: hidden and disabled items will not submit to the server.
 					 *   3. The "change" trigger must fire.
 					 */
-
-					cleanSearch($obj);
 
 					$('input[name*="[new]"]', $obj)
 						.prop('disabled', !ms.options['addNew'])
@@ -259,7 +297,9 @@
 				var $obj = $(this);
 
 				if ($obj.data('multiSelect') !== undefined) {
-					ret = $obj.data('multiSelect').select_button[0];
+					if ($obj.data('multiSelect').select_button !== null) {
+						ret = $obj.data('multiSelect').select_button[0];
+					}
 
 					return false;
 				}
@@ -271,7 +311,7 @@
 		/**
 		 * @param array entries  IDs to mark disabled.
 		 */
-		setDisabledEntries: function (entries) {
+		setDisabledEntries: function(entries) {
 			this.each(function() {
 				const $obj = $(this);
 				const ms_parameters = $obj.data('multiSelect');
@@ -287,6 +327,58 @@
 				ms_parameters.options.popup.parameters.disableids = entries;
 
 				$obj.data('multiSelect', ms_parameters);
+			});
+		},
+
+		addOptionalSelect: function(label, callback) {
+			this.each(function() {
+				const $obj = $(this);
+
+				if ($obj.data('multiSelect') !== undefined) {
+					addOptionalSelect($obj, label, callback);
+
+					return false;
+				}
+			});
+		},
+
+		openSelectPopup: function(event_target) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
+
+				if (ms !== undefined && ms.options.popup.parameters !== undefined) {
+					openSelectPopup($obj, event_target);
+
+					return false;
+				}
+			});
+		},
+
+		setCustomSuggestList: function(callback) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
+
+				ms.options.custom_suggest_list = callback;
+			});
+		},
+
+		setSuggestListModifier: function(callback) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
+
+				ms.options.suggest_list_modifier = callback;
+			});
+		},
+
+		customSuggestSelectHandler: function(callback) {
+			this.each(function() {
+				const $obj = $(this);
+				const ms = $obj.data('multiSelect');
+
+				ms.options.custom_suggest_select_handler = callback;
 			});
 		}
 	};
@@ -340,26 +432,31 @@
 		}
 
 		var defaults = {
-				url: '',
-				name: '',
-				labels: {
-					'No matches found': t('No matches found'),
-					'More matches found...': t('More matches found...'),
-					'type here to search': t('type here to search'),
-					'new': t('new'),
-					'Select': t('Select')
-				},
-				placeholder: t('type here to search'),
-				data: [],
-				excludeids: [],
-				addNew: false,
-				defaultValue: null,
-				disabled: false,
-				selectedLimit: 0,
-				limit: 20,
-				popup: {},
-				styles: {}
-			};
+			url: '',
+			name: '',
+			object_labels: {object: '', objects: ''},
+			labels: {
+				'No matches found': t('No matches found'),
+				'More matches found...': t('More matches found...'),
+				'type here to search': t('type here to search'),
+				'new': t('new'),
+				'Select': t('Select')
+			},
+			placeholder: t('type here to search'),
+			data: [],
+			excludeids: [],
+			addNew: false,
+			defaultValue: null,
+			custom_select: false,
+			custom_suggest_list: null,
+			suggest_list_modifier: null,
+			custom_suggest_select_handler: null,
+			disabled: false,
+			selectedLimit: 0,
+			limit: 20,
+			popup: {},
+			styles: {}
+		};
 
 		return this.each(function() {
 			var $obj = $(this);
@@ -374,23 +471,24 @@
 			$obj.removeAttr('aria-required');
 
 			var ms = {
-					options: options,
-					values: {
-						search: '',
-						searches: {},
-						searching: {},
-						selected: {},
-						available: {},
-						available_div: $('<div>', {'class': 'multiselect-available'}),
+				options: options,
+				values: {
+					search: '',
+					searches: {},
+					searching: {},
+					selected: {},
+					available: new Map(),
+					available_div: $('<div>', {'class': 'multiselect-available'}),
 
-						/*
-						 * Indicates a false click on an available list, but not on some actual item.
-						 * In such case the "focusout" event (IE) of the search input should not be processed.
-						 */
-						available_false_click: false
-					},
-					select_button: null
-				};
+					/*
+					 * Indicates a false click on an available list, but not on some actual item.
+					 * In such case the "focusout" event (IE) of the search input should not be processed.
+					 */
+					available_false_click: false
+				},
+				select_button: null,
+				optional_select_menu: []
+			};
 
 			ms.values.available_div.on('mousedown', 'li', function() {
 				/*
@@ -408,13 +506,13 @@
 			}));
 
 			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {
-					/*
-					 * Focus without options because here it don't matter.
-					 * Click used instead focus because in patternselect listen only click.
-					 */
-					$('input[type="text"]', $obj).click().focus();
-				}),
-				$selected_ul = $('<ul>', {'class': 'multiselect-list'});
+				/*
+				 * Focus without options because here it don't matter.
+				 * Click used instead focus because in patternselect listen only click.
+				 */
+				$('input[type="text"]', $obj).click().focus();
+			}),
+			$selected_ul = $('<ul>', {'class': 'multiselect-list'});
 
 			$obj.append($selected_div.append($selected_ul));
 
@@ -454,37 +552,21 @@
 			if (ms.options.custom_select || ms.options.popup.parameters !== undefined) {
 				ms.select_button = $('<button>', {
 					type: 'button',
-					'class': 'btn-grey',
+					'class': `${ZBX_STYLE_BTN_GREY} multiselect-button`,
 					text: ms.options.labels['Select']
 				});
+			}
+
+			if (ms.select_button !== null) {
+				if (ms.options.popup.parameters !== undefined) {
+					ms.select_button.on('click', (e) => openSelectPopup($obj, e.target));
+				}
 
 				if (ms.options.disabled) {
 					ms.select_button.prop('disabled', true);
 				}
 
-				if (ms.options.popup.parameters !== undefined) {
-					ms.select_button.on('click', function(event) {
-						var parameters = ms.options.popup.parameters;
-
-						if (ms.options.popup.filter_preselect) {
-							parameters = jQuery.extend(parameters, getFilterPreselect($obj, MS_ACTION_POPUP));
-						}
-
-						if (typeof parameters['disable_selected'] !== 'undefined' && parameters['disable_selected']) {
-							parameters['disableids'] = Object.keys(ms.values.selected);
-						}
-
-						// Click used instead focus because in patternselect only click is listened for.
-						$('input[type="text"]', $obj).click();
-
-						return PopUp('popup.generic', parameters, {
-							dialogue_class: 'modal-popup-generic',
-							trigger_element: event.target
-						});
-					});
-				}
-
-				$obj.after($('<div>', {'class': 'multiselect-button'}).append(ms.select_button));
+				addSelectButton($obj, ms.select_button);
 			}
 		});
 	};
@@ -581,7 +663,14 @@
 						 * 3. Schedule result set retrieval for the given term otherwise.
 						 */
 
-						if (cache_key in ms.values.searches) {
+						if (ms.options.custom_suggest_list !== null) {
+							ms.values.search = search;
+							ms.values.cache_key = cache_key;
+							ms.values.searches[cache_key] = ms.options.custom_suggest_list();
+							loadAvailable($obj);
+							showAvailable($obj);
+						}
+						else if (cache_key in ms.values.searches) {
 							ms.values.search = search;
 							ms.values.cache_key = cache_key;
 							loadAvailable($obj);
@@ -684,13 +773,15 @@
 
 						case KEY_ARROW_UP:
 						case KEY_ARROW_DOWN:
-							var $collection = $('li', ms.values.available_div.filter(':visible')),
-								$selected = $collection.filter('.suggest-hover').removeClass('suggest-hover');
+							var $collection = $('li[data-id]', ms.values.available_div.filter(':visible')),
+								$selected = $collection.filter('.suggest-hover');
 
 							if ($selected.length) {
+								$selected.removeClass('suggest-hover');
+
 								$selected = (e.which == KEY_ARROW_UP)
-									? ($selected.is(':first-child') ? $collection.last() : $selected.prev())
-									: ($selected.is(':last-child') ? $collection.first() : $selected.next());
+									? ($selected.is($collection.first()) ? $collection.last() : $selected.prevAll('[data-id]').first())
+									: ($selected.is($collection.last()) ? $collection.first() : $selected.nextAll('[data-id]').first());
 
 								$selected.addClass('suggest-hover');
 								$aria_live.text($selected.data('label'));
@@ -713,15 +804,21 @@
 										var aria_text = sprintf(t('Removed, %1$s'), $selected.data('label'));
 
 										$selected = (e.which == KEY_BACKSPACE)
-											? ($selected.is(':first-child') ? $selected.next() : $selected.prev())
-											: ($selected.is(':last-child') ? $selected.prev() : $selected.next());
+											? ($selected.is(':first-child')
+												? $selected.next('[data-id]')
+												: $selected.prev('[data-id]')
+											)
+											: ($selected.is(':last-child')
+												? $selected.prev('[data-id]')
+												: $selected.next('[data-id]')
+											);
 
 										removeSelected($obj, id);
 
 										$obj.trigger('change', ms);
 
 										if ($selected.length) {
-											var $collection = $('.selected li', $obj);
+											var $collection = $('.selected li[data-id]', $obj);
 											$selected.addClass('selected');
 
 											aria_text += ', ' + sprintf(
@@ -754,10 +851,10 @@
 							break;
 					}
 				})
-				.on('focusin', function($event) {
+				.on('focusin', function() {
 					$obj.addClass('active');
 				})
-				.on('focusout', function($event) {
+				.on('focusout', function() {
 					if (ms.values.available_false_click) {
 						ms.values.available_false_click = false;
 						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
@@ -793,13 +890,71 @@
 	function select($obj, id) {
 		var ms = $obj.data('multiSelect');
 
-		addSelected($obj, ms.values.available[id]);
+		if (ms.options.custom_suggest_select_handler !== null) {
+			ms.options.custom_suggest_select_handler(ms.values.available.get(id.toString()));
+		}
+		else {
+			addSelected($obj, ms.values.available.get(id.toString()));
+		}
 
 		if (isSearchFieldVisible($obj)) {
 			$('input[type="text"]', $obj)[0].focus({preventScroll:true});
 		}
 
 		$obj.trigger('change', ms);
+	}
+
+	function addSelectButton($obj, $button) {
+		let $container = $obj.siblings('.btn-split');
+
+		if (!$container.length) {
+			$container = $('<ul>', {'class': 'btn-split'});
+			$obj.after($container);
+		}
+
+		$container.append($('<li>').append($button));
+	}
+
+	function addOptionalSelect($obj, label, callback) {
+		const ms = $obj.data('multiSelect');
+
+		if (!ms.optional_select_menu.length) {
+			addSelectButton($obj, $('<button>', {
+				type: 'button',
+				class: `${ZBX_STYLE_BTN_GREY} ${ZBX_ICON_CHEVRON_DOWN_SMALL} multiselect-optional-select-button`
+			}).on('click', function(event) {
+				jQuery(event.target).menuPopup(
+					[{items: ms.optional_select_menu}],
+					new jQuery.Event(event), {
+						position: {of: event.target, my: 'left top', at: 'left bottom', within: '.wrapper'}
+					}
+				);
+			}));
+		}
+
+		ms.optional_select_menu.push({label, clickCallback: callback});
+	}
+
+	function openSelectPopup($obj, open_trigger_element) {
+		const ms = $obj.data('multiSelect');
+
+		let parameters = ms.options.popup.parameters;
+
+		if (ms.options.popup.filter_preselect) {
+			parameters = jQuery.extend(parameters, getFilterPreselect($obj, MS_ACTION_POPUP));
+		}
+
+		if (parameters['disable_selected'] !== undefined && parameters['disable_selected']) {
+			parameters['disableids'] = Object.keys(ms.values.selected);
+		}
+
+		// Click used instead focus because in pattern select only click is listened for.
+		$('input[type="text"]', $obj).click();
+
+		PopUp('popup.generic', parameters, {
+			dialogue_class: 'modal-popup-generic',
+			trigger_element: open_trigger_element
+		});
 	}
 
 	function addSelected($obj, item) {
@@ -875,7 +1030,9 @@
 	function removeSelected($obj, id) {
 		var ms = $obj.data('multiSelect');
 
-		$('.selected li[data-id]', $obj).each(function(){
+		$obj.trigger('before-remove', ms);
+
+		$('.multiselect-list [data-id]', $obj).each(function() {
 			if ($(this).data('id') == id) {
 				$(this).remove();
 			}
@@ -888,7 +1045,7 @@
 
 		delete ms.values.selected[id];
 
-		if (!$('.selected li', $obj).length) {
+		if (!Object.keys(ms.values.selected).length) {
 			addDefaultValue($obj);
 		}
 
@@ -901,7 +1058,8 @@
 			prefix = item.prefix || '',
 			$li = $('<li>', {
 				'data-id': item.id,
-				'data-label': prefix + item.name
+				'data-label': prefix + item.name,
+				'data-source': item.source
 			})
 				.on('mouseenter', function() {
 					$('li.suggest-hover', ms.values.available_div).removeClass('suggest-hover');
@@ -996,40 +1154,48 @@
 			}
 		}
 
-		var available_more = false;
+		let available_more = false;
 
-		$.each(data, function(i, item) {
-			if (ms.options.limit == 0 || objectSize(ms.values.available) < ms.options.limit) {
-				if (typeof ms.values.available[item.id] === 'undefined'
-						&& typeof ms.values.selected[item.id] === 'undefined'
-						&& ms.options.excludeids.indexOf(item.id) === -1) {
-					ms.values.available[item.id] = item;
+		if (ms.options.custom_suggest_list !== null) {
+			ms.values.available = data;
+		}
+		else {
+			$.each(data, function(i, item) {
+				if (ms.options.limit == 0 || ms.values.available.size < ms.options.limit) {
+					if (!ms.values.available.has(item.id) && ms.values.selected[item.id] === undefined
+						&& !ms.options.excludeids.includes(item.id)) {
+						ms.values.available.set(item.id, item);
+					}
 				}
-			}
-			else {
-				available_more = true;
-			}
-		});
+				else {
+					available_more = true;
+				}
+			});
+		}
 
 		if (addNew) {
-			ms.values.available[ms.values.search] = {
+			ms.values.available.set(ms.values.search, {
 				id: ms.values.search,
 				name: ms.values.search + ' (' + ms.options.labels['new'] + ')',
 				isNew: true
-			};
+			});
 		}
 
 		var found = 0,
 			preselected = '';
 
-		if (objectSize(ms.values.available) == 0) {
+		if (ms.options.suggest_list_modifier !== null) {
+			ms.values.available = ms.options.suggest_list_modifier(ms.values.available);
+		}
+
+		if (ms.values.available.size === 0) {
 			var div = $('<div>', {
-					'class': 'multiselect-matches',
-					text: ms.options.labels['No matches found']
-				})
-					.on('click', function() {
-						$('input[type="text"]', $obj)[0].focus({preventScroll:true});
-					});
+				'class': 'multiselect-matches',
+				text: ms.options.labels['No matches found']
+			})
+				.on('click', function() {
+					$('input[type="text"]', $obj)[0].focus({preventScroll:true});
+				});
 
 			ms.values.available_div.append(div);
 		}
@@ -1039,13 +1205,22 @@
 				'aria-hidden': true
 			}));
 
-			$.each(ms.values.available, function (i, item) {
-				if (found == 0) {
-					preselected = (item.prefix || '') + item.name;
+			for (const item of ms.values.available.values()) {
+				if ('group_label' in item) {
+					$('ul', ms.values.available_div)
+						.addClass('multiselect-suggest-grouped')
+						.append(
+							$('<li>', {class: 'suggest-group'}).text(item.group_label)
+						);
 				}
-				addAvailable($obj, item);
-				found++;
-			});
+				else {
+					if (found === 0) {
+						preselected = (item.prefix || '') + item.name;
+					}
+					addAvailable($obj, item);
+					found++;
+				}
+			}
 		}
 
 		if (found > 0) {
@@ -1111,7 +1286,7 @@
 				$(window).height() + $(window).scrollTop() - available_top - obj_padding_y - 10
 			));
 
-		if (objectSize(ms.values.available) > 0) {
+		if (ms.values.available.size > 0) {
 			available_width_min = Math.max(available_width, 300);
 
 			// Prevent less than 15% width difference for the available list and the input field.
@@ -1135,14 +1310,14 @@
 
 		$available.scrollTop(0);
 
-		if (objectSize(ms.values.available) != 0) {
+		if (ms.values.available.size !== 0) {
 			// Remove selected item selected state.
 			$('.selected li.selected', $obj).removeClass('selected');
 
 			// Pre-select first available item.
-			if ($('li', $available).length > 0) {
+			if ($('li[data-id]', $available).length > 0) {
 				$('li.suggest-hover', $available).removeClass('suggest-hover');
-				$('li:first-child', $available).addClass('suggest-hover');
+				$('li[data-id]', $available).first().addClass('suggest-hover');
 			}
 		}
 
@@ -1171,11 +1346,11 @@
 	}
 
 	function cleanAvailable($obj) {
-		var ms = $obj.data('multiSelect');
+		const ms = $obj.data('multiSelect');
 
 		hideAvailable($obj);
 
-		ms.values.available = {};
+		ms.values.available.clear();
 		ms.values.available_div.empty();
 	}
 
@@ -1189,7 +1364,7 @@
 				selected_top = 0,
 				selected_height = $selected.outerHeight(true);
 
-			if ($('.multiselect-matches', $available)) {
+			if ($('.multiselect-matches', $available).length > 0) {
 				selected_top += $('.multiselect-matches', $available).outerHeight(true);
 			}
 

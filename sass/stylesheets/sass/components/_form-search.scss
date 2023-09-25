@@ -70,9 +70,9 @@
 		@if $ui-transitions {
 			transition: background-color $ui-controls-transition-duration ease-out;
 		}
+	}
 
-		&.suggest-hover {
-			background-color: $action-hover-color;
-		}
+	.suggest-hover {
+		background-color: $action-hover-color;
 	}
 }

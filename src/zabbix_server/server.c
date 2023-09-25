@@ -1287,20 +1287,15 @@ int	main(int argc, char **argv)
 static void	zbx_check_db(void)
 {
 	struct zbx_json	db_version_json;
-	int		result = SUCCEED;
+	int		ret;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
-	result = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, zbx_program_type);
+	ret = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, zbx_program_type);
 
-	if (SUCCEED == result)
-		zbx_db_extract_dbextension_info(&db_version_info);
+	if (SUCCEED == ret)
+		ret = zbx_db_check_extension(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
 
-#ifdef HAVE_POSTGRESQL
-	if (SUCCEED == result)
-		result = zbx_db_check_tsdb_capabilities(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
-#endif
-
-	if (SUCCEED == result)
+	if (SUCCEED == ret)
 	{
 		zbx_ha_mode_t	ha_mode;
 
@@ -1309,7 +1304,7 @@ static void	zbx_check_db(void)
 		else
 			ha_mode = ZBX_HA_MODE_STANDALONE;
 
-		if (SUCCEED != (result = zbx_db_check_version_and_upgrade(ha_mode)))
+		if (SUCCEED != (ret = zbx_db_check_version_and_upgrade(ha_mode)))
 			goto out;
 	}
 
@@ -1329,11 +1324,6 @@ static void	zbx_check_db(void)
 			zabbix_log(LOG_LEVEL_WARNING, "database could be upgraded to use primary keys in history tables");
 		}
 
-#if defined(HAVE_POSTGRESQL)
-		if (0 == zbx_strcmp_null(db_version_info.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
-			zbx_tsdb_extract_compressed_chunk_flags(&db_version_info);
-#endif
-
 #ifdef HAVE_ORACLE
 		zbx_json_init(&db_version_info.tables_json, ZBX_JSON_STAT_BUF_LEN);
 
@@ -1343,8 +1333,8 @@ static void	zbx_check_db(void)
 #endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
-		if (SUCCEED == result)
-			zbx_history_check_version(&db_version_json, &result);
+		if (SUCCEED == ret)
+			zbx_history_check_version(&db_version_json, &ret);
 
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
@@ -1352,7 +1342,7 @@ static void	zbx_check_db(void)
 
 	zbx_db_close();
 out:
-	if (SUCCEED != result)
+	if (SUCCEED != ret)
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 				ZABBIX_VERSION, ZABBIX_REVISION);

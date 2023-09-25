@@ -43,19 +43,30 @@ class CWidgetSvgGraph extends CWidget {
 		this._deactivateGraph();
 	}
 
-	setTimePeriod(time_period) {
-		super.setTimePeriod(time_period);
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
+	onFeedback({type, value, descriptor}) {
+		if (type === '_timeperiod' && this.getFieldsReferredData().has('time_period')) {
 			this._startUpdating();
+
+			this.feedback({time_period: value});
+
+			return true;
 		}
+
+		return super.onFeedback({type, value, descriptor});
+	}
+
+	promiseUpdate() {
+		if (!this.hasBroadcast('time_period') || this.isFieldsReferredDataUpdated('time_period')) {
+			this.broadcast({_timeperiod: this.getFieldsData().time_period});
+		}
+
+		return super.promiseUpdate();
 	}
 
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			from: this._time_period.from,
-			to: this._time_period.to
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
 		};
 	}
 
@@ -108,10 +119,10 @@ class CWidgetSvgGraph extends CWidget {
 		}
 	}
 
-	getActionsContextMenu({can_paste_widget}) {
-		const menu = super.getActionsContextMenu({can_paste_widget});
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_copy_widget, can_paste_widget});
 
-		if (this._is_edit_mode) {
+		if (this.isEditMode()) {
 			return menu;
 		}
 

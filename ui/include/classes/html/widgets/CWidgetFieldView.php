@@ -63,11 +63,23 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
+	public function getName(): string {
+		return $this->field->getName();
+	}
+
 	/**
 	 * @return null|array|CTag
 	 */
 	public function getView() {
 		return null;
+	}
+
+	public function getViewCollection(): array {
+		return [[
+			'label' => $this->getLabel(),
+			'view' => $this->getView(),
+			'class' => $this->getClass()
+		]];
 	}
 
 	public function setFieldHint(CTag $hint): self {

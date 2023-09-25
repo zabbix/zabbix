@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0alpha5');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050122);
+define('ZABBIX_DB_VERSION',		6050134);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1235,9 +1235,6 @@ define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
 define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
 define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
 
-define('SVG_GRAPH_CUSTOM_TIME_OFF',	0);
-define('SVG_GRAPH_CUSTOM_TIME_ON',	1);
-
 define('SVG_GRAPH_LEGEND_OFF',	0);
 define('SVG_GRAPH_LEGEND_ON',	1);
 
@@ -1817,7 +1814,7 @@ define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS', 'graph-display-options');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
-define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
+define('TAB_INDICATOR_GRAPH_TIME_PERIOD', 'graph-time-period');
 define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_IPMI', 'ipmi');
@@ -2295,6 +2292,7 @@ define('ZBX_ICON_PENCIL', 'zi-pencil');
 define('ZBX_ICON_PLAY', 'zi-play');
 define('ZBX_ICON_PLUS', 'zi-plus');
 define('ZBX_ICON_PLUS_SMALL', 'zi-plus-small');
+define('ZBX_ICON_REFERENCE', 'zi-reference');
 define('ZBX_ICON_REMOVE', 'zi-remove');
 define('ZBX_ICON_REMOVE_SMALL', 'zi-remove-small');
 define('ZBX_ICON_REMOVE_SMALLER', 'zi-remove-smaller');
