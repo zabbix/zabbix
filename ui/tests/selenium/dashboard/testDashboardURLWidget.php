@@ -774,7 +774,7 @@ class testDashboardURLWidget extends CWebTest {
 		$broken_form = $dashboard->getWidget(self::$default_widget)->edit();
 
 		// Check that the widget URL field is empty.
-		$broken_form->checkValue(['URL' => '', 'Name' => self::$default_widget]);
+		$broken_form->checkValue(['URL' => 'ssh://zabbix.com', 'Name' => self::$default_widget]);
 		COverlayDialogElement::find()->one()->close();
 		$this->query('button:Save changes')->one()->click();
 
