@@ -930,7 +930,7 @@ function getFormFields(form) {
 		for (let i = 0; i < key_parts.length; i++) {
 			const key_part = key_parts[i][0];
 
-			if (i == key_parts.length - 1) {
+			if (i === key_parts.length - 1) {
 				if (key_part === '[]') {
 					key_fields.push(value);
 				}
