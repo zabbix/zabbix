@@ -157,7 +157,7 @@ class CControllerTimeSelectorUpdate extends CController {
 				'from_date' => date(ZBX_FULL_DATE_TIME, $time_period['from_ts']),
 				'to' => $time_period['to'],
 				'to_ts' => $time_period['to_ts'],
-				'to_date' => date(ZBX_FULL_DATE_TIME, $time_period['to_ts']),
+				'to_date' => date(ZBX_FULL_DATE_TIME, $time_period['to_ts'])
 			] + getTimeselectorActions($time_period['from'], $time_period['to']);
 		}
 
