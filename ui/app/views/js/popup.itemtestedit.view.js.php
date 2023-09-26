@@ -34,7 +34,7 @@
 function makeStepResult(step) {
 	if (typeof step.error !== 'undefined') {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(_('<empty string>')) ?>}
+			{error: step.error || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
 		));
 	}
 	else if (typeof step.result === 'undefined' || step.result === null) {
