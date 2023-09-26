@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-06-03 06:24+0000\n"
+"PO-Revision-Date: 2023-09-19 09:22+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -22336,6 +22336,10 @@ msgstr "now() - Nombre de segons des de l'època"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "nombre"
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr "l'objecte no existeix pas o pertany a un altre objecte"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

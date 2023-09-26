@@ -121,7 +121,7 @@ trait TableTrait {
 		$table = $this->getTable($selector);
 
 		if (!$data) {
-			// Check that table contain one row with text "No data found."
+			// Check that table contains one row with text "No data found."
 			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 
 			return;

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-15T16:13:27Z'
+  date: '2023-09-12T11:56:19Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -72,7 +72,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -83,7 +83,7 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
+                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
                     request.setProxy(params.httpproxy);
                 }
             
@@ -92,12 +92,14 @@ zabbix_export:
                 if (Array.isArray(organizations) && organizations.length > 0) {
                     for (i in organizations) {
                         if ('id' in organizations[i]) {
-                            organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices');
+                            organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/statuses');
             
                             if (Array.isArray(organization_devices) && organization_devices.length > 0) {
                                 for (j in organization_devices) {
                                     organization_devices[j].organizationId = organizations[i].id;
-            
+                                    if (!organization_devices[j].name) {
+                                        organization_devices[j].name = organization_devices[j].serial;
+                                    }
                                     devices.push(organization_devices[j]);
                                 }
                             }
@@ -110,9 +112,9 @@ zabbix_export:
             };
             
             return JSON.stringify({
-              'organizations': organizations,
-              'devices': devices,
-              'error': error_msg.toString()
+                'organizations': organizations,
+                'devices': devices,
+                'error': error_msg.toString()
             });
           description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: 60s
@@ -162,6 +164,7 @@ zabbix_export:
           key: meraki.devices.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#NAME}'
                 value: '{$MERAKI.DEVICE.NAME.MATCHES}'
@@ -170,9 +173,16 @@ zabbix_export:
                 value: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#STATUS}'
+                value: '{$MERAKI.DEVICE.STATUS.MATCHES}'
+                formulaid: C
+              - macro: '{#STATUS}'
+                value: '{$MERAKI.DEVICE.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           host_prototypes:
             - uuid: 86d599f384d94b368508a170911213ec
-              host: '{#NAME}'
+              host: '{#SERIAL}'
               name: '[{#PRODUCT_TYPE}] {#NAME}'
               group_links:
                 - group:
@@ -215,6 +225,8 @@ zabbix_export:
               path: $.productType
             - lld_macro: '{#SERIAL}'
               path: $.serial
+            - lld_macro: '{#STATUS}'
+              path: $.status
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -271,11 +283,17 @@ zabbix_export:
       macros:
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
-          description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
+          description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
         - macro: '{$MERAKI.DEVICE.NAME.MATCHES}'
           value: .+
           description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.DEVICE.STATUS.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.DEVICE.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.HTTP_PROXY}'
@@ -288,7 +306,7 @@ zabbix_export:
           description: 'This macro is used in organizations discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
-          description: 'Cisco Meraki Dashboard API Token.'
+          description: 'Cisco Meraki dashboard API token.'
     - uuid: 2cae7d2eeca04e6fa7419759ac9ad814
       template: 'Cisco Meraki device by HTTP'
       name: 'Cisco Meraki device by HTTP'
@@ -298,7 +316,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 2280b9212c474d99835ec1334ff780eb
-          name: 'Meraki: public ip'
+          name: 'Meraki: public IP'
           type: DEPENDENT
           key: meraki.device.public.ip
           delay: '0'
@@ -306,7 +324,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: |
-            Device public ip
+            Device public IP
             Network: {$NETWORK.ID} 
             MAC: {$MAC}
           preprocessing:
@@ -412,7 +430,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -431,7 +449,7 @@ zabbix_export:
                 uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=60');
             
                 if (uplinksLL.length > 0) {
-                    uplinks = uplinksLL.filter(function(device) {
+                    uplinksLL = uplinksLL.filter(function(device) {
                         return device.serial == params.serial;
                     });
                 }
@@ -442,7 +460,7 @@ zabbix_export:
             
             return JSON.stringify({
                 'device': device,
-                'uplinksLL': uplinks,
+                'uplinksLL': uplinksLL,
                 'error': error_msg.toString()
             });
           description: 'Item for gathering device data from Meraki API.'
@@ -497,6 +515,7 @@ zabbix_export:
           key: meraki.device.uplinks.discovery
           delay: '0'
           filter:
+            evaltype: AND
             conditions:
               - macro: '{#UPLINK}'
                 value: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
@@ -635,30 +654,30 @@ zabbix_export:
       macros:
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
-          description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
+          description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
         - macro: '{$MERAKI.DEVICE.LATENCY}'
           value: '0.15'
-          description: 'Devices uplink latency threshold in seconds.'
+          description: 'Devices uplink latency threshold, in seconds.'
         - macro: '{$MERAKI.DEVICE.LOSS}'
           value: '15'
-          description: 'Devices uplink loss threshold in percents.'
+          description: 'Devices uplink loss threshold, in percents.'
         - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
           value: '^((25[0-5]|(2[0-4]|1\d|[1-9]|)\d)\.?\b){4}$'
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
-          value: ^$
+          value: ^null$
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
-          value: .+
+          value: '.*'
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
-          value: ^$
+          value: ^null$
           description: 'This macro is used in loss and latency checks discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
-          description: 'Cisco Meraki Dashboard API Token.'
+          description: 'Cisco Meraki dashboard API token.'
       dashboards:
         - uuid: 76c4525eacc64f268572fefd76accc2f
           name: 'Meraki: General'
@@ -746,7 +765,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'Item for viewing the Change Log for your organization.\nGathering once per 20m by default.'
+          description: 'Item for viewing the change log for your organization. Gathering once per 20m by default.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -842,7 +861,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -942,7 +961,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: bb653e6dba3f489494a7143b74fe8f4f
-          name: 'Meraki: Get list of the vpn stats'
+          name: 'Meraki: Get list of the VPN stats'
           type: SCRIPT
           key: meraki.get.vpn.stats
           delay: 3m
@@ -993,7 +1012,7 @@ zabbix_export:
             try {
             
                 if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro with the proper value.';
+                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
                 }
             
                 if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
@@ -1004,7 +1023,7 @@ zabbix_export:
                     params.url += '/';
                 }
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
+                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
                     request.setProxy(params.httpproxy);
                 }
             
@@ -1014,31 +1033,30 @@ zabbix_export:
                     if (typeof vpnStats[i].merakiVpnPeers !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers)) {
                         for (u in vpnStats[i].merakiVpnPeers) {
                             if (typeof vpnStats[i].merakiVpnPeers[u].latencySummaries !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers[u].latencySummaries)) {
-                                for (l in vpnStats[i].merakiVpnPeers[u].latencySummaries) {
-                                    result = vpnStats[i].merakiVpnPeers[u].latencySummaries.map(function (x) {
+                                vpn_stats = vpnStats[i].merakiVpnPeers[u].latencySummaries.map(function (x) {
             
-                                        lps = vpnStats[i].merakiVpnPeers[u].lossPercentageSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                        js = vpnStats[i].merakiVpnPeers[u].jitterSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                        ms = vpnStats[i].merakiVpnPeers[u].mosSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                        Object.assign(x, lps[0], js[0], ms[0]);
+                                    lps = vpnStats[i].merakiVpnPeers[u].lossPercentageSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+                                    js = vpnStats[i].merakiVpnPeers[u].jitterSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+                                    ms = vpnStats[i].merakiVpnPeers[u].mosSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+                                    Object.assign(x, lps[0], js[0], ms[0]);
             
-                                        if ('networkId' in vpnStats[i]) {
-                                            x.networkId = vpnStats[i].networkId;
-                                        }
-                                        if ('networkName' in vpnStats[i]) {
-                                            x.networkName = vpnStats[i].networkName;
-                                        }
+                                    if ('networkId' in vpnStats[i]) {
+                                        x.networkId = vpnStats[i].networkId;
+                                    }
+                                    if ('networkName' in vpnStats[i]) {
+                                        x.networkName = vpnStats[i].networkName;
+                                    }
             
-                                        if ('networkId' in vpnStats[i].merakiVpnPeers[u]) {
-                                            x.peerNetworkId = vpnStats[i].merakiVpnPeers[u].networkId;
-                                        }
-                                        if ('networkName' in vpnStats[i].merakiVpnPeers[u]) {
-                                            x.peerNetworkName = vpnStats[i].merakiVpnPeers[u].networkName;
-                                        }
+                                    if ('networkId' in vpnStats[i].merakiVpnPeers[u]) {
+                                        x.peerNetworkId = vpnStats[i].merakiVpnPeers[u].networkId;
+                                    }
+                                    if ('networkName' in vpnStats[i].merakiVpnPeers[u]) {
+                                        x.peerNetworkName = vpnStats[i].merakiVpnPeers[u].networkName;
+                                    }
             
-                                        return x;
-                                    });
-                                }
+                                    return x;
+                                });
+                                result = result.concat(vpn_stats);
                             }
                         }
                     }
@@ -1053,7 +1071,7 @@ zabbix_export:
                 'vpnStats': result,
                 'error': error_msg.toString()
             });
-          description: 'Item for gathering all the vpn stats of the organization.'
+          description: 'Item for gathering all the VPN stats of the organization.'
           timeout: 30s
           parameters:
             - name: token
@@ -1075,7 +1093,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'Item for gathering all the vpn item errors.'
+          description: 'Item for gathering all the VPN item errors.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1104,7 +1122,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: s
-          description: 'Meraki license expire time in seconds left.'
+          description: 'Meraki license expire time, in seconds left.'
           valuemap:
             name: 'License status'
           preprocessing:
@@ -1266,6 +1284,23 @@ zabbix_export:
           type: DEPENDENT
           key: meraki.uplinks.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#UPLINK.ROLE}'
+                value: '{$MERAKI.LLD.UPLINK.ROLE.MATCHES}'
+                formulaid: C
+              - macro: '{#UPLINK.ROLE}'
+                value: '{$MERAKI.LLD.UPLINK.ROLE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           item_prototypes:
             - uuid: 7600f662dd044d1f857a6ffd9898277c
               name: 'Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: status'
@@ -1341,6 +1376,37 @@ zabbix_export:
           type: DEPENDENT
           key: meraki.vpn.stats.discovery
           delay: '0'
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.NETWORK.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.NETWORK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+              - macro: '{#PEER.NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#PEER.NETWORK.NAME}'
+                value: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#SENDER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.MATCHES}'
+                formulaid: G
+              - macro: '{#SENDER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#RECEIVER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.MATCHES}'
+                formulaid: E
+              - macro: '{#RECEIVER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
           item_prototypes:
             - uuid: 6e38c9538ad4489ea08b6d21fc8a8bd3
               name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: jitter avg'
@@ -1647,18 +1713,54 @@ zabbix_export:
       macros:
         - macro: '{$MERAKI.API.URL}'
           value: api.meraki.com/api/v1
-          description: 'Cisco Meraki Dashboard API URL. e.g api.meraki.com/api/v1'
+          description: 'Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1'
         - macro: '{$MERAKI.CONFIG.CHANGE.TIMESPAN}'
           value: '1200'
-          description: 'Timespan for gathering config change log. Used in the metric config and in the URL query.'
+          description: 'Timespan for gathering configuration change log. Used in the metric configuration and in the URL query.'
         - macro: '{$MERAKI.HTTP_PROXY}'
           description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
         - macro: '{$MERAKI.LICENSE.EXPIRE}'
           value: '86400'
           description: 'Time in seconds for license to expire.'
+        - macro: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.UPLINK.ROLE.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.UPLINK.ROLE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in uplinks discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.NETWORK.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.NETWORK.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.SENDER.UPLINK.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$MERAKI.LLD.VPN.SENDER.UPLINK.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in VPN stats discovery. Can be overridden on the host or linked template level.'
         - macro: '{$MERAKI.TOKEN}'
           type: SECRET_TEXT
-          description: 'Cisco Meraki Dashboard API Token.'
+          description: 'Cisco Meraki dashboard API token.'
       dashboards:
         - uuid: 2d10effbfff447f6937877f25d12646a
           name: 'Meraki: General'
@@ -1720,7 +1822,7 @@ zabbix_export:
           name: 'License status'
           mappings:
             - value: '0'
-              newvalue: 'License Required'
+              newvalue: 'License required'
             - value: '1'
               newvalue: OK
             - value: '10'
