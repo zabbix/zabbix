@@ -43,7 +43,7 @@ function getItemFormData(array $item = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
-		'type' => getRequest('type', 0),
+		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -95,6 +95,12 @@ function getItemFormData(array $item = []) {
 		'tags' => getRequest('tags', []),
 		'backurl' => getRequest('backurl')
 	];
+
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
+
+	if (!$data['is_discovery_rule']) {
+		$data['preprocessing'] = sortPreprocessingSteps($data['preprocessing']);
+	}
 
 	// Unset empty and inherited tags.
 	foreach ($data['tags'] as $key => $tag) {
@@ -293,7 +299,7 @@ function getItemFormData(array $item = []) {
 
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
 							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($data['key'], 'mqtt.get', 8) === 0))) {
+								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}
@@ -388,7 +394,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
-	$have_validate_not_supported = in_array(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, array_column($preprocessing, 'type'));
 
 	foreach ($preprocessing as $step) {
 		// Create a select with preprocessing types.
@@ -402,9 +407,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$enabled = (!$have_validate_not_supported || $type != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
-						|| $type == $step['type']);
-				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(!$enabled));
+				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(
+					$step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED && $type == $step['type']
+				));
 			}
 
 			$preproc_types_select->addOptionGroup($opt_group);
@@ -561,6 +566,32 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 					$step_param_1->setAttribute('placeholder', _('replacement'))
 				];
 				break;
+
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				if ($step_param_0_value == '') {
+					$step_param_0_value = ZBX_PREPROC_MATCH_ERROR_ANY;
+				}
+
+				$params = [
+					(new CSelect('preprocessing['.$i.'][params][0]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
+							ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
+							ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
+						]))
+							->setAttribute('placeholder', _('error-matching'))
+							->addClass('js-preproc-param-error-matching')
+							->setValue($step_param_0_value)
+							->setReadonly($readonly),
+					$step_param_1
+						->setAttribute('placeholder', _('pattern'))
+						->setReadonly($readonly)
+						->addClass(
+							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_VISIBILITY_HIDDEN : null
+						)
+				];
+				break;
+
 
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$params = [

@@ -55,7 +55,7 @@ class CControllerItemMassupdate extends CController {
 			'authtype' => 'string',
 			'username' => 'string',
 			'password' => 'string',
-			'timeout' => 'string',
+			'timeout' => 'string|not_empty',
 			'delay' => 'string',
 			'trapper_hosts' => 'string',
 
@@ -144,7 +144,7 @@ class CControllerItemMassupdate extends CController {
 				'authtype' => DB::getDefault('items', 'authtype'),
 				'username' => DB::getDefault('items', 'username'),
 				'password' => DB::getDefault('items', 'password'),
-				'timeout' => '',
+				'timeout' => DB::getDefault('items', 'timeout'),
 				'delay' => DB::getDefault('items', 'delay'),
 				'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
 
@@ -215,7 +215,7 @@ class CControllerItemMassupdate extends CController {
 
 			if ($item_prototypes) {
 				$db_items = API::ItemPrototype()->get([
-					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps'],
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'authtype', 'allow_traps', 'snmp_oid'],
 					'selectHosts' => ['status'],
 					'itemids' => $itemids,
 					'preservekeys' => true
@@ -223,7 +223,9 @@ class CControllerItemMassupdate extends CController {
 			}
 			else {
 				$db_items = API::Item()->get([
-					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps'],
+					'output' => ['type', 'key_', 'value_type', 'templateid', 'flags', 'authtype', 'allow_traps',
+						'snmp_oid'
+					],
 					'selectHosts' => ['status'],
 					'itemids' => $itemids,
 					'preservekeys' => true

@@ -133,7 +133,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 			// Hide zeros for trapper, SNMP trap and dependent items.
 			if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
 					|| $item['type'] == ITEM_TYPE_DEPENDENT
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0)) {
 				$item['delay'] = '';
 			}
 			elseif ($interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {

@@ -433,6 +433,7 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_ZABBIX:
 				$data += [
 					'key' => array_key_exists('key', $input) ? $input['key'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
@@ -495,6 +496,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 				$data += [
 					'snmp_oid' => array_key_exists('snmp_oid', $input) ? $input['snmp_oid'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'flags' => $item_flag,
 					'host' => [
 						'host' => $this->host['host']
@@ -523,7 +525,8 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_EXTERNAL:
 				$data += [
-					'key' => $input['key']
+					'key' => $input['key'],
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null
 				];
 				break;
 
@@ -532,7 +535,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'params_ap' => array_key_exists('params_ap', $input) ? $input['params_ap'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null
 				];
 				break;
 
@@ -606,6 +610,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : ITEM_AUTHTYPE_PASSWORD,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
@@ -623,6 +628,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 				break;
@@ -649,9 +655,10 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SIMPLE:
 				$data += [
 					'key' => $input['key'],
-					'interface' => $this->getHostInterface($interface_input),
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
+					'interface' => $this->getHostInterface($interface_input)
 				];
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],

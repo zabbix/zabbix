@@ -119,7 +119,7 @@ else {
 							'popup' => [
 								'filter_preselect' => [
 									'id' => 'filter_groupids_',
-									'submit_as' => 'groupid'
+									'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 								],
 								'parameters' => [
 									'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',

@@ -285,8 +285,8 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				if (SUCCEED != zbx_execute_agent_check(key, 0, &result) || NULL ==
-						ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
+				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, config_timeout) ||
+						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
 					ret = FAIL;
 				}
@@ -330,7 +330,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, config_timeout, source_ip, &result) &&
+					if (SUCCEED == get_value_agent(&item, source_ip, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -355,9 +355,8 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 						item.snmpv3_contextname = dcheck->snmpv3_contextname;
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, config_timeout,
-							source_ip) && NULL !=
-							(pvalue = ZBX_GET_TEXT_RESULT(&result)))
+					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, source_ip) &&
+							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 					}

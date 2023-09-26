@@ -30,6 +30,7 @@ if (array_key_exists('error', $data)) {
 	return;
 }
 
+$this->addJsFile('d3.v7.min.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');

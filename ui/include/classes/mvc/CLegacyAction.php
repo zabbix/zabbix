@@ -36,9 +36,7 @@ class CLegacyAction extends CAction {
 	 * @return bool
 	 */
 	public function checkInput(): bool {
-		$json_actions = ['templates.php', 'host_prototypes.php'];
-
-		if (in_array($this->getAction(), $json_actions) && array_key_exists('formdata_json', $_REQUEST)) {
+		if ($this->getAction() === 'host_prototypes.php' && array_key_exists('formdata_json', $_REQUEST)) {
 			$_REQUEST = json_decode($_REQUEST['formdata_json'], true);
 		}
 
@@ -73,8 +71,8 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
-			$denied = array_merge($denied, ['actionconf.php', 'graphs.php', 'host_discovery.php', 'host_prototypes.php',
-				'host.list', 'httpconf.php', 'report4.php', 'template.list', 'trigger_prototypes.php', 'triggers.php'
+			$denied = array_merge($denied, ['graphs.php', 'host_discovery.php', 'host_prototypes.php', 'host.list',
+				'httpconf.php', 'items.php', 'report4.php', 'template.list', 'trigger_prototypes.php', 'triggers.php'
 			]);
 		}
 
@@ -102,26 +100,6 @@ class CLegacyAction extends CAction {
 				CRoleHelper::UI_CONFIGURATION_TEMPLATES => ['template.list'],
 				CRoleHelper::UI_REPORTS_NOTIFICATIONS => ['report4.php']
 			];
-
-			if ($action === 'actionconf.php') {
-				switch (getRequest('eventsource')) {
-					case EVENT_SOURCE_TRIGGERS:
-						$rule_actions += [CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS => ['actionconf.php']];
-						break;
-					case EVENT_SOURCE_SERVICE:
-						$rule_actions += [CRoleHelper::UI_CONFIGURATION_SERVICE_ACTIONS => ['actionconf.php']];
-						break;
-					case EVENT_SOURCE_DISCOVERY:
-						$rule_actions += [CRoleHelper::UI_CONFIGURATION_DISCOVERY_ACTIONS => ['actionconf.php']];
-						break;
-					case EVENT_SOURCE_AUTOREGISTRATION:
-						$rule_actions += [CRoleHelper::UI_CONFIGURATION_AUTOREGISTRATION_ACTIONS => ['actionconf.php']];
-						break;
-					case EVENT_SOURCE_INTERNAL:
-						$rule_actions += [CRoleHelper::UI_CONFIGURATION_INTERNAL_ACTIONS => ['actionconf.php']];
-						break;
-				}
-			}
 		}
 
 		foreach ($rule_actions as $rule_name => $actions) {

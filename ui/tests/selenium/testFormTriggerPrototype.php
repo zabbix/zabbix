@@ -363,7 +363,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 		// Check hintbox.
 		$this->query('class:zi-help-filled-small')->one()->click();
-		$hint = $form->query('xpath:.//div[@class="hint-box"]')->waitUntilPresent()->one();
+		$hint = $this->query('xpath:.//div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 
 		// Assert text.
 		$this->assertEquals('Menu entry name is used as a label for the trigger URL in the event context menu.',
@@ -602,7 +602,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'type' => true,
 					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url_name' => 'Trigger context menu name for trigger URL.',
-					'url' => 'http://www.zabbix.com',
+					'url' => 'https://www.zabbix.com',
 					'severity' => 'High',
 					'status' => false
 				]
@@ -897,7 +897,8 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					$this->assertEquals($count,
 							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
 					);
-					$text = $this->query('xpath://tr[1]//div[@class="hint-box"]')->one()->getText();
+					$text = $this->query("xpath://tr[1]//button[@data-hintbox]")->one()
+						->getAttribute('data-hintbox-contents');
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}

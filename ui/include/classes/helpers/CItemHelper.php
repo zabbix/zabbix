@@ -78,7 +78,7 @@ class CItemHelper extends CItemGeneralHelper {
 
 				if ($delay == 0 && ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
 						|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-							&& strncmp($item['key'], 'mqtt.get', 8) === 0))) {
+							&& strncmp($item['key'], 'mqtt.get', 8) == 0))) {
 					$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 				}
 			}
