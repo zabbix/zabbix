@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "vps_tracker.h"
+#include "vps_monitor.h"
+
 #include "dbconfig.h"
 #include "zbxmutexs.h"
 
@@ -27,17 +28,17 @@ static zbx_mutex_t	vps_lock = ZBX_MUTEX_NULL;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create VPS tracker                                                *
+ * Purpose: create VPS monitor                                                *
  *                                                                            *
  ******************************************************************************/
-int	vps_tracker_create(zbx_vps_tracker_t *tracker, char **error)
+int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error)
 {
 	int	ret = FAIL;
 
-	if (SUCCEED != (ret = zbx_mutex_create(&vps_lock, ZBX_MUTEX_VPS_TRACKER, error)))
+	if (SUCCEED != (ret = zbx_mutex_create(&vps_lock, ZBX_MUTEX_VPS_MONITOR, error)))
 		goto out;
 
-	memset(tracker, 0, sizeof(zbx_vps_tracker_t));
+	memset(monitor, 0, sizeof(zbx_vps_monitor_t));
 
 	ret = SUCCEED;
 out:
@@ -46,7 +47,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: increment VPS tracker history cursor                              *
+ * Purpose: increment VPS monitor history cursor                              *
  *                                                                            *
  ******************************************************************************/
 int	vps_history_inc(int *cr)
@@ -59,7 +60,7 @@ int	vps_history_inc(int *cr)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: decrement VPS tracker history cursor                              *
+ * Purpose: decrement VPS monitor history cursor                              *
  *                                                                            *
  ******************************************************************************/
 int	vps_history_dec(int *cr)
@@ -74,84 +75,84 @@ int	vps_history_dec(int *cr)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize VPS tracker                                            *
+ * Purpose: initialize VPS monitor                                            *
  *                                                                            *
  * Comments: This function is called before processes are spawned -           *
  *           no locking is needed.                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vps_tracker_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit)
+void	zbx_vps_monitor_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit)
 {
-	zbx_vps_tracker_t	*tracker = &config->vps_tracker;
+	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
-	tracker->last_flush = time(NULL);
+	monitor->last_flush = time(NULL);
 
-	tracker->values_limit = nvps_limit * ZBX_VPS_FLUSH_PERIOD;
-	tracker->overcommit_limit = overcommit_limit * nvps_limit / 100;
-	tracker->overcommit_charge = overcommit_limit * nvps_limit / 100;
+	monitor->values_limit = nvps_limit * ZBX_VPS_FLUSH_PERIOD;
+	monitor->overcommit_limit = overcommit_limit * nvps_limit / 100;
+	monitor->overcommit_charge = overcommit_limit * nvps_limit / 100;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add number of synced values to the tracker                        *
+ * Purpose: add number of synced values to the monitor                        *
  *                                                                            *
  * Comments: This function is called before processes are spawned -           *
  *           no locking is needed.                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vps_tracker_add(zbx_uint64_t values_num)
+void	zbx_vps_monitor_add(zbx_uint64_t values_num)
 {
-	zbx_vps_tracker_t	*tracker = &config->vps_tracker;
+	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 	time_t			now;
 
 	now = time(NULL);
 
 	zbx_mutex_lock(vps_lock);
 
-	if (ZBX_VPS_FLUSH_PERIOD <= now - tracker->last_flush)
+	if (ZBX_VPS_FLUSH_PERIOD <= now - monitor->last_flush)
 	{
-		if (tracker->values_limit > tracker->values_num)
+		if (monitor->values_limit > monitor->values_num)
 		{
-			tracker->overcommit_charge += tracker->values_limit - tracker->values_num;
+			monitor->overcommit_charge += monitor->values_limit - monitor->values_num;
 
-			if (tracker->overcommit_charge > tracker->overcommit_limit)
-				tracker->overcommit_charge = tracker->overcommit_limit;
+			if (monitor->overcommit_charge > monitor->overcommit_limit)
+				monitor->overcommit_charge = monitor->overcommit_limit;
 
-			tracker->values_num = 0;
+			monitor->values_num = 0;
 		}
 		else
 		{
-			if (tracker->values_num <= tracker->values_limit + tracker->overcommit_charge)
+			if (monitor->values_num <= monitor->values_limit + monitor->overcommit_charge)
 			{
-				tracker->overcommit_charge -= tracker->values_num - tracker->values_limit;
-				tracker->values_num = 0;
+				monitor->overcommit_charge -= monitor->values_num - monitor->values_limit;
+				monitor->values_num = 0;
 			}
 			else
 			{
-				tracker->values_num -= tracker->values_limit + tracker->overcommit_charge;
-				tracker->overcommit_charge = 0;
+				monitor->values_num -= monitor->values_limit + monitor->overcommit_charge;
+				monitor->overcommit_charge = 0;
 			}
 		}
 
-		tracker->last_flush = now;
+		monitor->last_flush = now;
 	}
 
-	tracker->values_num += values_num;
+	monitor->values_num += values_num;
 
 	/* update history statistics */
 
-	while (tracker->last_flush != now)
+	while (monitor->last_flush != now)
 	{
-		tracker->history[vps_history_inc(&tracker->history_tail)] = tracker->total_values_num;
+		monitor->history[vps_history_inc(&monitor->history_tail)] = monitor->total_values_num;
 
-		if (tracker->history_tail == tracker->history_head)
-			vps_history_inc(&tracker->history_head);
+		if (monitor->history_tail == monitor->history_head)
+			vps_history_inc(&monitor->history_head);
 
-		tracker->last_flush++;
+		monitor->last_flush++;
 	}
 
-	tracker->total_values_num += values_num;
-	tracker->history[tracker->history_tail] += values_num;
+	monitor->total_values_num += values_num;
+	monitor->history[monitor->history_tail] += values_num;
 
 	zbx_mutex_unlock(vps_lock);
 }
@@ -164,17 +165,17 @@ void	zbx_vps_tracker_add(zbx_uint64_t values_num)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vps_tracker_is_limited(void)
+int	zbx_vps_monitor_capped(void)
 {
-	zbx_vps_tracker_t	*tracker = &config->vps_tracker;
+	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
-	if (0 == tracker->values_limit)
+	if (0 == monitor->values_limit)
 		return FAIL;
 
 	int	ret;
 
 	zbx_mutex_lock(vps_lock);
-	ret = (tracker->values_num <= tracker->values_limit + tracker->overcommit_charge ? FAIL : SUCCEED);
+	ret = (monitor->values_num <= monitor->values_limit + monitor->overcommit_charge ? FAIL : SUCCEED);
 	zbx_mutex_unlock(vps_lock);
 
 	return ret;
@@ -185,17 +186,17 @@ int	zbx_vps_tracker_is_limited(void)
  * Purpose: get available overcommit charge                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vps_tracker_get_stats(zbx_vps_tracker_stats_t *stats)
+void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats)
 {
-	zbx_vps_tracker_t	*tracker = &config->vps_tracker;
+	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
 	zbx_mutex_lock(vps_lock);
-	stats->overcommit_charge = tracker->overcommit_charge;
+	stats->overcommit_charge = monitor->overcommit_charge;
 	zbx_mutex_unlock(vps_lock);
 
 	/* preconfigured values, cannot change without restarting server */
-	stats->values_limit = tracker->values_limit / ZBX_VPS_FLUSH_PERIOD;
-	stats->overcommit_limit = tracker->overcommit_limit;
+	stats->values_limit = monitor->values_limit / ZBX_VPS_FLUSH_PERIOD;
+	stats->overcommit_limit = monitor->overcommit_limit;
 }
 
 /******************************************************************************
@@ -205,20 +206,20 @@ void	zbx_vps_tracker_get_stats(zbx_vps_tracker_stats_t *stats)
  ******************************************************************************/
 double	zbx_vps_get_avg(void)
 {
-	zbx_vps_tracker_t	*tracker = &config->vps_tracker;
+	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 	double			avg;
 
 	zbx_mutex_lock(vps_lock);
 
-	if (tracker->history_tail != tracker->history_head)
+	if (monitor->history_tail != monitor->history_head)
 	{
-		int		last = tracker->history_tail, period;
+		int		last = monitor->history_tail, period;
 		zbx_uint64_t	diff;
 
 		vps_history_dec(&last);
-		diff = tracker->history[last] - tracker->history[tracker->history_head];
+		diff = monitor->history[last] - monitor->history[monitor->history_head];
 
-		if (0 > (period = last - tracker->history_head))
+		if (0 > (period = last - monitor->history_head))
 			period += VPS_HISTORY_SIZE;
 
 		avg = (double)diff / period;

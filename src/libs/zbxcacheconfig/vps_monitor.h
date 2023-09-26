@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_VPS_TRACKER_H
-#define ZABBIX_VPS_TRACKER_H
+#ifndef ZABBIX_VPS_MONITOR_H
+#define ZABBIX_VPS_MONITOR_H
 
 #include "zbxcommon.h"
 
@@ -39,8 +39,8 @@ typedef struct
 	int		history_tail;
 	int		history_head;
 
-} zbx_vps_tracker_t;
+} zbx_vps_monitor_t;
 
-int	vps_tracker_create(zbx_vps_tracker_t *tracker, char **error);
+int	vps_monitor_create(zbx_vps_monitor_t *monitor, char **error);
 
 #endif

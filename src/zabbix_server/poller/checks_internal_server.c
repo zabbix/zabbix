@@ -298,9 +298,9 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 
-		zbx_vps_tracker_stats_t	stats;
+		zbx_vps_monitor_stats_t	stats;
 
-		zbx_vps_tracker_get_stats(&stats);
+		zbx_vps_monitor_get_stats(&stats);
 		SET_UI64_RESULT(result, stats.values_limit);
 	}
 	else if (0 == strcmp(param1, "limiter"))
@@ -315,7 +315,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 				goto out;
 			}
 
-			zbx_uint64_t	value = (SUCCEED == zbx_vps_tracker_is_limited() ? 1 : 0);
+			zbx_uint64_t	value = (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0);
 
 			SET_UI64_RESULT(result, value);
 			goto done;
@@ -332,9 +332,9 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			goto out;
 		}
 
-		zbx_vps_tracker_stats_t	stats;
+		zbx_vps_monitor_stats_t	stats;
 
-		zbx_vps_tracker_get_stats(&stats);
+		zbx_vps_monitor_get_stats(&stats);
 
 		param2 = get_rparam(request, 2);
 

@@ -1480,7 +1480,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	zbx_vps_tracker_init(config_nvps_limit, config_nvps_overcommit);
+	zbx_vps_monitor_init(config_nvps_limit, config_nvps_overcommit);
 
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{

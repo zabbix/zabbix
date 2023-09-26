@@ -2572,7 +2572,7 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
 
-	zbx_vps_tracker_add((zbx_uint64_t)history_values.values_num);
+	zbx_vps_monitor_add((zbx_uint64_t)history_values.values_num);
 
 	zbx_vector_ptr_destroy(&history_values);
 
@@ -3307,7 +3307,7 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 		else
 		{
 			/* report 0 synced values to keep the vps tracker running */
-			zbx_vps_tracker_add(0);
+			zbx_vps_monitor_add(0);
 		}
 
 		zbx_vector_uint64_clear(&itemids);

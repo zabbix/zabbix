@@ -8215,7 +8215,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	config = (ZBX_DC_CONFIG *)__config_shmem_malloc_func(NULL, sizeof(ZBX_DC_CONFIG) +
 			(size_t)get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER) * sizeof(zbx_vector_ptr_t));
 
-	if (SUCCEED != vps_tracker_create(&config->vps_tracker, error))
+	if (SUCCEED != vps_monitor_create(&config->vps_monitor, error))
 		goto out;
 
 #define CREATE_HASHSET(hashset, hashset_size)									\
