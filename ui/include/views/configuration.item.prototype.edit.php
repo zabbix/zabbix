@@ -620,7 +620,7 @@ $item_tab->addItem([
 				])
 			]))->addClass(ZBX_STYLE_LIST_DASHED)
 		])
-	] , 'snmp_oid'))
+	], 'snmp_oid'))
 		->setAsteriskMark()
 		->setId('js-item-snmp-oid-label'),
 	(new CFormField((new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
