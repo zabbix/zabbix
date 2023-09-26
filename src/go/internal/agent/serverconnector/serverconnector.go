@@ -86,8 +86,9 @@ type activeChecksResponse struct {
 }
 
 type agentDataResponse struct {
-	Response string `json:"response"`
-	Info     string `json:"info"`
+	Response      string `json:"response"`
+	Info          string `json:"info"`
+	HistoryUpload string `json:"upload"`
 }
 
 type heartbeatMessage struct {
