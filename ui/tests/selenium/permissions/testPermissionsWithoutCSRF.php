@@ -181,7 +181,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'zabbix.php?action=trigger.list&context=host',
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
 					'overlay' => 'trigger_update'
 				]
 			],
@@ -189,7 +189,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'zabbix.php?action=trigger.list&context=host&filter_hostids[0]=50011',
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
 					'overlay' => 'create'
 				]
 			],

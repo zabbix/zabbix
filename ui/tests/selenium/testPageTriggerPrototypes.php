@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 class testPageTriggerPrototypes extends CLegacyWebTest {
 
@@ -34,6 +35,15 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 					' AND h.hostid=i.hostid'.
 					' AND i.name LIKE \'%-layout-test%\''
 		);
+	}
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
 	}
 
 	/**
@@ -84,11 +94,10 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 		$this->query('button:Delete')->one()->click();
 
 		$this->zbxTestAcceptAlert();
-
+		$this->assertMessage(TEST_GOOD, 'Trigger prototype deleted');
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
 		$this->zbxTestTextPresent($data['d_name']);
-		$this->zbxTestTextPresent('Trigger prototype deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE triggerid='.$triggerid;
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -130,7 +139,7 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestCheckHeader('Trigger prototypes');
-		$this->zbxTestTextPresent('Trigger prototype deleted');
+		$this->assertMessage(TEST_GOOD, 'Trigger prototype deleted');
 
 		$sql = 'SELECT null FROM triggers WHERE '.dbConditionInt('triggerid', $triggerids);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
