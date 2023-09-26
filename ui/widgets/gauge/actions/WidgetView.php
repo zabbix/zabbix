@@ -333,9 +333,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$labels = self::makeValueLabels($item, $value, $this->fields_values['decimal_places']);
 
 			return [
-			 'value' => (float) $value,
-			 'value_text' => $labels['value'],
-			 'units_text' => $labels['units']
+				'value' => (float) $value,
+				'value_text' => $labels['value'],
+				'units_text' => $labels['units']
 			];
 		}
 
