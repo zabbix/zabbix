@@ -45,9 +45,6 @@ typedef struct
 	int				workers_used;
 	int				workers_max;
 	unsigned char			status;
-	char				*agent_timeout;
-	char				*snmp_timeout;
-	char				simple_timeout;
 }
 zbx_discoverer_job_t;
 
