@@ -182,12 +182,10 @@ func (p *Plugin) exportNetService(params []string, timeout int) int {
 		port = service
 	}
 
-	var udpTimeout time.Duration
+	udpTimeout := timeout
 
 	if timeout >= 2 {
-		udpTimeout = time.Duration(timeout-1)*time.Second
-	} else {
-		udpTimeout = time.Duration(timeout)*time.Second
+		udpTimeout--
 	}
 
 	return p.udpExpect(service, net.JoinHostPort(ip, port), udpTimeout)
