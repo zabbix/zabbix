@@ -259,7 +259,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
-	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
+	1, /* ZBX_PROCESS_TYPE_INTERNAL_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -576,6 +577,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_INTERNAL_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_INTERNAL_POLLER];
 	}
 	else
 		return FAIL;
@@ -1753,6 +1759,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_INTERNAL_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_INTERNAL;
+				thread_args.args = &poller_args;
+				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}
