@@ -26,11 +26,9 @@
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get(
-		$data['prototype'] ? 'triggerprototype' : 'trigger'
-	)))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
 	->setId('massupdate-form')
-	->addVar('action', $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger')
+	->addVar('action', $data['prototype'] ? 'trigger.prototype.massupdate' : 'trigger.massupdate')
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
@@ -189,7 +187,7 @@ $tabs = (new CTabView())
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.trigger.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('trigger.massupdate.js.php')));
 
 $output = [
 	'header' => $data['title'],
