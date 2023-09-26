@@ -19,11 +19,36 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+namespace Widgets\PieChart\Includes;
 
-class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
+use CButton,
+	CButtonIcon,
+	CButtonLink,
+	CCol,
+	CColor,
+	CDiv,
+	CFormField,
+	CFormGrid,
+	CLabel,
+	CLink,
+	CList,
+	CListItem,
+	CPatternSelect,
+	CRow,
+	CSelect,
+	CSimpleButton,
+	CSpan,
+	CTable,
+	CTableColumn,
+	CTag,
+	CTemplateTag,
+	CTextBox,
+	CVar,
+	CWidgetFieldView;
 
-	public function __construct(CWidgetFieldGraphDataSet $field) {
+class CWidgetFieldDataSetView extends CWidgetFieldView {
+
+	public function __construct(CWidgetFieldDataSet $field) {
 		$this->field = $field;
 	}
 
@@ -35,23 +60,22 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		$values = $this->field->getValue();
 
 		if (!$values) {
-			$values[] = CWidgetFieldGraphDataSet::getDefaults();
+			$values[] = CWidgetFieldDataSet::getDefaults();
 		}
 
-		// Get item names for single item datasets.
 		$itemids = array_merge(...array_column($values, 'itemids'));
 		$item_names = [];
 		if ($itemids) {
-			$item_names = CWidgetFieldGraphDataSet::getItemNames($itemids);
+			$item_names = CWidgetFieldDataSet::getItemNames($itemids);
 		}
 
 		foreach ($values as $i => $value) {
-			if ($value['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
+			if ($value['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				$value['item_names'] = $item_names;
 			}
 
 			$view->addItem(
-				$this->getGraphDataSetLayout($value, $value['dataset_type'], $i == 0, $i)
+				$this->getDataSetLayout($value, $value['dataset_type'], $i == 0, $i)
 			);
 		}
 
@@ -76,20 +100,20 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	}
 
 	public function getTemplates(): array {
-		$value = ['color' => '#{color}'] + CWidgetFieldGraphDataSet::getDefaults();
+		$value = ['color' => '#{color}'] + CWidgetFieldDataSet::getDefaults();
 
 		return [
 			new CTemplateTag('dataset-pattern-item-tmpl',
-				$this->getGraphDataSetLayout($value, CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM, true)
+				$this->getDataSetLayout($value, CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM, true)
 			),
 			new CTemplateTag('dataset-single-item-tmpl',
-				$this->getGraphDataSetLayout($value, CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM, true)
+				$this->getDataSetLayout($value, CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM, true)
 			),
 			new CTemplateTag('dataset-item-row-tmpl', $this->getItemRowTemplate())
 		];
 	}
 
-	private function getGraphDataSetLayout(array $value, int $dataset_type, bool $is_opened,
+	private function getDataSetLayout(array $value, int $dataset_type, bool $is_opened,
 			$row_num = '#{rowNum}'): CListItem {
 		$field_name = $this->field->getName();
 
@@ -100,7 +124,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
 
-		if ($dataset_type == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
+		if ($dataset_type == CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM) {
 			if ($this->field->isTemplateDashboard()) {
 				$host_pattern_field = null;
 
@@ -183,8 +207,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			}
 
 			$dataset_head = array_merge($dataset_head, [
-				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))
-					->appendColorPickerJs(false),
+				(new CColor($field_name.'['.$row_num.'][color]', $value['color']))->appendColorPickerJs(false),
 				$host_pattern_field,
 				$item_pattern_field
 			]);
@@ -196,7 +219,9 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 					? $value['item_names'][$itemid]
 					: '';
 
-				$item_rows[] = $this->getItemRowTemplate($row_num, ($i + 1), $itemid, $item_name, $value['color'][$i]);
+				$item_rows[] = $this->getItemRowTemplate($row_num, $i + 1, $itemid, $item_name, $value['color'][$i],
+					$value['type'][$i]
+				);
 			}
 
 			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('no-items-message');
@@ -209,6 +234,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 					(new CTableColumn())->addClass('table-col-color'),
 					(new CTableColumn())->addClass('table-col-no'),
 					(new CTableColumn(_('Name')))->addClass('table-col-name'),
+					(new CTableColumn(_('Type')))->addClass('table-col-type'),
 					(new CTableColumn(_('Action')))->addClass('table-col-action')
 				])
 				->addItem([
@@ -216,7 +242,11 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 					(new CTag('tfoot', true))
 						->addItem(
 							(new CCol(
-								(new CButtonLink(_('Add')))->addClass('js-add')
+								(new CList())
+									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
+									->addItem(
+										(new CButtonLink(_('Add')))->addClass('js-add')
+									)
 							))->setColSpan(5)
 						)
 				]);
@@ -248,170 +278,44 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 				->addItem([
 					(new CFormGrid())
 						->addItem([
-							new CLabel(_('Draw')),
-							new CFormField(
-								(new CRadioButtonList($field_name.'['.$row_num.'][type]', (int) $value['type']))
-									->addClass('js-type')
-									->addValue(_('Line'), SVG_GRAPH_TYPE_LINE)
-									->addValue(_('Points'), SVG_GRAPH_TYPE_POINTS)
-									->addValue(_('Staircase'), SVG_GRAPH_TYPE_STAIRCASE)
-									->addValue(_('Bar'), SVG_GRAPH_TYPE_BAR)
-									->setModern()
-							)
-						])
-						->addItem([
-							new CLabel(_('Stacked'), $field_name.'['.$row_num.'][stacked]'),
-							new CFormField([
-								(new CVar($field_name.'['.$row_num.'][stacked]', '0'))->removeId(),
-								(new CCheckBox($field_name.'['.$row_num.'][stacked]'))
-									->addClass('js-stacked')
-									->setChecked((bool) $value['stacked'])
-									->setEnabled($value['type'] != SVG_GRAPH_TYPE_POINTS)
-							])
-						])
-						->addItem([
-							new CLabel(_('Width')),
-							new CFormField(
-								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
-									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-									->setStep(1)
-									->setMin(0)
-									->setMax(10)
-							)
-						])
-						->addItem([
-							new CLabel(_('Point size')),
-							new CFormField(
-								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
-									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-									->setStep(1)
-									->setMin(1)
-									->setMax(10)
-							)
-						])
-						->addItem([
-							new CLabel(_('Transparency')),
-							new CFormField(
-								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
-									(int) $value['transparency'])
-								)
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-									->setStep(1)
-									->setMin(0)
-									->setMax(10)
-							)
-						])
-						->addItem([
-							new CLabel(_('Fill')),
-							new CFormField(
-								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
-									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-									->setStep(1)
-									->setMin(0)
-									->setMax(10)
-							)
-						])
-						->addItem([
-							new CLabel(_('Missing data')),
-							new CFormField(
-								(new CRadioButtonList($field_name.'['.$row_num.'][missingdatafunc]',
-									(int) $value['missingdatafunc'])
-								)
-									->addValue(_('None'), SVG_GRAPH_MISSING_DATA_NONE)
-									->addValue(_x('Connected', 'missing data function'),
-										SVG_GRAPH_MISSING_DATA_CONNECTED
-									)
-									->addValue(_x('Treat as 0', 'missing data function'),
-										SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO
-									)
-									->addValue(_x('Last known', 'missing data function'),
-										SVG_GRAPH_MISSING_DATA_LAST_KNOWN
-									)
-									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
-									->setModern()
-							)
-						]),
-					(new CFormGrid())
-						->addItem([
-							new CLabel(_('Y-axis')),
-							new CFormField(
-								(new CRadioButtonList($field_name.'['.$row_num.'][axisy]', (int) $value['axisy']))
-									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
-									->addValue(_('Right'), GRAPH_YAXIS_SIDE_RIGHT)
-									->setModern()
-							)
-						])
-						->addItem([
-							new CLabel(_('Time shift'), $field_name.'['.$row_num.'][timeshift]'),
-							new CFormField(
-								(new CTextBox($field_name.'['.$row_num.'][timeshift]', $value['timeshift']))
-									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-									->setAttribute('placeholder', _('none'))
-							)
-						])
-						->addItem([
-							new CLabel(_('Aggregation function'),
-								'label-'.$field_name.'_'.$row_num.'_aggregate_function'
-							),
+							new CLabel([
+								_('Aggregation function'),
+								makeHelpIcon(_('Aggregates each item in the data set.'))
+							], 'label-'.$field_name.'_'.$row_num.'_aggregate_function'),
 							new CFormField(
 								(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
 									->setId($field_name.'_'.$row_num.'_aggregate_function')
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
 									->setValue((int) $value['aggregate_function'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_NONE => item_aggr_fnc2str(AGGREGATE_NONE),
-										AGGREGATE_MIN => item_aggr_fnc2str(AGGREGATE_MIN),
-										AGGREGATE_MAX => item_aggr_fnc2str(AGGREGATE_MAX),
-										AGGREGATE_AVG => item_aggr_fnc2str(AGGREGATE_AVG),
-										AGGREGATE_COUNT => item_aggr_fnc2str(AGGREGATE_COUNT),
-										AGGREGATE_SUM => item_aggr_fnc2str(AGGREGATE_SUM),
-										AGGREGATE_FIRST => item_aggr_fnc2str(AGGREGATE_FIRST),
-										AGGREGATE_LAST => item_aggr_fnc2str(AGGREGATE_LAST)
+										AGGREGATE_LAST => $this->aggr_fnc2str(AGGREGATE_LAST),
+										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM),
+										AGGREGATE_FIRST => $this->aggr_fnc2str(AGGREGATE_FIRST)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
 						])
 						->addItem([
-							new CLabel(_('Aggregation interval'), $field_name.'['.$row_num.'][aggregate_interval]'),
+							new CLabel([
+								_('Data set aggregation'),
+								makeHelpIcon(_('Aggregates the whole data set.'))
+							], 'label-'.$field_name.'_'.$row_num.'_dataset_aggregation'),
 							new CFormField(
-								(new CTextBox($field_name.'['.$row_num.'][aggregate_interval]',
-									$value['aggregate_interval']
-								))
-									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
-									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-									->setAttribute('placeholder', GRAPH_AGGREGATE_DEFAULT_INTERVAL)
-							)
-						])
-						->addItem([
-							new CLabel(_('Aggregate')),
-							new CFormField(
-								(new CRadioButtonList($field_name.'['.$row_num.'][aggregate_grouping]',
-									(int) $value['aggregate_grouping'])
-								)
-									->addValue(_('Each item'), GRAPH_AGGREGATE_BY_ITEM)
-									->addValue(_('Data set'), GRAPH_AGGREGATE_BY_DATASET)
-									->setEnabled($value['aggregate_function'] != AGGREGATE_NONE)
-									->setModern()
-							)
-						])
-						->addItem([
-							new CLabel(_('Approximation'), 'label-'.$field_name.'_'.$row_num.'_approximation'),
-							new CFormField(
-								(new CSelect($field_name.'['.$row_num.'][approximation]'))
-									->setId($field_name.'_'.$row_num.'_approximation')
-									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_approximation')
-									->setValue((int) $value['approximation'])
+								(new CSelect($field_name.'['.$row_num.'][dataset_aggregation]'))
+									->setId($field_name.'_'.$row_num.'_dataset_aggregation')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_dataset_aggregation')
+									->setValue((int) $value['dataset_aggregation'])
 									->addOptions(CSelect::createOptionsFromArray([
-										APPROXIMATION_ALL => [
-											'label' => _('all'),
-											'disabled' => $value['type'] != SVG_GRAPH_TYPE_LINE || $value['stacked']
-										],
-										APPROXIMATION_MIN => _('min'),
-										APPROXIMATION_AVG => _('avg'),
-										APPROXIMATION_MAX => _('max')
+										AGGREGATE_NONE => $this->aggr_fnc2str(AGGREGATE_NONE),
+										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -437,7 +341,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	}
 
 	private function getItemRowTemplate($ds_num = '#{dsNum}', $row_num = '#{rowNum}', $itemid = '#{itemid}',
-			$name = '#{name}', $color = '#{color}'): CRow {
+			$name = '#{name}', $color = '#{color}', $type = '#{type}'): CRow {
 		return (new CRow([
 			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
 				->addClass('table-col-handle')
@@ -454,6 +358,15 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 					->addClass('js-click-expend')
 			))->addClass('table-col-name'),
 			(new CCol([
+				(new CSelect($this->field->getName().'['.$ds_num.'][type][]'))
+					->setId('items_'.$ds_num.'_'.$row_num.'_type')
+					->setValue($type)
+					->addOptions(CSelect::createOptionsFromArray([
+						CWidgetFieldDataSet::ITEM_TYPE_NORMAL => _('Normal'),
+						CWidgetFieldDataSet::ITEM_TYPE_TOTAL => _('Total')
+					]))
+			]))->addClass('table-col-type'),
+			(new CCol([
 				(new CButton('button', _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove'),
@@ -466,5 +379,26 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		]))
 			->addClass(ZBX_STYLE_SORTABLE)
 			->addClass('single-item-table-row');
+	}
+
+	private function aggr_fnc2str($function) {
+		switch ($function) {
+			case AGGREGATE_NONE:
+				return _('none');
+			case AGGREGATE_MIN:
+				return _('min');
+			case AGGREGATE_MAX:
+				return _('max');
+			case AGGREGATE_AVG:
+				return _('avg');
+			case AGGREGATE_COUNT:
+				return _('count');
+			case AGGREGATE_SUM:
+				return _('sum');
+			case AGGREGATE_FIRST:
+				return _('first');
+			case AGGREGATE_LAST:
+				return _('last');
+		}
 	}
 }

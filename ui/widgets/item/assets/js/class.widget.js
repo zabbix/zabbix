@@ -53,12 +53,4 @@ class CWidgetItem extends CWidget {
 			this._startUpdating();
 		}
 	}
-
-	getUpdateRequestData() {
-		return {
-			...super.getUpdateRequestData(),
-			from: this._time_period.from,
-			to: this._time_period.to
-		};
-	}
 }

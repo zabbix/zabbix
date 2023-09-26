@@ -40,7 +40,8 @@ trait PreprocessingTrait {
 			],
 			[
 				'name'		=> 'parameter_1',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]',
+				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]|'.
+						'.//z-select[contains(@name, "[params][0]")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],

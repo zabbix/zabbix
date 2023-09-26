@@ -19,7 +19,10 @@
 
 #include "zbxcacheconfig.h"
 
-#include "zbxcommon.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
 
 ZBX_PTR_VECTOR_IMPL(lld_macro_path, zbx_lld_macro_path_t *)
 

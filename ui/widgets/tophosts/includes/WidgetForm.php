@@ -32,6 +32,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGroup,
 	CWidgetFieldMultiSelectHost,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTags
@@ -50,7 +51,7 @@ class WidgetForm extends CWidgetForm {
 	private array $field_column_values = [];
 
 	protected function normalizeValues(array $values): array {
-		$values = self::convertDottedKeys($values);
+		$values = parent::normalizeValues($values);
 
 		if (array_key_exists('columnsthresholds', $values)) {
 			foreach ($values['columnsthresholds'] as $column_index => $fields) {
@@ -136,7 +137,8 @@ class WidgetForm extends CWidgetForm {
 				)
 			)
 			->addField(
-				(new CWidgetFieldColumnsList('columns', _('Columns')))->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+				(new CWidgetFieldColumnsList('columns', _('Columns')))
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('order', _('Order'), [
@@ -159,6 +161,9 @@ class WidgetForm extends CWidgetForm {
 				))
 					->setDefault(self::DEFAULT_HOSTS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 

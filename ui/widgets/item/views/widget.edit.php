@@ -33,7 +33,7 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,
@@ -88,8 +88,8 @@ $form
 				new CWidgetFieldRadioButtonListView($data['fields']['history'])
 			)
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')

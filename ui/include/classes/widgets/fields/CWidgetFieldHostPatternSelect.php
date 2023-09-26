@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldHostPatternSelect extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldHostPatternSelectView::class;
 	public const DEFAULT_VALUE = [];
 
 	public function __construct(string $name, string $label = null) {
@@ -33,19 +34,5 @@ class CWidgetFieldHostPatternSelect extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setValidationRules(['type' => API_STRINGS_UTF8]);
-	}
-
-	public function toApi(array &$widget_fields = []): void {
-		$value = $this->getValue();
-
-		if ($value !== $this->default) {
-			foreach ($value as $num => $val) {
-				$widget_fields[] = [
-					'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-					'name' => $this->name.'.'.$num,
-					'value' => $val
-				];
-			}
-		}
 	}
 }
