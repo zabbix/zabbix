@@ -215,7 +215,7 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
 			'name' => _('Clear history and trends'),
-			'confirm' => _('Delete history of selected web scenarios?')
+			'confirm' => _('Clear history and trends of selected web scenarios?')
 		]
 	];
 }
