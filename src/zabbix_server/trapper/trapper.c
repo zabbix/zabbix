@@ -138,7 +138,12 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zbx_process_command_results(jp);
 
-	zbx_send_response_same(sock, ret, info, config_timeout);
+	char	*ext = NULL;
+
+	if (SUCCEED == zbx_vps_monitor_capped())
+		ext = "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\"" ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}";
+
+	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 
 	zbx_free(info);
 

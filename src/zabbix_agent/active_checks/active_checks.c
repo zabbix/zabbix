@@ -1009,6 +1009,15 @@ static int	check_response(const char *response)
 	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info), NULL))
 		zabbix_log(LOG_LEVEL_DEBUG, "info from server: '%s'", info);
 
+	if (FAIL != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, value, sizeof(value), NULL) &&
+			0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+	}
+	else
+		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
+
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
