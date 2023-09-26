@@ -39,7 +39,7 @@ $interface_states_fields = [
 	INTERFACE_AVAILABLE_UNKNOWN => ['name' => _('Unknown'), 'style' => ZBX_STYLE_HOST_AVAIL_UNKNOWN,
 		'name_in_context' => _x('Unknown', 'compact table header')
 	],
-	'total' => ['name' => _('Total'), 'style' => ZBX_STYLE_HOST_AVAIL_TOTAL,
+	-1 => ['name' => _('Total'), 'style' => ZBX_STYLE_HOST_AVAIL_TOTAL,
 		'name_in_context' => _x('Total', 'compact table header')
 	]
 ];
@@ -58,7 +58,7 @@ if (count($data['interface_types']) == 1 || $data['only_totals'] == 1) {
 	foreach ($interface_states_fields as $state => $field) {
 		$table->addItem(
 			(new CDiv([
-				(new CSpan($state != 'total' ? $counts[$state] : $data['total_hosts_sum']))
+				(new CSpan($state !== -1 ? $counts[$state] : $data['total_hosts_sum']))
 					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
 				$field['name']
 			]))->addClass($field['style'])
@@ -121,10 +121,10 @@ else {
 		}
 
 		if ($type == 'total_hosts') {
-			$interface_data['total'] = new CCol($data['total_hosts_sum']);
+			$interface_data[-1] = new CCol($data['total_hosts_sum']);
 		}
 		else {
-			$interface_data['total'] = new CCol($data['interface_totals'][$type]);
+			$interface_data[-1] = new CCol($data['interface_totals'][$type]);
 		}
 
 		if ($data['layout'] == STYLE_HORIZONTAL) {
