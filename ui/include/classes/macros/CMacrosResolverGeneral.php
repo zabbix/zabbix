@@ -1536,22 +1536,11 @@ class CMacrosResolverGeneral {
 			' WHERE '.dbConditionInt('f.functionid', array_keys($macros))
 		);
 
+		$host_macros = ['HOST.ID' => 'hostid', 'HOSTNAME' => 'host', 'HOST.HOST' => 'host', 'HOST.NAME' => 'name'];
+
 		while ($row = DBfetch($result)) {
 			foreach ($macros[$row['functionid']] as $macro => $tokens) {
-				switch ($macro) {
-					case 'HOST.ID':
-						$value = $row['hostid'];
-						break;
-
-					case 'HOSTNAME':
-					case 'HOST.HOST':
-						$value = $row['host'];
-						break;
-
-					case 'HOST.NAME':
-						$value = $row['name'];
-						break;
-				}
+				$value = $row[$host_macros[$macro]];
 
 				foreach ($tokens as $token) {
 					$macro_values[$row['triggerid']][$token['token']] = array_key_exists('macrofunc', $token)
