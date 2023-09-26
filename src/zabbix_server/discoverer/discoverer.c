@@ -292,7 +292,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 			case SVC_TELNET:
 				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
 
-				zabbix_log(1, "simple timeout is %d", dcheck->timeout_sec);
 				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, dcheck->timeout_sec) ||
 						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 				{
@@ -340,7 +339,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 					item.timeout = dcheck->timeout_str;
 
-					zabbix_log(1, "agent timeout is %s", item.timeout);
 					if (SUCCEED == get_value_agent(&item, source_ip, &result) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
@@ -356,7 +354,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 					item.snmp_oid = dcheck->key_;
 					item.timeout = dcheck->timeout_str;
 
-					zabbix_log(1, "snmp timeout is %s", item.timeout);
 					if (ZBX_IF_SNMP_VERSION_3 == item.snmp_version)
 					{
 						item.snmpv3_securityname = dcheck->snmpv3_securityname;
