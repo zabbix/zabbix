@@ -44,7 +44,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve macros.
 	 *
 	 * Macros examples:
-	 * reference: $1, $2, $3, ...
 	 * user: {$MACRO1}, {$MACRO2}, ...
 	 * host: {HOSTNAME}, {HOST.HOST}, {HOST.NAME}
 	 * ip: {IPADDRESS}, {HOST.IP}, {HOST.DNS}, {HOST.CONN}
@@ -57,13 +56,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @return array
 	 */
 	public function resolve(array $options) {
-		if (empty($options['data'])) {
-			return [];
-		}
-
 		$this->config = $options['config'];
 
-		return $this->resolveTexts($options['data']);
+		return $options['data'] ? $this->resolveTexts($options['data']) : [];
 	}
 
 	/**
