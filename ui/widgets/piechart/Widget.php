@@ -19,22 +19,27 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectMap;
+namespace Widgets\PieChart;
 
-class CWidgetFieldMultiSelectMapView extends CWidgetFieldMultiSelectView {
+use Widgets\PieChart\Includes\WidgetForm;
 
-	public function __construct(CWidgetFieldMultiSelectMap $field, array $data) {
-		parent::__construct($field, $data);
+use Zabbix\Core\CWidget;
+
+class Widget extends CWidget {
+
+	public function getDefaultName(): string {
+		return _('Pie chart');
 	}
 
-	protected function getObjectName(): string {
-		return 'sysmaps';
-	}
-
-	protected function getPopupParameters(): array {
+	public function getTranslationStrings(): array {
 		return [
-			'srctbl' => 'sysmaps',
-			'srcfld1' => 'sysmapid'
+			'class.svgpie.js' => [
+				'No data' => _('No data')
+			],
+			'class.widget.js' => [
+				'Actions' => _('Actions'),
+				'Download image' => _('Download image')
+			]
 		];
 	}
 }

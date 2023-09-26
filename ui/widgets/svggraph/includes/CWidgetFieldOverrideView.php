@@ -19,11 +19,22 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphOverride;
+namespace Widgets\SvgGraph\Includes;
 
-class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
+use CButton,
+	CButtonIcon,
+	CSimpleButton,
+	CDiv,
+	CList,
+	CListItem,
+	CPatternSelect,
+	CTemplateTag,
+	CVar,
+	CWidgetFieldView;
 
-	public function __construct(CWidgetFieldGraphOverride $field) {
+class CWidgetFieldOverrideView extends CWidgetFieldView {
+
+	public function __construct(CWidgetFieldOverride $field) {
 		$this->field = $field;
 	}
 
@@ -148,7 +159,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 
 	public function getTemplates(): array {
 		return [
-			new CTemplateTag('overrides-row', $this->getItemTemplate(CWidgetFieldGraphOverride::getDefaults()))
+			new CTemplateTag('overrides-row', $this->getItemTemplate(CWidgetFieldOverride::getDefaults()))
 		];
 	}
 

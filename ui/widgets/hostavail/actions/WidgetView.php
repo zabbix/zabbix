@@ -35,14 +35,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		INTERFACE_AVAILABLE_MIXED
 	];
 
-	protected function init(): void {
-		parent::init();
-
-		$this->addValidationRules([
-			'dynamic_hostid' => 'db hosts.hostid'
-		]);
-	}
-
 	protected function doAction(): void {
 		$interface_types = array_merge([INTERFACE_TYPE_AGENT_ACTIVE], CItemGeneral::INTERFACE_TYPES_BY_PRIORITY);
 
@@ -57,8 +49,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$interface_type_count = array_fill_keys($interface_types, array_fill_keys(self::INTERFACE_STATUSES, 0));
 		$total_hosts = array_fill_keys(self::INTERFACE_STATUSES, 0);
 
-		if (!$this->isTemplateDashboard() || ($this->isTemplateDashboard() && $this->hasInput('dynamic_hostid'))) {
-			$hostids = $this->isTemplateDashboard() ? [$this->getInput('dynamic_hostid')] : null;
+		if (!$this->isTemplateDashboard() || ($this->isTemplateDashboard() && $this->fields_values['override_hostid'])) {
+			$hostids = $this->isTemplateDashboard() ? $this->fields_values['override_hostid'] : null;
 
 			$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 				? getSubGroups($this->fields_values['groupids'])

@@ -27,6 +27,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldCheckBoxList,
 	CWidgetFieldMultiSelectGroup,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList
 };
 
@@ -64,6 +65,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldCheckBox('only_totals', _('Show only totals'))
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

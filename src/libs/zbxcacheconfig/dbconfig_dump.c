@@ -465,10 +465,10 @@ static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[headers:'%s']", httpitem->headers);
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[posts:'%s']", httpitem->posts);
 
-	zabbix_log(LOG_LEVEL_TRACE, "  http:[timeout:'%s' status codes:'%s' follow redirects:%u post type:%u"
-			" http proxy:'%s' retrieve mode:%u request method:%u output format:%u allow traps:%u"
+	zabbix_log(LOG_LEVEL_TRACE, "  http:[status codes:'%s' follow redirects:%u post type:%u http proxy:'%s'"
+			" retrieve mode:%u request method:%u output format:%u allow traps:%u"
 			" trapper_hosts:'%s']",
-			httpitem->timeout, httpitem->status_codes, httpitem->follow_redirects, httpitem->post_type,
+			httpitem->status_codes, httpitem->follow_redirects, httpitem->post_type,
 			httpitem->http_proxy, httpitem->retrieve_mode, httpitem->request_method,
 			httpitem->output_format, httpitem->allow_traps, httpitem->trapper_hosts);
 
@@ -483,7 +483,7 @@ static void	DCdump_scriptitem(const ZBX_DC_SCRIPTITEM *scriptitem)
 {
 	int	i;
 
-	zabbix_log(LOG_LEVEL_TRACE, "  script:[timeout:'%s' script:'%s']", scriptitem->timeout, scriptitem->script);
+	zabbix_log(LOG_LEVEL_TRACE, "  script:[script:'%s']", scriptitem->script);
 
 	for (i = 0; i < scriptitem->params.values_num; i++)
 	{

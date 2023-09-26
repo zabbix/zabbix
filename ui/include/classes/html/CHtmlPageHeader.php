@@ -133,7 +133,11 @@ class CHtmlPageHeader {
 				<meta name="viewport" content="width=device-width, initial-scale=1">
 				<meta name="Author" content="Zabbix SIA" />
 		HTML;
-		echo (new CTag('title', true))->addItem($this->title);
+
+		if ($this->title !== '') {
+			echo (new CTag('title', true))->addItem($this->title);
+		}
+
 		echo <<<HTML
 				<link rel="icon" href="favicon.ico">
 				<link rel="apple-touch-icon-precomposed" sizes="76x76" href="assets/img/apple-touch-icon-76x76-precomposed.png">

@@ -48,7 +48,8 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate']) {
+		for (const id of ['operating_mode', 'tls_connect', 'tls_accept_psk', 'tls_accept_certificate',
+				'custom_timeouts']) {
 			document
 				.getElementById(id)
 				.addEventListener('change', () => this._update());
@@ -134,6 +135,15 @@ window.proxy_edit_popup = new class {
 					!(operating_mode_active && tls_accept_psk || !operating_mode_active && tls_connect_psk);
 			}
 		}
+
+		const custom_timeouts_disabled =
+			this.form.querySelector('#custom_timeouts input:checked').value == <?= ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED ?>;
+
+		for (const id of ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
+				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
+				'timeout_telnet_agent', 'timeout_script']) {
+			document.getElementById(id).disabled = custom_timeouts_disabled;
+		}
 	}
 
 	refreshConfig() {
@@ -174,7 +184,7 @@ window.proxy_edit_popup = new class {
 		this._post(curl.getUrl(), {proxyids: [this.proxyid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
@@ -194,7 +204,9 @@ window.proxy_edit_popup = new class {
 		}
 
 		for (const name of ['name', 'allowed_addresses', 'address', 'port', 'description', 'tls_psk_identity',
-			'tls_psk', 'tls_issuer', 'tls_subject']) {
+				'tls_psk', 'tls_issuer', 'tls_subject', 'timeout_zabbix_agent', 'timeout_simple_check',
+				'timeout_snmp_agent', 'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent',
+				'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script']) {
 			if (name in fields) {
 				fields[name] = fields[name].trim();
 			}
@@ -206,7 +218,7 @@ window.proxy_edit_popup = new class {
 		this._post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 

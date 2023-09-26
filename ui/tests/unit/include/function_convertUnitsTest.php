@@ -277,7 +277,7 @@ class function_convertUnitsTest extends TestCase {
 			[ 'in' => ['value' => '1024', 'units' => 'B'],			'out' => '1 KB' ],
 			[ 'in' => ['value' => '2048', 'units' => 'B'],			'out' => '2 KB' ],
 			[ 'in' => ['value' => '0', 'units' => 'unixtime'],		'out' => 'Never' ],
-			[ 'in' => ['value' => '1', 'units' => 'unixtime'],		'out' => '1970-01-01 00:00:01' ],
+			[ 'in' => ['value' => '1', 'units' => 'unixtime'],		'out' => '1970-01-01 12:00:01 AM' ],
 			[ 'in' => ['value' => '0', 'units' => 'uptime'],		'out' => '00:00:00' ],
 			[ 'in' => ['value' => '10000', 'units' => 'uptime'],	'out' => '02:46:40' ],
 			[ 'in' => ['value' => '10000000', 'units' => 'uptime'],	'out' => '115 days, 17:46:40' ],

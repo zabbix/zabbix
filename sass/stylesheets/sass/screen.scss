@@ -52,6 +52,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/menu-main";
 @import "components/menu-user";
 @import "components/message-box";
+@import "components/multiselect";
 @import "components/radio-list-control";
 @import "components/range-control";
 @import "components/section";
@@ -60,6 +61,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/subfilter";
 @import "components/svg-gauge";
 @import "components/svg-graph";
+@import "components/svg-piechart";
 @import "components/tabfilter";
 @import "components/tabs";
 @import "components/toc";
@@ -73,6 +75,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-map";
 @import "components/dashboard/widget-navtree";
+@import "components/dashboard/widget-piechart";
 @import "components/dashboard/widget-problemsbysv";
 @import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
@@ -558,10 +561,6 @@ form {
 
 	.filter-forms {
 		padding: 0 10px;
-
-		.btn-grey {
-			vertical-align: baseline;
-		}
 	}
 
 	.list-table {
@@ -628,191 +627,6 @@ form {
 		color: $form-disabled-font-color;
 		background-color: transparent;
 		border-color: transparent;
-	}
-}
-
-.multiselect-control {
-	display: flex;
-	position: relative;
-	vertical-align: top;
-	white-space: nowrap;
-}
-
-.multiselect {
-	@extend %form-input-style;
-	display: flex;
-	flex-direction: column;
-	position: relative;
-	margin-right: 3px;
-	min-height: 24px;
-	white-space: normal;
-
-	&.active {
-		border-color: $form-focus-border-color;
-	}
-
-	&[aria-disabled] {
-		@extend %form-disabled;
-	}
-
-	input[type="text"] {
-		border: 0;
-		background: none;
-		box-sizing: border-box;
-		width: 100%;
-		padding-bottom: 2px;
-		min-height: 20px;
-	}
-
-	&.search-disabled {
-		input[type="text"] {
-			position: absolute;
-			top: 0;
-			left: 0;
-			width: 0;
-			padding: 0;
-			margin: 0;
-		}
-	}
-
-	.multiselect-list {
-		display: flex;
-		flex-direction: row;
-		flex-wrap: wrap;
-		padding-left: 2px;
-		padding-bottom: 2px;
-
-		li {
-			display: block; // Override ".table-forms li".
-			padding-left: 0 !important;
-			margin: 2px 2px 0 0;
-			overflow: hidden;
-			white-space: nowrap;
-			cursor: default;
-
-			&.selected {
-				.subfilter-enabled {
-					background-color: $multiselect-selected-bg-color;
-				}
-			}
-		}
-
-		.subfilter-enabled {
-			padding-right: 0;
-			display: flex;
-			flex-direction: row;
-			line-height: 18px;
-
-			> span:first-child {
-				overflow: hidden;
-				text-overflow: ellipsis;
-			}
-
-			.btn-icon {
-				@extend %button-size-medium;
-
-				flex-shrink: 0;
-				margin-left: 0;
-				color: $ui-selected-color;
-
-				&:hover,
-				&:focus {
-					color: $ui-selected-hover-color;
-				}
-
-				&:active,
-				&:focus {
-					box-shadow: none;
-				}
-			}
-		}
-	}
-
-	.disabled {
-		background-color: $multiselect-disabled-bg-color;
-		opacity: 1;
-
-		.subfilter-enabled {
-			background-color: $multiselect-item-disabled-bg-color;
-			color: $multiselect-item-disabled-color;
-			-webkit-text-fill-color: $multiselect-item-disabled-color;
-
-			.btn-icon {
-				pointer-events: none;
-				color: $multiselect-item-disabled-color;
-				-webkit-text-fill-color: $multiselect-item-disabled-color;
-			}
-		}
-	}
-
-	div[aria-live] {
-		overflow: hidden;
-		position: absolute;
-		left: 0;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		z-index: -1;
-	}
-}
-
-.multiselect-button {
-	vertical-align: top;
-}
-
-.multiselect-suggest {
-	padding: 0 5px;
-	white-space: normal;
-	color: $font-alt-color;
-	background-color: $form-bg-color;
-
-	li {
-		display: block;
-		height: inherit;
-		line-height: normal;
-		color: $font-color;
-		padding: .4em 5px;
-		margin: 0 -5px;
-		cursor: pointer;
-		overflow: hidden;
-		text-overflow: ellipsis;
-
-		@if $ui-transitions {
-			transition: background-color $ui-controls-transition-duration ease-out;
-		}
-
-		&.suggest-hover {
-			background-color: $action-hover-color;
-		}
-	}
-}
-
-.multiselect-matches {
-	padding: .4em 5px;
-	color: $font-color;
-	font-weight: bold;
-	@extend .multiselect-suggest;
-}
-
-.multiselect-available {
-	position: absolute;
-	z-index: 20000;
-	border: 1px solid $action-border-color;
-	overflow-y: auto;
-	@extend %webkit-scrollbar;
-	box-shadow: 0 6px 10px 0 $action-shadow-color;
-}
-
-.suggest-found {
-	font-weight: bold;
-	color: $dark-yellow;
-}
-
-.suggest-new {
-	border-top: 1px solid $form-border-color;
-
-	span:first-child {
-		font-weight: bold;
 	}
 }
 
@@ -950,12 +764,6 @@ form {
 
 		.wrap-multiple-controls {
 			display: flex;
-		}
-
-		.table-forms-separator {
-			.radio-segmented + .multiselect-wrapper {
-				margin-top: 5px;
-			}
 		}
 	}
 
@@ -2043,10 +1851,10 @@ select {
 
 	.form-grid {
 		// 100px label column width for use in popup forms.
-		grid-template-columns: minmax(var(--label-width, 100px), max-content) auto;
+		grid-template-columns: minmax(var(--label-width, 100px), max-content) 1fr;
 
 		&.form-grid-1-1 {
-			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+			grid-template-columns: repeat(2, minmax(100px, max-content) 1fr);
 		}
 
 		&.form-grid-3-1 {
@@ -3475,6 +3283,24 @@ svg {
 	.table-forms-separator {
 		margin-top: -2px;
 	}
+
+	.runtime-error-fields {
+		display: flex;
+		justify-content: space-between;
+
+		label {
+			width: auto;
+			padding-inline-end: 8px;
+		}
+
+		> div {
+			display: inline-flex;
+		}
+
+		.multilineinput-control {
+			width: 250px;
+		}
+	}
 }
 
 .totals-list {
@@ -3668,16 +3494,18 @@ svg {
 }
 
 .btn-split {
-	display: inline-block;
 	position: relative;
+	display: inline-block;
 	margin-right: 10px;
 
 	li {
 		display: inline-block;
 
-		&:first-child button {
-			border-top-right-radius: 0;
-			border-bottom-right-radius: 0;
+		&:first-child {
+			button {
+				border-top-right-radius: 0;
+				border-bottom-right-radius: 0;
+			}
 		}
 
 		&:last-child {
@@ -3686,17 +3514,25 @@ svg {
 			button {
 				border-top-left-radius: 0;
 				border-bottom-left-radius: 0;
-
-				&[aria-expanded="true"] {
-					color: $btn-color;
-					background-color: $btn-hover-bg-color;
-					border-color: $btn-hover-border-color;
-				}
 			}
 		}
 
-		&:only-child button {
-			border-radius: 2px;
+		&:only-child {
+			button {
+				border-radius: 2px;
+			}
+		}
+	}
+
+	button {
+		&:focus {
+			z-index: 1;
+		}
+
+		&[aria-expanded="true"] {
+			color: $btn-color;
+			background-color: $btn-hover-bg-color;
+			border-color: $btn-hover-border-color;
 		}
 	}
 }

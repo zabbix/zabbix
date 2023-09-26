@@ -132,8 +132,13 @@ class testDashboardPages extends CWebTest {
 									],
 									[
 										'type' => 4,
-										'name' => 'itemid',
+										'name' => 'itemid.0',
 										'value' => 400410
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'FEDCB'
 									]
 								]
 							]
@@ -324,7 +329,8 @@ class testDashboardPages extends CWebTest {
 		$query_pageid = 'SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid=';
 		$query_widgets = 'SELECT type, name, x, y, width, height, view_mode FROM widget WHERE dashboard_pageid=';
 		$query_widgetid = 'SELECT widgetid FROM widget WHERE dashboard_pageid=';
-		$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE widgetid=';
+		$query_widgetfields = 'SELECT type, name, value_int, value_str, value_groupid FROM widget_field WHERE'.
+				' name!=\'reference\' AND widgetid=';
 
 		foreach ([self::$ids['Dashboard for copy'], self::$ids['Dashboard for paste']] as $dashboardid) {
 			$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for copy'])
