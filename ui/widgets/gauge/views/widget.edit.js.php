@@ -25,48 +25,18 @@ use Widgets\Gauge\Widget;
 
 window.widget_gauge_form = new class {
 
+	/**
+	 * @type {HTMLFormElement}
+	 */
+	#form;
+
 	init({thresholds_colors}) {
-		this._form = document.getElementById('widget-dialogue-form');
+		this.#form = document.getElementById('widget-dialogue-form');
 
-		this._show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
-		this._show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
-		this._show_needle = document.getElementById(`show_${<?= Widget::SHOW_NEEDLE ?>}`);
-		this._show_scale = document.getElementById(`show_${<?= Widget::SHOW_SCALE ?>}`);
+		jQuery(this.#form)
+			.on('change', 'input', (e) => this.#updateForm(e.target));
 
-		this._value_arc = document.getElementById('value_arc');
-		this._units_show = document.getElementById('units_show');
-		this._th_show_arc = document.getElementById('th_show_arc');
-
-		const show = [this._show_description, this._show_value, this._show_needle, this._show_scale];
-
-		for (const checkbox of show) {
-			checkbox.addEventListener('change', (e) => {
-				if (show.filter((checkbox) => checkbox.checked && !checkbox.disabled).length > 0) {
-					this.updateForm();
-				}
-				else {
-					e.target.checked = true;
-				}
-			});
-		}
-
-		const checkboxes = [this._value_arc, this._units_show, this._th_show_arc];
-
-		for (const checkbox of checkboxes) {
-			checkbox.addEventListener('change', () => this.updateForm());
-		}
-
-		$thresholds_table.on('afterremove.dynamicRows', () => this.updateForm());
-
-		this._thresholds_table = $thresholds_table[0];
-
-		this._thresholds_table.addEventListener('input', (e) => {
-			if (e.target.matches('input[name$="[threshold]"')) {
-				this.updateForm();
-			}
-		});
-
-		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
 				use_default: !colorpicker.name.includes('thresholds')
@@ -75,84 +45,97 @@ window.widget_gauge_form = new class {
 
 		colorPalette.setThemeColors(thresholds_colors);
 
-		this.updateForm();
+		this.#updateForm();
 	}
 
-	updateForm() {
-		for (const element of this._form.querySelectorAll('.fields-group-description')) {
-			element.style.display = this._show_description.checked ? '' : 'none';
+	#updateForm(trigger) {
+		const show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
+		const show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
+		const show_needle = document.getElementById(`show_${<?= Widget::SHOW_NEEDLE ?>}`);
+		const show_scale = document.getElementById(`show_${<?= Widget::SHOW_SCALE ?>}`);
+		const value_arc = document.getElementById('value_arc');
+		const units_show = document.getElementById('units_show');
+		const th_show_arc = document.getElementById('th_show_arc');
+		const filled_thresholds_count = this.#countFilledThresholds();
+
+		for (const element of document.querySelectorAll('#th_show_arc, #th_arc_size')) {
+			element.disabled = filled_thresholds_count === 0;
+		}
+
+		show_needle.disabled = (!th_show_arc.checked || th_show_arc.disabled)
+			&& (!value_arc.checked || !show_value.checked);
+
+		show_scale.disabled = (!th_show_arc.checked || th_show_arc.disabled)
+			&& (!value_arc.checked || !show_value.checked);
+
+		if ([show_description, show_value, show_needle, show_scale].filter((checkbox) =>
+				checkbox.checked && !checkbox.disabled).length == 0) {
+			trigger.checked = true;
+			this.#updateForm(trigger);
+		}
+
+		for (const element of this.#form.querySelectorAll('.fields-group-description')) {
+			element.style.display = show_description.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input, textarea')) {
-				input.disabled = !this._show_description.checked;
+				input.disabled = !show_description.checked;
 			}
 		}
 
-		for (const element of this._form.querySelectorAll('.fields-group-value')) {
-			element.style.display = this._show_value.checked ? '' : 'none';
+		for (const element of this.#form.querySelectorAll('.fields-group-value')) {
+			element.style.display = show_value.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
 				if (input.id === 'value_arc_size') {
-					input.disabled = !this._value_arc.checked || !this._show_value.checked;
+					input.disabled = !value_arc.checked || !show_value.checked;
 				}
 				else {
-					input.disabled = !this._show_value.checked;
+					input.disabled = !show_value.checked;
 				}
 			}
 		}
 
 		for (const element of
 			document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
-			element.disabled = !this._show_value.checked || !this._units_show.checked;
+			element.disabled = !show_value.checked || !units_show.checked;
 		}
 
-		for (const element of this._form.querySelectorAll('.fields-group-needle')) {
-			element.style.display = this._show_needle.checked ? '' : 'none';
+		for (const element of this.#form.querySelectorAll('.fields-group-needle')) {
+			element.style.display = show_needle.checked ? '' : 'none';
 		}
 
-		document.getElementById('needle_color').disabled = !this._show_needle.checked
-			|| ((!this._th_show_arc.checked || this._th_show_arc.disabled) && (!this._value_arc.checked || this._value_arc.disabled));
+		document.getElementById('needle_color').disabled = !show_needle.checked
+			|| ((!th_show_arc.checked || th_show_arc.disabled) && (!value_arc.checked || value_arc.disabled));
 
-		for (const element of this._form.querySelectorAll('.fields-group-scale')) {
-			element.style.display = !this._show_scale.checked ? 'none' : '';
+		for (const element of this.#form.querySelectorAll('.fields-group-scale')) {
+			element.style.display = !show_scale.checked ? 'none' : '';
 
 			for (const input of element.querySelectorAll('input')) {
 				if (input.id === 'scale_show_units') {
-					input.disabled = !this._units_show.checked || !this._show_scale.checked
-						|| ((!this._th_show_arc.checked || this._th_show_arc.disabled)
-							&& (!this._value_arc.checked || this._value_arc.disabled));
+					input.disabled = !units_show.checked || !show_scale.checked
+						|| ((!th_show_arc.checked || th_show_arc.disabled)
+							&& (!value_arc.checked || value_arc.disabled));
 				}
 				else {
-					input.disabled = !this._show_scale.checked
-						|| ((!this._th_show_arc.checked || this._th_show_arc.disabled)
-							&& (!this._value_arc.checked || this._value_arc.disabled));
+					input.disabled = !show_scale.checked
+						|| ((!th_show_arc.checked || th_show_arc.disabled)
+							&& (!value_arc.checked || value_arc.disabled));
 				}
 			}
 		}
 
-		const filled_thresholds_count = this.countFilledThresholds();
-
-		for (const element of document.querySelectorAll('#th_show_arc, #th_arc_size')) {
-			element.disabled = filled_thresholds_count === 0;
-		}
-
 		document.getElementById('th_arc_size').disabled = filled_thresholds_count === 0
-			|| (!this._th_show_arc.checked || this._th_show_arc.disabled);
+			|| (!th_show_arc.checked || th_show_arc.disabled);
 
 		document.getElementById('th_show_labels').disabled = filled_thresholds_count === 0
-			|| ((!this._th_show_arc.checked || this._th_show_arc.disabled)
-				&& (!this._value_arc.checked || this._value_arc.disabled));
-
-		this._show_needle.disabled = (!this._th_show_arc.checked || this._th_show_arc.disabled)
-			&& (!this._value_arc.checked || this._value_arc.disabled);
-
-		this._show_scale.disabled = (!this._th_show_arc.checked || this._th_show_arc.disabled)
-			&& (!this._value_arc.checked || this._value_arc.disabled);
+			|| ((!th_show_arc.checked || th_show_arc.disabled)
+				&& (!value_arc.checked || value_arc.disabled));
 	}
 
-	countFilledThresholds() {
+	#countFilledThresholds() {
 		let count = 0;
 
-		for (const threshold of this._thresholds_table.querySelectorAll('.form_row input[name$="[threshold]"')) {
+		for (const threshold of $thresholds_table[0].querySelectorAll('.form_row input[name$="[threshold]"')) {
 			if (threshold.value.trim() !== '') {
 				count++;
 			}
