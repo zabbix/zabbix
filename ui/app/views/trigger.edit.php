@@ -133,7 +133,7 @@ $trigger_form
 			'triggerid' => $data['triggerid'],
 			'expression_popup_parameters' => $popup_parameters,
 			'readonly' => $readonly,
-			'db_dependencies' => $data['db_dependencies'],
+			'dependencies' => $data['db_dependencies'],
 			'action' => 'trigger.edit',
 			'context' => $data['context'],
 			'db_trigger' => $data['db_trigger']

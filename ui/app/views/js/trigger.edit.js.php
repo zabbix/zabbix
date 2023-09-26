@@ -26,14 +26,14 @@
 ?>
 window.trigger_edit_popup = new class {
 
-	init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies, action,
+	init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, dependencies, action,
 			context, db_trigger
 	}) {
 		this.triggerid = triggerid;
 		this.expression_popup_parameters = expression_popup_parameters;
 		this.recovery_popup_parameters = recovery_popup_parameters;
 		this.readonly = readonly;
-		this.db_dependencies = db_dependencies;
+		this.dependencies = dependencies;
 		this.action = action;
 		this.context = context;
 		this.db_trigger = db_trigger;
@@ -57,8 +57,8 @@ window.trigger_edit_popup = new class {
 		this.#changeRecoveryMode();
 		this.#changeCorrelationMode();
 
-		if (this.db_dependencies) {
-			this.#loadDependencyTable(this.db_dependencies);
+		if (this.dependencies) {
+			this.#loadDependencyTable(this.dependencies);
 		}
 	}
 
@@ -346,20 +346,10 @@ window.trigger_edit_popup = new class {
 	}
 
 	#addDependencies(dependencies) {
-		const dependency_table = this.form.querySelector('#dependency-table tbody');
-		let template;
+		const template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
+		const tbody = Object.values(dependencies).map(row => template.evaluate(row)).join('');
 
-		Object.values(dependencies).forEach((dependency) => {
-			const element = {
-				name: dependency.name,
-				triggerid: dependency.triggerid,
-				prototype: dependency.prototype
-			};
-
-			template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
-
-			dependency_table.insertAdjacentHTML('beforeend', template.evaluate(element));
-		})
+		this.form.querySelector('#dependency-table tbody').insertAdjacentHTML('beforeend', tbody);
 	}
 
 	#toggleExpressionConstructor(id) {
@@ -692,9 +682,9 @@ window.trigger_edit_popup = new class {
 
 		this.db_trigger.dependencies = [];
 
-		if (Object.keys(this.db_dependencies).length > 0) {
+		if (Object.keys(this.dependencies).length > 0) {
 			// Dependencies are sorted alphabetically as in form to appear in the same order for JSON.stringify().
-			let dependencies = this.#prepareDependencies(this.db_dependencies);
+			let dependencies = this.#prepareDependencies(this.dependencies);
 			this.db_trigger.dependencies = dependencies.map(obj => obj.triggerid);
 		}
 
