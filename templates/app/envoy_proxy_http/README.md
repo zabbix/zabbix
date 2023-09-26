@@ -43,7 +43,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Envoy Proxy: Get node metrics|<p>Get server metrics.</p>|HTTP agent|envoy.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Envoy Proxy: Get node metrics|<p>Get server metrics.</p>|HTTP agent|envoy.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Envoy Proxy: Server state|<p>State of the server.</p><p>Live - (default) Server is live and serving traffic.</p><p>Draining - Server is draining listeners in response to external health checks failing.</p><p>Pre initializing - Server has not yet completed cluster manager initialization.</p><p>Initializing - Server is running the cluster manager initialization callbacks (e.g., RDS).</p>|Dependent item|envoy.server.state<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(envoy_server_state)`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Envoy Proxy: Server live|<p>1 if the server is not currently draining, 0 otherwise.</p>|Dependent item|envoy.server.live<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(envoy_server_live)`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Envoy Proxy: Uptime|<p>Current server uptime in seconds.</p>|Dependent item|envoy.server.uptime<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(envoy_server_uptime)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

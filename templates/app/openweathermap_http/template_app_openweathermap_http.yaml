@@ -629,13 +629,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Atmospheric pressure'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   name: 'Snow volume'
                   'y': '5'
@@ -646,13 +646,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Snow volume'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graphprototype
                   name: 'Rain volume'
                   x: '12'
@@ -663,13 +663,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Rain volume'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   name: Temperature
                   x: '12'
@@ -681,13 +681,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Temperature'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
       valuemaps:
         - uuid: 9a8fdac997914722acfea90f1f9d45e9
           name: 'Wind direction'
