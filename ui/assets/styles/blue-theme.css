@@ -2925,6 +2925,8 @@ output {
   white-space: nowrap; }
   .multiselect-control .btn-split {
     margin-right: 0; }
+    .multiselect-control .btn-split li:first-child {
+      margin-left: 0; }
 
 .multiselect {
   display: flex;
