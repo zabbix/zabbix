@@ -143,7 +143,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |Kubernetes: Get state metrics|<p>Collecting Kubernetes metrics from kube-state-metrics.</p>|Script|kube.state.metrics|
 |Kubernetes: Control plane LLD|<p>Generation of data for Control plane discovery rules.</p>|Script|kube.control_plane.lld<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Kubernetes: Node LLD|<p>Generation of data for Kubelet discovery rules.</p>|Script|kube.node.lld<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Kubernetes: Get component statuses||HTTP agent|kube.componentstatuses<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Get component statuses||HTTP agent|kube.componentstatuses<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Get readyz||HTTP agent|kube.readyz<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Kubernetes: Get livez||HTTP agent|kube.livez<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Kubernetes: Namespace count|<p>The number of namespaces.</p>|Dependent item|kube.namespace.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_namespace_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

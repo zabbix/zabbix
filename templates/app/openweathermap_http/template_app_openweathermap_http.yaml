@@ -162,7 +162,6 @@ zabbix_export:
                 }
             }
           description: 'JSON array with result of OpenWeatherMap API requests.'
-          timeout: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
           parameters:
             - name: apikey
               value: '{$OPENWEATHERMAP.API.TOKEN}'
@@ -606,9 +605,6 @@ zabbix_export:
         - macro: '{$OPENWEATHERMAP.API.TOKEN}'
           type: SECRET_TEXT
           description: 'Specify openweathermap API key.'
-        - macro: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
-          value: 3s
-          description: 'Response timeout for OpenWeatherMap API.'
         - macro: '{$TEMP.CRIT.HIGH}'
           value: '30'
           description: 'Threshold for high temperature trigger.'

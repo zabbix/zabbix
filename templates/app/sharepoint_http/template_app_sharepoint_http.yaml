@@ -135,7 +135,6 @@ zabbix_export:
                 - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"status":520,"data":{},"time":0}'
-          timeout: 3s
           parameters:
             - name: password
               value: '{$SHAREPOINT.PASSWORD}'
@@ -234,7 +233,6 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
-          timeout: 3s
           url: '{$SHAREPOINT.URL}'
           retrieve_mode: HEADERS
           request_method: HEAD
@@ -437,7 +435,6 @@ zabbix_export:
                   value: storage
                 - tag: full-path
                   value: '{#SHAREPOINT.LLD.FULL_PATH}'
-          timeout: 3s
           parameters:
             - name: password
               value: '{$SHAREPOINT.PASSWORD}'

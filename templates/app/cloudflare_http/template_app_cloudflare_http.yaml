@@ -405,7 +405,6 @@ zabbix_export:
                 throw 'Requesting failed: ' + error;
             }
           description: 'The JSON with result of Cloudflare API request.'
-          timeout: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
           parameters:
             - name: api_endpoint
               value: '{$CLOUDFLARE.API.URL}'
@@ -718,9 +717,6 @@ zabbix_export:
         - macro: '{$CLOUDFLARE.ERRORS.MAX.WARN}'
           value: '30'
           description: 'Maximum responses with errors in %.'
-        - macro: '{$CLOUDFLARE.GET_DATA.TIMEOUT}'
-          value: 3s
-          description: 'Response timeout for Cloudflare API.'
         - macro: '{$CLOUDFLARE.ZONE_ID}'
           value: '<change>'
           description: 'Your Cloudflare Site Zone ID.'
