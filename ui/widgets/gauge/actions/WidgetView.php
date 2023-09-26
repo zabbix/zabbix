@@ -304,9 +304,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private function getValueData(array $item): array {
 		$no_data = [
-			'value' => null,
-			'value_text' => _('No data'),
-			'units_text' => ''
+			'value' => null
 		];
 
 		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
@@ -331,12 +329,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item['units'] = '';
 		}
 
-		$labels = self::makeValueLabels($item, $value, $this->fields_values['decimal_places']);
+		if (in_array(Widget::SHOW_VALUE, $this->fields_values['show'])) {
+			$labels = self::makeValueLabels($item, $value, $this->fields_values['decimal_places']);
+
+			return [
+			 'value' => (float) $value,
+			 'value_text' => $labels['value'],
+			 'units_text' => $labels['units']
+			];
+		}
 
 		return [
-			'value' => (float) $value,
-			'value_text' => $labels['value'],
-			'units_text' => $labels['units']
+			'value' => (float) $value
 		];
 	}
 
