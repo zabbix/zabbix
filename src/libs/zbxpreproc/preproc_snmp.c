@@ -872,7 +872,7 @@ int	item_preproc_snmp_get_to_value(zbx_variant_t *value, const char *params, cha
 
 	if (FAIL == ret)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "cannot to extract value: %s", err);
+		*errmsg = zbx_dsprintf(*errmsg, "cannot extract value: %s", err);
 		zbx_free(err);
 		return FAIL;
 	}
