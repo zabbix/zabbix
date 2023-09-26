@@ -135,6 +135,7 @@ zabbix_export:
                 - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '{"status":520,"data":{},"time":0}'
+          timeout: 3s
           parameters:
             - name: password
               value: '{$SHAREPOINT.PASSWORD}'
@@ -233,6 +234,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+          timeout: 3s
           url: '{$SHAREPOINT.URL}'
           retrieve_mode: HEADERS
           request_method: HEAD
@@ -435,6 +437,7 @@ zabbix_export:
                   value: storage
                 - tag: full-path
                   value: '{#SHAREPOINT.LLD.FULL_PATH}'
+          timeout: 3s
           parameters:
             - name: password
               value: '{$SHAREPOINT.PASSWORD}'
@@ -501,10 +504,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Microsoft SharePoint by HTTP'
                         key: sharepoint.get_dir.status
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                     - type: INTEGER
                       name: source_type
                       value: '1'
@@ -514,10 +520,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Microsoft SharePoint by HTTP'
                         key: sharepoint.get_dir.time
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                     - type: INTEGER
                       name: source_type
                       value: '1'
@@ -527,10 +536,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Microsoft SharePoint by HTTP'
                         key: sharepoint.health_score
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                     - type: INTEGER
                       name: source_type
                       value: '1'

@@ -56,8 +56,8 @@ Copy the resulting Token ID and Secret into host macros.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Proxmox: Get cluster resources|<p>Resources index.</p>|HTTP agent|proxmox.cluster.resources<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
-|Proxmox: Get cluster status|<p>Get cluster status information.</p>|HTTP agent|proxmox.cluster.status<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
+|Proxmox: Get cluster resources|<p>Resources index.</p>|HTTP agent|proxmox.cluster.resources<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
+|Proxmox: Get cluster status|<p>Get cluster status information.</p>|HTTP agent|proxmox.cluster.status<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Set value to: `Error getting data`</p></li></ul>|
 |Proxmox: API service status|<p>Get API service status.</p>|Script|proxmox.api.available<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 
 ### Triggers

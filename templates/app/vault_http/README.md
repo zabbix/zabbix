@@ -50,9 +50,9 @@ Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Vault: Get health||HTTP agent|vault.get_health<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `{"healthcheck": 0}`</p></li></ul>|
-|Vault: Get leader||HTTP agent|vault.get_leader<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Vault: Get metrics||HTTP agent|vault.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Vault: Get health||HTTP agent|vault.get_health<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Set value to: `{"healthcheck": 0}`</p></li></ul>|
+|Vault: Get leader||HTTP agent|vault.get_leader<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Vault: Get metrics||HTTP agent|vault.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Vault: Clear metrics||Dependent item|vault.clear_metrics<p>**Preprocessing**</p><ul><li><p>Check for error in JSON: `$.errors`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Vault: Get tokens|<p>Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".</p>|Script|vault.get_tokens|
 |Vault: Check WAL discovery||Dependent item|vault.check_wal_discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `{__name__=~"^vault_wal_(?:.+)$"}`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|

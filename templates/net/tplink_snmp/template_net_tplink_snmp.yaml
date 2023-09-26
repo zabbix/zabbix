@@ -588,20 +588,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: G
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: E
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFDESCR}'
                 value: '{$NET.IF.IFDESCR.MATCHES}'
                 formulaid: C
@@ -609,6 +595,20 @@ zabbix_export:
                 value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: E
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: G
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: I
@@ -1111,14 +1111,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TP-LINK by SNMP'
                         name: 'Interface {#IFDESCR}: Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
       valuemaps:
         - uuid: ca6bcc5f345b46ffaa445d38a90ddcae
           name: 'IF-MIB::ifOperStatus'

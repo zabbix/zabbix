@@ -58,8 +58,8 @@ In case of Open Source version service namespace will be set to 'None'.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Consul: Get instance metrics|<p>Get raw metrics from Consul instance /metrics endpoint.</p>|HTTP agent|consul.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Consul: Get node info|<p>Get configuration and member information of the local agent.</p>|HTTP agent|consul.get_node_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Consul: Get instance metrics|<p>Get raw metrics from Consul instance /metrics endpoint.</p>|HTTP agent|consul.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Consul: Get node info|<p>Get configuration and member information of the local agent.</p>|HTTP agent|consul.get_node_info<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `type`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Consul: Role|<p>Role of current Consul agent.</p>|Dependent item|consul.role<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Config.Server`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Consul: Version|<p>Version of Consul agent.</p>|Dependent item|consul.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Config.Version`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Consul: Number of services|<p>Number of services on current node.</p>|Dependent item|consul.services_number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Stats.agent.services`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|

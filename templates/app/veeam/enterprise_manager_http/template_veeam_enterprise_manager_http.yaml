@@ -176,12 +176,12 @@ zabbix_export:
           parameters:
             - name: api_endpoint
               value: '{$VEEAM.MANAGER.API.URL}'
+            - name: http_proxy
+              value: '{$VEEAM.MANAGER.HTTP.PROXY}'
             - name: password
               value: '{$VEEAM.MANAGER.PASSWORD}'
             - name: user
               value: '{$VEEAM.MANAGER.USER}'
-            - name: http_proxy
-              value: '{$VEEAM.MANAGER.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -324,13 +324,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#TYPE}'
-                value: '{$BACKUP.TYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#TYPE}'
-                value: '{$BACKUP.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$BACKUP.NAME.MATCHES}'
                 formulaid: A
@@ -338,6 +331,13 @@ zabbix_export:
                 value: '{$BACKUP.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#TYPE}'
+                value: '{$BACKUP.TYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#TYPE}'
+                value: '{$BACKUP.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery of all backup files created on, or imported to the backup servers that are connected to Veeam Backup Enterprise Manager.'
           item_prototypes:
             - uuid: d3f87401602c48d3a837504ed08902db

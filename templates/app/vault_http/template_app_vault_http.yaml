@@ -345,6 +345,7 @@ zabbix_export:
             
             return JSON.stringify(output);
           description: 'Get information about tokens via their accessors. Accessors are defined in the macro "{$VAULT.TOKEN.ACCESSORS}".'
+          timeout: 3s
           parameters:
             - name: accessors
               value: '{$VAULT.TOKEN.ACCESSORS}'
