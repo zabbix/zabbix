@@ -1,1 +1,0 @@
-...G...... [ZBX-23110] fixed possible crash under win11 by removing concurrent Win Api call for update perfCounters list (MVekslers)

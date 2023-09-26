@@ -81,7 +81,7 @@ $filter_column_1
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
@@ -131,14 +131,14 @@ $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setValue((int) $data['filter_data']['filter_type'])
 	->setFocusableElementId('label-filter-type')
-	->addOption(new CSelectOption(-1, _('all')))
+	->addOption(new CSelectOption(-1, _('All')))
 	->addOptions(CSelect::createOptionsFromArray($item_types));
 
 $info_type_select = (new CSelect('filter_value_type'))
 	->setFocusableElementId('label-filter-value-type')
 	->setValue($data['filter_data']['filter_value_type'])
 	->addOptions(CSelect::createOptionsFromArray([
-		-1 => _('all'),
+		-1 => _('All'),
 		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 		ITEM_VALUE_TYPE_STR => _('Character'),
@@ -179,7 +179,7 @@ $filter_column_3->addRow(_('Tags'),
 if ($data['context'] === 'host') {
 	$filter_column_3->addRow(_('State'),
 		(new CRadioButtonList('filter_state', (int) $data['filter_data']['filter_state']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Normal'), ITEM_STATE_NORMAL)
 			->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
 			->setModern(true)
@@ -189,21 +189,21 @@ if ($data['context'] === 'host') {
 $filter_column_3
 	->addRow(_('Status'),
 		(new CRadioButtonList('filter_status', (int) $data['filter_data']['filter_status']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 			->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
 			->setModern(true)
 	)
 	->addRow(_('Triggers'),
 		(new CRadioButtonList('filter_with_triggers', (int) $data['filter_data']['filter_with_triggers']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern(true)
 	)
 	->addRow(_('Inherited'),
 		(new CRadioButtonList('filter_inherited', (int) $data['filter_data']['filter_inherited']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
 			->setModern(true)
@@ -212,7 +212,7 @@ $filter_column_3
 if ($data['context'] === 'host') {
 	$filter_column_3->addRow(_('Discovered'),
 		(new CRadioButtonList('filter_discovered', (int) $data['filter_data']['filter_discovered']))
-			->addValue(_('all'), -1)
+			->addValue(_('All'), -1)
 			->addValue(_('Yes'), ZBX_FLAG_DISCOVERY_CREATED)
 			->addValue(_('No'), ZBX_FLAG_DISCOVERY_NORMAL)
 			->setModern(true)

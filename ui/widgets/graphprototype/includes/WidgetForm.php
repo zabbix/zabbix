@@ -31,8 +31,12 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectGraphPrototype,
 	CWidgetFieldMultiSelectItemPrototype,
-	CWidgetFieldRadioButtonList
+	CWidgetFieldMultiSelectOverrideHost,
+	CWidgetFieldRadioButtonList,
+	CWidgetFieldTimePeriod
 };
+
+use CWidgetsData;
 
 /**
  * Graph prototype widget form.
@@ -62,11 +66,17 @@ class WidgetForm extends CWidgetForm {
 					->setMultiple(false)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
+			->addField(
+				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('columns', _('Columns'), 1, DASHBOARD_MAX_COLUMNS))
@@ -79,6 +89,9 @@ class WidgetForm extends CWidgetForm {
 				))
 					->setDefault(self::DEFAULT_ROWS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }
