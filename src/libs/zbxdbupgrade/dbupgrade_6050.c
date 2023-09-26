@@ -1273,8 +1273,7 @@ static int	DBpatch_6050127(void)
 
 static int	DBpatch_6050128(void)
 {
-	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("ugset_group", 2, &field);
 }
@@ -1329,8 +1328,7 @@ static int	DBpatch_6050133(void)
 
 static int	DBpatch_6050134(void)
 {
-	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("hgset_group", 2, &field);
 }

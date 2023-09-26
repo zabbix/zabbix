@@ -127,7 +127,7 @@ UNIQUE		|1		|type,name
 
 TABLE|hgset_group|hgsetid,groupid|ZBX_TEMPLATE
 FIELD		|hgsetid	|t_id		|	|NOT NULL	|0	|1|hgset
-FIELD		|groupid	|t_id		|	|NOT NULL	|0	|2|hstgrp
+FIELD		|groupid	|t_id		|	|NOT NULL	|0	|2|hstgrp	|		|RESTRICT
 INDEX		|1		|groupid
 
 TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE
@@ -397,7 +397,7 @@ INDEX		|2		|userid
 
 TABLE|ugset_group|ugsetid,usrgrpid|ZBX_DATA
 FIELD		|ugsetid	|t_id		|	|NOT NULL	|0	|1|ugset
-FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0	|2|usrgrp
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0	|2|usrgrp	|		|RESTRICT
 INDEX		|1		|usrgrpid
 
 TABLE|scripts|scriptid|ZBX_DATA
