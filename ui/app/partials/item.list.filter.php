@@ -119,14 +119,14 @@ $type_select = (new CSelect('filter_type'))
 	->setId('filter_type')
 	->setValue((int) $data['filter_data']['filter_type'])
 	->setFocusableElementId('label-filter-type')
-	->addOption(new CSelectOption(-1, _('all')))
+	->addOption(new CSelectOption(-1, _('All')))
 	->addOptions(CSelect::createOptionsFromArray($data['types']));
 
 $info_type_select = (new CSelect('filter_value_type'))
 	->setFocusableElementId('label-filter-value-type')
 	->setValue($data['filter_data']['filter_value_type'])
 	->addOptions(CSelect::createOptionsFromArray([
-		-1 => _('all'),
+		-1 => _('All'),
 		ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 		ITEM_VALUE_TYPE_STR => _('Character'),
@@ -195,7 +195,7 @@ if ($data['context'] === 'host') {
 		new CLabel(_('State')),
 		new CFormField(
 			(new CRadioButtonList('filter_state', (int) $data['filter_data']['filter_state']))
-				->addValue(_('all'), -1)
+				->addValue(_('All'), -1)
 				->addValue(_('Normal'), ITEM_STATE_NORMAL)
 				->addValue(_('Not supported'), ITEM_STATE_NOTSUPPORTED)
 				->setModern()
@@ -208,7 +208,7 @@ $filter_columns[2]
 		new CLabel(_('Status')),
 		new CFormField(
 			(new CRadioButtonList('filter_status', (int) $data['filter_data']['filter_status']))
-				->addValue(_('all'), -1)
+				->addValue(_('All'), -1)
 				->addValue(_('Enabled'), ITEM_STATUS_ACTIVE)
 				->addValue(_('Disabled'), ITEM_STATUS_DISABLED)
 				->setModern()
@@ -219,7 +219,7 @@ $filter_columns[2]
 		new CLabel(_('Triggers')),
 		new CFormField(
 			(new CRadioButtonList('filter_with_triggers', (int) $data['filter_data']['filter_with_triggers']))
-				->addValue(_('all'), -1)
+				->addValue(_('All'), -1)
 				->addValue(_('Yes'), 1)
 				->addValue(_('No'), 0)
 				->setModern()
@@ -229,7 +229,7 @@ $filter_columns[2]
 		new CLabel(_('Inherited')),
 		new CFormField(
 			(new CRadioButtonList('filter_inherited', (int) $data['filter_data']['filter_inherited']))
-				->addValue(_('all'), -1)
+				->addValue(_('All'), -1)
 				->addValue(_('Yes'), 1)
 				->addValue(_('No'), 0)
 				->setModern()
@@ -241,7 +241,7 @@ if ($data['context'] === 'host') {
 		new CLabel(_('Discovered')),
 		new CFormField(
 			(new CRadioButtonList('filter_discovered', (int) $data['filter_data']['filter_discovered']))
-				->addValue(_('all'), -1)
+				->addValue(_('All'), -1)
 				->addValue(_('Yes'), ZBX_FLAG_DISCOVERY_CREATED)
 				->addValue(_('No'), ZBX_FLAG_DISCOVERY_NORMAL)
 				->setModern()
