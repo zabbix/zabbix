@@ -14,7 +14,6 @@ import (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int    `conf:"optional,range=1:30"`
 	SourceIP             string `conf:"optional"`
 }
 
@@ -45,11 +44,11 @@ const defaultServerPort = 10051
 
 var impl Plugin
 
-func (p *Plugin) getRemoteZabbixStats(addr string, req []byte) ([]byte, error) {
+func (p *Plugin) getRemoteZabbixStats(addr string, req []byte, timeout int) ([]byte, error) {
 	var parse response
 
-	resp, errs, _ := zbxcomms.Exchange(&[]string{addr}, &p.localAddr, time.Duration(p.options.Timeout)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second, req)
+	resp, errs, _ := zbxcomms.Exchange(&[]string{addr}, &p.localAddr, time.Duration(timeout)*time.Second,
+		time.Duration(timeout)*time.Second, req)
 
 	if errs != nil {
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", errs[0])
@@ -127,7 +126,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, fmt.Errorf("Cannot obtain internal statistics: %s", err)
 	}
 
-	resp, err := p.getRemoteZabbixStats(addr, req)
+	resp, err := p.getRemoteZabbixStats(addr, req, ctx.Timeout())
 
 	if err != nil {
 		return nil, err
@@ -141,9 +140,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
 	}
 	if p.options.SourceIP == "" {
 		p.options.SourceIP = global.SourceIP

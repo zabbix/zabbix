@@ -2542,13 +2542,13 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 	else if (min_version > current_version && ZBX_DBVERSION_UNDEFINED != min_version)
 	{
 		flag = DB_VERSION_LOWER_THAN_MINIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is older than minimum required %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is older than %lu",
 				database, (unsigned long)current_version, (unsigned long)min_version);
 	}
 	else if (max_version < current_version && ZBX_DBVERSION_UNDEFINED != max_version)
 	{
 		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is newer than maximum allowed %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is newer than %lu",
 				database, (unsigned long)current_version, (unsigned long)max_version);
 	}
 	else if (min_supported_version > current_version && ZBX_DBVERSION_UNDEFINED != min_supported_version)
@@ -2900,15 +2900,8 @@ static int	zbx_tsdb_table_has_compressed_chunks(const char *table_names)
 	zbx_db_result_t	result;
 	int		ret;
 
-	if (1 == ZBX_DB_TSDB_V1) {
-		result = zbx_db_select_basic("select null from timescaledb_information.compressed_chunk_stats"
-				" where hypertable_name in (%s) and compression_status='Compressed'", table_names);
-	}
-	else
-	{
-		result = zbx_db_select_basic("select null from timescaledb_information.chunks"
-				" where hypertable_name in (%s) and is_compressed='t'", table_names);
-	}
+	result = zbx_db_select_basic("select null from timescaledb_information.chunks"
+			" where hypertable_name in (%s) and is_compressed='t'", table_names);
 
 	if ((zbx_db_result_t)ZBX_DB_DOWN == result)
 	{
@@ -2928,54 +2921,17 @@ out:
 
 void	zbx_tsdb_extract_compressed_chunk_flags(struct zbx_db_version_info_t *version_info)
 {
-#define ZBX_TSDB1_HISTORY_TABLES "'history_uint'::regclass,'history_log'::regclass,'history_str'::regclass,'history_text'::regclass,'history'::regclass"
-#define ZBX_TSDB2_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
-#define ZBX_TSDB1_TRENDS_TABLES "'trends'::regclass,'trends_uint'::regclass"
-#define ZBX_TSDB2_TRENDS_TABLES "'trends','trends_uint'"
-	const char	*history_tables, *trends_tables;
+#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history'"
+#define ZBX_TSDB_TRENDS_TABLES "'trends','trends_uint'"
 
-	history_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_HISTORY_TABLES : ZBX_TSDB2_HISTORY_TABLES);
-	trends_tables = (1 == ZBX_DB_TSDB_V1 ? ZBX_TSDB1_TRENDS_TABLES : ZBX_TSDB2_TRENDS_TABLES);
+	version_info->history_compressed_chunks =
+			(SUCCEED == zbx_tsdb_table_has_compressed_chunks(ZBX_TSDB_HISTORY_TABLES)) ? 1 : 0;
 
-	version_info->history_compressed_chunks = (SUCCEED == zbx_tsdb_table_has_compressed_chunks(history_tables)) ?
-			1 : 0;
+	version_info->trends_compressed_chunks =
+			(SUCCEED == zbx_tsdb_table_has_compressed_chunks(ZBX_TSDB_TRENDS_TABLES)) ? 1 : 0;
 
-	version_info->trends_compressed_chunks = (SUCCEED == zbx_tsdb_table_has_compressed_chunks(trends_tables)) ?
-			1 : 0;
-
-#undef ZBX_TSDB1_HISTORY_TABLES
-#undef ZBX_TSDB2_HISTORY_TABLES
-#undef ZBX_TSDB1_TRENDS_TABLES
-#undef ZBX_TSDB2_TRENDS_TABLES
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) license information                   *
- *                                                                            *
- * Return value: license information from datase as string                    *
- *               "apache"    for TimescaleDB Apache 2 Edition                 *
- *               "timescale" for TimescaleDB Community Edition                *
- *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
- *                                                                            *
- ******************************************************************************/
-static char	*zbx_tsdb_get_license(void)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		*tsdb_lic = NULL;
-
-	result = zbx_db_select_basic("show timescaledb.license");
-
-	if ((zbx_db_result_t)ZBX_DB_DOWN != result && NULL != result && NULL != (row = zbx_db_fetch_basic(result)))
-	{
-		tsdb_lic = zbx_strdup(NULL, row[0]);
-	}
-
-	zbx_db_free_result(result);
-
-	return tsdb_lic;
+#undef ZBX_TSDB_HISTORY_TABLES
+#undef ZBX_TSDB_TRENDS_TABLES
 }
 
 /***************************************************************************************************************
@@ -2985,7 +2941,7 @@ static char	*zbx_tsdb_get_license(void)
  **************************************************************************************************************/
 void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 {
-	int		tsdb_ver;
+	int	tsdb_ver;
 
 	if (0 != zbx_strcmp_null(version_info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		return;
@@ -3008,13 +2964,7 @@ void	zbx_tsdb_info_extract(struct zbx_db_version_info_t *version_info)
 			version_info->ext_min_version, version_info->ext_max_version,
 			version_info->ext_min_supported_version);
 
-	if (ZBX_TIMESCALE_MIN_VERSION_WITH_LICENSE_PARAM_SUPPORT <= tsdb_ver)
-		version_info->ext_lic = zbx_tsdb_get_license();
-
-	zbx_tsdb_extract_compressed_chunk_flags(version_info);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d], license: [%s]", tsdb_ver,
-		ZBX_NULL2EMPTY_STR(version_info->ext_lic));
+	zabbix_log(LOG_LEVEL_DEBUG, "TimescaleDB version: [%d]", tsdb_ver);
 }
 
 /******************************************************************************
@@ -3095,7 +3045,7 @@ void	zbx_tsdb_set_compression_availability(int compression_availabile)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrievs TimescaleDB (TSDB) compression availability              *
+ * Purpose: retrieves TimescaleDB (TSDB) compression availability             *
  *                                                                            *
  * Return value: compression availability as as integer                       *
  *               0 (OFF): compression is not available                        *

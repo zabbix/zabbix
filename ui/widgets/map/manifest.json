@@ -9,6 +9,9 @@
 	"description": "Displays either a single configured network map or one of the configured network maps in the map navigation tree.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/map",
 	"widget": {
+		"in": {
+			"sysmapid": {"type": "_mapid"}
+		},
 		"size": {
 			"width": 18,
 			"height": 5

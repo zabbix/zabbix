@@ -19,11 +19,39 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+namespace Widgets\SvgGraph\Includes;
 
-class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
+use CButton,
+	CButtonIcon,
+	CButtonLink,
+	CCheckBox,
+	CCol,
+	CColor,
+	CDiv,
+	CFormField,
+	CFormGrid,
+	CLabel,
+	CLink,
+	CList,
+	CListItem,
+	CPatternSelect,
+	CRadioButtonList,
+	CRangeControl,
+	CRow,
+	CSelect,
+	CSimpleButton,
+	CSpan,
+	CTable,
+	CTableColumn,
+	CTag,
+	CTemplateTag,
+	CTextBox,
+	CVar,
+	CWidgetFieldView;
 
-	public function __construct(CWidgetFieldGraphDataSet $field) {
+class CWidgetFieldDataSetView extends CWidgetFieldView {
+
+	public function __construct(CWidgetFieldDataSet $field) {
 		$this->field = $field;
 	}
 
@@ -35,18 +63,18 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		$values = $this->field->getValue();
 
 		if (!$values) {
-			$values[] = CWidgetFieldGraphDataSet::getDefaults();
+			$values[] = CWidgetFieldDataSet::getDefaults();
 		}
 
 		// Get item names for single item datasets.
 		$itemids = array_merge(...array_column($values, 'itemids'));
 		$item_names = [];
 		if ($itemids) {
-			$item_names = CWidgetFieldGraphDataSet::getItemNames($itemids);
+			$item_names = CWidgetFieldDataSet::getItemNames($itemids);
 		}
 
 		foreach ($values as $i => $value) {
-			if ($value['dataset_type'] == CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM) {
+			if ($value['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				$value['item_names'] = $item_names;
 			}
 
@@ -76,14 +104,14 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	}
 
 	public function getTemplates(): array {
-		$value = ['color' => '#{color}'] + CWidgetFieldGraphDataSet::getDefaults();
+		$value = ['color' => '#{color}'] + CWidgetFieldDataSet::getDefaults();
 
 		return [
 			new CTemplateTag('dataset-pattern-item-tmpl',
-				$this->getGraphDataSetLayout($value, CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM, true)
+				$this->getGraphDataSetLayout($value, CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM, true)
 			),
 			new CTemplateTag('dataset-single-item-tmpl',
-				$this->getGraphDataSetLayout($value, CWidgetFieldGraphDataSet::DATASET_TYPE_SINGLE_ITEM, true)
+				$this->getGraphDataSetLayout($value, CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM, true)
 			),
 			new CTemplateTag('dataset-item-row-tmpl', $this->getItemRowTemplate())
 		];
@@ -100,7 +128,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
 
-		if ($dataset_type == CWidgetFieldGraphDataSet::DATASET_TYPE_PATTERN_ITEM) {
+		if ($dataset_type == CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM) {
 			if ($this->field->isTemplateDashboard()) {
 				$host_pattern_field = null;
 

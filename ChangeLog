@@ -1,12 +1,26 @@
 Changes for 7.0.0alpha5
 
 New features:
+A.FG...PST [ZBXNEXT-1096] implemented configurable per-item-type timeouts (abakaldin, agriscenko, dgoloscapov, wiper)
+A.F.....S. [ZBXNEXT-7726] added support for extended error checking in preprocessing (akozlovs, jfreibergs)
+..F.I..... [ZBXNEXT-8331] implemented new Pie chart widget (apoga, ddauksa)
+..F.....S. [ZBXNEXT-8638] implemented new evaluation functions jsonpath and xmlxpath (jfreibergs, kprutkovs)
+.......PS. [ZBXNEXT-8469] increased PostgreSQL maximum supported version to 16 (mprihodko)
+.......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
+A.F.I...S. [ZBXNEXT-8702] added support of group discovery from different prototypes/lld rules (dfofanovs, wiper)
+A.F....... [ZBXNEXT-4165] implemented `selectActions` parameter for API method `mediatype.get` to display all associated actions for media types (ddauksa)
+..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 ..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 .........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
 ..F....... [ZBXNEXT-7687] extended Top Hosts widget column sorting (dfofanovs)
 ..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
 
 Bug fixes:
+..F....... [ZBX-23361] fixed uncapitalized first letter for value 'all' in radio buttons and in filter select fields (dpetra)
+..F....... [ZBX-22841] fixed all date/time displays to match standard US date and time formats (ddauksa)
+........S. [ZBX-23446] fixed nested transaction issue when processing autoregistration data (dimir)
+.......P.. [ZBX-23354] fixed crash on shutdown after unsuccessful database connection on startup (wiper)
+..F....... [ZBX-23358] fixed "Problem hosts" widget without filtering by tags not showing problem host count (agriscenko)
 ..F....... [ZBX-23302] fixed 'access denied' error in template multiselect popup (esekace)
 A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
 ...G...... [ZBX-23110] fixed possible crash on Windows 11 by removing concurrent Win API call for update perfCounters list (MVekslers)
@@ -259,6 +273,11 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.7
+
+6.4.7rc1 was released as 6.4.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.7rc1
@@ -1681,6 +1700,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.22
+
+6.0.22rc1 was released as 6.0.22 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.22rc1
@@ -4415,6 +4439,11 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.38
+
+5.0.38rc1 was released as 5.0.38 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 5.0.38rc1
@@ -7261,6 +7290,11 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.49
+
+4.0.49rc1 was released as 4.0.49 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 4.0.49rc1

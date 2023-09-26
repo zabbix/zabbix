@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldCheckBoxList extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldCheckBoxListView::class;
 	public const DEFAULT_VALUE = [];
 
 	private array $values;
