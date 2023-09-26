@@ -36,6 +36,8 @@ window.widget_gauge_form = new class {
 		jQuery(this.#form)
 			.on('change', 'input', (e) => this.#updateForm(e.target));
 
+		$thresholds_table.on('afterremove.dynamicRows', () => this.#updateForm());
+
 		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
@@ -48,7 +50,7 @@ window.widget_gauge_form = new class {
 		this.#updateForm();
 	}
 
-	#updateForm(trigger) {
+	#updateForm(trigger = null) {
 		const show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
 		const show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
 		const show_needle = document.getElementById(`show_${<?= Widget::SHOW_NEEDLE ?>}`);
