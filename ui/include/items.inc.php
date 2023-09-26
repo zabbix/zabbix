@@ -2521,7 +2521,14 @@ function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
 	return array_values($conditions);
 }
 
-function item_aggr_fnc2str($calc_fnc) {
+/**
+ * Retrieve the string representation of aggregation function constant.
+ *
+ * @param int $calc_fnc The numeric value of aggregation function constant.
+ *
+ * @return string The string representation of aggregation function.
+ */
+function item_aggr_fnc2str(int $calc_fnc): string {
 	switch ($calc_fnc) {
 		case AGGREGATE_NONE:
 			return _('not used');
