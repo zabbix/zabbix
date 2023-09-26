@@ -92,7 +92,7 @@ class CHtmlUrlValidator {
 			}
 		}
 
-		$url_parts = parse_url(preg_replace('/[\r\n\t]/', '', $url));
+		$url_parts = parse_url(preg_replace('/[\r\n\t]/', '', trim($url, "\x00..\x1F\x20")));
 		if (!$url_parts) {
 			return false;
 		}

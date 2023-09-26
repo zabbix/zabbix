@@ -1231,7 +1231,7 @@ class testFormAdministrationScripts extends CWebTest {
 				$form->fill(['Type' => $type]);
 
 				// Check visible fields.
-				$this->compareArrays(array_merge($scope_fields, $type_fields['fields']),
+				$this->assertEqualsCanonicalizing(array_merge($scope_fields, $type_fields['fields']),
 						$form->getLabels(CElementFilter::VISIBLE)->asText()
 				);
 
@@ -1239,7 +1239,7 @@ class testFormAdministrationScripts extends CWebTest {
 				$form->checkValue(array_merge($scope_default, $type_fields['default']));
 
 				// Check required fields.
-				$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required']),
+				$this->assertEqualsCanonicalizing(array_merge($common_all_scopes['required'], $type_fields['required']),
 						$form->getRequiredLabels()
 				);
 
@@ -1247,10 +1247,10 @@ class testFormAdministrationScripts extends CWebTest {
 					// Check fields with 'Public key' authentication method.
 					$form->fill(['Authentication method' => 'Public key']);
 
-					$this->compareArrays(array_merge($scope_fields, $type_fields['fields_public_key']),
+					$this->assertEqualsCanonicalizing(array_merge($scope_fields, $type_fields['fields_public_key']),
 							$form->getLabels(CElementFilter::VISIBLE)->asText()
 					);
-					$this->compareArrays(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
+					$this->assertEqualsCanonicalizing(array_merge($common_all_scopes['required'], $type_fields['required_public_key']),
 							$form->getRequiredLabels()
 					);
 
@@ -1259,17 +1259,5 @@ class testFormAdministrationScripts extends CWebTest {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Sort arrays and compare if they are equal.
-	 *
-	 * @param array $expected	expected fields from data provider
-	 * @param array $actual		actual fields on page
-	 */
-	private function compareArrays($expected, $actual) {
-		sort($expected);
-		sort($actual);
-		$this->assertEquals(json_encode($expected), json_encode($actual));
 	}
 }

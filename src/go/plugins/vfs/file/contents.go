@@ -27,6 +27,7 @@ import (
 )
 
 func (p *Plugin) exportContents(params []string) (result interface{}, err error) {
+	const maxFileLen = 16 * 1024 * 1024
 
 	if len(params) != 1 && len(params) != 2 {
 		return nil, errors.New("Wrong number of parameters")
@@ -44,8 +45,7 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 	}
 	filelen := f.Size()
 
-	bnum := 64 * 1024
-	if filelen > int64(bnum) {
+	if filelen > int64(maxFileLen) {
 		return nil, errors.New("File is too large for this check")
 	}
 

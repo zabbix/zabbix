@@ -180,6 +180,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	var cerrmsg *C.char
 	log.Tracef("Calling C function \"process_eventlog_check()\"")
+
 	ret := C.process_eventlog_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)),
 		C.zbx_vector_ptr_lp_t(cblob), C.ZBX_ACTIVE_METRIC_LP(data),
 		C.zbx_process_value_func_t(C.process_eventlog_value_cb), &clastLogsizeSent, &cerrmsg)

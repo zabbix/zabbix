@@ -84,13 +84,10 @@ AC_DEFUN([CONF_TESTS],
 	esac
 
 
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
-],
-[
+]], [[
 	__fxstat(0, 0, NULL);
-],
-AC_DEFINE([HAVE_FXSTAT], [1], [Define to 1 if fxstat function is available]))
+]])],[AC_DEFINE(HAVE_FXSTAT, 1, Define to 1 if fxstat function is available)],[])
 
 ])
