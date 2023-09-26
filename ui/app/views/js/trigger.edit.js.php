@@ -686,6 +686,12 @@ window.trigger_edit_popup = new class {
 		delete form_fields.context;
 		delete form_fields._csrf_token;
 
+		if (!form_fields.dependencies) {
+			form_fields.dependencies = [];
+		}
+
+		this.db_trigger.dependencies = [];
+
 		if (Object.keys(this.db_dependencies).length > 0) {
 			// Dependencies are sorted alphabetically as in form to appear in the same order for JSON.stringify().
 			let dependencies = this.#prepareDependencies(this.db_dependencies);
