@@ -3989,35 +3989,34 @@ div.dashboard-widget-gauge {
     div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
       display: block; }
 
-div.dashboard-widget-hostavail .host-avail-table thead th.host-avail-total {
+div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
+  padding-top: 5px;
   border-top: 1px solid #ebeef0; }
-div.dashboard-widget-hostavail .host-avail-table tbody tr th {
-  color: #768d99;
+div.dashboard-widget-hostavail .host-avail-table th {
+  width: 15%;
   min-width: 100px;
-  width: 15%; }
-div.dashboard-widget-hostavail .host-avail-table tbody tr td {
-  color: #1f2c33;
-  min-width: 95px; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-true {
-  color: #1f2c33;
-  background: #34af67; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-false {
-  color: #1f2c33;
-  background: #d64e4e; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed {
-  color: #1f2c33;
-  background: #f1a50b; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
-  color: #1f2c33;
-  background: #ebebeb; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
-  color: #1f2c33;
-  background: transparent; }
+  color: #768d99; }
+div.dashboard-widget-hostavail .host-avail-table td {
+  min-width: 95px;
+  border-left: 1px dotted #ebeef0; }
 div.dashboard-widget-hostavail .host-avail-table th:last-child,
 div.dashboard-widget-hostavail .host-avail-table td:last-child {
   padding-right: 5px; }
-div.dashboard-widget-hostavail .host-avail-table td:not(:first-child) {
-  border-left: 1px dotted #ebeef0; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-true {
+  color: #1f2c33;
+  background-color: #34af67 !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-false {
+  color: #1f2c33;
+  background-color: #d64e4e !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed {
+  color: #1f2c33;
+  background-color: #f1a50b !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
+  color: #1f2c33;
+  background-color: #ebebeb !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
+  color: #1f2c33;
+  background-color: transparent !important; }
 
 .dashboard-widget-inaccessible {
   display: grid;

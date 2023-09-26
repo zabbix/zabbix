@@ -3948,51 +3948,50 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
-div.dashboard-widget-hostavail .host-avail-table thead th.host-avail-total {
+div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
+  padding-top: 5px;
   border-top: 1px solid #333333; }
-div.dashboard-widget-hostavail .host-avail-table tbody tr th {
-  color: #cacaca;
+div.dashboard-widget-hostavail .host-avail-table th {
+  width: 15%;
   min-width: 100px;
-  width: 15%; }
-div.dashboard-widget-hostavail .host-avail-table tbody tr td {
-  color: #ffffff;
-  min-width: 95px; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-true {
-  color: #ffffff;
-  background: #34af67; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-false {
-  color: #ffffff;
-  background: #d64e4e; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed {
-  color: #ffffff;
-  background: #f1a50b; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
-  color: #ffffff;
-  background: #000000; }
-div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
-  color: #ffffff;
-  background: transparent; }
+  color: #cacaca; }
+div.dashboard-widget-hostavail .host-avail-table td {
+  min-width: 95px;
+  border-left: 1px dotted #333333; }
 div.dashboard-widget-hostavail .host-avail-table th:last-child,
 div.dashboard-widget-hostavail .host-avail-table td:last-child {
   padding-right: 5px; }
-div.dashboard-widget-hostavail .host-avail-table td:not(:first-child) {
-  border-left: 1px dotted #333333; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-true {
+  color: #ffffff;
+  background-color: #34af67 !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-false {
+  color: #ffffff;
+  background-color: #d64e4e !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed {
+  color: #ffffff;
+  background-color: #f1a50b !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
+  color: #ffffff;
+  background-color: #000000 !important; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
+  color: #ffffff;
+  background-color: transparent !important; }
 
 div.dashboard-widget-hostavail .host-avail-table thead th {
   color: #ffffff; }
-  div.dashboard-widget-hostavail .host-avail-table thead th.host-avail-total {
-    border-top: none; }
-div.dashboard-widget-hostavail .host-avail-table tbody tr th {
+div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
+  padding-top: 6px;
+  border-top: none; }
+div.dashboard-widget-hostavail .host-avail-table th {
   color: #ffffff; }
-div.dashboard-widget-hostavail .host-avail-table td:not(:first-child) {
+div.dashboard-widget-hostavail .host-avail-table td {
   border-left: 1px solid #444444; }
-div.dashboard-widget-hostavail .host-avail-table th.host-avail-true, div.dashboard-widget-hostavail .host-avail-table th.host-avail-false, div.dashboard-widget-hostavail .host-avail-table th.host-avail-mixed, div.dashboard-widget-hostavail .host-avail-table th.host-avail-unknown, div.dashboard-widget-hostavail .host-avail-table th.host-avail-total,
-div.dashboard-widget-hostavail .host-avail-table div.host-avail-true,
-div.dashboard-widget-hostavail .host-avail-table div.host-avail-false,
-div.dashboard-widget-hostavail .host-avail-table div.host-avail-mixed,
-div.dashboard-widget-hostavail .host-avail-table div.host-avail-unknown,
-div.dashboard-widget-hostavail .host-avail-table div.host-avail-total {
-  background: transparent; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-true,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-false,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
+  background-color: transparent; }
 
 .dashboard-widget-inaccessible {
   display: grid;

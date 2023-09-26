@@ -1,61 +1,35 @@
 // Widget colors.
-$host-avail-true-bg-color: $status-green-bg-color !default;
-$host-avail-false-bg-color: $status-red-bg-color !default;
-$host-avail-mixed-bg-color: $status-yellow-bg-color !default;
-$host-avail-unknown-bg-color: $status-grey-bg-color !default;
-$host-avail-total-bg-color: transparent !default;
+
+$host-avail-true-bg-color: $status-green-bg-color;
+$host-avail-false-bg-color: $status-red-bg-color;
+$host-avail-mixed-bg-color: $status-yellow-bg-color;
+$host-avail-unknown-bg-color: $status-grey-bg-color;
+$host-avail-total-bg-color: transparent;
 
 @if $theme-name == 'dark' {
 	$host-avail-unknown-bg-color: #737373;
 }
 
 // Widget view.
+
 div.dashboard-widget-hostavail {
 	.host-avail-table {
 		thead {
-			th.host-avail-total {
+			.host-avail-total {
+				padding-top: 5px;
 				border-top: 1px solid $table-border-color;
 			}
 		}
 
-		tbody {
-			tr {
-				th {
-					color: $font-alt-color;
-					min-width: 100px;
-					width: 15%;
-				}
-
-				td {
-					color: $font-color;
-					min-width: 95px;
-				}
-			}
+		th {
+			width: 15%;
+			min-width: 100px;
+			color: $font-alt-color;
 		}
 
-		.host-avail-true {
-			color: $font-color;
-			background: $host-avail-true-bg-color;
-		}
-
-		.host-avail-false {
-			color: $font-color;
-			background: $host-avail-false-bg-color;
-		}
-
-		.host-avail-mixed {
-			color: $font-color;
-			background: $host-avail-mixed-bg-color;
-		}
-
-		.host-avail-unknown {
-			color: $font-color;
-			background: $host-avail-unknown-bg-color;
-		}
-
-		.host-avail-total {
-			color: $font-color;
-			background: $host-avail-total-bg-color;
+		td {
+			min-width: 95px;
+			border-left: 1px dotted $table-border-color;
 		}
 
 		th:last-child,
@@ -63,47 +37,51 @@ div.dashboard-widget-hostavail {
 			padding-right: 5px;
 		}
 
-		td:not(:first-child) {
-			border-left: 1px dotted $table-border-color;
+		@each $class, $color in (
+			host-avail-true: $host-avail-true-bg-color,
+			host-avail-false: $host-avail-false-bg-color,
+			host-avail-mixed: $host-avail-mixed-bg-color,
+			host-avail-unknown: $host-avail-unknown-bg-color,
+			host-avail-total: $host-avail-total-bg-color
+		) {
+			.#{$class} {
+				color: $font-color;
+				background-color: $color !important;
+			}
 		}
 	}
 }
 
 // Modifications by themes.
+
 @if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-hostavail {
 		.host-avail-table {
 			thead {
 				th {
 					color: $font-color;
+				}
 
-					&.host-avail-total {
-						border-top: none;
-					}
+				.host-avail-total {
+					padding-top: 6px;
+					border-top: none;
 				}
 			}
 
-			tbody {
-				tr {
-					th {
-						color: $font-color;
-					}
-				}
+			th {
+				color: $font-color;
 			}
 
-			td:not(:first-child) {
+			td {
 				border-left: 1px solid $ui-border-color;
 			}
 
-			th,
-			div {
-				&.host-avail-true,
-				&.host-avail-false,
-				&.host-avail-mixed,
-				&.host-avail-unknown,
-				&.host-avail-total {
-					background: transparent;
-				}
+			.host-avail-true,
+			.host-avail-false,
+			.host-avail-mixed,
+			.host-avail-unknown,
+			.host-avail-total {
+				background-color: transparent;
 			}
 		}
 	}
