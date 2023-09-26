@@ -956,28 +956,6 @@ static int	DBpatch_6050091(void)
 	return SUCCEED;
 }
 
-static char	*fix_hist_param_escaping(const char *param, size_t left, size_t right)
-{
-	size_t escaped_len = 0;
-	/* resulting string cannot be more than 2 times longer than original string */
-	char *escaped = zbx_malloc(NULL, 2 * (right - left + 1) * sizeof(char) + 1);
-
-	char	*str = NULL;
-	size_t	str_alloc = 0, str_offset = 0;
-	zbx_strncpy_alloc(&str, &str_alloc, &str_offset, param + left, right - left + 1);
-	zbx_free(str);
-
-	for (size_t i = left; i <= right; i++)
-	{
-		escaped[escaped_len++] = param[i];
-		if (i < right && '\\' == param[i] && '"' != param[i + 1])
-			escaped[escaped_len++] = '\\';
-	}
-	escaped[escaped_len++] = '\0';
-
-	return escaped;
-}
-
 static int	DBpatch_6050092(void)
 {
 	zbx_db_result_t	result;
@@ -989,13 +967,16 @@ static int	DBpatch_6050092(void)
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* functions table contains history functions used in trigger expressions */
-	result = zbx_db_select("select functionid,parameter from functions where " ZBX_DB_CHAR_LENGTH(parameter) ">1");
+	result = zbx_db_select("select functionid,parameter,triggerid"
+			" from functions"
+			" where " ZBX_DB_CHAR_LENGTH(parameter) ">1");
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*ptr;
 		char		*buf, *tmp, *param = NULL;
 		size_t		param_pos, param_len, sep_pos, buf_alloc, buf_offset = 0;
+		int		quoted;
 
 		buf_alloc  = strlen(row[1]);
 		buf = zbx_malloc(NULL, buf_alloc);
@@ -1006,8 +987,44 @@ static int	DBpatch_6050092(void)
 
 			if (param_pos < sep_pos)
 			{
-				param = fix_hist_param_escaping(ptr, param_pos, sep_pos - 1);
-				zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
+				if ('"' != ptr[param_pos])
+				{
+					if ('{' == ptr[param_pos])
+					{
+						size_t	arg_end;
+						int	bracket_count = 1;
+
+						for (arg_end = param_pos + 1; 0 < bracket_count; arg_end++)
+						{
+							if ('}' == ptr[arg_end])
+								bracket_count--;
+							else if ('{' == ptr[arg_end])
+								bracket_count++;
+						}
+
+						sep_pos = arg_end;
+					}
+
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos,
+							sep_pos - param_pos);
+				}
+				else
+				{
+					param = zbx_function_param_unquote_dyn(
+							ptr + param_pos, sep_pos - param_pos, &quoted);
+
+					if (SUCCEED == zbx_function_param_escape(&param, quoted))
+					{
+						zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "Failed to escape parameter \"%s\" for"
+							" trigger with id %s", param, row[3]);
+						zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
+								ptr + param_pos, sep_pos - param_pos);
+					}
+				}
 			}
 
 			if (',' == ptr[sep_pos])
