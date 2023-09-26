@@ -30,7 +30,7 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 			->setPopupParameter('value_types', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 	)
 	->addField(
@@ -68,8 +68,8 @@ $form
 				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-thresholds')
 			)
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')

@@ -21,6 +21,9 @@
 
 namespace Widgets\Gauge\Includes;
 
+use API,
+	CNumberParser;
+
 use Zabbix\Widgets\{
 	CWidgetField,
 	CWidgetForm
@@ -32,6 +35,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
@@ -39,9 +43,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldNumericBox,
 	CWidgetFieldThresholds
 };
-
-use API,
-	CNumberParser;
 
 use Widgets\Gauge\Widget;
 
@@ -307,9 +308,8 @@ class WidgetForm extends CWidgetForm {
 					self::SIZE_PERCENT_MAX
 				))->setDefault(self::DEFAULT_TH_ARC_SIZE_PERCENT)
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

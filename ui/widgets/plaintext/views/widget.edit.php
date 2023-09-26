@@ -28,7 +28,7 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['items']['itemids']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,
@@ -46,8 +46,8 @@
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_as_html'])
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->show();

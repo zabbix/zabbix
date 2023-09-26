@@ -253,7 +253,8 @@ function itemCompleteTest(overlay) {
 		hostid: <?= $data['hostid'] ?>,
 		valuemapid: <?= $data['valuemapid'] ?>,
 		value: form_data['value'],
-		not_supported: form_data['not_supported']
+		not_supported: form_data['not_supported'],
+		runtime_error: form_data['runtime_error']
 	});
 
 	<?php if ($data['show_prev']): ?>
@@ -301,7 +302,17 @@ function itemCompleteTest(overlay) {
 				}
 			<?php endif ?>
 
+			if ('not_supported' in ret && jQuery('[name="not_supported"]', $form).length) {
+				jQuery('[name="not_supported"]', $form)
+					.prop('checked', ret.not_supported != 0)
+					.trigger('change');
+			}
+
 			jQuery('#value', $form).multilineInput('value', ret.value);
+
+			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
+				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
+			}
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -401,6 +412,7 @@ function saveItemTestInputs() {
 		$test_obj,
 		input_values = {
 			value: jQuery('#value').multilineInput('value'),
+			not_supported: jQuery('[name="not_supported"]').is(':checked') ? 1 : 0,
 			eol: jQuery('#eol').find(':checked').val()
 		},
 		form_data = $form.serializeJSON(),
@@ -408,6 +420,10 @@ function saveItemTestInputs() {
 		macros = {};
 
 	<?php if ($data['is_item_testable']): ?>
+		if (jQuery('#runtime_error').length) {
+			input_values.runtime_error = jQuery('#runtime_error').multilineInput('value');
+		}
+
 		input_values = jQuery.extend(input_values, {
 			get_value: jQuery('#get_value', $form).is(':checked') ? 1 : 0,
 			proxyid: jQuery('#proxyid', $form).val(),
@@ -454,7 +470,17 @@ jQuery(document).ready(function($) {
 		value: <?= json_encode($data['value']) ?>,
 		monospace_font: false,
 		autofocus: true,
-		readonly: false,
+		readonly: <?= $data['not_supported'] != 0 ? 'true' : 'false' ?>,
+		grow: 'auto',
+		rows: 0
+	});
+
+	$('#runtime_error').length && $('#runtime_error').multilineInput({
+		placeholder: <?= json_encode(_('error text')) ?>,
+		value: <?= json_encode($data['runtime_error']) ?>,
+		monospace_font: false,
+		autofocus: true,
+		readonly: <?= $data['not_supported'] != 0 ? 'false' : 'true' ?>,
 		grow: 'auto',
 		rows: 0
 	});
@@ -470,25 +496,24 @@ jQuery(document).ready(function($) {
 
 	<?php if ($data['is_item_testable']): ?>
 		$('#not_supported').on('change', function() {
-			var $form = $('#preprocessing-test-form');
+			const $form = $('#preprocessing-test-form');
 
-			if ($(this).is(':checked')) {
-				$('#value', $form).multilineInput('setReadOnly');
-			}
-			else {
-				$('#value', $form).multilineInput('unsetReadOnly');
-			}
+			$('#value', $form).multilineInput(this.checked ? 'setReadOnly' : 'unsetReadOnly');
+			$('#runtime_error').length && $('#runtime_error', $form).multilineInput(
+				this.checked && !$('[name="get_value"]', $form).is(':checked') ? 'unsetReadOnly' : 'setReadOnly'
+			);
 		});
 
 		$('#get_value').on('change', function() {
 			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
 				$form = $('#preprocessing-test-form'),
 				$submit_btn = overlays_stack.getById('item-test').$btn_submit,
-				$not_supported = $('#not_supported', $form);
+				$not_supported = $('[name="not_supported"]', $form);
 
 			if ($(this).is(':checked')) {
 				$('#value', $form).multilineInput('setReadOnly');
 				$not_supported.prop('disabled', true);
+				$('#runtime_error').length && $('#runtime_error', $form).multilineInput('setReadOnly');
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('setReadOnly');
@@ -557,8 +582,9 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				!$not_supported.is(':checked') && $('#value', $form).multilineInput('unsetReadOnly');
-				$not_supported.prop('disabled', false);
+				$not_supported
+					.prop('disabled', false)
+					.trigger('change');
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');

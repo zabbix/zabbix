@@ -166,6 +166,11 @@ class CopyWidgetsDashboards {
 										'type' => 4,
 										'name' => 'itemid',
 										'value' => 99088
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'ABCDE'
 									]
 								]
 							],
@@ -237,9 +242,9 @@ class CopyWidgetsDashboards {
 										'value' => 2
 									],
 									[
-										'type' => '0',
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => '0',
@@ -255,6 +260,11 @@ class CopyWidgetsDashboards {
 										'type' => '7',
 										'name' => 'graphid',
 										'value' => 600000
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'BCDEF'
 									]
 								]
 							],
@@ -314,11 +324,6 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 1,
-										'name' => 'reference',
-										'value' => 'OYKZW'
-									],
-									[
 										'type' => 8,
 										'name' => 'sysmapid',
 										'value' => 3
@@ -340,19 +345,9 @@ class CopyWidgetsDashboards {
 										'value' => '120'
 									],
 									[
-										'type' => 0,
-										'name' => 'source_type',
-										'value' => 2
-									],
-									[
 										'type' => 1,
-										'name' => 'filter_widget_reference',
-										'value' => 'STZDI'
-									],
-									[
-										'type' => 1,
-										'name' => 'reference',
-										'value' => 'PVEYR'
+										'name' => 'sysmapid._reference',
+										'value' => 'STZDI._mapid'
 									]
 								]
 							],
@@ -367,7 +362,7 @@ class CopyWidgetsDashboards {
 								'fields' => [
 									[
 										'type' => 0,
-										'name' => 'navtree.order.2',
+										'name' => 'navtree.2.order',
 										'value' => 2
 									],
 									[
@@ -382,12 +377,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'navtree.name.1',
+										'name' => 'navtree.1.name',
 										'value' => 'Map with icon mapping'
 									],
 									[
 										'type' => 1,
-										'name' => 'navtree.name.2',
+										'name' => 'navtree.2.name',
 										'value' => 'Public map with image'
 									],
 									[
@@ -397,12 +392,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 8,
-										'name' => 'navtree.sysmapid.1',
+										'name' => 'navtree.1.sysmapid',
 										'value' => 6
 									],
 									[
 										'type' => 8,
-										'name' => 'navtree.sysmapid.2',
+										'name' => 'navtree.2.sysmapid',
 										'value' => 10
 									]
 								]
@@ -483,12 +478,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.1',
+										'name' => 'tags.1.operator',
 										'value' => 1
 									],
 									[
@@ -503,12 +498,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => '2'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.1',
+										'name' => 'tags.1.value',
 										'value' => '33'
 									],
 									[
@@ -518,12 +513,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'tag2'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.1',
+										'name' => 'tags.1.tag',
 										'value' => 'tagg33'
 									],
 									[
@@ -599,7 +594,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
@@ -609,12 +604,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'tag5'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => '5'
 									],
 									[
@@ -767,12 +762,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.1',
+										'name' => 'tags.1.operator',
 										'value' => 0
 									],
 									[
@@ -787,12 +782,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => '3'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.1',
+										'name' => 'tags.1.value',
 										'value' => '44'
 									],
 									[
@@ -802,12 +797,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'tag3'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.1',
+										'name' => 'tags.1.tag',
 										'value' => 'tag44'
 									],
 									[
@@ -837,9 +832,9 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => 0,
@@ -863,9 +858,9 @@ class CopyWidgetsDashboards {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => 0,
@@ -945,7 +940,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
@@ -955,12 +950,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'Tag1'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => '1'
 									],
 									[
@@ -1097,7 +1092,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 1
 									],
 									[
@@ -1122,12 +1117,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'tag9'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => '9'
 									],
 									[
@@ -1172,9 +1167,9 @@ class CopyWidgetsDashboards {
 										'value' => 5
 									],
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 0
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									],
 									[
 										'type' => 0,
@@ -1185,6 +1180,11 @@ class CopyWidgetsDashboards {
 										'type' => 7,
 										'name' => 'graphid',
 										'value' => 600000
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'CDEFG'
 									]
 								]
 							],
@@ -1288,9 +1288,9 @@ class CopyWidgetsDashboards {
 										'value' => 0
 									],
 									[
-										'type' => 0,
-										'name' => 'dynamic',
-										'value' => 1
+										'type' => 1,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							],
@@ -1320,32 +1320,32 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'tag'
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => 'value'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.1',
+										'name' => 'tags.1.tag',
 										'value' => 'tag2'
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.1',
+										'name' => 'tags.1.operator',
 										'value' => 3
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.1',
+										'name' => 'tags.1.value',
 										'value' => 'value2'
 									]
 								]
@@ -1371,127 +1371,127 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'tag_name'
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => 'tag_value'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.name.0',
+										'name' => 'columns.0.name',
 										'value' => 'Item name'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.0',
+										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.item.0',
+										'name' => 'columns.0.item',
 										'value' => '3_item'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.timeshift.0',
+										'name' => 'columns.0.timeshift',
 										'value' => ''
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'name' => 'columns.0.aggregate_function',
 										'value' => 2
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.aggregate_interval.0',
+										'name' => 'columns.0.aggregate_interval',
 										'value' => '1h'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.min.0',
+										'name' => 'columns.0.min',
 										'value' => '10'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.max.0',
+										'name' => 'columns.0.max',
 										'value' =>  '50'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.display.0',
+										'name' => 'columns.0.display',
 										'value' => 2
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.history.0',
+										'name' => 'columns.0.history',
 										'value' => 2
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'name' => 'columns.0.base_color',
 										'value' => 'FF0000'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
+										'name' => 'columnsthresholds.0.color.0',
 										'value' => 'FF465C'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
+										'name' => 'columnsthresholds.0.threshold.0',
 										'value' => '100'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.name.1',
+										'name' => 'columns.1.name',
 										'value' => 'Host name'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.1',
+										'name' => 'columns.1.data',
 										'value' => 2
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
+										'name' => 'columns.1.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.1',
+										'name' => 'columns.1.base_color',
 										'value' => 'BF00FF'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.name.2',
+										'name' => 'columns.2.name',
 										'value' => 'Text name'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.2',
+										'name' => 'columns.2.data',
 										'value' => 3
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.2',
+										'name' => 'columns.2.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.2',
+										'name' => 'columns.2.base_color',
 										'value' => '00BFFF'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.text.2',
+										'name' => 'columns.2.text',
 										'value' => 'text_here'
 									],
 									[
@@ -1636,12 +1636,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'thresholds.color.0',
+										'name' => 'thresholds.0.color',
 										'value' => '26A69A'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'thresholds.threshold.0',
+										'name' => 'thresholds.0.threshold',
 										'value' => '123'
 									],
 									[
@@ -1660,9 +1660,84 @@ class CopyWidgetsDashboards {
 										'value' => 56
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'toptriggers',
+								'name' => 'Top triggers for copying',
+								'x' => 16,
+								'y' => 12,
+								'width' => 8,
+								'height' => 4,
+								'fields' => [
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => 1
+										'name' => 'rf_rate',
+										'value' => 10
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
+										'name' => 'groupids',
+										'value' => 4
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
+										'name' => 'hostids',
+										'value' => 10084
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'problem',
+										'value' => 'test top triggers'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 25
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.tag',
+										'value' => 'top trigger tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.value',
+										'value' => 'top trigger tag value1'
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.1.tag',
+										'value' => 'top trigger tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.1.operator',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.1.value',
+										'value' => 'top trigger tag value2'
 									]
 								]
 							]
@@ -1743,6 +1818,11 @@ class CopyWidgetsDashboards {
 										'type' => 4,
 										'name' => 'itemid',
 										'value' => 400410
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'EFGHI'
 									]
 								]
 							],
@@ -1788,6 +1868,11 @@ class CopyWidgetsDashboards {
 										'type' => 7,
 										'name' => 'graphid',
 										'value' => 700016
+									],
+									[
+										'type' => 1,
+										'name' => 'reference',
+										'value' => 'FGHIJ'
 									]
 								]
 							],
@@ -1941,12 +2026,12 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'thresholds.color.0',
+										'name' => 'thresholds.0.color',
 										'value' => '4527A0'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
-										'name' => 'thresholds.threshold.0',
+										'name' => 'thresholds.0.threshold',
 										'value' => '15'
 									],
 									[
@@ -1965,9 +2050,74 @@ class CopyWidgetsDashboards {
 										'value' => 52
 									],
 									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
+									]
+								]
+							],
+							[
+								'type' => 'toptriggers',
+								'name' => 'Top triggers widget',
+								'x' => 0,
+								'y' => 10,
+								'width' => 7,
+								'height' => 5,
+								'fields' => [
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => 1
+										'name' => 'rf_rate',
+										'value' => 10
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'problem',
+										'value' => 'test top triggers'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'severities',
+										'value' => 5
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'evaltype',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_lines',
+										'value' => 25
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.tag',
+										'value' => 'top trigger tag1'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.0.operator',
+										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.0.value',
+										'value' => 'top trigger tag value1'
+									],
+									[
+										'type' =>ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.1.tag',
+										'value' => 'top trigger tag2'
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'tags.1.operator',
+										'value' => 2
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'tags.1.value',
+										'value' => 'top trigger tag value2'
 									]
 								]
 							]

@@ -169,7 +169,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: 15s
           url: '{$KUBE.CONTROLLER.SERVER.URL}'
           headers:
@@ -463,7 +463,7 @@ zabbix_export:
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
-                    - ''
+                    - '-1'
               tags:
                 - tag: component
                   value: workqueue

@@ -29,7 +29,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	public $form_selector = 'xpath://form[contains(@action, "trigdisplay.update")]';
 
 	public $default_values = [
-		'Use custom event status colors' => false,
+		'Use custom event status colours' => false,
 		'Unacknowledged PROBLEM events' => true,
 		'Acknowledged PROBLEM events' => true,
 		'Unacknowledged RESOLVED events' => true,
@@ -81,7 +81,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	];
 
 	public $custom_values = [
-		'Use custom event status colors' => true,
+		'Use custom event status colours' => true,
 		'Unacknowledged PROBLEM events' => false,
 		'Acknowledged PROBLEM events' => false,
 		'Unacknowledged RESOLVED events' => false,
@@ -148,7 +148,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			$this->assertEquals($limit, $this->query('id', $id)->one()->getAttribute('maxlength'));
 		}
 
-		$form->fill(['Use custom event status colors' => true]);
+		$form->fill(['Use custom event status colours' => true]);
 		foreach ($color_limits as $selector => $limit) {
 			$form->query($selector)->one()->click()->waitUntilReady();
 			$color_pick = $this->query('xpath://div[@id="color_picker"]')->asColorPicker()->one();
@@ -176,7 +176,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 		];
 
 		foreach ([true, false] as $status) {
-			$form->fill(['Use custom event status colors' => $status]);
+			$form->fill(['Use custom event status colours' => $status]);
 
 			foreach ($event_colors as $colorbox) {
 				$this->assertTrue($this->query('id', $colorbox)->one()->isEnabled($status));
@@ -217,7 +217,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'Unacknowledged PROBLEM events' => true,
 						'Acknowledged PROBLEM events' => true,
 						'Unacknowledged RESOLVED events' => true,
@@ -273,7 +273,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => false,
+						'Use custom event status colours' => false,
 						'Unacknowledged PROBLEM events' => false,
 						'Acknowledged PROBLEM events' => false,
 						'Unacknowledged RESOLVED events' => false,
@@ -293,7 +293,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => '000000',
 						'xpath://button[@id="lbl_problem_ack_color"]/..' => '000000',
 						'xpath://button[@id="lbl_ok_unack_color"]/..' => '000000',
@@ -325,7 +325,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => 'AAAAAA',
 						'xpath://button[@id="lbl_problem_ack_color"]/..' => 'BBBBBB',
 						'xpath://button[@id="lbl_ok_unack_color"]/..' => 'CCCCCC',
@@ -357,7 +357,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_GOOD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'Not classified' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
 						'Information' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
 						'Warning' => 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
@@ -667,7 +667,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'Display OK triggers for' => 'test',
 						'On status change triggers blink for' => 'test'
 					],
@@ -682,7 +682,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'Display OK triggers for' => '!@#$%^&*()_+',
 						'On status change triggers blink for' => '!@#$%^&*()_+',
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => '!@#$%^&*()_+',
@@ -697,18 +697,18 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => '!@#$%^&*()_+'
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -717,7 +717,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'Display OK triggers for' => '',
 						'On status change triggers blink for' => '',
 						'Not classified' => '',
@@ -738,24 +738,24 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => ''
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": cannot be empty.',
 						'Incorrect value for field "blink_period": cannot be empty.',
 						'Incorrect value for field "severity_name_0": cannot be empty.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_1": cannot be empty.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_2": cannot be empty.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_3": cannot be empty.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_4": cannot be empty.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "severity_name_5": cannot be empty.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			],
@@ -764,7 +764,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 				[
 					'expected' => TEST_BAD,
 					'fields' =>  [
-						'Use custom event status colors' => true,
+						'Use custom event status colours' => true,
 						'Display OK triggers for' => '-1',
 						'On status change triggers blink for' => '-1',
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => '-1    ',
@@ -779,18 +779,18 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'xpath://button[@id="lbl_severity_color_5"]/..' => '-1    '
 					],
 					'details' => [
-						'Incorrect value for field "problem_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "problem_ack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_unack_color": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "ok_ack_color": a hexadecimal color code (6 symbols) is expected.',
+						'Incorrect value for field "problem_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "problem_ack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_unack_color": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "ok_ack_color": a hexadecimal colour code (6 symbols) is expected.',
 						'Incorrect value for field "ok_period": a time unit is expected.',
 						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_color_0": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_1": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_2": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_3": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_4": a hexadecimal color code (6 symbols) is expected.',
-						'Incorrect value for field "severity_color_5": a hexadecimal color code (6 symbols) is expected.'
+						'Incorrect value for field "severity_color_0": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_1": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_2": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_3": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_4": a hexadecimal colour code (6 symbols) is expected.',
+						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
 			]

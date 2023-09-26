@@ -130,7 +130,7 @@ css_images:
 	cp sass/favicon.ico ui/
 
 icons_build:
-	cd sass/icons
+	cd sass/icons && \
 	npm run generate
 	cp sass/icons/dist/_icons.scss sass/stylesheets/sass/base/
 	cp sass/icons/dist/zabbix-icons.svg ui/assets/fonts/
@@ -139,7 +139,7 @@ icons_build:
 	cp sass/icons/dist/zabbix-icons.woff2 ui/assets/fonts/
 
 icons_cleanup:
-	cd sass/icons
+	cd sass/icons && \
 	npm run cleanup
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_images

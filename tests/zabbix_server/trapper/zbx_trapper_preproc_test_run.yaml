@@ -1247,4 +1247,226 @@ out:
         "result": "10"
       }
     }
+---
+test case: 'Check for not supported test (supported item, single step)'
+in:
+  request: |
+    {
+          "data": {
+                "value": "value 123",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "\\0",
+                    "params": "0\n123"
+                  }
+                ],
+                "state": "0",
+                "value_type": "1"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "result": "value 123"
+          }
+        ],
+        "result": "value 123"
+      }
+    }
+---
+test case: 'Check for not supported test (single step)'
+in:
+  request: |
+    {
+          "data": {
+                "runtime_error": "error 123",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "\\0",
+                    "params": "0\n123"
+                  }
+                ],
+                "state": "1",
+                "value_type": "0"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "action": 3,
+             "error":"error 123",
+             "failed":"123"
+          }
+        ],
+        "error": "123"
+      }
+    }
+---
+test case: 'Check for not supported test (single step without parameter)'
+in:
+  request: |
+    {
+          "data": {
+                "value": "error",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "new error",
+                    "params": "-1\n"
+                  }
+                ],
+                "state": "1",
+                "value_type": "0"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "action": 3,
+             "error":"error",
+             "failed":"new error"
+          }
+        ],
+        "error": "new error"
+      }
+    }
+---
+test case: 'Check for not supported test (multiple step, supported item)'
+in:
+  request: |
+    {
+          "data": {
+                "value": "value 123",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "\\0",
+                    "params": "0\n123"
+                  },
+                  {
+                    "type": "26",
+                    "error_handler_params": "333",
+                    "params": "0\n123",
+                    "error_handler": "3"
+                  },
+                  {
+                    "type": "26",
+                    "error_handler": "2",
+                    "error_handler_params": "444",
+                    "params": "1\n123"
+                  }
+                ],
+                "state": "0",
+                "value_type": "1"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "result": "value 123"
+          },
+          {
+             "result": "value 123"
+          },
+          {
+             "result": "value 123"
+          }
+
+         ],
+        "result": "value 123"
+      }
+    }
+---
+test case: 'Check for not supported test (multiple step)'
+in:
+  request: |
+    {
+          "data": {
+                "runtime_error": "error 123",
+                "steps": [
+                  {
+                    "type": "26",
+                    "error_handler": "3",
+                    "error_handler_params": "\\0",
+                    "params": "0\n123"
+                  },
+                  {
+                    "type": "26",
+                    "error_handler_params": "333",
+                    "params": "0\n123",
+                    "error_handler": "3"
+                  },
+                  {
+                    "type": "26",
+                    "error_handler": "2",
+                    "error_handler_params": "444",
+                    "params": "1\n123"
+                  }
+                ],
+                "state": "1",
+                "value_type": "0"
+        },
+        "request": "preprocessing.test",
+        "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "response": "success",
+      "data": {
+        "steps": [
+          {
+             "action": 3,
+             "error":"error 123",
+             "failed":"123"
+          },
+          {
+             "action": 3,
+             "error":"123",
+             "failed": "333"
+          },
+          {
+             "action": 2,
+             "error":"333",
+             "result":"444"
+          }
+         ],
+        "result": "444"
+      }
+    }
 ...

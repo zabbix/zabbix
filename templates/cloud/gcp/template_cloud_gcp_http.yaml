@@ -1210,7 +1210,7 @@ zabbix_export:
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
-                    - ''
+                    - '-1'
                 - type: JSONPATH
                   parameters:
                     - $.p_used
@@ -1946,7 +1946,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -1971,7 +1971,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
             - type: JSONPATH
               parameters:
                 - '$.timeSeriesData[0].pointData[0].values[0].int64Value'
@@ -2688,7 +2688,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -2868,7 +2868,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -2983,7 +2983,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -3899,7 +3899,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -4122,7 +4122,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
             - type: JSONPATH
               parameters:
                 - '$.timeSeriesData[0].pointData[0].values[0].int64Value'
@@ -4766,7 +4766,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -5309,7 +5309,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -5688,7 +5688,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
             - type: JSONPATH
               parameters:
                 - '$.timeSeriesData[0].pointData[0].values[0].int64Value'
@@ -6208,7 +6208,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -6633,7 +6633,7 @@ zabbix_export:
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
-                    - ''
+                    - '-1'
               timeout: '{$GCP.DATA.TIMEOUT}'
               parameters:
                 - name: project_id
@@ -7306,7 +7306,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -7757,7 +7757,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -8317,7 +8317,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
