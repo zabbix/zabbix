@@ -61,7 +61,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$options['groupids'] = getSubGroups($this->fields_values['groupids']);
 			}
 
-			if ($this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
+			if ($this->isTemplateDashboard()) {
 				$options['hostids'] = $this->fields_values['override_hostid'];
 			}
 

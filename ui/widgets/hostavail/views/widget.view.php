@@ -124,7 +124,7 @@ else {
 			$interface_data['total'] = new CCol($data['total_hosts_sum']);
 		}
 		else {
-			$interface_data['total'] = new CCol( $data['interface_totals'][$type]);
+			$interface_data['total'] = new CCol($data['interface_totals'][$type]);
 		}
 
 		if ($data['layout'] == STYLE_HORIZONTAL) {
