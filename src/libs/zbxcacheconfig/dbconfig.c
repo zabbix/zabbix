@@ -2549,11 +2549,11 @@ static void	dc_preprocitem_free(ZBX_DC_PREPROCITEM *preprocitem)
 	__config_shmem_free_func(preprocitem);
 }
 
-static const char	*dc_get_global_item_type_timeout(const ZBX_DC_ITEM *item)
+static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 {
 	const char	*global_timeout;
 
-	switch (item->type)
+	switch (item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_ZABBIX_ACTIVE:
@@ -2589,6 +2589,21 @@ static const char	*dc_get_global_item_type_timeout(const ZBX_DC_ITEM *item)
 	}
 
 	return global_timeout;
+}
+
+char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type)
+{
+	const char	*cached_tmt;
+	char		*tmt;
+
+	RDLOCK_CACHE;
+
+	cached_tmt = dc_get_global_item_type_timeout(item_type);
+	tmt = zbx_strdup(NULL, cached_tmt);
+
+	UNLOCK_CACHE;
+
+	return tmt;
 }
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
@@ -9070,7 +9085,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	DCget_interface(&dst_item->interface, dc_interface);
 
 	if ('\0' == *src_item->timeout)
-		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item));
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
 	else
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
 
@@ -9086,7 +9101,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				if ('\0' != *src_item->timeout &&
 						0 != strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 				{
-					zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item));
+					zbx_strscpy(dst_item->timeout_orig,
+							dc_get_global_item_type_timeout(src_item->type));
 				}
 
 				zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
@@ -15671,6 +15687,8 @@ void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *ne
 				dheck_out->uniq = dcheck->uniq;
 				dheck_out->type = dcheck->type;
 				dheck_out->allow_redirect = dcheck->allow_redirect;
+				dheck_out->timeout_str = NULL;
+				dheck_out->timeout_sec = 0;
 
 				if (SVC_SNMPv1 == dheck_out->type || SVC_SNMPv2c == dheck_out->type ||
 						SVC_SNMPv3 == dheck_out->type)
