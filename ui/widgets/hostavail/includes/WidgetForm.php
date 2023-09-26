@@ -58,8 +58,7 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(STYLE_HORIZONTAL)
 			)
 			->addField(
-				new CWidgetFieldCheckBox(
-					'maintenance',
+				new CWidgetFieldCheckBox('maintenance',
 					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Include hosts in maintenance')
 				)
 			)

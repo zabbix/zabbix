@@ -26,19 +26,6 @@
  * @var array $data
  */
 
-$type_field_names = [
-	'total_hosts' => _('Total Hosts'),
-	INTERFACE_TYPE_AGENT_ACTIVE => _('Agent (active)'),
-	INTERFACE_TYPE_AGENT => _('Agent (passive)'),
-	INTERFACE_TYPE_SNMP => _('SNMP'),
-	INTERFACE_TYPE_JMX => _('JMX'),
-	INTERFACE_TYPE_IPMI => _('IPMI')
-];
-
-$interface_states_order = [INTERFACE_AVAILABLE_TRUE, INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_MIXED,
-	INTERFACE_AVAILABLE_UNKNOWN
-];
-
 $interface_states_fields = [
 	INTERFACE_AVAILABLE_TRUE => ['name' => _('Available'), 'style' => ZBX_STYLE_HOST_AVAIL_TRUE,
 		'name_in_context' => _x('Available', 'compact table header')
@@ -57,45 +44,58 @@ $interface_states_fields = [
 	]
 ];
 
-$header = [
-	STYLE_HORIZONTAL => [''],
-	STYLE_VERTICAL => ['']
-];
-
-foreach ($interface_states_fields as $field) {
-	$header[STYLE_HORIZONTAL][] = (new CColHeader($field['name_in_context']))->addClass($field['style']);
-}
-
-foreach ($type_field_names as $type => $interface_name) {
-	if (!in_array($type, $data['interface_types']) && $type !== 'total_hosts') {
-		continue;
-	}
-
-	$header[STYLE_VERTICAL][] = $interface_name;
-}
-
 if (count($data['interface_types']) == 1 || $data['only_totals'] == 1) {
 	$counts = $data['total_hosts'];
 
 	$table = (new CDiv())
 		->addClass(ZBX_STYLE_HOST_AVAIL_TABLE)
 		->addClass(ZBX_STYLE_TOTALS_LIST)
-		->addClass(($data['layout'] == STYLE_HORIZONTAL)
+		->addClass($data['layout'] == STYLE_HORIZONTAL
 			? ZBX_STYLE_TOTALS_LIST_HORIZONTAL
 			: ZBX_STYLE_TOTALS_LIST_VERTICAL
 		);
 
 	foreach ($interface_states_fields as $state => $field) {
-		$table->addItem((new CDiv([
-			(new CSpan($state != 'total' ? $counts[$state] : $data['total_hosts_sum']))
-				->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
-			$field['name']
-		]))
-			->addClass($field['style'])
+		$table->addItem(
+			(new CDiv([
+				(new CSpan($state != 'total' ? $counts[$state] : $data['total_hosts_sum']))
+					->addClass(ZBX_STYLE_TOTALS_LIST_COUNT),
+				$field['name']
+			]))->addClass($field['style'])
 		);
 	}
 }
 else {
+	$header = [
+		STYLE_HORIZONTAL => [''],
+		STYLE_VERTICAL => ['']
+	];
+
+	foreach ($interface_states_fields as $field) {
+		$header[STYLE_HORIZONTAL][] = (new CColHeader($field['name_in_context']))->addClass($field['style']);
+	}
+
+	$type_field_names = [
+		'total_hosts' => _('Total Hosts'),
+		INTERFACE_TYPE_AGENT_ACTIVE => _('Agent (active)'),
+		INTERFACE_TYPE_AGENT => _('Agent (passive)'),
+		INTERFACE_TYPE_SNMP => _('SNMP'),
+		INTERFACE_TYPE_JMX => _('JMX'),
+		INTERFACE_TYPE_IPMI => _('IPMI')
+	];
+
+	foreach ($type_field_names as $type => $interface_name) {
+		if (!in_array($type, $data['interface_types']) && $type !== 'total_hosts') {
+			continue;
+		}
+
+		$header[STYLE_VERTICAL][] = $interface_name;
+	}
+
+	$interface_states_order = [INTERFACE_AVAILABLE_TRUE, INTERFACE_AVAILABLE_FALSE, INTERFACE_AVAILABLE_MIXED,
+		INTERFACE_AVAILABLE_UNKNOWN
+	];
+
 	$table = (new CTableInfo)
 		->setHeader($header[$data['layout']])
 		->setHeadingColumn(0)
@@ -113,17 +113,19 @@ else {
 
 		foreach ($interface_states_order as $state) {
 			if ($type == INTERFACE_TYPE_AGENT_ACTIVE && $state == INTERFACE_AVAILABLE_MIXED) {
-				$interface_data[$state] = (new CCol(''));
+				$interface_data[$state] = new CCol('');
 			}
 			else {
-				$interface_data[$state] = (new CCol($counts[$state]));
+				$interface_data[$state] = new CCol($counts[$state]);
 			}
 		}
 
-		$interface_data['total'] = (new CCol($type == 'total_hosts'
-			? $data['total_hosts_sum']
-			: $data['interface_totals'][$type]
-		));
+		if ($type == 'total_hosts') {
+			$interface_data['total'] = new CCol($data['total_hosts_sum']);
+		}
+		else {
+			$interface_data['total'] = new CCol( $data['interface_totals'][$type]);
+		}
 
 		if ($data['layout'] == STYLE_HORIZONTAL) {
 			$table->addRow($interface_data);
@@ -139,7 +141,9 @@ else {
 
 	if ($data['layout'] == STYLE_VERTICAL) {
 		foreach ($interface_states_fields as $state => $field) {
-			$table->addRow(array_merge([(new CColHeader($field['name']))->addClass($field['style'])], $rows[$state]));
+			$table->addRow(
+				array_merge([(new CColHeader($field['name']))->addClass($field['style'])], $rows[$state])
+			);
 		}
 	}
 }

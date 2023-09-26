@@ -28,7 +28,7 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
-	const INTERFACE_STATUSES = [
+	private const INTERFACE_STATUSES = [
 		INTERFACE_AVAILABLE_UNKNOWN,
 		INTERFACE_AVAILABLE_TRUE,
 		INTERFACE_AVAILABLE_FALSE,
@@ -50,23 +50,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$total_hosts = array_fill_keys(self::INTERFACE_STATUSES, 0);
 
 		if (!$this->isTemplateDashboard() || ($this->isTemplateDashboard() && $this->fields_values['override_hostid'])) {
-			$hostids = $this->isTemplateDashboard() ? $this->fields_values['override_hostid'] : null;
-
-			$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
-				? getSubGroups($this->fields_values['groupids'])
-				: null;
-
-			$db_hosts = API::Host()->get([
+			$options = [
 				'output' => in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types) ? ['active_available'] : [],
 				'selectInterfaces' => ['type', 'available'],
-				'groupids' => $groupids,
-				'hostids' => $hostids,
-				'filter' => $this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF
-					? ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF]
-					: null,
 				'monitored_hosts' => true,
 				'preservekeys' => true
-			]);
+			];
+
+			if (!$this->isTemplateDashboard() && $this->fields_values['groupids']) {
+				$options['groupids'] = getSubGroups($this->fields_values['groupids']);
+			}
+
+			if ($this->isTemplateDashboard() && $this->fields_values['override_hostid']) {
+				$options['hostids'] = $this->fields_values['override_hostid'];
+			}
+
+			if ($this->fields_values['maintenance'] == HOST_MAINTENANCE_STATUS_OFF) {
+				$options['filter'] = ['maintenance_status' => HOST_MAINTENANCE_STATUS_OFF];
+			}
+
+			$db_hosts = API::Host()->get($options);
 
 			$db_items_active_count = in_array(INTERFACE_TYPE_AGENT_ACTIVE, $interface_types)
 				? API::Item()->get([
