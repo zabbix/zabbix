@@ -186,7 +186,7 @@ class CControllerDashboardView extends CController {
 				'owner' => [
 					'id' => CWebUser::$data['userid'],
 					'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
-				],
+				]
 			];
 
 			$stats['configuration_hash'] = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
@@ -224,7 +224,7 @@ class CControllerDashboardView extends CController {
 						'private' => $db_dashboards[0]['private'],
 						'users' => $db_dashboards[0]['users'],
 						'userGroups' => $db_dashboards[0]['userGroups']
-					],
+					]
 				];
 			}
 			else {
