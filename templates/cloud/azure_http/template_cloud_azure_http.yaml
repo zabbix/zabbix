@@ -3080,9 +3080,6 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: STRING

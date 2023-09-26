@@ -521,9 +521,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -544,9 +541,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -566,9 +560,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -2467,9 +2458,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -2488,9 +2476,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -2511,9 +2496,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -2532,9 +2514,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -2556,9 +2535,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -2579,9 +2555,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -2600,9 +2573,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -2624,9 +2594,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -2646,9 +2613,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6036,9 +6000,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6097,9 +6058,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6118,9 +6076,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6144,9 +6099,6 @@ zabbix_export:
                   width: '6'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6180,9 +6132,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6201,9 +6150,6 @@ zabbix_export:
                   width: '6'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6228,9 +6174,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6249,9 +6192,6 @@ zabbix_export:
                   width: '6'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6273,9 +6213,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6294,9 +6231,6 @@ zabbix_export:
                   width: '6'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6321,9 +6255,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6342,9 +6273,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6365,9 +6293,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6387,9 +6312,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6408,9 +6330,6 @@ zabbix_export:
                   width: '6'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6432,9 +6351,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6455,9 +6371,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6476,9 +6389,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6500,9 +6410,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6522,9 +6429,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6546,9 +6450,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6569,9 +6470,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6590,9 +6488,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6614,9 +6509,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6636,9 +6528,6 @@ zabbix_export:
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
@@ -6660,9 +6549,6 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
@@ -6682,9 +6568,6 @@ zabbix_export:
                   width: '6'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
                     - type: INTEGER
                       name: decimal_places
                       value: '0'
