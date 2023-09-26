@@ -288,13 +288,13 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
 									->setValue((int) $value['aggregate_function'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_LAST => $this->aggr_fnc2str(AGGREGATE_LAST),
-										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
-										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
-										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
-										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
-										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM),
-										AGGREGATE_FIRST => $this->aggr_fnc2str(AGGREGATE_FIRST)
+										AGGREGATE_LAST => item_aggr_fnc2str(AGGREGATE_LAST),
+										AGGREGATE_MIN => item_aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => item_aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => item_aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => item_aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => item_aggr_fnc2str(AGGREGATE_SUM),
+										AGGREGATE_FIRST => item_aggr_fnc2str(AGGREGATE_FIRST)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -310,12 +310,12 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_dataset_aggregation')
 									->setValue((int) $value['dataset_aggregation'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_NONE => $this->aggr_fnc2str(AGGREGATE_NONE),
-										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
-										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
-										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
-										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
-										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM)
+										AGGREGATE_NONE => item_aggr_fnc2str(AGGREGATE_NONE),
+										AGGREGATE_MIN => item_aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => item_aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => item_aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => item_aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => item_aggr_fnc2str(AGGREGATE_SUM)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)
@@ -379,26 +379,5 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		]))
 			->addClass(ZBX_STYLE_SORTABLE)
 			->addClass('single-item-table-row');
-	}
-
-	private function aggr_fnc2str($function) {
-		switch ($function) {
-			case AGGREGATE_NONE:
-				return _('none');
-			case AGGREGATE_MIN:
-				return _('min');
-			case AGGREGATE_MAX:
-				return _('max');
-			case AGGREGATE_AVG:
-				return _('avg');
-			case AGGREGATE_COUNT:
-				return _('count');
-			case AGGREGATE_SUM:
-				return _('sum');
-			case AGGREGATE_FIRST:
-				return _('first');
-			case AGGREGATE_LAST:
-				return _('last');
-		}
 	}
 }
