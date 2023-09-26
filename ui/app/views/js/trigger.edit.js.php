@@ -132,10 +132,9 @@ window.trigger_edit_popup = new class {
 				);
 			}
 			else if (e.target.id === 'test-recovery-expression') {
-				return PopUp('popup.testtriggerexpr',
-					{expression: this.recovery_expr_temp.value}, {
-						dialogue_class: 'modal-popup-generic'
-					});
+				return PopUp('popup.testtriggerexpr', {expression: this.recovery_expr_temp.value},
+					{dialogue_class: 'modal-popup-generic'}
+				);
 			}
 			else if (e.target.classList.contains('js-recovery-expression')) {
 				this.#copy_expression(e.target);
