@@ -298,8 +298,7 @@ abstract class CControllerItemPrototype extends CController {
 				];
 			}
 
-			CArrayHelper::sort($preprocessings, ['sortorder']);
-			$input['preprocessing'] = $preprocessings;
+			$input['preprocessing'] = CItemPrototypeHelper::sortPreprocessingSteps($preprocessings);
 		}
 
 		if ($input['tags']) {

@@ -98,10 +98,6 @@ function getItemFormData(array $item = []) {
 
 	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
 
-	if (!$data['is_discovery_rule']) {
-		$data['preprocessing'] = sortPreprocessingSteps($data['preprocessing']);
-	}
-
 	// Unset empty and inherited tags.
 	foreach ($data['tags'] as $key => $tag) {
 		if ($tag['tag'] === '' && $tag['value'] === '') {

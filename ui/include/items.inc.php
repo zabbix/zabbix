@@ -2590,33 +2590,3 @@ function getInheritedTimeouts(string $proxyid): array {
 		]
 	];
 }
-
-/**
- * Prioritize ZBX_PREPROC_VALIDATE_NOT_SUPPORTED checks, with "match any error" being the last of them.
- *
- * @param array $steps
- *
- * @return array
- */
-function sortPreprocessingSteps(array $steps): array {
-	$ns_regex = [];
-	$ns_any = [];
-	$other = [];
-
-	foreach ($steps as $step) {
-		if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-			$other[] = $step;
-			continue;
-		}
-
-		if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
-			$ns_any[] = $step;
-		}
-		else {
-			$ns_regex[] = $step;
-		}
-	}
-
-	return array_merge($ns_regex, $ns_any, $other);
-}
-
