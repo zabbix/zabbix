@@ -44,7 +44,7 @@ You must set {$TRAVIS.API.TOKEN} and {$TRAVIS.API.URL} macros.
 |Travis: Get repos|<p>Getting repos using Travis API.</p>|HTTP agent|travis.get_repos|
 |Travis: Get builds|<p>Getting builds using Travis API.</p>|HTTP agent|travis.get_builds|
 |Travis: Get jobs|<p>Getting jobs using Travis API.</p>|HTTP agent|travis.get_jobs|
-|Travis: Get health|<p>Getting home JSON using Travis API.</p>|HTTP agent|travis.get_health<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Travis: Get health|<p>Getting home JSON using Travis API.</p>|HTTP agent|travis.get_health<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Travis: Jobs passed|<p>Total count of passed jobs in all repos.</p>|Dependent item|travis.jobs.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs.length()`</p></li></ul>|
 |Travis: Jobs active|<p>Active jobs in all repos.</p>|Dependent item|travis.jobs.active<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.state == "started")].length()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |Travis: Jobs in queue|<p>Jobs in queue in all repos.</p>|Dependent item|travis.jobs.queue<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.jobs[?(@.state == "received")].length()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|

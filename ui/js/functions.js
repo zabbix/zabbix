@@ -50,35 +50,6 @@ function delete_expression(id, type) {
 	}
 }
 
-/**
- * Insert expression part into input field.
- *
- * @param string id		Expression temporary ID.
- * @param number type	Expression (type = 0) or recovery expression (type = 1).
- */
-function copy_expression(id, type) {
-	// If type is expression.
-	if (type == 0) {
-		var element = document.getElementsByName('expr_temp')[0];
-	}
-	// Type is recovery expression.
-	else {
-		var element = document.getElementsByName('recovery_expr_temp')[0];
-	}
-
-	if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
-		return null;
-	}
-
-	var src = document.getElementById(id);
-	if (typeof src.textContent != 'undefined') {
-		element.value = src.textContent;
-	}
-	else {
-		element.value = src.innerText;
-	}
-}
-
 function testUserSound(idx) {
 	var element = document.getElementById(idx);
 	var sound = element.options[element.selectedIndex].value;
@@ -959,7 +930,7 @@ function getFormFields(form) {
 		for (let i = 0; i < key_parts.length; i++) {
 			const key_part = key_parts[i][0];
 
-			if (i == key_parts.length - 1) {
+			if (i === key_parts.length - 1) {
 				if (key_part === '[]') {
 					key_fields.push(value);
 				}

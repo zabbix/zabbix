@@ -22,7 +22,7 @@
 class CControllerResponseData extends CControllerResponse {
 
 	private $data;
-	private $title = null;
+	private string $title = '';
 	private $file_name = null;
 
 	/**
@@ -38,11 +38,11 @@ class CControllerResponseData extends CControllerResponse {
 		return $this->data;
 	}
 
-	public function setTitle($title) {
+	public function setTitle(string $title) {
 		$this->title = $title;
 	}
 
-	public function getTitle() {
+	public function getTitle(): string {
 		return $this->title;
 	}
 

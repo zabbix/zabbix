@@ -173,14 +173,14 @@ zabbix_export:
           parameters:
             - name: api_endpoint
               value: '{$VEEAM.API.URL}'
-            - name: password
-              value: '{$VEEAM.PASSWORD}'
-            - name: user
-              value: '{$VEEAM.USER}'
             - name: created_after
               value: '{$CREATED.AFTER}'
             - name: http_proxy
               value: '{$VEEAM.HTTP.PROXY}'
+            - name: password
+              value: '{$VEEAM.PASSWORD}'
+            - name: user
+              value: '{$VEEAM.USER}'
           tags:
             - tag: component
               value: raw
@@ -193,20 +193,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#TYPE}'
-                value: '{$JOB.TYPE.MATCHES}'
-                formulaid: E
-              - macro: '{#TYPE}'
-                value: '{$JOB.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
-              - macro: '{#NAME}'
-                value: '{$JOB.NAME.MATCHES}'
-                formulaid: C
-              - macro: '{#NAME}'
-                value: '{$JOB.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#JOB.STATUS}'
                 value: '{$JOB.STATUS.MATCHES}'
                 formulaid: A
@@ -214,6 +200,20 @@ zabbix_export:
                 value: '{$JOB.STATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#NAME}'
+                value: '{$JOB.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#NAME}'
+                value: '{$JOB.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#TYPE}'
+                value: '{$JOB.TYPE.MATCHES}'
+                formulaid: E
+              - macro: '{#TYPE}'
+                value: '{$JOB.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Discovery of the jobs states.'
           item_prototypes:
             - uuid: 120a6bf888e74e0c9b054c3bdd50473f
@@ -320,13 +320,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#TYPE}'
-                value: '{$PROXIES.TYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#TYPE}'
-                value: '{$PROXIES.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$PROXIES.NAME.MATCHES}'
                 formulaid: A
@@ -334,6 +327,13 @@ zabbix_export:
                 value: '{$PROXIES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#TYPE}'
+                value: '{$PROXIES.TYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#TYPE}'
+                value: '{$PROXIES.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery of proxies.'
           item_prototypes:
             - uuid: 1daea1ba8ac144fc9e22296720af0b22
@@ -466,13 +466,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#TYPE}'
-                value: '{$REPOSITORIES.TYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#TYPE}'
-                value: '{$REPOSITORIES.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$REPOSITORIES.NAME.MATCHES}'
                 formulaid: A
@@ -480,6 +473,13 @@ zabbix_export:
                 value: '{$REPOSITORIES.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#TYPE}'
+                value: '{$REPOSITORIES.TYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#TYPE}'
+                value: '{$REPOSITORIES.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery of repositories.'
           item_prototypes:
             - uuid: 1c925cfa0a2b46838588471aa58a1591
@@ -576,13 +576,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#TYPE}'
-                value: '{$SESSION.TYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#TYPE}'
-                value: '{$SESSION.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAME}'
                 value: '{$SESSION.NAME.MATCHES}'
                 formulaid: A
@@ -590,6 +583,13 @@ zabbix_export:
                 value: '{$SESSION.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#TYPE}'
+                value: '{$SESSION.TYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#TYPE}'
+                value: '{$SESSION.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery of sessions.'
           item_prototypes:
             - uuid: 7224f41e5c614268bf6997ad8a49710b

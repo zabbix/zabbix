@@ -39,6 +39,10 @@ if ($data['is_resource_available']) {
 				)
 		)
 		->setVar('async_data', $data['widget']);
+
+	if ($data['info']) {
+		$view->setVar('info', $data['info']);
+	}
 }
 else {
 	$view->addItem(

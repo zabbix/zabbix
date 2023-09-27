@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateTrigger extends CController {
+class CControllerTriggerMassupdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -247,11 +247,15 @@ class CControllerPopupMassupdateTrigger extends CController {
 				'parent_discoveryid' => $this->getInput('parent_discoveryid', 0),
 				'context' => $this->getInput('context'),
 				'location_url' => $this->hasInput('prototype')
-					? (new CUrl('trigger_prototypes.php'))
+					? (new CUrl('zabbix.php'))
+						->setArgument('action', 'trigger.prototype.list')
 						->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
+						->setArgument('uncheck', '1')
 						->setArgument('context', $this->getInput('context'))
 						->getUrl()
-					: (new CUrl('triggers.php'))
+					: (new CUrl('zabbix.php'))
+						->setArgument('action', 'trigger.list')
+						->setArgument('uncheck', '1')
 						->setArgument('context', $this->getInput('context'))
 						->getUrl()
 			];

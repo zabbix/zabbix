@@ -124,12 +124,12 @@ zabbix_export:
           description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: 60s
           parameters:
+            - name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
               value: '{$MERAKI.API.URL}'
-            - name: httpproxy
-              value: '{$MERAKI.HTTP_PROXY}'
           tags:
             - tag: component
               value: raw
@@ -473,16 +473,16 @@ zabbix_export:
           description: 'Item for gathering device data from Meraki API.'
           timeout: 60s
           parameters:
+            - name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
+            - name: organizationId
+              value: '{$ORGANIZATION_ID}'
+            - name: serial
+              value: '{$SERIAL}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
               value: '{$MERAKI.API.URL}'
-            - name: organizationId
-              value: '{$ORGANIZATION_ID}'
-            - name: httpproxy
-              value: '{$MERAKI.HTTP_PROXY}'
-            - name: serial
-              value: '{$SERIAL}'
           tags:
             - tag: component
               value: raw
@@ -523,13 +523,6 @@ zabbix_export:
           delay: '0'
           filter:
             conditions:
-              - macro: '{#UPLINK}'
-                value: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
-                formulaid: C
-              - macro: '{#UPLINK}'
-                value: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IP}'
                 value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.MATCHES}'
                 formulaid: A
@@ -537,6 +530,13 @@ zabbix_export:
                 value: '{$MERAKI.DEVICE.LOSS.LATENCY.IP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#UPLINK}'
+                value: '{$MERAKI.DEVICE.UPLINK.MATCHES}'
+                formulaid: C
+              - macro: '{#UPLINK}'
+                value: '{$MERAKI.DEVICE.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           item_prototypes:
             - uuid: abf642b1bb944d16bebf90dcf58dbd86
               name: 'Uplink [{#IP}]: [{#UPLINK}]: Latency'
@@ -690,6 +690,22 @@ zabbix_export:
             - name: 'Meraki: Uplinks'
               widgets:
                 - type: graphprototype
+                  name: Loss
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Cisco Meraki device by HTTP'
+                        name: 'Uplink [{#IP}]: [{#UPLINK}]: Loss'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                - type: graphprototype
                   name: Latency
                   x: '12'
                   width: '12'
@@ -698,30 +714,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco Meraki device by HTTP'
                         name: 'Uplink [{#IP}]: [{#UPLINK}]: Latency'
-                - type: graphprototype
-                  name: Loss
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'Cisco Meraki device by HTTP'
-                        name: 'Uplink [{#IP}]: [{#UPLINK}]: Loss'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: 24967dff65a048578eae18b2485907cb
           name: 'Device status'
@@ -928,14 +928,14 @@ zabbix_export:
           description: 'Item for gathering all the networks of organization from Meraki API.'
           timeout: 30s
           parameters:
+            - name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
+            - name: organizationId
+              value: '{$ID}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
               value: '{$MERAKI.API.URL}'
-            - name: organizationId
-              value: '{$ID}'
-            - name: httpproxy
-              value: '{$MERAKI.HTTP_PROXY}'
           tags:
             - tag: component
               value: raw
@@ -1082,14 +1082,14 @@ zabbix_export:
           description: 'Item for gathering all the VPN stats of the organization.'
           timeout: 30s
           parameters:
+            - name: httpproxy
+              value: '{$MERAKI.HTTP_PROXY}'
+            - name: organizationId
+              value: '{$ID}'
             - name: token
               value: '{$MERAKI.TOKEN}'
             - name: url
               value: '{$MERAKI.API.URL}'
-            - name: organizationId
-              value: '{$ID}'
-            - name: httpproxy
-              value: '{$MERAKI.HTTP_PROXY}'
           tags:
             - tag: component
               value: raw
@@ -1400,13 +1400,6 @@ zabbix_export:
                 value: '{$MERAKI.LLD.VPN.PEER.NETWORK.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-              - macro: '{#SENDER.UPLINK}'
-                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.MATCHES}'
-                formulaid: G
-              - macro: '{#SENDER.UPLINK}'
-                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
               - macro: '{#RECEIVER.UPLINK}'
                 value: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.MATCHES}'
                 formulaid: E
@@ -1414,6 +1407,13 @@ zabbix_export:
                 value: '{$MERAKI.LLD.VPN.RECEIVER.UPLINK.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
+              - macro: '{#SENDER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.MATCHES}'
+                formulaid: G
+              - macro: '{#SENDER.UPLINK}'
+                value: '{$MERAKI.LLD.VPN.SENDER.UPLINK.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
           item_prototypes:
             - uuid: 6e38c9538ad4489ea08b6d21fc8a8bd3
               name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: jitter avg'
@@ -1781,31 +1781,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco Meraki organization by HTTP'
                         name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: latency'
-                - type: graphprototype
-                  name: loss
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'Cisco Meraki organization by HTTP'
-                        name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: loss'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   name: loss
                   'y': '5'
@@ -1815,14 +1798,31 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cisco Meraki organization by HTTP'
                         name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: jitter'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graphprototype
+                  name: loss
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Cisco Meraki organization by HTTP'
+                        name: 'VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: loss'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: af92df09c58c4c9287fe294b7b90e193
           name: 'License status'

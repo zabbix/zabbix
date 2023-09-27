@@ -680,14 +680,6 @@ window.widget_pie_chart_form = new class {
 
 		document.getElementById('units').disabled = !is_units_visible || !is_total_value_visible;
 
-		// Time period tab changes.
-		const is_time_period_custom = document.getElementById('graph_time').checked;
-
-		document.getElementById('time_from').disabled = !is_time_period_custom;
-		document.getElementById('time_to').disabled = !is_time_period_custom;
-		document.getElementById('time_from_calendar').disabled = !is_time_period_custom;
-		document.getElementById('time_to_calendar').disabled = !is_time_period_custom;
-
 		// Legend tab changes.
 		const is_legend_visible = document.getElementById('legend').checked;
 

@@ -99,7 +99,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 						'Source' => 'Simple graph prototype',
 						'Item prototype' => 'testFormItemPrototype2',
 						'Show legend' => true,
-						'Enable host selection' => true,
+						'Override host' => 'Dashboard',
 						'Columns' => '3',
 						'Rows' => '2'
 					]
@@ -379,7 +379,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 			$form->query('xpath:.//div[@id="graphid" or @id="itemid"]')->asMultiselect()->one()->clear();
 		}
 
-		$values = $form->getFields()->asValues();
+		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		$form->submit();
 
 		switch ($data['expected']) {
@@ -426,12 +426,12 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 				$placeholders_count = $widget->query('class:dashboard-grid-iterator-placeholder')->count();
 				$this->assertEquals($expected_placeholders_count, $placeholders_count);
 				// Check Dynamic item setting on Dashboard.
-				if (CTestArrayHelper::get($data['fields'], 'Enable host selection')) {
+				if (CTestArrayHelper::get($data['fields'], 'Override host')) {
 					$this->assertTrue($dashboard->getControls()->query('xpath://form[@aria-label = '.
 						'"Main filter"]')->one()->isPresent());
 				}
 				// Check widget form fields and values.
-				$this->assertEquals($values, $widget->edit()->getFields()->asValues());
+				$this->assertEquals($values, $widget->edit()->getFields()->filter(CElementFilter::VISIBLE)->asValues());
 
 				// Write widget name to variable to use it in next Update test case.
 				if ($update) {
@@ -461,7 +461,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 			: $dashboard->edit()->addWidget()->asForm();
 
 		if ($update) {
-			$original_values = $form->getFields()->asValues();
+			$original_values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 		}
 
 		$dialog = COverlayDialogElement::find()->one();
@@ -474,7 +474,7 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 					'Source' => 'Simple graph prototype',
 					'Item prototype' => 'testFormItemPrototype2',
 					'Show legend' => false,
-					'Enable host selection' => true,
+					'Override host' => 'Dashboard',
 					'Columns' => '3',
 					'Rows' => '2'
 				]);
@@ -492,7 +492,8 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		if ($update) {
-			$new_values = $dashboard->getWidget(self::$previous_widget_name)->edit()->getFields()->asValues();
+			$new_values = $dashboard->getWidget(self::$previous_widget_name)->edit()->getFields()
+					->filter(CElementFilter::VISIBLE)->asValues();
 			$this->assertEquals($original_values, $new_values);
 		}
 
