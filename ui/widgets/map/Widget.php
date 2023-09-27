@@ -25,9 +25,6 @@ use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
 
-	public const SOURCETYPE_MAP = 1;
-	public const SOURCETYPE_FILTER = 2;
-
 	public function getDefaultName(): string {
 		return _('Map');
 	}

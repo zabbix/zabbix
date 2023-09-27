@@ -256,12 +256,65 @@
 				to_offset = Math.floor(data.dimW - Math.max(data.start, data.end)) * data.spp;
 
 			if (seconds > data.minPeriod && (from_offset > 0 || to_offset > 0)) {
-				jQuery.publish('timeselector.rangeoffset', {
+				const widget = graph.data('widget');
+
+				updateTimeSelector(widget, {
+					method: 'rangeoffset',
+					from: data.timePeriod.from,
+					to: data.timePeriod.to,
 					from_offset: Math.max(0, Math.ceil(from_offset)),
 					to_offset: Math.ceil(to_offset)
-				});
+				})
+					.then((time_period) => {
+						widget._startUpdating();
+						widget.feedback({time_period});
+						widget.broadcast({_timeperiod: time_period});
+					});
 			}
 		}
+	}
+
+	function updateTimeSelector(widget, data) {
+		widget._schedulePreloader();
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'timeselector.calc');
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((time_period) => {
+				if ('error' in time_period) {
+					throw {error: time_period.error};
+				}
+
+				if ('has_fields_errors' in time_period) {
+					return;
+				}
+
+				return time_period;
+			})
+			.catch((exception) => {
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = t('Unexpected server error.');
+				}
+
+				widget._updateMessages(messages, title);
+			})
+			.finally(() => {
+				widget._hidePreloader();
+			});
 	}
 
 	// Read SVG nodes and find closest past value to the given x in each data set.
@@ -585,7 +638,7 @@
 
 			if (show_hint) {
 				// Calculate time at mouse position.
-				const time = new CDate((data.timeFrom + (offsetX - data.dimX) * data.spp) * 1000);
+				const time = new CDate((data.timePeriod.from_ts + (offsetX - data.dimX) * data.spp) * 1000);
 
 				html = jQuery('<div>')
 					.addClass('svg-graph-hintbox')
@@ -658,7 +711,7 @@
 						isHintBoxFrozen: false,
 						isTriggerHintBoxFrozen: false,
 						spp: widget._svg_options.spp || null,
-						timeFrom: widget._svg_options.time_from,
+						timePeriod: widget._svg_options.time_period,
 						minPeriod: widget._svg_options.min_period,
 						boxing: false
 					})
@@ -674,6 +727,7 @@
 		activate: function () {
 			const widget = jQuery(this).data('widget');
 			const graph = jQuery(widget._svg);
+			const data = graph.data('options');
 
 			graph
 				.on('mousemove', (e) => {
@@ -690,7 +744,20 @@
 				graph
 					.on('dblclick', function() {
 						hintBox.hideHint(graph, true);
-						jQuery.publish('timeselector.zoomout');
+
+						const widget = graph.data('widget');
+
+						updateTimeSelector(widget, {
+							method: 'zoomout',
+							from: data.timePeriod.from,
+							to: data.timePeriod.to,
+						})
+							.then((time_period) => {
+								widget._startUpdating();
+								widget.feedback({time_period});
+								widget.broadcast({_timeperiod: time_period});
+							});
+
 						return false;
 					})
 					.on('mousedown', {graph}, startSBoxDrag);

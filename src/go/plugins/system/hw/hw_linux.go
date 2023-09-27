@@ -47,13 +47,6 @@ const (
 // Plugin -
 type Plugin struct {
 	plugin.Base
-	options Options
-}
-
-// Options -
-type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int
 }
 
 var impl Plugin
@@ -100,7 +93,6 @@ var chassisTypes = []string{
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	p.options.Timeout = global.Timeout
 }
 
 // Validate -
@@ -112,7 +104,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "system.hw.chassis":
 		return p.exportChassis(params)
 	case "system.hw.devices":
-		return p.exportDevices(params)
+		return p.exportDevices(params, ctx.Timeout())
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
@@ -265,13 +257,13 @@ func clen(n []byte) int {
 	return len(n)
 }
 
-func (p *Plugin) exportDevices(params []string) (result interface{}, err error) {
+func (p *Plugin) exportDevices(params []string, timeout int) (result interface{}, err error) {
 	cmd, err := getDeviceCmd(params)
 	if err != nil {
 		return
 	}
 
-	return zbxcmd.ExecuteStrict(cmd, time.Second*time.Duration(p.options.Timeout), "")
+	return zbxcmd.ExecuteStrict(cmd, time.Second*time.Duration(timeout), "")
 }
 
 func getDeviceCmd(params []string) (string, error) {

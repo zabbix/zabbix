@@ -743,11 +743,11 @@ int	system_sw_packages(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), sysinfo_get_config_timeout(),
+			if (SUCCEED != zbx_execute(mng->list_cmd, &buf, tmp, sizeof(tmp), request->timeout,
 					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
@@ -922,6 +922,7 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char			*regex, *manager, *line, *saveptr, *buf = NULL, error[MAX_STRING_LEN];
 	ZBX_PACKAGE_MANAGER	*mng;
 	struct zbx_json		json;
+	int			timeout;
 
 	if (2 < request->nparam)
 	{
@@ -936,24 +937,34 @@ int	system_sw_packages_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	check_manager = (NULL != manager && '\0' != *manager && 0 != strcmp(manager, "all"));
 
 	zbx_json_initarray(&json, 10 * ZBX_KIBIBYTE);
+	timeout = request->timeout;
 
 	for (int i = 0; NULL != package_managers[i].name; i++)
 	{
+		time_t	tm_start;
 		mng = &package_managers[i];
 		saveptr = NULL;
 
 		if (1 == check_manager && 0 != strcmp(manager, mng->name))
 			continue;
 
-		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), sysinfo_get_config_timeout(),
+		tm_start = time(NULL);
+
+		if (SUCCEED == zbx_execute(mng->test_cmd, &buf, error, sizeof(error), timeout,
 				ZBX_EXIT_CODE_CHECKS_DISABLED, NULL) &&
 				'\0' != *buf)	/* consider this manager if test_cmd outputs anything to stdout */
 		{
-			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error),
-					sysinfo_get_config_timeout(), ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
+			timeout = timeout - (int)(time(NULL) - tm_start);
+
+			tm_start = time(NULL);
+
+			if (SUCCEED != zbx_execute(mng->details_cmd, &buf, error, sizeof(error), timeout,
+					ZBX_EXIT_CODE_CHECKS_DISABLED, NULL))
 			{
 				continue;
 			}
+
+			timeout = timeout - (int)(time(NULL) - tm_start);
 
 			ret = SYSINFO_RET_OK;
 
