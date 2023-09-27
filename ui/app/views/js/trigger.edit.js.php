@@ -265,20 +265,17 @@ window.trigger_edit_popup = new class {
 			recovery_fields.forEach((field) => {
 				field.style.display = '';
 			})
-			this.#toggleRecoveryExpressionConstructor('close-recovery-expression-constructor');
 		}
 		else if (recovery_mode == <?= ZBX_RECOVERY_MODE_NONE ?>) {
 			recovery_fields.forEach((field) => {
 				field.style.display = 'none';
 			})
-			this.#toggleRecoveryExpressionConstructor('close-recovery-expression-constructor');
 		}
 		else {
 			recovery_expression_row.style.display = 'none';
 			recovery_expression_row.previousElementSibling.style.display = 'none';
 			ok_event_closes.style.display = '';
 			ok_event_closes.previousElementSibling.style.display = '';
-			this.#toggleRecoveryExpressionConstructor('close-recovery-expression-constructor');
 		}
 	}
 
@@ -423,7 +420,7 @@ window.trigger_edit_popup = new class {
 			insert_recovery_expression.textContent = <?= json_encode(_('Edit')) ?>;
 			this.recovery_expression_constructor_active = true;
 
-			if (recovery_expression.value === '') {
+			if (this.recovery_expression.value === '') {
 				this.#showRecoveryConstructorAddButton();
 			}
 			else {
@@ -438,11 +435,11 @@ window.trigger_edit_popup = new class {
 			});
 
 			recovery_expression_constructor.style.display = '';
-			recovery_expr_temp.readOnly = this.readonly;
 			this.recovery_expression.name = 'recovery_expression';
 			this.recovery_expression.id = 'recovery_expression';
 			this.recovery_expr_temp.name = 'recovery_expr_temp';
 			this.recovery_expr_temp.id = 'recovery_expr_temp';
+			this.recovery_expression.readOnly = this.readonly;
 			insert_recovery_expression.textContent = <?= json_encode(_('Add')) ?>;
 			this.recovery_expression.value = this.recovery_expr_temp.value;
 			this.recovery_expression_constructor_active = false;
