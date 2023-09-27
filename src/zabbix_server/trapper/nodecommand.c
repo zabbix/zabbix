@@ -278,7 +278,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  ******************************************************************************/
 static int validate_manualinput(const char *manualinput, const char *validator, const unsigned char validator_type)
 {
-	int	ret;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() manualinput:%s, validator:%s, validator_type:" ZBX_FS_UI64,
 			__func__, manualinput, validator, validator_type);
