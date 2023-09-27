@@ -154,7 +154,7 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 	if (SUCCEED == zbx_vps_monitor_capped())
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
-		error = zbx_strdup(error, "data throttling is active");
+		error = zbx_strdup(error, "data collection has been paused");
 		goto reply;
 	}
 
