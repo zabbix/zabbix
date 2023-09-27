@@ -586,15 +586,23 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
-		get_pinger_hosts(&items, &items_alloc, &items_count, pinger_args_in->config_timeout);
-		process_pinger_hosts(items, items_count, process_num, process_type);
-		sec = zbx_time() - sec;
-		itc = items_count;
+		if (FAIL == zbx_vps_monitor_capped())
+		{
+			get_pinger_hosts(&items, &items_alloc, &items_count, pinger_args_in->config_timeout);
+			process_pinger_hosts(items, items_count, process_num, process_type);
+			sec = zbx_time() - sec;
+			itc = items_count;
 
-		free_hosts(&items, &items_count);
+			free_hosts(&items, &items_count);
 
-		nextcheck = zbx_dc_config_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
-		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
+			nextcheck = zbx_dc_config_get_poller_nextcheck(ZBX_POLLER_TYPE_PINGER);
+			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
+		}
+		else
+		{
+			itc = 0;
+			sleeptime = POLLER_DELAY;
+		}
 
 		zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), process_num, itc, sec, sleeptime);

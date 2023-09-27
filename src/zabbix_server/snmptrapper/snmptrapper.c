@@ -615,8 +615,14 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (ZBX_IS_RUNNING() && SUCCEED == get_latest_data())
+		while (ZBX_IS_RUNNING() && FAIL == zbx_vps_monitor_capped())
+		{
+			if (SUCCEED != get_latest_data())
+				break;
+
 			read_traps();
+		}
+
 		sec = zbx_time() - sec;
 
 		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",

@@ -1024,12 +1024,19 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					old_total_sec);
 		}
 
-		processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
-				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
-				poller_args_in->config_unreachable_period, poller_args_in->config_unreachable_delay);
-		total_sec += zbx_time() - sec;
+		if (ZBX_POLLER_TYPE_INTERNAL == poller_type || FAIL == zbx_vps_monitor_capped())
+		{
+			processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
+					poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
+					poller_args_in->config_unreachable_period,
+					poller_args_in->config_unreachable_delay);
 
-		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
+			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
+		}
+		else
+			sleeptime = POLLER_DELAY;
+
+		total_sec += zbx_time() - sec;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
