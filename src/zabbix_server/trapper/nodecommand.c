@@ -280,7 +280,7 @@ static int validate_manualinput(const char *manualinput, const char *validator, 
 {
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() manualinput:%s, validator:%s, validator_type:" ZBX_FS_UI64,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() manualinput:%s, validator:%s, validator_type:%hhu",
 			__func__, manualinput, validator, validator_type);
 
 	switch (validator_type)
