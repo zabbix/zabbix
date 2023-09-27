@@ -602,7 +602,8 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 				check_tasks = 1;
 
 			if (proxy.proxy_data_nextcheck <= now && (proxy.compatibility == ZBX_PROXY_VERSION_CURRENT ||
-					proxy.compatibility == ZBX_PROXY_VERSION_OUTDATED))
+					proxy.compatibility == ZBX_PROXY_VERSION_OUTDATED) &&
+					SUCCEED != zbx_vps_monitor_capped())
 			{
 				int	more;
 
