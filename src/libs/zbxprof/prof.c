@@ -57,8 +57,11 @@ void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope)
 	if (0 != zbx_prof_scope)
 	{
 		int			i;
+#if defined(__hpux)
+		zbx_func_profile_t	*func_profile, func_profile_local = {func_name, 0};
+#else
 		zbx_func_profile_t	*func_profile, func_profile_local = {.func_name = func_name};
-
+#endif
 		if (FAIL == (i = zbx_vector_func_profiles_bsearch(&zbx_func_profiles, &func_profile_local,
 				compare_func_profile)))
 		{
