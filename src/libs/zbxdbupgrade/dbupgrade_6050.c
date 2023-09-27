@@ -967,9 +967,12 @@ static int	DBpatch_6050092(void)
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	/* functions table contains history functions used in trigger expressions */
-	result = zbx_db_select("select functionid,parameter,triggerid"
+	if (NULL == (result = zbx_db_select("select functionid,parameter,triggerid"
 			" from functions"
-			" where " ZBX_DB_CHAR_LENGTH(parameter) ">1");
+			" where " ZBX_DB_CHAR_LENGTH(parameter) ">1")))
+	{
+		goto clean;
+	}
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1050,16 +1053,32 @@ static int	DBpatch_6050092(void)
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
-
+clean:
 	zbx_free(sql);
 
 	return ret;
 }
 
+static int	update_escaping_in_expression(const char *expression, char **substitute, char **error)
+{
+	zbx_eval_context_t	ctx;
+	int			ret = SUCCEED;
+
+	ret = zbx_eval_parse_expression(&ctx, expression, ZBX_EVAL_PARSE_CALC_EXPRESSION |
+			ZBX_EVAL_PARSE_STR_V64_COMPAT | ZBX_EVAL_PARSE_LLDMACRO, error);
+
+	if (FAIL == ret)
+		return FAIL;
+
+	ctx.rules ^= ZBX_EVAL_PARSE_STR_V64_COMPAT;
+	zbx_eval_compose_expression(&ctx, substitute);
+
+	return SUCCEED;
+}
+
 static int	DBpatch_6050093(void)
 {
 	int			ret = SUCCEED;
-	zbx_eval_context_t	ctx;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	char			*sql = NULL, *error = NULL;
@@ -1072,36 +1091,23 @@ static int	DBpatch_6050093(void)
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
 	{
-		char	*tmp, *substitute = NULL;
-		int	parse_ret;
-
-		parse_ret = zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION |
-				ZBX_EVAL_PARSE_STR_V64_COMPAT | ZBX_EVAL_PARSE_LLDMACRO, &error);
-
-		if (FAIL == parse_ret)
+		char	*substitute = NULL, *tmp = NULL;
+		if (SUCCEED == update_escaping_in_expression(row[1], &substitute, &error))
+		{
+			tmp = zbx_db_dyn_escape_string(substitute);
+			zbx_free(substitute);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update items set params='%s' where itemid=%s;\n", substitute, row[0]);
+			zbx_free(tmp);
+		}
+		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Failed to parse calculated item expression \"%s\" for"
-					" item with id %s, error: %s", row[1], row[0], error);
+				" item with id %s, error: %s", row[1], row[0], error);
 			zbx_free(error);
-			error = NULL;
-
-			continue;
 		}
 
-		zbx_free(error);
-		error = NULL;
-		ctx.rules ^= ZBX_EVAL_PARSE_STR_V64_COMPAT;
-
-		zbx_eval_compose_expression(&ctx, &substitute);
-
-		tmp = zbx_db_dyn_escape_string(substitute);
-		zbx_free(substitute);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update items set params='%s' where itemid=%s;\n",
-				tmp, row[0]);
-		zbx_free(tmp);
-
-		if (SUCCEED == ret)
-			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	zbx_db_free_result(result);
@@ -1112,9 +1118,89 @@ static int	DBpatch_6050093(void)
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
 			ret = FAIL;
 	}
-
 clean:
 	zbx_free(error);
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_6050094(void)
+{
+	int			ret = SUCCEED;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (NULL == (result = zbx_db_select("select scriptid,command from scripts")))
+		goto clean;
+
+	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	{
+		const char	*command = row[1];
+		char		*buf = NULL, *error = NULL, *tmp = NULL;;
+		size_t		buf_alloc = 0, buf_offset = 0;
+		size_t		pos = 0, cmd_len;
+		zbx_token_t	token;
+
+		cmd_len = strlen(command);
+
+		while (SUCCEED == zbx_token_find(command, pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) &&
+				cmd_len >= pos)
+		{
+			if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
+			{
+				char	*substitute = NULL, *expression = NULL;
+				size_t	expr_alloc = 0, expr_offset = 0;
+
+				zbx_strncpy_alloc(&expression, &expr_alloc, &expr_offset,
+						command + token.loc.l + 2, token.loc.r - token.loc.l - 2);
+
+				if (SUCCEED == update_escaping_in_expression(expression, &substitute, &error))
+				{
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
+						command + pos, token.loc.l + 2);
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
+						substitute, strlen(substitute));
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, "}", 1);
+					zbx_free(substitute);
+				}
+				else {
+					zabbix_log(LOG_LEVEL_WARNING, "Failed to parse expression macro \"%s\" for"
+						" script with id %s, error: %s", expression, row[0], error);
+					zbx_free(error);
+					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
+						command + pos, token.loc.r + 1);
+				}
+
+				zbx_free(expression);
+			}
+			else
+				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, token.loc.r + 1);
+
+			pos = token.loc.r + 1;
+		}
+
+		if (cmd_len >= pos)
+			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, cmd_len - pos);
+
+		tmp = zbx_db_dyn_escape_string(buf);
+		zbx_free(buf);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update scripts set command='%s' where scriptid=%s;\n", tmp, row[0]);
+		zbx_free(tmp);
+		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			ret = FAIL;
+	}
+clean:
 	zbx_free(sql);
 
 	return ret;
@@ -1218,5 +1304,6 @@ DBPATCH_ADD(6050090, 0, 1)
 DBPATCH_ADD(6050091, 0, 1)
 DBPATCH_ADD(6050092, 0, 1)
 DBPATCH_ADD(6050093, 0, 1)
+DBPATCH_ADD(6050094, 0, 1)
 
 DBPATCH_END()
