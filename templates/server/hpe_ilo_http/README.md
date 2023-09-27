@@ -213,7 +213,7 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Get data|<p>Get data about the fan.</p>|Dependent item|hpe.ilo.fan.get_data[{#CHASSIS_ID}, {#FAN_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Status|<p>The health state of the fan. Possible values:</p><p></p><p>0 - "OK", the fan is in normal condition;</p><p>1 - "Warning", the fan is in condition that requires attention;</p><p>2 - "Critical", the fan is in critical condition that requires immediate attention;</p><p>10 - "Unknown", the fan is in unknown condition.</p>|Dependent item|hpe.ilo.fan.status[{#CHASSIS_ID}, {#FAN_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Status.Health`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Reading, in %|<p>The current reading percentage for the fan.</p>|Dependent item|hpe.ilo.fan.reading[{#CHASSIS_ID}, {#FAN_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Reading`</p></li></ul>|
+|HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Speed, in %|<p>The current speed of the fan.</p>|Dependent item|hpe.ilo.fan.speed[{#CHASSIS_ID}, {#FAN_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Reading`</p></li></ul>|
 
 ### Trigger prototypes for HPE iLO: Fans discovery
 
@@ -234,7 +234,7 @@ This template has been tested on:
 |----|-----------|----|-----------------------|
 |HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Get data|<p>Get data about the sensor.</p>|Dependent item|hpe.ilo.sensor.get_data[{#CHASSIS_ID}, {#SENSOR_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Status|<p>The health state of the sensor. Possible values:</p><p></p><p>0 - "OK", the sensor is in normal condition;</p><p>1 - "Warning", the sensor is in condition that requires attention;</p><p>2 - "Critical", the sensor is in critical condition that requires immediate attention;</p><p>10 - "Unknown", the sensor is in unknown condition.</p>|Dependent item|hpe.ilo.sensor.status[{#CHASSIS_ID}, {#SENSOR_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Status.Health`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Reading|<p>The current temperature reading in Celsius degrees for the sensor.</p>|Dependent item|hpe.ilo.sensor.reading[{#CHASSIS_ID}, {#SENSOR_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ReadingCelsius`</p></li></ul>|
+|HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Temperature|<p>The current temperature reading in Celsius degrees for the sensor.</p>|Dependent item|hpe.ilo.sensor.temperature[{#CHASSIS_ID}, {#SENSOR_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.ReadingCelsius`</p></li></ul>|
 
 ### Trigger prototypes for HPE iLO: Temperature sensors discovery
 

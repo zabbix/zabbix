@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-25T14:28:41Z'
+  date: '2023-09-27T02:49:29Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -1385,13 +1385,13 @@ zabbix_export:
                 - tag: fan
                   value: '{#FAN_ID}'
             - uuid: d30cdb96ceb9470dbba0b30112c3a05b
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Reading, in %'
+              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Speed, in %'
               type: DEPENDENT
-              key: 'hpe.ilo.fan.reading[{#CHASSIS_ID}, {#FAN_ID}]'
+              key: 'hpe.ilo.fan.speed[{#CHASSIS_ID}, {#FAN_ID}]'
               delay: '0'
               history: 7d
               units: '%'
-              description: 'The current reading percentage for the fan.'
+              description: 'The current speed of the fan.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1479,14 +1479,14 @@ zabbix_export:
                       value: performance
           graph_prototypes:
             - uuid: f38e4d46dbe647c0a1cafb4f034d6fa2
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Reading, in %'
+              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Speed, in %'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'HPE iLO by HTTP'
-                    key: 'hpe.ilo.fan.reading[{#CHASSIS_ID}, {#FAN_ID}]'
+                    key: 'hpe.ilo.fan.speed[{#CHASSIS_ID}, {#FAN_ID}]'
           master_item:
             key: hpe.ilo.get_data
           lld_macro_paths:
@@ -2050,33 +2050,6 @@ zabbix_export:
                   value: '{#SENSOR_ID}'
                 - tag: sensor-context
                   value: '{#SENSOR_CONTEXT}'
-            - uuid: 04e0faf0a3b54f84a13341bab1238b60
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Reading'
-              type: DEPENDENT
-              key: 'hpe.ilo.sensor.reading[{#CHASSIS_ID}, {#SENSOR_ID}]'
-              delay: '0'
-              history: 7d
-              units: '!°C'
-              description: 'The current temperature reading in Celsius degrees for the sensor.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - $.ReadingCelsius
-              master_item:
-                key: 'hpe.ilo.sensor.get_data[{#CHASSIS_ID}, {#SENSOR_ID}]'
-              tags:
-                - tag: chassis
-                  value: '{#CHASSIS_ID}'
-                - tag: component
-                  value: environment
-                - tag: component
-                  value: performance
-                - tag: component
-                  value: sensor
-                - tag: sensor
-                  value: '{#SENSOR_ID}'
-                - tag: sensor-context
-                  value: '{#SENSOR_CONTEXT}'
             - uuid: ef3c3472c21a4716b9b3362e7b33644c
               name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Status'
               type: DEPENDENT
@@ -2147,14 +2120,41 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+            - uuid: 04e0faf0a3b54f84a13341bab1238b60
+              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Temperature'
+              type: DEPENDENT
+              key: 'hpe.ilo.sensor.temperature[{#CHASSIS_ID}, {#SENSOR_ID}]'
+              delay: '0'
+              history: 7d
+              units: '!°C'
+              description: 'The current temperature reading in Celsius degrees for the sensor.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.ReadingCelsius
+              master_item:
+                key: 'hpe.ilo.sensor.get_data[{#CHASSIS_ID}, {#SENSOR_ID}]'
+              tags:
+                - tag: chassis
+                  value: '{#CHASSIS_ID}'
+                - tag: component
+                  value: environment
+                - tag: component
+                  value: performance
+                - tag: component
+                  value: sensor
+                - tag: sensor
+                  value: '{#SENSOR_ID}'
+                - tag: sensor-context
+                  value: '{#SENSOR_CONTEXT}'
           graph_prototypes:
             - uuid: 4e9fadd38f52413a8c5d24b53971d5be
-              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Reading'
+              name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Temperature'
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'HPE iLO by HTTP'
-                    key: 'hpe.ilo.sensor.reading[{#CHASSIS_ID}, {#SENSOR_ID}]'
+                    key: 'hpe.ilo.sensor.temperature[{#CHASSIS_ID}, {#SENSOR_ID}]'
           master_item:
             key: hpe.ilo.get_data
           lld_macro_paths:
@@ -2658,7 +2658,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'HPE iLO by HTTP'
-                        name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Reading, in %'
+                        name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Fan [{#FAN_NAME}]: Speed, in %'
                     - type: INTEGER
                       name: rows
                       value: '2'
@@ -2675,7 +2675,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'HPE iLO by HTTP'
-                        name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Reading'
+                        name: 'HPE iLO: Chassis [{#CHASSIS_ID}]: Sensor [{#SENSOR_NAME}]: Temperature'
                     - type: INTEGER
                       name: rows
                       value: '2'
