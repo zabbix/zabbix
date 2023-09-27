@@ -1,0 +1,29 @@
+// Widget configuration.
+
+form.dashboard-widget-honeycomb {
+  .fields-group {
+    &.fields-group-primary,
+    &.fields-group-secondary {
+      display: grid;
+      grid-template-columns: minmax(10px, max-content) 1fr minmax(110px, max-content) 10px minmax(88px, max-content) 25px;
+      align-items: center;
+      column-gap: 10px;
+      row-gap: 5px;
+
+      .form-field {
+        line-height: 24px;
+      }
+    }
+
+    &.fields-group-primary,
+    &.fields-group-secondary {
+      .form-field:nth-child(1) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .form-row-interpolation {
+      margin-bottom: 10px;
+    }
+  }
+}

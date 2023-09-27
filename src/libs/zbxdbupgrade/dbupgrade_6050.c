@@ -953,6 +953,20 @@ static int	DBpatch_6050091(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050092(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'piechart','widgets/piechart',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -1049,5 +1063,6 @@ DBPATCH_ADD(6050086, 0, 1)
 DBPATCH_ADD(6050087, 0, 1)
 DBPATCH_ADD(6050090, 0, 1)
 DBPATCH_ADD(6050091, 0, 1)
+DBPATCH_ADD(6050092, 0, 1)
 
 DBPATCH_END()

@@ -3792,6 +3792,19 @@ div.dashboard-widget-gauge {
     div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
       display: block; }
 
+form.dashboard-widget-honeycomb .fields-group.fields-group-primary, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary {
+  display: grid;
+  grid-template-columns: minmax(10px, max-content) 1fr minmax(110px, max-content) 10px minmax(88px, max-content) 25px;
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px; }
+  form.dashboard-widget-honeycomb .fields-group.fields-group-primary .form-field, form.dashboard-widget-honeycomb .fields-group.fields-group-secondary .form-field {
+    line-height: 24px; }
+form.dashboard-widget-honeycomb .fields-group.fields-group-primary .form-field:nth-child(1), form.dashboard-widget-honeycomb .fields-group.fields-group-secondary .form-field:nth-child(1) {
+  grid-column: 1 / -1; }
+form.dashboard-widget-honeycomb .fields-group .form-row-interpolation {
+  margin-bottom: 10px; }
+
 div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
   border-left: 1px dotted #ebeef0; }
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-true {
