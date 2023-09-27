@@ -30,6 +30,7 @@ use Zabbix\Widgets\{
 	Fields\CWidgetFieldMultiSelectGroup,
 	Fields\CWidgetFieldMultiSelectHost,
 	Fields\CWidgetFieldMultiSelectItem,
+	Fields\CWidgetFieldMultiSelectOverrideHost,
 	Fields\CWidgetFieldRadioButtonList,
 	Fields\CWidgetFieldTags,
 	Fields\CWidgetFieldTextArea,
@@ -152,9 +153,8 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
 			)
-			->addField($this->isTemplateDashboard()
-				? null
-				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

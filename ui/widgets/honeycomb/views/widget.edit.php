@@ -30,13 +30,13 @@ use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 $form = new CWidgetFormView($data);
 
 $groupids = array_key_exists('groupids', $data['fields'])
-	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
 	: null;
 
 $form
 	->addField($groupids)
 	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
+		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
 	)
 	->addField(
@@ -47,7 +47,7 @@ $form
 		: null
 	)
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['items']['itemids']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids'],))
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['evaltype_item'])
@@ -77,8 +77,8 @@ $form
 				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('js-row-thresholds')
 			)
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')

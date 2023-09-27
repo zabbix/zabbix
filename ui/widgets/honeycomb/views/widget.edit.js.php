@@ -32,7 +32,7 @@ window.widget_honeycomb_form = new class {
 	init({thresholds_colors}) {
 		this.#form = document.getElementById('widget-dialogue-form');
 
-		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: ".overlay-dialogue-body",
 				use_default: !colorpicker.name.includes('thresholds')
