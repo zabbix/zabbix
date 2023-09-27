@@ -678,6 +678,10 @@ window.trigger_edit_popup = new class {
 			form_fields.dependencies = [];
 		}
 
+		if (!form_fields.manual_close) {
+			form_fields.manual_close = String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>);
+		}
+
 		this.db_trigger.dependencies = [];
 
 		if (Object.keys(this.dependencies).length > 0) {
