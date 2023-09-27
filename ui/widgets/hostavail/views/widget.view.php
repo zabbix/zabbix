@@ -115,7 +115,7 @@ else {
 
 		foreach ($interface_states_order as $state) {
 			if ($type == INTERFACE_TYPE_AGENT_ACTIVE && $state == INTERFACE_AVAILABLE_MIXED) {
-				$interface_data[$state] = new CCol('');
+				$interface_data[$state] = new CCol('-');
 			}
 			else {
 				$interface_data[$state] = new CCol($counts[$state]);
