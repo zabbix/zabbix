@@ -474,6 +474,7 @@ window.trigger_edit_popup = new class {
 			}
 
 			this.expression.value = '';
+			this.expression.dispatchEvent(new Event('change'));
 		}
 		else {
 			if (Object.keys(fields).length === 0 || fields.add_expression) {
@@ -487,6 +488,7 @@ window.trigger_edit_popup = new class {
 			}
 
 			this.recovery_expression.value = '';
+			this.recovery_expression.dispatchEvent(new Event('change'));
 		}
 
 		fields.readonly = this.readonly;
@@ -511,8 +513,6 @@ window.trigger_edit_popup = new class {
 					table.innerHTML = response.body;
 					this.expr_temp.value = response.expression;
 
-					this.expression.dispatchEvent(new Event('change'));
-
 					if (table.querySelector('tbody').innerHTML !== '') {
 						this.#showConstructorAddButton(false);
 					}
@@ -524,8 +524,6 @@ window.trigger_edit_popup = new class {
 					const table = this.form.querySelector('#recovery-expression-table');
 					table.innerHTML = response.body;
 					this.recovery_expr_temp.value = response.expression;
-
-					this.recovery_expression.dispatchEvent(new Event('change'));
 
 					if (table.querySelector('tbody').innerHTML !== '') {
 						this.#showRecoveryConstructorAddButton(false);
