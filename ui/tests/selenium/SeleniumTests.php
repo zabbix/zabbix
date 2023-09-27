@@ -229,6 +229,7 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 // Templates.
 require_once dirname(__FILE__).'/templates/testFormTemplate.php';
 require_once dirname(__FILE__).'/templates/testPageTemplates.php';
+require_once dirname(__FILE__).'/templates/testTemplatedMultiselects.php';
 
 // Users.
 require_once dirname(__FILE__).'/users/testFormUser.php';
@@ -511,6 +512,7 @@ class SeleniumTests {
 		// Templates.
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageTemplates');
+		$suite->addTestSuite('testTemplatedMultiselects');
 
 		// Users.
 		$suite->addTestSuite('testFormUser');
