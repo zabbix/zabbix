@@ -222,6 +222,49 @@ class testPageHostDashboards extends CWebTest {
 		);
 	}
 
+	public function getCheckNavigationData() {
+		return [
+			[
+				[
+
+				]
+			],
+
+		];
+	}
+
+	/**
+	 * Check dashboard tab navigation.
+	 *
+	 * @dataProvider getCheckNavigationData
+	 */
+	public function testPageHostDashboards_CheckNavigation($data) {
+		// Create the required entities in database.
+		$this->createHostWithDashboards($data);
+
+		$this->openDashboardsForHost(self::HOST_NAME);
+
+		// Parent to all dashboard navigation elements.
+		$nav = $this->query('class:host-dashboard-navigation')->one();
+
+		// Assert buttons.
+		$prev_button = $nav->query('xpath:.//button[@title="Previous dashboard"]')->one();
+		$this->assertFalse($prev_button->isEnabled());
+		$next_button = $nav->query('xpath:.//button[@title="Next dashboard"]')->one();
+		$this->assertFalse($next_button->isEnabled());
+
+		// Assert dashboard tabs.
+		$dasboard_tab = $nav->query('xpath:.//span[text()="Dashboard 1"]')->one();
+		$this->assertEquals('Dashboard 1', $dasboard_tab->getAttribute('title'));
+
+		// Assert the listed dashboard dropdown.
+		$list_button = $nav->query('xpath:.//button[@title="Dashboard list"]')->one();
+		$list_button->click();
+		$popup_menu = $list_button->asPopupButton()->getMenu();
+		$this->assertEquals(['Dashboard 1'], $popup_menu->getItems()->asText());
+		$popup_menu->close();
+	}
+
 	/**
 	 * Opens the Host dashboards page for a specific host.
 	 *
@@ -232,6 +275,62 @@ class testPageHostDashboards extends CWebTest {
 		$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host_name));
 		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.$id);
 		$this->page->waitUntilReady();
+	}
+
+	/**
+	 * Creates a template with required dashboards using API and assigns it to a new host.
+	 *
+	 * @param $data    data from data provider
+	 */
+	protected function createHostWithDashboards($data) {
+		$response = CDataHelper::createTemplates([
+			[
+				'host' => self::TEMPLATE_NAME,
+				'groups' => [
+					['groupid' => '1']
+				]
+			]
+		]);
+		$template_id = $response['templateids'][self::TEMPLATE_NAME];
+
+		CDataHelper::createHosts([
+			[
+				'host' => self::HOST_NAME,
+				'groups' => [
+					['groupid' => '6']
+				],
+				'templates' => [
+					'templateid' => $template_id
+				]
+			]
+		]);
+
+		CDataHelper::call('templatedashboard.create', [
+			[
+				'templateid' => $template_id,
+				'name' => 'Dashboard 1',
+				'pages' => [
+					[
+						'name' => 'Page 1',
+						'widgets' => [
+							[
+								'type' => 'svggraph',
+								'name' => 'Graph widget',
+								'width' => 6,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => 0,
+										'name' => '*',
+										'value' => 0
+									]
+								]
+							]
+						]
+					]
+				]
+			]
+		]);
 	}
 
 }
