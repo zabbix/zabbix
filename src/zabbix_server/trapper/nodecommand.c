@@ -50,7 +50,8 @@ extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
 {
 	zbx_token_t	token;
-	size_t		pos = 0, out_offset = 0, macrovalue_len;
+	int		pos = 0;
+	size_t		out_offset = 0, macrovalue_len;
 
 	macrovalue_len = strlen(macrovalue);
 	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
