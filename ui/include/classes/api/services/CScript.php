@@ -706,9 +706,9 @@ class CScript extends CApiService {
 
 			if ($manualinput_type !== null) {
 				$common_fields += [
-					'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
+					'manualinput_prompt' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED & API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_prompt')],
 					'manualinput_validator_type' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SCRIPT_MANUALINPUT_TYPE_LIST, SCRIPT_MANUALINPUT_TYPE_STRING])],
-					'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => [API_REQUIRED, API_NOT_EMPTY], 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
+					'manualinput_validator' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED & API_NOT_EMPTY, 'length' => DB::getFieldLength('scripts', 'manualinput_validator')]
 				];
 
 				if ($manualinput_type == SCRIPT_MANUALINPUT_TYPE_STRING) {
