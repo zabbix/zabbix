@@ -20,19 +20,10 @@
 
 class CWidgetTopTriggers extends CWidget {
 
-	setTimePeriod(time_period) {
-		super.setTimePeriod(time_period);
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
-	}
-
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),
-			from: this._time_period.from,
-			to: this._time_period.to
-		};
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
+		}
 	}
 }

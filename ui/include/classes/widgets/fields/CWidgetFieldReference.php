@@ -41,9 +41,7 @@ class CWidgetFieldReference extends CWidgetField {
 		 */
 		parent::__construct(self::FIELD_NAME);
 
-		$this
-			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR);
+		$this->setDefault(self::DEFAULT_VALUE);
 	}
 
 	/**

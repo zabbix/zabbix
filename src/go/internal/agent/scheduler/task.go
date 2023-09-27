@@ -165,9 +165,21 @@ func (t *exporterTask) perform(s Scheduler) {
 
 		if key, params, err = itemutil.ParseKey(itemkey); err == nil {
 			var ret interface{}
-			log.Debugf("executing exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 
-			if ret, err = exporter.Export(key, params, t); err == nil {
+			tc := make(chan bool)
+
+			go func() {
+				ret, err = exporter.Export(key, params, t)
+				tc <- true
+			}()
+
+			select {
+			case <-tc:
+			case <-time.After(time.Second * time.Duration(t.item.timeout)):
+				err = fmt.Errorf("Timeout occurred while gathering data.")
+			}
+
+			if err == nil {
 				log.Debugf("executed exporter task for itemid:%d key '%s'", t.item.itemid, itemkey)
 				if ret != nil {
 					rt := reflect.TypeOf(ret)
@@ -244,6 +256,10 @@ func (t *exporterTask) Meta() (meta *plugin.Meta) {
 
 func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *exporterTask) Timeout() int {
+	return t.item.timeout
 }
 
 // directExporterTask provides access to plugin Exporter interaface.
@@ -345,6 +361,10 @@ func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+func (t *directExporterTask) Timeout() int {
+	return t.item.timeout
+}
+
 // starterTask provides access to plugin Exporter interaface Start() method.
 type starterTask struct {
 	taskBase
@@ -402,15 +422,15 @@ func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 // stopperTask provides access to plugin Watcher interaface.
 type watcherTask struct {
 	taskBase
-	requests []*plugin.Request
-	client   ClientAccessor
+	items  []*plugin.Item
+	client ClientAccessor
 }
 
 func (t *watcherTask) perform(s Scheduler) {
 	log.Debugf("plugin %s: executing watcher task", t.plugin.name())
 	go func() {
 		watcher, _ := t.plugin.impl.(plugin.Watcher)
-		watcher.Watch(t.requests, t)
+		watcher.Watch(t.items, t)
 		s.FinishTask(t)
 	}()
 }
@@ -448,6 +468,10 @@ func (t *watcherTask) Meta() (meta *plugin.Meta) {
 
 func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *watcherTask) Timeout() int {
+	return 0
 }
 
 // configuratorTask provides access to plugin Configurator interaface.

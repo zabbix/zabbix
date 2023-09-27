@@ -262,7 +262,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: MULTIPLIER
@@ -612,27 +612,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -640,6 +619,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -1154,12 +1154,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_TYPE}'
-                value: '8'
-                formulaid: B
               - macro: '{#SENSOR_PRECISION}'
                 value: '0'
                 formulaid: A
+              - macro: '{#SENSOR_TYPE}'
+                value: '8'
+                formulaid: B
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             - uuid: 0f33142de9874eb288d48337becae31a
@@ -1335,14 +1335,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HP Enterprise Switch by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
         - uuid: 8d3bf7d0ded74f42bed66fcbc1eaec62
           name: Resources
           pages:
@@ -1352,10 +1352,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HP Enterprise Switch by SNMP'
                         name: 'HP Enterprise Switch: CPU utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   'y': '5'
                   width: '24'
@@ -1364,14 +1367,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HP Enterprise Switch by SNMP'
                         name: '#{#SNMPVALUE}: Memory usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -1380,14 +1383,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'HP Enterprise Switch by SNMP'
                         name: '#{#SNMPVALUE}: Memory utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
       valuemaps:
         - uuid: 846197beea984cc783b84822437bbace
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'
