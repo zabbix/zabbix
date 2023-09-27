@@ -22,6 +22,10 @@
 abstract class CControllerItem extends CController {
 
 	protected function checkPermissions(): bool {
+		if (!$this->hasInput('context')) {
+			return false;
+		}
+
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -45,6 +49,7 @@ abstract class CControllerItem extends CController {
 			'parameters'			=> 'array',
 			'script'				=> 'db items.params',
 			'request_method'		=> 'db items.request_method',
+			'custom_timeout'		=> 'in '.implode(',', [ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 			'timeout'				=> 'db items.timeout',
 			'post_type'				=> 'db items.post_type',
 			'posts'					=> 'db items.posts',
@@ -133,6 +138,12 @@ abstract class CControllerItem extends CController {
 		if ($ret) {
 			$ret = $this->hasInput('itemid') || $this->hasInput('hostid');
 			$field = $this->hasInput('hostid') ? 'itemid' : 'hostid';
+		}
+
+		if ($ret && $this->hasInput('custom_timeout')
+				&& $this->getInput('custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			$field = 'timeout';
+			$ret = trim($this->getInput('timeout', '')) !== '';
 		}
 
 		if (!$ret && $field !== '') {
@@ -225,6 +236,7 @@ abstract class CControllerItem extends CController {
 			'status' => DB::getDefault('items', 'status'),
 			'tags' => [],
 			'templateid' => 0,
+			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
 			'timeout' => DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
 			'trends_mode' => ITEM_STORAGE_CUSTOM,
@@ -330,6 +342,10 @@ abstract class CControllerItem extends CController {
 
 		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
 			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
+		if ($input['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) {
+			$input['timeout'] = DB::getDefault('items', 'timeout');
 		}
 
 		return $input;

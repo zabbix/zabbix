@@ -66,6 +66,8 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			'interface_types' => itemTypeInterface(),
 			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 			'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES,
+			'inherited_timeouts' => [],
+			'can_edit_source_timeouts' => false,
 			'config' => [
 				'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
@@ -151,6 +153,18 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 			]);
 		}
 
+		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$data['inherited_timeouts'] = getInheritedTimeouts($host['proxyid'])['timeouts'];
+			$data['inherited_timeout'] = $timeout_config['timeouts'][$data['form']['type']] ?? '';
+			$data['can_edit_source_timeouts'] = $host['proxyid']
+				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+
+			if (!$form_refresh && $data['form']['timeout'] === DB::getDefault('items', 'timeout')) {
+				$data['form']['timeout'] = $data['inherited_timeout'];
+			}
+		}
+
 		$data['value_type_keys'] = [];
 		$key_value_type = CItemData::getValueTypeByKey();
 		foreach (CItemData::getKeysByItemType() as $type => $keys) {
@@ -181,7 +195,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 	 */
 	protected function getHost($itemid): array {
 		[$host] = API::Host()->get([
-			'output' => ['hostid', 'name', 'flags', 'status'],
+			'output' => ['hostid', 'proxyid', 'name', 'flags', 'status'],
 			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
 			'itemids' => [$itemid]
 		]);
@@ -208,6 +222,7 @@ class CControllerItemPrototypeEdit extends CControllerItemPrototype {
 		]);
 		$template += [
 			'hostid' => $template['templateid'],
+			'proxyid' => 0,
 			'status' => HOST_STATUS_TEMPLATE,
 			'interfaces' => []
 		];

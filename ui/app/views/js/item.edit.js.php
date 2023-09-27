@@ -34,10 +34,12 @@ const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
 const ITEM_TYPE_IPMI = <?= ITEM_TYPE_IPMI ?>;
 const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
 const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
+const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
+const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
 const ZBX_STYLE_BTN_GREY = <?= json_encode(ZBX_STYLE_BTN_GREY) ?>;
 const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
@@ -46,14 +48,15 @@ const ZBX_STYLE_FORM_INPUT_MARGIN = <?= json_encode(ZBX_STYLE_FORM_INPUT_MARGIN)
 window.item_edit_form = new class {
 
 	init({
-		actions, field_switches, form_data, host, interface_types, readonly, testable_item_types, token,
-		type_with_key_select, value_type_keys, source
+		actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly, testable_item_types,
+		token, type_with_key_select, value_type_keys, source
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
 		this.form_readonly = readonly;
 		this.host = host;
 		this.interface_types = interface_types;
+		this.inherited_timeouts = inherited_timeouts;
 		this.optional_interfaces = [];
 		this.source = source;
 		this.testable_item_types = testable_item_types;
@@ -103,11 +106,15 @@ window.item_edit_form = new class {
 		new CViewSwitcher('value_type', 'change', field_switches.for_value_type);
 
 		this.field = {
+			custom_timeout: this.form.querySelectorAll('[name="custom_timeout"]'),
 			history: this.form.querySelector('[name="history"]'),
 			history_mode: this.form.querySelectorAll('[name="history_mode"]'),
 			interfaceid: this.form.querySelector('[name="interfaceid"]'),
 			key: this.form.querySelector('[name="key"]'),
 			key_button: this.form.querySelector('[name="key"] ~ .js-select-key'),
+			inherited_timeout: this.form.querySelector('[name="inherited_timeout"]'),
+			snmp_oid: this.form.querySelector('[name="snmp_oid"]'),
+			timeout: this.form.querySelector('[name="timeout"]'),
 			trends: this.form.querySelector('[name="trends"]'),
 			trends_mode: this.form.querySelectorAll('[name="trends_mode"]'),
 			type: this.form.querySelector('[name="type"]'),
@@ -172,16 +179,18 @@ window.item_edit_form = new class {
 
 	initEvents() {
 		// Item tab events.
-		this.field.key.addEventListener('help_items.paste', () => this.#keyChangeHandler());
-		this.field.key.addEventListener('keyup', () => this.#keyChangeHandler());
-		this.field.key_button?.addEventListener('click', () => this.#keySelectClickHandler());
-		this.field.type.addEventListener('click', () => this.updateFieldsVisibility());
-		this.field.value_type.addEventListener('change', (e) => this.#valueTypeChangeHandler(e));
-		this.field.request_method.addEventListener('change', () => this.updateFieldsVisibility());
+		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandler.bind(this));
+		this.field.key.addEventListener('keyup', this.#keyChangeHandler.bind(this));
+		this.field.key_button?.addEventListener('click', this.#keySelectClickHandler.bind(this));
+		this.field.snmp_oid.addEventListener('keyup', this.updateFieldsVisibility.bind(this));
+		this.field.type.addEventListener('click', this.#typeChangeHandler.bind(this));
+		this.field.value_type.addEventListener('change', this.#valueTypeChangeHandler.bind(this));
+		this.field.request_method.addEventListener('change', this.updateFieldsVisibility.bind(this));
 		this.form.addEventListener('click', e => {
 			const target = e.target;
 
 			switch (target.getAttribute('name')) {
+				case 'custom_timeout':
 				case 'history_mode':
 				case 'trends_mode':
 					this.updateFieldsVisibility();
@@ -234,6 +243,14 @@ window.item_edit_form = new class {
 				if (!this.#isFormModified()
 						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
 					this.#openTemplatePopup(target.dataset);
+				}
+			}
+			else if (target.matches('.js-edit-proxy')) {
+				e.preventDefault();
+
+				if (!this.#isFormModified()
+						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
+					this.#openProxyPopup(target.dataset);
 				}
 			}
 		});
@@ -328,6 +345,8 @@ window.item_edit_form = new class {
 		this.#updateValueTypeHintVisibility();
 		this.#updateValueTypeOptionVisibility();
 		this.#updateRetrieveModeVisibility();
+		this.#updateTimeoutVisibility();
+		this.#updateTimeoutOverrideVisibility();
 		this.field.key_button?.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
@@ -449,11 +468,44 @@ window.item_edit_form = new class {
 		const fields = ['delay', 'js-item-delay-label', 'js-item-delay-field', 'js-item-flex-intervals-label',
 			'js-item-flex-intervals-field'
 		];
-
 		const action = (this.field.key.value.substr(0, 8) === 'mqtt.get') ? 'hideObj' : 'showObj';
 		const switcher = globalAllObjForViewSwitcher['type'];
 
 		fields.forEach(id => switcher[action]({id}));
+	}
+
+	#updateTimeoutOverrideVisibility() {
+		const custom_timeout = [].filter.call(this.field.custom_timeout, e => e.matches(':checked')).pop();
+		const inherited_hidden = custom_timeout.value == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
+
+		this.form.inherited_timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inherited_hidden);
+		this.form.timeout.classList.toggle(ZBX_STYLE_DISPLAY_NONE, !inherited_hidden);
+	}
+
+	#updateTimeoutVisibility() {
+		let action = '';
+		const key = this.field.key.value;
+		const type = parseInt(this.field.type.value, 10);
+		const switcher = globalAllObjForViewSwitcher['type'];
+		const toggle_fields = ['js-item-timeout-label', 'js-item-timeout-field'];
+
+		switch (type) {
+			case ITEM_TYPE_SIMPLE:
+				action = key.substring(0, 8) === 'icmpping' || key.substring(0, 7) === 'vmware.' ? 'hideObj' : 'showObj';
+				break;
+
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				action = key.substring(0, 8) === 'mqtt.get' ? 'hideObj' : 'showObj';
+				break;
+
+			case ITEM_TYPE_SNMP:
+				action = this.field.snmp_oid.value.substring(0, 5) !== 'walk[' ? 'hideObj' : 'showObj';
+				break;
+		}
+
+		if (action !== '') {
+			toggle_fields.forEach(id => switcher[action]({id}));
+		}
 	}
 
 	#updateRetrieveModeVisibility() {
@@ -515,6 +567,11 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 	}
 
+	#typeChangeHandler(e) {
+		this.field.inherited_timeout.value = this.inherited_timeouts[e.target.value]||'';
+		this.updateFieldsVisibility();
+	}
+
 	#keyChangeHandler() {
 		const inferred_type = this.#getInferredValueType(this.field.key.value);
 
@@ -573,6 +630,20 @@ window.item_edit_form = new class {
 		const overlay = PopUp(parameters.action, parameters, {
 			dialogueid: 'item-form',
 			dialogue_class: 'modal-popup-large'
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit',
+			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
+		);
+	}
+
+	#openProxyPopup(parameters) {
+		overlayDialogueDestroy(this.overlay.dialogueid);
+
+		const overlay = PopUp('popup.proxy.edit', parameters, {
+			dialogueid: 'proxy_edit',
+			dialogue_class: 'modal-popup-static',
+			prevent_navigation: true
 		});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit',

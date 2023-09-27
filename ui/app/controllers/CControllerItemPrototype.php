@@ -42,6 +42,7 @@ abstract class CControllerItemPrototype extends CController {
 			'parameters'			=> 'array',
 			'script'				=> 'db items.params',
 			'request_method'		=> 'db items.request_method',
+			'custom_timeout'		=> 'in '.implode(',', [ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 			'timeout'				=> 'db items.timeout',
 			'post_type'				=> 'db items.post_type',
 			'posts'					=> 'db items.posts',
@@ -131,6 +132,12 @@ abstract class CControllerItemPrototype extends CController {
 		if ($ret) {
 			$ret = $this->hasInput('parent_discoveryid') || $this->hasInput('itemid');
 			$field = $this->hasInput('parent_discoveryid') ? 'itemid' : 'parent_discoveryid';
+		}
+
+		if ($ret && $this->hasInput('custom_timeout')
+				&& $this->getInput('custom_timeout') == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED) {
+			$field = 'timeout';
+			$ret = trim($this->getInput('timeout', '')) !== '';
 		}
 
 		if (!$ret && $field !== '') {
@@ -233,6 +240,7 @@ abstract class CControllerItemPrototype extends CController {
 			'status' => DB::getDefault('items', 'status'),
 			'tags' => [],
 			'templateid' => 0,
+			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
 			'timeout' => DB::getDefault('items', 'timeout'),
 			'trapper_hosts' => DB::getDefault('items', 'trapper_hosts'),
 			'trends_mode' => ITEM_STORAGE_CUSTOM,
@@ -339,6 +347,10 @@ abstract class CControllerItemPrototype extends CController {
 
 		if ($input['request_method'] == HTTPCHECK_REQUEST_HEAD) {
 			$input['retrieve_mode'] = HTTPTEST_STEP_RETRIEVE_MODE_HEADERS;
+		}
+
+		if ($input['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) {
+			$input['timeout'] = DB::getDefault('items', 'timeout');
 		}
 
 		return $input;

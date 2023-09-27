@@ -144,6 +144,7 @@ class CItemGeneralHelper {
 			'history_mode' => ITEM_STORAGE_CUSTOM,
 			'trends_mode' => ITEM_STORAGE_CUSTOM,
 			'show_inherited_tags' => 0,
+			'custom_timeout' => ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED,
 			'key' => $item['key_']
 		];
 		unset($item['key_']);
@@ -191,6 +192,10 @@ class CItemGeneralHelper {
 
 		if ($item['type'] != ITEM_TYPE_JMX) {
 			$item['jmx_endpoint'] = ZBX_DEFAULT_JMX_ENDPOINT;
+		}
+
+		if ($item['timeout'] !== DB::getDefault('items', 'timeout')) {
+			$item['custom_timeout'] = ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 		}
 
 		return $item;

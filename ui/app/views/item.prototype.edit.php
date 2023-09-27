@@ -132,6 +132,7 @@ $tabsid = 'items-tab';
 $tabs = (new CTabView(['id' => $tabsid]))
 	->addTab('item-tab', _('Item'),
 		new CPartial('item.edit.item.tab', [
+			'can_edit_source_timeouts' => $data['can_edit_source_timeouts'],
 			'config' => $data['config'],
 			'discovered' => $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'discovery_rule' => $data['discovery_rule'],
@@ -139,6 +140,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'form' => $item,
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
+			'inherited_timeout' => $data['inherited_timeouts'],
 			'inventory_fields' => $data['inventory_fields'],
 			'master_item' => $data['master_item'],
 			'parent_items' => $data['parent_items'],
@@ -188,6 +190,7 @@ $form
 			'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
 			'form_data' => $item,
 			'host' => $data['host'],
+			'inherited_timeouts' => $data['inherited_timeouts'],
 			'interface_types' => $data['interface_types'],
 			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'source' => 'itemprototype',

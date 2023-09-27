@@ -52,6 +52,8 @@ class CControllerItemEdit extends CControllerItem {
 			'readonly' => false,
 			'host' => $host,
 			'valuemap' => [],
+			'inherited_timeout' => '',
+			'inherited_timeouts' => [],
 			'inventory_fields' => [],
 			'form' => $form_refresh || !$this->hasInput('itemid') ? $this->getInputForForm() : $this->getItem(),
 			'form_refresh' => $form_refresh,
@@ -65,6 +67,7 @@ class CControllerItemEdit extends CControllerItem {
 			'interface_types' => itemTypeInterface(),
 			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 			'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES,
+			'can_edit_source_timeouts' => false,
 			'config' => [
 				'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS),
 				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL),
@@ -147,6 +150,18 @@ class CControllerItemEdit extends CControllerItem {
 			]);
 		}
 
+		if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$data['inherited_timeouts'] = getInheritedTimeouts($host['proxyid'])['timeouts'];
+			$data['inherited_timeout'] = $data['inherited_timeouts'][$data['form']['type']] ?? '';
+			$data['can_edit_source_timeouts'] = $host['proxyid']
+				? CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)
+				: CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+
+			if (!$form_refresh && $data['form']['timeout'] === DB::getDefault('items', 'timeout')) {
+				$data['form']['timeout'] = $data['inherited_timeout'];
+			}
+		}
+
 		$set_inventory = array_column(API::Item()->get([
 			'output' => ['inventory_link'],
 			'hostids' => [$hostid],
@@ -185,10 +200,12 @@ class CControllerItemEdit extends CControllerItem {
 
 	/**
 	 * Get host data.
+	 *
+	 * @return array
 	 */
 	protected function getHost(): array {
 		[$host] = API::Host()->get([
-			'output' => ['name', 'flags', 'status'],
+			'output' => ['hostid', 'proxyid', 'name', 'flags', 'status'],
 			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
 			'hostids' => !$this->hasInput('itemid') ? [$this->getInput('hostid')] : null,
 			'itemids' => $this->hasInput('itemid') ? [$this->getInput('itemid')] : null
@@ -208,6 +225,8 @@ class CControllerItemEdit extends CControllerItem {
 	 * Get template data.
 	 *
 	 * @param string $templateid
+	 *
+	 * @return array
 	 */
 	protected function getTemplate(): array {
 		[$template] = API::Template()->get([
@@ -217,6 +236,7 @@ class CControllerItemEdit extends CControllerItem {
 		]);
 		$template += [
 			'hostid' => $template['templateid'],
+			'proxyid' => 0,
 			'status' => HOST_STATUS_TEMPLATE,
 			'interfaces' => []
 		];
@@ -231,7 +251,7 @@ class CControllerItemEdit extends CControllerItem {
 	 */
 	protected function getItem(): array {
 		[$item] = API::Item()->get([
-			'ouput' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
+			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
 				'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
 				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
 				'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'master_itemid', 'url', 'query_fields',

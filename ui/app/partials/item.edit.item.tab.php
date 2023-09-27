@@ -219,16 +219,6 @@ $formgrid = (new CFormGrid())
 		))->setId('js-item-request-method-field')
 	])
 	->addItem([
-		(new CLabel(_('Timeout'), 'timeout'))
-			->setAsteriskMark()
-			->setId('js-item-timeout-label'),
-		(new CFormField(
-			(new CTextBox('timeout', $data['form']['timeout'], $data['readonly']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-		))->setId('js-item-timeout-field')
-	])
-	->addItem([
 		(new CLabel(_('Request body type'), 'post_type'))->setId('js-item-post-type-label'),
 		(new CFormField(
 			(new CRadioButtonList('post_type', (int) $data['form']['post_type']))
@@ -646,6 +636,48 @@ $formgrid
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-flex-intervals-field')
 	]);
+
+
+/**
+ * Append timeout field to form list for item types:
+ * ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
+ * ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT
+ */
+$edit_source_timeouts_link = null;
+$custom_timeout_enabled = $data['form']['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
+
+if ($data['can_edit_source_timeouts'] && (($data['readonly'] && !$custom_timeout_enabled) || !$data['readonly'])) {
+	$edit_source_timeouts_link = $data['proxyid']
+		? (new CLink(_('Timeouts')))
+			->setAttribute('data-proxyid', $data['proxyid'])
+			->addClass('js-edit-proxy')
+		: (new CLink(_('Timeouts'),
+			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')
+		))->setTarget('_blank');
+}
+
+$formgrid->addItem([
+	(new CLabel(_('Timeout'), 'timeout'))
+		->setAsteriskMark()
+		->setId('js-item-timeout-label'),
+	(new CFormField([
+		(new CRadioButtonList('custom_timeout', $data['form']['custom_timeout']))
+			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
+			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
+			->setReadonly($data['readonly'])
+			->setModern(),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox('inherited_timeout', $data['inherited_timeout']))
+			->setEnabled(false)
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->addClass($custom_timeout_enabled ? ZBX_STYLE_DISPLAY_NONE : null),
+		(new CTextBox('timeout', $data['form']['timeout'], $data['readonly']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->addClass($custom_timeout_enabled ? null : ZBX_STYLE_DISPLAY_NONE)
+			->setAriaRequired(),
+		$edit_source_timeouts_link
+	]))->setId('js-item-timeout-field')
+]);
 
 $hint = null;
 if ($data['source'] === 'item' && $data['config']['hk_history_global']
