@@ -5067,18 +5067,47 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 		ZBX_POST_VSPHERE_HEADER						\
 		"<ns0:CreateCollectorForEvents>"				\
 			"<ns0:_this type=\"EventManager\">%s</ns0:_this>"	\
-			"<ns0:filter/>"						\
+			"<ns0:filter>%s</ns0:filter>"				\
 		"</ns0:CreateCollectorForEvents>"				\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char	tmp[MAX_STRING_LEN];
+#	define ZBX_POST_VMWARE_EVENT_FILTER_SPEC_CATEGORY			\
+		"<ns0:category>%s</ns0:category>"
+
+	static unsigned char	levels_mask[] = {
+		ZBX_VMWARE_EVTLOG_SEVERITY_ERR,
+		ZBX_VMWARE_EVTLOG_SEVERITY_INFO,
+		ZBX_VMWARE_EVTLOG_SEVERITY_USER,
+		ZBX_VMWARE_EVTLOG_SEVERITY_WARN
+	};
+
+	static const char	*levels_str[] = {
+		ZBX_VMWARE_EVTLOG_SEVERITY_ERR_STR,
+		ZBX_VMWARE_EVTLOG_SEVERITY_INFO_STR,
+		ZBX_VMWARE_EVTLOG_SEVERITY_USER_STR,
+		ZBX_VMWARE_EVTLOG_SEVERITY_WARN_STR
+	};
+
+	char	tmp[MAX_STRING_LEN], *filter = NULL;
+	size_t	alloc_len = 0, offset = 0;
 	int	ret = FAIL;
 	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	for (size_t i = 0; i < sizeof(levels_mask) / sizeof(levels_mask[0]); i++)
+	{
+		if (0 != (levels_mask[i] & service->eventlog.severity))
+		{
+			zbx_snprintf_alloc(&filter, &alloc_len, &offset, ZBX_POST_VMWARE_EVENT_FILTER_SPEC_CATEGORY,
+					levels_str[i]);
+		}
+	}
+
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR,
-			get_vmware_service_objects()[service->type].event_manager);
+			get_vmware_service_objects()[service->type].event_manager, ZBX_NULL2EMPTY_STR(filter));
+
+	zbx_free(filter);
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, tmp, &doc, NULL, error))
 		goto out;
@@ -5096,6 +5125,9 @@ out:
 			ZBX_NULL2EMPTY_STR(*event_session));
 
 	return ret;
+
+#	undef ZBX_POST_VMWARE_CREATE_EVENT_COLLECTOR
+#	undef ZBX_POST_VMWARE_EVENT_FILTER_SPEC_CATEGORY
 }
 
 /******************************************************************************
@@ -7274,6 +7306,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->lastaccess = now;
 	service->eventlog.last_key = ZBX_VMWARE_EVENT_KEY_UNINITIALIZED;
 	service->eventlog.skip_old = 0;
+	service->eventlog.severity = 0;
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->jobs_num = 0;

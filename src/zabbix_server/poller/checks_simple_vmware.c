@@ -27,6 +27,7 @@
 #include "../vmware/vmware_perfcntr.h"
 #include "zbxxml.h"
 #include "zbxsysinfo.h"
+#include "zbxparam.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
@@ -1054,17 +1055,85 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): events:%d", __func__, add_results->values_num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts a single value of VMware event log level from string to  *
+ *          bitmask                                                           *
+ *                                                                            *
+ * Parameters: level_str - [IN]                                               *
+ *                                                                            *
+ * Return value: result of conversion                                         *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned char	level_str_to_mask(const char *level_str)
+{
+	size_t			i;
+	static const char	*levels_str[] = {
+		ZBX_VMWARE_EVTLOG_SEVERITY_ERR_STR,
+		ZBX_VMWARE_EVTLOG_SEVERITY_INFO_STR,
+		ZBX_VMWARE_EVTLOG_SEVERITY_USER_STR,
+		ZBX_VMWARE_EVTLOG_SEVERITY_WARN_STR
+	};
+
+	for (i = 0; i < sizeof(levels_str) / sizeof(levels_str[0]); i++)
+	{
+		if (0 == strcmp(level_str, levels_str[i]))
+			break;
+	}
+
+	return (1 << i);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts VMware event log level severity to bitmask               *
+ *                                                                            *
+ * Parameters: severity - [IN]  event severity value from item parameter,     *
+ *                              which might contain multiple severity levels  *
+ *             mask     - [OUT] result of conversion                          *
+ *             error    - [OUT] error message in case of an error             *
+ *                                                                            *
+ * Return value: SUCCEED - if no errors were detected                         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	evt_severity_to_mask(const char *severity, unsigned char *mask, char **error)
+{
+	*mask = 0;
+
+	for (int n = 1; n <= zbx_num_param(severity); n++)
+	{
+		unsigned char	level_mask;
+		char		*level_str;
+
+		if (NULL == (level_str = zbx_get_param_dyn(severity, n, NULL)))
+			continue;
+
+		if (ZBX_VMWARE_EVTLOG_SEVERITY_OVERFLOW & (level_mask = level_str_to_mask(level_str)))
+		{
+			*error = zbx_dsprintf(*error, "Invalid event severity level \"%s\".", level_str);
+			zbx_free(level_str);
+			return FAIL;
+		}
+
+		*mask |= level_mask;
+		zbx_free(level_str);
+	}
+
+	return SUCCEED;
+}
+
 int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
 		zbx_vector_ptr_t *add_results)
 {
 	const char		*url, *skip;
-	unsigned char		skip_old;
+	unsigned char		skip_old, severity_mask;
 	zbx_vmware_service_t	*service;
 	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (2 < request->nparam || 0 == request->nparam)
+	if (3 < request->nparam || 0 == request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
 		goto out;
@@ -1086,10 +1155,36 @@ int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AG
 		goto out;
 	}
 
+	if (3 == request->nparam)
+	{
+		const char	*severity_str;
+
+		if (NULL == (severity_str = get_rparam(request, 2)) || '\0' == *severity_str)
+		{
+			severity_mask = 0;
+		}
+		else
+		{
+			char	*error = NULL;
+
+			if (FAIL == evt_severity_to_mask(severity_str, &severity_mask, &error))
+			{
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid third parameter. %s", error));
+				zbx_free(error);
+				goto out;
+			}
+		}
+	}
+	else
+		severity_mask = 0;
+
 	zbx_vmware_lock();
 
 	if (NULL == (service = get_vmware_service(url, item->username, item->password, result, &ret)))
 		goto unlock;
+
+	if (severity_mask != service->eventlog.severity)
+		service->eventlog.severity = severity_mask;
 
 	if (ZBX_VMWARE_EVENT_KEY_UNINITIALIZED == service->eventlog.last_key ||
 			(0 != skip_old && 0 != service->eventlog.last_key ))
