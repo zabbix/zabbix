@@ -3963,19 +3963,19 @@ div.dashboard-widget-hostavail .host-avail-table td:last-child {
   padding-right: 5px; }
 div.dashboard-widget-hostavail .host-avail-table .host-avail-true {
   color: #ffffff;
-  background-color: #34af67 !important; }
+  background-color: #34af67; }
 div.dashboard-widget-hostavail .host-avail-table .host-avail-false {
   color: #ffffff;
-  background-color: #d64e4e !important; }
+  background-color: #d64e4e; }
 div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed {
   color: #ffffff;
-  background-color: #f1a50b !important; }
+  background-color: #f1a50b; }
 div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
   color: #ffffff;
-  background-color: #000000 !important; }
+  background-color: #000000; }
 div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
   color: #ffffff;
-  background-color: transparent !important; }
+  background-color: transparent; }
 
 div.dashboard-widget-hostavail .host-avail-table thead th {
   color: #ffffff; }
