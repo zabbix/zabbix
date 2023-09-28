@@ -39,12 +39,12 @@ class testPageReportsNotifications extends CLegacyWebTest {
 			$all_media[] = $name['name'];
 		}
 		$dropdowns = [
-			'media_type' => array_merge(['all'], $all_media),
+			'media_type' => array_merge(['All'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
 			'year' => array_reverse(range(date("Y"), date("Y",strtotime("-11 year"))))
 		];
 		$default_selected = [
-			'media_type' => 'all',
+			'media_type' => 'All',
 			'period' => 'Weekly',
 			'year' => date('Y')
 		];

@@ -20,13 +20,10 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "zbxlog.h"
-
 int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXFILES
-	int	mib[2], len;
-	int	maxfiles;
+	int	mib[2], len, maxfiles;
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_MAXFILES;
@@ -53,8 +50,7 @@ int	kernel_maxfiles(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	kernel_maxproc(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_FUNCTION_SYSCTL_KERN_MAXPROC
-	int	mib[2], len;
-	int	maxproc;
+	int	mib[2], len, maxproc;
 
 	mib[0] = CTL_KERN;
 	mib[1] = KERN_MAXPROC;

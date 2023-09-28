@@ -293,7 +293,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: MULTIPLIER
@@ -1019,27 +1019,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -1047,6 +1026,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -1718,13 +1718,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
                 formulaid: A
@@ -1732,6 +1725,13 @@ zabbix_export:
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter'
           item_prototypes:
             - uuid: 96d3b16a29c44dacbf57127395d4f760
@@ -2040,14 +2040,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Linux by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
         - uuid: 59f09fada3ab43d1bdb70091f92e77f1
           name: 'System performance'
           pages:
@@ -2057,47 +2057,26 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Linux by SNMP'
                         name: 'Linux: System load'
-                - type: graphprototype
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Linux: CPU usage{#SINGLETON}'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Linux by SNMP'
                         name: 'Linux: Memory usage'
-                - type: graph
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Linux by SNMP'
-                        name: 'Linux: Swap usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -2106,14 +2085,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Linux by SNMP'
                         name: '{#FSNAME}: Disk space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
                 - type: graphprototype
                   'y': '15'
                   width: '24'
@@ -2122,14 +2101,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Linux by SNMP'
                         name: '{#DEVNAME}: Disk read/write rates'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
                 - type: graphprototype
                   'y': '20'
                   width: '24'
@@ -2138,17 +2117,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
                     - type: ITEM_PROTOTYPE
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'Linux by SNMP'
                         key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
+                    - type: INTEGER
+                      name: source_type
+                      value: '3'
                 - type: graphprototype
                   'y': '25'
                   width: '24'
@@ -2157,14 +2136,44 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Linux by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
+                - type: graphprototype
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        name: 'Linux: CPU usage{#SINGLETON}'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                - type: graph
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Linux by SNMP'
+                        name: 'Linux: Swap usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
       valuemaps:
         - uuid: 1fe48656fa5e4a23903921a5b0f2aac4
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'

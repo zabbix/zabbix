@@ -27,9 +27,8 @@
  */
 
 if (array_key_exists('itemid', $data['fields'])) {
-	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid'],
-		$data['captions']['items']['itemid'])
-	)->setPopupParameter('numeric', true);
+	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
+		->setPopupParameter('numeric', true);
 
 	if (!$data['fields']['itemid']->isTemplateDashboard()) {
 		$field_itemid->setPopupParameter('with_simple_graph_items', true);
@@ -45,14 +44,20 @@ else {
 	)
 	->addField($field_itemid)
 	->addField(array_key_exists('graphid', $data['fields'])
-		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'], $data['captions']['graphs']['graphid'])
+		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'])
 		: null
+	)
+	->addField(
+		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+			->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_legend'])
 	)
-	->addField(array_key_exists('dynamic', $data['fields'])
-		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
+	->addField($data['templateid'] === null
+		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
 	->show();

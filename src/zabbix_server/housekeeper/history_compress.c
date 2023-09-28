@@ -30,10 +30,8 @@
 				" stable as $$ select extract(epoch from now())::integer $$"
 
 #define COMPRESSION_TOLERANCE		(SEC_PER_HOUR * 2)
-#define COMPRESSION_POLICY_REMOVE	(0 == ZBX_DB_TSDB_V1 ? "remove_compression_policy" : \
-					"remove_compress_chunks_policy")
-#define COMPRESSION_POLICY_ADD		(0 == ZBX_DB_TSDB_V1 ? "add_compression_policy" : \
-					"add_compress_chunks_policy")
+#define COMPRESSION_POLICY_REMOVE	"remove_compression_policy"
+#define COMPRESSION_POLICY_ADD		"add_compression_policy"
 
 typedef struct
 {
@@ -75,18 +73,9 @@ static void	hk_check_table_segmentation(const char *table_name, const char *segm
 
 	/* get hypertable's 'segmentby' attribute name */
 
-	if (1 == ZBX_DB_TSDB_V1)
-	{
-		result = zbx_db_select("select c.attname from _timescaledb_catalog.hypertable_compression c"
-				" inner join _timescaledb_catalog.hypertable h on (h.id=c.hypertable_id)"
-				" where c.segmentby_column_index<>0 and h.table_name='%s'", table_name);
-	}
-	else
-	{
-		result = zbx_db_select("select attname from timescaledb_information.compression_settings"
-				" where hypertable_schema='%s' and hypertable_name='%s'"
-				" and segmentby_column_index is not null", zbx_db_get_schema_esc(), table_name);
-	}
+	result = zbx_db_select("select attname from timescaledb_information.compression_settings"
+			" where hypertable_schema='%s' and hypertable_name='%s'"
+			" and segmentby_column_index is not null", zbx_db_get_schema_esc(), table_name);
 
 	for (i = 0; NULL != (row = zbx_db_fetch(result)); i++)
 	{
@@ -122,20 +111,9 @@ static int	hk_get_table_compression_age(const char *table_name)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): table: %s", __func__, table_name);
 
-	if (1 == ZBX_DB_TSDB_V1)
-	{
-		result = zbx_db_select("select (p.older_than).integer_interval"
-				" from _timescaledb_config.bgw_policy_compress_chunks p"
-				" inner join _timescaledb_catalog.hypertable h on (h.id=p.hypertable_id)"
-				" where h.table_name='%s'", table_name);
-	}
-	else
-	{
-		result = zbx_db_select("select extract(epoch from (config::json->>'compress_after')::interval) from"
-				" timescaledb_information.jobs where application_name like 'Compression%%' and"
-				" hypertable_schema='%s' and hypertable_name='%s'", zbx_db_get_schema_esc(),
-				table_name);
-	}
+	result = zbx_db_select("select extract(epoch from (config::json->>'compress_after')::interval) from"
+			" timescaledb_information.jobs where application_name like 'Compression%%' and"
+			" hypertable_schema='%s' and hypertable_name='%s'", zbx_db_get_schema_esc(), table_name);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		age = atoi(row[0]);

@@ -230,7 +230,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: MULTIPLIER
@@ -599,27 +599,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -627,6 +606,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -1119,12 +1119,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_TYPE}'
-                value: '8'
-                formulaid: B
               - macro: '{#SENSOR_PRECISION}'
                 value: '1'
                 formulaid: A
+              - macro: '{#SENSOR_TYPE}'
+                value: '8'
+                formulaid: B
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             - uuid: 2851148fc01c4ba5afb5ab6a3deba5ff
@@ -1271,13 +1271,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
                 formulaid: A
@@ -1285,6 +1278,13 @@ zabbix_export:
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: 676989796c6847ecb76732acce13126a
@@ -1416,13 +1416,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#MEMTYPE}'
-                value: '{$MEMORY.TYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#MEMTYPE}'
-                value: '{$MEMORY.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.MATCHES}'
                 formulaid: A
@@ -1430,6 +1423,13 @@ zabbix_export:
                 value: '{$MEMORY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#MEMTYPE}'
+                value: '{$MEMORY.TYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#MEMTYPE}'
+                value: '{$MEMORY.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with memory filter'
           item_prototypes:
             - uuid: 321107495a2d4f4cb2b9aea7bd62a238
@@ -1731,10 +1731,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Arista by SNMP'
                         name: 'Arista: CPU utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   name: 'disk space usage'
                   'y': '5'
@@ -1744,14 +1747,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Arista by SNMP'
                         name: '{#FSNAME}: Disk space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graphprototype
                   name: 'memory utilization'
                   x: '12'
@@ -1761,14 +1764,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Arista by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   name: 'network traffic'
                   x: '12'
@@ -1779,14 +1782,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Arista by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
       valuemaps:
         - uuid: 318f3041aea04848a223de86e589c232
           name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'

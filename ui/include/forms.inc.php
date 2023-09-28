@@ -461,7 +461,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 		if ($filter_data['filter_delay'] === '' && $filter_data['filter_type'] != ITEM_TYPE_TRAPPER
 				&& $item['type'] != ITEM_TYPE_TRAPPER && $item['type'] != ITEM_TYPE_SNMPTRAP
 				&& $item['type'] != ITEM_TYPE_DEPENDENT
-				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) !== 0)) {
+				&& ($item['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($item['key_'], 'mqtt.get', 8) != 0)) {
 			// Use temporary variable for delay, because the original will be used for sorting later.
 			$delay = $item['delay'];
 			$value = $delay;
@@ -733,7 +733,7 @@ function getItemFormData(array $item = [], array $options = []) {
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
 		'history' => getRequest('history', DB::getDefault('items', 'history')),
 		'status' => getRequest('status', isset($_REQUEST['form_refresh']) ? 1 : 0),
-		'type' => getRequest('type', 0),
+		'type' => getRequest('type', ITEM_TYPE_ZABBIX),
 		'snmp_oid' => getRequest('snmp_oid', ''),
 		'value_type' => getRequest('value_type', ITEM_VALUE_TYPE_UINT64),
 		'trapper_hosts' => getRequest('trapper_hosts', ''),
@@ -785,6 +785,12 @@ function getItemFormData(array $item = [], array $options = []) {
 		'tags' => getRequest('tags', []),
 		'backurl' => getRequest('backurl')
 	];
+
+	CArrayHelper::sort($data['preprocessing'], ['sortorder']);
+
+	if (!$data['is_discovery_rule']) {
+		$data['preprocessing'] = sortPreprocessingSteps($data['preprocessing']);
+	}
 
 	// Unset empty and inherited tags.
 	foreach ($data['tags'] as $key => $tag) {
@@ -1026,7 +1032,7 @@ function getItemFormData(array $item = [], array $options = []) {
 
 					if ($delay == 0 && ($data['type'] == ITEM_TYPE_TRAPPER || $data['type'] == ITEM_TYPE_SNMPTRAP
 							|| $data['type'] == ITEM_TYPE_DEPENDENT || ($data['type'] == ITEM_TYPE_ZABBIX_ACTIVE
-								&& strncmp($data['key'], 'mqtt.get', 8) === 0))) {
+								&& strncmp($data['key'], 'mqtt.get', 8) == 0))) {
 						$data['delay'] = ZBX_ITEM_DELAY_DEFAULT;
 					}
 				}
@@ -1260,7 +1266,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 	$sortable = (count($preprocessing) > 1 && !$readonly);
 
 	$i = 0;
-	$have_validate_not_supported = in_array(ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, array_column($preprocessing, 'type'));
 
 	foreach ($preprocessing as $step) {
 		// Create a select with preprocessing types.
@@ -1274,9 +1279,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$opt_group = new CSelectOptionGroup($group['label']);
 
 			foreach ($group['types'] as $type => $label) {
-				$enabled = (!$have_validate_not_supported || $type != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED
-						|| $type == $step['type']);
-				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(!$enabled));
+				$opt_group->addOption((new CSelectOption($type, $label))->setDisabled(
+					$step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED && $type == $step['type']
+				));
 			}
 
 			$preproc_types_select->addOptionGroup($opt_group);
@@ -1433,6 +1438,32 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 					$step_param_1->setAttribute('placeholder', _('replacement'))
 				];
 				break;
+
+			case ZBX_PREPROC_VALIDATE_NOT_SUPPORTED:
+				if ($step_param_0_value == '') {
+					$step_param_0_value = ZBX_PREPROC_MATCH_ERROR_ANY;
+				}
+
+				$params = [
+					(new CSelect('preprocessing['.$i.'][params][0]'))
+						->addOptions(CSelect::createOptionsFromArray([
+							ZBX_PREPROC_MATCH_ERROR_ANY => _('any error'),
+							ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
+							ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
+						]))
+							->setAttribute('placeholder', _('error-matching'))
+							->addClass('js-preproc-param-error-matching')
+							->setValue($step_param_0_value)
+							->setReadonly($readonly),
+					$step_param_1
+						->setAttribute('placeholder', _('pattern'))
+						->setReadonly($readonly)
+						->addClass(
+							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_VISIBILITY_HIDDEN : null
+						)
+				];
+				break;
+
 
 			case ZBX_PREPROC_SNMP_WALK_VALUE:
 				$params = [
@@ -1751,387 +1782,6 @@ function getTriggerMassupdateFormData() {
 	if (!$data['tags']) {
 		$data['tags'][] = ['tag' => '', 'value' => ''];
 	}
-
-	return $data;
-}
-
-/**
- * Generate data for the trigger configuration form.
- *
- * @param array       $data                                     Trigger data array.
- * @param string      $data['form']                             Form action.
- * @param string      $data['form_refresh']                     Form refresh.
- * @param null|string $data['parent_discoveryid']               Parent discovery ID.
- * @param array       $data['dependencies']                     Trigger dependencies.
- * @param array       $data['db_dependencies']                  DB trigger dependencies.
- * @param string      $data['triggerid']                        Trigger ID.
- * @param string      $data['expression']                       Trigger expression.
- * @param string      $data['recovery_expression']              Trigger recovery expression.
- * @param string      $data['expr_temp']                        Trigger temporary expression.
- * @param string      $data['recovery_expr_temp']               Trigger temporary recovery expression.
- * @param string      $data['recovery_mode']                    Trigger recovery mode.
- * @param string      $data['description']                      Trigger description.
- * @param string      $data['event_name']                       Trigger event name.
- * @param string      $data['opdata']                           Trigger operational data.
- * @param int         $data['type']                             Trigger problem event generation mode.
- * @param string      $data['priority']                         Trigger severity.
- * @param int         $data['status']                           Trigger status.
- * @param string      $data['comments']                         Trigger description.
- * @param string      $data['url']                              Trigger URL.
- * @param string      $data['expression_constructor']           Trigger expression constructor mode.
- * @param string      $data['recovery_expression_constructor']  Trigger recovery expression constructor mode.
- * @param bool        $data['limited']                          Templated trigger.
- * @param array       $data['templates']                        Trigger templates.
- * @param string      $data['hostid']                           Host ID.
- * @param string      $data['expression_action']                Trigger expression action.
- * @param string      $data['recovery_expression_action']       Trigger recovery expression action.
- * @param string      $data['tags']                             Trigger tags.
- * @param string      $data['correlation_mode']                 Trigger correlation mode.
- * @param string      $data['correlation_tag']                  Trigger correlation tag.
- * @param string      $data['manual_close']                     Trigger manual close.
- * @param string      $data['context']                          Additional parameter in URL to identify main section.
- *
- * @return array
- */
-function getTriggerFormData(array $data) {
-	if ($data['triggerid'] !== null) {
-		// Get trigger.
-		$options = [
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid'],
-			'triggerids' => $data['triggerid']
-		];
-
-		if (!hasRequest('form_refresh')) {
-			$options['selectTags'] = ['tag', 'value'];
-		}
-
-		if ($data['show_inherited_tags']) {
-			$options['selectItems'] = ['itemid', 'templateid', 'flags'];
-		}
-
-		if ($data['parent_discoveryid'] === null) {
-			$options['selectDiscoveryRule'] = ['itemid', 'name', 'templateid'];
-			$options['selectTriggerDiscovery'] = ['parent_triggerid'];
-			$triggers = API::Trigger()->get($options);
-			$flag = ZBX_FLAG_DISCOVERY_NORMAL;
-		}
-		else {
-			$triggers = API::TriggerPrototype()->get($options);
-			$flag = ZBX_FLAG_DISCOVERY_PROTOTYPE;
-		}
-
-		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		$trigger = reset($triggers);
-
-		if (!hasRequest('form_refresh')) {
-			$data['tags'] = $trigger['tags'];
-		}
-
-		// Get templates.
-		$data['templates'] = makeTriggerTemplatesHtml($trigger['triggerid'],
-			getTriggerParentTemplates([$trigger], $flag), $flag,
-			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
-
-		if ($data['show_inherited_tags']) {
-			if ($data['parent_discoveryid'] === null) {
-				if ($trigger['discoveryRule']) {
-					$item_parent_templates = getItemParentTemplates([$trigger['discoveryRule']],
-						ZBX_FLAG_DISCOVERY_RULE
-					)['templates'];
-				}
-				else {
-					$item_parent_templates = getItemParentTemplates($trigger['items'],
-						ZBX_FLAG_DISCOVERY_NORMAL
-					)['templates'];
-				}
-			}
-			else {
-				$items = [];
-				$item_prototypes = [];
-
-				foreach ($trigger['items'] as $item) {
-					if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-						$items[] = $item;
-					}
-					else {
-						$item_prototypes[] = $item;
-					}
-				}
-
-				$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
-					+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
-			}
-			unset($item_parent_templates[0]);
-
-			$db_templates = $item_parent_templates
-				? API::Template()->get([
-					'output' => ['templateid'],
-					'selectTags' => ['tag', 'value'],
-					'templateids' => array_keys($item_parent_templates),
-					'preservekeys' => true
-				])
-				: [];
-
-			$inherited_tags = [];
-
-			foreach ($item_parent_templates as $templateid => $template) {
-				if (array_key_exists($templateid, $db_templates)) {
-					foreach ($db_templates[$templateid]['tags'] as $tag) {
-						if (array_key_exists($tag['tag'], $inherited_tags)
-								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-							$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
-								$templateid => $template
-							];
-						}
-						else {
-							$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
-								'parent_templates' => [$templateid => $template],
-								'type' => ZBX_PROPERTY_INHERITED
-							];
-						}
-					}
-				}
-			}
-
-			$db_hosts = API::Host()->get([
-				'output' => [],
-				'selectTags' => ['tag', 'value'],
-				'hostids' => $data['hostid'],
-				'templated_hosts' => true
-			]);
-
-			if ($db_hosts) {
-				foreach ($db_hosts[0]['tags'] as $tag) {
-					$inherited_tags[$tag['tag']][$tag['value']] = $tag;
-					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
-				}
-			}
-
-			foreach ($data['tags'] as $tag) {
-				if (array_key_exists($tag['tag'], $inherited_tags)
-						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
-					$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
-				}
-				else {
-					$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
-				}
-			}
-
-			$data['tags'] = [];
-
-			foreach ($inherited_tags as $tag) {
-				foreach ($tag as $value) {
-					$data['tags'][] = $value;
-				}
-			}
-		}
-
-		$data['limited'] = ($trigger['templateid'] != 0);
-
-		// Select first host from triggers if no matching value is given.
-		$hosts = $trigger['hosts'];
-		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
-			$host = reset($hosts);
-			$data['hostid'] = $host['hostid'];
-		}
-	}
-
-	// tags
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-	else {
-		CArrayHelper::sort($data['tags'], ['tag', 'value']);
-	}
-
-	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
-		$data['expression'] = $trigger['expression'];
-		$data['recovery_expression'] = $trigger['recovery_expression'];
-
-		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
-			$data['description'] = $trigger['description'];
-			$data['event_name'] = $trigger['event_name'];
-			$data['opdata'] = $trigger['opdata'];
-			$data['type'] = $trigger['type'];
-			$data['recovery_mode'] = $trigger['recovery_mode'];
-			$data['correlation_mode'] = $trigger['correlation_mode'];
-			$data['correlation_tag'] = $trigger['correlation_tag'];
-			$data['manual_close'] = $trigger['manual_close'];
-			$data['priority'] = $trigger['priority'];
-			$data['status'] = $trigger['status'];
-			$data['comments'] = $trigger['comments'];
-			$data['url_name'] = $trigger['url_name'];
-			$data['url'] = $trigger['url'];
-
-			if ($data['parent_discoveryid'] !== null) {
-				$data['discover'] = $trigger['discover'];
-			}
-
-			$db_triggers = DBselect(
-				'SELECT t.triggerid,t.description'.
-				' FROM triggers t,trigger_depends d'.
-				' WHERE t.triggerid=d.triggerid_up'.
-					' AND d.triggerid_down='.zbx_dbstr($data['triggerid'])
-			);
-			while ($db_trigger = DBfetch($db_triggers)) {
-				if (uint_in_array($db_trigger['triggerid'], $data['dependencies'])) {
-					continue;
-				}
-				array_push($data['dependencies'], $db_trigger['triggerid']);
-			}
-		}
-	}
-
-	$readonly = false;
-	if ($data['triggerid'] !== null) {
-		$data['flags'] = $trigger['flags'];
-
-		if ($data['parent_discoveryid'] === null) {
-			$data['discoveryRule'] = $trigger['discoveryRule'];
-			$data['triggerDiscovery'] = $trigger['triggerDiscovery'];
-		}
-
-		if ($trigger['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $data['limited']) {
-			$readonly = true;
-		}
-	}
-
-	// Trigger expression constructor.
-	if ($data['expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
-
-		if ($analyze !== false) {
-			list($data['expression_formula'], $data['expression_tree']) = $analyze;
-
-			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
-				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
-					$data['expression_action'], $data['expr_temp'], $error
-				);
-
-				if ($new_expr !== false) {
-					$data['expression'] = $new_expr;
-					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
-
-					if ($analyze !== false) {
-						list($data['expression_formula'], $data['expression_tree']) = $analyze;
-					}
-					else {
-						error(_s('Cannot build expression tree: %1$s.', $error));
-						show_messages(false, '', _('Expression syntax error.'));
-					}
-
-					$data['expr_temp'] = '';
-				}
-				else {
-					error(_s('Cannot build expression tree: %1$s.', $error));
-					show_messages(false, '', _('Expression syntax error.'));
-				}
-			}
-
-			$data['expression_field_name'] = 'expr_temp';
-			$data['expression_field_value'] = $data['expr_temp'];
-			$data['expression_field_readonly'] = true;
-		}
-		else {
-			error(_s('Cannot build expression tree: %1$s.', $error));
-			show_messages(false, '', _('Expression syntax error.'));
-			$data['expression_field_name'] = 'expression';
-			$data['expression_field_value'] = $data['expression'];
-			$data['expression_field_readonly'] = $readonly;
-			$data['expression_constructor'] = IM_ESTABLISHED;
-		}
-	}
-	elseif ($data['expression_constructor'] != IM_TREE) {
-		$data['expression_field_name'] = 'expression';
-		$data['expression_field_value'] = $data['expression'];
-		$data['expression_field_readonly'] = $readonly;
-	}
-
-	// Trigger recovery expression constructor.
-	if ($data['recovery_expression_constructor'] == IM_TREE) {
-		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
-
-		if ($analyze !== false) {
-			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
-
-			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
-				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
-					$data['recovery_expression_action'], $data['recovery_expr_temp'], $error
-				);
-
-				if ($new_expr !== false) {
-					$data['recovery_expression'] = $new_expr;
-					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
-
-					if ($analyze !== false) {
-						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
-					}
-					else {
-						error(_s('Cannot build expression tree: %1$s.', $error));
-						show_messages(false, '', _('Recovery expression syntax error.'));
-					}
-
-					$data['recovery_expr_temp'] = '';
-				}
-				else {
-					error(_s('Cannot build expression tree: %1$s.', $error));
-					show_messages(false, '', _('Recovery expression syntax error.'));
-				}
-			}
-
-			$data['recovery_expression_field_name'] = 'recovery_expr_temp';
-			$data['recovery_expression_field_value'] = $data['recovery_expr_temp'];
-			$data['recovery_expression_field_readonly'] = true;
-		}
-		else {
-			error(_s('Cannot build expression tree: %1$s.', $error));
-			show_messages(false, '', _('Recovery expression syntax error.'));
-			$data['recovery_expression_field_name'] = 'recovery_expression';
-			$data['recovery_expression_field_value'] = $data['recovery_expression'];
-			$data['recovery_expression_field_readonly'] = $readonly;
-			$data['recovery_expression_constructor'] = IM_ESTABLISHED;
-		}
-	}
-	elseif ($data['recovery_expression_constructor'] != IM_TREE) {
-		$data['recovery_expression_field_name'] = 'recovery_expression';
-		$data['recovery_expression_field_value'] = $data['recovery_expression'];
-		$data['recovery_expression_field_readonly'] = $readonly;
-	}
-
-	if ($data['dependencies']) {
-		$dependencyTriggers = API::Trigger()->get([
-			'output' => ['triggerid', 'description', 'flags'],
-			'selectHosts' => ['hostid', 'name'],
-			'triggerids' => $data['dependencies'],
-			'preservekeys' => true
-		]);
-
-		if ($data['parent_discoveryid']) {
-			$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
-				'output' => ['triggerid', 'description', 'flags'],
-				'selectHosts' => ['hostid', 'name'],
-				'triggerids' => $data['dependencies'],
-				'preservekeys' => true
-			]);
-
-			$data['db_dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
-		}
-		else {
-			$data['db_dependencies'] = $dependencyTriggers;
-		}
-	}
-
-	foreach ($data['db_dependencies'] as &$dependency) {
-		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
-	}
-	unset($dependency);
-
-	order_result($data['db_dependencies'], 'description');
 
 	return $data;
 }
