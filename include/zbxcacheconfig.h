@@ -1288,13 +1288,14 @@ void	zbx_recalc_time_period(time_t *ts_from, int table_group);
 typedef struct
 {
 	zbx_uint64_t	overcommit_limit;
-	zbx_uint64_t	overcommit_charge;
+	zbx_uint64_t	overcommit;
 	zbx_uint64_t	values_limit;
 }
 zbx_vps_monitor_stats_t;
 
 void	zbx_vps_monitor_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit);
-void	zbx_vps_monitor_add(zbx_uint64_t values_num);
+void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num);
+void	zbx_vps_monitor_add_written(zbx_uint64_t values_num);
 int	zbx_vps_monitor_capped(void);
 void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats);
 double	zbx_vps_get_avg(void);

@@ -28,9 +28,9 @@ typedef struct
 {
 	zbx_uint64_t	total_values_num;
 	zbx_uint64_t	values_num;
-	zbx_uint64_t	overcommit_limit;
-	zbx_uint64_t	overcommit_charge;
 	zbx_uint64_t	values_limit;
+	zbx_uint64_t	overcommit_limit;
+	zbx_uint64_t	overcommit;
 
 	time_t		last_flush;
 	time_t		last_hist;

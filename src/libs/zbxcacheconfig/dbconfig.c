@@ -205,19 +205,17 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 					goto clean;
 				}
 
-				arg1 = get_rparam(&request, 0);
+				if (2 > request.nparam)
+					goto clean;
 
-				if (0 == strcmp(arg1, "limiter") || 0 == strcmp(arg1, "vps") ||
-						0 == strcmp(arg1, "nvps"))
+				arg1 = get_rparam(&request, 0);
+				arg2 = get_rparam(&request, 1);
+
+				if (0 == strcmp(arg1, "vps"))
 				{
 					ret = SUCCEED;
 					goto  clean;
 				}
-
-				if (2 > request.nparam)
-					goto clean;
-
-				arg2 = get_rparam(&request, 1);
 
 				if (2 == request.nparam)
 				{

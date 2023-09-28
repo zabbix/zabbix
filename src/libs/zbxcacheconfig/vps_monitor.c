@@ -86,21 +86,22 @@ void	zbx_vps_monitor_init(zbx_uint64_t nvps_limit, zbx_uint64_t overcommit_limit
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
 	monitor->last_flush = time(NULL);
+	monitor->last_hist = monitor->last_flush;
 
 	monitor->values_limit = nvps_limit * ZBX_VPS_FLUSH_PERIOD;
 	monitor->overcommit_limit = overcommit_limit * nvps_limit / 100;
-	monitor->overcommit_charge = overcommit_limit * nvps_limit / 100;
+	monitor->overcommit = overcommit_limit * nvps_limit / 100;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add number of synced values to the monitor                        *
+ * Purpose: add number of collected values to the monitor                     *
  *                                                                            *
  * Comments: This function is called before processes are spawned -           *
  *           no locking is needed.                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vps_monitor_add(zbx_uint64_t values_num)
+void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
 {
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 	time_t			now;
@@ -113,24 +114,26 @@ void	zbx_vps_monitor_add(zbx_uint64_t values_num)
 	{
 		if (monitor->values_limit > monitor->values_num)
 		{
-			monitor->overcommit_charge += monitor->values_limit - monitor->values_num;
-
-			if (monitor->overcommit_charge > monitor->overcommit_limit)
-				monitor->overcommit_charge = monitor->overcommit_limit;
+			if (monitor->overcommit > monitor->values_limit - monitor->values_num)
+				monitor->overcommit -= monitor->values_limit - monitor->values_num;
+			else
+				monitor->overcommit = 0;
 
 			monitor->values_num = 0;
 		}
 		else
 		{
-			if (monitor->values_num <= monitor->values_limit + monitor->overcommit_charge)
+			zbx_uint64_t	overcommit_available = monitor->overcommit_limit - monitor->overcommit;
+
+			if (monitor->values_num <= monitor->values_limit + overcommit_available)
 			{
-				monitor->overcommit_charge -= monitor->values_num - monitor->values_limit;
+				monitor->overcommit += monitor->values_num - monitor->values_limit;
 				monitor->values_num = 0;
 			}
 			else
 			{
-				monitor->values_num -= monitor->values_limit + monitor->overcommit_charge;
-				monitor->overcommit_charge = 0;
+				monitor->values_num -= monitor->values_limit + overcommit_available;
+				monitor->overcommit = monitor->overcommit_limit;
 			}
 		}
 
@@ -139,16 +142,34 @@ void	zbx_vps_monitor_add(zbx_uint64_t values_num)
 
 	monitor->values_num += values_num;
 
-	/* update history statistics */
+	zbx_mutex_unlock(vps_lock);
+}
 
-	while (monitor->last_flush != now)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add number of written values to the monitor                       *
+ *                                                                            *
+ * Comments: This function is called before processes are spawned -           *
+ *           no locking is needed.                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vps_monitor_add_written(zbx_uint64_t values_num)
+{
+	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
+	time_t			now;
+
+	now = time(NULL);
+
+	zbx_mutex_lock(vps_lock);
+
+	while (monitor->last_hist != now)
 	{
 		monitor->history[vps_history_inc(&monitor->history_tail)] = monitor->total_values_num;
 
 		if (monitor->history_tail == monitor->history_head)
 			vps_history_inc(&monitor->history_head);
 
-		monitor->last_flush++;
+		monitor->last_hist++;
 	}
 
 	monitor->total_values_num += values_num;
@@ -175,7 +196,10 @@ int	zbx_vps_monitor_capped(void)
 	int	ret;
 
 	zbx_mutex_lock(vps_lock);
-	ret = (monitor->values_num <= monitor->values_limit + monitor->overcommit_charge ? FAIL : SUCCEED);
+
+	zbx_uint64_t	overcommit_available = monitor->overcommit_limit - monitor->overcommit;
+	ret = (monitor->values_num <= monitor->values_limit + overcommit_available ? FAIL : SUCCEED);
+
 	zbx_mutex_unlock(vps_lock);
 
 	return ret;
@@ -191,7 +215,7 @@ void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats)
 	zbx_vps_monitor_t	*monitor = &config->vps_monitor;
 
 	zbx_mutex_lock(vps_lock);
-	stats->overcommit_charge = monitor->overcommit_charge;
+	stats->overcommit = monitor->overcommit;
 	zbx_mutex_unlock(vps_lock);
 
 	/* preconfigured values, cannot change without restarting server */

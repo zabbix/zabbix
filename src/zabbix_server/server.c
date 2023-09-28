@@ -360,8 +360,8 @@ static char	*zbx_config_webservice_url	= NULL;
 
 int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
-static int	config_nvps_limit	= 0;
-static int	config_nvps_overcommit	= 100;
+static int	config_vps_limit		= 0;
+static int	config_vps_overcommit_limit	= 100;
 
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
@@ -1042,10 +1042,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
-		{"NVPSLimit",			&config_nvps_limit,	TYPE_INT,
-			PARM_OPT,	1,			1000},
-		{"NVPSOvercommit",		&config_nvps_overcommit,	TYPE_INT,
-			PARM_OPT,	1,			1000},
+		{"VPSLimit",			&config_vps_limit,	TYPE_INT,
+			PARM_OPT,	0,			100000},
+		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,	TYPE_INT,
+			PARM_OPT,	50,			1000},
 	{NULL}
 	};
 
@@ -1480,7 +1480,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	zbx_vps_monitor_init(config_nvps_limit, config_nvps_overcommit);
+	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
 
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{

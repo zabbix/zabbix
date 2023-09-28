@@ -2572,7 +2572,7 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
 
-	zbx_vps_monitor_add((zbx_uint64_t)history_values.values_num);
+	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
 
 	zbx_vector_ptr_destroy(&history_values);
 
@@ -3304,11 +3304,6 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 			zbx_vector_ptr_clear(&history_items);
 			hc_free_item_values(history, history_num);
 		}
-		else
-		{
-			/* report 0 synced values to keep the vps tracker running */
-			zbx_vps_monitor_add(0);
-		}
 
 		zbx_vector_uint64_clear(&itemids);
 
@@ -3993,6 +3988,8 @@ void	zbx_dc_flush_history(void)
 	cache->history_num += item_values_num;
 
 	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
 	item_values_num = 0;
 	string_values_offset = 0;

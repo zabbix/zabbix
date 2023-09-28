@@ -340,11 +340,11 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		if (0 == strcmp(param2, "available"))
 		{
-			SET_UI64_RESULT(result, stats.overcommit_charge);
+			SET_UI64_RESULT(result, stats.overcommit);
 		}
 		else if (0 == strcmp(param2, "pavailable"))
 		{
-			SET_DBL_RESULT(result, (double)stats.overcommit_charge * 100 / stats.overcommit_limit);
+			SET_DBL_RESULT(result, (double)stats.overcommit * 100 / stats.overcommit_limit);
 		}
 		else if (0 == strcmp(param2, "total"))
 		{
