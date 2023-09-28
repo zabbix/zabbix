@@ -727,15 +727,28 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				break;
 		}
 
-		if (NULL != items[i].timeout)
+		switch (items[i].type)
 		{
-			if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = CONFIG_ERROR;
-				continue;
-			}
+			case ITEM_TYPE_ZABBIX:
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+			case ITEM_TYPE_SIMPLE:
+			case ITEM_TYPE_EXTERNAL:
+			case ITEM_TYPE_DB_MONITOR:
+			case ITEM_TYPE_SSH:
+			case ITEM_TYPE_TELNET:
+			case ITEM_TYPE_SNMP:
+			case ITEM_TYPE_SCRIPT:
+			case ITEM_TYPE_HTTPAGENT:
+				if (NULL != items[i].timeout && FAIL == zbx_validate_item_timeout(items[i].timeout,
+						NULL, error, sizeof(error)))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+					errcodes[i] = CONFIG_ERROR;
+					continue;
+				}
+				break;
 		}
+
 	}
 
 	zbx_free(port);
