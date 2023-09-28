@@ -1396,6 +1396,10 @@ msgstr "Угол"
 msgid "Annually"
 msgstr "Ежегодно"
 
+#: jsLoader.php:201
+msgid "Another widget is used as data source."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
 #: app/views/administration.module.list.php:53
@@ -6005,6 +6009,10 @@ msgstr[0] "Панель удалена"
 msgstr[1] "Панели удалены"
 msgstr[2] "Панели удалены"
 
+#: jsLoader.php:200
+msgid "Dashboard is used as data source."
+msgstr ""
+
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
 msgstr ""
@@ -8678,6 +8686,10 @@ msgstr "Ошибка при обновлении свойств панели."
 #: app/views/js/popup.dashboard.share.edit.js.php:83
 msgid "Failed to update dashboard sharing."
 msgstr "Ошибка при обновлении общего доступа к панели."
+
+#: jsLoader.php:128
+msgid "Failed to update time selector."
+msgstr ""
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -14617,6 +14629,14 @@ msgstr "Новый шаблон"
 msgid "New template group"
 msgstr "Новая группа шаблонов"
 
+#: app/views/trigger.edit.php:144
+msgid "New trigger"
+msgstr ""
+
+#: app/views/trigger.prototype.edit.php:143
+msgid "New trigger prototype"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "Новые триггера"
@@ -14713,6 +14733,10 @@ msgstr "Для аутентификации не указано имя поль�
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
 msgstr "Без изменений."
+
+#: jsLoader.php:194
+msgid "No compatible widgets."
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:56
 #: include/views/configuration.action.edit.php:58
@@ -15949,6 +15973,10 @@ msgstr "Переопределено"
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
 msgstr "Замещение"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
+msgid "Override host"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:128
 msgid "Override item history period"
@@ -18182,6 +18210,10 @@ msgstr "SLA обновлен"
 #, c-format
 msgid "SLA with ID \"%1$s\" is not available."
 msgstr "SLA с ID \"%1$s\" недоступен."
+
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
+msgid "SLAs"
+msgstr ""
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
@@ -23655,6 +23687,13 @@ msgstr "Добро пожаловать в"
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:83
 msgid "When active"
 msgstr "Когда активен"
+
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:59
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:96
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
+#: jsLoader.php:195 jsLoader.php:199
+msgid "Widget"
+msgstr ""
 
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format
