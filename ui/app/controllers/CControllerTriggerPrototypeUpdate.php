@@ -83,6 +83,12 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			return false;
 		}
 
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	}
+
+	protected function doAction(): void {
 		$db_trigger_prototypes = API::TriggerPrototype()->get([
 			'output' => ['expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments', 'templateid',
 				'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
@@ -94,23 +100,19 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			'editable' => true
 		]);
 
-		if (!$db_trigger_prototypes) {
-			return false;
+		if ($db_trigger_prototypes) {
+			$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+			$this->db_trigger_prototype = reset($db_trigger_prototypes);
+		}
+		else {
+			$this->db_trigger_prototype = null;
 		}
 
-		$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
-			['sources' => ['expression', 'recovery_expression']]
-		);
-
-		$this->db_trigger_prototype = reset($db_trigger_prototypes);
-
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-	}
-
-	protected function doAction(): void {
 		$trigger_prototype = [];
 
-		if ($this->db_trigger_prototype['templateid'] == 0) {
+		if ($this->db_trigger_prototype && $this->db_trigger_prototype['templateid'] == 0) {
 			$trigger_prototype += [
 				'description' => $this->getInput('name'),
 				'event_name' => $this->getInput('event_name', ''),

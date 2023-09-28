@@ -71,28 +71,26 @@ class CControllerTriggerUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if ($this->getInput('hostid') && !isWritableHostTemplates([$this->getInput('hostid')])) {
+			return false;
+		}
+
+		return $this->getInput('context') === 'host'
+			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
+	}
+
+	protected function doAction(): void {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['triggerid', 'templateid', 'flags'],
 			'triggerids' => $this->getInput('triggerid')
 		]);
 
-		if (!$db_triggers) {
-			return false;
-		}
+		$this->db_trigger = $db_triggers ? reset($db_triggers) : null;
 
-		$this->db_trigger = reset($db_triggers);
-
-		if ($this->getInput('hostid') && !isWritableHostTemplates([$this->getInput('hostid')])) {
-			return false;
-		}
-
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
-	}
-
-	protected function doAction(): void {
 		$trigger = [];
 
-		if ($this->db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+		if ($this->db_trigger && $this->db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			if ($this->db_trigger['templateid'] == 0) {
 				$trigger += [
 					'description' => $this->getInput('name'),
