@@ -431,7 +431,7 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0;
-	char		*str = NULL, *name = NULL, *context = NULL;
+	char		*str = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 
 	if ('\0' == *text)
@@ -440,12 +440,30 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		const char	*value = NULL;
+		char		*out = NULL;
 
-		if (ZBX_TOKEN_USER_MACRO != token.type)
+		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_FUNC_MACRO != token.type )
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
-		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, env, &value);
+
+		switch(token.type)
+		{
+			case ZBX_TOKEN_FUNC_MACRO:
+				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l + 1,
+						env, &value);
+
+				if (NULL != value)
+					out = zbx_strdup(NULL, value);
+
+				zbx_calculate_macro_function(text + token.loc.l, &token.data.func_macro, &out);
+				value = out;
+				break;
+			case ZBX_TOKEN_USER_MACRO:
+				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, env,
+						&value);
+				break;
+		}
 
 		if (NULL != value)
 		{
@@ -457,11 +475,9 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 					token.loc.r - token.loc.l + 1);
 		}
 
-		zbx_free(name);
-		zbx_free(context);
-
 		pos = (int)token.loc.r;
 		last_pos = pos + 1;
+		zbx_free(out);
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
