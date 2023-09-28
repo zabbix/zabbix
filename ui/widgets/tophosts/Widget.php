@@ -21,7 +21,6 @@
 
 namespace Widgets\TopHosts;
 
-use Widgets\TopHosts\Includes\WidgetForm;
 use Zabbix\Core\CWidget;
 
 class Widget extends CWidget {
@@ -33,9 +32,5 @@ class Widget extends CWidget {
 
 	public function getDefaultName(): string {
 		return _('Top hosts');
-	}
-
-	public function usesTimeSelector(array $fields_values): bool {
-		return !WidgetForm::hasOverrideTime($fields_values);
 	}
 }

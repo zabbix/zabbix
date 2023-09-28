@@ -92,13 +92,12 @@ class CControllerHostDashboardView extends CController {
 
 				$configuration_hash = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
 
-				$widgets_and_forms = CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'],
-					$dashboard['templateid']
-				);
+				$pages_raw = $dashboard['pages'];
+				$pages_prepared = CDashboardHelper::preparePages($pages_raw, $dashboard['templateid'], true);
 
-				$dashboard['pages'] = CDashboardHelper::preparePages($widgets_and_forms, $dashboard['pages'], true);
+				$dashboard['pages'] = $pages_prepared;
 
-				$broadcast_requirements = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
+				$broadcast_requirements = CDashboardHelper::getBroadcastRequirements($pages_prepared);
 
 				$time_selector_options = [
 					'profileIdx' => 'web.dashboard.filter',

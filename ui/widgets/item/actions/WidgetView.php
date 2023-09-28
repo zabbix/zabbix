@@ -28,13 +28,20 @@ use API,
 	CNumberParser,
 	CSettingsHelper,
 	CUrl,
-	Manager,
-	CRangeTimeParser;
+	Manager;
 
 use Widgets\Item\Widget;
 use Widgets\Item\Includes\WidgetForm;
 
 class WidgetView extends CControllerDashboardWidgetView {
+
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'has_custom_time_period' => 'in 1'
+		]);
+	}
 
 	protected function doAction(): void {
 		$name = $this->widget->getDefaultName();
@@ -50,6 +57,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$last_value = null;
 		$is_binary_units = true;
 		$prev_value = null;
+		$time_from = 0;
+		$time_to = 0;
 
 		$options = [
 			'output' => ['value_type'],
@@ -59,24 +68,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'preservekeys' => true
 		];
 
-
-		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE
-				&& !WidgetForm::hasOverrideTime($this->fields_values)) {
-			$from = $this->getInput('from');
-			$to = $this->getInput('to');
+		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE) {
+			$time_from = $this->fields_values['time_period']['from_ts'];
+			$time_to = $this->fields_values['time_period']['to_ts'];
 		}
-		else {
-			$from = $this->fields_values['time_from'];
-			$to = $this->fields_values['time_to'];
-		}
-
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($from);
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($to);
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$tmp_items = [];
 
@@ -180,8 +175,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 					);
 				}
 
-				$aggregate_interval = $this->fields_values['item_time'] == 1 ? $time_to - $time_from : $history_period;
-
 				if ($this->fields_values['aggregate_function'] == AGGREGATE_NONE) {
 					$last_results = [];
 				}
@@ -193,11 +186,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($last_results) {
 					$aggregate_data = $last_results[$items[$itemid]['itemid']]['data'];
-					$previous_time_to = $time_to - 1 - $aggregate_interval;
-					$previous_time_from = $previous_time_to - $aggregate_interval;
+					$previous_time_to = $time_to - 1 - $history_period;
+					$previous_time_from = $previous_time_to - $history_period;
 
 					$prev_results = Manager::History()->getAggregationByInterval(
-						$items, $previous_time_from, $previous_time_to, $aggregate_function, $aggregate_interval
+						$items, $previous_time_from, $previous_time_to, $aggregate_function, $history_period
 					);
 
 					if ($prev_results) {
@@ -609,11 +602,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function makeWidgetInfo(): array {
 		$info = [];
 
-		if ($this->fields_values['aggregate_function'] != AGGREGATE_NONE
-				&& WidgetForm::hasOverrideTime($this->fields_values)) {
+		if ($this->hasInput('has_custom_time_period')) {
 			$info[] = [
 				'icon' => ZBX_ICON_TIME_PERIOD,
-				'hint' => relativeDateToText($this->fields_values['time_from'], $this->fields_values['time_to'])
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
 			];
 		}
 

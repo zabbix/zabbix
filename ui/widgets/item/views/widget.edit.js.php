@@ -34,9 +34,6 @@ window.widget_item_form = new class {
 		this._show_change_indicator = document.getElementById(`show_${<?= Widget::SHOW_CHANGE_INDICATOR ?>}`);
 
 		this._units_show = document.getElementById('units_show');
-		this._item_time = document.getElementById('item_time');
-		this._aggregate_function = document.getElementById('aggregate_function');
-		this._aggregate_warning = document.getElementById('item_value_aggregate_warning');
 
 		jQuery('#itemid').on('change', () => this.updateWarningIcon());
 
@@ -63,25 +60,8 @@ window.widget_item_form = new class {
 			});
 		}
 
-		this._aggregate_warning.style.display =this._aggregate_function.value == <?= AGGREGATE_AVG ?>
-				|| this._aggregate_function.value == <?= AGGREGATE_MIN ?>
-				|| this._aggregate_function.value == <?= AGGREGATE_MAX ?>
-				|| this._aggregate_function.value == <?= AGGREGATE_SUM ?>
-			? ''
-			: 'none';
-
-		for (const element of this._form.querySelectorAll('.js-row-override-time')) {
-			element.style.display = this._aggregate_function.value == <?= AGGREGATE_NONE ?> ? 'none' : '';
-		}
-
-		this._units_show.addEventListener('change', () => this.updateForm());
-		this._item_time.addEventListener('change', () => this.updateForm());
-
-		this._aggregate_function.addEventListener('change', () => {
-			this._item_time.dispatchEvent(new Event('change'));
-		});
-
-		this._aggregate_function.dispatchEvent(new Event('change'));
+		document.getElementById('units_show').addEventListener('change', () => this.updateForm());
+		document.getElementById('aggregate_function').addEventListener('change', () => this.updateForm());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -89,9 +69,7 @@ window.widget_item_form = new class {
 	}
 
 	updateForm() {
-		const override_fields = this._form.querySelectorAll('.js-row-override-time');
-		const aggregate_options = document.getElementById('aggregate_function');
-		const aggregate_warning = document.getElementById('item_value_aggregate_warning')
+		const aggregate_function = document.getElementById('aggregate_function');
 
 		for (const element of this._form.querySelectorAll('.fields-group-description')) {
 			element.style.display = this._show_description.checked ? '' : 'none';
@@ -110,7 +88,7 @@ window.widget_item_form = new class {
 		}
 
 		for (const element of document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
-			element.disabled = !this._show_value.checked || !this._units_show.checked;
+			element.disabled = !this._show_value.checked || !document.getElementById('units_show').checked;
 		}
 
 		for (const element of this._form.querySelectorAll('.fields-group-time')) {
@@ -129,41 +107,16 @@ window.widget_item_form = new class {
 			}
 		}
 
-		this._item_time.value = this._aggregate_function.value != <?= AGGREGATE_NONE ?> && this._item_time.checked
-			? 1
-			: 0;
+		this._form.fields.time_period.hidden = aggregate_function.value == <?= AGGREGATE_NONE ?>;
 
-		const time_period_fields = [
-			'#time_from',
-			'#time_from_calendar',
-			'#time_to',
-			'#time_to_calendar'
+		const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
+			<?= AGGREGATE_SUM ?>
 		];
 
-		if (aggregate_options.value == <?= AGGREGATE_NONE ?>) {
-			time_period_fields.push('#item_time');
-
-			for (const element of document.querySelectorAll(time_period_fields)) {
-				element.disabled = true;
-			}
-		}
-		else {
-			document.querySelector('#item_time').disabled = false;
-
-			for (const element of document.querySelectorAll(time_period_fields)) {
-				element.disabled = !this._item_time.checked;
-			}
-		}
-
-		aggregate_options.addEventListener('change', (e) => {
-			for (const element of override_fields) {
-				element.style.display = e.target.value == <?= AGGREGATE_NONE ?> ? 'none' : '';
-			}
-
-			aggregate_warning.style.display = e.target.value == <?= AGGREGATE_AVG ?>
-				|| e.target.value == <?= AGGREGATE_MIN ?> || e.target.value == <?= AGGREGATE_MAX ?>
-				|| e.target.value == <?= AGGREGATE_SUM ?> ? '' : 'none';
-		});
+		document.getElementById('item_value_aggregate_warning').style.display =
+				aggregate_warning_functions.includes(parseInt(aggregate_function.value))
+			? ''
+			: 'none';
 	}
 
 	updateWarningIcon() {

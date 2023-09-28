@@ -166,31 +166,4 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
-
-	/**
-	 * Checks if the dashboard should use a time period, based on widget configuration:
-	 * if at least one widget column uses an aggregation function (excluding 'not used')
-	 * and has the Override Time Period Selector option unchecked.
-	 *
-	 * @param array $fields_values An array of field values.
-	 *
-	 * @return bool Returns true if custom item time has to be used; otherwise, returns false.
-	 */
-	public static function hasOverrideTime(array $fields_values): bool {
-		$agg_function_count = 0;
-		$item_time_count = 0;
-		$data = self::convertDottedKeys($fields_values);
-
-		foreach ($data['columns'] as $column) {
-			if (array_key_exists('aggregate_function', $column) && $column['aggregate_function'] != AGGREGATE_NONE) {
-				$agg_function_count++;
-			}
-
-			if (array_key_exists('item_time', $column) && $column['item_time'] != 0) {
-				$item_time_count++;
-			}
-		}
-
-		return ($agg_function_count === $item_time_count);
-	}
 }

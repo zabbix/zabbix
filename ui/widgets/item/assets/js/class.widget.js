@@ -42,15 +42,14 @@ class CWidgetItem extends CWidget {
 		this._resize_observer.disconnect();
 	}
 
-	hasPadding() {
-		return false;
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			has_custom_time_period: this.getFieldsReferredData().has('time_period') ? undefined : 1
+		}
 	}
 
-	setTimePeriod(time_period) {
-		super.setTimePeriod(time_period);
-
-		if (this._state === WIDGET_STATE_ACTIVE) {
-			this._startUpdating();
-		}
+	hasPadding() {
+		return false;
 	}
 }

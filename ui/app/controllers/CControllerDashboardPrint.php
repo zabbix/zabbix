@@ -89,11 +89,7 @@ class CControllerDashboardPrint extends CController {
 
 		if ($db_dashboards) {
 			$dashboard = $db_dashboards[0];
-			$dashboard['pages'] = CDashboardHelper::preparePages(
-				CDashboardHelper::prepareWidgetsAndForms([$dashboard['pages'][0]], null),
-				[$dashboard['pages'][0]],
-				true
-			);
+			$dashboard['pages'] = CDashboardHelper::preparePages([$dashboard['pages'][0]], null, true);
 		}
 		else {
 			$error = _('No permissions to referred object or it does not exist!');

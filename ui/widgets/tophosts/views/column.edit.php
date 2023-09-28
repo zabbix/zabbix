@@ -244,37 +244,24 @@ $form_grid->addItem([
 	)
 ]);
 
-$form_grid->addItem([
-	(new CLabel(_('Override time period selector'), 'item_time'))->addClass('override-time'),
-	(new CFormField(
-		(new CCheckBox('item_time'))
-			->setChecked($data['item_time'] == 1)
-	))->addClass('override-time')
-]);
+$time_period_field_view = (new CWidgetFieldTimePeriodView($data['time_period_field']))
+	->setDateFormat(ZBX_FULL_DATE_TIME)
+	->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	->setFormName('tophosts_column')
+	->addClass('js-time-period');
 
-$form_grid->addItem([
-	(new CLabel(_('From'), 'time_from'))
-		->addClass('override-time')
-		->setAsteriskMark(),
-	(new CFormField(
-		(new CDateSelector('time_from', $data['time_from']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-			->setAriaRequired()
-	))->addClass('override-time')
-]);
+foreach ($time_period_field_view->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+	$form_grid->addItem([
+		$label,
+		(new CFormField($view))->addClass($class)
+	]);
+}
 
-$form_grid->addItem([
-	(new CLabel(_('To'), 'time_to'))
-		->addClass('override-time')
-		->setAsteriskMark(),
-	(new CFormField(
-		(new CDateSelector('time_to', $data['time_to']))
-			->setDateFormat(ZBX_FULL_DATE_TIME)
-			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-			->setAriaRequired()
-	))->addClass('override-time')
-]);
+$form_grid->addItem(new CScriptTag([
+	'document.forms.tophosts_column.fields = {};',
+	$time_period_field_view->getJavaScript()
+]));
 
 // History data.
 $form_grid->addItem([

@@ -27,7 +27,6 @@
  */
 
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
-use Zabbix\Widgets\Fields\CWidgetFieldDatePicker;
 
 $form = new CWidgetFormView($data);
 
@@ -73,16 +72,11 @@ $form
 					->setId('item_value_aggregate_warning'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBoxView($data['fields']['item_time']))
-					->addRowClass('js-row-override-time')
-			)
-			->addField(
-				(new CWidgetFieldDatePickerView($data['fields']['time_from']))
-					->addRowClass('js-row-override-time')
-			)
-			->addField(
-				(new CWidgetFieldDatePickerView($data['fields']['time_to']))
-					->addRowClass('js-row-override-time')
+				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+					->setDateFormat(ZBX_FULL_DATE_TIME)
+					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->addRowClass('js-row-time-period')
 			)
 			->addField(
 				new CWidgetFieldRadioButtonListView($data['fields']['history'])

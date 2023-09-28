@@ -25,30 +25,16 @@ use CController,
 	CControllerResponseData,
 	CNumberParser,
 	CParser,
-	CRangeTimeParser,
-	CSettingsHelper;
+	CWidgetsData;
 
-use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
+use Zabbix\Widgets\CWidgetField;
+
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldColumnsList,
+	CWidgetFieldTimePeriod
+};
 
 class ColumnEdit extends CController {
-
-	protected array $column_defaults = [
-		'name' => '',
-		'data' => CWidgetFieldColumnsList::DATA_ITEM_VALUE,
-		'item' => '',
-		'aggregate_function' => AGGREGATE_NONE,
-		'item_time' => '0',
-		'time_from' => 'now-1h',
-		'time_to' => 'now',
-		'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
-		'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
-		'min' => '',
-		'max' => '',
-		'decimal_places' => CWidgetFieldColumnsList::DEFAULT_DECIMAL_PLACES,
-		'base_color' => '',
-		'text' => '',
-		'thresholds' => []
-	];
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -61,9 +47,7 @@ class ColumnEdit extends CController {
 			'data' =>				'int32',
 			'item' =>				'string',
 			'aggregate_function' =>	'int32',
-			'item_time' =>			'string',
-			'time_from' =>			'range_time',
-			'time_to' =>			'range_time',
+			'time_period' =>		'array',
 			'display' =>			'int32',
 			'history' =>			'int32',
 			'min' =>				'string',
@@ -77,43 +61,7 @@ class ColumnEdit extends CController {
 			'templateid' =>			'string'
 		];
 
-		$ret = $this->validateInput($fields) && $this->validateFields($this->getInputAll());
-
-		$column = $this->getInputAll();
-
-		if ($ret && array_key_exists('aggregate_function', $column) && $column['aggregate_function'] != AGGREGATE_NONE
-				&& array_key_exists('item_time', $column) && $column['time_from'] != '' && $column['time_to'] != '') {
-			$ts = [];
-			$ts['now'] = time();
-			$range_time_parser = new CRangeTimeParser();
-
-			$from = $column['time_from'];
-			$to = $column['time_to'];
-
-			foreach (['from' => $from, 'to' => $to] as $field => $value) {
-				$range_time_parser->parse($value);
-				$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
-			}
-
-			$period = $ts['to'] - $ts['from'] + 1;
-			$range_time_parser->parse('now-' . CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-			$max_period = 1 + $ts['now'] - $range_time_parser->getDateTime(true)->getTimestamp();
-
-			if ($period < ZBX_MIN_PERIOD) {
-				error(_n('Minimum time period to display is %1$s minute.',
-					'Minimum time period to display is %1$s minutes.', (int)(ZBX_MIN_PERIOD / SEC_PER_MIN)
-				));
-
-				$ret = false;
-			}
-			elseif ($period > $max_period) {
-				error(_n('Maximum time period to display is %1$s day.',
-					'Maximum time period to display is %1$s days.', (int)round($max_period / SEC_PER_DAY)
-				));
-
-				$ret = false;
-			}
-		}
+		$ret = $this->validateInput($fields) && $this->validateFields();
 
 		if (!$ret) {
 			$this->setResponse(
@@ -128,21 +76,23 @@ class ColumnEdit extends CController {
 		return $ret;
 	}
 
-	protected function validateFields(array $input): bool {
+	protected function validateFields(): bool {
+		if (!$this->hasInput('update')) {
+			return true;
+		}
+
+		$input = $this->getInputAll();
+
 		$field = new CWidgetFieldColumnsList('columns', '');
 
 		if (!$this->hasInput('edit') && !$this->hasInput('update')) {
-			$input += $this->column_defaults;
+			$input += self::getColumnDefaults();
 		}
 
 		unset($input['edit'], $input['update'], $input['templateid']);
 		$field->setValue([$input]);
 
-		if (!$this->hasInput('update')) {
-			return true;
-		}
-
-		$errors = $field->validate();
+		$errors = $field->validate(true);
 		array_map('error', $errors);
 
 		return !$errors;
@@ -157,7 +107,7 @@ class ColumnEdit extends CController {
 		unset($input['update']);
 
 		if (!$this->hasInput('update')) {
-			$this->setResponse(new CControllerResponseData([
+			$data = [
 				'action' => $this->getAction(),
 				'thresholds_colors' => CWidgetFieldColumnsList::THRESHOLDS_DEFAULT_COLOR_PALETTE,
 				'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
@@ -165,7 +115,18 @@ class ColumnEdit extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
-			] + $input + $this->column_defaults));
+			] + $input + self::getColumnDefaults();
+
+			$data['time_period_field'] = (new CWidgetFieldTimePeriod('time_period', 'Time period'))
+				->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
+				->acceptDashboard()
+				->acceptWidget()
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK);
+
+			$data['time_period_field']->setValue($data['time_period']);
+
+			$this->setResponse(new CControllerResponseData($data));
 
 			return;
 		}
@@ -205,5 +166,33 @@ class ColumnEdit extends CController {
 		$this->setResponse(
 			(new CControllerResponseData(['main_block' => json_encode($input, JSON_THROW_ON_ERROR)]))->disableView()
 		);
+	}
+
+	private static function getColumnDefaults() {
+		static $column_defaults;
+
+		if ($column_defaults === null) {
+			$column_defaults = [
+				'name' => '',
+				'data' => CWidgetFieldColumnsList::DATA_ITEM_VALUE,
+				'item' => '',
+				'aggregate_function' => AGGREGATE_NONE,
+				'time_period' => [
+					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+					)
+				],
+				'display' => CWidgetFieldColumnsList::DISPLAY_AS_IS,
+				'history' => CWidgetFieldColumnsList::HISTORY_DATA_AUTO,
+				'min' => '',
+				'max' => '',
+				'decimal_places' => CWidgetFieldColumnsList::DEFAULT_DECIMAL_PLACES,
+				'base_color' => '',
+				'text' => '',
+				'thresholds' => []
+			];
+		}
+
+		return $column_defaults;
 	}
 }

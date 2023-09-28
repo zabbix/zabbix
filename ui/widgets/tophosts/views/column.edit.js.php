@@ -27,16 +27,11 @@ window.tophosts_column_edit_form = new class {
 
 	init({form_name, thresholds, thresholds_colors}) {
 		this._$widget_form = $(`form[name="${form_name}"]`);
+
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
-		this._item_time = document.getElementById('item_time');
-		this._aggregate_function = document.getElementById('aggregate_function');
 
-		for (const element of this._$widget_form[0].querySelectorAll('.override-time')) {
-			element.style.display = Number(this._aggregate_function.value) === 0 ? 'none' : '';
-		}
-
-		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"], [name="item_time"]',
-			this._$widget_form).on('change', () => this._update());
+		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]', this._$widget_form)
+			.on('change', () => this._update());
 
 		colorPalette.setThemeColors(thresholds_colors);
 
@@ -74,15 +69,19 @@ window.tophosts_column_edit_form = new class {
 			})
 			.on('afterremove.dynamicRows', () => this._update());
 
-		this._$widget_form.on('process.form', (e, overlay) => {
-			this.handleFormSubmit(e, overlay);
-		});
+		this._$widget_form[0].addEventListener('change', (e) => {
+			e.target.value = e.target.value.trim();
+		}, {capture: true});
 
 		// Initialize form elements accessibility.
 		this._update();
 
 		this._$widget_form[0].style.display = '';
 		this._$widget_form[0].querySelector('[name="name"]').focus();
+
+		this._$widget_form.on('process.form', (e, overlay) => {
+			this.handleFormSubmit(e, overlay);
+		});
 	}
 
 	_update() {
@@ -91,12 +90,7 @@ window.tophosts_column_edit_form = new class {
 			<?= CWidgetFieldColumnsList::HISTORY_DATA_TRENDS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
-		const aggregate_function_avg = $('[name="aggregate_function"]').val() == <?= AGGREGATE_AVG ?>;
-		const aggregate_function_min = $('[name="aggregate_function"]').val() == <?= AGGREGATE_MIN ?>;
-		const aggregate_function_max = $('[name="aggregate_function"]').val() == <?= AGGREGATE_MAX ?>;
-		const aggregate_function_sum = $('[name="aggregate_function"]').val() == <?= AGGREGATE_SUM ?>;
-		const aggregate_options = document.getElementById('aggregate_function');
-		const override_fields = document.querySelectorAll('.override-time');
+		const aggregate_function = parseInt(document.getElementById('aggregate_function').value);
 
 		$('#item', this._$widget_form).multiSelect(data_item_value ? 'enable' : 'disable');
 		$('[name="aggregate_function"]', this._$widget_form).attr('disabled', !data_item_value);
@@ -108,97 +102,37 @@ window.tophosts_column_edit_form = new class {
 
 		// Toggle warning icons for non-numeric items settings.
 		if (data_item_value) {
-			document.getElementById('tophosts-column-aggregate-function-warning').style.display = aggregate_function_avg
-				|| aggregate_function_min || aggregate_function_max || aggregate_function_sum ? '' : 'none';
+			const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
+				<?= AGGREGATE_SUM ?>
+			];
+
+			document.getElementById('tophosts-column-aggregate-function-warning').style.display =
+					aggregate_warning_functions.includes(aggregate_function)
+				? ''
+				: 'none';
+
 			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
 			document.getElementById('tophosts-column-history-data-warning').style.display = history_data_trends
 				? ''
 				: 'none';
 		}
 
-		const data_type = document.querySelector('[name="data"]');
-
-		// Displays or hides override time period fields based on 'Data' value change.
-		data_type.onchange = () => {
-			data_item_value
-				? aggregate_options.dispatchEvent(new Event('change'))
-				: override_fields.forEach(element => element.style.display = 'none')
-		};
+		this._$widget_form[0].fields.time_period.disabled = !data_item_value
+			|| aggregate_function == <?= AGGREGATE_NONE ?>;
 
 		// Toggle visibility of disabled form elements.
 		$('.form-grid > label', this._$widget_form).each((i, elm) => {
-			const except_fields = 'override-time';
 			const form_field = $(elm).next();
+			const is_visible = (form_field.find(':disabled,.disabled').length == 0);
 
-			if (!form_field.hasClass(except_fields)) {
-				const is_visible = (form_field.find(':disabled,.disabled').length == 0);
-
-				$(elm).toggle(is_visible);
-				form_field.toggle(is_visible);
-			}
+			$(elm).toggle(is_visible);
+			form_field.toggle(is_visible);
 		});
-
-		const time_period_fields = [
-			'#time_from',
-			'#time_from_calendar',
-			'#time_to',
-			'#time_to_calendar'
-		];
-
-		if (this._aggregate_function.value == <?= AGGREGATE_NONE ?>
-				|| data_type.value != <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>) {
-			time_period_fields.push('#item_time');
-
-			for (const element of document.querySelectorAll(time_period_fields)) {
-				element.disabled = true;
-			}
-		}
-		else {
-			document.querySelector('#item_time').disabled = false;
-
-			for (const element of document.querySelectorAll(time_period_fields)) {
-				element.disabled = !this._item_time.checked;
-			}
-
-			['#time_from', '#time_to'].forEach(field => {
-				const element = document.querySelector(field);
-
-				if (element) {
-					element.addEventListener('focusout', () => {
-						element.value = element.value.trim();
-					});
-				}
-			});
-		}
-
-		aggregate_options.addEventListener('change', function() {
-			for (const element of override_fields) {
-				element.style.display = (Number(this.value) === <?= AGGREGATE_NONE ?>) ? 'none' : 'block';
-			}
-		});
-	}
-
-	#trimFields(fields) {
-		fields.name = fields.name.trim();
-
-		for (const field of ['text', 'timeshift', 'aggregate_interval', 'min', 'max', 'decimal_places']) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
-			}
-		}
-
-		if ('thresholds' in fields) {
-			for (const threshold of Object.values(fields.thresholds)) {
-				threshold.threshold = threshold.threshold.trim();
-			}
-		}
-
-		return fields;
 	}
 
 	handleFormSubmit(e, overlay) {
 		const curl = new Curl(e.target.getAttribute('action'));
-		const fields = this.#trimFields(getFormFields(e.target));
+		const fields = getFormFields(e.target);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

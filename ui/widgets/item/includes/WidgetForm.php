@@ -22,8 +22,7 @@
 namespace Widgets\Item\Includes;
 
 use API,
-	CRangeTimeParser,
-	CSettingsHelper;
+	CWidgetsData;
 
 use Zabbix\Widgets\{
 	CWidgetField,
@@ -34,7 +33,6 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldCheckBoxList,
 	CWidgetFieldColor,
-	CWidgetFieldDatePicker,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
 	CWidgetFieldMultiSelectOverrideHost,
@@ -42,7 +40,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
 	CWidgetFieldTextBox,
-	CWidgetFieldThresholds
+	CWidgetFieldThresholds,
+	CWidgetFieldTimePeriod
 };
 
 use Widgets\Item\Widget;
@@ -64,9 +63,6 @@ class WidgetForm extends CWidgetForm {
 	public const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
 	public const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
 	public const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
-
-	public const ITEM_VALUE_CUSTOM_TIME_OFF = 0;
-	public const ITEM_VALUE_CUSTOM_TIME_ON = 1;
 
 	private bool $is_binary_units = false;
 
@@ -121,13 +117,6 @@ class WidgetForm extends CWidgetForm {
 					break 2;
 				}
 			}
-		}
-
-		// Test item custom time period.
-		if ($this->getFieldValue('item_time') == self::ITEM_VALUE_CUSTOM_TIME_ON) {
-			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
-				$this->getFieldValue('time_to')
-			));
 		}
 
 		return $errors;
@@ -287,17 +276,14 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(AGGREGATE_NONE)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('item_time', _('Override time period selector'))
-			)
-			->addField(
-				(new CWidgetFieldDatePicker('time_from', _('From')))
-					->setDefault('now-1h')
-					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK | CWidgetField::FLAG_NOT_EMPTY)
-			)
-			->addField(
-				(new CWidgetFieldDatePicker('time_to', _('To')))
-					->setDefault('now')
-					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK | CWidgetField::FLAG_NOT_EMPTY)
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('history', _('History data'), [
@@ -312,55 +298,5 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldMultiSelectOverrideHost()
 			);
-	}
-
-	/**
-	 * Check if widget configuration is set to use overridden time.
-	 *
-	 * @param array $fields_values An array of field values.
-	 *
-	 * @return bool Returns true if custom item time has to be used; otherwise, returns false.
-	 */
-	public static function hasOverrideTime(array $fields_values): bool {
-		return array_key_exists('item_time', $fields_values)
-			&& $fields_values['item_time'] == self::ITEM_VALUE_CUSTOM_TIME_ON;
-	}
-
-	/**
-	 * Validates the time period selector from and to values and returns any validation errors.
-	 *
-	 * @param string $from The 'from' timestamp - the start of the selected period.
-	 * @param string $to   The 'to' timestamp - the end of the selected period.
-	 *
-	 * @return array An array containing validation error messages, or an empty array if data is valid.
-	 *
-	 */
-	private static function validateTimeSelectorPeriod(string $from, string $to): array {
-		$errors = [];
-		$ts = [];
-		$ts['now'] = time();
-		$range_time_parser = new CRangeTimeParser();
-
-		foreach (['from' => $from, 'to' => $to] as $field => $value) {
-			$range_time_parser->parse($value);
-			$ts[$field] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
-		}
-
-		$period = $ts['to'] - $ts['from'] + 1;
-		$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-		$max_period = 1 + $ts['now'] - $range_time_parser->getDateTime(true)->getTimestamp();
-
-		if ($period < ZBX_MIN_PERIOD) {
-			$errors[] = _n('Minimum time period to display is %1$s minute.',
-				'Minimum time period to display is %1$s minutes.', (int) (ZBX_MIN_PERIOD / SEC_PER_MIN)
-			);
-		}
-		elseif ($period > $max_period) {
-			$errors[] = _n('Maximum time period to display is %1$s day.',
-				'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
-			);
-		}
-
-		return $errors;
 	}
 }

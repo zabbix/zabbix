@@ -29,8 +29,7 @@ use API,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CSettingsHelper,
-	Manager,
-	CRangeTimeParser;
+	Manager;
 
 use Widgets\TopHosts\Widget;
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
@@ -59,14 +58,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private function getData(): array {
 		$configuration = $this->fields_values['columns'];
-
-		foreach ($configuration as $key => &$column) {
-			if ($column['aggregate_function'] != AGGREGATE_NONE && !array_key_exists('item_time', $column)) {
-				$column['time_from'] = $this->getInput('from');
-				$column['time_to'] = $this->getInput('to');
-			}
-		}
-		unset($column);
 
 		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
 			? getSubGroups($this->fields_values['groupids'])
@@ -472,15 +463,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return array_map(fn ($value) => $value[0]['value'], $values);
 		}
 		else {
-			$range_time_parser = new CRangeTimeParser();
-
-			$range_time_parser->parse($column['time_from']);
-			$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-			$range_time_parser->parse($column['time_to']);
-			$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
-
 			$from = time() - $history_period;
+
+			$time_from = $column['time_period']['from_ts'];
+			$time_to = $column['time_period']['to_ts'];
 
 			self::addDataSource($items, $from, $time_now, $column['history']);
 		}
