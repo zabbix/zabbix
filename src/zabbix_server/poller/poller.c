@@ -748,7 +748,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				}
 				break;
 		}
-
 	}
 
 	zbx_free(port);
