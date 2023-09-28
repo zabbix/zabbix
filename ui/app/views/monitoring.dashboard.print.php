@@ -56,40 +56,39 @@ $this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
 $this->enableLayoutModes();
 $this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
 
-$dashboard_container = new CDiv();
+$page_count = count($data['dashboard']['pages']);
 
-if (count($data['dashboard']['pages']) >= 2) {
+$header_title_tag = (new CTag('h1', true, $data['dashboard']['name']));
+
+(new CTag('header', true, $header_title_tag))
+	->addClass('header-title page_1')
+	->show();
+
+if ($page_count > 1) {
 	foreach ($data['dashboard']['pages'] as $index => $dashboard_page) {
 		$page_number = $index + 1;
 
-		$dashboard_container->addItem(
-			(new CDiv())
-				->addClass('dashboard-page')
-				->addItem(
-					new CTag('h1', true,
-						$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
-					)
-				)
-				->addItem(
-					(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
-				)
-		);
-	}
-}
-else {
-	$dashboard_container->addItem(
 		(new CDiv())
-			->addClass('dashboard-page')
+			->addClass('dashboard-page page_'.$page_number)
+			->addItem(
+				new CTag('h1', true,
+					$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
+				)
+			)
 			->addItem(
 				(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
 			)
-	);
+			->show();
+	}
 }
-
-(new CHtmlPage())
-	->setTitle($data['dashboard']['name'])
-	->addItem($dashboard_container)
+else {
+	(new CDiv())
+		->addClass('dashboard-page page_1')
+		->addItem(
+			(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
+		)
 	->show();
+}
 
 (new CScriptTag('
 	view.init('.json_encode([

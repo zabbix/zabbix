@@ -1091,8 +1091,13 @@
 }
 
 .wrapper.layout-kioskmode {
-
 	.dashboard-navigation {
 		display: none;
+	}
+}
+
+@media print {
+	.dashboard-page {
+		padding: 10px;
 	}
 }

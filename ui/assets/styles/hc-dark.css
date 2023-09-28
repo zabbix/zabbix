@@ -2130,6 +2130,9 @@ button {
 .wrapper.layout-kioskmode .dashboard-navigation {
   display: none; }
 
+@media print {
+  .dashboard-page {
+    padding: 10px; } }
 .diff {
   padding: 4px;
   background: #111111; }
