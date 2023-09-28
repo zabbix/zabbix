@@ -62,7 +62,7 @@ class testErrorsInFilterMultiselects extends CWebTest {
 		if (CTestArrayHelper::get($data, 'check_object_page', false)) {
 			$context_filter_form = $this->query('name:zbx_filter')->asForm()->one();
 
-			// Check second multiselect, when "Template groups" are empty.
+			// Check second multiselect, when the first "Template groups" field is empty.
 			$this->openDialogCheckAndClose($context_filter_form, $this->filter_labels['context_page'][0],
 					$this->filter_labels['context_page'][1], $this->filter_labels['context_page'][2]
 			);
@@ -71,7 +71,7 @@ class testErrorsInFilterMultiselects extends CWebTest {
 			$context_filter_form->getField($context.' groups')->asMultiselect()
 					->setFillMode(CMultiselectElement::MODE_SELECT)->fill($groups);
 
-			// Check second multiselect, when "Template groups" are filled.
+			// Check second multiselect, when the first "Template groups" field is filled.
 			$this->openDialogCheckAndClose($context_filter_form, $this->filter_labels['context_page'][0],
 					$this->filter_labels['context_page'][1], $this->filter_labels['context_page'][2]
 			);
@@ -83,7 +83,7 @@ class testErrorsInFilterMultiselects extends CWebTest {
 				->getColumn($data['object'])->query('tag:a')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check second multiselect, when "Template groups" are empty.
+		// Check second multiselect, when the first "Template groups" field is empty.
 		$object_filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->openDialogCheckAndClose($object_filter_form, $this->filter_labels['object_page'][0],
 				$this->filter_labels['object_page'][1], $this->filter_labels['object_page'][2]
@@ -93,12 +93,12 @@ class testErrorsInFilterMultiselects extends CWebTest {
 		$object_filter_form->getField($context.' groups')->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
 				->fill($groups);
 
-		// Check second multiselect, when "Template groups" are filled.
+		// Check second multiselect, when the first "Template groups" field is filled.
 		$this->openDialogCheckAndClose($object_filter_form, $this->filter_labels['object_page'][0],
 				$this->filter_labels['object_page'][1], $this->filter_labels['object_page'][2]
 		);
 
-		// Check "Value mapping" dialog.
+		// Check "Value mapping" dialog for Items page.
 		if ($data['object'] === 'Items') {
 			$value_mapping_dialog = $this->checkMultiselectDialog($object_filter_form, 'Value mapping', 'Value mapping');
 			$value_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
@@ -117,6 +117,7 @@ class testErrorsInFilterMultiselects extends CWebTest {
 		$level_1_dialog = $this->checkMultiselectDialog($form, $field, $title_1);
 		$level_2_dialog = $this->checkMultiselectDialog($level_1_dialog, $field, $title_2, true);
 
+		// Close both level dialogs.
 		$level_2_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$level_1_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 	}
