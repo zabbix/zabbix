@@ -1075,7 +1075,7 @@ static unsigned char	level_str_to_mask(const char *level_str)
 		ZBX_VMWARE_EVTLOG_SEVERITY_WARN_STR
 	};
 
-	for (i = 0; i < sizeof(levels_str) / sizeof(levels_str[0]); i++)
+	for (i = 0; i < ARRSIZE(levels_str); i++)
 	{
 		if (0 == strcmp(level_str, levels_str[i]))
 			break;

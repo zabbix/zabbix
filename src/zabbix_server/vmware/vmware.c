@@ -5100,7 +5100,7 @@ static int	vmware_service_get_event_session(const zbx_vmware_service_t *service,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (size_t i = 0; i < sizeof(levels_mask) / sizeof(levels_mask[0]); i++)
+	for (size_t i = 0; i < ARRSIZE(levels_mask); i++)
 	{
 		if (0 != (levels_mask[i] & service->eventlog.severity))
 		{
