@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-09-22 05:58+0000\n"
+"PO-Revision-Date: 2023-09-23 06:49+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1143,11 +1143,11 @@ msgstr "Funcions agregades"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:284
 msgid "Aggregates each item in the data set."
-msgstr ""
+msgstr "Afegeix cada element al conjunt de dades."
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:306
 msgid "Aggregates the whole data set."
-msgstr ""
+msgstr "Afegeix tot el conjunt de dades."
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
@@ -1372,6 +1372,10 @@ msgstr "Angle"
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr "Anualment"
+
+#: jsLoader.php:201
+msgid "Another widget is used as data source."
+msgstr ""
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
@@ -2284,7 +2288,7 @@ msgstr "No es pot pas afegir més d'un element amb el tipus \"Suma gràfica\" al
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:202
 msgid "Cannot add more than one item with type \"Total\" to the chart."
-msgstr ""
+msgstr "No es pot pas afegir més d'un element de tipus \"Total\" al gràfic."
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -3828,7 +3832,7 @@ msgstr "No es pot pas establir \"%1$s\" per a l'element \"%2$s\"."
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:208
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
-msgstr ""
+msgstr "No es pot pas establir \"Afegit del conjunt de dades\" quan s'afegeix un element de tipus \"Total\" al gràfic."
 
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
@@ -4738,7 +4742,7 @@ msgstr "Ordres"
 
 #: app/views/administration.timeouts.edit.php:138
 msgid "Communication"
-msgstr ""
+msgstr "Comunicació"
 
 #: app/views/administration.miscconfig.edit.php:133
 msgid "Communication with Zabbix server"
@@ -4954,7 +4958,7 @@ msgstr "Configuració de plantilles"
 
 #: app/controllers/CControllerTimeoutsEdit.php:110
 msgid "Configuration of timeouts"
-msgstr ""
+msgstr "Configuració de temps d'espera"
 
 #: app/controllers/CControllerTrigDisplayEdit.php:132
 msgid "Configuration of trigger displaying options"
@@ -5042,7 +5046,7 @@ msgstr "Connectat"
 
 #: app/views/administration.timeouts.edit.php:148
 msgid "Connection"
-msgstr ""
+msgstr "Connexió"
 
 #: app/views/administration.mediatype.edit.php:81
 msgid "Connection security"
@@ -5901,6 +5905,10 @@ msgid_plural "Dashboards deleted"
 msgstr[0] "S'ha esborrat el tauler"
 msgstr[1] "S'han esborrat els taulers"
 
+#: jsLoader.php:200
+msgid "Dashboard is used as data source."
+msgstr ""
+
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
 msgstr "Llistat de taulers"
@@ -5985,7 +5993,7 @@ msgstr "Conjunt de dades"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
 msgid "Data set aggregation"
-msgstr ""
+msgstr "Afegit del conjunt de dades"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
@@ -7483,7 +7491,7 @@ msgstr "Punt"
 
 #: widgets/piechart/includes/WidgetForm.php:142
 msgid "Doughnut"
-msgstr ""
+msgstr "Dònut"
 
 #: app/views/monitoring.widget.discovery.view.php:34
 msgctxt "discovery results in dashboard"
@@ -8568,6 +8576,10 @@ msgstr "No s'han pogut actualitzar les propietats del tauler."
 msgid "Failed to update dashboard sharing."
 msgstr "No s'ha pogut actualitzar la compartició de tauler."
 
+#: jsLoader.php:128
+msgid "Failed to update time selector."
+msgstr ""
+
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
 msgstr "No s'han pogut actualitzar les propietats del giny."
@@ -8996,7 +9008,7 @@ msgstr "L'expressió donada no és pas una macro"
 #: include/views/configuration.item.edit.php:844
 #: include/views/configuration.item.prototype.edit.php:798
 msgid "Global"
-msgstr ""
+msgstr "Global"
 
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
@@ -9005,7 +9017,7 @@ msgstr "L'expressió regular global \"%1$s\" no existeix."
 
 #: app/views/popup.proxy.edit.php:199
 msgid "Global timeouts"
-msgstr ""
+msgstr "Temps d'espera global"
 
 #: app/partials/hostmacros.inherited.list.html.php:56
 msgid "Global value"
@@ -10090,7 +10102,7 @@ msgstr "Neteja de registres"
 #: include/views/configuration.item.edit.php:1062
 #: include/views/configuration.item.prototype.edit.php:931
 msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
-msgstr ""
+msgstr "Tanmateix, si es configuren les passes de \"Comprovació si hi ha un valor no admès\", sempre es posen i s'executen primer (essent \"qualsevol error\" el darrer de tots)."
 
 #: include/locales.inc.php:46
 msgid "Hungarian (hu_HU)"
@@ -12240,7 +12252,7 @@ msgstr "Etiquetes d'elements"
 
 #: app/views/administration.timeouts.edit.php:178
 msgid "Item test"
-msgstr ""
+msgstr "Prova d'element"
 
 #: jsLoader.php:397
 msgid "Item type does not use interface"
@@ -13579,7 +13591,7 @@ msgstr "Mapatge del tipus de suport"
 
 #: app/views/administration.timeouts.edit.php:158
 msgid "Media type test"
-msgstr ""
+msgstr "Prova de tipus de suport"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -13664,7 +13676,7 @@ msgstr "Ruta del menú"
 
 #: widgets/piechart/includes/WidgetForm.php:158
 msgid "Merge sectors smaller than "
-msgstr ""
+msgstr "Combina sectors més petits que"
 
 #: app/partials/popup.operations.php:160
 #: app/partials/scheduledreport.formgrid.html.php:178
@@ -14326,7 +14338,7 @@ msgstr "Temps d'espera de la xarxa per a l'execució d'scripts"
 
 #: app/views/administration.timeouts.edit.php:136
 msgid "Network timeouts for UI"
-msgstr ""
+msgstr "Temps d'espera de la xarxa per a la IU"
 
 #: include/classes/data/CItemData.php:1687
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
@@ -14475,6 +14487,14 @@ msgstr "Plantilla nova"
 msgid "New template group"
 msgstr "Nou grup de plantilles"
 
+#: app/views/trigger.edit.php:144
+msgid "New trigger"
+msgstr ""
+
+#: app/views/trigger.prototype.edit.php:143
+msgid "New trigger prototype"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "Nous triggers"
@@ -14571,6 +14591,10 @@ msgstr "No s'ha especificat cap nom d'usuari d'autenticació."
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
 msgstr "Sense canvis."
+
+#: jsLoader.php:194
+msgid "No compatible widgets."
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:56
 #: include/views/configuration.action.edit.php:58
@@ -15807,6 +15831,10 @@ msgstr "Anul·lat per"
 msgid "Override"
 msgstr "Anul·lació"
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
+msgid "Override host"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:128
 msgid "Override item history period"
 msgstr "Anul·la el període d'historial d'elements"
@@ -16399,7 +16427,7 @@ msgstr "Pastís"
 
 #: widgets/piechart/Widget.php:31
 msgid "Pie chart"
-msgstr ""
+msgstr "Gràfic de pastís"
 
 #: include/views/js/monitoring.sysmaps.js.php:135
 msgid "Placing algorithm"
@@ -16559,7 +16587,7 @@ msgstr "Preprocessament"
 #: include/views/configuration.item.edit.php:1060
 #: include/views/configuration.item.prototype.edit.php:929
 msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
-msgstr ""
+msgstr "El preprocessament és una transformació que es fa abans de desar el valor a la base de dades. Es pot definir una seqüència de passes de preprocessament, i aquestes s'executen en l'ordre establert."
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:209
@@ -18035,6 +18063,10 @@ msgstr "SLA actualitzat"
 msgid "SLA with ID \"%1$s\" is not available."
 msgstr "L'SLA amb l'identificador \"%1$s\" no és pas disponible."
 
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
+msgid "SLAs"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:164
@@ -18361,7 +18393,7 @@ msgstr[1] "S'han activat els informes programats"
 
 #: app/views/administration.timeouts.edit.php:188
 msgid "Scheduled report test"
-msgstr ""
+msgstr "Prova d'informe programat"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
@@ -18432,7 +18464,7 @@ msgstr "L'script no té paràmetres."
 
 #: app/views/administration.timeouts.edit.php:168
 msgid "Script execution"
-msgstr ""
+msgstr "Execució d'script"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -19011,7 +19043,7 @@ msgstr "Mostra"
 #: widgets/piechart/includes/WidgetForm.php:234
 #: widgets/svggraph/includes/WidgetForm.php:378
 msgid "Show aggregation function"
-msgstr ""
+msgstr "Veure la funció d'agregació"
 
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
@@ -19122,7 +19154,7 @@ msgstr "Mostra la línia de temps"
 
 #: widgets/piechart/includes/WidgetForm.php:170
 msgid "Show total value"
-msgstr ""
+msgstr "Veure el valor total"
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show triggers"
@@ -19337,7 +19369,7 @@ msgstr "Tipus de font"
 
 #: widgets/piechart/includes/WidgetForm.php:152
 msgid "Space between sectors"
-msgstr ""
+msgstr "Espai entre sectors"
 
 #: include/locales.inc.php:61
 msgid "Spanish (es_ES)"
@@ -20663,16 +20695,16 @@ msgstr "Temps mort"
 #: include/views/configuration.item.prototype.edit.php:784
 #: include/views/configuration.item.prototype.edit.php:787
 msgid "Timeouts"
-msgstr ""
+msgstr "Temps d'espera"
 
 #: app/views/popup.proxy.edit.php:186
 msgid "Timeouts are disabled because the proxy and server versions do not match."
-msgstr ""
+msgstr "Els temps d'espera són desactivats perquè les versions del proxy i del servidor no coincideixen pas."
 
 #: app/views/administration.timeouts.edit.php:42
 #: app/views/popup.proxy.edit.php:191
 msgid "Timeouts for item types"
-msgstr ""
+msgstr "Temps d'espera per als tipus d'elements"
 
 #: app/views/monitoring.widget.plaintext.view.php:32
 #: include/classes/screens/CScreenHistory.php:265
@@ -23488,6 +23520,13 @@ msgstr "Benvingut a"
 msgid "When active"
 msgstr "Quan sigui actiu"
 
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:59
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:96
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
+#: jsLoader.php:195 jsLoader.php:199
+msgid "Widget"
+msgstr ""
+
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
@@ -24296,7 +24335,7 @@ msgstr "i"
 
 #: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
 msgid "any error"
-msgstr ""
+msgstr "qualsevol error"
 
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
@@ -24857,11 +24896,11 @@ msgstr "és igual"
 
 #: include/forms.inc.php:1452 include/views/js/item.preprocessing.js.php:239
 msgid "error does not match"
-msgstr ""
+msgstr "l'error no coincideix"
 
 #: include/forms.inc.php:1451 include/views/js/item.preprocessing.js.php:238
 msgid "error matches"
-msgstr ""
+msgstr "l'error coincideix"
 
 #: include/views/js/item.preprocessing.js.php:466
 msgid "error message"
@@ -24869,11 +24908,11 @@ msgstr "missatge d'error"
 
 #: app/views/js/popup.itemtestedit.view.js.php:479
 msgid "error text"
-msgstr ""
+msgstr "text d'error"
 
 #: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
 msgid "error-matching"
-msgstr ""
+msgstr "concordança d'errors"
 
 #: app/views/popup.lldoverride.php:119
 #: include/views/configuration.host.discovery.edit.php:789
@@ -25245,7 +25284,7 @@ msgstr "ja existeix un element amb el mateix UUID"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:688
 msgid "jsonpath() - Returns JSONPath result"
-msgstr ""
+msgstr "jsonpath() - Retorna el resultat JSONPath"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -26141,7 +26180,7 @@ msgstr "timeleft() - Temps per assolir el llindar estimat en funció del períod
 
 #: include/classes/api/services/CProxy.php:835
 msgid "timeouts are disabled because the proxy and server versions do not match"
-msgstr ""
+msgstr "els temps d'espera són desactivats perquè les versions del proxy i del servidor no coincideixen pas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
@@ -26562,7 +26601,7 @@ msgstr "tipus d'element principal incorrecte"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1207
 msgid "xmlxpath() - Returns XML XPath result"
-msgstr ""
+msgstr "xmlxpath() - Retorna el resultat XML XPath"
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"

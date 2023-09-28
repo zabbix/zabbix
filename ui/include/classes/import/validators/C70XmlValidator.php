@@ -61,6 +61,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::REGEX => CXmlConstantName::REGEX,
 		CXmlConstantValue::XMLPATH => CXmlConstantName::XMLPATH,
 		CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH,
+		CXmlConstantValue::MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
 		CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
 		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
 		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,

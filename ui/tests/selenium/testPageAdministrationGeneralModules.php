@@ -118,12 +118,12 @@ class testPageAdministrationGeneralModules extends CWebTest {
 									],
 									[
 										'type' => 1,
-										'name' => 'navtree.name.1',
+										'name' => 'navtree.1.name',
 										'value' => 'Awesome map'
 									],
 									[
 										'type' => 8,
-										'name' => 'navtree.sysmapid.1',
+										'name' => 'navtree.1.sysmapid',
 										'value' => 1
 									]
 								]
@@ -137,14 +137,9 @@ class testPageAdministrationGeneralModules extends CWebTest {
 								'view_mode' => 0,
 								'fields' => [
 									[
-										'type' => 0,
-										'name' => 'source_type',
-										'value' => 2
-									],
-									[
 										'type' => 1,
-										'name' => 'filter_widget_reference',
-										'value' => 'GZCSV'
+										'name' => 'sysmapid._reference',
+										'value' => 'GZCSV._mapid'
 									]
 								]
 							],

@@ -41,27 +41,16 @@
 				continue;
 			}
 
-			let curl;
-			if (list.object === 'deptrigger_prototype') {
-				curl = new Curl('trigger_prototypes.php');
-				curl.setArgument('form', 'update');
-				curl.setArgument('parent_discoveryid', '<?= $data['parent_discoveryid'] ?>');
-				curl.setArgument('triggerid', value.triggerid);
-				curl.setArgument('context', '<?= $data['context'] ?>');
-			}
-			else {
-				curl = new Curl('triggers.php');
-				curl.setArgument('form', 'update');
-				curl.setArgument('triggerid', value.triggerid);
-				curl.setArgument('context', '<?= $data['context'] ?>');
-			}
+			const prototype = (list.object === 'deptrigger_prototype') ? '1' : '0';
 
 			document
 				.querySelector('#dependency-table tr:last-child')
 				.insertAdjacentHTML('afterend', tmpl.evaluate({
 					triggerid: value.triggerid,
+					parent_discoveryid: '<?= $data['parent_discoveryid'] ?>',
+					context: '<?= $data['context'] ?>',
 					name: value.name,
-					url: curl.getUrl()
+					prototype: prototype
 				}));
 		}
 	}
@@ -70,4 +59,41 @@
 		jQuery('#dependency_' + triggerid).remove();
 		jQuery('#dependencies_' + triggerid).remove();
 	}
+
+	document.getElementById('massupdate-form').addEventListener('click', (e) => {
+		if (e.target.classList.contains('js-edit-dependency')) {
+			e.preventDefault();
+
+			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+				return;
+			}
+
+			const massupdate_overlay = overlays_stack.end();
+			overlayDialogueDestroy(massupdate_overlay.dialogueid);
+
+			const trigger_data = {
+				triggerid: e.target.dataset.triggerid,
+				parent_discoveryid: e.target.dataset.parent_discoveryid,
+				context: e.target.dataset.context
+			};
+
+			const action = (e.target.dataset.prototype === '0') ? 'trigger.edit' : 'trigger.prototype.edit';
+
+			const overlay = PopUp(action, trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.success.title);
+
+				if ('messages' in e.detail.success) {
+					postMessageDetails('success', e.detail.success.messages);
+				}
+
+				location.href = location.href;
+			});
+		}
+	})
 </script>

@@ -348,16 +348,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -365,12 +358,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Battery voltage'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Battery voltage sensors'
           item_prototypes:
             - uuid: b5fca30b1433461f82ea7fe5c72687ef
@@ -420,16 +420,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -437,12 +430,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: CO₂
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud CO2 sensors'
           item_prototypes:
             - uuid: 5057bec2a8d0446cb3515f1771e30d41
@@ -492,16 +492,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -509,12 +502,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Current
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Current sensors'
           item_prototypes:
             - uuid: 68434a6b6881497b8f7892b00044e3e7
@@ -544,16 +544,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -561,12 +554,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Differential Pressure'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Differential Pressure sensors'
           item_prototypes:
             - uuid: d02fa9c559af492d8f23503c6c0e6b67
@@ -596,16 +596,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -613,12 +606,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Distance
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Distance sensors'
           item_prototypes:
             - uuid: 4a2dd84d9be34e39b4b8e0c03199ebec
@@ -648,16 +648,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -665,12 +658,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Humidity
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud humidity sensors'
           item_prototypes:
             - uuid: b0b25cd929fe493e8db07b19f64e623a
@@ -720,16 +720,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -737,12 +730,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Illuminance
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Illuminance sensors'
           item_prototypes:
             - uuid: 0617cbdf99844d82a469bf600c94bcfa
@@ -772,16 +772,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -789,12 +782,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Last update'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Last update metric'
           item_prototypes:
             - uuid: 296198c168694dc0bd0af5d1cc07cc0e
@@ -835,16 +835,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -852,12 +845,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: pH
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud pH sensors'
           item_prototypes:
             - uuid: ad6f3af944a04305a196ff60bdae078f
@@ -886,16 +886,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -903,12 +896,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Pore Electrical Conductivity'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Pore Electrical Conductivity sensors'
           item_prototypes:
             - uuid: 4610a3ef84e54ddeb778e4f1c9e7ab8a
@@ -938,16 +938,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -955,12 +948,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: PPFD
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud PPFD sensors'
           item_prototypes:
             - uuid: 7f41b6f57a024e4fa632268bec66fdd3
@@ -990,16 +990,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1007,12 +1000,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Atmospheric Pressure'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud atmospheric pressure sensors'
           item_prototypes:
             - uuid: 3534343a6f78415e94b52f791a1a419a
@@ -1042,16 +1042,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1059,12 +1052,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Pulses
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Pulses sensors'
           item_prototypes:
             - uuid: 471e5f773216407e819c840161562d1e
@@ -1094,16 +1094,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1111,12 +1104,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Pulses Cumulative'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Pulses Cumulative sensors'
           item_prototypes:
             - uuid: da698f1bec144ab8aa8d960669c385d5
@@ -1146,16 +1146,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1163,12 +1156,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: RSSI
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud RSSI sensors'
           item_prototypes:
             - uuid: eefb5804ec224d26a3050246907c35aa
@@ -1198,16 +1198,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1215,12 +1208,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Soil Dielectric Permittivity'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Soil Dielectric Permittivity sensors'
           item_prototypes:
             - uuid: 53b7bb6bab76432f95599917e61a3ea7
@@ -1250,16 +1250,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1267,12 +1260,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Soil Electrical Conductivity'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Soil Electrical Conductivity sensors'
           item_prototypes:
             - uuid: 2f73f57b147c4d3498bd46a4048e2418
@@ -1302,16 +1302,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1319,12 +1312,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Temperature
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud temperature sensors'
           item_prototypes:
             - uuid: 86a562af26184359ac7d2287c6bd87c6
@@ -1354,16 +1354,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1371,12 +1364,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Voltage
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Voltage sensors'
           item_prototypes:
             - uuid: 461f54e7c7ce4658b8acc83be8d6906c
@@ -1406,16 +1406,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1423,12 +1416,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: 'Volumetric Water Content'
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Volumetric Water Content sensors'
           item_prototypes:
             - uuid: 8a03e78d9f4145b58c55d04189b90423
@@ -1458,16 +1458,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
-                formulaid: F
-              - macro: '{#SENSOR_NAME}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
-              - macro: '{#SENSOR_ID}'
-                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
-                formulaid: E
+              - macro: '{#GATEWAY_ID}'
+                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
+                formulaid: A
               - macro: '{#GATEWAY_NAME}'
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.MATCHES}'
                 formulaid: B
@@ -1475,12 +1468,19 @@ zabbix_export:
                 value: '{$ARANET.LLD.FILTER.GATEWAY_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#GATEWAY_ID}'
-                value: '{$ARANET.LLD.FILTER.GATEWAY_ID.MATCHES}'
-                formulaid: A
               - macro: '{#METRIC}'
                 value: Weight
                 formulaid: D
+              - macro: '{#SENSOR_ID}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_ID.MATCHES}'
+                formulaid: E
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.MATCHES}'
+                formulaid: F
+              - macro: '{#SENSOR_NAME}'
+                value: '{$ARANET.LLD.FILTER.SENSOR_NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           description: 'Discovery for Aranet Cloud Weight sensors'
           item_prototypes:
             - uuid: 6eb5e840b089469ca644a20bcb7739d4

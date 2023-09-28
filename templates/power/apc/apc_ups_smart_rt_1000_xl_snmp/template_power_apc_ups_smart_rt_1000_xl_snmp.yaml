@@ -596,7 +596,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: MULTIPLIER
@@ -1388,16 +1388,32 @@ zabbix_export:
             - name: 'APC Smart-UPS RT 1000 XL: General'
               widgets:
                 - type: graph
+                  name: Voltage
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'APC Smart-UPS RT 1000 XL by SNMP'
+                        name: 'APC Smart-UPS RT 1000 XL: Voltage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                - type: graph
                   name: 'Capacity of the UPS batteries'
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'APC Smart-UPS RT 1000 XL by SNMP'
                         name: 'APC Smart-UPS RT 1000 XL: Capacity of the UPS batteries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graph
                   name: Output
                   x: '12'
@@ -1405,20 +1421,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'APC Smart-UPS RT 1000 XL by SNMP'
                         name: 'APC Smart-UPS RT 1000 XL: Output'
-                - type: graph
-                  name: Voltage
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'APC Smart-UPS RT 1000 XL by SNMP'
-                        name: 'APC Smart-UPS RT 1000 XL: Voltage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: b2af1e2dcb874d43949c383f9b347f36
           name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'
