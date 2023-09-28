@@ -130,8 +130,6 @@ class CControllerTriggerUpdate extends CController {
 				}
 			}
 
-			CArrayHelper::sort($tags, ['tag', 'value']);
-
 			$trigger += [
 				'type' => $this->getInput('type', 0),
 				'url_name' => $this->getInput('url_name', ''),

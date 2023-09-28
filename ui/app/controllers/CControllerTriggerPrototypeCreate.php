@@ -98,8 +98,6 @@ class CControllerTriggerPrototypeCreate extends CController {
 			}
 		}
 
-		CArrayHelper::sort($tags, ['tag', 'value']);
-
 		$trigger_prototype = [
 			'description' => $this->getInput('name'),
 			'event_name' => $this->getInput('event_name', ''),
