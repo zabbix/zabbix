@@ -836,7 +836,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					],
 					'background_color' => [
 						'Problem with tag2' => 'info-bg',
-						'Problem with two tags' => 'warning-bg',
+						'Problem with two tags' => 'warning-bg'
 					]
 				]
 			],
@@ -1003,7 +1003,7 @@ class testPageReportsTopTriggers extends CWebTest {
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
 							'Number of problems' => '1'
-						],
+						]
 					],
 					'background_color' => [
 						'Severity status: High' => 'high-bg'
