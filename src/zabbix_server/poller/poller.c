@@ -1047,9 +1047,9 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			}
 			else
 			{
-				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
+				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec%s]",
 					get_process_type_string(process_type), process_num, processed, total_sec,
-					sleeptime);
+					sleeptime, zbx_vps_monitor_status());
 				old_processed = processed;
 				old_total_sec = total_sec;
 			}

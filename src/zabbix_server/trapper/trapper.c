@@ -1335,8 +1335,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 		int		snmp_reload = 0;
 #endif
 
-		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
-				get_process_type_string(process_type), process_num, sec);
+		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection%s]",
+				get_process_type_string(process_type), process_num, sec, zbx_vps_monitor_status());
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 

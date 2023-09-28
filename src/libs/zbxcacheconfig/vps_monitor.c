@@ -255,3 +255,16 @@ double	zbx_vps_get_avg(void)
 
 	return avg;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return data collection status string to append to process title   *
+ *                                                                            *
+ ******************************************************************************/
+const char	*zbx_vps_monitor_status(void)
+{
+	if (SUCCEED == zbx_vps_monitor_capped())
+		return ", data collection paused";
+	else
+		return "";
+}

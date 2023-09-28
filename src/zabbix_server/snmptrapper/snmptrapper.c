@@ -625,8 +625,8 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",
-				get_process_type_string(process_type), sec);
+		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec%s]",
+				get_process_type_string(process_type), sec, zbx_vps_monitor_status());
 
 		zbx_sleep_loop(info, 1);
 	}

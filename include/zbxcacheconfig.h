@@ -1299,5 +1299,6 @@ void	zbx_vps_monitor_add_written(zbx_uint64_t values_num);
 int	zbx_vps_monitor_capped(void);
 void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats);
 double	zbx_vps_get_avg(void);
+const char	*zbx_vps_monitor_status(void);
 
 #endif
