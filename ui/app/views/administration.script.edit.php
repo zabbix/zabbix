@@ -354,7 +354,7 @@ $form_grid
 				(new CRadioButtonList('input_type', (int) $data['input_type']))
 					->setReadonly(!$data['enable_user_input'])
 					->addValue(_('String'), SCRIPT_MANUALINPUT_TYPE_STRING)
-					->addValue(_('Dropdow'), SCRIPT_MANUALINPUT_TYPE_LIST)
+					->addValue(_('Dropdown'), SCRIPT_MANUALINPUT_TYPE_LIST)
 					->setModern()
 					->setId('input_type')
 			)
