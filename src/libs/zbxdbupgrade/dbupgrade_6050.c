@@ -1125,7 +1125,7 @@ clean:
 	return ret;
 }
 
-static int	DBpatch_6050094(void)
+static int	fix_expression_macro_escaping(const char *select, const char *update, const char *error_msg)
 {
 	int			ret = SUCCEED;
 	zbx_db_result_t		result;
@@ -1135,7 +1135,7 @@ static int	DBpatch_6050094(void)
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (NULL == (result = zbx_db_select("select scriptid,command from scripts")))
+	if (NULL == (result = zbx_db_select(select)))
 		goto clean;
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
@@ -1144,6 +1144,7 @@ static int	DBpatch_6050094(void)
 		char		*buf = NULL, *error = NULL, *tmp = NULL;;
 		size_t		buf_alloc = 0, buf_offset = 0;
 		size_t		pos = 0, cmd_len;
+		int		replaced = 0;
 		zbx_token_t	token;
 
 		cmd_len = strlen(command);
@@ -1161,6 +1162,7 @@ static int	DBpatch_6050094(void)
 
 				if (SUCCEED == update_escaping_in_expression(expression, &substitute, &error))
 				{
+					replaced = 1;
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
 						command + pos, token.loc.l + 2);
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
@@ -1169,8 +1171,7 @@ static int	DBpatch_6050094(void)
 					zbx_free(substitute);
 				}
 				else {
-					zabbix_log(LOG_LEVEL_WARNING, "Failed to parse expression macro \"%s\" for"
-						" script with id %s, error: %s", expression, row[0], error);
+					zabbix_log(LOG_LEVEL_WARNING, error_msg, expression, row[0], error);
 					zbx_free(error);
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset,
 						command + pos, token.loc.r + 1);
@@ -1184,15 +1185,19 @@ static int	DBpatch_6050094(void)
 			pos = token.loc.r + 1;
 		}
 
-		if (cmd_len >= pos)
-			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, cmd_len - pos);
+		if (0 != replaced)
+		{
+			if (cmd_len >= pos)
+				zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, command + pos, cmd_len - pos);
 
-		tmp = zbx_db_dyn_escape_string(buf);
-		zbx_free(buf);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"update scripts set command='%s' where scriptid=%s;\n", tmp, row[0]);
-		zbx_free(tmp);
-		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			tmp = zbx_db_dyn_escape_string(buf);
+			zbx_free(buf);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, update, tmp, row[0]);
+			zbx_free(tmp);
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+		else
+			zbx_free(buf);
 	}
 
 	if (SUCCEED == ret && 16 < sql_offset)
@@ -1204,6 +1209,34 @@ clean:
 	zbx_free(sql);
 
 	return ret;
+}
+
+static int	DBpatch_6050094(void)
+{
+	return fix_expression_macro_escaping("select scriptid,command from scripts",
+			"update scripts set command='%s' where scriptid=%s;\n",
+			"Failed to parse expression macro \"%s\" in script with id %s, error: %s");
+}
+
+static int	DBpatch_6050095(void)
+{
+	return fix_expression_macro_escaping("select mediatype_messageid,message from media_type_message",
+			"update media_type_message set message='%s' where mediatype_messageid=%s;\n",
+			"Failed to parse expression macro \"%s\" in media type message with id %s, error: %s");
+}
+
+static int	DBpatch_6050096(void)
+{
+	return fix_expression_macro_escaping("select operationid,message from opmessage",
+			"update opmessage set message='%s' where operationid=%s;\n",
+			"Failed to parse expression macro \"%s\" in action operation message with id %s, error: %s");
+}
+
+static int	DBpatch_6050097(void)
+{
+	return fix_expression_macro_escaping("select triggerid,event_name from triggers",
+			"update triggers set event_name='%s' where triggerid=%s;\n",
+			"Failed to parse expression macro \"%s\" in event name of the trigger with id %s, error: %s");
 }
 
 #endif
@@ -1305,5 +1338,8 @@ DBPATCH_ADD(6050091, 0, 1)
 DBPATCH_ADD(6050092, 0, 1)
 DBPATCH_ADD(6050093, 0, 1)
 DBPATCH_ADD(6050094, 0, 1)
+DBPATCH_ADD(6050095, 0, 1)
+DBPATCH_ADD(6050096, 0, 1)
+DBPATCH_ADD(6050097, 0, 1)
 
 DBPATCH_END()
