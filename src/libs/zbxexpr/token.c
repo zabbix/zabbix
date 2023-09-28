@@ -862,6 +862,15 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 
 		ptr = expression + expr_token.loc.r;
 	}
+	else if ('$' == macro[2])
+	{
+		zbx_token_t	expr_token;
+
+		if (SUCCEED != token_parse_user_macro(expression, macro + 1, &expr_token))
+			return FAIL;
+
+		ptr = expression + expr_token.loc.r;
+	}
 	else
 	{
 		zbx_strloc_t	loc;

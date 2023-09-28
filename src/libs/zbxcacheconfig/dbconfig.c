@@ -15077,19 +15077,35 @@ int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, 
 	for (; SUCCEED == zbx_token_find(*text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		const char	*value = NULL;
+		char		*out = NULL;
 
-		if (ZBX_TOKEN_USER_MACRO != token.type)
-			continue;
+		switch(token.type)
+		{
+			case ZBX_TOKEN_FUNC_MACRO:
+				um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text +
+						token.loc.l + 1, um_handle->macro_env, &value);
 
-		um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text + token.loc.l,
-				um_handle->macro_env, &value);
+				if (NULL != value)
+					out = zbx_strdup(NULL, value);
+
+				ret = zbx_calculate_macro_function(*text + token.loc.l, &token.data.func_macro, &out);
+				value = out;
+				break;
+			case ZBX_TOKEN_USER_MACRO:
+				um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text +
+						token.loc.l, um_handle->macro_env, &value);
+				break;
+			default:
+				continue;
+		}
 
 		if (NULL == value)
 		{
 			if (NULL != error)
 			{
 				*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
-						(int)(token.loc.r - token.loc.l + 1), *text + token.loc.l);
+						(int)(token.loc.r - token.loc.l + 1), *text +
+						token.loc.l);
 				goto out;
 			}
 		}
@@ -15097,6 +15113,7 @@ int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, 
 			zbx_replace_string(text, token.loc.l, &token.loc.r, value);
 
 		pos = (int)token.loc.r;
+		zbx_free(out);
 	}
 
 	ret = SUCCEED;

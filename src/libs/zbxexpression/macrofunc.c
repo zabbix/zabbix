@@ -32,17 +32,6 @@ typedef struct
 }
 zbx_macro_functions_t;
 
-/* macros that can be modified using macro functions */
-static zbx_macro_functions_t	mod_macros[] =
-{
-	{MVAR_ITEM_VALUE, "regsub,iregsub,fmtnum"},
-	{MVAR_ITEM_LASTVALUE, "regsub,iregsub,fmtnum"},
-	{MVAR_TIME, "fmttime"},
-	{"{?}", "fmtnum"},
-	{NULL, NULL}
-};
-
-
 /******************************************************************************
  *                                                                            *
  * Purpose: calculates regular expression substitution.                       *
@@ -236,7 +225,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if a macro function one in the list for the macro.          *
+ * Purpose: gets macro from the macro function                                *
  *                                                                            *
  * Parameters: str          - [IN] string containing potential macro          *
  *             fm           - [IN] function macro to check                    *
@@ -245,36 +234,19 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  * Return value: unindexed macro from the allowed list or NULL.               *
  *                                                                            *
  ******************************************************************************/
-const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+const char	*func_get_macro(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
 {
-	int	i;
+	char	*ptr_l = (char *)str + fm->macro.l, *ptr_r;
 
-	for (i = 0; NULL != mod_macros[i].macro; i++)
+	if (NULL != (ptr_r = strchr(ptr_l, '}')))
 	{
-		size_t	len, fm_len;
+		size_t	len = (size_t)(ptr_r - ptr_l), fm_len = fm->macro.r - fm->macro.l + 1;;
 
-		len = strlen(mod_macros[i].macro);
-		fm_len = fm->macro.r - fm->macro.l + 1;
+		zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid, sizeof(*N_functionid), 1,
+				9);
+		ptr_l[len + 1] = '\0';
 
-		if (len > fm_len || 0 != strncmp(mod_macros[i].macro, str + fm->macro.l, len - 1))
-			continue;
-
-		if ('?' != mod_macros[i].macro[1] && len != fm_len)
-		{
-			if (SUCCEED != zbx_is_uint_n_range(str + fm->macro.l + len - 1, fm_len - len, N_functionid,
-					sizeof(*N_functionid), 1, 9))
-			{
-				continue;
-			}
-		}
-		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + fm_len - 1])
-			continue;
-
-		if (SUCCEED == zbx_str_n_in_list(mod_macros[i].functions, str + fm->func.l,
-				fm->func_param.l - fm->func.l, ','))
-		{
-			return mod_macros[i].macro;
-		}
+		return ptr_l;
 	}
 
 	return NULL;
