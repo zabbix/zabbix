@@ -122,9 +122,16 @@
 					this.#delete(target, {itemids: itemids, context: this.context});
 				}
 			});
-			document.querySelector('.js-create-item')?.addEventListener('click',
-				(e) => this.#edit(e.target, e.target.dataset)
-			);
+			document.addEventListener('click', e => {
+				const target = e.target;
+
+				if (target.classList.contains('js-create-item')) {
+					this.#edit(target, target.dataset);
+				}
+				else if (target.classList.contains('js-trigger-edit')) {
+					this.editTrigger(target.dataset);
+				}
+			});
 		}
 
 		#edit(target, parameters = {}) {
@@ -272,6 +279,20 @@
 
 		editItem(target, data) {
 			this.#edit(target, data);
+		}
+
+		editTrigger(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#navigate(e.detail, location.href),
+				{once: true}
+			);
 		}
 
 		executeNow(target, data) {

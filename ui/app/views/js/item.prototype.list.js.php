@@ -195,6 +195,20 @@
 			this.#edit(target, {...data, action: 'item.prototype.edit'});
 		}
 
+		editTriggerPrototype(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.prototype.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#navigate(e.detail, location.href),
+				{once: true}
+			);
+		}
+
 		editHost(e, hostid) {
 			e.preventDefault();
 			this.openHostPopup({hostid});

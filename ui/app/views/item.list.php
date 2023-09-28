@@ -120,15 +120,11 @@ foreach ($data['items'] as $item) {
 				makeTriggerTemplatePrefix($trigger['triggerid'], $data['trigger_parent_templates'],
 					ZBX_FLAG_DISCOVERY_NORMAL, $data['allowed_ui_conf_templates']
 				),
-				new CLink(
-					$trigger['description'],
-					(new CUrl('triggers.php'))
-						->setArgument('form', 'update')
-						->setArgument('hostid', array_column($trigger['hosts'], 'hostid'))
-						->setArgument('triggerid', $trigger['triggerid'])
-						->setArgument('context', $data['context'])
-						->setArgument('backurl', $list_url)
-				)
+				(new CLink($trigger['description']))
+					->addClass('js-trigger-edit')
+					->setAttribute('data-hostid', key($trigger['hosts']))
+					->setAttribute('data-triggerid', $trigger['triggerid'])
+					->setAttribute('data-context', $data['context'])
 			],
 			(new CDiv(
 				$trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION
