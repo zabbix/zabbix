@@ -238,7 +238,8 @@ foreach ($data['templates'] as $template) {
 		],
 		[
 			new CLink(_('Triggers'),
-				(new CUrl('triggers.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
 					->setArgument('context', 'template')

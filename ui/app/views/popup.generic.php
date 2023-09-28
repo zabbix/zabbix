@@ -393,6 +393,10 @@ switch ($data['popup_type']) {
 					'status' => $trigger['status'],
 					'host' => $trigger['hostname']
 				];
+
+				if ($data['popup_type'] === 'trigger_prototypes') {
+					$trigger['prototype'] = '1';
+				}
 			}
 		}
 		unset($trigger);

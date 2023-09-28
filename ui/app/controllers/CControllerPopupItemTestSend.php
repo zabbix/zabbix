@@ -478,7 +478,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				unset($step);
 
 				if (array_key_exists('error', $result)) {
-					error($result['error']);
+					error($result['error'] === '' ? _('<empty string>') : $result['error']);
 				}
 				elseif ($this->show_final_result) {
 					if (array_key_exists('result', $result)) {

@@ -307,7 +307,8 @@ foreach ($data['discoveries'] as $discovery) {
 		],
 		[
 			new CLink(_('Trigger prototypes'),
-				(new CUrl('trigger_prototypes.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $discovery['itemid'])
 					->setArgument('context', $data['context'])
 			),

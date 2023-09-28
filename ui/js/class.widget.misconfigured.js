@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,22 +18,43 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectMap;
+class CWidgetMisconfigured extends CWidget {
 
-class CWidgetFieldMultiSelectMapView extends CWidgetFieldMultiSelectView {
+	#messages = [];
 
-	public function __construct(CWidgetFieldMultiSelectMap $field, array $data) {
-		parent::__construct($field, $data);
+	onStart() {
+		this._updateMessages(this.#messages);
 	}
 
-	protected function getObjectName(): string {
-		return 'sysmaps';
+	promiseUpdate() {
+		return Promise.resolve();
 	}
 
-	protected function getPopupParameters(): array {
-		return [
-			'srctbl' => 'sysmaps',
-			'srcfld1' => 'sysmapid'
-		];
+	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
+		const menu = super.getActionsContextMenu({can_copy_widget: false, can_paste_widget});
+
+		for (const section of menu) {
+			switch (section.label) {
+				case t('Refresh interval'):
+					for (const item of section.items) {
+						item.disabled = true;
+					}
+					break;
+			}
+		}
+
+		return menu;
+	}
+
+	setMessages(messages) {
+		this.#messages = messages;
+
+		if (this.getState() !== WIDGET_STATE_INITIAL) {
+			this._updateMessages(this.#messages);
+		}
+	}
+
+	hasPadding() {
+		return true;
 	}
 }

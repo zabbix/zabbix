@@ -13,7 +13,12 @@
 			"width": 8,
 			"height": 5
 		},
-		"js_class": "CWidgetPieChart"
+		"js_class": "CWidgetPieChart",
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		}
 	},
 	"actions": {
 		"widget.piechart.view": {

@@ -1203,11 +1203,17 @@ jQuery(function ($) {
 	}
 });
 
-window.addEventListener('load', e => {
+document.addEventListener('DOMContentLoaded', () => {
 
-	/**
-	 * SideBar initialization.
-	 */
+	// Event hub initialization.
+
+	ZABBIX.EventHub = new CEventHub();
+});
+
+window.addEventListener('load', () => {
+
+	// SideBar initialization.
+
 	const sidebar = document.querySelector('.sidebar');
 
 	if (sidebar !== null) {

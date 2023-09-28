@@ -57,9 +57,8 @@ class CLegacyAction extends CAction {
 		 * Overwrite legacy action in case user is located in sub-section like items, triggers etc. That will make
 		 * sure to hide left menu and display error in case user has no access to templates or hosts.
 		 */
-		if (in_array(getRequest('context', ''), ['host', 'template']) && in_array($action, ['triggers.php',
-				'graphs.php', 'host_discovery.php', 'httpconf.php', 'trigger_prototypes.php',
-				'host_prototypes.php'])) {
+		if (in_array(getRequest('context', ''), ['host', 'template'])
+				&& in_array($action, ['graphs.php', 'host_discovery.php', 'httpconf.php', 'host_prototypes.php'])) {
 			$action = (getRequest('context') === 'host') ? 'host.list' : 'template.list';
 		}
 
@@ -72,7 +71,7 @@ class CLegacyAction extends CAction {
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
 			$denied = array_merge($denied, ['graphs.php', 'host_discovery.php', 'host_prototypes.php', 'host.list',
-				'httpconf.php', 'items.php', 'report4.php', 'template.list', 'trigger_prototypes.php', 'triggers.php'
+				'httpconf.php', 'report4.php', 'template.list'
 			]);
 		}
 

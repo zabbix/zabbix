@@ -459,7 +459,8 @@ foreach ($data['hosts'] as $host) {
 		],
 		[
 			new CLink(_('Triggers'),
-				(new CUrl('triggers.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')

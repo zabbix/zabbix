@@ -59,7 +59,6 @@ window.widget_svggraph_form = new class {
 			.on('change', 'input, z-select, .multiselect', (e) => this.onGraphConfigChange(e));
 
 		this._datasetTabInit();
-		this._timePeriodTabInit();
 		this._legendTabInit();
 		this._problemsTabInit();
 
@@ -215,16 +214,6 @@ window.widget_svggraph_form = new class {
 		this._initDataSetSortable();
 
 		this._initSingleItemSortable(this._getOpenedDataset());
-	}
-
-	_timePeriodTabInit() {
-		document.getElementById('graph_time')
-			.addEventListener('click', (e) => {
-				document.getElementById('time_from').disabled = !e.target.checked;
-				document.getElementById('time_to').disabled = !e.target.checked;
-				document.getElementById('time_from_calendar').disabled = !e.target.checked;
-				document.getElementById('time_to_calendar').disabled = !e.target.checked;
-			});
 	}
 
 	_legendTabInit() {
@@ -829,77 +818,157 @@ window.widget_svggraph_form = new class {
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
 	}
 
+	#update_preview_abort_controller = null;
+	#update_preview_loading_timeout = null;
+
 	_updatePreview() {
-		// Update graph preview.
-		const $preview = jQuery('#svg-graph-preview');
-		const $preview_container = $preview.parent();
-		const preview_data = $preview_container.data();
-		const $form = jQuery(this._form);
-		const url = new Curl('zabbix.php');
+		if (this.#update_preview_abort_controller !== null) {
+			this.#update_preview_abort_controller.abort();
+		}
+
+		if (this.#update_preview_loading_timeout !== null) {
+			clearTimeout(this.#update_preview_loading_timeout);
+		}
+
+		const preview = document.getElementById('svg-graph-preview');
+		const preview_container = preview.parentElement;
+		const preview_computed_style = getComputedStyle(preview);
+		const contents_width = Math.floor(parseFloat(preview_computed_style.width));
+		const contents_height = Math.floor(parseFloat(preview_computed_style.height)) - 10;
+
+		const fields = getFormFields(this._form);
+
+		fields.override_hostid = this.#resolveOverrideHostId();
+		fields.time_period = this.#resolveTimePeriod(fields.time_period);
+
 		const data = {
-			uniqueid: 0,
+			templateid: this._templateid ?? undefined,
+			fields,
 			preview: 1,
-			contents_width: Math.floor($preview.width()),
-			contents_height: Math.floor($preview.height()) - 10
+			contents_width,
+			contents_height
 		};
 
-		url.setArgument('action', 'widget.svggraph.view');
+		const curl = new Curl('zabbix.php');
 
-		const form_fields = $form.serializeJSON();
+		curl.setArgument('action', 'widget.svggraph.view');
 
-		if ('ds' in form_fields) {
-			for (const i in form_fields.ds) {
-				form_fields.ds[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.ds[i]);
-			}
-		}
-		if ('or' in form_fields) {
-			for (const i in form_fields.or) {
-				form_fields.or[i] = jQuery.extend({'hosts': [], 'items': []}, form_fields.or[i]);
-			}
-		}
-		data.fields = form_fields;
-
-		if (this._templateid !== null) {
-			data.templateid = this._templateid
-		}
-
-		if (preview_data.xhr) {
-			preview_data.xhr.abort();
-		}
-
-		if (preview_data.timeoutid) {
-			clearTimeout(preview_data.timeoutid);
-		}
-
-		preview_data.timeoutid = setTimeout(function() {
-			$preview_container.addClass('is-loading');
+		this.#update_preview_loading_timeout = setTimeout(() => {
+			this.#update_preview_loading_timeout = null;
+			preview_container.classList.add('is-loading');
 		}, 1000);
 
-		preview_data.xhr = jQuery.ajax({
-			url: url.getUrl(),
+		const abort_controller = new AbortController();
+
+		this.#update_preview_abort_controller = abort_controller;
+
+		fetch(curl.getUrl(), {
 			method: 'POST',
-			contentType: 'application/json',
-			data: JSON.stringify(data),
-			dataType: 'json',
-			success: function(r) {
-				if (preview_data.timeoutid) {
-					clearTimeout(preview_data.timeoutid);
-				}
-				$preview_container.removeClass('is-loading');
-
-				$form.prev('.msg-bad').remove();
-
-				if ('error' in r) {
-					const message_box = makeMessageBox('bad', r.error.messages, r.error.title);
-					message_box.insertBefore($form);
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data),
+			signal: abort_controller.signal
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
-				if (typeof r.body !== 'undefined') {
-					$preview.html(jQuery(r.body)).attr('unselectable', 'on').css('user-select', 'none');
+				for (const element of this._form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
 				}
-			}
+
+				if (this.#update_preview_loading_timeout !== null) {
+					clearTimeout(this.#update_preview_loading_timeout);
+					this.#update_preview_loading_timeout = null;
+				}
+
+				preview_container.classList.remove('is-loading');
+
+				if ('body' in response) {
+					preview.innerHTML = response.body;
+					preview.setAttribute('unselectable', 'on');
+					preview.style.userSelect = 'none';
+				}
+			})
+			.catch((exception) => {
+				if (abort_controller.signal.aborted) {
+					return;
+				}
+
+				for (const element of this._form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				if (this.#update_preview_loading_timeout !== null) {
+					clearTimeout(this.#update_preview_loading_timeout);
+					this.#update_preview_loading_timeout = null;
+				}
+
+				preview_container.classList.remove('is-loading');
+
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					title = <?= json_encode(_('Unexpected server error.')) ?>;
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this._form.parentNode.insertBefore(message_box, this._form);
+			});
+	}
+
+	#resolveTimePeriod(time_period_field) {
+		if ('from' in time_period_field && 'to' in time_period_field) {
+			return time_period_field;
+		}
+
+		let time_period;
+
+		if (CWidgetBase.FOREIGN_REFERENCE_KEY in time_period_field) {
+			const {reference} = CWidgetBase.parseTypedReference(
+				time_period_field[CWidgetBase.FOREIGN_REFERENCE_KEY]
+			);
+
+			time_period = ZABBIX.EventHub.getData({
+				context: 'dashboard',
+				event_type: 'broadcast',
+				reference,
+				type: '_timeperiod'
+			});
+		}
+
+		if (time_period === undefined) {
+			time_period = ZABBIX.EventHub.getData({
+				context: 'dashboard',
+				event_type: 'broadcast',
+				reference: CDashboard.REFERENCE_DASHBOARD,
+				type: '_timeperiod'
+			});
+		}
+
+		return {
+			from: time_period.from,
+			to: time_period.to
+		};
+	}
+
+	#resolveOverrideHostId() {
+		return ZABBIX.EventHub.getData({
+			context: 'dashboard',
+			event_type: 'broadcast',
+			reference: CDashboard.REFERENCE_DASHBOARD,
+			type: '_hostid'
 		});
-
-		$preview_container.data(preview_data);
 	}
 };

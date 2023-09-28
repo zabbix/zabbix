@@ -20,6 +20,16 @@
 
 class CWidgetUrl extends CWidget {
 
+	getUpdateRequestData() {
+		const use_dashboard_host = this._dashboard.templateid !== null
+			|| CWidgetBase.FOREIGN_REFERENCE_KEY in this.getFields().override_hostid;
+
+		return {
+			...super.getUpdateRequestData(),
+			use_dashboard_host: use_dashboard_host ? '1' : undefined
+		};
+	}
+
 	hasPadding() {
 		return false;
 	}

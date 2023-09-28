@@ -78,16 +78,6 @@ class AllItemValueTypes {
 		$dependent_itemids = CDataHelper::getIds('name');
 		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids);
 
-		$triggers_data = [];
-		for ($i = 1; $i < 5; $i++) {
-			$triggers_data[] = [
-				'description' => 'testFormTrigger'.$i,
-				'expression' => 'last(/'.self::HOST.'/Float,#1)=0',
-				'priority' => 0
-			];
-		}
-		CDataHelper::call('trigger.create', $triggers_data);
-
 		return $itemids;
 	}
 }

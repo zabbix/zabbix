@@ -1819,30 +1819,52 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix server performance'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zabbix server health'
-                        name: 'Zabbix server: Zabbix data gathering process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix internal process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graph
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Value cache effectiveness'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Zabbix data gathering process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -1850,20 +1872,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix cache usage, % free'
-                - type: graph
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zabbix server health'
-                        name: 'Zabbix server: Value cache effectiveness'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graph
                   x: '12'
                   'y': '10'
@@ -1871,10 +1886,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Zabbix internal queues'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
         - uuid: 32994a87287449eab12bed911880ef13
           name: 'Zabbix server processes'
           pages:
@@ -1884,30 +1902,39 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Data handling processes'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zabbix server health'
-                        name: 'Zabbix server: Reporting processes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Internal processes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zabbix server health'
+                        name: 'Zabbix server: Reporting processes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -1915,10 +1942,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix server health'
                         name: 'Zabbix server: Data gathering processes'
+                    - type: STRING
+                      name: reference
+                      value: AAAAJ
       valuemaps:
         - uuid: cee1681b12ff49b6b7d442a851e870b4
           name: 'Cluster node status'

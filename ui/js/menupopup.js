@@ -253,7 +253,8 @@ function getMenuPopupHost(options, trigger_element) {
 			});
 
 			// triggers
-			url = new Curl('triggers.php');
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'trigger.list');
 			url.setArgument('filter_set', '1');
 			url.setArgument('filter_hostids[]', options.hostid);
 			url.setArgument('context', 'host');
@@ -515,14 +516,17 @@ function getMenuPopupMapElementTrigger(options) {
 		const item_urls = [];
 
 		for (const value of options.triggers) {
-			url = new Curl('triggers.php');
-			url.setArgument('form', 'update');
-			url.setArgument('triggerid', value.triggerid);
-			url.setArgument('context', 'host');
-
 			trigger_urls.push({
 				label: value.description,
-				url: url.getUrl()
+				clickCallback: function(e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup-top').menuPopup('close', null);
+
+					view.editTrigger({
+						triggerid: value.triggerid,
+						context: 'host'
+					});
+				}
 			});
 		}
 
@@ -802,15 +806,17 @@ function getMenuPopupTrigger(options, trigger_element) {
 		const config_urls = [];
 		const item_urls = [];
 
-		url = new Curl('triggers.php');
-		url.setArgument('form', 'update');
-		url.setArgument('triggerid', options.triggerid);
-		url.setArgument('context', 'host');
-		url.setArgument('backurl', options.backurl);
-
 		config_urls.push({
 			label: t('Trigger'),
-			url: url.getUrl()
+			clickCallback: function(e) {
+				e.preventDefault();
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.editTrigger({
+					triggerid: options.triggerid,
+					context: 'host'
+				});
+			}
 		});
 
 		if (options.items.length) {
@@ -1079,15 +1085,18 @@ function getMenuPopupItem(options) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
-				url = new Curl('triggers.php');
-				url.setArgument('form', 'update');
-				url.setArgument('triggerid', value.triggerid);
-				url.setArgument('backurl', options.backurl);
-				url.setArgument('context', options.context);
-
 				trigger_items.push({
 					label: value.description,
-					url: url.getUrl()
+					clickCallback: function(e) {
+						e.preventDefault();
+						jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
+
+						view.editTrigger({
+							triggerid: value.triggerid,
+							hostid: options.hostid,
+							context: options.context
+						});
+					}
 				});
 			}
 
@@ -1096,18 +1105,20 @@ function getMenuPopupItem(options) {
 
 		config_urls.push(config_triggers);
 
-		url = new Curl('triggers.php');
-		url.setArgument('form', 'create');
-		url.setArgument('hostid', options.hostid);
-		url.setArgument('description', options.name);
-		url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-		url.setArgument('backurl', options.backurl);
-		url.setArgument('context', options.context);
-
 		config_urls.push({
 			label: t('Create trigger'),
-			url: url.getUrl(),
-			disabled: options.binary_value_type
+			disabled: options.binary_value_type,
+			clickCallback: function(e) {
+				e.preventDefault();
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.editTrigger({
+					hostid: options.hostid,
+					name: options.name,
+					expression: 'func(/' + options.host + '/' + options.key + ')',
+					context: options.context
+				});
+			}
 		});
 
 		if (options.isDiscovery) {
@@ -1218,16 +1229,18 @@ function getMenuPopupItemPrototype(options) {
 		const trigger_prototypes = [];
 
 		for (const value of options.trigger_prototypes) {
-			url = new Curl('trigger_prototypes.php');
-			url.setArgument('form', 'update');
-			url.setArgument('parent_discoveryid', options.parent_discoveryid);
-			url.setArgument('triggerid', value.triggerid)
-			url.setArgument('context', options.context);
-			url.setArgument('backurl', options.backurl);
-
 			trigger_prototypes.push({
 				label: value.description,
-				url: url.getUrl()
+				clickCallback: function(e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
+
+					view.editTriggerPrototype({
+						triggerid: value.triggerid,
+						parent_discoveryid: options.parent_discoveryid,
+						context: options.context
+					});
+				}
 			});
 		}
 
@@ -1238,17 +1251,19 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push(config_triggers);
 
-	url = new Curl('trigger_prototypes.php');
-	url.setArgument('parent_discoveryid', options.parent_discoveryid);
-	url.setArgument('form', 'create');
-	url.setArgument('description', options.name);
-	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-	url.setArgument('context', options.context);
-	url.setArgument('backurl', options.backurl);
-
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		url: url.getUrl()
+		clickCallback: function(e) {
+			e.preventDefault();
+			jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+			view.editTriggerPrototype({
+				parent_discoveryid: options.parent_discoveryid,
+				name: options.name,
+				expression: 'func(/' + options.host + '/' + options.key + ')',
+				context: options.context
+			});
+		}
 	});
 
 	config_urls.push({
@@ -1402,6 +1417,7 @@ function getMenuPopupTriggerMacro(options) {
 				expressionInput.val(expression.string);
 
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+				document.getElementById('expr_temp').dispatchEvent(new Event('change'));
 			}
 		};
 	});

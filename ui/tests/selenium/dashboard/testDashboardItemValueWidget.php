@@ -165,22 +165,22 @@ class testDashboardItemValueWidget extends CWebTest {
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.color.0',
+										'name' => 'thresholds.0.color',
 										'value' => 'BF00FF'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.threshold.0',
+										'name' => 'thresholds.0.threshold',
 										'value' => '0'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.color.1',
+										'name' => 'thresholds.1.color',
 										'value' => 'FF0080'
 									],
 									[
 										'type' => '1',
-										'name' => 'thresholds.threshold.1',
+										'name' => 'thresholds.1.threshold',
 										'value' => '0.01'
 									]
 								]
@@ -230,7 +230,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			'id:show_3' => true,
 			'id:show_4' => true,
 			'Advanced configuration' => false,
-			'id:dynamic' => false
+			'id:override_hostid_ms' => ''
 		];
 
 		foreach ($default_values as $field => $value) {
@@ -286,7 +286,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$form->fill(['Advanced configuration' => $advanced_config]);
 
 			// Check that dynamic item checkbox is not depending on Advanced configuration checkbox state.
-			$dynamic_field = $form->getField('Enable host selection');
+			$dynamic_field = $form->getField('Override host');
 			$this->assertTrue($dynamic_field->isVisible());
 			$this->assertTrue($dynamic_field->isEnabled());
 
@@ -296,7 +296,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			}
 
 			// Check advanced fields when Advanced configuration is true.
-			if ($advanced_config){
+			if ($advanced_config) {
 				// Check hintbox.
 				$form->getLabel('Description')->query('class:zi-help-filled-small')->one()->click();
 				$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
@@ -832,7 +832,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						// Time size in % relative to the size of the widget.
 						'id:time_size' => '13',
 						'id:time_bold' => true,
-						'Enable host selection' => true
+						'Override host' => 'Dashboard'
 					]
 				]
 			],

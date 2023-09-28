@@ -51,7 +51,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes Scheduler: Get Scheduler metrics|<p>Get raw metrics from Scheduler instance /metrics endpoint.</p>|HTTP agent|kubernetes.scheduler.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes Scheduler: Get Scheduler metrics|<p>Get raw metrics from Scheduler instance /metrics endpoint.</p>|HTTP agent|kubernetes.scheduler.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes Scheduler: Virtual memory, bytes|<p>Virtual memory size in bytes.</p>|Dependent item|kubernetes.scheduler.process_virtual_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_virtual_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes Scheduler: Resident memory, bytes|<p>Resident memory size in bytes.</p>|Dependent item|kubernetes.scheduler.process_resident_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_resident_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes Scheduler: CPU|<p>Total user and system CPU usage ratio.</p>|Dependent item|kubernetes.scheduler.cpu.util<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_cpu_seconds_total)`</p></li><li>Change per second</li><li><p>Custom multiplier: `100`</p></li></ul>|
