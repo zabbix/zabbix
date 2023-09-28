@@ -20,21 +20,17 @@
 
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
-/**
- * Test for assuring that bug from ZBX-23302 is not reproducing.
- */
-class testTemplatedMultiselects extends CWebTest {
+class testErrorsInFilterMultiselects extends CWebTest {
 
-	const TEMPLATE = 'AIX by Zabbix agent';
+	public $filter_labels;
 
-	public static function getSelectionDialogData() {
+	public static function getCheckDialogsData() {
 		return [
 			[
 				[
 					'object' => 'Items',
-					'check_templates_page' => true
+					'check_object_page' => true
 				]
 			],
 			[
@@ -60,49 +56,54 @@ class testTemplatedMultiselects extends CWebTest {
 		];
 	}
 
-	/**
-	 * @dataProvider getSelectionDialogData
-	 */
-	public function testTemplatedMultiselects_SelectionDialog($data) {
-		$this->page->login()->open('zabbix.php?action=template.list');
+	public function testMultiselectDialog($data, $url, $context_name) {
+		$this->page->login()->open($url);
 
-		if (CTestArrayHelper::get($data, 'check_templates_page', false)) {
+		if (CTestArrayHelper::get($data, 'check_object_page', false)) {
 			$templates_filter_form = $this->query('name:zbx_filter')->asForm()->one();
-			// Check second multiselect, when "Template groups" field is empty.
-			$this->openDialogCheckAndClose($templates_filter_form, 'Linked templates', 'Templates',
-					'Template groups'
+
+			$this->openDialogCheckAndClose($templates_filter_form, $this->filter_labels['context_page'][0],
+					$this->filter_labels['context_page'][1], $this->filter_labels['context_page'][2]
 			);
 
 			// Fill "Template groups" multiselect.
-			$templates_filter_form->getField('Template groups')->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
-				->fill('Templates');
+			$templates_filter_form->getField('Template groups')->asMultiselect()
+					->setFillMode(CMultiselectElement::MODE_SELECT)->fill('Templates');
 
 			// Check second multiselect, when "Template groups" is filled.
-			$this->openDialogCheckAndClose($templates_filter_form, 'Linked templates', 'Templates',
-					'Template groups'
+			$this->openDialogCheckAndClose($templates_filter_form, $this->filter_labels['context_page'][0],
+					$this->filter_labels['context_page'][1], $this->filter_labels['context_page'][2]
 			);
+
+			$templates_filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
 		}
 
-		$this->query('class:list-table')->asTable()->waitUntilPresent()->one()->findRow('Name', self::TEMPLATE)
+		$this->query('class:list-table')->asTable()->waitUntilPresent()->one()->findRow('Name', $context_name)
 				->getColumn($data['object'])->query('tag:a')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check second multiselect, when "Template groups" field is empty.
 		$object_filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->openDialogCheckAndClose($object_filter_form, 'Templates', 'Templates', 'Template groups');
+		$this->openDialogCheckAndClose($object_filter_form, $this->filter_labels['object_page'][0],
+				$this->filter_labels['object_page'][1], $this->filter_labels['object_page'][2]
+		);
 
 		// Fill "Template groups" multiselect.
 		$object_filter_form->getField('Template groups')->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
 				->fill('Templates');
 
 		// Check second multiselect, when "Template groups" field is filled.
-		$this->openDialogCheckAndClose($object_filter_form, 'Templates', 'Templates', 'Template groups');
+		$this->openDialogCheckAndClose($object_filter_form, $this->filter_labels['object_page'][0],
+				$this->filter_labels['object_page'][1], $this->filter_labels['object_page'][2]
+		);
 
 		// Check "Value mapping" dialog.
 		if ($data['object'] === 'Items') {
 			$value_mapping_dialog = $this->checkMultiselectDialog($object_filter_form, 'Value mapping', 'Value mapping');
 			$value_mapping_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 		}
+
+		$object_filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
 	}
 
 	protected function openDialogCheckAndClose($form, $field, $title_1, $title_2) {

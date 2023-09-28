@@ -18,7 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * @browsers chrome
@@ -27,18 +27,18 @@ class testMultiselect extends CWebTest {
 
 	public function testMultiselect_SuggestExisting() {
 		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
-			'Host groups', 'z', 'multiselect-suggest'
+				'Host groups', 'z', 'multiselect-suggest'
 		);
 	}
 
 	public function testMultiselect_SuggestNoMatches() {
-		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1','zbx_filter',
-			'Host groups', 'QQQ', 'multiselect-matches'
+		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
+				'Host groups', 'QQQ', 'multiselect-matches'
 		);
 	}
 
 	public function testMultiselect_SuggestCreateNew() {
-		$this->checkSuggest('zabbix.php?action=host.edit','host-form', 'Host groups', 'QQQwww',
+		$this->checkSuggest('zabbix.php?action=host.edit', 'host-form', 'Host groups', 'QQQwww',
 				'multiselect-suggest'
 		);
 	}
@@ -70,9 +70,7 @@ class testMultiselect extends CWebTest {
 		$element = $field->query('tag:input')->one();
 		$element->type('Zabbix server');
 		$this->query('class:multiselect-matches')->waitUntilVisible();
-		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(),
-			[$element]
-		);
+		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(), [$element]);
 	}
 
 	public function testMultiselect_SuggestInOverlay() {
@@ -99,8 +97,8 @@ class testMultiselect extends CWebTest {
 		$element->type('Zab');
 		$this->query('class:multiselect-suggest')->waitUntilVisible();
 		$this->assertScreenshotExcept(null, [
-			$element,
-			['query' => 'xpath://footer[text()]']
+				$element,
+				['query' => 'xpath://footer[text()]']
 		]);
 	}
 }
