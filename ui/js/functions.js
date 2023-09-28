@@ -50,35 +50,6 @@ function delete_expression(id, type) {
 	}
 }
 
-/**
- * Insert expression part into input field.
- *
- * @param string id		Expression temporary ID.
- * @param number type	Expression (type = 0) or recovery expression (type = 1).
- */
-function copy_expression(id, type) {
-	// If type is expression.
-	if (type == 0) {
-		var element = document.getElementsByName('expr_temp')[0];
-	}
-	// Type is recovery expression.
-	else {
-		var element = document.getElementsByName('recovery_expr_temp')[0];
-	}
-
-	if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
-		return null;
-	}
-
-	var src = document.getElementById(id);
-	if (typeof src.textContent != 'undefined') {
-		element.value = src.textContent;
-	}
-	else {
-		element.value = src.innerText;
-	}
-}
-
 function testUserSound(idx) {
 	var element = document.getElementById(idx);
 	var sound = element.options[element.selectedIndex].value;
@@ -795,15 +766,16 @@ function toggleMessageBoxDetails(element) {
 }
 
 /**
- * Download svg graph as .png image.
+ * Download svg as .png image.
  *
  * @param {SVGElement} svg
  * @param {string}     file_name
+ * @param {string}     legend_class
  */
-function downloadSvgImage(svg, file_name) {
+function downloadSvgImage(svg, file_name, legend_class = '') {
 	var $dom_node = jQuery(svg),
 		canvas = document.createElement('canvas'),
-		labels = $dom_node.next('.svg-graph-legend'),
+		labels = $dom_node.next(legend_class),
 		$clone = $dom_node.clone(),
 		$container = $dom_node.closest('.dashboard-grid-widget-contents'),
 		image = new Image,
@@ -813,7 +785,7 @@ function downloadSvgImage(svg, file_name) {
 		labels_height = labels.length ? labels.height() : 0,
 		context2d;
 
-	// Clone only svg graph styles.
+	// Clone only svg styles.
 	style.innerText = jQuery.map(document.styleSheets[0].cssRules, function (rule) {
 		return rule.selectorText && rule.selectorText.substr(0, 5) == '.svg-' ? rule.cssText : '';
 	}).join('');
@@ -958,7 +930,7 @@ function getFormFields(form) {
 		for (let i = 0; i < key_parts.length; i++) {
 			const key_part = key_parts[i][0];
 
-			if (i == key_parts.length - 1) {
+			if (i === key_parts.length - 1) {
 				if (key_part === '[]') {
 					key_fields.push(value);
 				}

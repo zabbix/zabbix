@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha5');
+define('ZABBIX_VERSION',		'7.0.0alpha6');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050091);
+define('ZABBIX_DB_VERSION',		6050138);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -130,6 +130,9 @@ define('ZBX_PROXY_VERSION_UNDEFINED', 0);
 define('ZBX_PROXY_VERSION_CURRENT', 1);
 define('ZBX_PROXY_VERSION_OUTDATED', 2);
 define('ZBX_PROXY_VERSION_UNSUPPORTED', 3);
+
+define('ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED',	0);
+define('ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED',		1);
 
 define('ZBX_FLAG_DISCOVERY_NORMAL',		0x0);
 define('ZBX_FLAG_DISCOVERY_RULE',		0x1);
@@ -644,6 +647,9 @@ define('ITEM_LOGTYPE_VERBOSE',			10);
 define('ITEM_DELAY_FLEXIBLE',	0);
 define('ITEM_DELAY_SCHEDULING',	1);
 
+define('ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED',	0);
+define('ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED',	1);
+
 // Item pre-processing types.
 define('ZBX_PREPROC_MULTIPLIER',				1);
 define('ZBX_PREPROC_RTRIM',						2);
@@ -698,6 +704,10 @@ define('ZBX_PREPROC_SNMP_UNCHANGED', 0);
 define('ZBX_PREPROC_SNMP_UTF8_FROM_HEX', 1);
 define('ZBX_PREPROC_SNMP_MAC_FROM_HEX', 2);
 define('ZBX_PREPROC_SNMP_INT_FROM_BITS', 3);
+
+define('ZBX_PREPROC_MATCH_ERROR_ANY', -1);
+define('ZBX_PREPROC_MATCH_ERROR_REGEX', 0);
+define('ZBX_PREPROC_MATCH_ERROR_NOT_REGEX', 1);
 
 // LLD rule overrides.
 define('ZBX_LLD_OVERRIDE_STOP_NO',	0);
@@ -1147,6 +1157,10 @@ define('TAG_OPERATOR_NOT_EQUAL',	3);
 define('TAG_OPERATOR_EXISTS',		4);
 define('TAG_OPERATOR_NOT_EXISTS',	5);
 
+// Problem tag filter constants.
+define('TAG_FILTER_ALL',	0);
+define('TAG_FILTER_LIST',	1);
+
 define('GRAPH_FILTER_ALL',		0);
 define('GRAPH_FILTER_HOST',		1);
 define('GRAPH_FILTER_SIMPLE',	2);
@@ -1220,9 +1234,6 @@ define('SVG_GRAPH_PERCENTILE_LEFT_ON',		1);
 
 define('SVG_GRAPH_PERCENTILE_RIGHT_OFF',	0);
 define('SVG_GRAPH_PERCENTILE_RIGHT_ON',		1);
-
-define('SVG_GRAPH_CUSTOM_TIME_OFF',	0);
-define('SVG_GRAPH_CUSTOM_TIME_ON',	1);
 
 define('SVG_GRAPH_LEGEND_OFF',	0);
 define('SVG_GRAPH_LEGEND_ON',	1);
@@ -1640,6 +1651,7 @@ define('ZBX_TEXTAREA_SMALL_WIDTH',				150);
 define('ZBX_TEXTAREA_MEDIUM_WIDTH',				270);
 define('ZBX_TEXTAREA_STANDARD_WIDTH',			453);
 define('ZBX_TEXTAREA_BIG_WIDTH',				540);
+define('ZBX_TEXTAREA_NUMERIC_SMALL_WIDTH',		55);
 define('ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH',	75);
 define('ZBX_TEXTAREA_NUMERIC_BIG_WIDTH',		150);
 define('ZBX_TEXTAREA_2DIGITS_WIDTH',			35);	// please use for date selector only
@@ -1802,7 +1814,7 @@ define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');
 define('TAB_INDICATOR_GRAPH_DISPLAY_OPTIONS', 'graph-display-options');
 define('TAB_INDICATOR_GRAPH_OVERRIDES', 'graph-overrides');
 define('TAB_INDICATOR_GRAPH_PROBLEMS', 'graph-problems');
-define('TAB_INDICATOR_GRAPH_TIME', 'graph-time');
+define('TAB_INDICATOR_GRAPH_TIME_PERIOD', 'graph-time-period');
 define('TAB_INDICATOR_HTTP_AUTH', 'http-auth');
 define('TAB_INDICATOR_INVENTORY', 'inventory');
 define('TAB_INDICATOR_IPMI', 'ipmi');
@@ -1819,6 +1831,7 @@ define('TAB_INDICATOR_HOST_PERMISSIONS', 'host-permissions');
 define('TAB_INDICATOR_TEMPLATE_PERMISSIONS', 'template-permissions');
 define('TAB_INDICATOR_PREPROCESSING', 'preprocessing');
 define('TAB_INDICATOR_PROXY_ENCRYPTION', 'proxy-encryption');
+define('TAB_INDICATOR_PROXY_TIMEOUTS', 'proxy-timeouts');
 define('TAB_INDICATOR_SHARING', 'sharing');
 define('TAB_INDICATOR_STEPS', 'steps');
 define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
@@ -1923,6 +1936,7 @@ define('ZBX_STYLE_DIFF_REMOVED', 'diff-removed');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DISPLAY_NONE', 'display-none');
+define('ZBX_STYLE_VISIBILITY_HIDDEN', 'visibility-hidden');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
 define('ZBX_STYLE_PROBLEM_UNACK_FG', 'problem-unack-fg');
 define('ZBX_STYLE_PROBLEM_ACK_FG', 'problem-ack-fg');
@@ -1953,6 +1967,7 @@ define('ZBX_STYLE_FLH_NA_BG', 'flh-na-bg');
 define('ZBX_STYLE_FLH_WARNING_BG', 'flh-warning-bg');
 define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
+define('ZBX_STYLE_FORM_SUBFIELD', 'form-subfield');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
 define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
@@ -2062,6 +2077,7 @@ define('ZBX_STYLE_SETUP_LEFT_CURRENT', 'setup-left-current');
 define('ZBX_STYLE_SETUP_RIGHT', 'setup-right');
 define('ZBX_STYLE_SETUP_RIGHT_BODY', 'setup-right-body');
 define('ZBX_STYLE_SETUP_TITLE', 'setup-title');
+define('ZBX_STYLE_SEVERITY', 'severity');
 define('ZBX_STYLE_SIGNIN_CONTAINER', 'signin-container');
 define('ZBX_STYLE_SIGNIN_LINKS', 'signin-links');
 define('ZBX_STYLE_SIGNIN_LOGO', 'signin-logo');
@@ -2278,6 +2294,7 @@ define('ZBX_ICON_PENCIL', 'zi-pencil');
 define('ZBX_ICON_PLAY', 'zi-play');
 define('ZBX_ICON_PLUS', 'zi-plus');
 define('ZBX_ICON_PLUS_SMALL', 'zi-plus-small');
+define('ZBX_ICON_REFERENCE', 'zi-reference');
 define('ZBX_ICON_REMOVE', 'zi-remove');
 define('ZBX_ICON_REMOVE_SMALL', 'zi-remove-small');
 define('ZBX_ICON_REMOVE_SMALLER', 'zi-remove-smaller');

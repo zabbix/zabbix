@@ -25,6 +25,8 @@ import (
 	"fmt"
 	"math"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -48,6 +50,15 @@ const (
 	shutdownInactive = -1
 )
 
+type Request struct {
+	Itemid      uint64  `json:"itemid"`
+	Key         string  `json:"key"`
+	Delay       string  `json:"delay"`
+	LastLogsize *uint64 `json:"lastlogsize"`
+	Mtime       *int    `json:"mtime"`
+	Timeout     any     `json:"timeout"`
+}
+
 // Manager implements Scheduler interface and manages plugin interface usage.
 type Manager struct {
 	input       chan interface{}
@@ -66,7 +77,7 @@ type updateRequest struct {
 	clientID                   uint64
 	sink                       resultcache.Writer
 	firstActiveChecksRefreshed bool
-	requests                   []*plugin.Request
+	requests                   []*Request
 	expressions                []*glexpr.Expression
 	now                        time.Time
 }
@@ -92,7 +103,7 @@ type queryRequestUserParams struct {
 
 type Scheduler interface {
 	UpdateTasks(clientID uint64, writer resultcache.Writer, firstActiveChecksRefreshed bool,
-		expressions []*glexpr.Expression, requests []*plugin.Request, now time.Time)
+		expressions []*glexpr.Expression, requests []*Request, now time.Time)
 	UpdateCommands(clientID uint64, writer resultcache.Writer, commands []*agent.RemoteCommand, now time.Time)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
@@ -152,6 +163,47 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 	}
 }
 
+func parseItemTimeout(s string) (seconds int, e error) {
+	const invalidTimeoutError = "Unsupported timeout value."
+	const maxTimeout = 600
+
+	if s == "" {
+		e = errors.New(invalidTimeoutError)
+
+		return
+	}
+
+	if intVal, err := strconv.Atoi(s); err != nil {
+		var mult int
+
+		if strings.HasSuffix(s, "m") {
+			mult = 60
+		} else if strings.HasSuffix(s, "s") {
+			mult = 1
+		} else {
+			e = errors.New(invalidTimeoutError)
+
+			return
+		}
+
+		if val, err := strconv.Atoi(s[:len(s)-1]); err != nil {
+			e = errors.New(invalidTimeoutError)
+
+			return
+		} else {
+			seconds = val * mult
+		}
+	} else {
+		seconds = intVal
+	}
+
+	if seconds > maxTimeout {
+		e = errors.New(invalidTimeoutError)
+	}
+
+	return
+}
+
 // processUpdateRequest processes client update request. It's being used for multiple requests
 // (active checks on a server) and also for direct requets (single passive and internal checks).
 func (m *Manager) processUpdateRequestRun(update *updateRequest) {
@@ -185,7 +237,24 @@ func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				err = c.addRequest(p, r, update.sink, update.now, update.firstActiveChecksRefreshed)
+				var timeout int
+
+				switch v := r.Timeout.(type) {
+				case nil:
+					timeout = agent.Options.Timeout
+				case float64:
+					timeout = int(v)
+				case int:
+					timeout = v
+				case string:
+					timeout, err = parseItemTimeout(v)
+				default:
+					err = fmt.Errorf("unexpected timeout %q of type %T", r.Timeout, r.Timeout)
+				}
+
+				if err == nil {
+					err = c.addRequest(p, r, timeout, update.sink, update.now, update.firstActiveChecksRefreshed)
+				}
 			}
 		}
 
@@ -628,7 +697,7 @@ func (m *Manager) Stop() {
 }
 
 func (m *Manager) UpdateTasks(clientID uint64, writer resultcache.Writer, firstActiveChecksRefreshed bool,
-	expressions []*glexpr.Expression, requests []*plugin.Request, now time.Time) {
+	expressions []*glexpr.Expression, requests []*Request, now time.Time) {
 	m.input <- &updateRequest{clientID: clientID,
 		sink:                       writer,
 		requests:                   requests,
@@ -675,8 +744,12 @@ func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}},
-		time.Now())
+	m.UpdateTasks(clientID, w, false, nil, []*Request{{
+		Key:         key,
+		LastLogsize: &lastLogsize,
+		Mtime:       &mtime,
+		Timeout:     int(timeout.Seconds()),
+	}}, time.Now())
 
 	select {
 	case r := <-w:

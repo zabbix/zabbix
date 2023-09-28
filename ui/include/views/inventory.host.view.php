@@ -185,7 +185,8 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 			->setArgument('context', 'host')
 	);
 	$triggersLink = new CLink(_('Triggers'),
-		(new CUrl('triggers.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'trigger.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 			->setArgument('context', 'host')

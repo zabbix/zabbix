@@ -243,7 +243,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: MULTIPLIER
@@ -1535,10 +1535,13 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'OceanStor 5300 V5: Capacity'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
             - name: 'CPU utilization'
               widgets:
                 - type: graphprototype
@@ -1549,14 +1552,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Controller {#ID}: CPU utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   name: 'Node {#NODE}: CPU utilization'
                   x: '12'
@@ -1566,14 +1569,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Node {#NODE}: CPU utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
             - name: Node
               widgets:
                 - type: graphprototype
@@ -1584,14 +1587,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Node {#NODE}: Node I/O'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graphprototype
                   name: 'Node {#NODE}: Node traffic'
                   x: '12'
@@ -1601,14 +1604,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Node {#NODE}: Node traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
             - name: Lun
               widgets:
                 - type: graphprototype
@@ -1619,14 +1622,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'LUN {#NAME}: LUN I/O'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
                 - type: graphprototype
                   name: 'LUN {#NAME}: LUN traffic'
                   x: '12'
@@ -1636,14 +1639,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'LUN {#NAME}: LUN traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
       valuemaps:
         - uuid: b5c6d9d67da54531a918c93a9c98cec8
           name: 'Huawei storage: Controller role'
