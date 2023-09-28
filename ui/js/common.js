@@ -744,14 +744,16 @@ function validate_trigger_expression(overlay) {
 				? jQuery(form).find('#' + ret.dstfld1).get(0)
 				: document.getElementById(ret.dstfld1);
 
-			if (ret.dstfld1 === 'expression' || ret.dstfld1 === 'recovery_expression') {
-				jQuery(obj).val(jQuery(obj).val() + ret.expression);
+			if ((ret.dstfld1 === 'expr_temp' || ret.dstfld1 === 'recovery_expr_temp')) {
+				jQuery(obj).val(ret.expression);
 			}
 			else {
-				jQuery(obj).val(ret.expression);
+				jQuery(obj).val(jQuery(obj).val() + ret.expression);
 			}
 
 			overlayDialogueDestroy(overlay.dialogueid);
+
+			obj.dispatchEvent(new Event('change'));
 		},
 		dataType: 'json',
 		type: 'POST'
@@ -1045,12 +1047,12 @@ function openMassupdatePopup(action, parameters = {}, {
 			parameters.prototype = 0;
 			break;
 
-		case 'popup.massupdate.trigger':
+		case 'trigger.massupdate':
 			parameters.context = form.querySelector('#form_context').value;
 			break;
 
 		case 'popup.massupdate.itemprototype':
-		case 'popup.massupdate.triggerprototype':
+		case 'trigger.prototype.massupdate':
 			parameters.parent_discoveryid = form.querySelector('#form_parent_discoveryid').value;
 			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 1;

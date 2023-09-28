@@ -1185,6 +1185,27 @@ select {
 	}
 }
 
+.radio-list-control {
+	&.severity {
+		vertical-align: top;
+
+		label {
+			max-width: 110px;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+	}
+}
+
+.table-forms {
+	// TODO: Should be removed after migration to the form-grid.
+	.radio-list-control {
+		&.severity {
+			vertical-align: middle;
+		}
+	}
+}
+
 .filter-space {
 	box-sizing: border-box;
 
@@ -3900,7 +3921,6 @@ z-select {
 }
 
 .overlay-dialogue #templates-form {
-	#tagsFormList,
 	#macrosFormList {
 		.form-field {
 			grid-column-start: 1;

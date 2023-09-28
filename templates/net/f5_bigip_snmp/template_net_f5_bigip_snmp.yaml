@@ -3182,14 +3182,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'F5 Big-IP by SNMP'
                         name: 'F5 BIG-IP: Interface [{#IF.NAME}]'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                    - type: INTEGER
+                      name: rows
+                      value: '5'
       valuemaps:
         - uuid: 849febb31f524e9296afc5ec6ffb2fe3
           name: 'Chassis status'

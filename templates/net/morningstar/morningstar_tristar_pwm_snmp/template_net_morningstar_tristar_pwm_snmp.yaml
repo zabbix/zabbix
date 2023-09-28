@@ -1095,10 +1095,13 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar TriStar PWM by SNMP'
                         name: 'Temperature: Battery/Heatsink'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
       valuemaps:
         - uuid: 4985c4742d5844e7bc0aee5aeeacc436
           name: 'TriStar PWM charge state'

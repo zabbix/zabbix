@@ -1137,6 +1137,8 @@ footer {
   .form-grid.form-grid-1-1 .form-field:not(.field-fluid), .form-grid.form-grid-3-1 .form-field:not(.field-fluid) {
     grid-column-start: initial;
     grid-column-end: span 1; }
+  .form-grid .form-subfield {
+    margin-top: 5px; }
   .form-grid table {
     width: 100%; }
     .form-grid table.table-initial-width {
@@ -2925,6 +2927,8 @@ output {
   white-space: nowrap; }
   .multiselect-control .btn-split {
     margin-right: 0; }
+    .multiselect-control .btn-split li:first-child {
+      margin-left: 0; }
 
 .multiselect {
   display: flex;
@@ -3050,6 +3054,8 @@ output {
 
 .radio-list-control {
   display: inline-block;
+  height: 24px;
+  line-height: 0;
   white-space: nowrap; }
   .radio-list-control li {
     position: relative;
@@ -5305,6 +5311,16 @@ z-select .list, input[type="text"], input[type="password"], input[type="search"]
     -webkit-text-fill-color: #9d9d9d;
     opacity: 1; }
 
+.radio-list-control.severity {
+  vertical-align: top; }
+  .radio-list-control.severity label {
+    max-width: 110px;
+    text-overflow: ellipsis;
+    overflow: hidden; }
+
+.table-forms .radio-list-control.severity {
+  vertical-align: middle; }
+
 .filter-space {
   box-sizing: border-box; }
   .filter-space li .ui-tabs-anchor {
@@ -7073,13 +7089,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
 .overlay-dialogue #host-form #valuemap-formlist .table-forms-td-right {
   width: 100%; }
 
-.overlay-dialogue #templates-form #tagsFormList .form-field,
 .overlay-dialogue #templates-form #macrosFormList .form-field {
   grid-column-start: 1; }
-.overlay-dialogue #templates-form #tagsFormList .table-forms-td-left,
 .overlay-dialogue #templates-form #macrosFormList .table-forms-td-left {
   display: none; }
-.overlay-dialogue #templates-form #tagsFormList .table-forms-td-right,
 .overlay-dialogue #templates-form #macrosFormList .table-forms-td-right {
   width: 100%; }
 
