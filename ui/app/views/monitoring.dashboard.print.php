@@ -70,6 +70,7 @@ if ($page_count > 1) {
 
 		(new CDiv())
 			->addClass('dashboard-page page_'.$page_number)
+			->setAttribute('data-height', $data['page_sizes'][$index])
 			->addItem(
 				new CTag('h1', true,
 					$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
@@ -84,10 +85,11 @@ if ($page_count > 1) {
 else {
 	(new CDiv())
 		->addClass('dashboard-page page_1')
+		->setAttribute('data-height', $data['page_sizes'][0])
 		->addItem(
 			(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
 		)
-	->show();
+		->show();
 }
 
 (new CScriptTag('

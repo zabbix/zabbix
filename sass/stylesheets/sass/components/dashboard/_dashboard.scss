@@ -1096,8 +1096,13 @@
 	}
 }
 
+@page {
+	margin: 10px;
+}
+
 @media print {
 	.dashboard-page {
-		padding: 10px;
+		margin: 10px;
+		break-after: page;
 	}
 }

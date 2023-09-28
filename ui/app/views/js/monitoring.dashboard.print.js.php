@@ -73,14 +73,14 @@
 			}
 
 			const page_heights = {};
-			const dashboard_header_height = 47;
-			const page_header_height = 26;
-			const screen_width = 1920;
+			const dashboard_header_height = 60;
+			const page_header_height = 50;
+			const screen_width = 1940;
 
 			const pages = document.querySelectorAll('.dashboard-page');
 
 			pages.forEach((page) => {
-				page_heights[page.classList[1]] = Math.floor(page.getBoundingClientRect().height);
+				page_heights[page.classList[1]] = parseInt(page.getAttribute('data-height'));
 			});
 
 			const page_styles = document.createElement('style');
