@@ -155,8 +155,13 @@ zbx_vmware_alarms_data_t;
 #define ZBX_HOSTINFO_NODES_DATACENTER		0x01
 #define ZBX_HOSTINFO_NODES_COMPRES		0x02
 #define ZBX_HOSTINFO_NODES_HOST			0x04
-#define ZBX_HOSTINFO_NODES_MASK_ALL		\
-		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST)
+#define ZBX_HOSTINFO_NODES_VM			0x08
+#define ZBX_HOSTINFO_NODES_DS			0x10
+#define ZBX_HOSTINFO_NODES_NET			0x20
+#define ZBX_HOSTINFO_NODES_DVS			0x40
+#define ZBX_HOSTINFO_NODES_MASK_ALL									\
+		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST | \
+		ZBX_HOSTINFO_NODES_VM | ZBX_HOSTINFO_NODES_DS | ZBX_HOSTINFO_NODES_NET | ZBX_HOSTINFO_NODES_DVS)
 
 ZBX_VECTOR_DECL(id_xmlnode, zbx_id_xmlnode_t)
 ZBX_VECTOR_IMPL(id_xmlnode, zbx_id_xmlnode_t)
@@ -5340,7 +5345,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 		zbx_uint64_t *alloc_sz)
 {
 	zbx_vmware_event_t		*event = NULL;
-	char				*message, *time_str, *ip;
+	char				*message, *time_str, *ip, *type;
 	int				nodes_det = 0;
 	time_t				timestamp = 0;
 	unsigned int			i;
@@ -5351,7 +5356,11 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 		{ ZBX_XPATH_EVT_INFO("computeResource"),	ZBX_HOSTINFO_NODES_COMPRES,	NULL },
 		{ ZBX_XPATH_EVT_INFO("host"),			ZBX_HOSTINFO_NODES_HOST,	NULL },
 		{ ZBX_XPATH_EVT_ARGUMENT("_sourcehost_"),	ZBX_HOSTINFO_NODES_HOST,	NULL },
-		{ ZBX_XPATH_EVT_ARGUMENT("entityName"),		ZBX_HOSTINFO_NODES_HOST,	NULL }
+		{ ZBX_XPATH_EVT_ARGUMENT("entityName"),		ZBX_HOSTINFO_NODES_HOST,	NULL },
+		{ ZBX_XPATH_EVT_INFO("vm"),			ZBX_HOSTINFO_NODES_VM,		NULL },
+		{ ZBX_XPATH_EVT_INFO("ds"),			ZBX_HOSTINFO_NODES_DS,		NULL },
+		{ ZBX_XPATH_EVT_INFO("net"),			ZBX_HOSTINFO_NODES_NET,		NULL },
+		{ ZBX_XPATH_EVT_INFO("dvs"),			ZBX_HOSTINFO_NODES_DVS,		NULL }
 	};
 
 	if (NULL == (message = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("fullFormattedMessage"))))
@@ -5359,6 +5368,23 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 		zabbix_log(LOG_LEVEL_TRACE, "skipping event key '" ZBX_FS_UI64 "', fullFormattedMessage"
 				" is missing", xml_event.id);
 		return FAIL;
+	}
+
+	if (NULL == (type = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("eventTypeId"))))
+	{
+		xmlChar	*attr_value;
+
+		if (NULL != (attr_value = xmlGetProp(xml_event.xml_node, (const xmlChar *)"type")))
+		{
+			type = zbx_strdup(NULL, (const char *)attr_value);
+			xmlFree(attr_value);
+		}
+	}
+
+	if (NULL != type)
+	{
+		message = zbx_dsprintf(message, "%s\n\ntype: %s", message, type);
+		zbx_free(type);
 	}
 
 	for (i = 0; i < ARRSIZE(host_nodes); i++)
@@ -5373,8 +5399,10 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 		}
 	}
 
-	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_HOST))
+	if (0 != (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
 	{
+		int	n = 0;
+
 		message = zbx_strdcat(message, "\n\nsource: ");
 
 		for (i = 0; i < ARRSIZE(host_nodes); i++)
@@ -5382,18 +5410,14 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 			if (NULL == host_nodes[i].name)
 				continue;
 
-			message = zbx_dsprintf(message, "%s%s%s", message, host_nodes[i].name,
-					0 != (host_nodes[i].flag & ZBX_HOSTINFO_NODES_HOST) ? "" : "/");
+			message = zbx_dsprintf(message, "%s%s%s", message, n++ > 0 ? "/" : "", host_nodes[i].name);
 			zbx_free(host_nodes[i].name);
 		}
 	}
 	else
 	{
-		if (0 != (nodes_det & ZBX_HOSTINFO_NODES_MASK_ALL))
-		{
-			for (i = 0; i < ARRSIZE(host_nodes); i++)
-				zbx_free(host_nodes[i].name);
-		}
+		for (i = 0; i < ARRSIZE(host_nodes); i++)
+			zbx_free(host_nodes[i].name);
 
 		if (NULL != (ip = zbx_xml_node_read_value(xdoc, xml_event.xml_node, ZBX_XPATH_NN("ipAddress"))))
 		{
