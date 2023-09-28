@@ -58,12 +58,14 @@ require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidgetSelectedHosts
 require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardPlainTextWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardTopTriggersWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardURLWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
@@ -143,6 +145,10 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Maintenance
+require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
+require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
+
 // Media types.
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
@@ -153,8 +159,7 @@ require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php
 require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
 // Network discovery.
-// TODO: Uncomment when DEV-2507 is merged.
-//require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
+require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
 require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
 
 // Permissions.
@@ -237,6 +242,7 @@ require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
 require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 
@@ -250,7 +256,6 @@ require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
-require_once dirname(__FILE__).'/testPageMaintenance.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
@@ -277,7 +282,6 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
@@ -346,12 +350,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
 		$suite->addTestSuite('testDashboardPages');
+		$suite->addTestSuite('testDashboardPlainTextWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
 		$suite->addTestSuite('testDashboardProblemsWidgetDisplay');
 		$suite->addTestSuite('testDashboardSlaReportWidget');
 		$suite->addTestSuite('testDashboardSystemInformationWidget');
 		$suite->addTestSuite('testDashboardTopHostsWidget');
+		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
 		$suite->addTestSuite('testDashboardViewMode');
@@ -435,8 +441,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// Network discovery.
-		// TODO: Uncomment when DEV-2507 is merged.
-//		$suite->addTestSuite('testFormNetworkDiscovery');
+		$suite->addTestSuite('testFormNetworkDiscovery');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 
 		// Permissions.
@@ -514,6 +519,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testPageUsers');
 
+		// Web scenarios.
+		$suite->addTestSuite('testFormWebScenario');
+		$suite->addTestSuite('testFormWebScenarioStep');
+		$suite->addTestSuite('testInheritanceWeb');
+		$suite->addTestSuite('testPageMonitoringWeb');
+		$suite->addTestSuite('testPageMonitoringWebDetails');
+
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
 		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
@@ -539,7 +551,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
-		$suite->addTestSuite('testPageMonitoringWeb');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
@@ -563,11 +574,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
-		$suite->addTestSuite('testFormWebScenario');
-		$suite->addTestSuite('testFormWebScenarioStep');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceTrigger');
-		$suite->addTestSuite('testInheritanceWeb');
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');

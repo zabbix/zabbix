@@ -76,7 +76,6 @@ class AllItemValueTypes {
 		}
 		CDataHelper::call('item.create', $dependent_items_data);
 		$dependent_itemids = CDataHelper::getIds('name');
-
 		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids);
 
 		return $itemids;

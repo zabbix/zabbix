@@ -319,7 +319,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -455,7 +455,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           tags:
             - tag: component
               value: raw
@@ -2609,30 +2609,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: pg_stat_database metrics'
-                - type: graphprototype
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by ODBC'
-                        name: 'DB [{#DBNAME}]: Locks'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   'y': '5'
                   width: '12'
@@ -2641,14 +2625,46 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Size'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graphprototype
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by ODBC'
+                        name: 'DB [{#DBNAME}]: Queries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                - type: graphprototype
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'PostgreSQL by ODBC'
+                        name: 'DB [{#DBNAME}]: Locks'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   x: '12'
                   'y': '5'
@@ -2658,30 +2674,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Number of bloating tables'
-                - type: graphprototype
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by ODBC'
-                        name: 'DB [{#DBNAME}]: Queries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graphprototype
                   x: '12'
                   'y': '10'
@@ -2691,14 +2691,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Slow queries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
       valuemaps:
         - uuid: 6e5062ae5345454f95cb8608b35eddf4
           name: 'PostgreSQL recovery role'

@@ -36,7 +36,7 @@ class CSvg extends CSvgTag {
 	 * @param int $width
 	 * @param int $height
 	 *
-	 * @return CSvg
+	 * @return $this
 	 */
 	public function setSize(int $width, int $height): self {
 		$this->setAttribute('width', $width.'px');

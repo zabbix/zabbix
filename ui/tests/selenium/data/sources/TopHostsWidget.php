@@ -88,47 +88,47 @@ class TopHostsWidget {
 								'fields' => [
 									[
 										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
+										'name' => 'columns.0.name',
+										'value' => 'test update column 1'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.0',
+										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.item.0',
+										'name' => 'columns.0.item',
 										'value' => 'Available memory'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.timeshift.0',
+										'name' => 'columns.0.timeshift',
 										'value' => ''
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.decimal_places.0',
+										'name' => 'columns.0.decimal_places',
 										'value' =>  4
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.display.0',
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.history.0',
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
@@ -138,87 +138,87 @@ class TopHostsWidget {
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
+										'name' => 'columns.1.name',
+										'value' => 'test update column 2'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.1',
+										'name' => 'columns.1.data',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.item.1',
+										'name' => 'columns.1.item',
 										'value' => 'Available memory in %'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.timeshift.1',
+										'name' => 'columns.1.timeshift',
 										'value' => ''
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
+										'name' => 'columns.1.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.decimal_places.1',
+										'name' => 'columns.1.decimal_places',
 										'value' =>  2
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.display.1',
+										'name' => 'columns.1.display',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.history.1',
+										'name' => 'columns.1.history',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.1',
+										'name' => 'columns.1.base_color',
 										'value' => ''
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.color.1.0',
+										'name' => 'columnsthresholds.1.color.0',
 										'value' => 'FF465C'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.0',
+										'name' => 'columnsthresholds.1.threshold.0',
 										'value' => '100'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.color.1.1',
+										'name' => 'columnsthresholds.1.color.1',
 										'value' => 'B0AF07'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.threshold.1.1',
+										'name' => 'columnsthresholds.1.threshold.1',
 										'value' => '600'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
+										'name' => 'columnsthresholds.0.color.0',
 										'value' => 'FF465C'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
+										'name' => 'columnsthresholds.0.threshold.0',
 										'value' => '100'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
+										'name' => 'columnsthresholds.0.color.1',
 										'value' => 'B0AF07'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
+										'name' => 'columnsthresholds.0.threshold.1',
 										'value' => '600'
 									]
 								]
@@ -252,42 +252,42 @@ class TopHostsWidget {
 								'fields' => [
 									[
 										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
+										'name' => 'columns.0.name',
+										'value' => 'delete widget column 1'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.0',
+										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.item.0',
+										'name' => 'columns.0.item',
 										'value' => 'Available memory'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.timeshift.0',
+										'name' => 'columns.0.timeshift',
 										'value' => ''
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.display.0',
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.history.0',
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
@@ -320,42 +320,42 @@ class TopHostsWidget {
 								'fields' => [
 									[
 										'type' => 1,
-										'name' => 'columns.name.0',
-										'value' => ''
+										'name' => 'columns.0.name',
+										'value' => 'remove top hosts column 1'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.0',
+										'name' => 'columns.0.data',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.item.0',
+										'name' => 'columns.0.item',
 										'value' => 'Available memory'
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.timeshift.0',
+										'name' => 'columns.0.timeshift',
 										'value' => ''
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.0',
+										'name' => 'columns.0.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.display.0',
+										'name' => 'columns.0.display',
 										'value' => 1
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.history.0',
+										'name' => 'columns.0.history',
 										'value' => 1
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.0',
+										'name' => 'columns.0.base_color',
 										'value' => ''
 									],
 									[
@@ -365,72 +365,72 @@ class TopHostsWidget {
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.name.1',
-										'value' => ''
+										'name' => 'columns.1.name',
+										'value' => 'remove top hosts column 2'
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.data.1',
+										'name' => 'columns.1.data',
 										'value' => 2
 									],
 									[
 										'type' => 0,
-										'name' => 'columns.aggregate_function.1',
+										'name' => 'columns.1.aggregate_function',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.base_color.1',
+										'name' => 'columns.1.base_color',
 										'value' => ''
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.color.0.0',
+										'name' => 'columnsthresholds.0.color.0',
 										'value' => 'FF465C'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.0',
+										'name' => 'columnsthresholds.0.threshold.0',
 										'value' => '100'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.color.0.1',
+										'name' => 'columnsthresholds.0.color.1',
 										'value' => '4000FF'
 									],
 									[
 										'type' => 1,
-										'name' => 'columnsthresholds.threshold.0.1',
+										'name' => 'columnsthresholds.0.threshold.1',
 										'value' => '1000'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.0',
+										'name' => 'tags.0.tag',
 										'value' => 'tag1'
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.0',
+										'name' => 'tags.0.operator',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.0',
+										'name' => 'tags.0.value',
 										'value' => 'val1'
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.tag.1',
+										'name' => 'tags.1.tag',
 										'value' => 'tag2'
 									],
 									[
 										'type' => 0,
-										'name' => 'tags.operator.1',
+										'name' => 'tags.1.operator',
 										'value' => 0
 									],
 									[
 										'type' => 1,
-										'name' => 'tags.value.1',
+										'name' => 'tags.1.value',
 										'value' => 'val2'
 									]
 								]

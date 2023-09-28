@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-01-05 06:48+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2023-09-22 06:34+0000\n"
+"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
@@ -937,6 +937,10 @@ msgstr "Pridať"
 msgid "Add (message type limit reached)"
 msgstr "Pridať (bol dosiahnutý limit typov správ)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "Pridajte nový widget"
@@ -1160,6 +1164,14 @@ msgstr "Agreguj"
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr "Agregačná funkcie"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:284
+msgid "Aggregates each item in the data set."
+msgstr ""
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:306
+msgid "Aggregates the whole data set."
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
@@ -1385,6 +1397,10 @@ msgstr ""
 msgid "Annually"
 msgstr "Ročne"
 
+#: jsLoader.php:201
+msgid "Another widget is used as data source."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
 #: app/views/administration.module.list.php:53
@@ -1514,6 +1530,32 @@ msgstr "Tvrdenia"
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "Inventárne číslo"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr ""
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -2272,6 +2314,10 @@ msgstr "Nie je možné pridať viac než jednu položku typu \"Súhrn grafu\" k 
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "Nie je možné pridať viac ako jednu položku \"Súhrn grafu\" k prototypu grafu \"%1$s\"."
+
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:202
+msgid "Cannot add more than one item with type \"Total\" to the chart."
+msgstr ""
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -3873,6 +3919,10 @@ msgstr "Nemožno nastaviť \"%1$s\" pre prototyp grafu \"%2$s\"."
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Nie je možné nastaviť \"%1$s\" pre položku \"%2$s\"."
 
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:208
+msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -4785,6 +4835,10 @@ msgstr "Príkaz"
 msgid "Commands"
 msgstr "Príkazy"
 
+#: app/views/administration.timeouts.edit.php:138
+msgid "Communication"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:133
 msgid "Communication with Zabbix server"
 msgstr "Komunikácia so serverom Zabbix"
@@ -4997,6 +5051,10 @@ msgstr "Nastavenie template groupy"
 msgid "Configuration of templates"
 msgstr "Nastavenie šablón"
 
+#: app/controllers/CControllerTimeoutsEdit.php:110
+msgid "Configuration of timeouts"
+msgstr ""
+
 #: app/controllers/CControllerTrigDisplayEdit.php:132
 msgid "Configuration of trigger displaying options"
 msgstr "Nastavenie možností zobrazenia spúšťača"
@@ -5080,6 +5138,10 @@ msgstr "Pripojiť k"
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "Pripojené"
+
+#: app/views/administration.timeouts.edit.php:148
+msgid "Connection"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:81
 msgid "Connection security"
@@ -5948,6 +6010,10 @@ msgstr[0] "Dashboard bol odstránený"
 msgstr[1] "Dashboardy boli odstránené"
 msgstr[2] " "
 
+#: jsLoader.php:200
+msgid "Dashboard is used as data source."
+msgstr ""
+
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
 msgstr ""
@@ -6029,6 +6095,10 @@ msgstr "Prehľad dát"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "Data set"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
+msgid "Data set aggregation"
+msgstr ""
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
@@ -7527,6 +7597,10 @@ msgstr "Nezodpovedá regulárnemu výrazu"
 msgid "Dot"
 msgstr "Bodka"
 
+#: widgets/piechart/includes/WidgetForm.php:142
+msgid "Doughnut"
+msgstr ""
+
 #: app/views/monitoring.widget.discovery.view.php:34
 msgctxt "discovery results in dashboard"
 msgid "Down"
@@ -8614,6 +8688,10 @@ msgstr "Nepodarilo sa aktualizovať vlastnosti dashboardu."
 msgid "Failed to update dashboard sharing."
 msgstr "Dashboard zdieľanie sa nepodarilo aktualizovať"
 
+#: jsLoader.php:128
+msgid "Failed to update time selector."
+msgstr ""
+
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
 msgstr "Nepodarilo sa aktualizovať vlastnosti widgetu."
@@ -9037,10 +9115,21 @@ msgstr "Získajte hodnotu od hosta"
 msgid "Given expression is not a macro"
 msgstr "Zadaný výraz nie je makro"
 
+#: app/views/popup.massupdate.item.php:291 app/views/popup.proxy.edit.php:194
+#: include/views/configuration.host.discovery.edit.php:717
+#: include/views/configuration.item.edit.php:844
+#: include/views/configuration.item.prototype.edit.php:798
+msgid "Global"
+msgstr ""
+
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "Globálny regulárny výraz „%1$s“ neexistuje."
+
+#: app/views/popup.proxy.edit.php:199
+msgid "Global timeouts"
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:56
 msgid "Global value"
@@ -10127,6 +10216,12 @@ msgstr "hodín"
 #: include/classes/helpers/CMenuHelper.php:251 include/html.inc.php:891
 msgid "Housekeeping"
 msgstr "Údržba"
+
+#: app/views/popup.massupdate.item.php:207
+#: include/views/configuration.item.edit.php:1062
+#: include/views/configuration.item.prototype.edit.php:931
+msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
+msgstr ""
 
 #: include/locales.inc.php:46
 msgid "Hungarian (hu_HU)"
@@ -12280,6 +12375,10 @@ msgstr "Prototypy itemov boli aktualizované"
 msgid "Item tags"
 msgstr "Item tagy"
 
+#: app/views/administration.timeouts.edit.php:178
+msgid "Item test"
+msgstr ""
+
 #: jsLoader.php:397
 msgid "Item type does not use interface"
 msgstr "Typ itemu nepoužíva rozhranie"
@@ -13626,6 +13725,10 @@ msgstr[2] "Typ média povolený"
 msgid "Media type mapping"
 msgstr "Mapovanie typov médií"
 
+#: app/views/administration.timeouts.edit.php:158
+msgid "Media type test"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
 msgid "Media type test failed."
@@ -13706,6 +13809,10 @@ msgstr "Názov položky ponuky sa používa ako označenie pre URL spúšťača 
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr "Cesta menu"
+
+#: widgets/piechart/includes/WidgetForm.php:158
+msgid "Merge sectors smaller than "
+msgstr ""
 
 #: app/partials/popup.operations.php:160
 #: app/partials/scheduledreport.formgrid.html.php:178
@@ -14372,6 +14479,10 @@ msgstr "Časový limit siete pre naplánovaný test report"
 msgid "Network timeout for script execution"
 msgstr "Časový limit siete na spustenie skriptu"
 
+#: app/views/administration.timeouts.edit.php:136
+msgid "Network timeouts for UI"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1687
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
 msgstr ""
@@ -14502,6 +14613,10 @@ msgstr "Nová služba"
 msgid "New step of web scenario"
 msgstr ""
 
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr ""
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
 msgstr "Nový názov značky"
@@ -14514,6 +14629,14 @@ msgstr ""
 #: app/views/popup.templategroup.edit.php:59
 msgid "New template group"
 msgstr "Nová skupina templatov"
+
+#: app/views/trigger.edit.php:144
+msgid "New trigger"
+msgstr ""
+
+#: app/views/trigger.prototype.edit.php:143
+msgid "New trigger prototype"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
@@ -14611,6 +14734,10 @@ msgstr "Nie je špecifikované používateľské meno autentifikácie."
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
 msgstr "Bez zmien."
+
+#: jsLoader.php:194
+msgid "No compatible widgets."
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:56
 #: include/views/configuration.action.edit.php:58
@@ -15848,6 +15975,10 @@ msgstr "Prepísané"
 msgid "Override"
 msgstr "Nadradené"
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
+msgid "Override host"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:128
 msgid "Override item history period"
 msgstr "Prepísaná položka historickej periódy"
@@ -16438,6 +16569,10 @@ msgstr "Persky (fa_IR)"
 msgid "Pie"
 msgstr "Koláčový"
 
+#: widgets/piechart/Widget.php:31
+msgid "Pie chart"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:135
 msgid "Placing algorithm"
 msgstr "Algoritmus umiestňovania"
@@ -16591,6 +16726,12 @@ msgstr "Predikčné funkcie"
 #: include/views/configuration.item.prototype.edit.php:891
 msgid "Preprocessing"
 msgstr "Preprocessing"
+
+#: app/views/popup.massupdate.item.php:205
+#: include/views/configuration.item.edit.php:1060
+#: include/views/configuration.item.prototype.edit.php:929
+msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
+msgstr ""
 
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:209
@@ -18071,6 +18212,10 @@ msgstr "SLA aktualizovaná"
 msgid "SLA with ID \"%1$s\" is not available."
 msgstr "SLA s ID \"%1$s\" nie je k dispozícii."
 
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
+msgid "SLAs"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:164
@@ -18398,6 +18543,10 @@ msgstr[0] "Plánovaný report je povolený"
 msgstr[1] "Plánované reporty sú povolené"
 msgstr[2] " "
 
+#: app/views/administration.timeouts.edit.php:188
+msgid "Scheduled report test"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
 msgstr "Naplánovaný report bol aktualizovaný"
@@ -18464,6 +18613,10 @@ msgstr[2] "Skript zmazaný"
 
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
+msgstr ""
+
+#: app/views/administration.timeouts.edit.php:168
+msgid "Script execution"
 msgstr ""
 
 #: app/views/js/popup.scriptexec.js.php:47
@@ -19041,6 +19194,11 @@ msgstr "Skrátené"
 msgid "Show"
 msgstr "Zobraziť"
 
+#: widgets/piechart/includes/WidgetForm.php:234
+#: widgets/svggraph/includes/WidgetForm.php:378
+msgid "Show aggregation function"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
 msgstr ""
@@ -19147,6 +19305,10 @@ msgstr "Zobraziť text ako HTML"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:218
 msgid "Show timeline"
 msgstr "Zobraziť časovú os"
+
+#: widgets/piechart/includes/WidgetForm.php:170
+msgid "Show total value"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show triggers"
@@ -19358,6 +19520,10 @@ msgstr "Zdroj"
 #: include/classes/widgets/forms/CWidgetFormMap.php:40
 msgid "Source type"
 msgstr "Typ zdroja"
+
+#: widgets/piechart/includes/WidgetForm.php:152
+msgid "Space between sectors"
+msgstr ""
 
 #: include/locales.inc.php:61
 msgid "Spanish (es_ES)"
@@ -19934,6 +20100,10 @@ msgstr "Tag filter"
 #: include/views/configuration.triggers.edit.php:550
 msgid "Tag for matching"
 msgstr "Tag na priradenie"
+
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
@@ -20670,6 +20840,28 @@ msgstr "Časové pásmo"
 #: include/views/configuration.item.prototype.edit.php:330 items.php:151
 msgid "Timeout"
 msgstr "Časový limit"
+
+#: app/views/administration.timeouts.edit.php:203
+#: app/views/administration.timeouts.edit.php:207
+#: app/views/popup.proxy.edit.php:309
+#: include/classes/helpers/CMenuHelper.php:344 include/html.inc.php:907
+#: include/views/configuration.host.discovery.edit.php:703
+#: include/views/configuration.host.discovery.edit.php:706
+#: include/views/configuration.item.edit.php:830
+#: include/views/configuration.item.edit.php:833
+#: include/views/configuration.item.prototype.edit.php:784
+#: include/views/configuration.item.prototype.edit.php:787
+msgid "Timeouts"
+msgstr ""
+
+#: app/views/popup.proxy.edit.php:186
+msgid "Timeouts are disabled because the proxy and server versions do not match."
+msgstr ""
+
+#: app/views/administration.timeouts.edit.php:42
+#: app/views/popup.proxy.edit.php:191
+msgid "Timeouts for item types"
+msgstr ""
 
 #: app/views/monitoring.widget.plaintext.view.php:32
 #: include/classes/screens/CScreenHistory.php:265
@@ -23497,6 +23689,13 @@ msgstr "Vitajte"
 msgid "When active"
 msgstr "Iba v dňoch/časoch"
 
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:59
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:96
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
+#: jsLoader.php:195 jsLoader.php:199
+msgid "Widget"
+msgstr ""
+
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format
 msgid "Widget at X:%3$d, Y:%4$d on page #%2$d of dashboard \"%1$s\" is out of bounds."
@@ -23728,6 +23927,14 @@ msgstr "d.m.Y H:i"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i:s"
+msgstr "d.m.Y H:i:s"
+
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr "d.m.Y H:i"
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
 msgstr "d.m.Y H:i:s"
 
 #: include/translateDefines.inc.php:40
@@ -24295,6 +24502,10 @@ msgstr "veľké a malé latinské písmeno"
 msgid "and"
 msgstr "a"
 
+#: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
+msgid "any error"
+msgstr ""
+
 #: include/views/monitoring.history.php:186
 msgid "as Blue"
 msgstr "na modro"
@@ -24852,9 +25063,25 @@ msgstr "email"
 msgid "equals"
 msgstr "rovná sa"
 
+#: include/forms.inc.php:1452 include/views/js/item.preprocessing.js.php:239
+msgid "error does not match"
+msgstr ""
+
+#: include/forms.inc.php:1451 include/views/js/item.preprocessing.js.php:238
+msgid "error matches"
+msgstr ""
+
 #: include/views/js/item.preprocessing.js.php:466
 msgid "error message"
 msgstr "chybová správa"
+
+#: app/views/js/popup.itemtestedit.view.js.php:479
+msgid "error text"
+msgstr ""
+
+#: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
+msgid "error-matching"
+msgstr ""
 
 #: app/views/popup.lldoverride.php:119
 #: include/views/configuration.host.discovery.edit.php:789
@@ -24947,6 +25174,14 @@ msgstr "názov skupiny sa musí zhodovať s názvom skupiny %1$s"
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
+
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr "H:i"
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr "H:i:s"
 
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
@@ -25216,6 +25451,10 @@ msgstr ""
 msgid "item with the same UUID already exists"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:688
+msgid "jsonpath() - Returns JSONPath result"
+msgstr ""
+
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "kľúč je prázdny"
@@ -25308,6 +25547,10 @@ msgstr "d-m"
 
 #: include/translateDefines.inc.php:33
 msgid "m-d H:i"
+msgstr "d-m H:i"
+
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
 msgstr "d-m H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:37
@@ -25508,6 +25751,10 @@ msgstr "n-d"
 msgid "n-d H:i"
 msgstr "n-d H:i"
 
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr "n-d H:i"
+
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
 #: include/views/configuration.item.edit.php:262
@@ -25620,6 +25867,10 @@ msgstr "now() - Počet sekúnd od epochy"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "číslo"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
@@ -26096,6 +26347,10 @@ msgstr "time() - Aktuálny čas"
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft() – čas na dosiahnutie prahu odhadovaný na základe obdobia T"
 
+#: include/classes/api/services/CProxy.php:835
+msgid "timeouts are disabled because the proxy and server versions do not match"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() - Priemerná hodnota periódy T s presným posunom periódy"
@@ -26514,6 +26769,10 @@ msgstr "nesprávny typ itemu"
 #: include/classes/api/services/CTask.php:591
 msgid "wrong master item type"
 msgstr "nesprávny typ hlavného itemu"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1207
+msgid "xmlxpath() - Returns XML XPath result"
+msgstr ""
 
 #: include/func.inc.php:591 jsLoader.php:221
 msgctxt "year short"

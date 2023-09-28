@@ -128,7 +128,7 @@ func (p *Plugin) Validate(privateOptions interface{}) error {
 }
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	resp, err := p.broker.export(key, params)
+	resp, err := p.broker.export(key, params, ctx.Timeout())
 	if err != nil {
 		return nil, err
 	}

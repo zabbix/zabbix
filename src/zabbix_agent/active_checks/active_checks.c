@@ -118,6 +118,10 @@ zbx_cmd_hash_t;
 static volatile sig_atomic_t	need_update_userparam;
 #endif
 
+void	send_back_unsupported_item(char *key, char *error, const char *config_hostname, zbx_vector_addr_ptr_t *addrs,
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		int config_buffer_send, int config_buffer_size);
+
 static void	init_active_metrics(int config_buffer_size)
 {
 	size_t	sz;
@@ -247,12 +251,13 @@ static int	get_min_nextcheck(void)
 	return min;
 }
 
-static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
+static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime,
+		int timeout)
 {
 	ZBX_ACTIVE_METRIC	*metric;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__func__, key, refresh, lastlogsize, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d timeout:%d",
+			__func__, key, refresh, lastlogsize, mtime, timeout);
 
 	for (int i = 0; i < active_metrics.values_num; i++)
 	{
@@ -314,6 +319,8 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->refresh = refresh;
 		}
 
+		metric->timeout = timeout;
+
 		goto out;
 	}
 
@@ -327,6 +334,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->state = ITEM_STATE_NORMAL;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
+	metric->timeout = timeout;
 	/* existing log[], log.count[] and eventlog[] data can be skipped */
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->big_rec = 0;
@@ -388,7 +396,6 @@ static void	add_command(const char *key, zbx_uint64_t id)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Purpose: tests log[] or log.count[] item key if <mode> parameter is set to *
@@ -423,6 +430,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	return ret;
 }
 
+
 /********************************************************************************
  *                                                                              *
  * Purpose: parses list of active checks received from server                   *
@@ -432,6 +440,8 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *     host                  - [IN] address of host                             *
  *     port                  - [IN] port number on host                         *
  *     config_revision_local - [IN/OUT] revision of processed configuration     *
+ *     config_timeout        - [IN] global timeout value for checks without     *
+ *                                  timeouts                                    *
  *                                                                              *
  * Comments:                                                                    *
  *    String is represented as "ZBX_EOF" termination list, with '\n'            *
@@ -441,17 +451,19 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                                                              *
  ********************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
-		zbx_uint32_t *config_revision_local)
+		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_hostname,
+		zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, const char *config_source_ip,
+		int config_buffer_send, int config_buffer_size)
 {
 	const char		*p;
 	size_t			name_alloc = 0, key_orig_alloc = 0;
-	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
-				tmp[MAX_STRING_LEN] = {0}, exp_delimiter;
+	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN] = {0},
+				exp_delimiter, error[MAX_STRING_LEN];
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
-	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
+	int			delay, mtime, expression_type, case_sensitive, timeout, i, j, ret = FAIL;
 	zbx_uint32_t		config_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -563,7 +575,20 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			mtime = atoi(tmp);
 
-		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TIMEOUT, tmp, sizeof(tmp), NULL) ||
+				'\0' == *tmp)
+		{
+			timeout = config_timeout;
+		}
+		else if (FAIL == zbx_validate_item_timeout(tmp, &timeout, error, sizeof(error)))
+		{
+			send_back_unsupported_item(key_orig, error, config_hostname, addrs, config_tls, config_timeout,
+					config_source_ip, config_buffer_send, config_buffer_size);
+
+			continue;
+		}
+
+		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime, timeout);
 
 		/* remember what was received */
 		zbx_vector_str_append(&received_metrics, zbx_strdup(NULL, key_orig));
@@ -799,8 +824,8 @@ static void	process_config_item(struct zbx_json *json, const char *config, size_
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED == zbx_execute_agent_check(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
-			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
+	if (SUCCEED == zbx_execute_agent_check(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result,
+			ZBX_CHECK_TIMEOUT_UNDEFINED) && NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 	{
 		if (SUCCEED != zbx_is_utf8(*value))
 		{
@@ -843,7 +868,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
 		const char *config_listen_ip, int config_listen_port, const char *config_hostname,
 		const char *config_host_metadata, const char *config_host_metadata_item,
-		const char *config_host_interface, const char *config_host_interface_item)
+		const char *config_host_interface, const char *config_host_interface_item, int config_buffer_send, int config_buffer_size)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -922,7 +947,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 				}
 
 				if (SUCCEED != parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, config_revision_local))
+						((zbx_addr_t *)addrs->values[0])->port, config_revision_local,
+						config_timeout, config_hostname, addrs, config_tls, config_source_ip, config_buffer_send, config_buffer_size))
 				{
 						zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
 								zbx_json_strerror());
@@ -1519,7 +1545,13 @@ static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC 
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result)))
+	if (ZBX_CHECK_TIMEOUT_UNDEFINED == metric->timeout)
+	{
+		SET_MSG_RESULT(&result, zbx_strdup(NULL, "Unsupported timeout value."));
+		*error = zbx_strdup(*error, *ZBX_GET_MSG_RESULT(&result));
+		ret = NOTSUPPORTED;
+	}
+	else if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result, metric->timeout)))
 	{
 		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);
@@ -1550,7 +1582,7 @@ static void	process_command(zbx_active_command_t *command)
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result))
+	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result, ZBX_CHECK_TIMEOUT_UNDEFINED))
 	{
 		state = ITEM_STATE_NOTSUPPORTED;
 		if (NULL == (pvalue = ZBX_GET_MSG_RESULT(&result)))
@@ -1924,7 +1956,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 					activechks_args_in->config_host_metadata,
 					activechks_args_in->config_host_metadata_item,
 					activechks_args_in->config_host_interface,
-					activechks_args_in->config_host_interface_item))
+					activechks_args_in->config_host_interface_item, activechks_args_in->config_buffer_send, activechks_args_in->config_buffer_size))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
@@ -2011,4 +2043,15 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 #endif
+}
+
+void	send_back_unsupported_item(char *key, char *error, const char *config_hostname, zbx_vector_addr_ptr_t *addrs,
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		int config_buffer_send, int config_buffer_size)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s", key, error);
+
+	process_value(addrs, NULL, config_hostname, key, error, ITEM_STATE_NOTSUPPORTED,
+			NULL, NULL, NULL, NULL, NULL, NULL, 0, config_tls, config_timeout, config_source_ip,
+			config_buffer_send, config_buffer_size);
 }

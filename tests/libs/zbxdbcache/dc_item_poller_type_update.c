@@ -36,6 +36,11 @@
 #include "dbconfig.h"
 #include "dc_item_poller_type_update_test.h"
 
+#define ZBX_SNMP_OID_TYPE_NORMAL	0
+#define ZBX_SNMP_OID_TYPE_DYNAMIC	1
+#define ZBX_SNMP_OID_TYPE_MACRO		2
+#define ZBX_SNMP_OID_TYPE_WALK		3
+
 /* defines from dbconfig.c */
 #define ZBX_ITEM_COLLECTED		0x01
 #define ZBX_HOST_UNREACHABLE		0x02
@@ -230,9 +235,20 @@ void	zbx_mock_test_entry(void **state)
 					sizeof(ZBX_DC_SNMPITEM), &found);
 
 			if (0 == found)
+			{
 				snmpitem->snmp_oid = NULL;
+			}
 
 			snmpitem->snmp_oid = zbx_strdup((char *)snmpitem->snmp_oid, snmp_oid);
+
+			if (0 == strncmp(snmpitem->snmp_oid, "walk[", 5))
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+			else if (NULL != strchr(snmpitem->snmp_oid, '{'))
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+			else if (NULL != strchr(snmpitem->snmp_oid, '['))
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
+			else
+				snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
 		}
 
 		if (PROXY == test_config.monitored)

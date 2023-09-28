@@ -147,11 +147,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'maxlength' => 3,
 				'value' => 20
 			],
-			'id:date_from' => [
+			'id:date_period_from' => [
 				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			],
-			'id:date_to' => [
+			'id:date_period_to' => [
 				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			]
@@ -164,7 +164,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		}
 
 		// Check that the date pickers are present.
-		foreach (['id:date_from_calendar', 'id:date_to_calendar'] as $selector) {
+		foreach (['id:date_period_from_calendar', 'id:date_period_to_calendar'] as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isVisible());
 		}
 
@@ -314,8 +314,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'expected' => TEST_BAD,
 					'error' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
@@ -329,8 +329,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					],
 					'expected' => TEST_BAD,
 					'error' => [
-						'Incorrect value for field "From": a date is expected.',
-						'Incorrect value for field "To": a date is expected.'
+						'Invalid parameter "From": a date is expected.',
+						'Invalid parameter "To": a date is expected.'
 					]
 				]
 			],
