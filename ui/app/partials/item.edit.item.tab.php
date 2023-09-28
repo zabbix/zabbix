@@ -661,7 +661,7 @@ $formgrid->addItem([
 		->setAsteriskMark()
 		->setId('js-item-timeout-label'),
 	(new CFormField([
-		(new CRadioButtonList('custom_timeout', $data['form']['custom_timeout']))
+		(new CRadioButtonList('custom_timeout', (int) $data['form']['custom_timeout']))
 			->addValue(_('Global'), ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)
 			->addValue(_('Override'), ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED)
 			->setReadonly($data['readonly'])
