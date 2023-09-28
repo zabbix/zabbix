@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../common/testErrorsInFilterMultiselects.php';
 /**
  * Test for assuring that bug from ZBX-23302 is not reproducing.
  */
-class testErrorsInFilterMultiselectsTemplate extends testErrorsInFilterMultiselects {
+class testErrorsInFilterMultiselectsTemplates extends testErrorsInFilterMultiselects {
 
 	public $filter_labels = [
 		'context_page' => ['Linked templates', 'Templates', 'Template groups'],
@@ -33,7 +33,9 @@ class testErrorsInFilterMultiselectsTemplate extends testErrorsInFilterMultisele
 	/**
 	 * @dataProvider getCheckDialogsData
 	 */
-	public function testErrorsInFilterMultiselectsTemplate_CheckDialogs($data) {
-		$this->testMultiselectDialog($data, 'zabbix.php?action=template.list', 'AIX by Zabbix agent');
+	public function testErrorsInFilterMultiselectsTemplates_CheckDialogs($data) {
+		$this->checkErrorInDialog($data, 'zabbix.php?action=template.list', 'Template', 'Templates',
+				'AIX by Zabbix agent'
+		);
 	}
 }

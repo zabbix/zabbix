@@ -56,43 +56,44 @@ class testErrorsInFilterMultiselects extends CWebTest {
 		];
 	}
 
-	public function testMultiselectDialog($data, $url, $context_name) {
+	public function checkErrorInDialog($data, $url, $context, $groups, $context_name) {
 		$this->page->login()->open($url);
 
 		if (CTestArrayHelper::get($data, 'check_object_page', false)) {
-			$templates_filter_form = $this->query('name:zbx_filter')->asForm()->one();
+			$context_filter_form = $this->query('name:zbx_filter')->asForm()->one();
 
-			$this->openDialogCheckAndClose($templates_filter_form, $this->filter_labels['context_page'][0],
+			// Check second multiselect, when "Template groups" are empty.
+			$this->openDialogCheckAndClose($context_filter_form, $this->filter_labels['context_page'][0],
 					$this->filter_labels['context_page'][1], $this->filter_labels['context_page'][2]
 			);
 
 			// Fill "Template groups" multiselect.
-			$templates_filter_form->getField('Template groups')->asMultiselect()
-					->setFillMode(CMultiselectElement::MODE_SELECT)->fill('Templates');
+			$context_filter_form->getField($context.' groups')->asMultiselect()
+					->setFillMode(CMultiselectElement::MODE_SELECT)->fill($groups);
 
-			// Check second multiselect, when "Template groups" is filled.
-			$this->openDialogCheckAndClose($templates_filter_form, $this->filter_labels['context_page'][0],
+			// Check second multiselect, when "Template groups" are filled.
+			$this->openDialogCheckAndClose($context_filter_form, $this->filter_labels['context_page'][0],
 					$this->filter_labels['context_page'][1], $this->filter_labels['context_page'][2]
 			);
 
-			$templates_filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
+			$context_filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
 		}
 
 		$this->query('class:list-table')->asTable()->waitUntilPresent()->one()->findRow('Name', $context_name)
 				->getColumn($data['object'])->query('tag:a')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
-		// Check second multiselect, when "Template groups" field is empty.
+		// Check second multiselect, when "Template groups" are empty.
 		$object_filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$this->openDialogCheckAndClose($object_filter_form, $this->filter_labels['object_page'][0],
 				$this->filter_labels['object_page'][1], $this->filter_labels['object_page'][2]
 		);
 
 		// Fill "Template groups" multiselect.
-		$object_filter_form->getField('Template groups')->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
-				->fill('Templates');
+		$object_filter_form->getField($context.' groups')->asMultiselect()->setFillMode(CMultiselectElement::MODE_SELECT)
+				->fill($groups);
 
-		// Check second multiselect, when "Template groups" field is filled.
+		// Check second multiselect, when "Template groups" are filled.
 		$this->openDialogCheckAndClose($object_filter_form, $this->filter_labels['object_page'][0],
 				$this->filter_labels['object_page'][1], $this->filter_labels['object_page'][2]
 		);
@@ -106,6 +107,12 @@ class testErrorsInFilterMultiselects extends CWebTest {
 		$object_filter_form->query('button:Reset')->waitUntilClickable()->one()->click();
 	}
 
+	/**
+	 * @param CFormElement    $form       page filter form or dialog form
+	 * @param string          $field      field name of checked multiselect
+	 * @param string          $title_1    title of first-level multiselect dialog
+	 * @param string          $title_2    title of multiselect second-level dialog
+	 */
 	protected function openDialogCheckAndClose($form, $field, $title_1, $title_2) {
 		$level_1_dialog = $this->checkMultiselectDialog($form, $field, $title_1);
 		$level_2_dialog = $this->checkMultiselectDialog($level_1_dialog, $field, $title_2, true);
@@ -114,11 +121,21 @@ class testErrorsInFilterMultiselects extends CWebTest {
 		$level_1_dialog->getFooter()->query('button:Cancel')->waitUntilClickable()->one()->click();
 	}
 
+	/**
+	 * @param CFormElement    $form          page filter form or dialog form
+	 * @param string          $field         field name of checked multiselect
+	 * @param string          $title         title of a checked dialog
+	 * @param boolean         $sub_dialog    true if it is second-level dialog, false - if first-level
+	 *
+	 * @return COverlayDialogElement
+	 */
 	protected function checkMultiselectDialog($form, $field, $title, $sub_dialog = false) {
 		$field_container = $sub_dialog ? $form : $form->getFieldContainer($field);
 		$field_container->query('button:Select')->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 		$this->assertEquals($title, $dialog->getTitle());
+
+		// Check that opened dialog does not contain any error messages.
 		$this->assertFalse($dialog->query('xpath:.//*[contains(@class, "msg-bad")]')->exists());
 
 		return $dialog;
