@@ -1194,7 +1194,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 										? (new CLink('/'.$function['host'].'/'.$function['key_']))
 											->addClass($style)
 											->addClass(ZBX_STYLE_LINK_ALT)
-											->onClick('view.editItem(this, '.json_encode([
+											->onClick('view.editItemPrototype(this, '.json_encode([
 												'context' => $options['context'],
 												'itemid' => $function['itemid'],
 												'parent_discoveryid' => $function['parent_itemid']

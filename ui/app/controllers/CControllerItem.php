@@ -168,7 +168,7 @@ abstract class CControllerItem extends CController {
 			}
 			else {
 				$ret = (bool) API::Template()->get([
-					'output' => ['hostid'],
+					'output' => ['templateid'],
 					'templateids' => [$this->getInput('hostid')]
 				]);
 			}
