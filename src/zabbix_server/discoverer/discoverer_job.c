@@ -19,14 +19,22 @@
 
 #include "discoverer_job.h"
 
+ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
+
 zbx_hash_t	discoverer_task_hash(const void *data)
 {
 	const zbx_discoverer_task_t	*task = (const zbx_discoverer_task_t *)data;
 	zbx_hash_t			hash;
-	zbx_uint64_t			port = task->port;
+	struct {
+		zbx_uint32_t		port;
+		zbx_uint32_t		dcheck_type;
+	}				state;
+	const char			*ip = DISCOVERY_ADDR_IP == task->addr_type ? task->addr.ip : "";
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&port);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(task->ip, strlen(task->ip), hash);
+	state.port = task->port;
+	state.dcheck_type = DISCOVERY_ADDR_IP == task->addr_type ? 0 : task->dchecks.values[0]->type;
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC((zbx_uint64_t*)&state);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(ip, strlen(ip), hash);
 
 	return hash;
 }
@@ -35,25 +43,28 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 {
 	const zbx_discoverer_task_t	*task1 = (const zbx_discoverer_task_t *)d1;
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
+	const char			*ip1 = DISCOVERY_ADDR_IP == task1->addr_type ? task1->addr.ip : "",
+					*ip2 = DISCOVERY_ADDR_IP == task2->addr_type ? task2->addr.ip : "";
+	unsigned char			type1, type2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(task1->port, task2->port);
+	type1 = DISCOVERY_ADDR_IP == task1->addr_type ? 0 : task1->dchecks.values[0]->type;
+	type2 = DISCOVERY_ADDR_IP == task2->addr_type ? 0 : task2->dchecks.values[0]->type;
+	ZBX_RETURN_IF_NOT_EQUAL(type1, type2);
 
-	return strcmp(task1->ip, task2->ip);
+	return strcmp(ip1, ip2);
 }
 
 void	discoverer_task_clear(zbx_discoverer_task_t *task)
 {
-	if (NULL != task->ips)
+	if (DISCOVERY_ADDR_IP == task->addr_type)
 	{
-		zbx_vector_str_clear_ext(task->ips, zbx_str_free);
-		zbx_vector_str_destroy(task->ips);
-		zbx_free(task->ips);
+		zbx_free(task->addr.ip);
 	}
 
 	/* dcheck is stored in job->dcheck_common */
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
 
-	zbx_free(task->ip);
 }
 
 void	discoverer_task_free(zbx_discoverer_task_t *task)
@@ -64,9 +75,7 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 
 zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 {
-	return NULL != task->ips ?
-			(zbx_uint64_t)task->ips->values_num * (zbx_uint64_t)task->dchecks.values_num :
-			(zbx_uint64_t)task->dchecks.values_num;
+	return (zbx_uint64_t)task->dchecks.values_num;
 }
 
 zbx_uint64_t	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
@@ -87,14 +96,16 @@ void	discoverer_job_free(zbx_discoverer_job_t *job)
 {
 	(void)discoverer_job_tasks_free(job);
 
-	zbx_vector_dc_dcheck_ptr_clear_ext(&job->dchecks_common, zbx_discovery_dcheck_free);
-	zbx_vector_dc_dcheck_ptr_destroy(&job->dchecks_common);
-
+	zbx_vector_dc_dcheck_ptr_clear_ext(job->dchecks_common, zbx_discovery_dcheck_free);
+	zbx_vector_dc_dcheck_ptr_destroy(job->dchecks_common);
+	zbx_free(job->dchecks_common);
+	zbx_vector_iprange_destroy(job->ipranges);
+	zbx_free(job->ipranges);
 	zbx_free(job);
 }
 
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeout,
-		zbx_vector_dc_dcheck_ptr_t *dchecks_common)
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc_dcheck_ptr_t *dchecks_common,
+		zbx_vector_iprange_t *ipranges)
 {
 	zbx_discoverer_job_t	*job;
 
@@ -105,9 +116,8 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeo
 	job->drule_revision = drule->revision;
 	job->status = DISCOVERER_JOB_STATUS_QUEUED;
 	zbx_list_create(&job->tasks);
-	zbx_vector_dc_dcheck_ptr_create(&job->dchecks_common);
-	zbx_vector_dc_dcheck_ptr_append_array(&job->dchecks_common, dchecks_common->values, dchecks_common->values_num);
-	zbx_vector_dc_dcheck_ptr_clear(dchecks_common);
+	job->dchecks_common = dchecks_common;
+	job->ipranges = ipranges;
 
 	return job;
 }

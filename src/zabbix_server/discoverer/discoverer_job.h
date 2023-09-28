@@ -21,15 +21,26 @@
 #define ZABBIX_DISCOVERER_JOB_H
 
 #include "zbxdiscovery.h"
+#include "zbxip.h"
+
+ZBX_VECTOR_DECL(iprange, zbx_iprange_t)
 
 typedef struct
 {
 	zbx_vector_dc_dcheck_ptr_t	dchecks;
-	char				*ip;
-	zbx_vector_str_t		*ips;
+	union
+	{
+		char			*ip;
+		zbx_vector_iprange_t	*ipranges;
+	}
+	addr;
 	unsigned short			port;
 	zbx_uint64_t			unique_dcheckid;
-	int				resolve_dns;
+	unsigned char			resolve_dns;
+
+#define	DISCOVERY_ADDR_IP		0
+#define	DISCOVERY_ADDR_RANGE		1
+	unsigned char			addr_type;
 }
 zbx_discoverer_task_t;
 
@@ -45,7 +56,8 @@ typedef struct
 	int				workers_used;
 	int				workers_max;
 	unsigned char			status;
-	zbx_vector_dc_dcheck_ptr_t	dchecks_common;
+	zbx_vector_dc_dcheck_ptr_t	*dchecks_common;
+	zbx_vector_iprange_t		*ipranges;
 }
 zbx_discoverer_job_t;
 
@@ -56,7 +68,7 @@ void			discoverer_task_free(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_task_check_count_get(zbx_discoverer_task_t *task);
 zbx_uint64_t		discoverer_job_tasks_free(zbx_discoverer_job_t *job);
 void			discoverer_job_free(zbx_discoverer_job_t *job);
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeout,
-				zbx_vector_dc_dcheck_ptr_t *dchecks_common);
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc_dcheck_ptr_t *dchecks_common,
+					zbx_vector_iprange_t *ipranges);
 
 #endif
