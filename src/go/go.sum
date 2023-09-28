@@ -1,15 +1,3 @@
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230830115154-0cdc16dc3195 h1:M8OAqlMU9mI/XH81go2fkaJ0wMe8999hrJkYYkAKS1c=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230830115154-0cdc16dc3195/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230831143109-da0b04e0e6c0 h1:vglF8UsU+EmcCriBLdBN+dTMhqHYJinHxHQRef3NCXM=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230831143109-da0b04e0e6c0/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230905132720-f160c8e56c05 h1:bpKODnW5utSSSgs6QJ9DcEA4ISxw7UgWCDdFBjDqzHc=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230905132720-f160c8e56c05/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230907124052-73f3bcdb4208 h1:6R67a7ys08pepF34YIRrXiwIRnWJKE1xRdCsmGnuAk8=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230907124052-73f3bcdb4208/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230908104251-aca7f9c46c05 h1:ERCNlahjwqUCKKBOd6T6OkRwGLVj+mj3KEAobqu3Vbo=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230908104251-aca7f9c46c05/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230908104615-db1b3da166d8 h1:73VAsFFWoTVRQ+fq0vECtF6EEI341Mc/6kzHl+6vgag=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230908104615-db1b3da166d8/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230914084003-665583c76b07 h1:1JoRqxI+ruxFvdzE9c/lNuFiIxfdQo1ENEuolLm6C5I=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230914084003-665583c76b07/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
