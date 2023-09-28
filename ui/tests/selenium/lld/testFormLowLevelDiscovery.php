@@ -317,6 +317,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 		$this->zbxTestTextNotPresent('Additional parameters');
 		$this->zbxTestAssertNotVisibleId('params_ap');
+		$layout = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
 			$this->zbxTestTextPresent('Executed script');
@@ -389,7 +390,18 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestTextPresent('SNMP OID');
 			$this->zbxTestAssertVisibleId('snmp_oid');
 			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'maxlength', 512);
-			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', '[IF-MIB::]ifInOctets.1');
+			$this->zbxTestAssertAttribute("//input[@id='snmp_oid']", 'placeholder', 'walk[OID1,OID2,...]');
+
+			//Check hintbox.
+			$hint_text = "Field requirements:".
+				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
+				"\ndiscovery[{#MACRO1},OID1,{#MACRO2},OID2,...] - (legacy) to retrieve a subtree in JSON";
+
+			$layout->getLabel('SNMP OID')->query('xpath:./button[@data-hintbox]')->one()->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
+			$this->assertEquals($hint_text, $hint->one()->getText());
+			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+			$hint->waitUntilNotPresent();
 		}
 		else {
 			$this->zbxTestTextNotVisible('SNMP OID');
