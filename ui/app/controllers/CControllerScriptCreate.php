@@ -140,9 +140,17 @@ class CControllerScriptCreate extends CController {
 				else {
 					$default_input = trim($this->getInput('default_input', ''));
 					$user_input_value = $default_input;
-					$input_validation = trim($this->getInput('input_validation'));
+					$input_validation = $this->getInput('input_validation');
 
-					if (!preg_match('/'.str_replace('/', '\/', $input_validation).'/', $user_input_value)) {
+					$regular_expression = '/'.str_replace('/', '\/', $input_validation).'/';
+
+					if (@preg_match($regular_expression, '') === false) {
+						error(
+							_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'),
+								_('invalid regular expression')
+							));
+					}
+					elseif (!preg_match($regular_expression,$user_input_value)) {
 						error(
 							_s('Incorrect value for field "%1$s": %2$s.', 'default_input',
 								_s('input does not match the provided pattern: %1$s', $input_validation)
@@ -158,7 +166,7 @@ class CControllerScriptCreate extends CController {
 			}
 		}
 
-		// Reset the manualinput value to default, if scope changed to Action operation.
+		// Reset the manualinput values to default, if scope changed to Action operation.
 		if ($script['scope'] == ZBX_SCRIPT_SCOPE_ACTION) {
 			$script['manualinput'] = DB::getDefault('scripts', 'manualinput');
 		}

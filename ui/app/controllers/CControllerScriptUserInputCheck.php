@@ -76,8 +76,15 @@ class CControllerScriptUserInputCheck extends CController {
 		}
 		else{
 			$input_validation = $this->getInput('input_validation');
+			$regular_expression = '/'.str_replace('/', '\/', $input_validation).'/';
 
-			if (!preg_match('/' . str_replace('/', '\/', $input_validation) . '/', $manual_input)) {
+			if (@preg_match($regular_expression, '') === false) {
+				error(
+					_s('Incorrect value for field "%1$s": %2$s.', _('input_validation'),
+						_('invalid regular expression')
+					));
+			}
+			elseif (!preg_match($regular_expression, $manual_input)) {
 				error(
 					_s('Incorrect value for field "%1$s": %2$s.', 'manual_input',
 						_s('input does not match the provided pattern: %1$s', $input_validation)
