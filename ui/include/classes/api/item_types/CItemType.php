@@ -174,7 +174,7 @@ abstract class CItemType {
 					case ITEM_TYPE_SNMP:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
-								return strncmp($data['snmp_oid'], 'walk[', 5) == 0;
+								return strncmp($data['snmp_oid'], 'get[', 4) == 0 || strncmp($data['snmp_oid'], 'walk[', 5) == 0;
 							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];
@@ -286,7 +286,7 @@ abstract class CItemType {
 					case ITEM_TYPE_SNMP:
 						return ['type' => API_MULTIPLE, 'rules' => [
 							['if' => static function (array $data): bool {
-								return strncmp($data['snmp_oid'], 'walk[', 5) == 0;
+								return strncmp($data['snmp_oid'], 'get[', 4) == 0 || strncmp($data['snmp_oid'], 'walk[', 5) == 0;
 							}, 'type' => API_TIME_UNIT, 'flags' => API_ALLOW_USER_MACRO | ($is_item_prototype ? API_ALLOW_LLD_MACRO : 0), 'in' => '1:'.(10 * SEC_PER_MIN), 'length' => DB::getFieldLength('items', 'timeout')],
 							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'timeout')]
 						]];
