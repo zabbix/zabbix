@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-02T14:33:51Z'
+  date: '2023-09-20T10:45:02Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -184,12 +184,12 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.BILLING.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.BILLING.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -206,7 +206,7 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['access_key', 'region', 'secret_key'].forEach(function (field) {
+                    ['access_key', 'region', 'secret_key', 'month'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
@@ -214,8 +214,8 @@ zabbix_export:
                     today = new Date();
                     params.end_date = today.toDateString();
                     month = today.getMonth();
-                    today.setMonth(month - 12);
-                    params.start_time = today.toDateString();
+                    today.setMonth(month - params.month);
+                    params.start_time = new Date(today.getFullYear(), today.getMonth()).toDateString();
             
                     AwsBilling.params = params;
                 },
@@ -391,12 +391,14 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.BILLING.REGION}'
+            - name: month
+              value: '{$AWS.BILLING.MONTH}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.BILLING.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -592,6 +594,9 @@ zabbix_export:
         - macro: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered billing service by name.'
+        - macro: '{$AWS.BILLING.MONTH}'
+          value: '11'
+          description: 'Months to get historical data from AWS Cost Explore API, no more than 12 months.'
         - macro: '{$AWS.BILLING.REGION}'
           value: us-east-1
           description: 'Amazon Billing region code.'
@@ -613,14 +618,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '6'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Monthly blended cost'
+                    - type: INTEGER
+                      name: rows
+                      value: '6'
             - name: 'Monthly costs by service'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -630,14 +635,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '6'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+                    - type: INTEGER
+                      name: rows
+                      value: '6'
             - name: 'Daily costs by service'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -647,11 +652,11 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+                    - type: INTEGER
+                      name: rows
+                      value: '5'

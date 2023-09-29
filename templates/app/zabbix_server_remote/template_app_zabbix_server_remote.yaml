@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-20T10:38:37Z'
+  date: '2023-09-20T10:44:48Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1782,16 +1782,6 @@ zabbix_export:
                         host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Zabbix server performance'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Remote Zabbix server health'
-                        name: 'Remote Zabbix server: Zabbix data gathering process busy %'
-                - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1801,6 +1791,26 @@ zabbix_export:
                       value:
                         host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Zabbix internal process busy %'
+                - type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Value cache effectiveness'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Zabbix data gathering process busy %'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'
@@ -1812,16 +1822,6 @@ zabbix_export:
                       value:
                         host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Zabbix cache usage, % free'
-                - type: GRAPH_CLASSIC
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Remote Zabbix server health'
-                        name: 'Remote Zabbix server: Value cache effectiveness'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '10'
@@ -1847,16 +1847,6 @@ zabbix_export:
                         host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Data handling processes'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Remote Zabbix server health'
-                        name: 'Remote Zabbix server: Reporting processes'
-                - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1866,6 +1856,16 @@ zabbix_export:
                       value:
                         host: 'Remote Zabbix server health'
                         name: 'Remote Zabbix server: Internal processes'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Remote Zabbix server health'
+                        name: 'Remote Zabbix server: Reporting processes'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'

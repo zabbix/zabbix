@@ -26,9 +26,9 @@
 
 #include "perfmon.h"
 
-zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
 		zbx_perf_counter_lang_t lang, char **error);
-void			remove_perf_counter(zbx_perf_counter_data_t *counter);
+void			zbx_remove_perf_counter(zbx_perf_counter_data_t *counter);
 
 typedef enum
 {

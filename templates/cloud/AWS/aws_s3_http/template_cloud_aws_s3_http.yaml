@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:23:42Z'
+  date: '2023-09-20T10:44:58Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -447,14 +447,14 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -666,16 +666,16 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.REGION}'
-            - name: filter_id
-              value: '{$AWS.S3.FILTER.ID}'
             - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
+            - name: filter_id
+              value: '{$AWS.S3.FILTER.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw

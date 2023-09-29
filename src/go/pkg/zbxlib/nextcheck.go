@@ -40,7 +40,12 @@ import (
 func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.Time, scheduling bool, err error) {
 	var cnextcheck, cscheduling C.int
 	var cerr *C.char
+
 	cdelay := C.CString(delay)
+	defer func() {
+		log.Tracef("Calling C function \"free(cdelay)\"")
+		C.free(unsafe.Pointer(cdelay))
+	}()
 
 	now := from.Unix()
 	log.Tracef("Calling C function \"zbx_get_agent_item_nextcheck()\"")
@@ -57,8 +62,6 @@ func GetNextcheck(itemid uint64, delay string, from time.Time) (nextcheck time.T
 			scheduling = true
 		}
 	}
-	log.Tracef("Calling C function \"free()\"")
-	C.free(unsafe.Pointer(cdelay))
 
 	return
 }

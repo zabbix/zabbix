@@ -22464,6 +22464,10 @@ msgstr ""
 msgid "number"
 msgstr ""
 
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr ""
+
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
 msgid "of"

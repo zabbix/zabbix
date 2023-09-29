@@ -33,7 +33,6 @@
 #include "sddl.h"
 #endif
 
-#define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */
 
 extern int	CONFIG_TIMEOUT;
 
@@ -353,6 +352,7 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
+#define ZBX_MAX_VFS_FILE_SIZE	16 * ZBX_MEBIBYTE	/* file contents larger than 64 KB will be truncated in the database */
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
 	size_t		contents_alloc = 0, contents_offset = 0;
@@ -400,7 +400,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (ZBX_MAX_DB_FILE_SIZE < stat_buf.st_size)
+	if (ZBX_MAX_VFS_FILE_SIZE < stat_buf.st_size)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 		goto err;
@@ -423,7 +423,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		if (ZBX_MAX_DB_FILE_SIZE < (flen += nbytes))
+		if (ZBX_MAX_VFS_FILE_SIZE < (flen += nbytes))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "File is too large for this check."));
 			zbx_free(contents);
@@ -457,6 +457,7 @@ err:
 		close(f);
 
 	return ret;
+#undef ZBX_MAX_VFS_FILE_SIZE
 }
 
 int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
