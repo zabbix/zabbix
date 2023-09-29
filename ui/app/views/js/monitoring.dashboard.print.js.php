@@ -44,7 +44,7 @@
 						dashboardid: dashboard.dashboardid
 					},
 					cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-					cell_height: 70,
+					cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
 					max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
 					max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 					widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
@@ -70,38 +70,6 @@
 				dashboard_page.activate();
 
 				page_number = page_number + 1;
-			}
-
-			const page_heights = {};
-			const dashboard_header_height = 60;
-			const page_header_height = 50;
-			const screen_width = 1940;
-
-			const pages = document.querySelectorAll('.dashboard-page');
-
-			pages.forEach((page) => {
-				page_heights[page.classList[1]] = parseInt(page.getAttribute('data-height'));
-			});
-
-			const page_styles = document.createElement('style');
-			document.head.appendChild(page_styles);
-
-			for (const page in page_heights) {
-				let page_height = page_header_height + page_heights[page];
-
-				if (page == 'page_1') {
-					page_height += dashboard_header_height;
-				}
-
-				page_styles.sheet.insertRule(
-					'@page '+ page + ' {' +
-						' size: ' + screen_width + 'px '+ page_height + 'px;' +
-					'}'
-				);
-
-				page_styles.sheet.insertRule(
-					'.' + page +' { page: '+ page +'; }'
-				);
 			}
 		}
 	}

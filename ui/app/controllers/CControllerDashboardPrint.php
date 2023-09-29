@@ -101,7 +101,7 @@ class CControllerDashboardPrint extends CController {
 					$max = max($max, $widget['pos']['y'] + $widget['pos']['height']);
 				}
 
-				$page_sizes[$index] = $max * 70 + 12;
+				$page_sizes[$index] = $max * DASHBOARD_ROW_HEIGHT + 12;
 			}
 		}
 		else {

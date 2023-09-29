@@ -24,6 +24,12 @@
  * @var array $data
  */
 
+const HEADER_TITLE_HEIGHT = 60;
+const PAGE_TITLE_HEIGHT = 50;
+const PAGE_WIDTH = 1940;
+const PAGE_MARGIN = 10;
+
+
 if (array_key_exists('error', $data)) {
 	show_error_message($data['error']);
 
@@ -53,10 +59,8 @@ $this->includeJsFile('monitoring.dashboard.print.js.php');
 
 $this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
 
-$this->enableLayoutModes();
-$this->setLayoutMode(ZBX_LAYOUT_KIOSKMODE);
-
 $page_count = count($data['dashboard']['pages']);
+$page_styles = '';
 
 $header_title_tag = (new CTag('h1', true, $data['dashboard']['name']));
 
@@ -67,10 +71,18 @@ $header_title_tag = (new CTag('h1', true, $data['dashboard']['name']));
 if ($page_count > 1) {
 	foreach ($data['dashboard']['pages'] as $index => $dashboard_page) {
 		$page_number = $index + 1;
+		$page_name = 'page_' . $page_number;
+		$page_height = $data['page_sizes'][$index] + PAGE_TITLE_HEIGHT + PAGE_MARGIN;
+
+		if ($index === 0) {
+			$page_height += HEADER_TITLE_HEIGHT;
+		}
+
+		$page_styles .= '@page '.$page_name.' { size: '.(PAGE_WIDTH).'px '.$page_height.'px; } ';
+		$page_styles .= '.'.$page_name.' { page: '.$page_name.'; } ';
 
 		(new CDiv())
 			->addClass('dashboard-page page_'.$page_number)
-			->setAttribute('data-height', $data['page_sizes'][$index])
 			->addItem(
 				new CTag('h1', true,
 					$dashboard_page['name'] !== '' ? $dashboard_page['name'] : _s('Page %1$d', $page_number)
@@ -83,14 +95,21 @@ if ($page_count > 1) {
 	}
 }
 else {
+	$page_name = 'page_1';
+	$page_height = $data['page_sizes'][0] + HEADER_TITLE_HEIGHT + PAGE_MARGIN;
+
+	$page_styles .= '@page '.$page_name.' { size: '.PAGE_WIDTH.'px '.$page_height.'px; } ';
+	$page_styles .= '.'.$page_name.' { page: ' . $page_name.'; } ';
+
 	(new CDiv())
 		->addClass('dashboard-page page_1')
-		->setAttribute('data-height', $data['page_sizes'][0])
 		->addItem(
 			(new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID)
 		)
 		->show();
 }
+
+(new CTag('style', true, $page_styles))->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
