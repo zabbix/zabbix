@@ -317,7 +317,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		}
 		$this->zbxTestTextNotPresent('Additional parameters');
 		$this->zbxTestAssertNotVisibleId('params_ap');
-		$layout = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
+		$form_discovery = $this->query('id:host-discovery-form')->asForm()->waitUntilVisible()->one();
 
 		if ($type == 'SSH agent' || $type == 'TELNET agent' ) {
 			$this->zbxTestTextPresent('Executed script');
@@ -397,7 +397,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				"\nwalk[OID1,OID2,...] - to retrieve a subtree".
 				"\ndiscovery[{#MACRO1},OID1,{#MACRO2},OID2,...] - (legacy) to retrieve a subtree in JSON";
 
-			$layout->getLabel('SNMP OID')->query('xpath:./button[@data-hintbox]')->one()->click();
+			$form_discovery->getLabel('SNMP OID')->query('xpath:./button[@data-hintbox]')->one()->click();
 			$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
 			$this->assertEquals($hint_text, $hint->one()->getText());
 			$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
