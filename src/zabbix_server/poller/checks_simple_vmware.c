@@ -1081,7 +1081,7 @@ static unsigned char	level_str_to_mask(const char *level_str)
 			break;
 	}
 
-	return (1 << i);
+	return (unsigned char)(1 << i);
 }
 
 /******************************************************************************
