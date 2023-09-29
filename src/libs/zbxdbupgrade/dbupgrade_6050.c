@@ -1690,7 +1690,7 @@ static void	DBpatch_6050139_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 		}
 	}
 
-	while (0 < interval->values_num)	/* columns.time_from.N */
+	while (0 < interval->values_num)	/* columns.N.time_from */
 	{
 		int			n;
 		const char		*shift, *sign_shift = "+", *sign_interv = "-";
@@ -1713,7 +1713,7 @@ static void	DBpatch_6050139_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 		zbx_vector_wiget_field_remove_noorder(interval, interval->values_num - 1);
 	}
 
-	while (0 < timeshift->values_num)	/* columns.time_to.N */
+	while (0 < timeshift->values_num)	/* columns.N.time_to */
 	{
 		const char		*sign_shift = "+";
 		zbx_wiget_field_t	*val = timeshift->values[timeshift->values_num - 1];
@@ -1735,9 +1735,10 @@ static int	DBpatch_6050139_load(zbx_vector_wiget_field_t *time_from, zbx_vector_
 	zbx_vector_wiget_field_t	timeshift, interval, aggr_func;
 
 	if (NULL == (result = zbx_db_select("select widget_fieldid,widgetid,name,value_str,value_int from widget_field"
-				" where name like 'columns.timeshift.%%'"
-					" or name like 'columns.aggregate_interval.%%'"
-					" or name like 'columns.aggregate_function.%%'")))
+				" where name like 'columns.%%.timeshift'"
+					" or name like 'columns.%%.aggregate_interval'"
+					" or name like 'columns.%%.aggregate_function'"
+					" and widgetid in (select widgetid from widget where type='tophosts')")))
 	{
 		return FAIL;
 	}
@@ -1750,28 +1751,35 @@ static int	DBpatch_6050139_load(zbx_vector_wiget_field_t *time_from, zbx_vector_
 	{
 		zbx_wiget_field_t	*val;
 		const char		*name;
+		int			l;
 
 		val = (zbx_wiget_field_t *) zbx_malloc(NULL, sizeof(zbx_wiget_field_t));
 
 		ZBX_STR2UINT64(val->wfid, row[0]);
 		ZBX_STR2UINT64(val->wid, row[1]);
 		name = row[2];
+		l = strlen(name);
 		val->value_str = zbx_strdup(NULL, row[3]);
 		val->value_int = atoi(row[4]);
 
-		if ('t' == name[ZBX_CONST_STRLEN("columns.")])
+		if ('t' == name[l - 1])
 		{
-			val->name = zbx_strdup(NULL, &name[ZBX_CONST_STRLEN("columns.timeshift")]);
+			val->name = zbx_dsprintf(NULL, "%.*s", (int)(l - ZBX_CONST_STRLEN("columns" "timeshift")),
+					&name[ZBX_CONST_STRLEN("columns")]);
 			zbx_vector_wiget_field_append(&timeshift, val);
 		}
-		else if  ('i' == name[ZBX_CONST_STRLEN("columns.aggregate_")])
+		else if  ('l' == name[l - 1])
 		{
-			val->name = zbx_strdup(NULL, &name[ZBX_CONST_STRLEN("columns.aggregate_interval")]);
+			val->name = zbx_dsprintf(NULL, "%.*s",
+					(int)(l - ZBX_CONST_STRLEN("columns" "aggregate_interval")),
+					&name[ZBX_CONST_STRLEN("columns")]);
 			zbx_vector_wiget_field_append(&interval, val);
 		}
 		else
 		{
-			val->name = zbx_strdup(NULL, &name[ZBX_CONST_STRLEN("columns.aggregate_function")]);
+			val->name = zbx_dsprintf(NULL, "%.*s",
+					(int)(l - ZBX_CONST_STRLEN("columns" "aggregate_function")),
+					&name[ZBX_CONST_STRLEN("columns")]);
 			zbx_vector_wiget_field_append(&aggr_func, val);
 		}
 	}
@@ -1812,7 +1820,7 @@ static int	DBpatch_6050139_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 		zbx_wiget_field_t	*val = time_from->values[i];
 		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-		zbx_snprintf(name, sizeof(name), "columns.time_from%s", val->name);
+		zbx_snprintf(name, sizeof(name), "columns%stime_from", val->name);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update widget_field"
 				" set value_str='%s',name='%s'"
@@ -1826,7 +1834,7 @@ static int	DBpatch_6050139_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 		zbx_wiget_field_t	*val = time_to->values[i];
 		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-		zbx_snprintf(name, sizeof(name), "columns.time_to%s", val->name);
+		zbx_snprintf(name, sizeof(name), "columns%stime_to", val->name);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update widget_field"
 				" set value_str='%s',name='%s'"
@@ -1864,7 +1872,7 @@ static int	DBpatch_6050139_insert(zbx_vector_wiget_field_t *time_from)
 		zbx_wiget_field_t	*val = time_from->values[i];
 		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-		zbx_snprintf(name, sizeof(name), "columns.item_time%s", val->name);
+		zbx_snprintf(name, sizeof(name), "columns%sitem_time", val->name);
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), val->wid, 0, name, 1);
 	}
 
