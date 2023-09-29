@@ -960,12 +960,12 @@ zabbix_export:
           delay: 1h
           filter:
             conditions:
-              - macro: '{#SNMPINDEX}'
-                value: 0\.1
-                formulaid: B
               - macro: '{#SENSOR_LOCALE}'
                 value: '11'
                 formulaid: A
+              - macro: '{#SNMPINDEX}'
+                value: 0\.1
+                formulaid: B
           description: |
             Scanning table of Temperature Sensor Entries:
             CPQHLTH-MIB::cpqHeTemperatureTable with ambient(11) and 0.1 index filter

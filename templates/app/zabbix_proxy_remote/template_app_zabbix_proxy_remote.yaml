@@ -1291,30 +1291,39 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Remote Zabbix proxy health'
                         name: 'Remote Zabbix proxy: Zabbix proxy performance'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Remote Zabbix proxy health'
-                        name: 'Remote Zabbix proxy: Zabbix data gathering process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Remote Zabbix proxy health'
                         name: 'Remote Zabbix proxy: Zabbix internal process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Remote Zabbix proxy health'
+                        name: 'Remote Zabbix proxy: Zabbix data gathering process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -1322,10 +1331,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Remote Zabbix proxy health'
                         name: 'Remote Zabbix proxy: Zabbix cache usage, % used'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
   graphs:
     - uuid: 4cc55dd64cab48cc92fbde98135d7f7f
       name: 'Remote Zabbix proxy: Zabbix cache usage, % used'

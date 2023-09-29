@@ -34,7 +34,7 @@
 function makeStepResult(step) {
 	if (typeof step.error !== 'undefined') {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(_('<empty string>')) ?>}
+			{error: step.error || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
 		));
 	}
 	else if (typeof step.result === 'undefined' || step.result === null) {
@@ -494,16 +494,16 @@ jQuery(document).ready(function($) {
 		rows: 0
 	});
 
+	$('#not_supported').on('change', function() {
+		const $form = $('#preprocessing-test-form');
+
+		$('#value', $form).multilineInput(this.checked ? 'setReadOnly' : 'unsetReadOnly');
+		$('#runtime_error', $form).length && $('#runtime_error', $form).multilineInput(
+			this.checked && !$('[name="get_value"]', $form).is(':checked') ? 'unsetReadOnly' : 'setReadOnly'
+		);
+	});
+
 	<?php if ($data['is_item_testable']): ?>
-		$('#not_supported').on('change', function() {
-			const $form = $('#preprocessing-test-form');
-
-			$('#value', $form).multilineInput(this.checked ? 'setReadOnly' : 'unsetReadOnly');
-			$('#runtime_error').length && $('#runtime_error', $form).multilineInput(
-				this.checked && !$('[name="get_value"]', $form).is(':checked') ? 'unsetReadOnly' : 'setReadOnly'
-			);
-		});
-
 		$('#get_value').on('change', function() {
 			var $rows = $('.js-host-address-row, .js-proxy-hostid-row, .js-get-value-row, [class*=js-popup-row-snmp]'),
 				$form = $('#preprocessing-test-form'),

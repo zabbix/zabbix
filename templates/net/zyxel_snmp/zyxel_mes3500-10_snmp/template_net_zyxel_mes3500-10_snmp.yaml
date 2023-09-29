@@ -368,13 +368,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#ZYXEL.IF.NAME}'
-                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
-                formulaid: C
-              - macro: '{#ZYXEL.IF.NAME}'
-                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#ZYXEL.IF.LINKUPTYPE}'
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.MATCHES}'
                 formulaid: A
@@ -382,6 +375,13 @@ zabbix_export:
                 value: '{$ZYXEL.LLD.FILTER.IF.LINKUPTYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#ZYXEL.IF.NAME}'
+                value: '{$ZYXEL.LLD.FILTER.IF.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           item_prototypes:
             - uuid: d300b380e4bc44f89ac7a40083d424ed
               name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Administrative status'
@@ -1348,14 +1348,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'ZYXEL MES3500-10 by SNMP'
                         name: 'ZYXEL MES3500-10: Port {#SNMPINDEX}: Traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                    - type: INTEGER
+                      name: rows
+                      value: '5'
       valuemaps:
         - uuid: 7ad9362759b542d98a67796dd13fc5d4
           name: 'SNMP available'

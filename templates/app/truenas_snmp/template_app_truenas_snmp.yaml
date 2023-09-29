@@ -1090,27 +1090,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '@Network interfaces for discovery'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -1118,6 +1097,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '@Network interfaces for discovery'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -2275,31 +2275,26 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: Memory utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: Memory usage'
-                - type: graph
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'TrueNAS by SNMP'
-                        name: 'TrueNAS: Swap usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -2308,14 +2303,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: CPU usage{#SINGLETON}'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graphprototype
                   'y': '15'
                   width: '12'
@@ -2324,14 +2319,41 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: CPU utilization{#SINGLETON}'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                - type: graph
+                  'y': '20'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'TrueNAS by SNMP'
+                        name: 'TrueNAS: CPU jumps'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
+                - type: graph
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'TrueNAS by SNMP'
+                        name: 'TrueNAS: Swap usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graph
                   x: '12'
                   'y': '15'
@@ -2339,20 +2361,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: System load'
-                - type: graph
-                  'y': '20'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'TrueNAS by SNMP'
-                        name: 'TrueNAS: CPU jumps'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
             - name: Disks
               widgets:
                 - type: graphprototype
@@ -2362,14 +2377,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: [{#DEVNAME}]: Read/write rates'
+                    - type: STRING
+                      name: reference
+                      value: AAAAH
                 - type: graphprototype
                   'y': '5'
                   width: '24'
@@ -2378,14 +2393,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: Disk [{#DISK_NAME}]: Temperature'
+                    - type: STRING
+                      name: reference
+                      value: AAAAI
             - name: ZFS
               widgets:
                 - type: graph
@@ -2393,10 +2408,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: ARC hit ratio'
+                    - type: STRING
+                      name: reference
+                      value: AAAAJ
                 - type: graphprototype
                   'y': '5'
                   width: '24'
@@ -2405,14 +2423,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: Pool [{#POOLNAME}]: Space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAK
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -2421,14 +2439,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: Pool [{#POOLNAME}]: Read/write rates'
+                    - type: STRING
+                      name: reference
+                      value: AAAAL
                 - type: graphprototype
                   'y': '15'
                   width: '24'
@@ -2437,14 +2455,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: ZFS volume [{#ZVOL_NAME}]: Space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAM
                 - type: graphprototype
                   'y': '20'
                   width: '24'
@@ -2453,14 +2471,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: Dataset [{#DATASET_NAME}]: Space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAN
             - name: 'Network interfaces'
               widgets:
                 - type: graphprototype
@@ -2470,14 +2488,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TrueNAS by SNMP'
                         name: 'TrueNAS: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAO
       valuemaps:
         - uuid: 1ce70fc8edf2449ea6a0c687f359441a
           name: 'FREENAS-MIB::ZPoolHealthType'

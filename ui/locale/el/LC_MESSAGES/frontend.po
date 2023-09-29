@@ -1377,6 +1377,10 @@ msgstr ""
 msgid "Annually"
 msgstr ""
 
+#: jsLoader.php:201
+msgid "Another widget is used as data source."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
 #: app/views/administration.module.list.php:53
@@ -5891,6 +5895,10 @@ msgid_plural "Dashboards deleted"
 msgstr[0] ""
 msgstr[1] ""
 
+#: jsLoader.php:200
+msgid "Dashboard is used as data source."
+msgstr ""
+
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
 msgstr ""
@@ -8558,6 +8566,10 @@ msgstr ""
 #: app/controllers/CControllerDashboardShareUpdate.php:110
 #: app/views/js/popup.dashboard.share.edit.js.php:83
 msgid "Failed to update dashboard sharing."
+msgstr ""
+
+#: jsLoader.php:128
+msgid "Failed to update time selector."
 msgstr ""
 
 #: jsLoader.php:141
@@ -14470,6 +14482,14 @@ msgstr ""
 msgid "New template group"
 msgstr ""
 
+#: app/views/trigger.edit.php:144
+msgid "New trigger"
+msgstr ""
+
+#: app/views/trigger.prototype.edit.php:143
+msgid "New trigger prototype"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr ""
@@ -14565,6 +14585,10 @@ msgstr "Δεν καθορίστηκε όνομα χρήστη αυθεντικό
 
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
+msgstr ""
+
+#: jsLoader.php:194
+msgid "No compatible widgets."
 msgstr ""
 
 #: app/views/configuration.correlation.edit.php:56
@@ -15800,6 +15824,10 @@ msgstr "Επικαλυπτόμενο με"
 
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
+msgstr ""
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
+msgid "Override host"
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:128
@@ -18030,6 +18058,10 @@ msgstr ""
 #: include/classes/api/services/CDashboardGeneral.php:630
 #, c-format
 msgid "SLA with ID \"%1$s\" is not available."
+msgstr ""
+
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
+msgid "SLAs"
 msgstr ""
 
 #: app/partials/service.info.php:61
@@ -23487,6 +23519,13 @@ msgstr ""
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:83
 msgid "When active"
 msgstr "Όταν είναι ενεργά"
+
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:59
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:96
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
+#: jsLoader.php:195 jsLoader.php:199
+msgid "Widget"
+msgstr ""
 
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format

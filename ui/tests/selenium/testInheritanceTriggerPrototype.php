@@ -19,6 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -36,10 +37,19 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	private $discoveryRuleId = 15011;	// 'testInheritanceDiscoveryRule'
 	private $discoveryRule = 'testInheritanceDiscoveryRule';
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
+	}
+
 	// Returns update data
 	public static function update() {
 		return CDBHelper::getDataProvider(
-			'SELECT DISTINCT t.triggerid,id.parent_itemid'.
+			'SELECT DISTINCT t.description,id.parent_itemid'.
 			' FROM triggers t,functions f,item_discovery id'.
 			' WHERE t.triggerid=f.triggerid'.
 				' AND f.itemid=id.itemid'.
@@ -62,9 +72,11 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 		$sqlTriggers = 'SELECT * FROM triggers ORDER BY triggerid';
 		$oldHashTriggers = CDBHelper::getHash($sqlTriggers);
 
-		$this->zbxTestLogin('trigger_prototypes.php?form=update&context=host&triggerid='.$data['triggerid'].
-				'&parent_discoveryid='.$data['parent_itemid']);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.$data['parent_itemid']);
+		$this->zbxTestClickLinkTextWait($data['description']);
+		COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->query('button:Update')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 		$this->zbxTestTextPresent('Trigger prototype updated');
 
@@ -86,10 +98,8 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_BAD,
 					'description' => 'testInheritanceTriggerPrototype1',
 					'expression' => 'last(/Inheritance test template/key-item-inheritance-test)=0',
-					'errors' => [
-						'Cannot add trigger prototype',
-						'Trigger prototype "testInheritanceTriggerPrototype1" must contain at least one item prototype.'
-					]
+					'title' => 'Cannot add trigger prototype',
+					'errors' => 'Trigger prototype "testInheritanceTriggerPrototype1" must contain at least one item prototype.'
 				]
 			]
 		];
@@ -100,16 +110,17 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 	 */
 	public function testInheritanceTriggerPrototype_SimpleCreate($data) {
 
-		$this->zbxTestLogin('trigger_prototypes.php?form=Create+trigger+prototype&context=host&parent_discoveryid='.
+		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&context=host&parent_discoveryid='.
 				$this->discoveryRuleId);
-
-		$this->zbxTestInputTypeByXpath("//input[@name='description']", $data['description']);
+		$this->zbxTestContentControlButtonClickTextWait('Create trigger prototype');
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$this->zbxTestInputTypeByXpath("//input[@name='name']", $data['description']);
 		$this->zbxTestInputType('expression', $data['expression']);
-
-		$this->zbxTestClickWait('add');
+		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$dialog->ensureNotPresent();
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 				$this->zbxTestCheckHeader('Trigger prototypes');
 				$this->zbxTestTextPresent('Trigger prototype added');
@@ -119,7 +130,7 @@ class testInheritanceTriggerPrototype extends CLegacyWebTest {
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Configuration of trigger prototypes');
 				$this->zbxTestCheckHeader('Trigger prototypes');
-				$this->zbxTestTextPresent($data['errors']);
+				$this->assertMessage(TEST_BAD, $data['title'], $data['errors']);
 				break;
 		}
 	}
