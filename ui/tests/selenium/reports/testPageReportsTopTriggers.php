@@ -382,6 +382,11 @@ class testPageReportsTopTriggers extends CWebTest {
 				'name' => 'Problem Warning',
 				'time' => self::$time - 691200, // now - 8 days.
 				'problem_count' => '1'
+			],
+			[
+				'name' => 'Not classified ❌',
+				'time' => self::$time - 14465000, // now - approximately 5.5 months.
+				'problem_count' => '1'
 			]
 		];
 
@@ -1029,6 +1034,25 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			[
+				[
+					'date' => [
+						'from' => date('Y-m-d H:i', time() - 15780000), // 6 month from now.
+						'to' => date('Y-m-d H:i', time() - 13150000) // 5 month from now.
+					],
+					'expected' => [
+						[
+							'Host' => 'Host with triggers that contains special characters or macro',
+							'Trigger' => 'Not classified ❌',
+							'Severity' => 'Not classified',
+							'Number of problems' => '1'
+						]
+					],
+					'background_color' => [
+						'Not classified ❌' => 'na-bg'
+					]
+				]
+			],
 			// Search by custom time period and without expected data.
 			[
 				[
@@ -1160,6 +1184,8 @@ class testPageReportsTopTriggers extends CWebTest {
 
 				$filter->query('id', 'apply')->one()->click();
 			}
+
+			$filter->waitUntilReloaded();
 		}
 		else {
 			$filter_form->submit();
