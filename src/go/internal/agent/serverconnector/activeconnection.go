@@ -55,16 +55,16 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []er
 		return upload, []error{err}
 	}
 
+	if response.HistoryUpload == "disabled" {
+		upload = false
+	}
+
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
 			return upload, []error{fmt.Errorf("%s", response.Info)}
 		}
 
 		return upload, []error{errors.New("unsuccessful response")}
-	}
-
-	if response.HistoryUpload == "disabled" {
-		upload = false
 	}
 
 	return upload, nil

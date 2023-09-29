@@ -118,12 +118,18 @@ zbx_status_section_t;
 static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		int config_timeout)
 {
-	char	*info = NULL;
+	char	*info = NULL, *ext = NULL;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		ext = "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\"" ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}";
+		info = zbx_strdup(info, "data collection is paused");
+		ret = FAIL;
+	}
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -137,11 +143,6 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
 
 	zbx_process_command_results(jp);
-
-	char	*ext = NULL;
-
-	if (SUCCEED == zbx_vps_monitor_capped())
-		ext = "{\"" ZBX_PROTO_TAG_HISTORY_UPLOAD "\":\"" ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED "\"}";
 
 	zbx_send_response_json(sock, ret, info, NULL, sock->protocol, config_timeout, ext);
 

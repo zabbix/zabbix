@@ -74,7 +74,11 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	if timeout > 60 {
 		timeout = 60
 	}
-	if upload, errs := u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
+	var (
+		upload bool
+		errs   []error
+	)
+	if upload, errs = u.Write(data, time.Duration(timeout)*time.Second); errs != nil {
 		if !reflect.DeepEqual(errs, c.lastErrors) {
 			for i := 0; i < len(errs); i++ {
 				c.Warningf("%s", errs[i])
@@ -84,9 +88,9 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		}
 
 		return errors.New("history upload failed")
-	} else {
-		c.EnableUpload(upload)
 	}
+
+	c.EnableUpload(upload)
 
 	if c.lastErrors != nil {
 		c.Warningf("history upload to [%s] [%s] is working again", u.Addr(), u.Hostname())
