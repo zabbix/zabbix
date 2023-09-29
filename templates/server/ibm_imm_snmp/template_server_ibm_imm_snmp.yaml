@@ -831,17 +831,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
                     - type: ITEM_PROTOTYPE
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'IBM IMM by SNMP'
                         key: 'sensor.temp.value[tempReading.{#SNMPINDEX}]'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                    - type: INTEGER
+                      name: source_type
+                      value: '3'
                 - type: graphprototype
                   'y': '4'
                   width: '24'
@@ -850,17 +850,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
                     - type: ITEM_PROTOTYPE
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'IBM IMM by SNMP'
                         key: 'sensor.temp.value[tempReading.Ambient.{#SNMPINDEX}]'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                    - type: INTEGER
+                      name: source_type
+                      value: '3'
                 - type: graphprototype
                   'y': '8'
                   width: '24'
@@ -869,17 +869,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
                     - type: ITEM_PROTOTYPE
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'IBM IMM by SNMP'
                         key: 'sensor.temp.value[tempReading.CPU.{#SNMPINDEX}]'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                    - type: INTEGER
+                      name: source_type
+                      value: '3'
             - name: Fan
               widgets:
                 - type: graphprototype
@@ -889,17 +889,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
                     - type: ITEM_PROTOTYPE
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'IBM IMM by SNMP'
                         key: 'sensor.fan.speed.percentage[fanSpeed.{#SNMPINDEX}]'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
+                    - type: INTEGER
+                      name: source_type
+                      value: '3'
       valuemaps:
         - uuid: 61bded84be1d419083d8bd8a8bd25152
           name: 'IMM-MIB::systemHealthStat'

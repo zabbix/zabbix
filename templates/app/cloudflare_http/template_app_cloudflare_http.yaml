@@ -730,50 +730,65 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Bandwidth'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: DNS requests'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: HTTP responses ratio over time'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
                 - type: graph
                   'y': '15'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: HTTP response codes over time'
+                    - type: STRING
+                      name: reference
+                      value: AAAAG
                 - type: graph
                   x: '12'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Web requests'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -781,10 +796,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: Caching'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graph
                   x: '12'
                   'y': '10'
@@ -792,10 +810,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Cloudflare by HTTP'
                         name: 'Cloudflare: IPs and threats'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
   graphs:
     - uuid: 09e113216680490c9dd15805474bcac7
       name: 'Cloudflare: Bandwidth'

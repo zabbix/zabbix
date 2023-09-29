@@ -1387,16 +1387,32 @@ zabbix_export:
             - name: 'APC Smart-UPS 3000 XLM: General'
               widgets:
                 - type: graph
+                  name: Voltage
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'APC Smart-UPS 3000 XLM by SNMP'
+                        name: 'APC Smart-UPS 3000 XLM: Voltage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
+                - type: graph
                   name: 'Capacity of the UPS batteries'
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'APC Smart-UPS 3000 XLM by SNMP'
                         name: 'APC Smart-UPS 3000 XLM: Capacity of the UPS batteries'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graph
                   name: Output
                   x: '12'
@@ -1404,20 +1420,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'APC Smart-UPS 3000 XLM by SNMP'
                         name: 'APC Smart-UPS 3000 XLM: Output'
-                - type: graph
-                  name: Voltage
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'APC Smart-UPS 3000 XLM by SNMP'
-                        name: 'APC Smart-UPS 3000 XLM: Voltage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: 55fecbd639c44c328b4199569a7305ef
           name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'

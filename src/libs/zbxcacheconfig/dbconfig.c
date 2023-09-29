@@ -61,6 +61,7 @@ int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
 #define ZBX_SNMP_OID_TYPE_WALK		3
+#define ZBX_SNMP_OID_TYPE_GET		4
 
 /* trigger is functional unless its expression contains disabled or not monitored items */
 #define TRIGGER_FUNCTIONAL_TRUE		0
@@ -310,7 +311,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 
 			return ZBX_POLLER_TYPE_AGENT;
 		case ITEM_TYPE_SNMP:
-			if (ZBX_SNMP_OID_TYPE_WALK == snmp_oid_type)
+			if (ZBX_SNMP_OID_TYPE_WALK == snmp_oid_type || ZBX_SNMP_OID_TYPE_GET == snmp_oid_type)
 			{
 				if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_SNMP_POLLER))
 					break;
@@ -382,8 +383,11 @@ static zbx_uint64_t	get_item_nextcheck_seed(zbx_uint64_t itemid, zbx_uint64_t in
 
 		if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
 		{
-			if (ZBX_SNMP_OID_TYPE_WALK == snmpitem->snmp_oid_type)
+			if (ZBX_SNMP_OID_TYPE_WALK == snmpitem->snmp_oid_type ||
+					ZBX_SNMP_OID_TYPE_GET == snmpitem->snmp_oid_type)
+			{
 				return itemid;
+			}
 		}
 
 		if (NULL == (snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &interfaceid))
@@ -2549,11 +2553,11 @@ static void	dc_preprocitem_free(ZBX_DC_PREPROCITEM *preprocitem)
 	__config_shmem_free_func(preprocitem);
 }
 
-static const char	*dc_get_global_item_type_timeout(const ZBX_DC_ITEM *item)
+static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 {
 	const char	*global_timeout;
 
-	switch (item->type)
+	switch (item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_ZABBIX_ACTIVE:
@@ -2589,6 +2593,21 @@ static const char	*dc_get_global_item_type_timeout(const ZBX_DC_ITEM *item)
 	}
 
 	return global_timeout;
+}
+
+char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type)
+{
+	const char	*cached_tmt;
+	char		*tmt;
+
+	RDLOCK_CACHE;
+
+	cached_tmt = dc_get_global_item_type_timeout(item_type);
+	tmt = zbx_strdup(NULL, cached_tmt);
+
+	UNLOCK_CACHE;
+
+	return tmt;
 }
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
@@ -2820,8 +2839,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 			if (SUCCEED == dc_strpool_replace(found, &snmpitem->snmp_oid, row[6]))
 			{
-				if (0 == strncmp(snmpitem->snmp_oid, "walk[", 5))
+				if (0 == strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_WALK;
+				else if (0 == strncmp(snmpitem->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_GET;
 				else if (NULL != strchr(snmpitem->snmp_oid, '{'))
 					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
 				else if (NULL != strchr(snmpitem->snmp_oid, '['))
@@ -9070,7 +9091,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	DCget_interface(&dst_item->interface, dc_interface);
 
 	if ('\0' == *src_item->timeout)
-		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item));
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
 	else
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
 
@@ -9086,7 +9107,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				if ('\0' != *src_item->timeout &&
 						0 != strncmp(snmpitem->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 				{
-					zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item));
+					zbx_strscpy(dst_item->timeout_orig,
+							dc_get_global_item_type_timeout(src_item->type));
 				}
 
 				zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
@@ -15671,6 +15693,8 @@ void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *ne
 				dheck_out->uniq = dcheck->uniq;
 				dheck_out->type = dcheck->type;
 				dheck_out->allow_redirect = dcheck->allow_redirect;
+				dheck_out->timeout_str = NULL;
+				dheck_out->timeout_sec = 0;
 
 				if (SVC_SNMPv1 == dheck_out->type || SVC_SNMPv2c == dheck_out->type ||
 						SVC_SNMPv3 == dheck_out->type)

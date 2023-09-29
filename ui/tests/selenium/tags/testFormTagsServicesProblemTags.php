@@ -35,7 +35,6 @@ class testFormTagsServicesProblemTags extends testFormTags {
 	public $clone_name = 'Service with tags for cloning';
 	public $remove_name = 'Service for removing tags';
 	public $link = 'zabbix.php?action=service.list.edit';
-	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
 
 	public function getCreateProblemTagsData() {
 		return [

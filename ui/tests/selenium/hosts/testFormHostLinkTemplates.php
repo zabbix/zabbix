@@ -95,7 +95,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent($template.':');
 		// using "host navigation bar" at the top of entity list
-		$this->zbxTestHrefClickWait('triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
@@ -153,7 +153,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent($template.':');
 
-		$this->zbxTestHrefClickWait('triggers.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
+		$this->zbxTestHrefClickWait('zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
 		$this->zbxTestHrefClickWait('graphs.php?filter_set=1&filter_hostids%5B0%5D='.$hostid);
 		$this->zbxTestTextNotPresent($template.':');
