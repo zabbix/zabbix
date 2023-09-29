@@ -495,6 +495,14 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		goto out;
 	}
 
+	if (FAIL != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, tmp, sizeof(tmp), NULL) &&
+			0 == strcmp(tmp, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+	}
+	else
+		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
+
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		if (0 != *config_revision_local)
@@ -515,14 +523,6 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		zbx_vector_active_command_ptr_clear_ext(&active_commands, free_active_command);
 		zbx_vector_command_result_ptr_clear_ext(&command_results, free_command_result);
 	}
-
-	if (FAIL != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, tmp, sizeof(tmp), NULL) &&
-			0 == strcmp(tmp, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
-	{
-		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
-	}
-	else
-		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
 
 	*config_revision_local = config_revision;
 
