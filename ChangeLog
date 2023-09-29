@@ -1,8 +1,14 @@
 Changes for 7.0.0alpha6
 
 New features:
+A.F....PS. [ZBXNEXT-8645] added get[oid] to retrieve single value asynchronously (agriscenko, vso)
 
 Bug fixes:
+..F.....S. [ZBX-23301] removed checks for PostgreSQL-TimescaleDB versions combination (dimir)
+..F....... [ZBX-23454] fixed runtime errors while resolving macros in the trigger URL name (Sasha)
+...G...... [ZBX-22735] fixed confusing error message on user parameter reload in Zabbix agent 2 (rzvejs)
+.......PS. [ZBX-23477] fixed item test failures due to timeout error (dgoloscapov)
+........S. [ZBX-23154] stopped running housekeeper TimescaleDB 'drop_chunks' query on history_bin table (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0alpha5
