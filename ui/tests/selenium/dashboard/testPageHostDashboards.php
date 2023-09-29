@@ -29,6 +29,7 @@ class testPageHostDashboards extends CWebTest {
 
 	protected const HOST_NAME = 'Host for Host Dashboards';
 	protected const TEMPLATE_NAME = 'Template for '.self::HOST_NAME;
+	protected const COUNT_MANY = 20;
 
 	public function prepareHostDashboardsData() {
 		$data = [
@@ -59,8 +60,33 @@ class testPageHostDashboards extends CWebTest {
 				]
 			]
 		];
-
 		$this->createHostWithDashboards($data);
+
+		// Create a Host with many Dashboards and another Host with many Pages.
+		$dashboard_array = [];
+		$page_array = [];
+
+		for ($i = 1; $i <= self::COUNT_MANY; $i++) {
+			$dashboard_array[] = ['name' => 'Dashboard '.$i];
+			$page_array[] = ['name' => 'Page '.$i];
+		}
+
+		$data_dashboards = [
+			'host_name' => 'Many Dashboards',
+			'dashboards' => $dashboard_array
+		];
+		$this->createHostWithDashboards($data_dashboards);
+
+		$data_pages = [
+			'host_name' => 'Many Pages',
+			'dashboards' => [
+				[
+					'name' => 'Dashboard 1',
+					'pages' => $page_array
+				]
+			]
+		];
+		$this->createHostWithDashboards($data_pages);
 	}
 
 	/**
@@ -204,7 +230,7 @@ class testPageHostDashboards extends CWebTest {
 		);
 	}
 
-	public function getCheckNavigationData() {
+	public function getCheckNavigationTabsData() {
 		return [
 			[
 				[
@@ -281,38 +307,16 @@ class testPageHostDashboards extends CWebTest {
 						]
 					]
 				]
-			],
-			[
-				[
-					'host_name' => 'Many Dashboards',
-					'dashboards' => [
-						['name' => 'Dashboard 1'],
-						['name' => 'Dashboard 2'],
-						['name' => 'Dashboard 3'],
-						['name' => 'Dashboard 4'],
-						['name' => 'Dashboard 5'],
-						['name' => 'Dashboard 6'],
-						['name' => 'Dashboard 7'],
-						['name' => 'Dashboard 8'],
-						['name' => 'Dashboard 9'],
-						['name' => 'Dashboard 10'],
-						['name' => 'Dashboard 11'],
-						['name' => 'Dashboard 12'],
-						['name' => 'Dashboard 13'],
-						['name' => 'Dashboard 14'],
-						['name' => 'Dashboard 15']
-					]
-				]
 			]
 		];
 	}
 
 	/**
-	 * Check Dashboard Tab navigation.
+	 * Check Dashboard and Page navigation using tabs.
 	 *
-	 * @dataProvider getCheckNavigationData
+	 * @dataProvider getCheckNavigationTabsData
 	 */
-	public function testPageHostDashboards_CheckNavigation($data) {
+	public function testPageHostDashboards_CheckNavigationTabs($data) {
 		// Create the required entities in database.
 		$api_dashboards = $this->createHostWithDashboards($data);
 
@@ -342,9 +346,7 @@ class testPageHostDashboards extends CWebTest {
 			// It is expected that in every page there will be a Widget named like so: 'Dashboard 1 - Page 2 widget'.
 			if (count($dashboard['pages']) === 1) {
 				// Case when there is only one Page. The Page button is not even visible.
-				$this->assertTrue($this->query('xpath://h4[text()='.
-						CXPathHelper::escapeQuotes(
-						$this->widgetName($dashboard['name'], $dashboard['pages'][0]['name'])).']')->exists());
+				$this->checkDashboardOpen($dashboard);
 			}
 			else {
 				// When a Dashboard contains several Pages.
@@ -360,13 +362,10 @@ class testPageHostDashboards extends CWebTest {
 						$this->page->waitUntilReady();
 					}
 
-					// Assert the widget name.
-					$this->assertTrue($this->query('xpath://h4[text()='.
-							CXPathHelper::escapeQuotes($this->widgetName($dashboard['name'], $page['name'])).']')->exists());
+					// Assert that the Dashboard has opened.
+					$this->checkDashboardOpen($dashboard, $page);
 				}
 			}
-
-
 		}
 
 		// Assert the Dashboard dropdown.
@@ -375,6 +374,86 @@ class testPageHostDashboards extends CWebTest {
 		$popup_menu = $list_button->asPopupButton()->getMenu();
 		$this->assertEquals(array_column($api_dashboards, 'name'), $popup_menu->getItems()->asText());
 		$popup_menu->close();
+	}
+
+	/**
+	 * Check Dashboard navigation using the buttons.
+	 */
+	public function testPageHostDashboards_CheckNavigationDashboardButtons() {
+		$this->openDashboardsForHost('Many Dashboards');
+
+		$prev = $this->query('class:btn-host-dashboard-previous-dashboard')->one();
+		$next = $this->query('class:btn-host-dashboard-next-dashboard')->one();
+
+		// Cycle Dashboards in forward direction (by using the > button).
+		for ($i = 1; $i <= self::COUNT_MANY; $i++) {
+			$this->checkDashboardOpen(['name' => 'Dashboard '.$i], ['name' => 'Page 1']);
+
+			//Assert if enabled/disabled correctly.
+			$this->assertEquals($i > 1, $prev->isEnabled());
+			$this->assertEquals($i < self::COUNT_MANY, $next->isEnabled());
+
+			// Only switch the Dashboard if it is not the last one.
+			if ($i !== self::COUNT_MANY) {
+				$next->click();
+				$this->page->waitUntilReady();
+			}
+		}
+
+		// Cycle Dashboards in backward direction (by using the < button).
+		for ($i = self::COUNT_MANY; $i >= 1; $i--) {
+			$this->checkDashboardOpen(['name' => 'Dashboard '.$i], ['name' => 'Page 1']);
+
+			//Assert if enabled/disabled correctly.
+			$this->assertEquals($i > 1, $prev->isEnabled());
+			$this->assertEquals($i < self::COUNT_MANY, $next->isEnabled());
+
+			// Only switch the Dashboard if it is not the first one.
+			if ($i !== 1) {
+				$prev->click();
+				$this->page->waitUntilReady();
+			}
+		}
+	}
+
+	/**
+	 * Check Dashboard Page navigation using the buttons.
+	 */
+	public function testPageHostDashboards_CheckNavigationPageButtons() {
+		$this->openDashboardsForHost('Many Pages');
+
+		$prev = $this->query('class:btn-dashboard-previous-page')->one();
+		$next = $this->query('class:btn-dashboard-next-page')->one();
+
+		// Cycle Pages in forward direction (by using the > button).
+		for ($i = 1; $i <= self::COUNT_MANY; $i++) {
+			$this->checkDashboardOpen(['name' => 'Dashboard 1'], ['name' => 'Page '.$i]);
+
+			//Assert if enabled/disabled correctly.
+			$this->assertEquals($i > 1, $prev->isEnabled());
+			$this->assertEquals($i < self::COUNT_MANY, $next->isEnabled());
+
+			// Only switch the Dashboard if it is not the last one.
+			if ($i !== self::COUNT_MANY) {
+				$next->click();
+				$this->page->waitUntilReady();
+			}
+		}
+
+		// Cycle Pages in backward direction (by using the < button).
+		for ($i = self::COUNT_MANY; $i >= 1; $i--) {
+			$this->checkDashboardOpen(['name' => 'Dashboard 1'], ['name' => 'Page '.$i]);
+
+			//Assert if enabled/disabled correctly.
+			$this->assertEquals($i > 1, $prev->isEnabled());
+			$this->assertEquals($i < self::COUNT_MANY, $next->isEnabled());
+
+			// Only switch the Dashboard if it is not the first one.
+			if ($i !== 1) {
+				$prev->click();
+				$this->page->waitUntilReady();
+			}
+		}
 	}
 
 	/**
@@ -392,7 +471,7 @@ class testPageHostDashboards extends CWebTest {
 	/**
 	 * Creates a Template with required Dashboards using API and assigns it to a new Host.
 	 *
-	 * @param $data    data from data provider
+	 * @param $data      data from data provider
 	 *
 	 * @returns array    dashboard data, that was actually sent to the API (with the defaults set)
 	 */
@@ -472,7 +551,7 @@ class testPageHostDashboards extends CWebTest {
 
 	/**
 	 * Create a widget name from the dashboard and page name.
-	 * The name is used for making sure the correct dashboard has successfully opened.
+	 * The name is used for making sure the correct Dashboard is displayed.
 	 *
 	 * @param $dashboard_name    name of the dashboard this widget is on
 	 * @param $page_name         name of the page this widget is on
@@ -482,6 +561,21 @@ class testPageHostDashboards extends CWebTest {
 	protected function widgetName($dashboard_name, $page_name) {
 		// Widget name max length 255.
 		return substr($dashboard_name.' - '.$page_name.' widget', 0, 255);
+	}
+
+	/**
+	 * Check that the correct Dashboard and Pages is displayed.
+	 * This is done by testing for the unique Widget name.
+	 *
+	 * @param $dashboard    Dashboard data array
+	 * @param $page         Page data array
+	 */
+	protected function checkDashboardOpen ($dashboard, $page = null) {
+		if($page === null) {
+			$page = $dashboard['pages'][0];
+		}
+		$this->assertTrue($this->query('xpath://h4[text()='.
+				CXPathHelper::escapeQuotes($this->widgetName($dashboard['name'], $page['name'])).']')->exists());
 	}
 
 }
