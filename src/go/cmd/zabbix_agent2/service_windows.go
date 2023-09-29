@@ -65,9 +65,10 @@ func osDependentFlags() zbxflag.Flags {
 	return zbxflag.Flags{
 		&zbxflag.BoolFlag{
 			Flag: zbxflag.Flag{
-				Name:        "multiple-agents",
-				Shorthand:   "m",
-				Description: "For -i -d -s -x functions service name will\ninclude Hostname parameter specified in\nconfiguration file",
+				Name:      "multiple-agents",
+				Shorthand: "m",
+				Description: "For -i -d -s -x functions service name will " +
+					"include Hostname parameter specified in configuration file",
 			},
 			Default: false,
 			Dest:    &svcMultipleAgentFlag,
