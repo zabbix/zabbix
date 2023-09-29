@@ -872,10 +872,10 @@ class testPageReportsTopTriggers extends CWebTest {
 							'Severity' => 'Disaster',
 							'Number of problems' => '5'
 						]
+					],
+					'background_color' => [
+						'Problem Disaster' => 'disaster-bg'
 					]
-				],
-				'background_color' => [
-					'Problem Disaster' => 'disaster-bg'
 				]
 			],
 			// Search results without filtering parameters.
@@ -942,19 +942,19 @@ class testPageReportsTopTriggers extends CWebTest {
 							'Severity' => 'Not classified',
 							'Number of problems' => '1'
 						]
+					],
+					'background_color' => [
+						'Problem Disaster' => 'disaster-bg',
+						'Problem with tag' => 'warning-bg',
+						'Problem with tag2' => 'info-bg',
+						'Severity status: High' => 'high-bg',
+						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg',
+						'Problem Warning' => 'warning-bg',
+						'Problem with two tags' => 'warning-bg',
+						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
+						'Not classified ❌' => 'na-bg',
+						'Problem with tag3' => 'na-bg'
 					]
-				],
-				'background_color' => [
-					'Problem Disaster' => 'disaster-bg',
-					'Problem with tag' => 'warning-bg',
-					'Problem with tag2' => 'info-bg',
-					'Severity status: High' => 'high-bg',
-					'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg',
-					'Problem Warning' => 'warning-bg',
-					'Problem with two tags' => 'warning-bg',
-					'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
-					'Not classified ❌' => 'na-bg',
-					'Problem with tag3' => 'na-bg'
 				]
 			],
 			// Search by date label.
@@ -1130,19 +1130,19 @@ class testPageReportsTopTriggers extends CWebTest {
 							'Severity' => 'Not classified',
 							'Number of problems' => '1'
 						]
+					],
+					'background_color' => [
+						'Problem Disaster' => 'disaster-bg',
+						'Problem with tag' => 'warning-bg',
+						'Severity status: High' => 'high-bg',
+						'Problem Warning' => 'warning-bg',
+						'Problem with tag2' => 'info-bg',
+						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg',
+						'Problem with two tags' => 'warning-bg',
+						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
+						'Not classified ❌' => 'na-bg',
+						'Problem with tag3' => 'na-bg'
 					]
-				],
-				'background_color' => [
-					'Problem Disaster' => 'disaster-bg',
-					'Problem with tag' => 'warning-bg',
-					'Severity status: High' => 'high-bg',
-					'Problem Warning' => 'warning-bg',
-					'Problem with tag2' => 'info-bg',
-					'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg',
-					'Problem with two tags' => 'warning-bg',
-					'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
-					'Not classified ❌' => 'na-bg',
-					'Problem with tag3' => 'na-bg'
 				]
 			]
 		];
