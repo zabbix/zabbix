@@ -21,7 +21,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -192,7 +192,7 @@ Refer to the vendor documentation.
 |Interface {#IFNAME}({#IFALIAS}): High output error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): High outbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
 |Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.status[{#SNMPINDEX}])<>2)`|Info|**Depends on**:<br><ul><li>Interface {#IFNAME}({#IFALIAS}): Link down</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:1. It can be triggered if the operations status is down.2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.status[{#SNMPINDEX}])=2)`|Average||
+|Interface {#IFNAME}({#IFALIAS}): Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/Cisco Catalyst 3750V2-48PS by SNMP/net.if.status[{#SNMPINDEX}])=2)`|Average||
 
 ### LLD rule EtherLike discovery
 

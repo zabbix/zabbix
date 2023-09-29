@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-07T11:28:24Z'
+  date: '2023-09-20T10:44:54Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -657,14 +657,14 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -904,14 +904,14 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -1080,14 +1080,14 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: instance_id
               value: '{$AWS.EC2.INSTANCE.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -1372,13 +1372,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#ALARM_SERVICE_NAMESPACE}'
-                value: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
-                formulaid: C
-              - macro: '{#ALARM_SERVICE_NAMESPACE}'
-                value: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}'
                 formulaid: A
@@ -1386,6 +1379,13 @@ zabbix_export:
                 value: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#ALARM_SERVICE_NAMESPACE}'
+                value: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
+              - macro: '{#ALARM_SERVICE_NAMESPACE}'
+                value: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery instance and attached EBS volumes alarms.'
           item_prototypes:
             - uuid: 6294e05dc170431bb3af2caf1ccf6d40
@@ -2213,14 +2213,14 @@ zabbix_export:
               parameters:
                 - name: access_key
                   value: '{$AWS.ACCESS.KEY.ID}'
-                - name: secret_key
-                  value: '{$AWS.SECRET.ACCESS.KEY}'
-                - name: region
-                  value: '{$AWS.REGION}'
-                - name: volume_id
-                  value: '{#VOLUME_ID}'
                 - name: proxy
                   value: '{$AWS.PROXY}'
+                - name: region
+                  value: '{$AWS.REGION}'
+                - name: secret_key
+                  value: '{$AWS.SECRET.ACCESS.KEY}'
+                - name: volume_id
+                  value: '{#VOLUME_ID}'
               tags:
                 - tag: component
                   value: raw
