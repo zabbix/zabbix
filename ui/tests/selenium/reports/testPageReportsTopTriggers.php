@@ -325,7 +325,7 @@ class testPageReportsTopTriggers extends CWebTest {
 			],
 			[
 				'name' => 'Not classified ❌',
-				'time' => self::$time - 60, // now - 5 minutes.
+				'time' => self::$time - 60, // now - 1 minute.
 				'problem_count' => '1'
 			],
 			[
