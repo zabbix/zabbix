@@ -27,7 +27,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/tlsconfig"
 )
 
-func Test_getTlsDetails(t *testing.T) {
+func Test_getTLSDetails(t *testing.T) {
 	type args struct {
 		params map[string]string
 	}
@@ -139,14 +139,14 @@ func Test_getTlsDetails(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getTlsDetails(tt.args.params)
+			got, err := getTLSDetails(tt.args.params)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("getTlsDetails() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("getTLSDetails() error = %v, wantErr %v", err, tt.wantErr)
 
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getTlsDetails() = %v, want %v", got, tt.want)
+				t.Errorf("getTLSDetails() = %v, want %v", got, tt.want)
 			}
 		})
 	}

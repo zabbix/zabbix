@@ -82,9 +82,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorConnectionFailed.Wrap(err)
 	}
 
-	ctx := context.Background()
-
-	result, err := handleMetric(ctx, conn, params, extraParams...)
+	result, err := handleMetric(context.Background(), conn, params, extraParams...)
 	if err != nil {
 		p.Errf(err.Error())
 
