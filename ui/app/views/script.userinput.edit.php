@@ -30,13 +30,18 @@ $form = (new CForm())
 
 if ($data['input_type'] == SCRIPT_MANUALINPUT_TYPE_LIST) {
 	$form
-		->addItem((new CSpan($data['input_prompt']))->addClass(ZBX_STYLE_WORDBREAK))
+		->addItem(
+			(new CSpan($data['input_prompt']))
+				->addClass(ZBX_STYLE_WORDBREAK)
+				->addClass(ZBX_STYLE_FLOAT_LEFT)
+		)
 		->addItem(
 			(new CSelect('manual_input'))
 				->addStyle('margin-top: 8px;')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->addOptions(CSelect::createOptionsFromArray($data['dropdown_options']))
 				->setValue(array_shift($data['dropdown_options']))
+				->addClass(ZBX_STYLE_FLOAT_LEFT)
 		);
 }
 else {
