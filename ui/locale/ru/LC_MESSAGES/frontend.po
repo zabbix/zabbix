@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-08-09 03:14+0000\n"
+"PO-Revision-Date: 2023-09-29 06:01+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -776,7 +776,7 @@ msgstr "Добавить несколько карт"
 
 #: include/classes/widgets/CWidgetHelper.php:1211
 msgid "Add new data set"
-msgstr "Добавить новый набор данных"
+msgstr "Новый набор данных"
 
 #: include/views/configuration.host.edit.php:147
 msgid "Add new interface"
