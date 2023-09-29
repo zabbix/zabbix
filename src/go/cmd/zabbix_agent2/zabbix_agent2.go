@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -65,7 +66,7 @@ A Zabbix daemon for monitoring of various server parameters.
 Options:
 %[2]s
 
-Example: %[1]s -c %[3]s
+Example: zabbix_agent2 -c %[3]s
 
 Report bugs to: <https://support.zabbix.com>
 Zabbix home page: <http://www.zabbix.com>
@@ -153,7 +154,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fatalExit("", err)
 	}
 
-	err = validateExclusiveFlags()
+	err = validateExclusiveFlags(args)
 	if err != nil {
 		fatalExit("", errors.Join(err, eventLogErr(err)))
 	}
@@ -528,7 +529,7 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 	fs.Usage = func() {
 		fmt.Printf(
 			usageMessageFormat,
-			os.Args[0],
+			filepath.Base(os.Args[0]),
 			f.Usage(),
 			usageMessageExampleConfPath,
 		)

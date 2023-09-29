@@ -58,6 +58,7 @@ var (
 
 	fatalStopChan chan bool
 	startChan     chan bool
+	stopChan      = make(chan bool)
 )
 
 func osDependentFlags() zbxflag.Flags {
@@ -168,9 +169,9 @@ func eventLogErr(err error) error {
 	return nil
 }
 
-func validateExclusiveFlags() error {
+func validateExclusiveFlags(args *Arguments) error {
 	var (
-		defaultFlagSet  = argTest || argPrint || argVerbose
+		defaultFlagSet  = args.test != "" || args.print || args.verbose
 		serviceFlagsSet = []bool{svcInstallFlag, svcUninstallFlag, svcStartFlag, svcStopFlag}
 		count           int
 	)
