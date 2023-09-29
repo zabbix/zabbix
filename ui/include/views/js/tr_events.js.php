@@ -39,6 +39,18 @@
 			this.openHostPopup(host_data);
 		},
 
+		editTrigger(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+		},
+
 		openHostPopup(host_data) {
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {

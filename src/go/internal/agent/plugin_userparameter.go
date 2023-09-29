@@ -119,9 +119,7 @@ func (p *UserParameterPlugin) Export(
 	p.Debugf("executing command:'%s'", s)
 
 	stdoutStderr, err := zbxcmd.Execute(
-		s,
-		time.Second*time.Duration(Options.Timeout),
-		p.userParameterDir,
+		s, time.Second*time.Duration(ctx.Timeout()), p.userParameterDir,
 	)
 	if err != nil {
 		return nil, err

@@ -293,6 +293,25 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			);
 		},
 
+		editProxy(e, proxyid) {
+			e.preventDefault();
+			const proxy_data = {proxyid};
+
+			this.openProxyPopup(proxy_data);
+		},
+
+		openProxyPopup(proxy_data) {
+			const overlay = PopUp('popup.proxy.edit', proxy_data, {
+				dialogueid: 'proxy_edit',
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context)
+			);
+		},
+
 		refresh() {
 			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];

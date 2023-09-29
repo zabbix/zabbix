@@ -67,7 +67,6 @@ type ValidationResult struct {
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 }
 
 type Plugin struct {
@@ -86,7 +85,6 @@ const (
 var impl Plugin
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	p.options.Timeout = global.Timeout
 }
 
 func (p *Plugin) Validate(options interface{}) error {
@@ -100,16 +98,16 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, plugin.UnsupportedMetricError
 	}
 
-	return p.webCertificateGet(params)
+	return p.webCertificateGet(params, ctx.Timeout())
 }
 
-func (p *Plugin) webCertificateGet(params []string) (interface{}, error) {
+func (p *Plugin) webCertificateGet(params []string, timeout int) (interface{}, error) {
 	address, port, domain, err := getParameters(params)
 	if err != nil {
 		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
-	certs, err := getCertificatesPEM(fmt.Sprintf("%s:%s", address, port), domain, p.options.Timeout)
+	certs, err := getCertificatesPEM(fmt.Sprintf("%s:%s", address, port), domain, timeout)
 	if err != nil {
 		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}

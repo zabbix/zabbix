@@ -266,17 +266,17 @@ var hintBox = {
 	 * - onDeleteHint.hintBox 	- when removing a hintbox.
 	 */
 	bindEvents: function () {
-		jQuery(document).on('keydown click mouseenter mouseleave', '[data-hintbox=1]', function (e) {
-			var $target = jQuery(this).hasClass('hint-item')
+		jQuery(document).on('keydown click mouseenter mousemove mouseleave', '[data-hintbox=1]', function (e) {
+			const $target = jQuery(this).hasClass('hint-item')
 				? jQuery(this).siblings('.main-hint')
 				: jQuery(this);
 
 			if (e.type === 'keydown') {
-				if (e.which != 13) {
+				if (e.which !== 13) {
 					return;
 				}
 
-				var offset = $target.offset(),
+				const offset = $target.offset(),
 					w = jQuery(window);
 
 				// Emulate a click on the left middle point of the target.
@@ -285,7 +285,7 @@ var hintBox = {
 				e.preventDefault();
 			}
 
-			if ($target.data('hintbox-preload') && $target.next('.hint-box').children().length == 0) {
+			if ($target.data('hintbox-preload') && $target.data('hintbox-contents') === '') {
 				clearTimeout(hintBox.preload_hint_timer);
 
 				// Manually trigger preloaderCloseHandler for the previous preloader.
@@ -300,6 +300,7 @@ var hintBox = {
 				}
 
 				if (e.type === 'mouseleave') {
+					hintBox.hideHint($target[0], false);
 					$target.blur();
 
 					return false;
@@ -333,17 +334,15 @@ var hintBox = {
 
 		switch (e.handleObj.origType) {
 			case 'mouseenter':
-				var showHintHandler = function() {
-					hintBox.showHint(e, $target[0], $target.next('.hint-box').html(), $target.data('hintbox-class'),
-						false, $target.data('hintbox-style')
-					);
-				}
+				hintBox.showHintStart(e, $target, delay);
+				break;
 
-				if (delay > 0) {
-					hintBox.show_hint_timer = setTimeout(showHintHandler, delay);
+			case 'mousemove':
+				if (!$target[0].hintBoxItem) {
+					hintBox.showHintStart(e, $target, delay);
 				}
-				else {
-					showHintHandler();
+				else if ($target.data('hintbox-track-mouse') === 1 && !$target[0].isStatic) {
+					hintBox.positionElement(e, $target, $target[0].hintBoxItem);
 				}
 				break;
 
@@ -354,12 +353,27 @@ var hintBox = {
 
 			case 'keydown':
 			case 'click':
-				if ($target.data('hintbox-static') == 1) {
+				if ($target.data('hintbox-static') === 1) {
 					hintBox.showStaticHint(e, $target[0], $target.data('hintbox-class'), false,
 						$target.data('hintbox-style')
 					);
 				}
 				break;
+		}
+	},
+
+	showHintStart: function (e, $target, delay) {
+		const showHintHandler = function() {
+			hintBox.showHint(e, $target[0], $target[0].dataset.hintboxContents, $target.data('hintbox-class'),
+				false, $target.data('hintbox-style')
+			);
+		}
+
+		if (delay > 0) {
+			hintBox.show_hint_timer = setTimeout(showHintHandler, delay);
+		}
+		else {
+			showHintHandler();
 		}
 	},
 
@@ -399,22 +413,24 @@ var hintBox = {
 			clearTimeout(preloader_timer);
 			overlayPreloaderDestroy($preloader.prop('id'));
 
-			var $hint_box = $target.next('.hint-box').empty();
+			let hintbox_contents = '';
 
 			if ('error' in resp) {
-				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true);
+				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true)[0];
 
-				$hint_box.append(message_box);
+				hintbox_contents += message_box.innerHTML;
 			}
 			else {
 				if (resp.messages) {
-					$hint_box.append(resp.messages);
+					hintbox_contents += resp.messages;
 				}
 
 				if (resp.data) {
-					$hint_box.append(resp.data);
+					hintbox_contents += resp.data;
 				}
 			}
+
+			$target[0].dataset.hintboxContents = hintbox_contents;
 
 			hintBox.displayHint(e, $target);
 		});
@@ -513,12 +529,12 @@ var hintBox = {
 	},
 
 	showStaticHint: function(e, target, className, resizeAfterLoad, styles, hintText) {
-		var isStatic = target.isStatic;
+		const isStatic = target.isStatic;
 		hintBox.hideHint(target, true);
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = jQuery(target).next('.hint-box').html();
+				hintText = target.dataset.hintboxContents;
 			}
 
 			target.isStatic = true;
@@ -1100,11 +1116,17 @@ jQuery(function ($) {
 	}
 });
 
-window.addEventListener('load', e => {
+document.addEventListener('DOMContentLoaded', () => {
 
-	/**
-	 * SideBar initialization.
-	 */
+	// Event hub initialization.
+
+	ZABBIX.EventHub = new CEventHub();
+});
+
+window.addEventListener('load', () => {
+
+	// SideBar initialization.
+
 	const sidebar = document.querySelector('.sidebar');
 
 	if (sidebar !== null) {

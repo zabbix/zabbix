@@ -799,6 +799,13 @@ ZABBIX.apps.map = (function($) {
 					}
 				});
 
+				jQuery(document).on('keydown', (event) => {
+					if (event.which == KEY_ESCAPE) {
+						that.clearSelection();
+						that.toggleForm();
+					}
+				});
+
 				$('.btn-overlay-close, #elementClose').click(function() {
 					that.clearSelection();
 					that.toggleForm();

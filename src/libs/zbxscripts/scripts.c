@@ -21,15 +21,18 @@
 #include "zbxexpression.h"
 
 #include "../../zabbix_server/poller/checks_agent.h"
+#ifdef HAVE_OPENIPMI
 #include "../../zabbix_server/ipmi/ipmi.h"
+#endif
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "../../zabbix_server/poller/checks_ssh.h"
+#endif
 #include "../../zabbix_server/poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
 #include "zbxnum.h"
-#include "zbxsysinfo.h"
 #include "zbxparam.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
@@ -422,7 +425,7 @@ out:
 }
 
 static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
-		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+		const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -463,7 +466,7 @@ static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, cons
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = get_value_agent(&item, config_timeout, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = get_value_agent(&item, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -499,17 +502,17 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 				error, max_error_len);
 	}
 
-	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip, error,
+	return passive_command_send_and_result_fetch(host, command, result, config_source_ip, error,
 			max_error_len);
 }
 
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
-		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+		const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret = FAIL;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
-	int             (*function)(zbx_dc_item_t *, int timeout, const char*, AGENT_RESULT *);
+	int		(*function)(zbx_dc_item_t *, const char*, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -570,7 +573,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = function(&item, config_timeout, config_source_ip, &agent_result)))
+	if (SUCCEED != (ret = function(&item, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -902,7 +905,7 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, config_source_ip,
+			ret = zbx_execute_script_on_terminal(host, script, result, config_source_ip,
 					error, max_error_len);
 			break;
 		default:

@@ -114,9 +114,9 @@ class testDashboardPlainTextWidget extends CWebTest {
 										'value' => '42227' // item name in widget 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running'.
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => '1'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							],
@@ -204,9 +204,9 @@ class testDashboardPlainTextWidget extends CWebTest {
 										'value' => '99142' // item name in widget 'Test item host: Master item'.
 									],
 									[
-										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
-										'name' => 'dynamic',
-										'value' => '1'
+										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+										'name' => 'override_hostid._reference',
+										'value' => 'DASHBOARD._hostid'
 									]
 								]
 							]
@@ -238,7 +238,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			'Items location' => 'Left',
 			'Show lines' => '25',
 			'Show text as HTML' => false,
-			'Enable host selection' => false
+			'Override host' => ''
 		];
 		$form->checkValue($default_state);
 
@@ -276,12 +276,12 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$dialog->close();
 		$dashboard->save();
 
-		// Check parameter 'Enable host selection' true/false state.
+		// Check parameter 'Override host' true/false state.
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
 		$dashboard->getWidget(self::DEFAULT_WIDGET)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
-		$form->fill(['Enable host selection' => false])->submit();
+		$form->fill(['Override host' => ''])->submit();
 		$dashboard->save();
 		$this->assertFalse($host_selector->isVisible());
 	}
@@ -533,7 +533,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Enable host selection' => true,
+						'Override host' => 'Dashboard',
 						'Refresh interval' => '2 minutes'
 					],
 					'items' => [
@@ -545,7 +545,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Enable host selection' => false,
+						'Override host' => 'Dashboard',
 						'Refresh interval' => '1 minute'
 					],
 					'items' => [
@@ -577,7 +577,8 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'Items location' => 'Top',
 						'Show lines' => '50',
 						'Show text as HTML' => true,
-						'Enable host selection' => true],
+						'Override host' => 'Dashboard'
+					],
 					'items' => [
 						['ЗАББИКС Сервер' => 'Linux: Available memory']
 					]
@@ -958,17 +959,17 @@ class testDashboardPlainTextWidget extends CWebTest {
 							'Value' => '1' // value rounding is expected.
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 7 hours 7 minutes 7 seconds')),
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => '<b>'.STRING_128.'</b>'
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 5 hours 5 minutes 5 seconds')),
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Saturday + 3 hours 5 minutes')),
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_255
 						]
@@ -979,28 +980,28 @@ class testDashboardPlainTextWidget extends CWebTest {
 							'Test item host: Master item' => '1'
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 7 hours 7 minutes 7 seconds')),
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-15 hours')),
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_128
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 5 hours 5 minutes 5 seconds')),
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => 'TEST'
 						],
 						[
-							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Saturday + 3 hours 5 minutes')),
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_255
 						]
 					],
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
-						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('last Sunday + 7 hours 7 minutes 7 seconds')],
+						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
 						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
-								'time' => strtotime('last Sunday + 5 hours 5 minutes 5 seconds')],
-						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('last Saturday + 3 hours 5 minutes')]
+								'time' => strtotime('-16 hours')],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
 					]
 				]
 			],
-			// Test case for 'Enable host selection' check.
+			// Test case for host selection check.
 			[
 				[
 					'host_select' => [
