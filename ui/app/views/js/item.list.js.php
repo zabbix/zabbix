@@ -331,7 +331,10 @@
 
 				if (e.detail.success.action === 'delete') {
 					let list_url = new Curl('zabbix.php');
-					list_url.setArgument('action', 'host.list');
+
+					list_url.setArgument('action', 'item.list');
+					list_url.setArgument('context', this.context);
+					list_url.setArgument('filter_set', 1);
 					original_url = list_url.getUrl();
 				}
 
@@ -351,7 +354,10 @@
 			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
 				if (e.detail.success.action === 'delete') {
 					let list_url = new Curl('zabbix.php');
-					list_url.setArgument('action', 'template.list');
+
+					list_url.setArgument('action', 'item.list');
+					list_url.setArgument('context', this.context);
+					list_url.setArgument('filter_set', 1);
 					original_url = list_url.getUrl();
 				}
 
