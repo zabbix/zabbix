@@ -21,11 +21,6 @@
 
 class CControllerTriggerPrototypeUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $db_trigger_prototype;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -73,16 +68,6 @@ class CControllerTriggerPrototypeUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name', 'itemid', 'hostid'],
-			'itemids' => $this->getInput('parent_discoveryid'),
-			'editable' => true
-		]);
-
-		if (!$discovery_rule) {
-			return false;
-		}
-
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -104,15 +89,15 @@ class CControllerTriggerPrototypeUpdate extends CController {
 			$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
 				['sources' => ['expression', 'recovery_expression']]
 			);
-			$this->db_trigger_prototype = reset($db_trigger_prototypes);
+			$db_trigger_prototype = reset($db_trigger_prototypes);
 		}
 		else {
-			$this->db_trigger_prototype = null;
+			$db_trigger_prototype = null;
 		}
 
 		$trigger_prototype = [];
 
-		if ($this->db_trigger_prototype && $this->db_trigger_prototype['templateid'] == 0) {
+		if ($db_trigger_prototype && $db_trigger_prototype['templateid'] == 0) {
 			$trigger_prototype += [
 				'description' => $this->getInput('name'),
 				'event_name' => $this->getInput('event_name', ''),

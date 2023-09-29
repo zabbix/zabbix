@@ -21,11 +21,6 @@
 
 class CControllerTriggerUpdate extends CController {
 
-	/**
-	 * @var array
-	 */
-	private $db_trigger;
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -86,12 +81,12 @@ class CControllerTriggerUpdate extends CController {
 			'triggerids' => $this->getInput('triggerid')
 		]);
 
-		$this->db_trigger = $db_triggers ? reset($db_triggers) : null;
+		$db_trigger = $db_triggers ? reset($db_triggers) : null;
 
 		$trigger = [];
 
-		if ($this->db_trigger && $this->db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			if ($this->db_trigger['templateid'] == 0) {
+		if ($db_trigger && $db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			if ($db_trigger['templateid'] == 0) {
 				$trigger += [
 					'description' => $this->getInput('name'),
 					'event_name' => $this->getInput('event_name', ''),

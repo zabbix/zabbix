@@ -67,16 +67,6 @@ class CControllerTriggerPrototypeCreate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		$discovery_rule = API::DiscoveryRule()->get([
-			'output' => ['name', 'itemid', 'hostid'],
-			'itemids' => $this->getInput('parent_discoveryid'),
-			'editable' => true
-		]);
-
-		if (!$discovery_rule) {
-			return false;
-		}
-
 		return $this->getInput('context') === 'host'
 			? $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
