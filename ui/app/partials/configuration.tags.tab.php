@@ -118,7 +118,7 @@ foreach ($data['tags'] as $i => $tag) {
 				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
 					$template_link = (new CLink($template['name']))->setAttribute('data-templateid', $templateid);
 
-					($data['source'] === 'trigger' || $data['source'] === 'trigger_prototype')
+					$data['source'] !== 'httptest'
 						? $template_link->addClass('js-edit-template')
 						: $template_link->onClick('view.editTemplate(event, this.dataset.templateid);');
 

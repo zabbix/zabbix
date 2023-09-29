@@ -223,8 +223,7 @@ window.item_edit_form = new class {
 			if (target.matches('a') && target.closest('.js-parent-items')) {
 				e.preventDefault();
 
-				if (!this.#isFormModified()
-						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
+				if (!this.#isFormModified() || this.#isConfirmed()) {
 					this.#openRelatedItem(target.dataset);
 				}
 			}
@@ -240,16 +239,14 @@ window.item_edit_form = new class {
 			if (target.matches('.js-edit-template')) {
 				e.preventDefault();
 
-				if (!this.#isFormModified()
-						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
+				if (!this.#isFormModified() || this.#isConfirmed()) {
 					this.#openTemplatePopup(target.dataset);
 				}
 			}
 			else if (target.matches('.js-edit-proxy')) {
 				e.preventDefault();
 
-				if (!this.#isFormModified()
-						|| window.confirm(t('Any changes made in the current form will be lost.'))) {
+				if (!this.#isFormModified() || this.#isConfirmed()) {
 					this.#openProxyPopup(target.dataset);
 				}
 			}
@@ -267,9 +264,11 @@ window.item_edit_form = new class {
 	}
 
 	initItemPrototypeEvents() {
-		this.form.querySelector('[name="master-item-prototype"]').addEventListener('click',
-			e => this.#openMasterItemPrototypePopup(e)
-		);
+		this.form.querySelector('[name="master-item-prototype"]').addEventListener('click', (e) => {
+			this.#openMasterItemPrototypePopup();
+
+			return cancelEvent(e);
+		});
 	}
 
 	clone() {
@@ -307,27 +306,36 @@ window.item_edit_form = new class {
 	}
 
 	delete() {
-		const fields = this.#getFormFields();
+		const data = {
+			context: this.form_data.context,
+			itemids: [this.form_data.itemid]
+		}
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.delete);
-		this.#post(curl.getUrl(), {context: fields.context, itemids: [fields.itemid]});
+		this.#post(curl.getUrl(), data);
 	}
 
 	clear() {
-		const fields = this.#getFormFields();
+		const data = {
+			context: this.form_data.context,
+			itemids: [this.form_data.itemid]
+		}
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.clear');
-		this.#post(curl.getUrl(), {context: fields.context, itemids: [fields.itemid]}, true);
+		this.#post(curl.getUrl(), data, true);
 	}
 
 	execute() {
-		const fields = this.#getFormFields();
+		const data = {
+			discovery_rule: this.form_data.discovery_rule,
+			itemids: [this.form_data.itemid]
+		}
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', 'item.execute');
-		this.#post(curl.getUrl(), {discovery_rule: fields.discovery_rule, itemids: [fields.itemid]}, true);
+		this.#post(curl.getUrl(), data, true);
 	}
 
 	updateFieldsVisibility() {
@@ -378,7 +386,7 @@ window.item_edit_form = new class {
 		const fields = getFormFields(this.form);
 
 		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
+			if (typeof fields[key] === 'string') {
 				fields[key] = fields[key].trim();
 			}
 		}
@@ -450,6 +458,10 @@ window.item_edit_form = new class {
 
 	#isFormModified() {
 		return JSON.stringify(this.initial_form_fields) !== JSON.stringify(getFormFields(this.form));
+	}
+
+	#isConfirmed() {
+		return window.confirm(t('Any changes made in the current form will be lost.'));
 	}
 
 	#updateActionButtons() {
@@ -527,6 +539,38 @@ window.item_edit_form = new class {
 			.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inferred_type === null || value_type == inferred_type);
 	}
 
+	#updateHistoryModeVisibility() {
+		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
+		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+
+		this.field.history.toggleAttribute('disabled', disabled);
+		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+	}
+
+	#updateTrendsModeVisibility() {
+		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
+		const disabled = mode_field.value == ITEM_STORAGE_OFF;
+
+		this.field.trends.toggleAttribute('disabled', disabled);
+		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+	}
+
+	#updateValueTypeOptionVisibility() {
+		const disable_binary = this.field.type.value != ITEM_TYPE_DEPENDENT;
+
+		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
+			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
+
+			this.field.value_type.value = value;
+			this.field.value_type_steps.value = value;
+		}
+
+		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+	}
+
 	#getInferredValueType(key) {
 		const type = this.field.type.value;
 		const search = key.split('[')[0].trim().toLowerCase();
@@ -592,38 +636,6 @@ window.item_edit_form = new class {
 		}, {dialogue_class: 'modal-popup-generic'});
 	}
 
-	#updateHistoryModeVisibility() {
-		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF;
-
-		this.field.history.toggleAttribute('disabled', disabled);
-		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-	}
-
-	#updateTrendsModeVisibility() {
-		const mode_field = [].filter.call(this.field.trends_mode, e => e.matches(':checked')).pop();
-		const disabled = mode_field.value == ITEM_STORAGE_OFF;
-
-		this.field.trends.toggleAttribute('disabled', disabled);
-		this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-	}
-
-	#updateValueTypeOptionVisibility() {
-		const disable_binary = this.field.type.value != ITEM_TYPE_DEPENDENT;
-
-		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
-			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
-
-			this.field.value_type.value = value;
-			this.field.value_type_steps.value = value;
-		}
-
-		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
-		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
-	}
-
 	#openRelatedItem(parameters) {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 
@@ -632,9 +644,7 @@ window.item_edit_form = new class {
 			dialogue_class: 'modal-popup-large'
 		});
 
-		overlay.$dialogue[0].addEventListener('dialogue.submit',
-			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
-		);
+		this.#proxyDialogueSubmitEvent(overlay);
 	}
 
 	#openProxyPopup(parameters) {
@@ -646,41 +656,39 @@ window.item_edit_form = new class {
 			prevent_navigation: true
 		});
 
-		overlay.$dialogue[0].addEventListener('dialogue.submit',
-			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
-		);
+		this.#proxyDialogueSubmitEvent(overlay);
 	}
 
-	#openMasterItemPrototypePopup(e) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		PopUp('popup.generic', {
+	#openMasterItemPrototypePopup() {
+		const parameters = {
 			srctbl: 'item_prototypes',
 			srcfld1: 'itemid',
 			srcfld2: 'name',
 			dstfrm: this.form.getAttribute('name'),
 			dstfld1: 'master_itemid',
-			parent_discoveryid: this.form_data.discoveryid,
-			excludeids: [this.form_data.itemid]
-		}, {dialogue_class: 'modal-popup-generic'});
+			parent_discoveryid: this.form_data.parent_discoveryid,
+			excludeids: 'itemid' in this.form_data ? [this.form_data.itemid] : [],
+		}
 
-		return false;
+		PopUp('popup.generic', parameters, {dialogue_class: 'modal-popup-generic'});
 	}
 
 	#openTemplatePopup(template_data) {
 		overlayDialogueDestroy(this.overlay.dialogueid);
 
-		let original_url = location.href;
 		const overlay =  PopUp('template.edit', template_data, {
 			dialogueid: 'templates-form',
 			dialogue_class: 'modal-popup-large',
 			prevent_navigation: true
 		});
 
-		overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+		this.#proxyDialogueSubmitEvent(overlay);
+	}
+
+	#proxyDialogueSubmitEvent(overlay) {
+		overlay.$dialogue[0].addEventListener('dialogue.submit',
 			(e) => this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
-		});
+		);
 	}
 }
 })();

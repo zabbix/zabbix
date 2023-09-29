@@ -144,6 +144,7 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'inventory_fields' => $data['inventory_fields'],
 			'master_item' => $data['master_item'],
 			'parent_items' => $data['parent_items'],
+			'proxyid' => $data['host']['proxyid'],
 			'readonly' => $data['readonly'] || $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED,
 			'source' => 'itemprototype',
 			'types' => $data['types'],
