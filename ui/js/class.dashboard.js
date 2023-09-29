@@ -1521,8 +1521,8 @@ class CDashboard extends CBaseComponent {
 		const data = this._dashboard_pages.get(dashboard_page);
 
 		data.tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
-		this._tabs.scrollItemIntoView(data.tab);
 		this._updateNavigationButtons(dashboard_page);
+		this._tabs.scrollItemIntoView(data.tab);
 	}
 
 	_updateNavigationButtons(dashboard_page = null) {

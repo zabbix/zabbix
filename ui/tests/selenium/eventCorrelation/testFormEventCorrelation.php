@@ -18,14 +18,95 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+
+require_once dirname(__FILE__) . '/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup correlation
+ *
+ * @onBefore prepareEventData
  */
 class testFormEventCorrelation extends CLegacyWebTest {
+
+	public function prepareEventData() {
+		CDataHelper::call('correlation.create', [
+			[
+				'name' => 'Event correlation for cancel',
+				'description' => 'Test description cancel',
+				'status' => ZBX_CORRELATION_DISABLED,
+				'filter' => [
+					'evaltype' => 1,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'cancel tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			],
+			[
+				'name' => 'Event correlation for clone',
+				'description' => 'Test description clone',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'clone tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			],
+			[
+				'name' => 'Event correlation for delete',
+				'description' => 'Test description delete',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'delete tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			],
+			[
+				'name' => 'Event correlation for update',
+				'description' => 'Test description update',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'update tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			]
+		]);
+	}
 
 	public static function create() {
 		return [
@@ -450,7 +531,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with calculation And/Or',
-					'tags'=>[
+					'tags' => [
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					]
@@ -459,7 +540,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with calculation And',
-					'tags'=>[
+					'tags' => [
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
@@ -469,7 +550,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with calculation OR',
-					'tags'=>[
+					'tags' => [
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
@@ -479,14 +560,14 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with calculation Custom',
-					'tags'=>[
+					'tags' => [
 						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
 						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag3']
 
 					],
-				'calculation' => 'Custom expression',
-				'formula' => 'A or (B and not C)'
+					'calculation' => 'Custom expression',
+					'formula' => 'A or (B and not C)'
 				]
 			]
 		];
@@ -539,80 +620,80 @@ class testFormEventCorrelation extends CLegacyWebTest {
 			[
 				[
 					'name' => 'Test create with empty expression',
-					'tags'=>[
-						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
+					'tags' => [
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
-					'formula'=> '',
+					'formula' => '',
 					'error_message' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
 			[
 				[
 					'name' => 'Test create with missing argument',
-					'tags'=>[
-						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
+					'tags' => [
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains', 'value' => 'Value']
 					],
-					'formula'=> 'A or B',
+					'formula' => 'A or B',
 					'error_message' => 'Invalid parameter "/1/operations": cannot be empty.'
 				]
 			],
 			[
 				[
 					'name' => 'Test create with extra argument',
-					'tags'=>[
-						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
+					'tags' => [
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains', 'value' => 'Value']
 					],
-					'formula'=> '(A or B) and (C or D)',
+					'formula' => '(A or B) and (C or D)',
 					'error_message' => 'Invalid parameter "/1/operations": cannot be empty.'
 				]
 			],
 			[
 				[
 					'name' => 'Test create with wrong formula',
-					'tags'=>[
-						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ],
-						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains','value' => 'Value']
+					'tags' => [
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2'],
+						['select_tag' => 'Old event tag value', 'tag_name' => 'Test tag3', 'operator' => 'contains', 'value' => 'Value']
 					],
-					'formula'=> 'Wrong formula',
+					'formula' => 'Wrong formula',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Wrong formula".'
 				]
 			],
 			[
 				[
 					'name' => 'Check case sensitive of operator in formula',
-					'tags'=>[
-						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
+					'tags' => [
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
-					'formula'=> 'A and Not B',
+					'formula' => 'A and Not B',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Not B".'
 				]
 			],
 			[
 				[
 					'name' => 'Check case sensitive of first operator in formula',
-					'tags'=>[
-						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
+					'tags' => [
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
-					'formula'=> 'NOT A and not B',
+					'formula' => 'NOT A and not B',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " A and not B".'
 				]
 			],
 			[
 				[
 					'name' => 'Test create with only NOT in formula',
-					'tags'=>[
-						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1' ],
-						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2' ]
+					'tags' => [
+						['select_tag' => 'Old event tag name', 'tag_name' => 'Test tag1'],
+						['select_tag' => 'New event tag name', 'tag_name' => 'Test tag2']
 					],
-					'formula'=> 'not A not B',
+					'formula' => 'not A not B',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " not B".'
 				]
 			]

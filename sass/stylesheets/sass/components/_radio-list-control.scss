@@ -73,6 +73,7 @@
 
 		&:checked + label {
 			color: $white;
+			-webkit-text-fill-color: $white;
 			border-color: $ui-bg-selected-color;
 			background-color: $ui-bg-selected-color;
 			position: relative;

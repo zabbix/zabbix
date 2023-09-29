@@ -108,6 +108,11 @@ Then you will be able to use these names as the 1st parameter (ConnString) in ke
 *Note*: sessions names are case-sensitive.
   
 ## Supported keys
+**mysql.custom.query[\<commonParams\>,queryName[,args...]** — Returns the result of a custom query.
+*Parameters:*  
+queryName (required) — the name of a custom query (must be equal to the name of an *sql* file without an extension).
+args (optional) — one or more arguments to pass to a query.
+
 **mysql.db.discovery[\<commonParams\>]** — Returns list of databases in LLD format.
 
 **mysql.db.size[\<commonParams\>,database]** — Returns size of given database in bytes.  
@@ -126,6 +131,42 @@ database (required) — database name.
 **mysql.get_status_variables[\<commonParams\>]** — Returns values of global status variables.
 
 **mysql.version[\<commonParams\>]** — Returns MySQL version.      
+
+## Custom queries
+
+It is possible to extend the functionality of the plugin using user-defined queries. In order to do it, you should place all your queries in a specified directory in `Plugins.Mysql.CustomQueriesPath` (there is no default path) as it is for *.sql* files.
+For example, you can have a following tree:
+
+    /etc/zabbix/mysql/sql/  
+    ├── long_tx.sql
+    ├── payment.sql    
+    └── top_proc.sql
+     
+Then, you should set `Plugins.Mysql.CustomQueriesPath=/etc/zabbix/mysql/sql`.
+     
+Finally, when the queries are located in the right place, you can execute them:
+
+    mysql.custom.query[<commonParams>,top_proc]  
+    mysql.custom.query[<commonParams>,long_tx,600]
+          
+You can pass as many parameters to a query as you need.   
+The syntax for the placeholder parameters uses "?" where "?" is the parameter in order as provided. 
+For example: 
+
+```
+/* payment.sql */
+
+SELECT 
+    amount 
+FROM 
+    payment 
+WHERE
+    user = ?
+    AND service_id = ?
+    AND date = ?
+``` 
+
+    mysql.custom.query[<commonParams>,payment,"John Doe",1,"10/25/2020"]
 
 ## Troubleshooting
 The plugin uses Zabbix agent's logs. You can increase debugging level of Zabbix Agent if you need more details about 

@@ -115,22 +115,23 @@ class CTemplateDashboard extends CDashboardGeneral {
 
 				// Select direct templates of all hosts accessible to the current user.
 				$db_host_templates = DBselect(
-					'SELECT DISTINCT ht.templateid FROM hosts_templates ht'.
-					' WHERE ht.hostid IN ('.
-						'SELECT h.hostid FROM hosts h'.
-						' WHERE h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+					'SELECT DISTINCT ht.templateid'.
+					' FROM hosts_templates ht'.
+						' JOIN hosts h ON ht.hostid=h.hostid'.
 							' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-							' AND EXISTS ('.
-								'SELECT NULL'.
-								' FROM hosts_groups hgg'.
-									' JOIN rights r'.
-										' ON r.id=hgg.groupid'.
-											' AND '.dbConditionId('r.groupid', $user_groups).
-								' WHERE h.hostid=hgg.hostid'.
-								' GROUP BY hgg.hostid'.
-								' HAVING MIN(r.permission)>'.PERM_DENY.
-									' AND MAX(r.permission)>='.PERM_READ.
-							')'.
+							' AND h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
+						' JOIN hosts_groups hg ON h.hostid=hg.hostid'.
+						' JOIN rights r ON hg.groupid=r.id'.
+							' AND '.dbConditionId('r.groupid', $user_groups).
+							' AND r.permission>='.PERM_READ.
+					' WHERE NOT EXISTS ('.
+						'SELECT NULL'.
+						' FROM hosts_groups hgg'.
+							' JOIN rights r2'.
+								' ON hgg.groupid=r2.id'.
+									' AND '.dbConditionId('r2.groupid', $user_groups).
+									' AND r2.permission='.PERM_DENY.
+						' WHERE h.hostid=hgg.hostid'.
 					')'
 				);
 

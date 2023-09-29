@@ -175,6 +175,7 @@ function createFontSelect(string $name): CSelect {
 								->setId('triggerContainer')
 								->setAttribute('style', 'width: 100%;')
 								->addClass('ui-sortable')
+								->addClass('trigger-list')
 						]))
 							->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

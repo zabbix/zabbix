@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -72,7 +72,7 @@ Test availability: `zabbix_get -s memcached-host -k memcached.ping`
 |Memcached: Service is down||`last(/Memcached by Zabbix agent 2/memcached.ping["{$MEMCACHED.CONN.URI}"])=0`|Average|**Manual close**: Yes|
 |Memcached: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Memcached by Zabbix agent 2/memcached.cpu.sys,30m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Memcached: Service is down</li></ul>|
 |Memcached: Too many queued connections|<p>The max number of connections is reached and a new connection had to wait in the queue as a result.</p>|`min(/Memcached by Zabbix agent 2/memcached.connections.queued.rate,5m)>{$MEMCACHED.CONN.QUEUED.MAX.WARN}`|Warning||
-|Memcached: Too many throttled connections|<p>Number of times a client connection was throttled is too high.When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p>|`min(/Memcached by Zabbix agent 2/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}`|Warning||
+|Memcached: Too many throttled connections|<p>Number of times a client connection was throttled is too high.<br>When sending GETs in batch mode and the connection contains too many requests (limited by -R parameter) the connection might be throttled to prevent starvation.</p>|`min(/Memcached by Zabbix agent 2/memcached.connections.throttled.rate,5m)>{$MEMCACHED.CONN.THROTTLED.MAX.WARN}`|Warning||
 |Memcached: Total number of connected clients is too high|<p>When the number of connections reaches the value of the "max_connections" parameter, new connections will be rejected.</p>|`min(/Memcached by Zabbix agent 2/memcached.connections.current,5m)/last(/Memcached by Zabbix agent 2/memcached.connections.max)*100>{$MEMCACHED.CONN.PRC.MAX.WARN}`|Warning||
 |Memcached: Version has changed|<p>The Memcached version has changed. Acknowledge to close the problem manually.</p>|`last(/Memcached by Zabbix agent 2/memcached.version,#1)<>last(/Memcached by Zabbix agent 2/memcached.version,#2) and length(last(/Memcached by Zabbix agent 2/memcached.version))>0`|Info|**Manual close**: Yes|
 |Memcached: has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Memcached by Zabbix agent 2/memcached.uptime)<10m`|Info|**Manual close**: Yes|

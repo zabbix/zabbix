@@ -363,8 +363,9 @@ class CControllerPopupMassupdateItem extends CController {
 			}
 		}
 		else {
-			$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-				->toString();
+			$output['errors'] = makeMessageBox(
+				ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle(), true, true
+			)->toString();
 		}
 
 		return (new CControllerResponseData(['main_block' => json_encode($output)]))->disableView();
