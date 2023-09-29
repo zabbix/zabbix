@@ -1,6 +1,17 @@
+Changes for 7.0.0alpha6
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0alpha5
 
 New features:
+..F.I..... [ZBXNEXT-8453] moved triggers and trigger prototypes to mvc model and refactored edit forms to modal forms (epulke)
+..F.I....T [ZBXNEXT-8145] implemented communication framework for dashboard widgets (ashubin, averza)
+..F.I..PS. [ZBXNEXT-8570] removed support for TimescaleDB v1 (dimir)
+.......PS. [ZBXNEXT-8600] added secrets resolving to script preprocessing step (askolmeisters)
 A.FG...PST [ZBXNEXT-1096] implemented configurable per-item-type timeouts (abakaldin, agriscenko, dgoloscapov, wiper)
 A.F.....S. [ZBXNEXT-7726] added support for extended error checking in preprocessing (akozlovs, jfreibergs)
 ..F.I..... [ZBXNEXT-8331] implemented new Pie chart widget (apoga, ddauksa)
@@ -16,6 +27,7 @@ A.F....... [ZBXNEXT-4165] implemented `selectActions` parameter for API method `
 ..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
 
 Bug fixes:
+........S. [ZBX-23427] fixed trends not being calculated (arimdjonoks)
 ..F....... [ZBX-23361] fixed uncapitalized first letter for value 'all' in radio buttons and in filter select fields (dpetra)
 ..F....... [ZBX-22841] fixed all date/time displays to match standard US date and time formats (ddauksa)
 ........S. [ZBX-23446] fixed nested transaction issue when processing autoregistration data (dimir)
@@ -273,6 +285,18 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.8rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.7
+
+6.4.7rc1 was released as 6.4.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.7rc1
@@ -1695,6 +1719,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.23rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.0.22

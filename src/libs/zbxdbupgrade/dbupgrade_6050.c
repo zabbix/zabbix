@@ -1585,6 +1585,50 @@ static int	DBpatch_6050134(void)
 
 static int	DBpatch_6050135(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050136(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.templates.trigger_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050137(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.triggers.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050138(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx like 'web.hosts.trigger_prototypes.php.%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050139(void)
+{
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_db_insert_t	db_insert;
@@ -1759,5 +1803,9 @@ DBPATCH_ADD(6050132, 0, 1)
 DBPATCH_ADD(6050133, 0, 1)
 DBPATCH_ADD(6050134, 0, 1)
 DBPATCH_ADD(6050135, 0, 1)
+DBPATCH_ADD(6050136, 0, 1)
+DBPATCH_ADD(6050137, 0, 1)
+DBPATCH_ADD(6050138, 0, 1)
+DBPATCH_ADD(6050139, 0, 1)
 
 DBPATCH_END()

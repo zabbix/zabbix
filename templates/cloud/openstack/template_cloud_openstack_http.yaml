@@ -615,14 +615,14 @@ zabbix_export:
               error_handler_params: 'Could not get tenant list'
           timeout: 10s
           parameters:
-            - name: api_url
-              value: '{$OPENSTACK.NOVA.SERVICE.URL}'
             - name: api_token
               value: '{$OPENSTACK.TOKEN}'
-            - name: period
-              value: '{$OPENSTACK.NOVA.TENANT.PERIOD}'
+            - name: api_url
+              value: '{$OPENSTACK.NOVA.SERVICE.URL}'
             - name: http_proxy
               value: '{$OPENSTACK.HTTP.PROXY}'
+            - name: period
+              value: '{$OPENSTACK.NOVA.TENANT.PERIOD}'
           tags:
             - tag: component
               value: raw
@@ -751,13 +751,6 @@ zabbix_export:
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#TYPE}'
-                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.MATCHES}'
-                formulaid: E
-              - macro: '{#TYPE}'
-                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#HOST_IP}'
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.MATCHES}'
                 formulaid: C
@@ -765,6 +758,13 @@ zabbix_export:
                 value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#TYPE}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.MATCHES}'
+                formulaid: E
+              - macro: '{#TYPE}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
           lifetime: 7d
           description: 'Discovers OpenStack Nova hypervisors.'
           item_prototypes:
@@ -1042,13 +1042,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#HOST}'
-                value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}'
-                formulaid: C
-              - macro: '{#HOST}'
-                value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#BINARY}'
                 value: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.MATCHES}'
                 formulaid: A
@@ -1056,6 +1049,13 @@ zabbix_export:
                 value: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#HOST}'
+                value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}'
+                formulaid: C
+              - macro: '{#HOST}'
+                value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           lifetime: 7d
           description: 'Discovers OpenStack compute services.'
           item_prototypes:
@@ -1501,30 +1501,39 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'OpenStack Nova by HTTP'
                         name: 'Nova: Instances utilization'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'OpenStack Nova by HTTP'
-                        name: 'Nova: vCPUs utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'OpenStack Nova by HTTP'
                         name: 'Nova: RAM utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'OpenStack Nova by HTTP'
+                        name: 'Nova: vCPUs utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: b5d0c4e859eb4b2d854f551e3d8aeff5
           name: 'Availability zone state'

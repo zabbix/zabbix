@@ -99,7 +99,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			$field_labels = [
 				'from' => ($label !== '' ? $label.'/' : '').$this->getFromLabel(),
-				'to' => ($label !== '' ? $label.'/' : '').$this->getToLabel(),
+				'to' => ($label !== '' ? $label.'/' : '').$this->getToLabel()
 			];
 
 			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {

@@ -6,6 +6,10 @@
 
 	.btn-split {
 		margin-right: 0;
+
+		li:first-child {
+			margin-left: 0;
+		}
 	}
 }
 

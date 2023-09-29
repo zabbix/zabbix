@@ -896,13 +896,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues total'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   name: 'Mantis BT: Issues by priority'
                   'y': '5'
@@ -913,13 +913,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by priority'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graphprototype
                   name: 'Mantis BT: Issues by resolution'
                   x: '6'
@@ -931,13 +931,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by resolution'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graphprototype
                   name: 'Mantis BT: Issues by severity'
                   x: '12'
@@ -949,13 +949,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by severity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graphprototype
                   name: 'Mantis BT: Issues by status'
                   x: '18'
@@ -967,10 +967,10 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by status'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE

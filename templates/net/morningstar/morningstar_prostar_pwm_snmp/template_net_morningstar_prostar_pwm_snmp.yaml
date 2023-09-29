@@ -1100,30 +1100,39 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar ProStar PWM by SNMP'
                         name: 'Array: Voltage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '4'
                   width: '24'
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar ProStar PWM by SNMP'
                         name: 'Current: Charge/Load'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   'y': '8'
                   width: '24'
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar ProStar PWM by SNMP'
                         name: 'Temperature: Ambient/Battery/Heatsink'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
       valuemaps:
         - uuid: f94eb6ad54c44281878c7c018c6209d1
           name: 'ProStar PWM charge state'

@@ -1352,6 +1352,10 @@ msgstr ""
 msgid "Annually"
 msgstr "毎年"
 
+#: jsLoader.php:201
+msgid "Another widget is used as data source."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
 #: app/views/administration.module.list.php:53
@@ -5799,6 +5803,10 @@ msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] "ダッシュボードを削除しました"
 
+#: jsLoader.php:200
+msgid "Dashboard is used as data source."
+msgstr ""
+
 #: app/views/monitoring.host.dashboard.view.php:142
 msgid "Dashboard list"
 msgstr ""
@@ -8458,6 +8466,10 @@ msgstr "ダッシュボードのプロパティの変更に失敗しました。
 #: app/views/js/popup.dashboard.share.edit.js.php:83
 msgid "Failed to update dashboard sharing."
 msgstr "ダッシュボードの共有の更新に失敗しました。"
+
+#: jsLoader.php:128
+msgid "Failed to update time selector."
+msgstr ""
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -14335,6 +14347,14 @@ msgstr ""
 msgid "New template group"
 msgstr "新しいテンプレートグループの作成"
 
+#: app/views/trigger.edit.php:144
+msgid "New trigger"
+msgstr ""
+
+#: app/views/trigger.prototype.edit.php:143
+msgid "New trigger prototype"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "新規トリガー"
@@ -14431,6 +14451,10 @@ msgstr "認証ユーザー名が設定されていません。"
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
 msgstr "変更はありません。"
+
+#: jsLoader.php:194
+msgid "No compatible widgets."
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:56
 #: include/views/configuration.action.edit.php:58
@@ -15665,6 +15689,10 @@ msgstr "次で上書き"
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
 msgstr "上書き"
+
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
+msgid "Override host"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:128
 msgid "Override item history period"
@@ -17888,6 +17916,10 @@ msgstr "SLAを更新しました"
 #, c-format
 msgid "SLA with ID \"%1$s\" is not available."
 msgstr "ID\"%1$s\"のSLAは使用できません。"
+
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
+msgid "SLAs"
+msgstr ""
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
@@ -23321,6 +23353,13 @@ msgstr "ようこそ"
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:83
 msgid "When active"
 msgstr "有効な時間帯"
+
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:59
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:96
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
+#: jsLoader.php:195 jsLoader.php:199
+msgid "Widget"
+msgstr ""
 
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format

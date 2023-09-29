@@ -477,27 +477,6 @@ zabbix_export:
                 value: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
-                formulaid: I
-              - macro: '{#IFOPERSTATUS}'
-                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: J
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: G
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: H
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: E
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: C
@@ -505,6 +484,27 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: E
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: G
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: H
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.MATCHES}'
+                formulaid: I
+              - macro: '{#IFOPERSTATUS}'
+                value: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: J
               - macro: '{#IFTYPE}'
                 value: '{$NET.IF.IFTYPE.MATCHES}'
                 formulaid: K
@@ -921,12 +921,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SENSOR_TYPE}'
-                value: '8'
-                formulaid: B
               - macro: '{#SENSOR_PRECISION}'
                 value: '1'
                 formulaid: A
+              - macro: '{#SENSOR_TYPE}'
+                value: '8'
+                formulaid: B
           description: 'ENTITY-SENSORS-MIB::EntitySensorDataType discovery with temperature filter'
           item_prototypes:
             - uuid: 4f298c0f2b6547b7b1827b3faebd1089
@@ -1040,13 +1040,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#FSNAME}'
                 value: '{$VFS.FS.FSNAME.MATCHES}'
                 formulaid: A
@@ -1054,6 +1047,13 @@ zabbix_export:
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: 84e47981247243bd888a870700da8be3
@@ -1187,13 +1187,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#MEMTYPE}'
-                value: '{$MEMORY.TYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#MEMTYPE}'
-                value: '{$MEMORY.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#MEMNAME}'
                 value: '{$MEMORY.NAME.MATCHES}'
                 formulaid: A
@@ -1201,6 +1194,13 @@ zabbix_export:
                 value: '{$MEMORY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#MEMTYPE}'
+                value: '{$MEMORY.TYPE.MATCHES}'
+                formulaid: C
+              - macro: '{#MEMTYPE}'
+                value: '{$MEMORY.TYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'HOST-RESOURCES-MIB::hrStorage discovery with memory filter'
           item_prototypes:
             - uuid: 70918ede8bff4f76be467a806a015b21
@@ -1390,14 +1390,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mellanox by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
         - uuid: e41382f2a3394e52b885bb6a70df35ff
           name: 'System performance'
           pages:
@@ -1408,27 +1408,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mellanox by SNMP'
                         name: 'Mellanox: CPU utilization'
-                - type: graphprototype
-                  name: '{#FSNAME}: Disk space usage'
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'Mellanox by SNMP'
-                        name: '{#FSNAME}: Disk space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graphprototype
                   name: '{#MEMNAME}: Memory utilization'
                   'y': '5'
@@ -1438,14 +1424,37 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Mellanox by SNMP'
                         name: '{#MEMNAME}: Memory utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                    - type: INTEGER
+                      name: rows
+                      value: '5'
+                - type: graphprototype
+                  name: '{#FSNAME}: Disk space usage'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid.0
+                      value:
+                        host: 'Mellanox by SNMP'
+                        name: '{#FSNAME}: Disk space usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                    - type: INTEGER
+                      name: rows
+                      value: '5'
       valuemaps:
         - uuid: d42214398aea4362b4fc61a090f188e1
           name: 'ENTITY-SENSORS-MIB::EntitySensorStatus'
