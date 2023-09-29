@@ -103,8 +103,9 @@ var (
 )
 
 // handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(ctx context.Context, conn MyClient,
-	params map[string]string, extraParams ...string) (res interface{}, err error)
+type handlerFunc func(
+	ctx context.Context, conn MyClient, params map[string]string, extraParams ...string,
+) (res interface{}, err error)
 
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {
