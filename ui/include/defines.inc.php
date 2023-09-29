@@ -680,6 +680,7 @@ define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
 define('ZBX_PREPROC_XML_TO_JSON',				27);
 define('ZBX_PREPROC_SNMP_WALK_VALUE',			28);
 define('ZBX_PREPROC_SNMP_WALK_TO_JSON',			29);
+define('ZBX_PREPROC_SNMP_GET_VALUE',			30);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
