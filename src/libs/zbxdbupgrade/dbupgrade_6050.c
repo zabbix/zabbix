@@ -1667,7 +1667,7 @@ static void	DBpatch_6050139_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 	zbx_vector_wiget_field_sort(interval, zbx_wiget_field_compare);
 	zbx_vector_wiget_field_sort(timeshift, zbx_wiget_field_compare);
 
-	for (i = 0; i < aggr_func->values_num; i++)	/* remove fields */
+	for (i = 0; i < aggr_func->values_num; i++)	/* remove fields if aggregate_function = 0 */
 	{
 		int			n;
 		zbx_wiget_field_t	*val = aggr_func->values[i];
@@ -1690,7 +1690,7 @@ static void	DBpatch_6050139_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 		}
 	}
 
-	while (0 < interval->values_num)	/* columns.N.time_from */
+	while (0 < interval->values_num)	/* columns.N.time_period.from */
 	{
 		int			n;
 		const char		*shift, *sign_shift = "+", *sign_interv = "-";
@@ -1713,7 +1713,7 @@ static void	DBpatch_6050139_transform(zbx_vector_wiget_field_t *timeshift, zbx_v
 		zbx_vector_wiget_field_remove_noorder(interval, interval->values_num - 1);
 	}
 
-	while (0 < timeshift->values_num)	/* columns.N.time_to */
+	while (0 < timeshift->values_num)	/* columns.N.time_period.to */
 	{
 		const char		*sign_shift = "+";
 		zbx_wiget_field_t	*val = timeshift->values[timeshift->values_num - 1];
@@ -1820,7 +1820,7 @@ static int	DBpatch_6050139_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 		zbx_wiget_field_t	*val = time_from->values[i];
 		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-		zbx_snprintf(name, sizeof(name), "columns%stime_from", val->name);
+		zbx_snprintf(name, sizeof(name), "columns%stime_period.from", val->name);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update widget_field"
 				" set value_str='%s',name='%s'"
@@ -1834,7 +1834,7 @@ static int	DBpatch_6050139_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 		zbx_wiget_field_t	*val = time_to->values[i];
 		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
 
-		zbx_snprintf(name, sizeof(name), "columns%stime_to", val->name);
+		zbx_snprintf(name, sizeof(name), "columns%stime_period.to", val->name);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update widget_field"
 				" set value_str='%s',name='%s'"
