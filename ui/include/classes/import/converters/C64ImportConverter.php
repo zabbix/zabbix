@@ -36,6 +36,8 @@ class C64ImportConverter extends CConverter {
 	public function convert(array $data): array {
 		$data['zabbix_export']['version'] = '7.0';
 
+		self::$parser = new CExpressionParser(['usermacros' => true, 'no_backslash_escaping' => true]);
+
 		if (array_key_exists('templates', $data['zabbix_export'])) {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
