@@ -1856,33 +1856,6 @@ static int	DBpatch_6050139_update(zbx_vector_wiget_field_t *time_from, zbx_vecto
 	return ret;
 }
 
-static int	DBpatch_6050139_insert(zbx_vector_wiget_field_t *time_from)
-{
-	zbx_db_insert_t	db_insert;
-	int		i, ret = SUCCEED;
-
-	if (0 == time_from->values_num)
-		return ret;
-
-	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
-			NULL);
-
-	for (i = 0; i < time_from->values_num; i++)
-	{
-		zbx_wiget_field_t	*val = time_from->values[i];
-		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
-
-		zbx_snprintf(name, sizeof(name), "columns%sitem_time", val->name);
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), val->wid, 0, name, 1);
-	}
-
-	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
-	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-
-	return ret;
-}
-
 static int	DBpatch_6050139(void)
 {
 	zbx_vector_wiget_field_t	time_from, time_to;
@@ -1898,8 +1871,7 @@ static int	DBpatch_6050139(void)
 
 	if (SUCCEED == DBpatch_6050139_load(&time_from, &time_to, &nofuncs_ids)
 			&& SUCCEED == DBpatch_6050139_remove(&nofuncs_ids)
-			&& SUCCEED == DBpatch_6050139_update(&time_from, &time_to)
-			&& SUCCEED == DBpatch_6050139_insert(&time_from))
+			&& SUCCEED == DBpatch_6050139_update(&time_from, &time_to))
 	{
 		ret = SUCCEED;
 	}
