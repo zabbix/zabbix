@@ -675,8 +675,16 @@ window.trigger_edit_popup = new class {
 			form_fields.dependencies = [];
 		}
 
+		if (!form_fields.discover) {
+			form_fields.discover = String(<?= TRIGGER_NO_DISCOVER ?>);
+		}
+
 		if (!form_fields.manual_close) {
 			form_fields.manual_close = String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>);
+		}
+
+		if (!form_fields.status) {
+			form_fields.status = String(<?= TRIGGER_STATUS_DISABLED ?>);
 		}
 
 		this.db_trigger.dependencies = [];
