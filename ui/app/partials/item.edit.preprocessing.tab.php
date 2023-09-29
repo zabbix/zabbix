@@ -20,7 +20,8 @@
 
 
 /**
- * @var CView $this
+ * @var CPartial $this
+ * @var array    $data
  */
 
 $formgrid = (new CFormGrid())
