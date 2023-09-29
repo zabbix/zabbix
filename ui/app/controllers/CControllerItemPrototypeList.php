@@ -96,7 +96,10 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 	protected function getItems(array $profile): array {
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$items = API::ItemPrototype()->get([
-			'output' => API_OUTPUT_EXTEND, // TODO: list required fields
+			'output' => [
+				'delay', 'history', 'key_', 'name', 'status', 'trends', 'type', 'discover',
+				'itemid', 'templateid', 'value_type', 'master_itemid'
+			],
 			'discoveryids' => [$this->getInput('parent_discoveryid')],
 			'selectTags' => ['tag', 'value'],
 			'editable' => true,
