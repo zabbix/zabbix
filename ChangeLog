@@ -1,8 +1,12 @@
 Changes for 6.0.23rc1
 
 New features:
+.......PS. [ZBXNEXT-8469] increased PostgreSQL maximum supported version to 16 (mprihodko)
+.......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
 
 Bug fixes:
+..F.....S. [ZBX-23301] removed checks for PostgreSQL-TimescaleDB versions combination (dimir)
+..F....... [ZBX-23211] fixed host dashboard view for multi page dashboard where the first page is empty (dpetra)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.22
