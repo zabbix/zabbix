@@ -21,9 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
-?>
 
+?>
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
 	<?= CTagFilterFieldHelper::getTemplate() ?>
 </script>

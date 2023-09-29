@@ -21,7 +21,9 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
 ?>
 <script>
 	const view = new class {
@@ -76,6 +78,79 @@
 				else if (target.matches('.js-massdelete-itemprototype')) {
 					this.#delete(target, {itemids: itemids, context: this.context});
 				}
+			});
+		}
+
+		editItemPrototype(target, data) {
+			this.#edit(target, {...data, action: 'item.prototype.edit'});
+		}
+
+		editTriggerPrototype(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.prototype.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#navigate(e.detail, location.href),
+				{once: true}
+			);
+		}
+
+		editHost(e, hostid) {
+			e.preventDefault();
+			this.openHostPopup({hostid});
+		}
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		}
+
+		openHostPopup(host_data) {
+			let original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('host_discovery.php');
+
+					list_url.setArgument('context', this.context);
+					list_url.setArgument('filter_set', 1);
+					original_url = list_url.getUrl();
+				}
+
+				history.replaceState({}, '', original_url);
+				this.#navigate(e.detail, original_url);
+			});
+		}
+
+		openTemplatePopup(template_data) {
+			let original_url = location.href;
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('host_discovery.php');
+
+					list_url.setArgument('context', this.context);
+					list_url.setArgument('filter_set', 1);
+					original_url = list_url.getUrl();
+				}
+
+				this.#navigate(e.detail, original_url);
 			});
 		}
 
@@ -189,79 +264,6 @@
 			});
 
 			return overlay;
-		}
-
-		editItemPrototype(target, data) {
-			this.#edit(target, {...data, action: 'item.prototype.edit'});
-		}
-
-		editTriggerPrototype(trigger_data) {
-			clearMessages();
-
-			const overlay = PopUp('trigger.prototype.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#navigate(e.detail, location.href),
-				{once: true}
-			);
-		}
-
-		editHost(e, hostid) {
-			e.preventDefault();
-			this.openHostPopup({hostid});
-		}
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		}
-
-		openHostPopup(host_data) {
-			let original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				if (e.detail.success.action === 'delete') {
-					let list_url = new Curl('host_discovery.php');
-
-					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
-					original_url = list_url.getUrl();
-				}
-
-				history.replaceState({}, '', original_url);
-				this.#navigate(e.detail, original_url);
-			});
-		}
-
-		openTemplatePopup(template_data) {
-			let original_url = location.href;
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				if (e.detail.success.action === 'delete') {
-					let list_url = new Curl('host_discovery.php');
-
-					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
-					original_url = list_url.getUrl();
-				}
-
-				this.#navigate(e.detail, original_url);
-			});
 		}
 
 		#navigate(response, url) {
