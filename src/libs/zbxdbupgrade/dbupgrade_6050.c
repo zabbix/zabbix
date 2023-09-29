@@ -1771,7 +1771,7 @@ static int	DBpatch_6050140(void)
 			tmp = zbx_db_dyn_escape_string(substitute);
 			zbx_free(substitute);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update items set params='%s' where itemid=%s;\n", substitute, row[0]);
+					"update items set params='%s' where itemid=%s;\n", tmp, row[0]);
 			zbx_free(tmp);
 		}
 		else
