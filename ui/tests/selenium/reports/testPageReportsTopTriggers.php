@@ -410,7 +410,7 @@ class testPageReportsTopTriggers extends CWebTest {
 
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
-			// Leave the page and reopen the previous page to make sure the filter state is still saved..
+			// Leave the page and reopen the previous page to make sure the filter state is still saved.
 			$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
 			$this->page->open($link)->waitUntilReady();
 			$this->assertTrue($filter->isExpanded($state));
