@@ -20,7 +20,8 @@
 
 
 /**
- * @var CView $this
+ * @var CPartial $this
+ * @var array    $data
  */
 
 $filter = (new CFilter())->setResetUrl((new CUrl())->setArgument('action', $data['action']));
