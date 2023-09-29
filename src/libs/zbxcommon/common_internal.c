@@ -37,4 +37,3 @@ void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_pro
 	log_func_callback = log_func;
 	get_progname_cb = get_progname;
 }
-

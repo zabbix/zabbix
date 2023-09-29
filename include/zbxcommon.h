@@ -459,7 +459,7 @@ while (0)
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_help(const char *param, const char **p, const char **usage_message);
+void	zbx_help(const char *param, const char **help_message, const char **usage_message);
 void	zbx_usage(const char **usage_message);
 void	zbx_version(const char *title_message);
 

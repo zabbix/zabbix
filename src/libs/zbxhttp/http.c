@@ -129,9 +129,8 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 
 	if (NULL != ssl_cert_file && '\0' != *ssl_cert_file)
 	{
-		char	*file_name;
+		char	*file_name = zbx_dsprintf(NULL, "%s/%s", config_ssl_cert_location, ssl_cert_file);
 
-		file_name = zbx_dsprintf(NULL, "%s/%s", config_ssl_cert_location, ssl_cert_file);
 		zabbix_log(LOG_LEVEL_DEBUG, "using SSL certificate file: '%s'", file_name);
 
 		err = curl_easy_setopt(easyhandle, CURLOPT_SSLCERT, file_name);

@@ -235,13 +235,14 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  * Purpose: prints application parameters on stdout with layout suitable for  *
  *          80-column terminal                                                *
  *                                                                            *
- * Comments:  p - [IN] usage_message                                          *
+ * Parameters:  usage_message - [IN]                                          *
  ******************************************************************************/
-void	zbx_usage(const char **p)
+void	zbx_usage(const char **usage_message)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
 #define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
+	const char	**p = usage_message;
 
 	if (NULL != *p)
 		printf("usage:\n");
@@ -298,12 +299,14 @@ static const char	help_message_footer[] =
  *          request with parameter '-h'                                       *
  *                                                                            *
  * Parameters: param         - [IN] pointer to modification parameter         *
- *             p             - [IN] help_message                              *
+ *             help_message  - [IN]                                           *
  *             usage_message - [IN]                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_help(const char *param, const char **p, const char **usage_message)
+void	zbx_help(const char *param, const char **help_message, const char **usage_message)
 {
+	const char	**p = help_message;
+
 	zbx_usage(usage_message);
 	printf("\n");
 
