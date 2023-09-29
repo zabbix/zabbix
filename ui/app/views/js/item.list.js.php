@@ -134,6 +134,94 @@
 			});
 		}
 
+		editItem(target, data) {
+			this.#edit(target, data);
+		}
+
+		editTrigger(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#navigate(e.detail, location.href),
+				{once: true}
+			);
+		}
+
+		executeNow(target, data) {
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'item.execute');
+			this.#post(curl, data);
+		}
+
+		editHost(e, hostid) {
+			e.preventDefault();
+			const host_data = {hostid};
+
+			this.openHostPopup(host_data);
+		}
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		}
+
+		openHostPopup(host_data) {
+			let original_url = location.href;
+			const overlay = PopUp('popup.host.edit', host_data, {
+				dialogueid: 'host_edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (['item.update', 'item.create', 'item.delete'].indexOf(e.detail.action) != -1) {
+					uncheckTableRows('item');
+				}
+
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('zabbix.php');
+
+					list_url.setArgument('action', 'item.list');
+					list_url.setArgument('context', this.context);
+					list_url.setArgument('filter_set', 1);
+					original_url = list_url.getUrl();
+				}
+
+				history.replaceState({}, '', original_url);
+				this.#navigate(e.detail, original_url);
+			});
+		}
+
+		openTemplatePopup(template_data) {
+			let original_url = location.href;
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
+				if (e.detail.success.action === 'delete') {
+					let list_url = new Curl('zabbix.php');
+
+					list_url.setArgument('action', 'item.list');
+					list_url.setArgument('context', this.context);
+					list_url.setArgument('filter_set', 1);
+					original_url = list_url.getUrl();
+				}
+
+				this.#navigate(e.detail, original_url)
+			});
+		}
+
 		#edit(target, parameters = {}) {
 			this.#popup('item.edit', parameters, {
 				dialogueid: 'item-edit',
@@ -181,10 +269,7 @@
 		}
 
 		#copy(target, itemids) {
-			this.#popup('copy.edit', {
-				source: 'items',
-				itemids
-			}, {
+			this.#popup('copy.edit', {source: 'items', itemids}, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static',
 				trigger_element: target
@@ -275,94 +360,6 @@
 			});
 
 			return overlay;
-		}
-
-		editItem(target, data) {
-			this.#edit(target, data);
-		}
-
-		editTrigger(trigger_data) {
-			clearMessages();
-
-			const overlay = PopUp('trigger.edit', trigger_data, {
-				dialogueid: 'trigger-edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this.#navigate(e.detail, location.href),
-				{once: true}
-			);
-		}
-
-		executeNow(target, data) {
-			const curl = new Curl('zabbix.php');
-
-			curl.setArgument('action', 'item.execute');
-			this.#post(curl, data);
-		}
-
-		editHost(e, hostid) {
-			e.preventDefault();
-			const host_data = {hostid};
-
-			this.openHostPopup(host_data);
-		}
-
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.openTemplatePopup(template_data);
-		}
-
-		openHostPopup(host_data) {
-			let original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
-				dialogueid: 'host_edit',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				if (['item.update', 'item.create', 'item.delete'].indexOf(e.detail.action) != -1) {
-					uncheckTableRows('item');
-				}
-
-				if (e.detail.success.action === 'delete') {
-					let list_url = new Curl('zabbix.php');
-
-					list_url.setArgument('action', 'item.list');
-					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
-					original_url = list_url.getUrl();
-				}
-
-				history.replaceState({}, '', original_url);
-				this.#navigate(e.detail, original_url);
-			});
-		}
-
-		openTemplatePopup(template_data) {
-			let original_url = location.href;
-			const overlay =  PopUp('template.edit', template_data, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', e => {
-				if (e.detail.success.action === 'delete') {
-					let list_url = new Curl('zabbix.php');
-
-					list_url.setArgument('action', 'item.list');
-					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
-					original_url = list_url.getUrl();
-				}
-
-				this.#navigate(e.detail, original_url)
-			});
 		}
 
 		#navigate(response, url) {
