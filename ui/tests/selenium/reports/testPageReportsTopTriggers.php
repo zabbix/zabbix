@@ -477,8 +477,7 @@ class testPageReportsTopTriggers extends CWebTest {
 		$this->assertEquals(['Host', 'Trigger', 'Severity', 'Number of problems'], $table->getHeadersText());
 	}
 
-	public static function getFilterData()
-	{
+	public static function getFilterData() {
 		return [
 			// Check filter results from particular host group.
 			[
