@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/../common/testFormGroups.php';
  * @backup hosts
  *
  * @onBefore prepareGroupData
+ *
+ * @dataSource HostTemplateGroups
  */
 class testFormTemplateGroupStandalone extends testFormGroups {
 
@@ -137,8 +139,8 @@ class testFormTemplateGroupStandalone extends testFormGroups {
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'One group for Delete',
-					'error' => 'Template "Template for group testing" cannot be without template group.'
+					'name' => self::DELETE_ONE_GROUP,
+					'error' => 'Template "Template for template group testing" cannot be without template group.'
 				]
 			]
 		];

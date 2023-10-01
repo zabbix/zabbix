@@ -559,10 +559,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'macOS by Zabbix agent'
                         name: 'macOS: CPU load'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   name: 'Memory usage'
                   'y': '5'
@@ -570,10 +573,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'macOS by Zabbix agent'
                         name: 'macOS: Memory usage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: 0355844b2bee4fb59bddda6175ef4810
           name: zabbix.host.available

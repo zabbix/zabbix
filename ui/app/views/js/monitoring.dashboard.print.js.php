@@ -26,8 +26,45 @@
 
 <script>
 	const view = {
-		init({dashboard, widget_defaults, time_period}) {
+		init({dashboard, widget_defaults, dashboard_time_period}) {
 			timeControl.refreshPage = false;
+
+			ZABBIX.Dashboard = new CDashboard(document.querySelector('.wrapper'), {
+				containers: {
+					grid: null,
+					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
+					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
+				},
+				buttons: {
+					previous_page: null,
+					next_page: null,
+					slideshow: null
+				},
+				data: {
+					dashboardid: dashboard.dashboardid,
+					name: dashboard.name,
+					userid: null,
+					templateid: null,
+					display_period: dashboard.display_period,
+					auto_start: false
+				},
+				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
+				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
+				cell_height: 70,
+				max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
+				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
+				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
+				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
+				widget_defaults,
+				is_editable: false,
+				is_edit_mode: false,
+				can_edit_dashboards: false,
+				is_kiosk_mode: true,
+				broadcast_options: {
+					_hostid: {rebroadcast: false},
+					_timeperiod: {rebroadcast: true}
+				}
+			});
 
 			const dashboard_page_containers = document.querySelectorAll('.<?= ZBX_STYLE_DASHBOARD_GRID ?>');
 			let page_number = 0;
@@ -52,25 +89,36 @@
 					widget_defaults: widget_defaults,
 					is_editable: false,
 					is_edit_mode: false,
-					can_edit_dashboards: false,
-					time_period: time_period,
-					dynamic_hostid: null,
 					unique_id: page.dashboard_pageid
 				});
 
-				for (const widget_data of page.widgets) {
-					dashboard_page.addWidget({
-						...widget_data,
-						is_new: false,
-						unique_id: widget_data.widgetid
-					});
+				for (const widget of page.widgets) {
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
+				}
+
+				for (const widget of page.widgets) {
+					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
 				}
 
 				dashboard_page.start();
 				dashboard_page.activate();
 
+				ZABBIX.Dashboard.addDashboardPage(dashboard_page);
+
 				page_number = page_number + 1;
 			}
+
+			ZABBIX.Dashboard.broadcast({
+				_hostid: null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
+
+			ZABBIX.Dashboard.activate();
 		}
 	}
 </script>

@@ -63,9 +63,7 @@ class CControllerDashboardWidgetView extends CController {
 	protected function checkInput(): bool {
 		$this->widget = APP::ModuleManager()->getActionModule();
 
-		$validation_rules = $this->validation_rules;
-
-		$ret = $this->validateInput($validation_rules);
+		$ret = $this->validateInput($this->validation_rules);
 
 		if ($ret) {
 			$this->form = $this->widget->getForm($this->getInput('fields', []),

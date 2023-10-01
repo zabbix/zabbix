@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/common/testAuditlogCommon.php';
 
 /**
- * @backup hosts
+ * @backup proxy
  */
 class testAuditlogProxy extends testAuditlogCommon {
 
@@ -39,11 +39,11 @@ class testAuditlogProxy extends testAuditlogCommon {
 	public function testAuditlogProxy_Create() {
 		$create = $this->call('proxy.create', [
 			[
-				'host' => 'Audit proxy',
-				'status' => 5,
+				'name' => 'Audit proxy',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Proxy audit description',
 				'tls_accept' => 2,
-				'proxy_address' => 'localhost',
+				'allowed_addresses' => 'localhost',
 				'tls_psk_identity' => 'Audit',
 				'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193478'
 			]
@@ -52,11 +52,10 @@ class testAuditlogProxy extends testAuditlogCommon {
 		self::$resourceid = $create['result']['proxyids'][0];
 
 		$created = json_encode([
-			'proxy.host' => ['add', 'Audit proxy'],
-			'proxy.status' => ['add', '5'],
+			'proxy.name' => ['add', 'Audit proxy'],
 			'proxy.description' => ['add', 'Proxy audit description'],
 			'proxy.tls_accept' => ['add', '2'],
-			'proxy.proxy_address' => ['add', 'localhost'],
+			'proxy.allowed_addresses' => ['add', 'localhost'],
 			'proxy.tls_psk_identity' => ['add', '******'],
 			'proxy.tls_psk' => ['add', '******'],
 			'proxy.proxyid' => ['add', self::$resourceid]
@@ -67,10 +66,10 @@ class testAuditlogProxy extends testAuditlogCommon {
 
 	public function testAuditlogProxy_Update() {
 		$updated = json_encode([
-			'proxy.host' => ['update', 'Updated Audit proxy', 'API active proxy for discovery action'],
+			'proxy.name' => ['update', 'Updated Audit proxy', 'API active proxy for discovery action'],
 			'proxy.description' => ['update', 'Update proxy audit description', ''],
 			'proxy.tls_accept' => ['update', '2', '1'],
-			'proxy.proxy_address' => ['update', 'updated_address', ''],
+			'proxy.allowed_addresses' => ['update', 'updated_address', ''],
 			'proxy.tls_psk_identity' => ['update', '******', '******'],
 			'proxy.tls_psk' => ['update', '******', '******']
 		]);
@@ -78,11 +77,11 @@ class testAuditlogProxy extends testAuditlogCommon {
 		$this->call('proxy.update', [
 			[
 				'proxyid' => self::PROXYID,
-				'host' => 'Updated Audit proxy',
-				'status' => 5,
+				'name' => 'Updated Audit proxy',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Update proxy audit description',
 				'tls_accept' => 2,
-				'proxy_address' => 'updated_address',
+				'allowed_addresses' => 'updated_address',
 				'tls_psk_identity' => 'Updated_TSK',
 				'tls_psk' => '11111595725ac58dd977beef14b97461a7c1045b9a1c923453302c5473193111'
 			]

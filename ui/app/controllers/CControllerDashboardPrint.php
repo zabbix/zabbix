@@ -25,7 +25,7 @@ class CControllerDashboardPrint extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'dashboardid' =>	'required|db dashboard.dashboardid',
 			'from' =>			'range_time',
@@ -41,7 +41,7 @@ class CControllerDashboardPrint extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD);
 	}
 
@@ -56,7 +56,7 @@ class CControllerDashboardPrint extends CController {
 
 		$time_selector_options = [
 			'profileIdx' => 'web.dashboard.filter',
-			'profileIdx2' => ($dashboard['dashboardid'] !== null) ? $dashboard['dashboardid'] : 0,
+			'profileIdx2' => $dashboard['dashboardid'] ?? 0,
 			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
 			'to' => $this->hasInput('to') ? $this->getInput('to') : null
 		];
@@ -65,7 +65,7 @@ class CControllerDashboardPrint extends CController {
 			'dashboard' => $dashboard,
 			'page_sizes' => $page_sizes,
 			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
-			'time_period' => getTimeSelectorPeriod($time_selector_options)
+			'dashboard_time_period' => getTimeSelectorPeriod($time_selector_options)
 		];
 
 		$response = new CControllerResponseData($data);
@@ -83,16 +83,19 @@ class CControllerDashboardPrint extends CController {
 		$error = null;
 		$page_sizes = [];
 
-		$dashboards = API::Dashboard()->get([
+		$db_dashboards = API::Dashboard()->get([
 			'output' => ['dashboardid', 'name', 'display_period'],
 			'selectPages' => ['dashboard_pageid', 'name', 'display_period', 'widgets'],
-			'dashboardids' => [$this->getInput('dashboardid')],
-			'preservekeys' => true
+			'dashboardids' => [$this->getInput('dashboardid')]
 		]);
 
-		if ($dashboards) {
-			$dashboard = array_shift($dashboards);
-			$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
+		if ($db_dashboards) {
+			$dashboard = $db_dashboards[0];
+			$dashboard['pages'] = CDashboardHelper::preparePages(
+				CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null),
+				$dashboard['pages'],
+				true
+			);
 
 			foreach($dashboard['pages'] as $index => $page) {
 				$max = 0;

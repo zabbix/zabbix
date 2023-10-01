@@ -26,8 +26,6 @@
 /*#define HOST_STATUS_UNREACHABLE	2*/
 #define HOST_STATUS_TEMPLATE		3
 /*#define HOST_STATUS_DELETED		4*/
-#define HOST_STATUS_PROXY_ACTIVE	5
-#define HOST_STATUS_PROXY_PASSIVE	6
 
 /* host group types */
 #define HOSTGROUP_TYPE_HOST		0

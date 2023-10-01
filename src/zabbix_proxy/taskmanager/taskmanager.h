@@ -37,7 +37,7 @@ typedef struct
 }
 zbx_thread_taskmanager_args;
 
-void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxy_hostid,
+void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
 		zbx_proxy_compatibility_t compatibility);
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args);

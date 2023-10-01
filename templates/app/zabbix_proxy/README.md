@@ -39,6 +39,7 @@
 |Zabbix proxy: Utilization of vmware data collector processes, in %|<p>Average percentage of time vmware collector processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,vmware collector,avg,busy]|
 |Zabbix proxy: Utilization of agent poller data collector processes, in %|<p>Average percentage of time agent poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,agent poller,avg,busy]|
 |Zabbix proxy: Utilization of http agent poller data collector processes, in %|<p>Average percentage of time http agent poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,http agent poller,avg,busy]|
+|Zabbix proxy: Utilization of snmp poller data collector processes, in %|<p>Average percentage of time snmp poller processes have been busy in the last minute.</p>|Zabbix internal|zabbix[process,snmp poller,avg,busy]|
 |Zabbix proxy: Configuration cache, % used|<p>Availability statistics of Zabbix configuration cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[rcache,buffer,pused]|
 |Zabbix proxy: Version|<p>Version of Zabbix proxy.</p>|Zabbix internal|zabbix[version]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |Zabbix proxy: VMware cache, % used|<p>Availability statistics of Zabbix vmware cache. Percentage of used buffer.</p>|Zabbix internal|zabbix[vmware,buffer,pused]|
@@ -87,6 +88,7 @@
 |Zabbix proxy: Utilization of vmware collector processes is high||`avg(/Zabbix proxy health/zabbix[process,vmware collector,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"vmware collector"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of agent poller processes is high||`avg(/Zabbix proxy health/zabbix[process,agent poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"agent poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Utilization of http agent poller processes is high||`avg(/Zabbix proxy health/zabbix[process,http agent poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"http agent poller"}`|Average|**Manual close**: Yes|
+|Zabbix proxy: Utilization of snmp poller processes is high||`avg(/Zabbix proxy health/zabbix[process,snmp poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}`|Average|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the configuration cache|<p>Consider increasing CacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[rcache,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|
 |Zabbix proxy: Version has changed|<p>Zabbix proxy version has changed. Acknowledge to close the problem manually.</p>|`last(/Zabbix proxy health/zabbix[version],#1)<>last(/Zabbix proxy health/zabbix[version],#2) and length(last(/Zabbix proxy health/zabbix[version]))>0`|Info|**Manual close**: Yes|
 |Zabbix proxy: More than {$ZABBIX.PROXY.UTIL.MAX}% used in the vmware cache|<p>Consider increasing VMwareCacheSize in the zabbix_proxy.conf configuration file.</p>|`max(/Zabbix proxy health/zabbix[vmware,buffer,pused],10m)>{$ZABBIX.PROXY.UTIL.MAX}`|Average|**Manual close**: Yes|

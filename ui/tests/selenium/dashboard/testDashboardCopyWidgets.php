@@ -179,7 +179,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 		// Get fields from widget form to compare them with new widget after copying.
 		$widget = $dashboard->getWidget($widget_name)->edit();
-		$original_form = $widget->getFields()->asValues();
+		$original_form = $widget->getFields()->filter(CElementFilter::VISIBLE)->asValues();
 
 		// Get tags of original widget.
 		if (stristr($widget_name, 'Problem')) {
@@ -228,12 +228,12 @@ class testDashboardCopyWidgets extends CWebTest {
 		// For Other dashboard and Map from Navigation tree case - add map source, because it is not being copied by design.
 		if (($new_dashboard || $new_page) && stristr($widget_name, 'Map from tree')) {
 			$copied_widget_form = $copied_widget->edit();
-			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
+			$copied_widget_form->fill(['Map' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
 		}
 
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
-		$copied_fields = $copied_widget->edit()->getFields();
+		$copied_fields = $copied_widget->edit()->getFields()->filter(CElementFilter::VISIBLE);
 
 		// Check tags of original and copied widget.
 		if (stristr($widget_name, 'Problem')) {
@@ -352,6 +352,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Gauge widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Top triggers widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Clock widget',
 					'copy to' => 'another dashboard'
 				]
@@ -389,6 +401,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Clock widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Gauge widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Top triggers widget',
 					'copy to' => 'another template'
 				]
 			]

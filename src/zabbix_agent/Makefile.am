@@ -1,34 +1,22 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	listener \
 	active_checks \
+	agent_conf \
 	logfiles
 
 EXTRA_DIST = \
-	eventlog \
-	perfstat.c \
-	perfstat.h
+	eventlog
 
 sbin_PROGRAMS = zabbix_agentd
-
-noinst_LIBRARIES = libzbxagent.a
-
-libzbxagent_a_SOURCES = \
-	listener.c \
-	listener.h \
-	metrics.h \
-	zbxconf.c \
-	zbxconf.h
-
-libzbxagent_a_CFLAGS = \
-	-DZABBIX_DAEMON \
-	$(TLS_CFLAGS)
 
 zabbix_agentd_SOURCES = zabbix_agentd.c
 
 zabbix_agentd_LDADD = \
-	libzbxagent.a \
 	active_checks/libzbxactive_checks.a \
+	listener/libzbxlistener.a \
+	agent_conf/libagent_conf.a \
 	logfiles/libzbxlogfiles.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \

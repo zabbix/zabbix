@@ -32,11 +32,13 @@ class CWarning extends Ctag {
 			->addClass(ZBX_STYLE_MSG_BAD);
 
 		if ($messages) {
-			$this->addItem(
-				(new CDiv(
-					(new CList($messages))->addClass(ZBX_STYLE_LIST_DASHED)
-				))->addClass(ZBX_STYLE_MSG_DETAILS)
-			);
+			$this
+				->addItem(
+					(new CDiv(
+						(new CList($messages))->addClass(ZBX_STYLE_LIST_DASHED)
+					))->addClass(ZBX_STYLE_MSG_DETAILS)
+				)
+				->addClass(ZBX_STYLE_COLLAPSIBLE);
 		}
 
 		$this->addItem(

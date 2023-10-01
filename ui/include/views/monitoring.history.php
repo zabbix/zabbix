@@ -238,7 +238,8 @@ else {
 
 	if ($data['itemids'] && $data['action'] !== HISTORY_LATEST) {
 		$filter_form->addTimeSelector($screen->timeline['from'], $screen->timeline['to'],
-			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE);
+			$web_layout_mode != ZBX_LAYOUT_KIOSKMODE
+		);
 	}
 
 	if ($data['action'] == HISTORY_BATCH_GRAPH) {

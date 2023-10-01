@@ -223,7 +223,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 		return FAIL;
 	}
 
-	if (FAIL == zbx_is_uint32(params[0], &precision))
+	if (FAIL == zbx_is_uint_range(params[0], &precision, 0, 20))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "invalid parameter \"%s\"", params[0]);
 		return FAIL;

@@ -31,7 +31,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxautoreg.h"
-#include "../scripts/scripts.h"
+#include "zbxscripts.h"
 
 extern unsigned char	program_type;
 
@@ -384,7 +384,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6) || 0 == strncmp(key, "log.count[", 10) ||
 			0 == strncmp(key, "logrt.count[", 12))
 		item_key = ZBX_KEY_LOG;
-	else if (0 == strncmp(key, "eventlog[", 9))
+	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 15))
 		item_key = ZBX_KEY_EVENTLOG;
 	else
 		return;
@@ -617,11 +617,21 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 			/* Removing those would cause older agents to fail. */
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, dc_items[i].lastlogsize);
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, dc_items[i].mtime);
+
+			dc_items[i].timeout = zbx_strdup(dc_items[i].timeout, dc_items[i].timeout_orig);
+
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &dc_items[i].host.hostid, NULL, NULL,
+						NULL, NULL, NULL, NULL, NULL, &dc_items[i].timeout, ZBX_MACRO_TYPE_COMMON, NULL,
+						0);
+
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_TIMEOUT, dc_items[i].timeout, ZBX_JSON_TYPE_STRING);
+
 			zbx_json_close(&json);
 
 			zbx_itemkey_extract_global_regexps(dc_items[i].key, &names);
 
 			zbx_free(dc_items[i].key);
+			zbx_free(dc_items[i].timeout);
 		}
 
 		zbx_dc_config_clean_items(dc_items, errcodes, num);

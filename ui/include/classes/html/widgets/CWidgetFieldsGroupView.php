@@ -91,16 +91,19 @@ class CWidgetFieldsGroupView extends CDiv {
 	}
 
 	protected function bodyToString() {
-		foreach ($this->fields as &$field) {
+		$collection = [];
+
+		foreach ($this->fields as $field) {
 			if ($field instanceof CWidgetFieldView) {
-				$field = [
-					$field->getLabel(),
-					(new CFormField($field->getView()))->addClass($field->getClass())
-				];
+				foreach ($field->getViewCollection() as ['label' => $label, 'view' => $view, 'class' => $class]) {
+					$collection[] = [$label, (new CFormField($view))->addClass($class)];
+				}
+			}
+			else {
+				$collection[] = $field;
 			}
 		}
-		unset($field);
 
-		return unpack_object($this->fields);
+		return unpack_object($collection);
 	}
 }

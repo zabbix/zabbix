@@ -151,6 +151,7 @@
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=128"/>
+			<arg line="--with-openssl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -341,6 +342,7 @@
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=128"/>
+			<arg line="--with-openssl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>

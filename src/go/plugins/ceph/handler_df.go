@@ -21,7 +21,6 @@ package ceph
 
 import (
 	"encoding/json"
-	"math"
 
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -91,7 +90,7 @@ func dfHandler(data map[command][]byte) (interface{}, error) {
 
 	for _, p := range df.Pools {
 		poolsStat[p.Name] = poolStat{
-			PercentUsed: math.Round(p.Stats.PercentUsed),
+			PercentUsed: p.Stats.PercentUsed,
 			Objects:     p.Stats.Objects,
 			BytesUsed:   p.Stats.BytesUsed,
 			Rd:          p.Stats.Rd,

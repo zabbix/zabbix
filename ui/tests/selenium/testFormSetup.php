@@ -54,10 +54,11 @@ class testFormSetup extends CWebTest {
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
-		$this->assertEquals('English (en_US)', $language_field->getValue());
+		$this->assertEquals('English (en_GB)', $language_field->getValue());
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
-		$this->assertEquals($hint_text, $this->query('class:hint-box')->one()->getText());
+		$this->assertEquals($hint_text, $this->query('xpath://button[@data-hintbox]')->one()
+				->getAttribute('data-hintbox-contents'));
 		$this->checkButtons('first section');
 
 		$this->assertScreenshot($form, 'Welcome_En');
@@ -276,9 +277,11 @@ class testFormSetup extends CWebTest {
 
 		// Check timezone field.
 		$timezones_field = $form->getField('Default time zone');
-
 		$timezones = $timezones_field->getOptions()->asText();
-		$this->assertEquals(427, count($timezones));
+
+		// Note that count of available timezones may differ based on the local environment configuration.
+		$this->assertEquals(420, count($timezones));
+
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
 			$this->assertContains($timezone, $timezones);

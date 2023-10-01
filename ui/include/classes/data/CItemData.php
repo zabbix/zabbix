@@ -130,6 +130,7 @@ final class CItemData {
 			'agent.variant',
 			'agent.version',
 			'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]',
+			'eventlog.count[name,<regexp>,<severity>,<source>,<eventid>,<maxproclines>,<mode>]',
 			'kernel.maxfiles',
 			'kernel.maxproc',
 			'kernel.openfiles',
@@ -517,6 +518,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'js-item-username-label',
 					'js-item-username-field',
 					'username',
@@ -546,6 +549,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -557,13 +562,13 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'js-item-query-fields-label',
 					'js-item-query-fields-field',
 					'js-item-request-method-label',
 					'js-item-request-method-field',
 					'request_method',
-					'js-item-timeout-label',
-					'js-item-timeout-field',
 					'js-item-post-type-label',
 					'js-item-post-type-field',
 					'js-item-posts-label',
@@ -653,13 +658,13 @@ final class CItemData {
 					'js-item-parameters-field',
 					'js-item-script-label',
 					'js-item-script-field',
-					'js-item-timeout-label',
-					'js-item-timeout-field',
 					'js-item-delay-label',
 					'js-item-delay-field',
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -669,6 +674,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'js-item-interface-label',
 					'js-item-interface-field',
 					'interfaceid',
@@ -693,6 +700,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -723,6 +732,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'params_script',
 					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH],
 					['id' => 'value_type', 'defaultValue' => '']
@@ -744,6 +755,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					'params_script',
 					['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET],
 					['id' => 'value_type', 'defaultValue' => '']
@@ -764,6 +777,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				],
@@ -773,6 +788,8 @@ final class CItemData {
 					'delay',
 					'js-item-flex-intervals-label',
 					'js-item-flex-intervals-field',
+					'js-item-timeout-label',
+					'js-item-timeout-field',
 					['id' => 'key', 'defaultValue' => ''],
 					['id' => 'value_type', 'defaultValue' => '']
 				]
@@ -940,6 +957,12 @@ final class CItemData {
 				'value_type' => ITEM_VALUE_TYPE_LOG,
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#eventlog'
+				]
+			],'eventlog.count[name,<regexp>,<severity>,<source>,<eventid>,<maxproclines>,<mode>]' => [
+				'description' => _('Event log monitoring. Returns count of entries'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#eventlog.count'
 				]
 			],
 			'icmpping[<target>,<packets>,<interval>,<size>,<timeout>,<options>]' => [

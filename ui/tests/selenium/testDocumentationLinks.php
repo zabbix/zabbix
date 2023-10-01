@@ -59,6 +59,27 @@ class testDocumentationLinks extends CWebTest {
 				'url' => '{$URL}'
 			]
 		]);
+
+		// Create event correlation.
+		CDataHelper::call('correlation.create', [
+			[
+				'name' => 'Event correlation for links check',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'links tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			]
+		]);
 	}
 
 	/**
@@ -524,28 +545,41 @@ class testDocumentationLinks extends CWebTest {
 			// #49 Template list view.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates'
 				]
 			],
 			// #50 Create template view.
 			[
 				[
-					'url' => 'templates.php?form=create',
+					'url' => 'zabbix.php?action=template.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create template'
+						]
+					],
+					'open_button' => 'button:Create template',
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
 			// #51 Update template view.
 			[
 				[
-					'url' => 'templates.php?form=update&templateid=10047',
+					'url' => 'zabbix.php?action=template.list',
+					'actions' => [
+								[
+									'callback' => 'openFormWithLink',
+									'element' => 'xpath://a[text()="AIX by Zabbix agent"]'
+								]
+							],
 					'doc_link' => '/en/manual/config/templates/template#creating-a-template'
 				]
 			],
 			// #52 Template import popup.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -558,7 +592,7 @@ class testDocumentationLinks extends CWebTest {
 			// #53 Template mass update popup.
 			[
 				[
-					'url' => 'templates.php',
+					'url' => 'zabbix.php?action=template.list',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -616,28 +650,40 @@ class testDocumentationLinks extends CWebTest {
 			// #59 Template trigger list view.
 			[
 				[
-					'url' => 'triggers.php?context=template',
+					'url' => 'zabbix.php?action=trigger.list&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/triggers'
 				]
 			],
 			// #60 Template trigger create form.
 			[
 				[
-					'url' => 'triggers.php?hostid=15000&form=create&context=template',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=15000&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create trigger'
+						]
+					],
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
 			// #61 Template trigger update form.
 			[
 				[
-					'url' => 'triggers.php?form=update&triggerid=99000&context=template',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=15000&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testInheritanceTrigger1'
+						]
+					],
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
 			// #62 Template trigger Mass update popup.
 			[
 				[
-					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=15000&context=template',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=15000&context=template',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -813,28 +859,40 @@ class testDocumentationLinks extends CWebTest {
 			// #80 Template LLD trigger prototype list view.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=15011&context=template',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/templates/discovery/trigger_prototypes'
 				]
 			],
 			// #81 Template LLD trigger prototype create form.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&form=create&context=template',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=15011&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create trigger prototype'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
 			// #82 Template LLD trigger prototype edit form.
 			[
 				[
-					'url' => 'trigger_prototypes.php?form=update&parent_discoveryid=15011&triggerid=99008&context=template',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=15011&context=template',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'xpath://table[@class="list-table"]//tr[1]/td[3]/a'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
 			// #83 Template LLD trigger prototype mass update popup.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=15011&context=template',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=15011&context=template',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -1039,28 +1097,40 @@ class testDocumentationLinks extends CWebTest {
 			// #105 Host trigger list view.
 			[
 				[
-					'url' => 'triggers.php?context=host',
+					'url' => 'zabbix.php?action=trigger.list&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/triggers'
 				]
 			],
 			// #106 Host trigger create form.
 			[
 				[
-					'url' => 'triggers.php?hostid=40001&form=create&context=host',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=40001&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create trigger'
+						]
+					],
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
 			// #107 Host trigger update form.
 			[
 				[
-					'url' => 'triggers.php?form=update&triggerid=14000&context=host',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=40001&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testFormTrigger1'
+						]
+					],
 					'doc_link' => '/en/manual/config/triggers/trigger#configuration'
 				]
 			],
 			// #108 Host trigger Mass update popup.
 			[
 				[
-					'url' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=40001&context=host',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -1166,28 +1236,40 @@ class testDocumentationLinks extends CWebTest {
 			// #120 Host LLD trigger prototype list view.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes'
 				]
 			],
 			// #121 Host LLD trigger prototype create form.
 			[
 				[
-					'url' => 'trigger_prototypes.php?parent_discoveryid=133800&form=create&context=host',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create trigger prototype'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
 			// #122 Host LLD trigger prototype edit form.
 			[
 				[
-					'url' => 'trigger_prototypes.php?form=update&parent_discoveryid=133800&triggerid=99518&context=host',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:testFormTriggerPrototype1'
+						]
+					],
 					'doc_link' => '/en/manual/discovery/low_level_discovery/trigger_prototypes'
 				]
 			],
 			// #123 Host LLD trigger prototype mass update popup.
 			[
 				[
-					'url' => 'trigger_prototypes.php?cancel=1&parent_discoveryid=133800&context=host',
+					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
 					'actions' => [
 						[
 							'callback' => 'openMassUpdate'
@@ -1241,28 +1323,28 @@ class testDocumentationLinks extends CWebTest {
 			// #130 Host Web scenario list view.
 			[
 				[
-					'url' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D=40001&context=host',
+					'url' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D=50001&context=host',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/data_collection/hosts/web'
 				]
 			],
 			// #131 Host Web scenario create form.
 			[
 				[
-					'url' => 'httpconf.php?form=create&hostid=40001&context=host',
+					'url' => 'httpconf.php?form=create&hostid=50001&context=host',
 					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 				]
 			],
 			// #132 Host Web scenario edit form.
 			[
 				[
-					'url' => 'httpconf.php?form=update&hostid=40001&httptestid=94&context=host',
+					'url' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host',
 					'doc_link' => '/en/manual/web_monitoring#configuring-a-web-scenario'
 				]
 			],
 			// #133 Host Web scenario step configuration form popup.
 			[
 				[
-					'url' => 'httpconf.php?form=update&hostid=40001&httptestid=94&context=host',
+					'url' => 'httpconf.php?form=update&hostid=50001&httptestid=102&context=host',
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
@@ -1468,7 +1550,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'link:Event correlation for update'
+							'element' => 'link:Event correlation for links check'
 						]
 					],
 					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
@@ -2401,14 +2483,32 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/data_overview'
 				]
 			],
-			// #233 Connectors list view.
+			// #233 Start creating Gauge widget.
+			[
+				[
+					'url' => 'zabbix.php?action=dashboard.view&dashboardid=1',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Edit dashboard'
+						],
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'id:dashboard-add-widget'
+						]
+					],
+					'widget_type' => 'Gauge',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/gauge'
+				]
+			],
+			// #234 Connectors list view.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#connectors'
 				]
 			],
-			// #234 Create connectors popup.
+			// #235 Create connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',
@@ -2421,7 +2521,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
 				]
 			],
-			// #235 Edit connectors popup.
+			// #236 Edit connectors popup.
 			[
 				[
 					'url' => 'zabbix.php?action=connector.list',

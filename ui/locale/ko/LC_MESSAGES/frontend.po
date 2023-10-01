@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-12 02:59+0000\n"
-"Last-Translator: kimseungyong <sykim@feelatech.com>\n"
+"PO-Revision-Date: 2023-09-22 06:16+0000\n"
+"Last-Translator: diana.dauksa <diana.dauksa@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -892,6 +892,10 @@ msgstr "추가"
 msgid "Add (message type limit reached)"
 msgstr "추가(메시지 유형 제한에 도달함)"
 
+#: widgets/tophosts/views/widget.edit.php:63
+msgid "Add a column"
+msgstr ""
+
 #: jsLoader.php:149
 msgid "Add a new widget"
 msgstr "새로운 위젯을 추가"
@@ -927,6 +931,10 @@ msgstr ""
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
 msgstr "호스트 추가"
+
+#: include/actions.inc.php:653 include/actions.inc.php:871
+msgid "Add host tags"
+msgstr ""
 
 #: app/views/popup.massupdate.trigger.php:155
 #: include/views/configuration.trigger.prototype.edit.php:685
@@ -1111,6 +1119,14 @@ msgstr "집계"
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
 msgstr "집계 함수"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:284
+msgid "Aggregates each item in the data set."
+msgstr ""
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:306
+msgid "Aggregates the whole data set."
+msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
@@ -1336,6 +1352,10 @@ msgstr ""
 msgid "Annually"
 msgstr "매년"
 
+#: jsLoader.php:201
+msgid "Another widget is used as data source."
+msgstr ""
+
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
 #: app/views/administration.module.list.php:53
@@ -1355,6 +1375,10 @@ msgstr "매년"
 #: include/views/configuration.maintenance.list.php:69
 msgid "Any"
 msgstr "전부"
+
+#: app/views/js/popup.host.edit.js.php:64 app/views/js/template.edit.js.php:139
+msgid "Any changes made in the current form will be lost."
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:164
 #: include/classes/helpers/CRegexHelper.php:27
@@ -1461,6 +1485,28 @@ msgstr ""
 #: include/hosts.inc.php:149
 msgid "Asset tag"
 msgstr "포함 태그"
+
+#: include/classes/helpers/CMaintenanceHelper.php:85
+#, c-format
+msgid "At %1$s %2$s of every week"
+msgid_plural "At %1$s %2$s of every %3$s weeks"
+msgstr[0] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:71
+#, c-format
+msgid "At %1$s every day"
+msgid_plural "At %1$s every %2$s days"
+msgstr[0] ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:113
+#, c-format
+msgid "At %1$s on %2$s %3$s of every %4$s"
+msgstr ""
+
+#: include/classes/helpers/CMaintenanceHelper.php:118
+#, c-format
+msgid "At %1$s on day %2$s of every %3$s"
+msgstr ""
 
 #: include/maintenances.inc.php:70
 #, c-format
@@ -2213,6 +2259,10 @@ msgstr "그래프 \"%1$s\" 에 \"그래프 합계값\" 은 2개 이상 설정할
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
 msgstr "그래프 프로토타입 \"%1$s\"에 \"그래프 합계값\" 은 두 개 이상 설정할 수 없습니다."
+
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:202
+msgid "Cannot add more than one item with type \"Total\" to the chart."
+msgstr ""
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -3697,6 +3747,10 @@ msgstr "그래프의 프로토타입 \"%2$s\"에 \"%1$s\"를 설정할 수 없�
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "아이템\"%2$s\"에 \"%1$s\"를 설정할 수 없습니다."
 
+#: widgets/piechart/includes/CWidgetFieldDataSet.php:208
+msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2237
 #, c-format
 msgid "Cannot set dependency for LLD rule with key \"%1$s\" on the master item with key \"%2$s\" on the host \"%3$s\": %4$s."
@@ -4597,6 +4651,10 @@ msgstr "커맨드"
 msgid "Commands"
 msgstr "커맨드"
 
+#: app/views/administration.timeouts.edit.php:138
+msgid "Communication"
+msgstr ""
+
 #: app/views/administration.miscconfig.edit.php:133
 msgid "Communication with Zabbix server"
 msgstr "Zabbix 서버와 통신"
@@ -4809,6 +4867,10 @@ msgstr "템플릿 그룹 설정"
 msgid "Configuration of templates"
 msgstr "템플릿 설정"
 
+#: app/controllers/CControllerTimeoutsEdit.php:110
+msgid "Configuration of timeouts"
+msgstr ""
+
 #: app/controllers/CControllerTrigDisplayEdit.php:132
 msgid "Configuration of trigger displaying options"
 msgstr "트리거 표시 옵션 설정"
@@ -4892,6 +4954,10 @@ msgstr "접속 방법"
 msgctxt "missing data function"
 msgid "Connected"
 msgstr "접속됨"
+
+#: app/views/administration.timeouts.edit.php:148
+msgid "Connection"
+msgstr ""
 
 #: app/views/administration.mediatype.edit.php:81
 msgid "Connection security"
@@ -5741,6 +5807,14 @@ msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] "대시보드를 삭제하셨습니다."
 
+#: jsLoader.php:200
+msgid "Dashboard is used as data source."
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:142
+msgid "Dashboard list"
+msgstr ""
+
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
 msgstr "대시보드 페이지 속성"
@@ -5818,6 +5892,10 @@ msgstr "데이터 개요"
 #: include/classes/widgets/views/widget.svggraph.form.view.php:304
 msgid "Data set"
 msgstr "데이터 셋"
+
+#: widgets/piechart/includes/CWidgetFieldDataSetView.php:305
+msgid "Data set aggregation"
+msgstr ""
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:401
 msgid "Data set label"
@@ -7312,6 +7390,10 @@ msgstr "정규 표현식과 일치하지 않음"
 msgid "Dot"
 msgstr "점선"
 
+#: widgets/piechart/includes/WidgetForm.php:142
+msgid "Doughnut"
+msgstr ""
+
 #: app/views/monitoring.widget.discovery.view.php:34
 msgctxt "discovery results in dashboard"
 msgid "Down"
@@ -8051,6 +8133,10 @@ msgstr "이벤트가 인정되지 않음"
 msgid "Event list [previous 20]"
 msgstr "이벤트리스트 [최근20]"
 
+#: include/classes/data/CItemData.php:946
+msgid "Event log monitoring. Returns count of entries"
+msgstr ""
+
 #: include/classes/data/CItemData.php:842
 msgid "Event log monitoring. Returns log"
 msgstr "이벤트 로그의 감시. 로그 값을 리턴."
@@ -8386,6 +8472,10 @@ msgstr "대시보드 속성을 갱신하지 못했습니다."
 #: app/views/js/popup.dashboard.share.edit.js.php:83
 msgid "Failed to update dashboard sharing."
 msgstr "대시보드 공유를 갱신하지 못했습니다."
+
+#: jsLoader.php:128
+msgid "Failed to update time selector."
+msgstr ""
 
 #: jsLoader.php:141
 msgid "Failed to update widget properties."
@@ -8810,10 +8900,21 @@ msgstr ""
 msgid "Given expression is not a macro"
 msgstr "설정한 조건식은 매크로가 아닙니다"
 
+#: app/views/popup.massupdate.item.php:291 app/views/popup.proxy.edit.php:194
+#: include/views/configuration.host.discovery.edit.php:717
+#: include/views/configuration.item.edit.php:844
+#: include/views/configuration.item.prototype.edit.php:798
+msgid "Global"
+msgstr ""
+
 #: include/classes/api/services/CIconMap.php:366
 #, c-format
 msgid "Global regular expression \"%1$s\" does not exist."
 msgstr "글로벌 정규표현 \"%1$s\" 는 존재하지 않습니다."
+
+#: app/views/popup.proxy.edit.php:199
+msgid "Global timeouts"
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:56
 msgid "Global value"
@@ -9506,6 +9607,10 @@ msgstr "호스트에 같은 타입의 기본 인터페이스는 2개 이상 설�
 msgid "Host count"
 msgstr "호스트 수"
 
+#: app/views/monitoring.host.dashboard.view.php:71
+msgid "Host dashboards"
+msgstr ""
+
 #: app/controllers/CControllerHostMassDelete.php:65
 msgid "Host deleted"
 msgstr "호스트를 삭제하였습니다"
@@ -9882,6 +9987,12 @@ msgstr "시간"
 #: include/classes/helpers/CMenuHelper.php:251 include/html.inc.php:891
 msgid "Housekeeping"
 msgstr "데이터 보존기간"
+
+#: app/views/popup.massupdate.item.php:207
+#: include/views/configuration.item.edit.php:1062
+#: include/views/configuration.item.prototype.edit.php:931
+msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
+msgstr ""
 
 #: include/locales.inc.php:46
 msgid "Hungarian (hu_HU)"
@@ -12023,6 +12134,10 @@ msgstr "아이템 프로토타입 갱신됨"
 msgid "Item tags"
 msgstr "아이템 태그"
 
+#: app/views/administration.timeouts.edit.php:178
+msgid "Item test"
+msgstr ""
+
 #: jsLoader.php:397
 msgid "Item type does not use interface"
 msgstr "아이템 유형은 인터페이스를 사용하지 않습니다."
@@ -13347,6 +13462,10 @@ msgstr[0] "미디어 타입을 활성화 하였습니다"
 msgid "Media type mapping"
 msgstr ""
 
+#: app/views/administration.timeouts.edit.php:158
+msgid "Media type test"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
 msgid "Media type test failed."
@@ -13427,6 +13546,10 @@ msgstr "메뉴 항목 이름은 이벤트 컨텍스트 메뉴에서 트리거 UR
 #: app/views/administration.script.edit.php:108
 msgid "Menu path"
 msgstr "메뉴 경로"
+
+#: widgets/piechart/includes/WidgetForm.php:158
+msgid "Merge sectors smaller than "
+msgstr ""
 
 #: app/partials/popup.operations.php:160
 #: app/partials/scheduledreport.formgrid.html.php:178
@@ -14079,6 +14202,10 @@ msgstr "예약된 보고서 테스트에 대한 네트워크 시간 초과"
 msgid "Network timeout for script execution"
 msgstr "스크립트 실행을 위한 네트워크 시간 초과"
 
+#: app/views/administration.timeouts.edit.php:136
+msgid "Network timeouts for UI"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1687
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
 msgstr ""
@@ -14209,8 +14336,16 @@ msgstr ""
 msgid "New step of web scenario"
 msgstr ""
 
+#: app/controllers/CControllerUsergroupTagFilterEdit.php:65
+msgid "New tag filter"
+msgstr ""
+
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
+msgstr ""
+
+#: app/views/template.edit.php:352
+msgid "New template"
 msgstr ""
 
 #: app/views/configuration.templategroup.edit.php:52
@@ -14218,12 +14353,24 @@ msgstr ""
 msgid "New template group"
 msgstr "새 템플릿 그룹"
 
+#: app/views/trigger.edit.php:144
+msgid "New trigger"
+msgstr ""
+
+#: app/views/trigger.prototype.edit.php:143
+msgid "New trigger prototype"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:187
 msgid "New triggers"
 msgstr "신규 트리거"
 
 #: app/views/popup.usergroupmapping.edit.php:114
 msgid "New user group mapping"
+msgstr ""
+
+#: app/views/monitoring.host.dashboard.view.php:144
+msgid "Next dashboard"
 msgstr ""
 
 #: app/views/monitoring.dashboard.view.php:181
@@ -14310,6 +14457,10 @@ msgstr "인증사용자 명이 설정되어 있지 않습니다"
 #: app/views/popup.import.compare.php:173
 msgid "No changes."
 msgstr "변경 사항 없음."
+
+#: jsLoader.php:194
+msgid "No compatible widgets."
+msgstr ""
 
 #: app/views/configuration.correlation.edit.php:56
 #: include/views/configuration.action.edit.php:58
@@ -15545,6 +15696,10 @@ msgstr "다음에 덮어쓰기"
 msgid "Override"
 msgstr ""
 
+#: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
+msgid "Override host"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:128
 msgid "Override item history period"
 msgstr "아이템 이력의 보존기간을 덮어쓰기"
@@ -16135,6 +16290,10 @@ msgstr "페르시아어 (fa_IR)"
 msgid "Pie"
 msgstr "원 그래프"
 
+#: widgets/piechart/Widget.php:31
+msgid "Pie chart"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:135
 msgid "Placing algorithm"
 msgstr "배치 알고리즘"
@@ -16289,6 +16448,12 @@ msgstr "예측 함수"
 msgid "Preprocessing"
 msgstr "보존하기 전의 처리"
 
+#: app/views/popup.massupdate.item.php:205
+#: include/views/configuration.item.edit.php:1060
+#: include/views/configuration.item.prototype.edit.php:929
+msgid "Preprocessing is a transformation before saving the value to the database. It is possible to define a sequence of preprocessing steps, and those are executed in the order they are set."
+msgstr ""
+
 #: app/views/popup.itemtestedit.view.php:354
 #: app/views/popup.massupdate.item.php:209
 #: include/views/configuration.host.discovery.edit.php:971
@@ -16312,6 +16477,10 @@ msgstr ""
 #: include/views/configuration.graph.edit.php:451
 msgid "Preview"
 msgstr "미리보기"
+
+#: app/views/monitoring.host.dashboard.view.php:133
+msgid "Previous dashboard"
+msgstr ""
 
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
@@ -16690,6 +16859,10 @@ msgstr "공개키"
 #: include/views/configuration.item.prototype.edit.php:662
 msgid "Public key file"
 msgstr "공개키 파일"
+
+#: app/controllers/CControllerAuditLogList.php:218
+msgid "Push"
+msgstr ""
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
@@ -17179,6 +17352,10 @@ msgstr "호스트 그룹에서 삭제"
 #: include/actions.inc.php:690 include/actions.inc.php:1030
 msgid "Remove host"
 msgstr "호스트 삭제"
+
+#: include/actions.inc.php:656 include/actions.inc.php:872
+msgid "Remove host tags"
+msgstr ""
 
 #: app/views/monitoring.widget.favgraphs.view.php:42
 #: app/views/monitoring.widget.favmaps.view.php:39
@@ -17746,6 +17923,10 @@ msgstr ""
 msgid "SLA with ID \"%1$s\" is not available."
 msgstr ""
 
+#: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
+msgid "SLAs"
+msgstr ""
+
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:164
@@ -18067,6 +18248,10 @@ msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
 msgstr[0] "예약 보고서 사용"
 
+#: app/views/administration.timeouts.edit.php:188
+msgid "Scheduled report test"
+msgstr ""
+
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
 msgstr "예약 보고서 업데이트됨"
@@ -18131,6 +18316,10 @@ msgstr[0] "스크립트를 삭제하였습니다"
 
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
+msgstr ""
+
+#: app/views/administration.timeouts.edit.php:168
+msgid "Script execution"
 msgstr ""
 
 #: app/views/js/popup.scriptexec.js.php:47
@@ -18707,6 +18896,11 @@ msgstr "단축"
 msgid "Show"
 msgstr "보이기"
 
+#: widgets/piechart/includes/WidgetForm.php:234
+#: widgets/svggraph/includes/WidgetForm.php:378
+msgid "Show aggregation function"
+msgstr ""
+
 #: widgets/gauge/includes/WidgetForm.php:302
 msgid "Show arc"
 msgstr ""
@@ -18813,6 +19007,10 @@ msgstr "HTML로 텍스트 보이기"
 #: include/classes/widgets/forms/CWidgetFormProblems.php:218
 msgid "Show timeline"
 msgstr "타임라인을 표시"
+
+#: widgets/piechart/includes/WidgetForm.php:170
+msgid "Show total value"
+msgstr ""
 
 #: include/views/configuration.graph.edit.php:130
 msgid "Show triggers"
@@ -19024,6 +19222,10 @@ msgstr "소스"
 #: include/classes/widgets/forms/CWidgetFormMap.php:40
 msgid "Source type"
 msgstr "소스의 종류"
+
+#: widgets/piechart/includes/WidgetForm.php:152
+msgid "Space between sectors"
+msgstr ""
 
 #: include/locales.inc.php:61
 msgid "Spanish (es_ES)"
@@ -19425,6 +19627,10 @@ msgstr ""
 msgid "Support"
 msgstr "지원"
 
+#: include/classes/setup/CSetupWizard.php:517
+msgid "Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:124
 msgid "Support for the old numeric type is deprecated. Please upgrade to numeric values of extended range."
 msgstr ""
@@ -19596,6 +19802,10 @@ msgstr "태그 필터"
 #: include/views/configuration.triggers.edit.php:550
 msgid "Tag for matching"
 msgstr "매칭을 위한 태그"
+
+#: app/views/usergroup.tagfilter.edit.php:75
+msgid "Tag list"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:151
 #: app/partials/monitoring.problem.filter.php:219 include/actions.inc.php:65
@@ -20327,6 +20537,28 @@ msgstr ""
 msgid "Timeout"
 msgstr "타임아웃"
 
+#: app/views/administration.timeouts.edit.php:203
+#: app/views/administration.timeouts.edit.php:207
+#: app/views/popup.proxy.edit.php:309
+#: include/classes/helpers/CMenuHelper.php:344 include/html.inc.php:907
+#: include/views/configuration.host.discovery.edit.php:703
+#: include/views/configuration.host.discovery.edit.php:706
+#: include/views/configuration.item.edit.php:830
+#: include/views/configuration.item.edit.php:833
+#: include/views/configuration.item.prototype.edit.php:784
+#: include/views/configuration.item.prototype.edit.php:787
+msgid "Timeouts"
+msgstr ""
+
+#: app/views/popup.proxy.edit.php:186
+msgid "Timeouts are disabled because the proxy and server versions do not match."
+msgstr ""
+
+#: app/views/administration.timeouts.edit.php:42
+#: app/views/popup.proxy.edit.php:191
+msgid "Timeouts for item types"
+msgstr ""
+
 #: app/views/monitoring.widget.plaintext.view.php:32
 #: include/classes/screens/CScreenHistory.php:265
 #: include/classes/screens/CScreenHistory.php:391
@@ -20381,12 +20613,23 @@ msgstr "오늘의 지금까지"
 msgid "Top"
 msgstr "위쪽"
 
+#: app/controllers/CControllerTopTriggersList.php:192
+#: app/views/reports.toptriggers.list.php:142
+#: include/classes/helpers/CMenuHelper.php:144
+#: include/classes/helpers/CRoleHelper.php:424
+msgid "Top 100 triggers"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
 msgstr ""
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
+msgstr ""
+
+#: widgets/toptriggers/Widget.php:29
+msgid "Top triggers"
 msgstr ""
 
 #: app/views/administration.queue.overview.proxy.php:98
@@ -20596,6 +20839,10 @@ msgstr "트리거는 자신을 계승한 트리거와 의존관계를 지닐 수
 msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] "트리거를 복사하였습니다"
+
+#: widgets/toptriggers/includes/WidgetForm.php:72
+msgid "Trigger count"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:50
 msgid "Trigger data storage period"
@@ -22970,6 +23217,10 @@ msgstr "경고"
 msgid "Warning message"
 msgstr ""
 
+#: app/partials/administration.system.info.php:198
+msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
+msgstr ""
+
 #: app/partials/administration.system.info.php:154
 msgid "Warning! Unable to retrieve database version."
 msgstr ""
@@ -23109,6 +23360,13 @@ msgstr "환영합니다"
 #: app/views/administration.user.edit.php:300 app/views/popup.media.php:83
 msgid "When active"
 msgstr "연락 허용 시간대"
+
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:59
+#: include/classes/html/widgets/fields/CWidgetFieldTimePeriodView.php:96
+#: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
+#: jsLoader.php:195 jsLoader.php:199
+msgid "Widget"
+msgstr ""
 
 #: include/classes/api/services/CDashboardGeneral.php:349
 #, c-format
@@ -23341,6 +23599,14 @@ msgstr "Y/m/d H:i"
 
 #: include/translateDefines.inc.php:31
 msgid "Y-m-d H:i:s"
+msgstr "Y/m/d H:i:s"
+
+#: include/translateDefines.inc.php:32
+msgid "Y-m-d h:i A"
+msgstr "Y/m/d H:i"
+
+#: include/translateDefines.inc.php:31
+msgid "Y-m-d h:i:s A"
 msgstr "Y/m/d H:i:s"
 
 #: include/translateDefines.inc.php:40
@@ -23814,6 +24080,10 @@ msgstr ""
 msgid "an IP address is expected"
 msgstr ""
 
+#: include/classes/validators/CApiInputValidator.php:2773
+msgid "an IP or DNS is expected"
+msgstr ""
+
 #: include/classes/api/services/CDRule.php:474
 #: include/classes/api/services/CDRule.php:481
 #: include/classes/api/services/CItemGeneral.php:2588
@@ -23902,6 +24172,10 @@ msgstr ""
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
+msgstr ""
+
+#: include/forms.inc.php:1450 include/views/js/item.preprocessing.js.php:237
+msgid "any error"
 msgstr ""
 
 #: include/views/monitoring.history.php:186
@@ -24462,8 +24736,24 @@ msgstr ""
 msgid "equals"
 msgstr "같음"
 
+#: include/forms.inc.php:1452 include/views/js/item.preprocessing.js.php:239
+msgid "error does not match"
+msgstr ""
+
+#: include/forms.inc.php:1451 include/views/js/item.preprocessing.js.php:238
+msgid "error matches"
+msgstr ""
+
 #: include/views/js/item.preprocessing.js.php:466
 msgid "error message"
+msgstr ""
+
+#: app/views/js/popup.itemtestedit.view.js.php:479
+msgid "error text"
+msgstr ""
+
+#: include/forms.inc.php:1454 include/views/js/item.preprocessing.js.php:241
+msgid "error-matching"
 msgstr ""
 
 #: app/views/popup.lldoverride.php:119
@@ -24557,6 +24847,14 @@ msgstr ""
 msgctxt "hour short"
 msgid "h"
 msgstr "h"
+
+#: include/translateDefines.inc.php:37
+msgid "h:i A"
+msgstr "H:i"
+
+#: include/translateDefines.inc.php:36
+msgid "h:i:s A"
+msgstr "H:i:s"
 
 #: include/classes/import/validators/C10XmlValidator.php:341
 msgctxt "XML time format"
@@ -24826,6 +25124,10 @@ msgstr ""
 msgid "item with the same UUID already exists"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:688
+msgid "jsonpath() - Returns JSONPath result"
+msgstr ""
+
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "키가 설정되지 않았습니다."
@@ -24918,6 +25220,10 @@ msgstr "m/d"
 
 #: include/translateDefines.inc.php:33
 msgid "m-d H:i"
+msgstr "m/d H:i"
+
+#: include/translateDefines.inc.php:33
+msgid "m-d h:i A"
 msgstr "m/d H:i"
 
 #: include/classes/parsers/CUserMacroParser.php:37
@@ -25118,6 +25424,10 @@ msgstr ""
 msgid "n-d H:i"
 msgstr ""
 
+#: include/translateDefines.inc.php:39
+msgid "n-d h:i A"
+msgstr "n-d H:i"
+
 #: include/views/configuration.host.discovery.edit.php:205
 #: include/views/configuration.host.discovery.edit.php:362
 #: include/views/configuration.item.edit.php:262
@@ -25230,6 +25540,10 @@ msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "수치"
+
+#: include/classes/api/services/CHostPrototype.php:836
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
@@ -25706,6 +26020,10 @@ msgstr "time() - 현재시간"
 msgid "timeleft() - Time to reach threshold estimated based on period T"
 msgstr "timeleft() - 기간T를 기준으로 하여 지정한 값에 도달하기 까지의 시간"
 
+#: include/classes/api/services/CProxy.php:835
+msgid "timeouts are disabled because the proxy and server versions do not match"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:1046
 msgid "trendavg() - Average value of a period T with exact period shift"
 msgstr "trendavg() - 정확한 기간 이동이 있는 기간 T의 평균 값"
@@ -26119,6 +26437,10 @@ msgstr "아이템의 타입이 잘못되었습니다"
 #: app/controllers/CControllerItemMassCheckNow.php:178
 #: include/classes/api/services/CTask.php:591
 msgid "wrong master item type"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1207
+msgid "xmlxpath() - Returns XML XPath result"
 msgstr ""
 
 #: include/func.inc.php:591 jsLoader.php:221

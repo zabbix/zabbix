@@ -662,7 +662,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
             - type: MULTIPLIER
@@ -1097,30 +1097,39 @@ zabbix_export:
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar SunSaver MPPT by SNMP'
                         name: 'Array: Voltage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '4'
                   width: '24'
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar SunSaver MPPT by SNMP'
                         name: 'Current: Charge/Load'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   'y': '8'
                   width: '24'
                   height: '4'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Morningstar SunSaver MPPT by SNMP'
                         name: 'Temperature: Ambient/Battery/Heatsink'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
       valuemaps:
         - uuid: b51b9440e801481fbb76f28b4a5431d1
           name: 'SunSaver MPPT charge state'

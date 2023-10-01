@@ -130,7 +130,7 @@ css_images:
 	cp sass/favicon.ico ui/
 
 icons_build:
-	cd sass/icons
+	cd sass/icons && \
 	npm run generate
 	cp sass/icons/dist/_icons.scss sass/stylesheets/sass/base/
 	cp sass/icons/dist/zabbix-icons.svg ui/assets/fonts/
@@ -139,7 +139,7 @@ icons_build:
 	cp sass/icons/dist/zabbix-icons.woff2 ui/assets/fonts/
 
 icons_cleanup:
-	cd sass/icons
+	cd sass/icons && \
 	npm run cleanup
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_images
@@ -177,6 +177,7 @@ WRAP_IO_FUNCS = \
 	-Wl,--wrap=fopen \
 	-Wl,--wrap=fclose \
 	-Wl,--wrap=fgets \
+	-Wl,--wrap=fstat \
 	-Wl,--wrap=open
 
 WRAP_FS_FUNCS = \
@@ -214,4 +215,20 @@ clean: clean-recursive modules_clean
 	cd tests && $(MAKE) clean
 endif
 
-.PHONY: test tests clean modules_build modules_clean
+sbom: sbom-ui
+
+sbom-ui: ui/sbom.json
+
+ui/sbom.json:
+	(cd ${@D} && \
+		composer CycloneDX:make-sbom --omit=dev --no-interaction \
+		--spec-version=1.4 \
+		--output-reproducible --output-format=JSON --output-file="${@F}")
+
+ui/sbom.xml:
+	(cd ${@D} && \
+		composer CycloneDX:make-sbom --omit=dev --no-interaction \
+		--spec-version=1.4 \
+		--output-reproducible --output-format=XML --output-file="${@F}")
+
+.PHONY: test tests clean modules_build modules_clean sbom sbom-ui

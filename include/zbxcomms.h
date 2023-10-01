@@ -81,6 +81,8 @@ typedef struct pollfd zbx_pollfd_t;
 
 #endif
 
+void	zbx_tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
+
 int	zbx_socket_had_nonblocking_error(void);
 
 #ifdef _WINDOWS
@@ -143,6 +145,7 @@ typedef struct
 	const char		*server;
 	const int		proxymode;
 	const int		config_timeout;
+	const int		config_trapper_timeout;
 	const char		*config_source_ip;
 }
 zbx_config_comms_args_t;
@@ -201,6 +204,7 @@ typedef struct
 	int				protocol;
 	int				timeout;
 	zbx_timespec_t			deadline;
+	zbx_uint32_t			reserved_payload;
 }
 zbx_socket_t;
 
@@ -234,14 +238,16 @@ zbx_tcp_send_context_t;
 
 const char	*zbx_socket_strerror(void);
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
+int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len);
 #endif
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
 
+void	zbx_socket_clean(zbx_socket_t *s);
 int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout);
 
@@ -305,8 +311,10 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
 
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode);
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
 int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list);
 int	validate_cidr(const char *ip, const char *cidr, void *value);
 

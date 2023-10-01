@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -25,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup items
  *
- * @dataSource ExecuteNowAction, DiscoveredHosts
+ * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
@@ -72,9 +73,9 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'Type' => ['Zabbix agent', 'Zabbix agent (active)', 'Simple check',
 						'SNMP agent', 'Zabbix internal','Zabbix trapper', 'External check',
 						'Database monitor', 'HTTP agent', 'IPMI agent', 'SSH agent',
-						'TELNET agent', 'JMX agent', 'Dependent item', 'all'],
-				'State' => ['Normal', 'Not supported', 'all'],
-				'Status' => ['all', 'Enabled', 'Disabled']
+						'TELNET agent', 'JMX agent', 'Dependent item', 'All'],
+				'State' => ['Normal', 'Not supported', 'All'],
+				'Status' => ['All', 'Enabled', 'Disabled']
 		];
 		foreach ($dropdowns as $name => $values) {
 			foreach ($values as $value) {
@@ -90,7 +91,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					case 'Normal':
 					case 'Not supported':
 						$this->assertFalse($form->getField('Status')->isEnabled());
-						$this->assertEquals('all', $form->getField('Status')->getText());
+						$this->assertEquals('All', $form->getField('Status')->getText());
 						break;
 				}
 			}
@@ -295,7 +296,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 86
+					'rows' => 88
 				]
 			],
 			// #1
@@ -443,6 +444,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
 						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
 						'LLD for Discovered host tests',
+						'LLD for host group test',
 						'Linux by Zabbix agent: Linux: Get filesystems: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery',
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',
@@ -545,7 +547,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Zabbix agent',
 						'Update interval' => '0',
 						'Keep lost resources period' => '30d',
-						'State' => 'all',
+						'State' => 'All',
 						'Status' => 'Enabled'
 					],
 					'expected' => [

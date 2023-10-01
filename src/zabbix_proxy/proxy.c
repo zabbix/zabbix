@@ -65,7 +65,7 @@
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
 #include "zbxproxybuffer.h"
-#include "../zabbix_server/scripts/scripts.h"
+#include "zbxscripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -113,10 +113,10 @@ const char	*help_message[] = {
 	"        process-type             All processes of specified type",
 	"                                 (availability manager, configuration syncer, data sender,",
 	"                                 discovery manager, history syncer, housekeeper, http poller,",
-	"                                 icmp pinger, ipmi manager, ipmi poller,",
-	"                                 java poller, odbc poller, poller, agent poller, http agent poller,",
-	"                                 preprocessing manager, self-monitoring, snmp trapper, task manager,",
-	"                                 trapper, unreachable poller, vmware collector)",
+	"                                 icmp pinger, ipmi manager, ipmi poller, java poller,",
+	"                                 odbc poller, poller, agent poller, http agent poller,",
+	"                                 snmp poller, preprocessing manager, self-monitoring, snmp trapper,",
+	"                                 task manager, trapper, unreachable poller, vmware collector)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
 	"",
@@ -124,10 +124,10 @@ const char	*help_message[] = {
 	"        process-type             All processes of specified type",
 	"                                 (availability manager, configuration syncer, data sender,",
 	"                                 discovery manager, history syncer, housekeeper, http poller,",
-	"                                 icmp pinger, ipmi manager, ipmi poller,",
-	"                                 java poller, odbc poller, poller, agent poller, http agent poller,",
-	"                                 preprocessing manager, self-monitoring, snmp trapper, task manager,",
-	"                                 trapper, unreachable poller, vmware collector)",
+	"                                 icmp pinger, ipmi manager, ipmi poller, java poller,",
+	"                                 odbc poller, poller, agent poller, http agent poller,",
+	"                                 snmp poller, preprocessing manager, self-monitoring, snmp trapper,",
+	"                                 task manager, trapper, unreachable poller, vmware collector)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
 	"        pid                      Process identifier",
 	"        scope                    Profiling scope",
@@ -226,7 +226,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
-	1 /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1 /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -238,7 +239,7 @@ static int	get_config_forks(unsigned char process_type)
 }
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
-
+static int	zbx_config_trapper_timeout	= 300;
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
 static int	config_housekeeping_frequency	= 1;
@@ -248,7 +249,6 @@ static int	config_histsyncer_frequency	= 1;
 
 static int	config_listen_port		= ZBX_DEFAULT_SERVER_PORT;
 static char	*config_listen_ip		= NULL;
-int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 static int	config_heartbeat_frequency	= -1;
 
@@ -465,6 +465,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_AGENT_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER];
 	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SNMP_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER];
+	}
 	else
 		return FAIL;
 
@@ -490,8 +495,8 @@ static void	zbx_set_defaults(void)
 
 		zbx_init_agent_result(&result);
 
-		if (SUCCEED == zbx_execute_agent_check(config_hostname_item, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
-				NULL != (value = ZBX_GET_STR_RESULT(&result)))
+		if (SUCCEED == zbx_execute_agent_check(config_hostname_item, ZBX_PROCESS_LOCAL_COMMAND, &result,
+				ZBX_CHECK_TIMEOUT_UNDEFINED) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 
@@ -882,7 +887,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
-		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
+		{"TrapperTimeout",		&zbx_config_trapper_timeout,		TYPE_INT,
 			PARM_OPT,	1,			300},
 		{"UnreachablePeriod",		&config_unreachable_period,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
@@ -1031,6 +1036,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartHTTPAgentPollers",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartSNMPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_SNMP_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
 			PARM_OPT,	1,			1000},
@@ -1181,7 +1188,7 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				zbx_help();
+				zbx_help(NULL);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
@@ -1234,8 +1241,8 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
-	zbx_init_library_dbupgrade(get_program_type);
-	zbx_init_library_dbwrap(NULL);
+	zbx_init_library_dbupgrade(get_program_type, get_zbx_config_timeout);
+	zbx_init_library_dbwrap(NULL, zbx_preprocess_item_value, zbx_preprocessor_flush);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
@@ -1244,6 +1251,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_proxy);
+	zbx_init_library_eval(zbx_dc_get_expressions_by_name);
 
 	if (ZBX_TASK_RUNTIME_CONTROL == t.task)
 	{
@@ -1357,10 +1365,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_config_comms_args_t			config_comms = {zbx_config_tls, config_hostname, config_server,
 								config_proxymode, zbx_config_timeout,
-								zbx_config_source_ip};
+								zbx_config_trapper_timeout, zbx_config_source_ip};
 	zbx_thread_args_t			thread_args;
 	zbx_thread_poller_args			poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
-								config_startup_time, config_unavailable_delay, 0, 0,
+								config_startup_time, config_unavailable_delay,
+								config_unreachable_period, config_unreachable_delay,
 								config_max_concurrent_checks_per_poller};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, zbx_config_timeout,
@@ -1567,15 +1576,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	proxy_db_init();
-
-	if (FAIL == zbx_pb_init(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
+	if (FAIL == zbx_pb_create(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
 			config_proxy_memory_buffer_age, config_proxy_offline_buffer * SEC_PER_HOUR, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy buffer: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	proxy_db_init();
+
+	zbx_pb_init();
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
@@ -1741,6 +1752,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
+				thread_args.args = &poller_args;
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_SNMP_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_SNMP;
 				thread_args.args = &poller_args;
 				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;

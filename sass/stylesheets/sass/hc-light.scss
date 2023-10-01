@@ -114,6 +114,9 @@ $scrollbar-track-color: #999999;
 $scrollbar-thumb-color: #f9f9f9;
 $scrollbar-thumb-color-darken: 30%;
 
+$input-placeholder-color: #777777;
+$input-disabled-placeholder-color: #c8c8c8;
+
 // Search form
 $form-search-icon-color: #ffffff;
 $form-search-icon-hover-color: #ffffff;
@@ -123,8 +126,6 @@ $form-search-border-color: #ffffff;
 $form-search-focused-color: #000000;
 $form-search-focused-bg-color: #ffffff;
 $form-search-focused-border-color: #ffffff;
-
-$input-placeholder-color: #777777;
 
 // Buttons
 $btn-bg-color: #555555;
@@ -171,6 +172,9 @@ $gauge-empty-color: #f3f3f3;
 $gauge-fill-color: #555555;
 $gauge-needle-fill-color: #000000;
 $gauge-needle-stoke-color: #000000;
+
+// Pie chart.
+$pie-chart-arc-no-data-color: #f3f3f3;
 
 // Statuses
 $status-disabled-border-color: rgba(#000000, 0.2);
@@ -558,18 +562,16 @@ a.link-action {
 }
 
 .multiselect-suggest {
-	li {
-		&.suggest-hover {
-			color: #ffffff;
-			background-color: #000000;
+	.suggest-hover {
+		color: #ffffff;
+		background-color: #000000;
 
-			.grey {
-				color: #dcdcdc;
-			}
+		.grey {
+			color: #dcdcdc;
+		}
 
-			.suggest-found {
-				color: lighten($alt-yellow, 10%);
-			}
+		.suggest-found {
+			color: lighten($alt-yellow, 10%);
 		}
 	}
 }

@@ -48,6 +48,7 @@ $this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
+$this->addJsFile('class.widget.misconfigured.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
@@ -115,7 +116,7 @@ else {
 	view.init('.json_encode([
 		'dashboard' => $data['dashboard'],
 		'widget_defaults' => $data['widget_defaults'],
-		'time_period' => $data['time_period']
+		'dashboard_time_period' => $data['dashboard_time_period']
 	]).');
 '))
 	->setOnDocumentReady()

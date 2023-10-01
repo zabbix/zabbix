@@ -26,6 +26,8 @@
  * @var array $data
  */
 
+$view = new CWidgetView($data);
+
 $table = (new CTableInfo())
 	->setHeader([_('Host'), _('Trigger'), _('Severity'), _('Number of problems')])
 	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER);
@@ -49,13 +51,24 @@ else {
 
 		$table->addRow([
 			$hosts,
-			(new CLinkAction($trigger['description']))->setMenuPopup(CMenuPopupHelper::getTrigger($triggerid)),
+			(new CLinkAction($trigger['description']))->setMenuPopup(
+				CMenuPopupHelper::getTrigger([
+					'triggerid' => $trigger['triggerid'],
+					'backurl' => (new CUrl('zabbix.php'))
+						->setArgument('action', 'dashboard.view')
+						->getUrl()
+				])
+			),
 			CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 			$trigger['problem_count']
 		]);
 	}
 }
 
-(new CWidgetView($data))
+if ($data['info']) {
+	$view->setVar('info', $data['info']);
+}
+
+$view
 	->addItem($table)
 	->show();

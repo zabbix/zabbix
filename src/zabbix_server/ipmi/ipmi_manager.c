@@ -962,8 +962,8 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	zbx_ipc_message_t		*message;
 	zbx_ipmi_manager_t		ipmi_manager;
 	zbx_ipmi_poller_t		*poller;
-	int				ret, nextcheck, nextcleanup, polled_num = 0, scheduled_num = 0, now;
-	double				time_stat, time_idle = 0, time_now, sec;
+	int				ret, polled_num = 0, scheduled_num = 0, tmp;
+	double				time_idle = 0, sec;
 	zbx_timespec_t			timeout = {0, 0};
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -993,16 +993,15 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	nextcleanup = time(NULL) + ZBX_IPMI_MANAGER_CLEANUP_DELAY;
-
-	time_stat = zbx_time();
+	double time_stat = zbx_time();
+	time_t nextcleanup = (time_t)time_stat + ZBX_IPMI_MANAGER_CLEANUP_DELAY;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
-		now = time_now;
+		double time_now = zbx_time();
+		time_t now = (time_t)time_now;
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -1018,9 +1017,10 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 		/* manager -> client */
 		scheduled_num += ipmi_manager_schedule_requests(&ipmi_manager, now,
-				ipmi_manager_args_in->config_timeout, &nextcheck);
+				ipmi_manager_args_in->config_timeout, &tmp);
+		time_t nextcheck = (time_t)tmp;
 
-		if (FAIL != nextcheck)
+		if (FAIL != tmp)
 			timeout.sec = (nextcheck > now ? nextcheck - now : 0);
 		else
 			timeout.sec = ZBX_IPMI_MANAGER_DELAY;

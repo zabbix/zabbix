@@ -192,15 +192,11 @@ foreach ($data['items'] as $item) {
 
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
-		$trigger_description[] = new CLink(
-			$trigger['description'],
-			(new CUrl('triggers.php'))
-				->setArgument('form', 'update')
-				->setArgument('hostid', key($trigger['hosts']))
-				->setArgument('triggerid', $trigger['triggerid'])
-				->setArgument('context', $data['context'])
-				->setArgument('backurl', $backurl)
-		);
+		$trigger_description[] = (new CLink($trigger['description']))
+			->addClass('js-trigger-edit')
+			->setAttribute('data-hostid', key($trigger['hosts']))
+			->setAttribute('data-triggerid', $trigger['triggerid'])
+			->setAttribute('data-context', $data['context']);
 
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$trigger['error'] = '';
@@ -253,7 +249,7 @@ foreach ($data['items'] as $item) {
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
 			|| $item['type'] == ITEM_TYPE_DEPENDENT
-			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0)) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -376,7 +372,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'group_itemid'
+		'checkbox_object' => 'group_itemid',
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

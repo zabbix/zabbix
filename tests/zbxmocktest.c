@@ -19,9 +19,7 @@
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 
-#include "zbxnum.h"
 #include "zbxtypes.h"
-#include "zbxlog.h"
 
 /* unresolved symbols needed for linking */
 
@@ -75,6 +73,7 @@ static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
 	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	1, /* ZBX_PROCESS_TYPE_SNMP_POLLER */
 };
 
 int	get_config_forks(unsigned char process_type)
@@ -87,14 +86,7 @@ void	set_config_forks(unsigned char process_type, int forks)
 	CONFIG_FORKS[process_type] = forks;
 }
 
-int	CONFIG_LISTEN_PORT		= 0;
-char	*CONFIG_LISTEN_IP		= NULL;
-int	CONFIG_TRAPPER_TIMEOUT		= 300;
-
-int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
-int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field value */
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
-int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 
@@ -139,22 +131,7 @@ const char	*help_message[] = {"mock_help_message", NULL};
 const char	*progname = "mock_progname";
 const char	syslog_app_name[] = "mock_syslog_app_name";
 
-char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-
-int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
-
-int	CONFIG_BUFFER_SIZE		= 100;
-int	CONFIG_BUFFER_SEND		= 5;
-
-int	CONFIG_MAX_LINES_PER_SECOND	= 20;
-
-char	**CONFIG_ALIASES		= NULL;
-char	**CONFIG_USER_PARAMETERS	= NULL;
-#if defined(_WINDOWS)
-char	**CONFIG_PERF_COUNTERS		= NULL;
-char	**CONFIG_PERF_COUNTERS_EN	= NULL;
-#endif
 
 static ZBX_THREAD_LOCAL int	zbx_config_timeout = 3;
 int	get_zbx_config_timeout(void)

@@ -472,6 +472,28 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
+        - uuid: 96b04e9605e04b26a280bc62da92879b
+          name: 'Zabbix proxy: Utilization of snmp poller data collector processes, in %'
+          type: INTERNAL
+          key: 'zabbix[process,snmp poller,avg,busy]'
+          history: 1w
+          value_type: FLOAT
+          units: '%'
+          description: 'Average percentage of time snmp poller processes have been busy in the last minute.'
+          tags:
+            - tag: component
+              value: data-collector
+          triggers:
+            - uuid: 811e08cb2382482db4054a4665e328d7
+              expression: 'avg(/Zabbix proxy health/zabbix[process,snmp poller,avg,busy],10m)>{$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}'
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: 'avg(/Zabbix proxy health/zabbix[process,snmp poller,avg,busy],10m)<{$ZABBIX.PROXY.UTIL.MIN:"snmp poller"}'
+              name: 'Zabbix proxy: Utilization of snmp poller processes is high'
+              event_name: 'Zabbix proxy: Utilization of snmp poller processes over {$ZABBIX.PROXY.UTIL.MAX:"snmp poller"}%'
+              priority: AVERAGE
+              tags:
+                - tag: scope
+                  value: performance
         - uuid: 77ab21500d734deea86938a1a90035e0
           name: 'Zabbix proxy: Utilization of snmp trapper data collector processes, in %'
           type: INTERNAL
@@ -903,30 +925,39 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix proxy performance'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Zabbix proxy health'
-                        name: 'Zabbix proxy: Zabbix data gathering process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix internal process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Zabbix proxy health'
+                        name: 'Zabbix proxy: Zabbix data gathering process busy %'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   x: '12'
                   'y': '5'
@@ -934,10 +965,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Zabbix proxy health'
                         name: 'Zabbix proxy: Zabbix cache usage, % used'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
   graphs:
     - uuid: 40b649050cb8420888abcae129eafe27
       name: 'Zabbix proxy: Zabbix cache usage, % used'
@@ -1018,16 +1052,21 @@ zabbix_export:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,snmp trapper,avg,busy]'
         - sortorder: '10'
+          color: F63100
+          item:
+            host: 'Zabbix proxy health'
+            key: 'zabbix[process,snmp poller,avg,busy]'
+        - sortorder: '11'
           color: 00FF00
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,vmware collector,avg,busy]'
-        - sortorder: '11'
+        - sortorder: '12'
           color: 5A2B57
           item:
             host: 'Zabbix proxy health'
             key: 'zabbix[process,history poller,avg,busy]'
-        - sortorder: '12'
+        - sortorder: '13'
           color: 9FA8DA
           item:
             host: 'Zabbix proxy health'

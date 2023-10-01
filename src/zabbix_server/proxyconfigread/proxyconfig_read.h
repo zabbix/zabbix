@@ -33,6 +33,7 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		char **error);
 
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_vault_t *config_vault, int config_timeout, const char *config_source_ip);
+		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
+		const char *config_source_ip);
 
 #endif

@@ -32,10 +32,12 @@
 	const view = {
 		checkbox_object: null,
 		checkbox_hash: null,
+		context: null,
 
-		init({checkbox_hash, checkbox_object}) {
+		init({checkbox_hash, checkbox_object, context}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
+			this.context = context;
 
 			// Disable the status filter when using the state filter.
 			$('#filter_state')
@@ -79,6 +81,16 @@
 				});
 			});
 
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-trigger-edit')) {
+					this.editTrigger({
+						triggerid: e.target.dataset.triggerid,
+						hostid: e.target.dataset.hostid,
+						context: e.target.dataset.context
+					});
+				}
+			});
+
 			const execute_now = document.querySelector('.js-execute-now');
 
 			if (execute_now !== null) {
@@ -103,12 +115,31 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		},
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
 		},
 
 		openCopyPopup() {
@@ -121,6 +152,20 @@
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});
+		},
+
+		editTrigger(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
 		},
 
 		massCheckNow() {
@@ -207,8 +252,9 @@
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(context, e) {
 				const data = e.detail;
+				let curl = null;
 
 				if ('success' in data) {
 					postMessageOk(data.success.title);
@@ -216,26 +262,17 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
-				}
 
-				location.href = location.href;
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
+					if ('action' in data.success && data.success.action === 'delete') {
+						curl = new Curl('items.php');
+						curl.setArgument('context', context);
+						curl.setArgument('filter_set', 1);
 					}
 				}
 
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
+				uncheckTableRows('items_' + this.checkbox_hash, [], false);
 
-				location.href = curl.getUrl();
+				location.href = curl === null ? location.href : curl.getUrl();
 			}
 		}
 	};

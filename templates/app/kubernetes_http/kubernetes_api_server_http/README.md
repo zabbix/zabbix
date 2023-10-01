@@ -45,7 +45,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes API: Get API instance metrics|<p>Get raw metrics from API instance /metrics endpoint.</p>|HTTP agent|kubernetes.api.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes API: Get API instance metrics|<p>Get raw metrics from API instance /metrics endpoint.</p>|HTTP agent|kubernetes.api.get_metrics<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes API: Audit events, total|<p>Accumulated number audit events generated and sent to the audit backend.</p>|Dependent item|kubernetes.api.audit_event_total<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(apiserver_audit_event_total)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes API: Virtual memory, bytes|<p>Virtual memory size in bytes.</p>|Dependent item|kubernetes.api.process_virtual_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_virtual_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes API: Resident memory, bytes|<p>Resident memory size in bytes.</p>|Dependent item|kubernetes.api.process_resident_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_resident_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|

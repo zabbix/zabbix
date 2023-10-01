@@ -8,7 +8,7 @@ data.sql: $(top_srcdir)/create/src/data.tmpl $(top_srcdir)/create/src/templates.
 schema.sql: $(top_srcdir)/create/src/schema.tmpl $(top_srcdir)/create/bin/gen_schema.pl
 	$(top_srcdir)/create/bin/gen_schema.pl $(DATABASE) > schema.sql || (rm -rf schema.sql && exit 1)
 
-$(DB_EXTENSION).sql:
+$(DB_EXTENSION).sql: $(top_srcdir)/create/bin/gen_schema.pl
 	$(top_srcdir)/create/bin/gen_schema.pl $(DB_EXTENSION) > $(DB_EXTENSION).sql
 
 gen_history_pk = $(top_srcdir)/create/bin/gen_history_pk.pl

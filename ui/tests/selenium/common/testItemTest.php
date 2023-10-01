@@ -740,7 +740,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid',
+						'proxy' => 'id:proxyid',
 						'version' => 'id:interface_details_version',
 						'context' => 'id:interface_details_contextname',
 						'security' => 'id:interface_details_securityname',
@@ -755,7 +755,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid',
+						'proxy' => 'id:proxyid',
 						'version' => 'id:interface_details_version',
 						'community' => 'id:interface_details_community'
 					];
@@ -764,7 +764,7 @@ class testItemTest extends CWebTest {
 					$elements = [
 						'address' => 'id:interface_address',
 						'port' => 'id:interface_port',
-						'proxy' => 'id:proxy_hostid'
+						'proxy' => 'id:proxyid'
 					];
 				}
 
@@ -772,8 +772,8 @@ class testItemTest extends CWebTest {
 					$elements[$name] = $test_form->query($selector)->one()->detect();
 				}
 
-				$proxy = CDBHelper::getValue("SELECT host FROM hosts WHERE hostid IN ".
-						"(SELECT proxy_hostid FROM hosts WHERE host = 'Test item host')");
+				$proxy = CDBHelper::getValue("SELECT name FROM proxy WHERE proxyid IN ".
+						"(SELECT proxyid FROM hosts WHERE host = 'Test item host')");
 
 				// Check test item form fields depending on item type.
 				switch ($data['fields']['Type']) {

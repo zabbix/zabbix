@@ -1383,10 +1383,10 @@ static int	execute_graphs_inserts(zbx_vector_graphs_copies_t *graphs_copies_inse
 	zbx_db_insert_prepare(&db_insert, "graphs", "graphid", "name", "width", "height", "yaxismin",
 			"yaxismax", "templateid", "show_work_period", "show_triggers", "graphtype", "show_legend",
 			"show_3d", "percent_left", "percent_right", "ymin_type", "ymax_type", "ymin_itemid",
-			"ymax_itemid", "flags", "discover", NULL);
+			"ymax_itemid", "flags", "discover", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_graphs_items, "graphs_items", "gitemid", "graphid", "itemid", "drawtype",
-			"sortorder", "color", "yaxisside", "calc_fnc", "type", NULL);
+			"sortorder", "color", "yaxisside", "calc_fnc", "type", (char *)NULL);
 
 	graphid = zbx_db_get_maxid_num("graphs", graphs_copies_insert->values_num);
 	graphs_itemsid = zbx_db_get_maxid_num("graphs_items", *total_insert_gitems_count);

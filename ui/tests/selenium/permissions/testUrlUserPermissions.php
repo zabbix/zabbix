@@ -296,19 +296,9 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'templates.php',
+				'url' => 'zabbix.php?action=template.list',
 				'title' =>	'Configuration of templates',
 				'header' => 'Templates',
-				'users' => [
-					'guest' => false,
-					'user-zabbix' => false,
-					'admin-zabbix' => true
-				]
-			]],
-			[[
-				'url' => 'templates.php?form=update&templateid=10093',
-				'title' =>	'Configuration of templates',
-				'no_permissions_to_object' => true,
 				'users' => [
 					'guest' => false,
 					'user-zabbix' => false,
@@ -346,7 +336,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
-				'url' => 'triggers.php?context=host',
+				'url' => 'zabbix.php?action=trigger.list&context=host',
 				'title' =>	'Configuration of triggers',
 				'header' => 'Triggers',
 				'users' => [

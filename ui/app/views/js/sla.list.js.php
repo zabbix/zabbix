@@ -85,7 +85,6 @@
 			const dialogue = overlay.$dialogue[0];
 
 			dialogue.addEventListener('dialogue.submit', (e) => this._reload(e.detail));
-			dialogue.addEventListener('dialogue.delete', (e) => this._reload(e.detail));
 		}
 
 		_reload(success) {

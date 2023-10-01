@@ -301,13 +301,14 @@ func (b *pluginBroker) stop() {
 	b.tx <- &r
 }
 
-func (b *pluginBroker) export(key string, params []string) (*comms.ExportResponse, error) {
+func (b *pluginBroker) export(key string, params []string, timeout int) (*comms.ExportResponse, error) {
 	data := comms.ExportRequest{
 		Common: comms.Common{
 			Type: comms.ExportRequestType,
 		},
-		Key:    key,
-		Params: params,
+		Key:     key,
+		Params:  params,
+		Timeout: timeout,
 	}
 
 	r := request{

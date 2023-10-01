@@ -54,7 +54,6 @@ extern ZBX_THREAD_LOCAL char	info_buf[256];
 
 extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
-static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags);
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
 static ssize_t	tcp_read(zbx_socket_t *s, char *buffer, size_t size, short *events);
@@ -184,7 +183,7 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
 	return SUCCEED;
 }
 
-#ifndef _WINDOWS
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve 'hostent' by IP address                                  *
@@ -219,6 +218,37 @@ out:
 		freeaddrinfo(ai);
 }
 
+int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
+{
+	if (AF_INET == ai->ai_addr->sa_family)
+	{
+		const struct sockaddr_in	*sin = (const struct sockaddr_in *) (void *)ai->ai_addr;
+
+		if (NULL == inet_ntop(AF_INET, &sin->sin_addr, ip, len))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv4 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+	else if (AF_INET6 == ai->ai_addr->sa_family)
+	{
+		const struct sockaddr_in6	*sin6 = (const struct sockaddr_in6 *) (void *)ai->ai_addr;
+
+		if (NULL == inet_ntop(AF_INET6, &sin6->sin6_addr, ip, len))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv6 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "unknown address family:%d", ai->ai_addr->sa_family);
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve IP address by host name                                  *
@@ -239,17 +269,8 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 		goto out;
 	}
 
-	switch(ai->ai_addr->sa_family) {
-		case AF_INET:
-			inet_ntop(AF_INET, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, (socklen_t)iplen);
-			break;
-		case AF_INET6:
-			inet_ntop(AF_INET6, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, (socklen_t)iplen);
-			break;
-		default:
-			ip[0] = '\0';
-			goto out;
-	}
+	if (FAIL == zbx_inet_ntop(ai, ip, (socklen_t)iplen))
+		ip[0] = '\0';
 out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
@@ -319,10 +340,11 @@ int	zbx_socket_start(char **error)
  * Purpose: initialize socket                                                 *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_socket_clean(zbx_socket_t *s)
+void	zbx_socket_clean(zbx_socket_t *s)
 {
 	memset(s, 0, sizeof(zbx_socket_t));
 
+	s->socket = ZBX_SOCKET_ERROR;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 }
 
@@ -452,7 +474,7 @@ int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const c
 		flags = 0;
 
 	zbx_snprintf(service, sizeof(service), "%hu", port);
-	tcp_init_hints(&hints, type, flags);
+	zbx_tcp_init_hints(&hints, type, flags);
 
 	if (0 != getaddrinfo(ip, service, &hints, &ai))
 	{
@@ -478,7 +500,7 @@ int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const c
 
 	if (NULL != source_ip)
 	{
-		tcp_init_hints(&hints, type, AI_NUMERICHOST);
+		zbx_tcp_init_hints(&hints, type, AI_NUMERICHOST);
 
 		if (0 != getaddrinfo(source_ip, NULL, &hints, &ai_bind))
 		{
@@ -995,7 +1017,7 @@ static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip)
  * Purpose: initialize hints for getaddrinfo() call                           *
  *                                                                            *
  ******************************************************************************/
-static void	tcp_init_hints(struct addrinfo *hints, int socktype, int flags)
+void	zbx_tcp_init_hints(struct addrinfo *hints, int socktype, int flags)
 {
 	memset(hints, 0, sizeof(struct addrinfo));
 
@@ -1289,7 +1311,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 	zbx_socket_clean(s);
 	s->timeout = timeout;
 
-	tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST | AI_PASSIVE);
+	zbx_tcp_init_hints(&hints, SOCK_STREAM, AI_NUMERICHOST | AI_PASSIVE);
 	zbx_snprintf(port, sizeof(port), "%hu", listen_port);
 
 	ip = ips = (NULL == listen_ip ? NULL : strdup(listen_ip));
@@ -2003,6 +2025,11 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 				memcpy(&len32_le, s->buf_stat + context->offset, sizeof(len32_le));
 				context->offset += sizeof(len32_le);
 				context->reserved = zbx_letoh_uint32(len32_le);
+
+				if (0 == flags && ZBX_TCP_PROTOCOL == context->protocol_version)
+					s->reserved_payload = context->reserved;
+				else
+					s->reserved_payload = 0;
 			}
 
 			if (context->max_len < context->expected_len)
@@ -2294,17 +2321,19 @@ static int	subnet_match(int af, unsigned int prefix_size, const void *address1, 
  *                                                                            *
  ******************************************************************************/
 #ifndef HAVE_IPV6
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode)
 {
-	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
-				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
+	const struct sockaddr_in	*name4 = (const struct sockaddr_in *)name,
+					*ai_addr4 = (const struct sockaddr_in *)current_ai->ai_addr;
 
 	ZBX_UNUSED(ipv6v4_mode);
 
 	return subnet_match(current_ai->ai_family, prefix_size, &name4->sin_addr.s_addr, &ai_addr4->sin_addr.s_addr);
 }
 #else
-int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_SOCKADDR name, int ipv6v4_mode)
+int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, const ZBX_SOCKADDR *name,
+		int ipv6v4_mode)
 {
 	/* Network Byte Order is ensured */
 	/* IPv4-compatible, the first 96 bits are zeros */
@@ -2312,15 +2341,15 @@ int	zbx_ip_cmp(unsigned int prefix_size, const struct addrinfo *current_ai, ZBX_
 	/* IPv4-mapped, the first 80 bits are zeros, 16 next - ones */
 	const unsigned char	ipv4_mapped_mask[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
 
-	struct sockaddr_in	*name4 = (struct sockaddr_in *)&name,
-				*ai_addr4 = (struct sockaddr_in *)current_ai->ai_addr;
-	struct sockaddr_in6	*name6 = (struct sockaddr_in6 *)&name,
-				*ai_addr6 = (struct sockaddr_in6 *)current_ai->ai_addr;
+	const struct sockaddr_in	*name4 = (const struct sockaddr_in *)name,
+					*ai_addr4 = (const struct sockaddr_in *)current_ai->ai_addr;
+	const struct sockaddr_in6	*name6 = (const struct sockaddr_in6 *)name,
+					*ai_addr6 = (const struct sockaddr_in6 *)current_ai->ai_addr;
 
 #ifdef HAVE_SOCKADDR_STORAGE_SS_FAMILY
-	if (current_ai->ai_family == name.ss_family)
+	if (current_ai->ai_family == name->ss_family)
 #else
-	if (current_ai->ai_family == name.__ss_family)
+	if (current_ai->ai_family == name->__ss_family)
 #endif
 	{
 		switch (current_ai->ai_family)
@@ -2447,7 +2476,7 @@ int	zbx_validate_peer_list(const char *peer_list, char **error)
  *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
+int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list)
 {
 	char	*start = NULL, *end = NULL, *cidr_sep, tmp[MAX_STRING_LEN];
 	int	prefix_size;
@@ -2481,6 +2510,9 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 
 		if (0 == getaddrinfo(start, NULL, &hints, &ai))
 		{
+			if (NULL != end)
+				*end = ',';
+
 			for (current_ai = ai; NULL != current_ai; current_ai = current_ai->ai_next)
 			{
 				int	prefix_size_current = prefix_size;
@@ -2491,8 +2523,7 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 							ZBX_IPV4_MAX_CIDR_PREFIX : ZBX_IPV6_MAX_CIDR_PREFIX);
 				}
 
-				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, s->peer_info,
-						0))
+				if (SUCCEED == zbx_ip_cmp((unsigned int)prefix_size_current, current_ai, peer_info, 0))
 				{
 					freeaddrinfo(ai);
 					return SUCCEED;
@@ -2506,6 +2537,30 @@ int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
 		else
 			break;
 	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if connection initiator is in list of peers                 *
+ *                                                                            *
+ * Parameters: s         - [IN] socket descriptor                             *
+ *             peer_list - [IN] comma-delimited list of allowed peers.        *
+ *                              NULL not allowed. Empty string results in     *
+ *                              return value FAIL.                            *
+ *                                                                            *
+ * Return value: SUCCEED - connection allowed                                 *
+ *               FAIL - connection is not allowed                             *
+ *                                                                            *
+ * Comments: standard, compatible and IPv4-mapped addresses are treated       *
+ *           the same: 127.0.0.1 == ::127.0.0.1 == ::ffff:127.0.0.1           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tcp_check_allowed_peers(const zbx_socket_t *s, const char *peer_list)
+{
+	if (SUCCEED == zbx_tcp_check_allowed_peers_info(&s->peer_info, peer_list))
+		return SUCCEED;
 
 	zbx_set_socket_strerror("connection from \"%s\" rejected, allowed hosts: \"%s\"", s->peer, peer_list);
 

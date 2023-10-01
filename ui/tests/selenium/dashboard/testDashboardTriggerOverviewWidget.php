@@ -52,7 +52,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	private static $icon_host = 'Host for triggers filtering';
 
 	private static $background_classes = [
-		'1_trigger_Average' => 'normal-bg cursor-pointer js-blink',
+		'1_trigger_Average' => 'normal-bg cursor-pointer blink',
 		'1_trigger_Disaster' => 'disaster-bg',
 		'1_trigger_High' => 'high-bg',
 		'1_trigger_Not_classified' => 'na-bg',
@@ -675,7 +675,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
-	public function testDashboardSlaReportWidget_Delete() {
+	public function testDashboardTriggerOverviewWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget(self::$delete_widget);
@@ -727,8 +727,10 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$row = $dashboard->getWidget(self::$update_widget)->getContent()->asTable()->findRow('Hosts', self::$icon_host);
 
 		foreach ($popup_content as $trigger => $dependency) {
-			// Locate hint and check table headers in hint.
-			$hint_table = $row->getColumn($trigger)->query('class:hint-box')->one()->asTable();
+			// Hover hint and check table headers in hint.
+			$row->getColumn($trigger)->query('tag:button')->one()->hoverMouse();
+			$hint_table = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible()->one()
+					->query('class:list-table')->one()->asTable();
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 
 			// Gather data from rows and compare result with reference.

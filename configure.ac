@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[7.0.0alpha3])
+AC_INIT([Zabbix],[7.0.0alpha6])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -2041,6 +2041,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
 	src/libs/zbxexpression/Makefile
+	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
 	src/libs/zbxstr/Makefile
@@ -2073,6 +2074,8 @@ AC_CONFIG_FILES([
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
+	src/zabbix_agent/agent_conf/Makefile
+	src/zabbix_agent/listener/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
@@ -2107,7 +2110,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/reporter/Makefile
 	src/zabbix_server/rtc/Makefile
-	src/zabbix_server/scripts/Makefile
 	src/zabbix_server/service/Makefile
 	src/zabbix_server/snmptrapper/Makefile
 	src/zabbix_server/stats/Makefile
@@ -2351,6 +2353,6 @@ echo "***********************************************************"
 echo "*            Now run '${am_make} install'                       *"
 echo "*                                                         *"
 echo "*            Thank you for using Zabbix!                  *"
-echo "*              <http://www.zabbix.com>                    *"
+echo "*              <https://www.zabbix.com>                   *"
 echo "***********************************************************"
 echo

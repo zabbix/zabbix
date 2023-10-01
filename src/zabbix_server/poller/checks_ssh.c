@@ -24,10 +24,10 @@
 
 #include "zbxsysinfo.h"
 
-int	get_value_ssh(zbx_dc_item_t *item, int timeout, const char *config_source_ip, AGENT_RESULT *result)
+int	get_value_ssh(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
-	int		ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED, timeout_sec = ZBX_CHECK_TIMEOUT_UNDEFINED;
 	const char	*port, *dns, *encoding, *ssh_options;
 
 	zbx_init_agent_request(&request);
@@ -79,7 +79,14 @@ int	get_value_ssh(zbx_dc_item_t *item, int timeout, const char *config_source_ip
 	encoding = get_rparam(&request, 3);
 	ssh_options = get_rparam(&request, 4);
 
-	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options), timeout,
+	if (FAIL == zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		/* it is already validated in zbx_prepare_items by zbx_validate_item_timeout */
+		/* failures are handled there */
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	ret = ssh_run(item, result, ZBX_NULL2EMPTY_STR(encoding), ZBX_NULL2EMPTY_STR(ssh_options), timeout_sec,
 			config_source_ip);
 out:
 	zbx_free_agent_request(&request);
