@@ -743,14 +743,12 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				break;
 		}
 
-		if (NULL != items[i].timeout)
+		if (NULL != items[i].timeout &&
+				FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
 		{
-			if (FAIL == zbx_validate_item_timeout(items[i].timeout, NULL, error, sizeof(error)))
-			{
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
-				errcodes[i] = CONFIG_ERROR;
-				continue;
-			}
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, error));
+			errcodes[i] = CONFIG_ERROR;
+			continue;
 		}
 	}
 

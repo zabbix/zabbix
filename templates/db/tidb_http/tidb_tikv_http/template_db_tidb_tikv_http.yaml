@@ -1073,16 +1073,34 @@ zabbix_export:
           pages:
             - name: Main
               widgets:
+                - type: item
+                  name: Uptime
+                  width: '4'
+                  fields:
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'TiDB TiKV by HTTP'
+                        key: tikv.uptime
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
                 - type: graph
                   'y': '2'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TiDB TiKV by HTTP'
                         name: 'TiKV: Snapshot state count'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   x: '12'
                   'y': '2'
@@ -1090,25 +1108,13 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'TiDB TiKV by HTTP'
                         name: 'TiKV: Scheduler priority commands rate'
-                - type: item
-                  name: Uptime
-                  width: '4'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'TiDB TiKV by HTTP'
-                        key: tikv.uptime
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
   graphs:
     - uuid: cdca8a2bb2bb486da8c57740acc431d6
       name: 'TiKV: Scheduler priority commands rate'

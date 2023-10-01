@@ -1416,8 +1416,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'History' => ['Linux: Number of processes' => 'history.php?action=showgraph&itemids%5B%5D=42253']
 				],
 				'CONFIGURATION' => [
-					'Trigger' => 'triggers.php?form=update&triggerid=99252&context=host'.
-						'&backurl=zabbix.php%3Faction%3Ddashboard.view',
+					'Trigger' => 'menu-popup-item',
 					'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
 						'&backurl=zabbix.php%3Faction%3Ddashboard.view'
 					]
@@ -1435,7 +1434,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				'CONFIGURATION' => [
 					'Host' => 'zabbix.php?action=host.edit&hostid=10084',
 					'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
-					'Triggers' => 'triggers.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Web' => 'httpconf.php?filter_set=1&filter_hostids%5B%5D=10084&context=host'

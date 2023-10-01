@@ -307,12 +307,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SNMPVALUE}'
-                value: '[1-9]+'
-                formulaid: B
               - macro: '{#SENSOR_DESCR}'
                 value: 'FAN.*'
                 formulaid: A
+              - macro: '{#SNMPVALUE}'
+                value: '[1-9]+'
+                formulaid: B
           description: 'Scanning ATEN-IPMI-MIB::sensorTable with filter: not connected FAN sensors (Value = 0)'
           item_prototypes:
             - uuid: 5309e5fab7a44b11a8f045db2868a544
@@ -338,12 +338,12 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#SNMPVALUE}'
-                value: '[1-9]+'
-                formulaid: B
               - macro: '{#SENSOR_DESCR}'
                 value: '.*Temp.*'
                 formulaid: A
+              - macro: '{#SNMPVALUE}'
+                value: '[1-9]+'
+                formulaid: B
           description: 'Scanning ATEN-IPMI-MIB::sensorTable with filter: not connected temp sensors (Value = 0)'
           item_prototypes:
             - uuid: fe3acdb63d884c10bc5abe7edf001ceb

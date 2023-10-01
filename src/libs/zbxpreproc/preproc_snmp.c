@@ -30,6 +30,10 @@ ZBX_VECTOR_IMPL(snmp_walk_to_json_param, zbx_snmp_walk_to_json_param_t)
 ZBX_PTR_VECTOR_IMPL(snmp_walk_to_json_output_val, zbx_snmp_walk_json_output_value_t *)
 ZBX_PTR_VECTOR_IMPL(snmp_value_pair, zbx_snmp_value_pair_t *)
 
+#define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
+#define ZBX_PREPROC_SNMP_MAC_FROM_HEX	2
+#define ZBX_PREPROC_SNMP_UINT_FROM_BITS	3
+
 #ifdef HAVE_NETSNMP
 static char	zbx_snmp_init_done;
 
@@ -488,10 +492,6 @@ static int	preproc_parse_value_from_walk_params(const char *params, char **oid_n
 	return SUCCEED;
 }
 
-#define ZBX_PREPROC_SNMP_UTF8_FROM_HEX	1
-#define ZBX_PREPROC_SNMP_MAC_FROM_HEX	2
-#define ZBX_PREPROC_SNMP_UINT_FROM_BITS	3
-
 static int	preproc_snmp_convert_bits_value(char **value, int format, char **error)
 {
 #define SNMP_UINT_FROM_BITS_MAX_BYTES	(8 * 2)
@@ -574,10 +574,6 @@ static int	preproc_snmp_convert_hex_value(char **value, int format, char **error
 
 	return SUCCEED;
 }
-
-#undef ZBX_PREPROC_SNMP_UTF8_FROM_HEX
-#undef ZBX_PREPROC_SNMP_MAC_FROM_HEX
-#undef ZBX_PREPROC_SNMP_UINT_FROM_BITS
 
 /******************************************************************************
  *                                                                            *
@@ -801,7 +797,7 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 		return FAIL;
 	}
 
-	if (NULL == cache || ZBX_PREPROC_SNMP_WALK_TO_VALUE != cache->type)
+	if (NULL == cache || ZBX_PREPROC_SNMP_WALK_VALUE != cache->type)
 	{
 		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
 			return FAIL;
@@ -847,6 +843,41 @@ int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value,
 
 	zbx_variant_clear(value);
 	zbx_variant_set_str(value, value_out);
+
+	return SUCCEED;
+}
+
+int	item_preproc_snmp_get_to_value(zbx_variant_t *value, const char *params, char **errmsg)
+{
+	char	*err = NULL;
+	int	ret = FAIL, format;
+
+	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+		return FAIL;
+
+	zbx_remove_chars(value->data.str, "\r\n");
+	zbx_rtrim(value->data.str, " ");
+
+	switch ((format = atoi(params)))
+	{
+		case ZBX_PREPROC_SNMP_UTF8_FROM_HEX:
+		case ZBX_PREPROC_SNMP_MAC_FROM_HEX:
+			ret = preproc_snmp_convert_hex_value(&value->data.str, format, &err);
+			break;
+		case ZBX_PREPROC_SNMP_UINT_FROM_BITS:
+			ret = preproc_snmp_convert_bits_value(&value->data.str, format, &err);
+			break;
+		default:
+			*errmsg = zbx_dsprintf(*errmsg, "unknown parameter '%s'", params);
+			return FAIL;
+	}
+
+	if (FAIL == ret)
+	{
+		*errmsg = zbx_dsprintf(*errmsg, "cannot extract value: %s", err);
+		zbx_free(err);
+		return FAIL;
+	}
 
 	return SUCCEED;
 }

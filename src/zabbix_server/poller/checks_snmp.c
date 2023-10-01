@@ -171,6 +171,7 @@ struct zbx_snmp_context
 	unsigned char			snmpv3_privprotocol;
 	char				*snmpv3_privpassphrase;
 	const char			*config_source_ip;
+	unsigned char			snmp_oid_type;
 };
 
 typedef struct
@@ -187,6 +188,9 @@ static char				zbx_snmp_init_done;
 static char				zbx_snmp_init_bulkwalk_done;
 static pthread_rwlock_t			snmp_exec_rwlock;
 static char				snmp_rwlock_init_done;
+
+#define ZBX_SNMP_GET	0
+#define ZBX_SNMP_WALK	1
 
 #define	SNMP_MT_EXECLOCK					\
 	if (0 != snmp_rwlock_init_done)				\
@@ -2090,9 +2094,45 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 	return SUCCEED;
 }
 
+static int	snmp_get_value_from_var(struct variable_list *var, char **results, size_t *results_alloc,
+		size_t *results_offset, char *error, size_t max_error_len)
+{
+	char		**str_res = NULL;
+	AGENT_RESULT	result;
+	unsigned char	val_type;
+	int		ret = SUCCEED;
+
+	zbx_init_agent_result(&result);
+
+	if (SUCCEED == zbx_snmp_set_result(var, &result, &val_type))
+	{
+		if (ZBX_ISSET_TEXT(&result) && ZBX_SNMP_STR_HEX == val_type)
+			zbx_remove_chars(result.text, "\r\n");
+
+		str_res = ZBX_GET_STR_RESULT(&result);
+	}
+
+	if (NULL == str_res)
+	{
+		char	**msg;
+
+		msg = ZBX_GET_MSG_RESULT(&result);
+
+		zbx_snprintf(error, max_error_len, "cannot get SNMP result: %s", *msg);
+		ret = NOTSUPPORTED;
+	}
+	else
+		zbx_strcpy_alloc(results, results_alloc, results_offset, *str_res);
+
+	zbx_free_agent_result(&result);
+
+	return ret;
+}
+
 static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		zbx_bulkwalk_context_t *bulkwalk_context, char **results, size_t *results_alloc,
-		size_t *results_offset, const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface, char *error,
+		size_t *results_offset, const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface,
+		unsigned char snmp_oid_type, char *error,
 		size_t max_error_len)
 {
 	struct variable_list	*var;
@@ -2107,10 +2147,11 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		goto out;
 	}
 
-	if (SNMP_ERR_NOSUCHNAME == response->errstat)
+	if (ZBX_SNMP_GET == snmp_oid_type && NULL == response->variables)
 	{
+		zbx_snprintf(error, max_error_len, "No variables");
+		ret = NOTSUPPORTED;
 		bulkwalk_context->running = 0;
-		goto out;
 	}
 
 	for (var = response->variables; NULL != var; var = var->next_variable)
@@ -2119,6 +2160,20 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 				0 != memcmp(bulkwalk_context->p_oid->root_oid, var->name,
 				bulkwalk_context->p_oid->root_oid_len * sizeof(oid)))
 		{
+			if (ZBX_SNMP_GET == snmp_oid_type)
+			{
+				zbx_snprintf(error, max_error_len, "OID mismatched");
+				ret = NOTSUPPORTED;
+			}
+
+			bulkwalk_context->running = 0;
+			break;
+		}
+
+		if (ZBX_SNMP_GET == snmp_oid_type)
+		{
+			ret = snmp_get_value_from_var(var, results, results_alloc, results_offset, error,
+					max_error_len);
 			bulkwalk_context->running = 0;
 			break;
 		}
@@ -2225,7 +2280,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 
 		if (SUCCEED != (ret = snmp_bulkwalk_handle_response(stat, pdu, bulkwalk_context, &snmp_context->results,
 				&snmp_context->results_alloc, &snmp_context->results_offset, snmp_context->ssp,
-				&snmp_context->item.interface, error, sizeof(error))))
+				&snmp_context->item.interface, snmp_context->snmp_oid_type, error, sizeof(error))))
 		{
 			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
@@ -2698,8 +2753,18 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
+	if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
+	{
+		snmp_context->snmp_oid_type = ZBX_SNMP_WALK;
+		pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
+	}
+	else
+	{
+		snmp_context->snmp_oid_type = ZBX_SNMP_GET;
+		pdu_type = SNMP_MSG_GET;
+	}
+
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
-	pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 
 	if (SNMP_MSG_GETBULK == pdu_type && 1 > item->snmp_max_repetitions)
 	{
@@ -3105,7 +3170,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 	SNMP_MT_EXECLOCK;
 
-	if (0 == strncmp(items[j].snmp_oid, "walk[", 5))
+	if (0 == strncmp(items[j].snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")) ||
+			(0 == strncmp(items[j].snmp_oid, "get[", ZBX_CONST_STRLEN("get["))))
 	{
 		struct evdns_base	*dnsbase;
 		zbx_snmp_result_t	snmp_result = {.result = &results[j]};
