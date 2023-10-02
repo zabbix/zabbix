@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-10T19:15:57Z'
+  date: '2023-10-02T06:21:31Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1129,7 +1129,7 @@ zabbix_export:
                 - tag: user
                   value: '{#NEXTCLOUD.USER}'
               trigger_prototypes:
-                - uuid: ee778919cf91495da4445974afa039e9
+                - uuid: e39849b5b7394bd88002441afa27907c
                   expression: 'min(/Nextcloud by HTTP/nextcloud.user.quota.pused[{#NEXTCLOUD.USER}],5m) > {$NEXTCLOUD.USER.QUOTA.PUSED.MAX:"{#NEXTCLOUD.USER}"}'
                   name: 'Nextcloud: User "{#NEXTCLOUD.USER}": High quota utilization'
                   event_name: 'Nextcloud: User "{#NEXTCLOUD.USER}" High quota utilization (>{$NEXTCLOUD.USER.QUOTA.PUSED.MAX:"{#NEXTCLOUD.USER}"}% for 5m)'
@@ -1340,6 +1340,21 @@ zabbix_export:
           pages:
             - name: 'Nextcloud: Overview'
               widgets:
+                - type: ITEM
+                  name: 'Nextcloud: Version'
+                  width: '2'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: STRING
+                      name: description
+                      value: ''
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.version
                 - type: GRAPH_CLASSIC
                   name: 'Nextcloud: Active users'
                   'y': '2'
@@ -1362,22 +1377,6 @@ zabbix_export:
                       value:
                         host: 'Nextcloud by HTTP'
                         name: 'Nextcloud: CPU load'
-                - type: ITEM
-                  name: 'Nextcloud: Database'
-                  x: '12'
-                  width: '12'
-                  fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: STRING
-                      name: description
-                      value: ''
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Nextcloud by HTTP'
-                        key: nextcloud.serverinfo.db.version
                 - type: GRAPH_CLASSIC
                   name: 'Nextcloud: Database size'
                   'y': '14'
@@ -1389,22 +1388,6 @@ zabbix_export:
                       value:
                         host: 'Nextcloud by HTTP'
                         name: 'Nextcloud: Database: size'
-                - type: ITEM
-                  name: 'Nextcloud: Free space'
-                  x: '8'
-                  width: '4'
-                  fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: STRING
-                      name: description
-                      value: ''
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Nextcloud by HTTP'
-                        key: nextcloud.serverinfo.freespace
                 - type: GRAPH_CLASSIC
                   name: 'Nextcloud: Memory utilization'
                   'y': '20'
@@ -1416,21 +1399,6 @@ zabbix_export:
                       value:
                         host: 'Nextcloud by HTTP'
                         name: 'Nextcloud: Memory utilization'
-                - type: ITEM
-                  name: 'Nextcloud: Version'
-                  width: '2'
-                  fields:
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: STRING
-                      name: description
-                      value: ''
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Nextcloud by HTTP'
-                        key: nextcloud.serverinfo.version
                 - type: ITEM
                   name: 'Nextcloud: Web server'
                   x: '2'
@@ -1447,6 +1415,38 @@ zabbix_export:
                       value:
                         host: 'Nextcloud by HTTP'
                         key: nextcloud.serverinfo.apps.webserver
+                - type: ITEM
+                  name: 'Nextcloud: Free space'
+                  x: '8'
+                  width: '4'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: STRING
+                      name: description
+                      value: ''
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.freespace
+                - type: ITEM
+                  name: 'Nextcloud: Database'
+                  x: '12'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: STRING
+                      name: description
+                      value: ''
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Nextcloud by HTTP'
+                        key: nextcloud.serverinfo.db.version
             - name: 'Nextcloud: Users'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1457,14 +1457,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '4'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Nextcloud by HTTP'
                         name: 'Nextcloud: User "{#NEXTCLOUD.USER}": Quota, history'
+                    - type: INTEGER
+                      name: rows
+                      value: '4'
       valuemaps:
         - uuid: 19c5ab8f192d42f4bd35a969bef3c9d6
           name: 'Last activity'
