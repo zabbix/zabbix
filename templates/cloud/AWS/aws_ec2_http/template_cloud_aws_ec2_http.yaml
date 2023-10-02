@@ -573,16 +573,17 @@ zabbix_export:
                         var volumes = AwsEc2.request('GET', AwsEc2.params.region, 'ec2', AwsEc2.prepareParams(payload));
                         if (typeof volumes !== 'object'
                             || typeof volumes.DescribeVolumesResponse !== 'object'
-                            || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object'
-                            || typeof volumes.DescribeVolumesResponse.volumeSet.item !== 'object') {
+                            || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object') {
                             throw 'Cannot get metrics data from AWS EC2 API. Check debug log for more information.';
                         }
-                        payload.NextToken = volumes.DescribeVolumesResponse.NextToken || '';
-                        if (!Array.isArray(volumes.DescribeVolumesResponse.volumeSet.item))
+                        payload.NextToken = volumes.DescribeVolumesResponse.nextToken || '';
+                        if (volumes.DescribeVolumesResponse.volumeSet && typeof volumes.DescribeVolumesResponse.volumeSet.item === 'object') {
+                          if (!Array.isArray(volumes.DescribeVolumesResponse.volumeSet.item))
                             volumes.DescribeVolumesResponse.volumeSet.item = [volumes.DescribeVolumesResponse.volumeSet.item]
-                        volumes.DescribeVolumesResponse.volumeSet.item.forEach(function (volume) {
+                          volumes.DescribeVolumesResponse.volumeSet.item.forEach(function (volume) {
                             result.push(volume.volumeId)
-                        });
+                          });
+                        }
                     }
             
                     return result;
@@ -1041,12 +1042,13 @@ zabbix_export:
                           var volumes = AwsEbs.request('GET', AwsEbs.params.region, 'ec2', AwsEbs.prepareParams(payload));
                           if (typeof result !== 'object'
                               || typeof volumes.DescribeVolumesResponse !== 'object'
-                              || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object'
-                              || typeof volumes.DescribeVolumesResponse.volumeSet.item !== 'object') {
+                              || typeof volumes.DescribeVolumesResponse.volumeSet !== 'object') {
                               throw 'Cannot get metrics data from AWS EC2 API. Check debug log for more information.';
                           }
-                          payload.NextToken = volumes.DescribeVolumesResponse.NextToken || '';
-                          volumes_list = volumes.DescribeVolumesResponse.volumeSet.item
+                          payload.NextToken = volumes.DescribeVolumesResponse.nextToken || '';
+                          if (volumes.DescribeVolumesResponse.volumeSet && typeof volumes.DescribeVolumesResponse.volumeSet.item === 'object') {
+                            volumes_list = volumes.DescribeVolumesResponse.volumeSet.item
+                          }
             
                           if (typeof volumes_list === 'object'
                               && volumes_list !== null
