@@ -526,8 +526,8 @@ class CSVGGauge {
 	#createNeedle() {
 		const radius = CSVGGauge.NEEDLE_RADIUS / 100;
 
-		const length = this.#config.value_arc.show
-			? 1 - this.#config.value_arc.size / 2 / 100
+		const length = this.#config.thresholds.arc.show
+			? 1 - this.#config.thresholds.arc.size / 2 / 100
 			: 1 - this.#config.value_arc.size / 2 / 100;
 
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'path');
