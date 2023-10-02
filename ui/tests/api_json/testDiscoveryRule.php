@@ -817,7 +817,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/preprocessing/1/type": value must be one of 5, 11, 12, 15, 16, 17, 20, 21, 23, 24, 25, 27, 28, 29.'
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/type": value must be one of 5, 11, 12, 14, 15, 16, 17, 20, 21, 23, 24, 25, 27, 28, 29, 30.'
 			],
 			'Test unallowed preprocessing type (integer)' => [
 				'discoveryrule' => [
@@ -830,7 +830,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/preprocessing/1/type": value must be one of 5, 11, 12, 15, 16, 17, 20, 21, 23, 24, 25, 27, 28, 29.'
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/type": value must be one of 5, 11, 12, 14, 15, 16, 17, 20, 21, 23, 24, 25, 27, 28, 29, 30.'
 			],
 			'Test valid type but empty preprocessing params (bool)' => [
 				'discoveryrule' => [
@@ -1363,6 +1363,84 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params": value must be empty.'
+			],
+			'Test empty preprocessing parameters for ZBX_PREPROC_SNMP_GET_VALUE type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => '',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params/1": an integer is expected.'
+			],
+			'Test invalid (boolean) preprocessing parameters for ZBX_PREPROC_SNMP_GET_VALUE type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => false,
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params": a character string is expected.'
+			],
+			'Test invalid (array) preprocessing parameters for ZBX_PREPROC_SNMP_GET_VALUE type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => [],
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params": a character string is expected.'
+			],
+			'Test invalid (too many) preprocessing parameters for ZBX_PREPROC_SNMP_GET_VALUE type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => "\n",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params": unexpected parameter "2".'
+			],
+			'Test invalid (unsupported - value is too low) preprocessing parameters for ZBX_PREPROC_SNMP_GET_VALUE type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => '0',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1, 2, 3.'
+			],
+			'Test invalid (unsupported - value is too high) preprocessing parameters for ZBX_PREPROC_SNMP_GET_VALUE type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => '999999',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params/1": value must be one of 1, 2, 3.'
 			]
 		];
 	}
@@ -1640,6 +1718,45 @@ class testDiscoveryRule extends CAPITest {
 						[
 							'type' => ZBX_PREPROC_XML_TO_JSON,
 							'params' => '',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_SNMP_GET_VALUE having ZBX_PREPROC_SNMP_UTF8_FROM_HEX' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => '1',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_SNMP_GET_VALUE having ZBX_PREPROC_SNMP_MAC_FROM_HEX' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => '2',
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => null
+			],
+			'Test valid preprocessing with type ZBX_PREPROC_SNMP_GET_VALUE having ZBX_PREPROC_SNMP_INT_FROM_BITS' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_SNMP_GET_VALUE,
+							'params' => '3',
 							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
 							'error_handler_params' => ''
 						]

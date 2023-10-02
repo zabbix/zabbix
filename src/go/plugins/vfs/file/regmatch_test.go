@@ -25,12 +25,12 @@ import (
 	"os"
 	"reflect"
 	"testing"
+
+	"zabbix.com/pkg/zbxtest"
 )
 
 func TestFileRegmatch(t *testing.T) {
-
-	impl.options.Timeout = 3
-
+	var ctx zbxtest.MockEmptyCtx
 	filename := "/tmp/zbx_vfs_file_regmatch_test.dat"
 
 	type testCase struct {
@@ -164,7 +164,7 @@ func TestFileRegmatch(t *testing.T) {
 		var err error
 
 		if result, err = impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd}, nil); err != nil {
+			c.lineStart, c.lineEnd}, ctx); err != nil {
 			t.Errorf("vfs.file.regmatch[%d] returned error %s", i, err.Error())
 
 			return
@@ -214,7 +214,7 @@ func TestFileRegmatch(t *testing.T) {
 		}
 
 		if _, err := impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd}, nil); err != nil {
+			c.lineStart, c.lineEnd}, ctx); err != nil {
 			if err.Error() != expectedError {
 				t.Errorf(`vfs.file.regmatch testcase[%d] failed with unexpected error: %s,
 					expected: %s`, i, err.Error(), expectedError)
@@ -247,7 +247,7 @@ func TestFileRegmatch(t *testing.T) {
 
 		var err error
 		_, err = impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
-			c.lineStart, c.lineEnd}, nil)
+			c.lineStart, c.lineEnd}, ctx)
 
 		if nil == err {
 			t.Errorf("vfs.file.regmatch (testCase[%d]) did not return error: ->%s<- when wrong target "+

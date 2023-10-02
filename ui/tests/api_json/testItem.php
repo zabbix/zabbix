@@ -506,25 +506,6 @@ class testItem extends CAPITest {
 					'delay' => '0'
 				],
 				'expected_error' => 'Invalid parameter "/1/delay": cannot be equal to zero without custom intervals.'
-			],
-			// Item preprocessing.
-			[
-				'request_data' => [
-					'hostid' => '50009',
-					'name' => 'Test preprocessing 1',
-					'key_' => 'mqtt.get[5]',
-					'interfaceid' => '50022',
-					'value_type' => ITEM_VALUE_TYPE_UINT64,
-					'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-					'preprocessing' => [
-						[
-							'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
-							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
-							'error_handler_params' => ''
-						]
-					]
-				],
-				'expected_error' => 'Invalid parameter "/1/preprocessing/1/error_handler": value must be one of 1, 2, 3.'
 			]
 		], $item_type_tests, $interfaces_tests, $uuid_tests, $binary_valuetype_tests);
 	}

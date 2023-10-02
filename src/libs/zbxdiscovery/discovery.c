@@ -60,6 +60,11 @@ void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck)
 		zbx_free(dcheck->snmpv3_authpassphrase);
 		zbx_free(dcheck->snmpv3_privpassphrase);
 		zbx_free(dcheck->snmpv3_contextname);
+		zbx_free(dcheck->timeout_str);
+	}
+	else if (SVC_AGENT == dcheck->type)
+	{
+		zbx_free(dcheck->timeout_str);
 	}
 
 	zbx_free(dcheck);

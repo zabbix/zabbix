@@ -146,7 +146,6 @@ class CControllerHostList extends CController {
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
 				'groupids' => $filter['groups'],
-				'editable' => true,
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];

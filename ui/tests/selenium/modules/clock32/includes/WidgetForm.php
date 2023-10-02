@@ -32,6 +32,7 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldColor,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldMultiSelectItem,
+	CWidgetFieldMultiSelectOverrideHost,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldSelect,
 	CWidgetFieldTimeZone
@@ -134,6 +135,9 @@ class WidgetForm extends CWidgetForm {
 					Widget::TIMEZONE_SHORT => _('Short'),
 					Widget::TIMEZONE_FULL => _('Full')
 				]))->setDefault(Widget::TIMEZONE_SHORT)
+			)
+			->addField(
+				new CWidgetFieldMultiSelectOverrideHost()
 			);
 	}
 }

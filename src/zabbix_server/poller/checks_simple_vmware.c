@@ -24,6 +24,7 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include"../vmware/vmware.h"
+#include "../vmware/vmware_perfcntr.h"
 #include "zbxxml.h"
 #include "zbxsysinfo.h"
 

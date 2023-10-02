@@ -51,6 +51,19 @@ size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args)
 	return (size_t)written_len;
 }
 
+int	zbx_vsnprintf_check_len(const char *fmt, va_list args)
+{
+	int	rv;
+
+	if (0 > (rv = vsnprintf(NULL, 0, fmt, args)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	return rv;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: dynamical formatted output conversion                             *
@@ -179,10 +192,23 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 retry:
 	if (NULL == *str)
 	{
+		int	rv;
+
+		va_start(args, fmt);
+
 		/* zbx_vsnprintf() returns bytes actually written instead of bytes to write, */
 		/* so we have to use the standard function                                   */
-		va_start(args, fmt);
-		*alloc_len = vsnprintf(NULL, 0, fmt, args) + 2;	/* '\0' + one byte to prevent the operation retry */
+		if (0 > (rv = zbx_vsnprintf_check_len(fmt, args)))
+		{
+			va_end(args);
+			*alloc_len = 0;
+			*offset = 0;
+
+			return;
+		}
+
+		*alloc_len = (size_t)rv + 2;	/* '\0' + one byte to prevent the operation retry */
+
 		va_end(args);
 		*offset = 0;
 		*str = (char *)zbx_malloc(*str, *alloc_len);

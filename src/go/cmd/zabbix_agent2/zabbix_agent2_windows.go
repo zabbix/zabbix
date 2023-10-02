@@ -41,7 +41,7 @@ func loadOSDependentItems() error {
 func init() {
 	if path, err := os.Executable(); err == nil {
 		dir, name := filepath.Split(path)
-		confDefault = dir + strings.TrimSuffix(name, filepath.Ext(name)) + ".win.conf"
+		confDefault = dir + strings.TrimSuffix(name, filepath.Ext(name)) + ".conf"
 	}
 }
 

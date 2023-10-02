@@ -31,7 +31,6 @@ import (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int `conf:"optional,range=1:30"`
 	LogRemoteCommands    int `conf:"optional,range=0:1,default=0"`
 }
 
@@ -46,9 +45,6 @@ var impl Plugin
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
 	}
 }
 
@@ -74,7 +70,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	if len(params) == 1 || params[1] == "" || params[1] == "wait" {
-		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(p.options.Timeout), "")
+		stdoutStderr, err := zbxcmd.Execute(params[0], time.Second*time.Duration(ctx.Timeout()), "")
 		if err != nil {
 			return nil, err
 		}
