@@ -35,7 +35,6 @@ class testPageReportsActionLog extends CWebTest {
 		CDataHelper::call('action.create', [
 			[
 				'name' => 'Simple action',
-//				'esc_period' => '60s',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
 					'evaltype' => 0,
@@ -56,7 +55,6 @@ class testPageReportsActionLog extends CWebTest {
 			],
 			[
 				'name' => 'Trigger action 2',
-//				'esc_period' => '60s',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
 					'evaltype' => 0,
@@ -79,7 +77,6 @@ class testPageReportsActionLog extends CWebTest {
 			],
 			[
 				'name' => 'Trigger action 3',
-//				'esc_period' => '60s',
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
 					'evaltype' => 0,
@@ -97,36 +94,7 @@ class testPageReportsActionLog extends CWebTest {
 						'operationtype' => OPERATION_TYPE_MESSAGE,
 						'opmessage' => ['mediatypeid' => 3],
 						'opmessage_grp' => [['usrgrpid' => 7]]
-					],
-//					[
-//						'operationtype' => OPERATION_TYPE_MESSAGE,
-//						'esc_period' => 3600,
-//						'esc_step_from' => 2,
-//						'esc_step_to' => 2,
-//						'opconditions' => [
-//							[
-//								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-//								'operator' => CONDITION_OPERATOR_EQUAL,
-//								'value' => "0"
-//							]
-//						],
-//						'opmessage' => ['mediatypeid' => 1],
-//						'opmessage_grp' => [['usrgrpid' => 7]]
-//					],
-//					[
-//						'operationtype' => OPERATION_TYPE_MESSAGE,
-//						'esc_step_from' => 5,
-//						'esc_step_to' => 6,
-//						'opconditions' => [
-//							[
-//								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-//								'operator' => CONDITION_OPERATOR_EQUAL,
-//								'value' => "0"
-//							]
-//						],
-//						'opmessage' => ['mediatypeid' => 1],
-//						'opmessage_usr' => [['userid' => 1]]
-//					]
+					]
 				]
 			]
 		]);
@@ -856,7 +824,6 @@ class testPageReportsActionLog extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
-//		$this->assertScreenshot(null, microtime());
 		$this->assertTableHasData($data['result']);
 		$this->assertTableStats(count($data['result']));
 
