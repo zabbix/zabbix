@@ -351,7 +351,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: 15s
           parameters:
             - name: AccessKeyId
@@ -613,7 +613,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: 15s
           parameters:
             - name: AccessKeyId
@@ -914,7 +914,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: 15s
           parameters:
             - name: AccessKeyId
@@ -1601,7 +1601,7 @@ zabbix_export:
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
-                    - ''
+                    - '-1'
               timeout: 15s
               parameters:
                 - name: AccessKeyId
@@ -1940,18 +1940,15 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.service_count
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                 - type: graph
                   'y': '5'
@@ -1959,30 +1956,39 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster: CPU Utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graph
                   'y': '10'
                   width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster: Memory Utilization'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                 - type: graph
                   'y': '15'
                   width: '24'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster: Network'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: item
                   name: 'Task count'
                   x: '8'
@@ -1990,18 +1996,15 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.task_count
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
                 - type: item
                   name: 'Container instance count'
@@ -2010,18 +2013,15 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
                       name: decimal_places
                       value: '0'
                     - type: ITEM
-                      name: itemid
+                      name: itemid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.container_instance_count
                     - type: INTEGER
-                      name: show
+                      name: show.0
                       value: '2'
             - name: Services
               widgets:
@@ -2033,13 +2033,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: CPU Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
                 - type: graphprototype
                   'y': '5'
                   width: '24'
@@ -2049,13 +2049,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
                 - type: graphprototype
                   'y': '10'
                   width: '24'
@@ -2065,13 +2065,13 @@ zabbix_export:
                       name: columns
                       value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: AAAAF
       valuemaps:
         - uuid: 6b0f40b56f1c49f0beb66ffb85009c15
           name: 'Alarm state'

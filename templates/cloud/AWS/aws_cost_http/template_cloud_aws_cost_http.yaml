@@ -224,7 +224,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: 15s
           parameters:
             - name: AccessKeyId
@@ -475,7 +475,7 @@ zabbix_export:
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
-                - ''
+                - '-1'
           timeout: 15s
           parameters:
             - name: AccessKeyId
@@ -709,14 +709,14 @@ zabbix_export:
                   width: '24'
                   height: '25'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Monthly blended cost'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                     - type: INTEGER
                       name: rows
                       value: '6'
@@ -726,14 +726,14 @@ zabbix_export:
                   width: '24'
                   height: '25'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
                     - type: INTEGER
                       name: rows
                       value: '6'
@@ -743,14 +743,14 @@ zabbix_export:
                   width: '24'
                   height: '20'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                     - type: INTEGER
                       name: rows
                       value: '5'
