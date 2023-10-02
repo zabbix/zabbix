@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-08-24T11:13:37Z'
+  date: '2023-09-20T10:46:04Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1741,30 +1741,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Tuples'
-                - type: GRAPH_PROTOTYPE
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: INTEGER
                       name: rows
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB [{#DBNAME}]: Events'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -1772,15 +1756,63 @@ zabbix_export:
                   fields:
                     - type: INTEGER
                       name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
                       value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Block hit/read'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_PROTOTYPE
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'DB [{#DBNAME}]: Locks'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_PROTOTYPE
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'DB [{#DBNAME}]: Queries'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_PROTOTYPE
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'DB [{#DBNAME}]: Events'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -1790,30 +1822,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Temp files'
-                - type: GRAPH_PROTOTYPE
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: INTEGER
                       name: rows
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB [{#DBNAME}]: Locks'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -1822,31 +1838,15 @@ zabbix_export:
                   fields:
                     - type: INTEGER
                       name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
                       value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Database size'
-                - type: GRAPH_PROTOTYPE
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
                     - type: INTEGER
                       name: rows
                       value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB [{#DBNAME}]: Queries'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '15'
@@ -1856,14 +1856,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Slow queries'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
         - uuid: f2ceabf59fd64ca9828ea55e9b9668bd
           name: 'PostgreSQL stat'
           pages:
@@ -1878,16 +1878,6 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL connections'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'PostgreSQL transactions'
-                - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1897,6 +1887,36 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL ping'
+                - type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'PostgreSQL replication lag'
+                - type: GRAPH_CLASSIC
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'PostgreSQL bgwriter'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'PostgreSQL by Zabbix agent'
+                        name: 'PostgreSQL transactions'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'
@@ -1909,16 +1929,6 @@ zabbix_export:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL uptime'
                 - type: GRAPH_CLASSIC
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'PostgreSQL replication lag'
-                - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '10'
                   width: '12'
@@ -1929,16 +1939,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'PostgreSQL WAL'
-                - type: GRAPH_CLASSIC
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'PostgreSQL by Zabbix agent'
-                        name: 'PostgreSQL bgwriter'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '15'

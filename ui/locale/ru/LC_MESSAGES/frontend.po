@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-07 11:41+0000\n"
-"Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
+"PO-Revision-Date: 2023-09-29 06:01+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -903,7 +903,7 @@ msgstr "Добавить несколько карт"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr "Добавить новый набор данных"
+msgstr "Новый набор данных"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
@@ -22478,7 +22478,7 @@ msgstr "число"
 
 #: include/classes/api/services/CHostPrototype.php:820
 msgid "object does not exist or belongs to another object"
-msgstr ""
+msgstr "объект не существует или принадлежит другому объекту"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

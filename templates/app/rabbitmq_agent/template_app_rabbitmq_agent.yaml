@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-12T00:43:24Z'
+  date: '2023-09-20T10:44:15Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1029,16 +1029,6 @@ zabbix_export:
                         host: 'RabbitMQ cluster by Zabbix agent'
                         name: 'RabbitMQ: Messages'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'RabbitMQ cluster by Zabbix agent'
-                        name: 'RabbitMQ: Connections'
-                - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -1048,6 +1038,26 @@ zabbix_export:
                       value:
                         host: 'RabbitMQ cluster by Zabbix agent'
                         name: 'RabbitMQ: Messages status'
+                - type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'RabbitMQ cluster by Zabbix agent'
+                        name: 'RabbitMQ: Messages per second'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'RabbitMQ cluster by Zabbix agent'
+                        name: 'RabbitMQ: Connections'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'
@@ -1059,16 +1069,6 @@ zabbix_export:
                       value:
                         host: 'RabbitMQ cluster by Zabbix agent'
                         name: 'RabbitMQ: Queues'
-                - type: GRAPH_CLASSIC
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'RabbitMQ cluster by Zabbix agent'
-                        name: 'RabbitMQ: Messages per second'
       valuemaps:
         - uuid: 78275d6daacf42b4b97e3d806dfe81fe
           name: 'RabbitMQ healthcheck'
@@ -1900,6 +1900,9 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
+              - macro: '{#NODE}'
+                value: '{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}'
+                formulaid: A
               - macro: '{#QUEUE}'
                 value: '{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}'
                 formulaid: B
@@ -1907,9 +1910,6 @@ zabbix_export:
                 value: '{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#NODE}'
-                value: '{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}'
-                formulaid: A
           description: 'The metrics for an individual queue.'
           item_prototypes:
             - uuid: 158f41423b094efcb90ac273d1e6349c
@@ -2475,16 +2475,6 @@ zabbix_export:
                         host: 'RabbitMQ node by Zabbix agent'
                         name: 'RabbitMQ: Node status'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'RabbitMQ node by Zabbix agent'
-                        name: 'RabbitMQ: Uptime'
-                - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
                   height: '5'
@@ -2494,6 +2484,26 @@ zabbix_export:
                       value:
                         host: 'RabbitMQ node by Zabbix agent'
                         name: 'RabbitMQ: Disk free'
+                - type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'RabbitMQ node by Zabbix agent'
+                        name: 'RabbitMQ: File descriptors'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'RabbitMQ node by Zabbix agent'
+                        name: 'RabbitMQ: Uptime'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '5'
@@ -2505,16 +2515,6 @@ zabbix_export:
                       value:
                         host: 'RabbitMQ node by Zabbix agent'
                         name: 'RabbitMQ: Memory used'
-                - type: GRAPH_CLASSIC
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'RabbitMQ node by Zabbix agent'
-                        name: 'RabbitMQ: File descriptors'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '10'

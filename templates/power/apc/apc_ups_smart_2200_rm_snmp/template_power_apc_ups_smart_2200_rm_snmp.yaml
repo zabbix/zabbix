@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:59:10Z'
+  date: '2023-09-20T10:51:12Z'
   groups:
     - uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
       name: Templates/Power
@@ -1384,6 +1384,16 @@ zabbix_export:
             - name: 'APC Smart-UPS 2200 RM: General'
               widgets:
                 - type: GRAPH_CLASSIC
+                  name: Voltage
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'APC Smart-UPS 2200 RM by SNMP'
+                        name: 'APC Smart-UPS 2200 RM: Voltage'
+                - type: GRAPH_CLASSIC
                   name: 'Capacity of the UPS batteries'
                   'y': '5'
                   width: '12'
@@ -1405,16 +1415,6 @@ zabbix_export:
                       value:
                         host: 'APC Smart-UPS 2200 RM by SNMP'
                         name: 'APC Smart-UPS 2200 RM: Output'
-                - type: GRAPH_CLASSIC
-                  name: Voltage
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'APC Smart-UPS 2200 RM by SNMP'
-                        name: 'APC Smart-UPS 2200 RM: Voltage'
       valuemaps:
         - uuid: 6940a4d08173433bb4bc8ff3b44e578c
           name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:58:57Z'
+  date: '2023-09-20T10:51:10Z'
   groups:
     - uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
       name: Templates/Power
@@ -1384,6 +1384,16 @@ zabbix_export:
             - name: 'APC UPS Galaxy 3500: General'
               widgets:
                 - type: GRAPH_CLASSIC
+                  name: Voltage
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'APC UPS Galaxy 3500 by SNMP'
+                        name: 'APC UPS Galaxy 3500: Voltage'
+                - type: GRAPH_CLASSIC
                   name: 'Capacity of the UPS batteries'
                   'y': '5'
                   width: '12'
@@ -1405,16 +1415,6 @@ zabbix_export:
                       value:
                         host: 'APC UPS Galaxy 3500 by SNMP'
                         name: 'APC UPS Galaxy 3500: Output'
-                - type: GRAPH_CLASSIC
-                  name: Voltage
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'APC UPS Galaxy 3500 by SNMP'
-                        name: 'APC UPS Galaxy 3500: Voltage'
       valuemaps:
         - uuid: 30a78904cbc94fc58609dc1a11aa48ef
           name: 'PowerNet-MIB::uioSensorStatusAlarmStatus'

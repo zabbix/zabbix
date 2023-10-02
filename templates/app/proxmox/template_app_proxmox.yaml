@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:19:41Z'
+  date: '2023-09-20T10:44:11Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -39,14 +39,14 @@ zabbix_export:
                 - 12h
           timeout: 10s
           parameters:
-            - name: token
-              value: '{$PVE.TOKEN.ID}'
-            - name: secret
-              value: '{$PVE.TOKEN.SECRET}'
-            - name: url
-              value: '{HOST.CONN}'
             - name: port
               value: '{$PVE.URL.PORT}'
+            - name: secret
+              value: '{$PVE.TOKEN.SECRET}'
+            - name: token
+              value: '{$PVE.TOKEN.ID}'
+            - name: url
+              value: '{HOST.CONN}'
           tags:
             - tag: component
               value: system
