@@ -36,6 +36,7 @@ $available_js = [
 	'common.js' => '',
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
+	'class.dashboard.print.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
 	'class.widget-base.js' => '',
 	'class.widget.js' => '',

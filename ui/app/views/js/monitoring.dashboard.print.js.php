@@ -29,9 +29,9 @@
 		init({dashboard, widget_defaults, dashboard_time_period}) {
 			timeControl.refreshPage = false;
 
-			ZABBIX.Dashboard = new CDashboard(document.querySelector('.wrapper'), {
+			ZABBIX.Dashboard = new CDashboardPrint(document.querySelector('.wrapper'), {
 				containers: {
-					grid: null,
+					grid: document.querySelector('.wrapper'),
 					navigation: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION ?>'),
 					navigation_tabs: document.querySelector('.<?= ZBX_STYLE_DASHBOARD_NAVIGATION_TABS ?>')
 				},
@@ -70,40 +70,11 @@
 			let page_number = 0;
 
 			for (const page of dashboard.pages) {
-				const dashboard_page = new CDashboardPage(dashboard_page_containers[page_number], {
-					data: {
-						dashboard_pageid: page.dashboard_pageid,
-						name: page.name,
-						display_period: page.display_period
-					},
-					dashboard: {
-						templateid: null,
-						dashboardid: dashboard.dashboardid
-					},
-					cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,
-					cell_height: <?= DASHBOARD_ROW_HEIGHT ?>,
-					max_columns: <?= DASHBOARD_MAX_COLUMNS ?>,
-					max_rows: <?= DASHBOARD_MAX_ROWS ?>,
-					widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
-					widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-					widget_defaults: widget_defaults,
-					is_editable: false,
-					is_edit_mode: false,
-					unique_id: page.dashboard_pageid
-				});
-
 				for (const widget of page.widgets) {
 					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
-				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
-				}
-
-				dashboard_page.start();
-				dashboard_page.activate();
-
-				ZABBIX.Dashboard.addDashboardPage(dashboard_page);
+				ZABBIX.Dashboard.addDashboardPage(page, dashboard_page_containers[page_number]);
 
 				page_number = page_number + 1;
 			}
