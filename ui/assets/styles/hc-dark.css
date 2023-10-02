@@ -6096,8 +6096,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .tag a.link-action:hover, .btn-tag a.link-action:hover {
       text-decoration: underline;
       border-bottom: none; }
-  .tag:last-child, .btn-tag:last-child {
-    margin: 0; }
+  .tag:last-of-type, .btn-tag:last-of-type {
+    margin-right: 0; }
   .tag.green-bg, .green-bg.btn-tag {
     color: #0e4123; }
   .tag.yellow-bg, .yellow-bg.btn-tag {
