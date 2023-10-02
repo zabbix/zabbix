@@ -1,0 +1,1 @@
+.......PS. [ZBX-23475] fixed memory leak when error happens in snmp to walk (dgoloscapov)
