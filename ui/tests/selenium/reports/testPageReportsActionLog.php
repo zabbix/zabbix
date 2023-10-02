@@ -66,107 +66,7 @@ class testPageReportsActionLog extends CWebTest {
 							'operator' => CONDITION_OPERATOR_NOT_LIKE,
 							'value' => 'PostgreSQL',
 							'value2' => 'Database'
-						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
-//							'operator' => CONDITION_OPERATOR_LIKE,
-//							'value' => 'MYSQL',
-//							'value2' => 'Database'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value2' => 'MySQL'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
-//							'operator' => CONDITION_OPERATOR_YES
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TEMPLATE,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 10081
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TEMPLATE,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 10001
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-//							'operator' => CONDITION_OPERATOR_NOT_IN,
-//							'value' => '6-7,08:00-18:00'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-//							'operator' => CONDITION_OPERATOR_IN,
-//							'value' => '1-7,00:00-24:00'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_LESS_EQUAL,
-//							'value' => 4
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_MORE_EQUAL,
-//							'value' => 3
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 2
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 5
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 1
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
-//							'operator' => CONDITION_OPERATOR_NOT_LIKE,
-//							'value' => 'DB2'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
-//							'operator' => CONDITION_OPERATOR_LIKE,
-//							'value' => 'Oracle'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 13485
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 99252
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 10084
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 99134
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 4
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 2
-//						]
+						]
 					]
 				],
 				'operations' => [
@@ -189,107 +89,7 @@ class testPageReportsActionLog extends CWebTest {
 							'operator' => CONDITION_OPERATOR_NOT_LIKE,
 							'value' => 'PostgreSQL',
 							'value2' => 'Database'
-						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
-//							'operator' => CONDITION_OPERATOR_LIKE,
-//							'value' => 'MYSQL',
-//							'value2' => 'Database'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value2' => 'MySQL'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
-//							'operator' => CONDITION_OPERATOR_YES
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TEMPLATE,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 10081
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TEMPLATE,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 10001
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-//							'operator' => CONDITION_OPERATOR_NOT_IN,
-//							'value' => '6-7,08:00-18:00'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
-//							'operator' => CONDITION_OPERATOR_IN,
-//							'value' => '1-7,00:00-24:00'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_LESS_EQUAL,
-//							'value' => 4
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_MORE_EQUAL,
-//							'value' => 3
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 2
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 5
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 1
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
-//							'operator' => CONDITION_OPERATOR_NOT_LIKE,
-//							'value' => 'DB2'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
-//							'operator' => CONDITION_OPERATOR_LIKE,
-//							'value' => 'Oracle'
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 13485
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_TRIGGER,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 99252
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 10084
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 99134
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-//							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
-//							'value' => 4
-//						],
-//						[
-//							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
-//							'operator' => CONDITION_OPERATOR_EQUAL,
-//							'value' => 2
-//						]
+						]
 					]
 				],
 				'operations' => [
@@ -309,11 +109,11 @@ class testPageReportsActionLog extends CWebTest {
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'value' => "0"
 							],
-							[
-								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-								'operator' => CONDITION_OPERATOR_EQUAL,
-								'value' => "1"
-							]
+//							[
+//								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+//								'operator' => CONDITION_OPERATOR_EQUAL,
+//								'value' => "1"
+//							]
 						],
 						'opmessage' => ['mediatypeid' => 1],
 						'opmessage_grp' => [['usrgrpid' => 7]]
@@ -330,9 +130,9 @@ class testPageReportsActionLog extends CWebTest {
 							]
 						],
 						'opmessage' => [
-							'default_msg' => 0,
-							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
-							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
+//							'default_msg' => 0,
+//							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
+//							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
 							'mediatypeid' => 1
 						],
 						'opmessage_usr' => [['userid' => 1]]
@@ -342,6 +142,9 @@ class testPageReportsActionLog extends CWebTest {
 		]);
 
 		$actionids = CDataHelper::getIds('name');
+
+
+		// Add Actions to Action Log in database.
 		DBexecute("INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES ".
 				" (1, 0, 0, 13545, 1329724790, 1, 0, 0);"
 		);
@@ -1063,6 +866,7 @@ class testPageReportsActionLog extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
+		$this->assertScreenshot(null, microtime());
 		$this->assertTableHasData($data['result']);
 		$this->assertTableStats(count($data['result']));
 
