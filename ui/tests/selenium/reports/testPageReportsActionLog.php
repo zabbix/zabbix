@@ -108,12 +108,7 @@ class testPageReportsActionLog extends CWebTest {
 								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 								'operator' => CONDITION_OPERATOR_EQUAL,
 								'value' => "0"
-							],
-//							[
-//								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-//								'operator' => CONDITION_OPERATOR_EQUAL,
-//								'value' => "1"
-//							]
+							]
 						],
 						'opmessage' => ['mediatypeid' => 1],
 						'opmessage_grp' => [['usrgrpid' => 7]]
@@ -129,12 +124,7 @@ class testPageReportsActionLog extends CWebTest {
 								'value' => "0"
 							]
 						],
-						'opmessage' => [
-//							'default_msg' => 0,
-//							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
-//							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
-							'mediatypeid' => 1
-						],
+						'opmessage' => ['mediatypeid' => 1],
 						'opmessage_usr' => [['userid' => 1]]
 					]
 				]
@@ -866,7 +856,7 @@ class testPageReportsActionLog extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
-		$this->assertScreenshot(null, microtime());
+//		$this->assertScreenshot(null, microtime());
 		$this->assertTableHasData($data['result']);
 		$this->assertTableStats(count($data['result']));
 
