@@ -237,7 +237,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
  *                                                                            *
  * Parameters:  usage_message - [IN]                                          *
  ******************************************************************************/
-void	zbx_usage(const char **usage_message)
+void	zbx_print_usage(const char **usage_message)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
@@ -303,11 +303,11 @@ static const char	help_message_footer[] =
  *             usage_message - [IN]                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_help(const char *param, const char **help_message, const char **usage_message)
+void	zbx_print_help(const char *param, const char **help_message, const char **usage_message)
 {
 	const char	**p = help_message;
 
-	zbx_usage(usage_message);
+	zbx_print_usage(usage_message);
 	printf("\n");
 
 	while (NULL != *p)
@@ -335,7 +335,7 @@ void	zbx_help(const char *param, const char **help_message, const char **usage_m
  *          by application request with parameter '-V'                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_version(const char *title_message)
+void	zbx_print_version(const char *title_message)
 {
 	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);

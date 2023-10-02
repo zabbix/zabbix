@@ -1186,11 +1186,11 @@ int	main(int argc, char **argv)
 				t.task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
 			case 'h':
-				zbx_help(NULL, help_message, usage_message);
+				zbx_print_help(NULL, help_message, usage_message);
 				exit(EXIT_SUCCESS);
 				break;
 			case 'V':
-				zbx_version(title_message);
+				zbx_print_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
@@ -1201,7 +1201,7 @@ int	main(int argc, char **argv)
 				t.flags |= ZBX_TASK_FLAG_FOREGROUND;
 				break;
 			default:
-				zbx_usage(usage_message);
+				zbx_print_usage(usage_message);
 				exit(EXIT_FAILURE);
 				break;
 		}

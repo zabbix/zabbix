@@ -171,15 +171,15 @@ int	main(int argc, char **argv)
 
 				break;
 			case 'h':
-				zbx_help(NULL, help_message, usage_message);
+				zbx_print_help(NULL, help_message, usage_message);
 				ret = SUCCEED;
 				goto clean;
 			case 'V':
-				zbx_version(title_message);
+				zbx_print_version(title_message);
 				ret = SUCCEED;
 				goto clean;
 			default:
-				zbx_usage(usage_message);
+				zbx_print_usage(usage_message);
 				goto clean;
 		}
 	}
@@ -198,7 +198,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == script_file || (NULL == input_file && NULL == param))
 	{
-		zbx_usage(usage_message);
+		zbx_print_usage(usage_message);
 		goto close;
 	}
 

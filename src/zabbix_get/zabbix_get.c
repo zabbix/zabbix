@@ -355,10 +355,10 @@ int	main(int argc, char **argv)
 				}
 				break;
 			case 'h':
-				zbx_help(NULL, help_message, usage_message);
+				zbx_print_help(NULL, help_message, usage_message);
 				exit(EXIT_SUCCESS);
 			case 'V':
-				zbx_version(title_message);
+				zbx_print_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				printf("\n");
 				zbx_tls_version();
@@ -433,7 +433,7 @@ int	main(int argc, char **argv)
 				break;
 #endif
 			default:
-				zbx_usage(usage_message);
+				zbx_print_usage(usage_message);
 				exit(EXIT_FAILURE);
 		}
 	}
@@ -449,7 +449,7 @@ int	main(int argc, char **argv)
 
 	if (NULL == host || NULL == key)
 	{
-		zbx_usage(usage_message);
+		zbx_print_usage(usage_message);
 		ret = FAIL;
 	}
 
