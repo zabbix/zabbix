@@ -38,12 +38,7 @@ class testPageReportsActionLog extends CWebTest {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
 					'evaltype' => 0,
-					'conditions' => [
-						[
-							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
-							'operator' => CONDITION_OPERATOR_NO
-						]
-					]
+					'conditions' => []
 				],
 				'operations' => [
 					[
@@ -58,14 +53,7 @@ class testPageReportsActionLog extends CWebTest {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
 					'evaltype' => 0,
-					'conditions' => [
-						[
-							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
-							'operator' => CONDITION_OPERATOR_NOT_LIKE,
-							'value' => 'PostgreSQL',
-							'value2' => 'Database'
-						]
-					]
+					'conditions' => []
 				],
 				'operations' => [
 					[
@@ -80,14 +68,7 @@ class testPageReportsActionLog extends CWebTest {
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'filter' => [
 					'evaltype' => 0,
-					'conditions' => [
-						[
-							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
-							'operator' => CONDITION_OPERATOR_NOT_LIKE,
-							'value' => 'PostgreSQL',
-							'value2' => 'Database'
-						]
-					]
+					'conditions' => []
 				],
 				'operations' => [
 					[
@@ -100,7 +81,6 @@ class testPageReportsActionLog extends CWebTest {
 		]);
 
 		$actionids = CDataHelper::getIds('name');
-
 
 		// Add Actions to Action Log in database.
 		DBexecute("INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES ".

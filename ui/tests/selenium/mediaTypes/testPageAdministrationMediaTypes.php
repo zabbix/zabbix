@@ -25,10 +25,32 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup media_type
+ *
+ * @onBefore prepareActionData
  */
 class testPageAdministrationMediaTypes extends CWebTest {
 
 	use TableTrait;
+
+	public static function prepareActionData() {
+		CDataHelper::call('action.create', [
+			[
+				'name' => 'Action with email',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => []
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => ['mediatypeid' => 1],
+						'opmessage_grp' => [['usrgrpid' => 7]]
+					]
+				]
+			]
+		]);
+	}
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -279,7 +301,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'rows' => ['Email'],
 					'db_name' => 'Email',
-					'used_by_action' => 'Trigger action 3'
+					'used_by_action' => 'Action with email'
 				]
 			],
 			// Select several.
