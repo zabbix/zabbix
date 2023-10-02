@@ -1574,7 +1574,7 @@ static void	discoverer_libs_init(void)
 static void	discoverer_libs_destroy(void)
 {
 #ifdef HAVE_NETSNMP
-	zbx_shutdown_library_mt_snmp();
+	zbx_shutdown_library_mt_snmp(zbx_get_progname_cb());
 #endif
 #ifdef HAVE_LIBCURL
 	curl_global_cleanup();

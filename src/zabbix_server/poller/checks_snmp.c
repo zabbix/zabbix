@@ -3072,7 +3072,9 @@ static void	zbx_init_snmp(const char *progname)
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-static void	zbx_shutdown_snmp(void)
+/* Actually this could be called by discoverer, without poller being initialized, */
+/* , so cannot call poller_get_progname(), need progname to be passed directly. */
+static void	zbx_shutdown_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;
 
@@ -3083,7 +3085,8 @@ static void	zbx_shutdown_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
-	snmp_shutdown(poller_get_progname()());
+	snmp_shutdown(progname);
+
 	zbx_snmp_init_done = 0;
 
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
@@ -3111,7 +3114,7 @@ void	zbx_init_library_mt_snmp(const char *progname)
 	}
 }
 
-void	zbx_shutdown_library_mt_snmp(void)
+void	zbx_shutdown_library_mt_snmp(const char *progname)
 {
 	if (1 == snmp_rwlock_init_done)
 	{
@@ -3124,8 +3127,7 @@ void	zbx_shutdown_library_mt_snmp(void)
 		else
 			snmp_rwlock_init_done = 0;
 	}
-
-	zbx_shutdown_snmp();
+	zbx_shutdown_snmp(progname);
 }
 
 static void	process_snmp_result(void *data)
@@ -3335,7 +3337,7 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const cha
 	SNMP_MT_INITLOCK;
 
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
-	zbx_shutdown_snmp();
+	zbx_shutdown_snmp(progname);
 
 	if (0 != snmp_rwlock_init_done)
 		zbx_init_library_mt_snmp(progname);

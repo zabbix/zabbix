@@ -36,7 +36,7 @@
 typedef struct zbx_snmp_context	zbx_snmp_context_t;
 
 void	zbx_init_library_mt_snmp(const char *progname);
-void	zbx_shutdown_library_mt_snmp(void);
+void	zbx_shutdown_library_mt_snmp(const char *progname);
 
 int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
 		const char *config_source_ip, const char *progname);
