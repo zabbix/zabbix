@@ -27,8 +27,6 @@ import (
 	"strings"
 	"time"
 
-	_ "zabbix.com/plugins"
-
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin/comms"
@@ -45,6 +43,7 @@ import (
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxlib"
+	_ "zabbix.com/plugins"
 )
 
 type AgentUserParamOption struct {
@@ -53,11 +52,12 @@ type AgentUserParamOption struct {
 
 const remoteCommandSendingTimeout = time.Second
 
-var manager *scheduler.Manager
-var listeners []*serverlistener.ServerListener
-var serverConnectors []*serverconnector.Connector
-var closeChan = make(chan bool)
-var stopChan = make(chan bool)
+var (
+	manager          *scheduler.Manager
+	listeners        []*serverlistener.ServerListener
+	serverConnectors []*serverconnector.Connector
+	closeChan        = make(chan bool)
+)
 
 func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
 	if log.IncreaseLogLevel() {
@@ -106,28 +106,36 @@ func processHelpCommand(c *remotecontrol.Client) (err error) {
 	return c.Reply(help)
 }
 
-func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
+func processUserParamReloadCommand(c *remotecontrol.Client) error {
 	var userparams AgentUserParamOption
 
-	if err = conf.LoadUserParams(&userparams); err != nil {
-		err = fmt.Errorf("Cannot load user parameters: %s", err)
+	err := conf.LoadUserParams(&userparams)
+	if err != nil {
+		err = fmt.Errorf("Cannot load user parameters: %s", err.Error())
 		log.Infof(err.Error())
-		return
+
+		return err
 	}
 
 	agent.Options.UserParameter = userparams.UserParameter
 
-	if res := manager.QueryUserParams(); res != "ok" {
-		err = fmt.Errorf("Failed to reload user parameters: %s", res)
+	status := manager.QueryUserParams()
+	if status != "ok" {
+		err := fmt.Errorf("Failed to reload user parameters: %s", status)
 		log.Infof(err.Error())
-		return
+
+		return err
 	}
 
 	message := "User parameters reloaded"
 	log.Infof(message)
-	err = c.Reply(message)
 
-	return
+	err = c.Reply(message)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func processRemoteCommand(c *remotecontrol.Client) (err error) {
@@ -161,26 +169,30 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 
 var pidFile *pidfile.File
 
-func run() (err error) {
+func run() error {
 	sigs := createSigsChan()
 
-	var control *remotecontrol.Conn
-	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
-		return
+	control, err := remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout)
+	if err != nil {
+		return err
 	}
+
 	confirmService()
 	control.Start()
 
-loop:
+	defer control.Stop()
+
 	for {
 		select {
 		case sig := <-sigs:
 			if !handleSig(sig) {
-				break loop
+				return nil
 			}
 		case client := <-control.Client():
-			if rerr := processRemoteCommand(client); rerr != nil {
-				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
+			err := processRemoteCommand(client)
+			if err != nil {
+				rerr := client.Reply(fmt.Sprintf("error: %s", err.Error()))
+				if rerr != nil {
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
@@ -188,12 +200,10 @@ loop:
 			client.Close()
 		case serviceStop := <-closeChan:
 			if serviceStop {
-				break loop
+				return nil
 			}
 		}
 	}
-	control.Stop()
-	return nil
 }
 
 var (
@@ -260,7 +270,7 @@ func main() {
 
 	var remoteCommand string
 	const remoteDefault = ""
-	var remoteDescription = "Perform administrative functions (send 'help' for available commands) " +
+	remoteDescription := "Perform administrative functions (send 'help' for available commands) " +
 		"(" + remoteCommandSendingTimeout.String() + " timeout)"
 	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
 
@@ -305,8 +315,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	var err error
-	if err = openEventLog(); err != nil {
+	err := openEventLog()
+	if err != nil {
 		fatalExit("", err)
 	}
 
@@ -354,12 +364,15 @@ func main() {
 			os.Exit(0)
 		}
 
-		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
-			remoteCommandSendingTimeout); err != nil {
+		reply, err := remotecontrol.SendCommand(
+			agent.Options.ControlSocket, remoteCommand, remoteCommandSendingTimeout,
+		)
+		if err != nil {
 			log.Errf("Cannot send remote command: %s", err)
-		} else {
-			log.Infof(reply)
+			os.Exit(1)
 		}
+
+		log.Infof(reply)
 		os.Exit(0)
 	}
 
@@ -480,6 +493,7 @@ func main() {
 	if pidFile, err = pidfile.New(agent.Options.PidFile); err != nil {
 		fatalExit("cannot initialize PID file", err)
 	}
+
 	defer pidFile.Delete()
 
 	log.Infof("using configuration file: %s", confFlag)
@@ -555,23 +569,24 @@ func main() {
 			idx++
 		}
 	}
+
 	agent.SetPerformTask(manager.PerformTask)
 
 	for _, listener := range listeners {
-		if err = listener.Start(); err != nil {
+		err = listener.Start()
+		if err != nil {
 			fatalExit("cannot start server listener", err)
 		}
 	}
 
 	if agent.Options.StatusPort != 0 {
-		if err = statuslistener.Start(manager, confFlag); err != nil {
+		err = statuslistener.Start(manager, confFlag)
+		if err != nil {
 			fatalExit("cannot start HTTP listener", err)
 		}
 	}
 
-	if err == nil {
-		err = run()
-	}
+	err = run()
 	if err != nil {
 		log.Errf("cannot start agent: %s", err.Error())
 	}

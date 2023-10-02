@@ -904,22 +904,9 @@ int	zbx_db_check_extension(struct zbx_db_version_info_t *info, int allow_unsuppo
 	if (0 != zbx_strcmp_null(info->extension, ZBX_DB_EXTENSION_TIMESCALEDB))
 		goto out;
 
-	/* at this point we are sure the TimescaleDB extension is enabled in Zabbix */
+	/* at this point we know the TimescaleDB extension is enabled in Zabbix */
 
 	zbx_tsdb_info_extract(info);
-
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
-	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
-	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
-	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > info->current_version)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
-				" required is %d.", (unsigned long)info->current_version,
-				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
-		info->ext_err_code = ZBX_TIMESCALEDB_POSTGRES_TOO_OLD;
-		ret = FAIL;
-		goto out;
-	}
 
 	if (DB_VERSION_FAILED_TO_RETRIEVE == info->ext_flag)
 	{

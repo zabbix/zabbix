@@ -461,14 +461,36 @@ if ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] 
 
 $formgrid
 	->addItem([
-		(new CLabel(_('SNMP OID'), 'snmp_oid'))
+		(new CLabel([
+			_('SNMP OID'),
+			makeHelpIcon([
+				_('Field requirements:'),
+				(new CList([
+					new CListItem([
+						(new CSpan('walk[OID1,OID2,...]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+						' - ',
+						_('to retrieve a subtree')
+					]),
+					new CListItem([
+						(new CSpan('get[OID]'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+						' - ',
+						_('to retrieve a single value')
+					]),
+					new CListItem([
+						(new CSpan('OID'))->addClass(ZBX_STYLE_MONOSPACE_FONT),
+						' - ',
+						_('(legacy) to retrieve a single value synchronously, optionally combined with other values')
+					])
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])]
+			, 'snmp_oid'))
 			->setAsteriskMark()
 			->setId('js-item-snmp-oid-label'),
 		(new CFormField(
 			(new CTextBox('snmp_oid', $data['form']['snmp_oid'], $data['readonly'],
 				DB::getFieldLength('items', 'snmp_oid')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('placeholder', '[IF-MIB::]ifInOctets.1')
+				->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 				->setAriaRequired()
 		))->setId('js-item-snmp-oid-field')
 	])

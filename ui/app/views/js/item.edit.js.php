@@ -511,7 +511,9 @@ window.item_edit_form = new class {
 				break;
 
 			case ITEM_TYPE_SNMP:
-				action = this.field.snmp_oid.value.substring(0, 5) !== 'walk[' ? 'hideObj' : 'showObj';
+				let snmp = this.field.snmp_oid.value.substring(0, 5);
+
+				action = snmp !== 'walk[' && snmp.substring(0, 4) !== 'get[' ? 'hideObj' : 'showObj';
 				break;
 		}
 

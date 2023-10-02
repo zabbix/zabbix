@@ -1567,6 +1567,10 @@ function get_preprocessing_types($type = null, $grouped = true, array $supported
 			'group' => _('SNMP'),
 			'name' => _('SNMP walk to JSON')
 		],
+		ZBX_PREPROC_SNMP_GET_VALUE => [
+			'group' => _('SNMP'),
+			'name' => _('SNMP get value')
+		],
 		ZBX_PREPROC_MULTIPLIER => [
 			'group' => _('Arithmetic'),
 			'name' => _('Custom multiplier')
@@ -1871,6 +1875,7 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 			case ZBX_PREPROC_ERROR_FIELD_XML:
 			case ZBX_PREPROC_THROTTLE_TIMED_VALUE:
 			case ZBX_PREPROC_SCRIPT:
+			case ZBX_PREPROC_SNMP_GET_VALUE:
 				$step['params'] = $step['params'][0];
 				break;
 
@@ -2470,7 +2475,8 @@ function getConditionalItemFieldNames(array $field_names, array $input): array {
 			case 'timeout':
 				return ($input['type'] != ITEM_TYPE_SIMPLE || (strncmp($input['key_'], 'icmpping', 8) != 0
 						&& strncmp($input['key_'], 'vmware.', 7) != 0))
-					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'walk[', 5) == 0);
+					&& ($input['type'] != ITEM_TYPE_SNMP || strncmp($input['snmp_oid'], 'get[', 4) == 0
+						|| strncmp($input['snmp_oid'], 'walk[', 5) == 0);
 
 			case 'delay':
 				return $input['type'] != ITEM_TYPE_ZABBIX_ACTIVE || strncmp($input['key_'], 'mqtt.get', 8) != 0;

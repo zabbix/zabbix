@@ -671,6 +671,18 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 							->setAttribute('data-index', $i)
 					])->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 				break;
+
+			case ZBX_PREPROC_SNMP_GET_VALUE:
+				$params = (new CSelect('preprocessing['.$i.'][params][0]'))
+					->setValue($step_param_0_value)
+					->setAdaptiveWidth(202)
+					->addOptions([
+						new CSelectOption(ZBX_PREPROC_SNMP_UTF8_FROM_HEX, _('UTF-8 from Hex-STRING')),
+						new CSelectOption(ZBX_PREPROC_SNMP_MAC_FROM_HEX, _('MAC from Hex-STRING')),
+						new CSelectOption(ZBX_PREPROC_SNMP_INT_FROM_BITS, _('Integer from BITS'))
+					])
+					->setReadonly($readonly);
+				break;
 		}
 
 		// Create checkbox "Custom on fail" and enable or disable depending on preprocessing type.
