@@ -30,7 +30,7 @@ function local_showHeader(array $data): void {
 
 	if ($data['config']['x_frame_options'] !== '') {
 		if (strcasecmp($data['config']['x_frame_options'], 'SAMEORIGIN') == 0
-			|| strcasecmp($data['config']['x_frame_options'], 'DENY') == 0) {
+				|| strcasecmp($data['config']['x_frame_options'], 'DENY') == 0) {
 			$x_frame_options = $data['config']['x_frame_options'];
 		}
 		else {

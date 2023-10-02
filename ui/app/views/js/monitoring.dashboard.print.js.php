@@ -76,7 +76,7 @@
 
 				ZABBIX.Dashboard.addDashboardPage(page, dashboard_page_containers[page_number]);
 
-				page_number = page_number + 1;
+				page_number++;
 			}
 
 			ZABBIX.Dashboard.broadcast({
