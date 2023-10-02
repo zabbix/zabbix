@@ -49,14 +49,8 @@ class testPageReportsActionLog extends CWebTest {
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => [
-							'mediatypeid' => 1
-						],
-						'opmessage_grp' => [
-							[
-								'usrgrpid' => 7
-							]
-						]
+						'opmessage' => ['mediatypeid' => 1],
+						'opmessage_grp' => [['usrgrpid' => 7]]
 					]
 				]
 			],
@@ -178,14 +172,8 @@ class testPageReportsActionLog extends CWebTest {
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => [
-							'mediatypeid' => 0
-						],
-						'opmessage_grp' => [
-							[
-								'usrgrpid' => 7
-							]
-						]
+						'opmessage' => ['mediatypeid' => 1],
+						'opmessage_grp' => [['usrgrpid' => 7]]
 					]
 				]
 			],
@@ -307,14 +295,8 @@ class testPageReportsActionLog extends CWebTest {
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => [
-							'mediatypeid' => 0
-						],
-						'opmessage_grp' => [
-							[
-								'usrgrpid' => 7
-							]
-						]
+						'opmessage' => ['mediatypeid' => 1],
+						'opmessage_grp' => [['usrgrpid' => 7]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
@@ -333,14 +315,8 @@ class testPageReportsActionLog extends CWebTest {
 								'value' => "1"
 							]
 						],
-						'opmessage' => [
-							'mediatypeid' => 1
-						],
-						'opmessage_grp' => [
-							[
-								'usrgrpid' => 7
-							]
-						]
+						'opmessage' => ['mediatypeid' => 2],
+						'opmessage_grp' => [['usrgrpid' => 7],['usrgrpid' => 92]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
@@ -359,11 +335,7 @@ class testPageReportsActionLog extends CWebTest {
 							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
 							'mediatypeid' => 1
 						],
-						'opmessage_usr' => [
-							[
-								'userid' => 1
-							]
-						]
+						'opmessage_usr' => [['userid' => 1]]
 					]
 				]
 			]
