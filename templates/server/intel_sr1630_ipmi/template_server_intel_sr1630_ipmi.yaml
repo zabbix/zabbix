@@ -424,20 +424,26 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Intel SR1630 IPMI'
                         name: 'Intel SR1630 IPMI: Voltage'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   x: '12'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Intel SR1630 IPMI'
                         name: 'Intel SR1630 IPMI: Fan speed and temperature'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
   graphs:
     - uuid: aab06155f8aa4bc991603a3c8c335d6e
       name: 'Intel SR1630 IPMI: Fan speed and temperature'

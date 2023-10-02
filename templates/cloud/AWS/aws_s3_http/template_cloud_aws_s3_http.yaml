@@ -449,14 +449,14 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -668,16 +668,16 @@ zabbix_export:
           parameters:
             - name: access_key
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: secret_key
-              value: '{$AWS.SECRET.ACCESS.KEY}'
-            - name: region
-              value: '{$AWS.REGION}'
-            - name: filter_id
-              value: '{$AWS.S3.FILTER.ID}'
             - name: bucket_name
               value: '{$AWS.S3.BUCKET.NAME}'
+            - name: filter_id
+              value: '{$AWS.S3.FILTER.ID}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: secret_key
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw

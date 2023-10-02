@@ -399,10 +399,10 @@ zabbix_export:
           master_item:
             key: controlm.services
           lld_macro_paths:
-            - lld_macro: '{#SERVICE.NAME}'
-              path: $.serviceName
             - lld_macro: '{#SERVICE.JOB}'
               path: $.serviceJob
+            - lld_macro: '{#SERVICE.NAME}'
+              path: $.serviceName
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1037,20 +1037,26 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Control-M server by HTTP'
                         name: 'Control-M: Jobs statistics'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   x: '12'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Control-M server by HTTP'
                         name: 'Control-M: Server state'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
       valuemaps:
         - uuid: 55b997715e1e4a4cb5272874b975b43a
           name: 'Control-M agent status'
