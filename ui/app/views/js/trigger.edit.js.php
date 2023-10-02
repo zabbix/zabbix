@@ -70,6 +70,13 @@ window.trigger_edit_popup = new class {
 			this.name.dispatchEvent(new Event('input'));
 		});
 
+		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
+		this.form.querySelector('[name="event_name"]').addEventListener('keyup', e => {
+			if (e.key === 'Enter') {
+				$(this.form).submit();
+			}
+		});
+
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
 			.forEach(o => o.addEventListener('change', e => this.#toggleInheritedTags()));
