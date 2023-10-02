@@ -33,14 +33,12 @@ type Plugin struct {
 // Options -
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int
 }
 
 var impl Plugin
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	p.options.Timeout = global.Timeout
 }
 
 // Validate -
@@ -56,10 +54,10 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 	switch key {
 	case "system.sw.packages":
-		result, err = p.systemSwPackages(params)
+		result, err = p.systemSwPackages(params, ctx.Timeout())
 
 	case "system.sw.packages.get":
-		result, err = p.systemSwPackagesGet(params)
+		result, err = p.systemSwPackagesGet(params, ctx.Timeout())
 
 	case "system.sw.os":
 		if len(params) > maxSwOSParams {

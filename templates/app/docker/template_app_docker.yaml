@@ -1946,51 +1946,66 @@ zabbix_export:
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Docker by Zabbix agent 2'
                         name: 'Docker: Containers'
-                - type: graph
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Docker by Zabbix agent 2'
-                        name: 'Docker: Size'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA
                 - type: graph
                   'y': '5'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Docker by Zabbix agent 2'
                         name: 'Docker: Memory total'
-                - type: graph
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Docker by Zabbix agent 2'
-                        name: 'Docker: Goroutines'
+                    - type: STRING
+                      name: reference
+                      value: AAAAC
                 - type: graph
                   'y': '10'
                   width: '12'
                   height: '5'
                   fields:
                     - type: GRAPH
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Docker by Zabbix agent 2'
                         name: 'Docker: Images'
+                    - type: STRING
+                      name: reference
+                      value: AAAAE
+                - type: graph
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Docker by Zabbix agent 2'
+                        name: 'Docker: Size'
+                    - type: STRING
+                      name: reference
+                      value: AAAAB
+                - type: graph
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid.0
+                      value:
+                        host: 'Docker by Zabbix agent 2'
+                        name: 'Docker: Goroutines'
+                    - type: STRING
+                      name: reference
+                      value: AAAAD
       valuemaps:
         - uuid: bec7f850ca6a477fbaa6c409d971259f
           name: 'Docker container health state'

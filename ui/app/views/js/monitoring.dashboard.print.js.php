@@ -26,7 +26,7 @@
 
 <script>
 	const view = {
-		init({dashboard, widget_defaults, time_period}) {
+		init({dashboard, widget_defaults, dashboard_time_period}) {
 			timeControl.refreshPage = false;
 
 			ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {
@@ -55,22 +55,34 @@
 				max_rows: <?= DASHBOARD_MAX_ROWS ?>,
 				widget_min_rows: <?= DASHBOARD_WIDGET_MIN_ROWS ?>,
 				widget_max_rows: <?= DASHBOARD_WIDGET_MAX_ROWS ?>,
-				widget_defaults: widget_defaults,
+				widget_defaults,
 				is_editable: false,
 				is_edit_mode: false,
 				can_edit_dashboards: false,
 				is_kiosk_mode: true,
-				time_period: time_period,
-				dynamic_hostid: null
+				broadcast_options: {
+					_hostid: {rebroadcast: false},
+					_timeperiod: {rebroadcast: true}
+				}
 			});
 
 			for (const page of dashboard.pages) {
 				for (const widget of page.widgets) {
-					widget.fields = (typeof widget.fields === 'object') ? widget.fields : {};
+					widget.fields = Object.keys(widget.fields).length > 0 ? widget.fields : {};
 				}
 
 				ZABBIX.Dashboard.addDashboardPage(page);
 			}
+
+			ZABBIX.Dashboard.broadcast({
+				_hostid: null,
+				_timeperiod: {
+					from: dashboard_time_period.from,
+					from_ts: dashboard_time_period.from_ts,
+					to: dashboard_time_period.to,
+					to_ts: dashboard_time_period.to_ts
+				}
+			});
 
 			ZABBIX.Dashboard.activate();
 		}

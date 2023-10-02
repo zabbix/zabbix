@@ -169,7 +169,19 @@ class CExpressionValidatorTest extends TestCase {
 			['foo(1, 2, 3)', [], ['rc' => false, 'error' => 'unknown function "foo"']],
 			['change(1, 2, 3)', [], ['rc' => false, 'error' => 'incorrect usage of function "change"']],
 			['count(123)', [], ['rc' => false, 'error' => 'incorrect usage of function "count"']],
-			['avg(bucket_rate_foreach(/host/*, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']]
+			['avg(bucket_rate_foreach(/host/*, 1))', ['calculated' => true], ['rc' => false, 'error' => 'incorrect usage of function "bucket_rate_foreach"']],
+			['jsonpath(/host/item)', [], ['rc' => false, 'error' => 'incorrect usage of function "jsonpath"']],
+			['jsonpath(/host/item, "$.path")', [], ['rc' => false, 'error' => 'incorrect usage of function "jsonpath"']],
+			['jsonpath(last(/host/item))', [], ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+			['jsonpath(last(/host/item), "$.path")', [], ['rc' => true, 'error' => null]],
+			['jsonpath(last(/host/item), "$.path", "fallback")', [], ['rc' => true, 'error' => null]],
+			['jsonpath(last(/host/item), "$.path", "fallback", "extra param")', [], ['rc' => false, 'error' => 'invalid number of parameters in function "jsonpath"']],
+			['xmlxpath(/host/item)', [], ['rc' => false, 'error' => 'incorrect usage of function "xmlxpath"']],
+			['xmlxpath(/host/item, "/path")', [], ['rc' => false, 'error' => 'incorrect usage of function "xmlxpath"']],
+			['xmlxpath(last(/host/item))', [], ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']],
+			['xmlxpath(last(/host/item), "/path")', [], ['rc' => true, 'error' => null]],
+			['xmlxpath(last(/host/item), "/path", "fallback")', [], ['rc' => true, 'error' => null]],
+			['xmlxpath(last(/host/item), "/path", "fallback", "extra param")', [], ['rc' => false, 'error' => 'invalid number of parameters in function "xmlxpath"']]
 		];
 	}
 

@@ -899,6 +899,8 @@ void	op_host_del(const zbx_db_event *event)
 
 	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames);
 
+	zbx_db_execute("delete from autoreg_host where host='%s'", hostname);
+
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);
 	zbx_vector_uint64_destroy(&hostids);

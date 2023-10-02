@@ -35,11 +35,11 @@ class testFormAdministrationProxies extends CWebTest {
 
 	private $sql = 'SELECT * FROM proxy ORDER BY proxyid';
 
-	private static $update_proxy = 'Active proxy for update';
-	private static $change_active_proxy = 'Active proxy for refresh cancel simple update';
-	private static $change_passive_proxy = 'Passive proxy for refresh cancel simple update';
-	private static $delete_proxy_with_hosts = 'Proxy_2 for filter';
-	private static $delete_proxy_with_discovery_rule = 'Proxy for Discovery rule';
+	protected static $update_proxy = 'Active proxy for update';
+	const CHANGE_ACTIVE_PROXY = 'Active proxy for refresh cancel simple update';
+	const CHANGE_PASSIVE_PROXY = 'Passive proxy for refresh cancel simple update';
+	const DELETE_PROXY_WITH_HOSTS = 'Proxy_2 for filter';
+	const DELETE_PROXY_WITH_DISCOVERY_RULE = 'Delete Proxy used in Network discovery rule';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -63,7 +63,7 @@ class testFormAdministrationProxies extends CWebTest {
 				'tls_accept'=> 1
 			],
 			[
-				'name' => self::$change_active_proxy,
+				'name' => self::CHANGE_ACTIVE_PROXY,
 				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE,
 				'description' => 'Active description for refresh',
 				'tls_connect' => 1,
@@ -75,7 +75,7 @@ class testFormAdministrationProxies extends CWebTest {
 				'allowed_addresses' => '127.0.1.2'
 			],
 			[
-				'name' => self::$change_passive_proxy,
+				'name' => self::CHANGE_PASSIVE_PROXY,
 				'operating_mode' => PROXY_OPERATING_MODE_PASSIVE,
 				'address' => '127.9.9.9',
 				'port' => 10051,
@@ -504,7 +504,7 @@ class testFormAdministrationProxies extends CWebTest {
 				}
 
 				// Check form tabs.
-				$this->assertEquals(['Proxy', 'Encryption'], $form->getTabs());
+				$this->assertEquals(['Proxy', 'Encryption', 'Timeouts'], $form->getTabs());
 				$form->checkValue(['Proxy mode' => 'Active']);
 			}
 			else{
@@ -516,9 +516,7 @@ class testFormAdministrationProxies extends CWebTest {
 				// Check Interface field for passive scenario.
 				$selector = 'xpath:.//div[@class="table-forms-separator"]/table';
 				$this->assertTrue($dialog->query($selector)->one()->isEnabled());
-				$this->assertEquals(['Address', 'Port'],
-						$dialog->query($selector)->one()->asTable()->getHeadersText()
-				);
+				$this->assertEquals(['Address', 'Port'],    $dialog->query($selector)->one()->asTable()->getHeadersText());
 
 				// Check interface fields values.
 				foreach (['address' => '127.0.0.1', 'port' => '10051'] as $id => $value) {
@@ -1115,7 +1113,9 @@ class testFormAdministrationProxies extends CWebTest {
 			$dialog->close();
 
 			// Check DB.
-			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM proxy WHERE name ='.zbx_dbstr($data['proxy_fields']['Proxy name'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM proxy WHERE name ='.
+					zbx_dbstr($data['proxy_fields']['Proxy name']))
+			);
 
 			if ($update) {
 				self::$update_proxy = $data['proxy_fields']['Proxy name'];
@@ -1127,12 +1127,12 @@ class testFormAdministrationProxies extends CWebTest {
 		return [
 			[
 				[
-					'proxy' => self::$change_active_proxy
+					'proxy' => self::CHANGE_ACTIVE_PROXY
 				]
 			],
 			[
 				[
-					'proxy' => self::$change_passive_proxy
+					'proxy' => self::CHANGE_PASSIVE_PROXY
 				]
 			]
 		];
@@ -1344,15 +1344,16 @@ class testFormAdministrationProxies extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'proxy' => self::$delete_proxy_with_hosts,
+					'proxy' => self::DELETE_PROXY_WITH_HOSTS,
 					'error' => "Host \"Host_2 with proxy\" is monitored by proxy \"Proxy_2 for filter\"."
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'proxy' => self::$delete_proxy_with_discovery_rule,
-					'error' => "Proxy \"Proxy for Discovery rule\" is used by discovery rule \"Discovery rule for update\"."
+					'proxy' => self::DELETE_PROXY_WITH_DISCOVERY_RULE,
+					'error' => "Proxy \"Delete Proxy used in Network discovery rule\" is used by discovery rule ".
+						"\"Discovery rule for proxy delete test\"."
 				]
 			]
 		]);

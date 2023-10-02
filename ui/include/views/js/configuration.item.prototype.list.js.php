@@ -46,6 +46,20 @@
 			this.openTemplatePopup(template_data);
 		},
 
+		editTriggerPrototype(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.prototype.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit',
+				this.events.elementSuccess.bind(this, this.context), {once: true}
+			);
+		},
+
 		openHostPopup(host_data) {
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {

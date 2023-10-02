@@ -25,6 +25,7 @@ use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldSelect extends CWidgetField {
 
+	public const DEFAULT_VIEW = \CWidgetFieldSelectView::class;
 	public const DEFAULT_VALUE = null;
 
 	private array $values;
@@ -41,15 +42,15 @@ class CWidgetFieldSelect extends CWidgetField {
 
 		$this
 			->setDefault(self::DEFAULT_VALUE)
-			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setExValidationRules(['in' => implode(',', array_keys($this->values))]);
-	}
-
-	public function setValue($value): self {
-		return parent::setValue((int) $value);
+			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32);
 	}
 
 	public function getValues(): array {
 		return $this->values;
+	}
+
+	protected function getValidationRules(bool $strict = false): array {
+		return parent::getValidationRules($strict)
+			+ ['in' => implode(',', array_keys($this->values))];
 	}
 }

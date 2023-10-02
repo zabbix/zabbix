@@ -100,7 +100,7 @@ const char	*zbx_result_string(int result);
 #define ZBX_HOSTNAME_BUF_LEN	(ZBX_MAX_HOSTNAME_LEN + 1)
 #define ZBX_MAX_DNSNAME_LEN		255	/* maximum host DNS name length from RFC 1035 */
 						/*(without terminating '\0') */
-#define MAX_EXECUTE_OUTPUT_LEN		(512 * ZBX_KIBIBYTE)
+#define MAX_EXECUTE_OUTPUT_LEN		(16 * ZBX_MEBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
@@ -465,7 +465,7 @@ extern const char	*help_message[];
 
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_help(void);
+void	zbx_help(const char *param);
 void	zbx_usage(void);
 void	zbx_version(void);
 
@@ -596,6 +596,8 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 /* used by log */
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
+int	zbx_vsnprintf_check_len(const char *fmt, va_list args);
+
 /* used by log */
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
@@ -711,8 +713,9 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_STR_REPLACE			25
 #define ZBX_PREPROC_VALIDATE_NOT_SUPPORTED	26
 #define ZBX_PREPROC_XML_TO_JSON			27
-#define ZBX_PREPROC_SNMP_WALK_TO_VALUE		28
+#define ZBX_PREPROC_SNMP_WALK_VALUE		28
 #define ZBX_PREPROC_SNMP_WALK_TO_JSON		29
+#define ZBX_PREPROC_SNMP_GET_VALUE		30
 
 /* custom on fail actions */
 #define ZBX_PREPROC_FAIL_DEFAULT	0
