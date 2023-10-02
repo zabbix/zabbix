@@ -132,29 +132,28 @@ class CWidgetMap extends CWidget {
 
 			return Promise.resolve();
 		}
-		else {
-			const curl = new Curl(this._map_svg.options.refresh);
 
-			return fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-				},
-				body: urlEncodeData({
-					'curtime': new CDate().getTime(),
-					'initial_load': 0
-				})
+		const curl = new Curl(this._map_svg.options.refresh);
+
+		return fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+			},
+			body: urlEncodeData({
+				'curtime': new CDate().getTime(),
+				'initial_load': 0
 			})
-				.then((response) => response.json())
-				.then((response) => {
-					if (response.mapid > 0 && this._map_svg) {
-						this._map_svg.update(response);
-					}
-					else {
-						this._restartUpdating();
-					}
-				});
-		}
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if (response.mapid > 0 && this._map_svg) {
+					this._map_svg.update(response);
+				}
+				else {
+					this._restartUpdating();
+				}
+			});
 	}
 
 	_getUpdateRequestData() {
