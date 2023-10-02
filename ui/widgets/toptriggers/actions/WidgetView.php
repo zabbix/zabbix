@@ -87,7 +87,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'tags' => $this->fields_values['tags'] ?: null,
 			'sortfield' => ['rowscount'],
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit' => $this->fields_values['show_lines']
+			'limit' => ZBX_MAX_WIDGET_LINES
 		]);
 
 		if (!$db_problems) {
@@ -114,6 +114,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			['field' => 'priority', 'order' => ZBX_SORT_DOWN],
 			'description'
 		]);
+
+		$db_triggers = array_slice($db_triggers, 0, $this->fields_values['show_lines'], true);
 
 		return $db_triggers;
 	}

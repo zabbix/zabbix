@@ -596,6 +596,8 @@ void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const cha
 /* used by log */
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
+int	zbx_vsnprintf_check_len(const char *fmt, va_list args);
+
 /* used by log */
 char	*zbx_dsprintf(char *dest, const char *f, ...) __zbx_attr_format_printf(2, 3);
 
