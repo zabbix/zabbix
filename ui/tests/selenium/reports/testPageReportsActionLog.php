@@ -295,7 +295,7 @@ class testPageReportsActionLog extends CWebTest {
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
-						'opmessage' => ['mediatypeid' => 1],
+						'opmessage' => ['mediatypeid' => 3],
 						'opmessage_grp' => [['usrgrpid' => 7]]
 					],
 					[
@@ -315,8 +315,8 @@ class testPageReportsActionLog extends CWebTest {
 								'value' => "1"
 							]
 						],
-						'opmessage' => ['mediatypeid' => 2],
-						'opmessage_grp' => [['usrgrpid' => 7],['usrgrpid' => 92]]
+						'opmessage' => ['mediatypeid' => 1],
+						'opmessage_grp' => [['usrgrpid' => 7]]
 					],
 					[
 						'operationtype' => OPERATION_TYPE_MESSAGE,
