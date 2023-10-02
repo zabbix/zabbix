@@ -1738,6 +1738,7 @@ select {
 	width: 16px !important;
 	height: 16px !important;
 	opacity: 0;
+	pointer-events: none;
 
 	& + label {
 		span {

@@ -3650,7 +3650,8 @@ select {
   z-index: 1;
   width: 16px !important;
   height: 16px !important;
-  opacity: 0; }
+  opacity: 0;
+  pointer-events: none; }
   .checkbox-radio + label span {
     position: relative;
     display: inline-block;
