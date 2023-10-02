@@ -76,7 +76,6 @@ class WidgetForm extends CWidgetForm {
 
 	// Value defaults.
 	private const DEFAULT_VALUE_SIZE_PERCENT = 25;
-	private const DEFAULT_VALUE_ARC_SHOW = 1;
 	private const DEFAULT_VALUE_BOLD = 0;
 
 	// Value arc defaults.
@@ -187,11 +186,13 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBoxList('show', _('Show'), [
 					Widget::SHOW_DESCRIPTION => _('Description'),
 					Widget::SHOW_VALUE => _('Value'),
+					Widget::SHOW_VALUE_ARC => _('Value arc'),
 					Widget::SHOW_NEEDLE => _('Needle'),
 					Widget::SHOW_SCALE => _('Scale')
 				]))
-					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_SCALE])
-					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+					->setDefault([Widget::SHOW_DESCRIPTION, Widget::SHOW_VALUE, Widget::SHOW_SCALE,
+						Widget::SHOW_VALUE_ARC
+					])
 			)
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
@@ -226,9 +227,6 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))->setDefault(self::DEFAULT_VALUE_BOLD)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('value_arc', _('Arc')))->setDefault(self::DEFAULT_VALUE_ARC_SHOW)
-			)
-			->addField(
 				(new CWidgetFieldIntegerBox('value_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
 					->setFullName(_('Value size'))
 					->setDefault(self::DEFAULT_VALUE_SIZE_PERCENT)
@@ -237,7 +235,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('value_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('value_arc_size', _('Arc size'),
+				(new CWidgetFieldIntegerBox('value_arc_size', _('Size'),
 					self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX
 				))->setDefault(self::DEFAULT_VALUE_ARC_SIZE_PERCENT)
 			)

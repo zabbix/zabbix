@@ -210,7 +210,7 @@ class CSVGGauge {
 			this.#createDescription();
 		}
 
-		if (this.#config.thresholds.arc.show || this.#config.value.arc?.show) {
+		if (this.#config.thresholds.arc.show || this.#config.value_arc.show) {
 			this.#createArcs();
 
 			if (this.#config.needle.show) {
@@ -258,7 +258,7 @@ class CSVGGauge {
 			this.#drawDescription();
 		}
 
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc?.show)
+		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
 				&& this.#config.angle === 270)
 			? 1 + Math.sqrt(2) / 2
 			: 1;
@@ -306,7 +306,7 @@ class CSVGGauge {
 
 		this.#elements.no_data.container.textContent = value === null ? t('No data') : '';
 
-		if (this.#config.value.arc?.show || this.#config.needle.show) {
+		if (this.#config.value_arc.show || this.#config.needle.show) {
 			let pos_new = 0;
 
 			if (value !== null) {
@@ -315,7 +315,7 @@ class CSVGGauge {
 				pos_new = (value_in_range - this.#config.min) / (this.#config.max - this.#config.min);
 			}
 
-			let arc_color_new = this.#config.value.arc?.color || '';
+			let arc_color_new = this.#config.value_arc.color;
 			let needle_color_new = '';
 			let threshold_pos_start = 0;
 
@@ -331,7 +331,7 @@ class CSVGGauge {
 				needle_color_new = color_next;
 			}
 
-			if (this.#config.value.arc?.show) {
+			if (this.#config.value_arc.show) {
 				this.#elements.value_arcs.value_arc.style.fill = arc_color_new !== '' ? `#${arc_color_new}` : '';
 			}
 
@@ -360,7 +360,7 @@ class CSVGGauge {
 				(pos) => {
 					const angle = (pos - 0.5) * this.#config.angle;
 
-					if (this.#config.value.arc?.show) {
+					if (this.#config.value_arc.show) {
 						this.#elements.value_arcs.value_arc.setAttribute('d',
 							this.#defineArc(-this.#config.angle / 2, angle, this.#elements.value_arcs.data.radius,
 								this.#elements.value_arcs.data.size
@@ -480,16 +480,16 @@ class CSVGGauge {
 			}
 		}
 
-		if (this.#config.value.arc?.show) {
+		if (this.#config.value_arc.show) {
 			const radius = this.#config.thresholds.arc.show
 				? Math.max(0, 1 - (this.#config.thresholds.arc.size + CSVGGauge.ARCS_GAP) / 100)
 				: 1;
 
-			const size = Math.min(radius, this.#config.value.arc.size / 100);
+			const size = Math.min(radius, this.#config.value_arc.size / 100);
 
 			const value_arc_sectors = [
 				{pos_start: 0, pos_end: 0, class_name: CSVGGauge.ZBX_STYLE_VALUE_ARC_SECTOR,
-					color: this.#config.value.arc.color
+					color: this.#config.value_arc.color
 				},
 				{pos_start: 0, pos_end: 1, class_name: CSVGGauge.ZBX_STYLE_EMPTY_ARC_SECTOR,
 					color: this.#config.empty_color
@@ -526,9 +526,9 @@ class CSVGGauge {
 	#createNeedle() {
 		const radius = CSVGGauge.NEEDLE_RADIUS / 100;
 
-		const length = this.#config.thresholds.arc.show
-			? 1 - this.#config.thresholds.arc.size / 2 / 100
-			: 1 - this.#config.value.arc.size / 2 / 100;
+		const length = this.#config.value_arc.show
+			? 1 - this.#config.value_arc.size / 2 / 100
+			: 1 - this.#config.value_arc.size / 2 / 100;
 
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'path');
 
@@ -628,12 +628,12 @@ class CSVGGauge {
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS);
 
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc.show)
+		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
 				&& this.#config.angle === 270)
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
-		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value.arc.show)
+		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
 			&& (this.#config.angle === 270 || !this.#config.needle.show);
 
 		const value_font_size = this.#config.value.size / 100;
@@ -771,12 +771,12 @@ class CSVGGauge {
 			container.style.fontWeight = 'bold';
 		}
 
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc?.show)
+		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
 				&& this.#config.angle === 270)
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
-		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value.arc?.show)
+		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value_arc.show)
 			&& (this.#config.angle === 270 || !this.#config.needle.show);
 
 		if (is_aligned_to_bottom) {

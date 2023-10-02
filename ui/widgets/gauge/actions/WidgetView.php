@@ -224,16 +224,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'show' => true,
 				'size' => $this->fields_values['value_size'],
 				'is_bold' => $this->fields_values['value_bold'] == 1,
-				'color' => $this->fields_values['value_color'],
-				'arc' => $this->fields_values['value_arc'] == 1
-					? [
-						'show' => true,
-						'size' => $this->fields_values['value_arc_size'],
-						'color' => $this->fields_values['value_arc_color']
-					]
-					: [
-						'show' => false
-					]
+				'color' => $this->fields_values['value_color']
 			];
 
 			$config['units'] = $this->fields_values['units_show'] == 1
@@ -253,6 +244,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$config['units']['show'] = false;
 		}
+
+		$config['value_arc'] = array_key_exists(Widget::SHOW_VALUE_ARC, $show)
+			? [
+				'show' => true,
+				'size' => $this->fields_values['value_arc_size'],
+				'color' => $this->fields_values['value_arc_color']
+			]
+			: [
+				'show' => false
+			];
 
 		$config['needle'] = array_key_exists(Widget::SHOW_NEEDLE, $show)
 			? [
@@ -320,6 +321,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$value = $history[$item['itemid']][0]['value'];
 
+		if (!in_array(Widget::SHOW_VALUE, $this->fields_values['show'])) {
+			return [
+				'value' => (float) $value
+			];
+		}
+
 		if ($this->fields_values['units_show'] == 1) {
 			if ($this->fields_values['units'] !== '') {
 				$item['units'] = $this->fields_values['units'];
@@ -329,18 +336,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item['units'] = '';
 		}
 
-		if (in_array(Widget::SHOW_VALUE, $this->fields_values['show'])) {
-			$labels = self::makeValueLabels($item, $value, $this->fields_values['decimal_places']);
-
-			return [
-				'value' => (float) $value,
-				'value_text' => $labels['value'],
-				'units_text' => $labels['units']
-			];
-		}
+		$labels = self::makeValueLabels($item, $value, $this->fields_values['decimal_places']);
 
 		return [
-			'value' => (float) $value
+			'value' => (float) $value,
+			'value_text' => $labels['value'],
+			'units_text' => $labels['units']
 		];
 	}
 

@@ -51,11 +51,11 @@ window.widget_gauge_form = new class {
 	}
 
 	#updateForm(trigger = null) {
-		const show_description = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
-		const show_value = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
-		const show_needle = document.getElementById(`show_${<?= Widget::SHOW_NEEDLE ?>}`);
-		const show_scale = document.getElementById(`show_${<?= Widget::SHOW_SCALE ?>}`);
-		const value_arc = document.getElementById('value_arc');
+		const description_show = document.getElementById(`show_${<?= Widget::SHOW_DESCRIPTION ?>}`);
+		const value_show = document.getElementById(`show_${<?= Widget::SHOW_VALUE ?>}`);
+		const needle_show = document.getElementById(`show_${<?= Widget::SHOW_NEEDLE ?>}`);
+		const scale_show = document.getElementById(`show_${<?= Widget::SHOW_SCALE ?>}`);
+		const value_arc_show = document.getElementById(`show_${<?= Widget::SHOW_VALUE_ARC ?>}`);
 		const units_show = document.getElementById('units_show');
 		const th_show_arc = document.getElementById('th_show_arc');
 		const filled_thresholds_count = this.#countFilledThresholds();
@@ -64,64 +64,61 @@ window.widget_gauge_form = new class {
 			element.disabled = filled_thresholds_count === 0;
 		}
 
-		show_needle.disabled = (!th_show_arc.checked || th_show_arc.disabled)
-			&& (!value_arc.checked || !show_value.checked);
+		needle_show.disabled = (!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked;
 
-		show_scale.disabled = (!th_show_arc.checked || th_show_arc.disabled)
-			&& (!value_arc.checked || !show_value.checked);
+		scale_show.disabled = (!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked;
 
-		if ([show_description, show_value, show_needle, show_scale].filter((checkbox) =>
-				checkbox.checked && !checkbox.disabled).length == 0) {
+		if ([description_show, value_show, needle_show, scale_show, value_arc_show].filter((checkbox) =>
+				checkbox.checked && !checkbox.disabled).length === 0) {
 			trigger.checked = true;
 			this.#updateForm(trigger);
 		}
 
 		for (const element of this.#form.querySelectorAll('.fields-group-description')) {
-			element.style.display = show_description.checked ? '' : 'none';
+			element.style.display = description_show.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input, textarea')) {
-				input.disabled = !show_description.checked;
+				input.disabled = !description_show.checked;
 			}
 		}
 
 		for (const element of this.#form.querySelectorAll('.fields-group-value')) {
-			element.style.display = show_value.checked ? '' : 'none';
+			element.style.display = value_show.checked ? '' : 'none';
 
 			for (const input of element.querySelectorAll('input')) {
-				if (input.id === 'value_arc_size') {
-					input.disabled = !value_arc.checked || !show_value.checked;
-				}
-				else {
-					input.disabled = !show_value.checked;
-				}
+				input.disabled = !value_show.checked;
 			}
 		}
 
 		for (const element of
 			document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
-			element.disabled = !show_value.checked || !units_show.checked;
+			element.disabled = !value_show.checked || !units_show.checked;
 		}
+
+		for (const element of this.#form.querySelectorAll('.fields-group-value-arc')) {
+			element.style.display = value_arc_show.checked ? '' : 'none';
+		}
+
+		document.getElementById('value_arc_size').disabled = !value_arc_show.checked;
 
 		for (const element of this.#form.querySelectorAll('.fields-group-needle')) {
-			element.style.display = show_needle.checked ? '' : 'none';
+			element.style.display = needle_show.checked ? '' : 'none';
 		}
 
-		document.getElementById('needle_color').disabled = !show_needle.checked
-			|| ((!th_show_arc.checked || th_show_arc.disabled) && (!value_arc.checked || value_arc.disabled));
+		document.getElementById('needle_color').disabled = !needle_show.checked
+			|| ((!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked);
 
 		for (const element of this.#form.querySelectorAll('.fields-group-scale')) {
-			element.style.display = !show_scale.checked ? 'none' : '';
+			element.style.display = !scale_show.checked ? 'none' : '';
 
 			for (const input of element.querySelectorAll('input')) {
 				if (input.id === 'scale_show_units') {
-					input.disabled = !units_show.checked || !show_scale.checked
-						|| ((!th_show_arc.checked || th_show_arc.disabled)
-							&& (!value_arc.checked || value_arc.disabled));
+					input.disabled = !units_show.checked || !scale_show.checked
+						|| ((!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked);
 				}
 				else {
-					input.disabled = !show_scale.checked
-						|| ((!th_show_arc.checked || th_show_arc.disabled)
-							&& (!value_arc.checked || value_arc.disabled));
+					input.disabled = !scale_show.checked
+						|| ((!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked);
 				}
 			}
 		}
@@ -130,8 +127,7 @@ window.widget_gauge_form = new class {
 			|| (!th_show_arc.checked || th_show_arc.disabled);
 
 		document.getElementById('th_show_labels').disabled = filled_thresholds_count === 0
-			|| ((!th_show_arc.checked || th_show_arc.disabled)
-				&& (!value_arc.checked || value_arc.disabled));
+			|| ((!th_show_arc.checked || th_show_arc.disabled) && !value_arc_show.checked);
 	}
 
 	#countFilledThresholds() {

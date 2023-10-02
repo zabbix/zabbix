@@ -28,6 +28,8 @@
 
 $form = new CWidgetFormView($data);
 
+$value_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($data['fields']['value_arc_size']));
+
 $form
 	->addField(
 		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
@@ -43,7 +45,12 @@ $form
 		getColorsFieldsGroupView($data['fields'])->addRowClass('fields-group-colors')
 	)
 	->addField(
-		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(2)
+		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->setColumns(3)
+	)
+	->addItem(
+		new CFormField(
+			(new CLabel(_('At least one parameter must be enabled.')))->setAsteriskMark()
+		)
 	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
@@ -57,9 +64,17 @@ $form
 				getValueFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value')
 			)
 			->addFieldsGroup(
+				(new CWidgetFieldsGroupView(_('Value arc')))
+					->addItem([
+						$value_arc_size_field->getLabel(),
+						(new CFormField([$value_arc_size_field->getView(), '%']))->addClass('field-size')
+					])->addRowClass('fields-group-value-arc')
+			)
+			->addFieldsGroup(
 				(new CWidgetFieldsGroupView(_('Needle')))
-					->addField((new CWidgetFieldColorView($data['fields']['needle_color']))->addClass('needle-show'))
-					->addRowClass('fields-group-needle')
+					->addField(
+						new CWidgetFieldColorView($data['fields']['needle_color'])
+					)->addRowClass('fields-group-needle')
 			)
 			->addFieldsGroup(
 				getScaleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-scale')
@@ -133,7 +148,6 @@ function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CW
 
 function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$value_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
-	$value_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_arc_size']));
 	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
 	$units_field = $form->registerField(
 		(new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
@@ -154,13 +168,6 @@ function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetF
 		->addField(
 			(new CWidgetFieldColorView($fields['value_color']))->addLabelClass('offset-3')
 		)
-		->addField(
-			new CWidgetFieldCheckBoxView($fields['value_arc'])
-		)
-		->addItem([
-			$value_arc_size_field->getLabel(),
-			(new CFormField([$value_arc_size_field->getView(), '%']))->addClass('field-size')
-		])
 		->addItem(
 			new CTag('hr')
 		)
