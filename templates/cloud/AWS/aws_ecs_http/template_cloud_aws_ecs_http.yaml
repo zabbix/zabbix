@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-22T08:20:19Z'
+  date: '2023-10-02T12:47:29Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -354,16 +354,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: cluster_name
               value: '{$AWS.ECS.CLUSTER.NAME}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -616,16 +616,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: cluster_name
               value: '{$AWS.ECS.CLUSTER.NAME}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -917,16 +917,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.REGION}'
             - name: cluster_name
               value: '{$AWS.ECS.CLUSTER.NAME}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -1082,13 +1082,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#ALARM_SERVICE_NAMESPACE}'
-                value: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
-                formulaid: C
-              - macro: '{#ALARM_SERVICE_NAMESPACE}'
-                value: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#ALARM_NAME}'
                 value: '{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}'
                 formulaid: A
@@ -1096,6 +1089,13 @@ zabbix_export:
                 value: '{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#ALARM_SERVICE_NAMESPACE}'
+                value: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
+                formulaid: C
+              - macro: '{#ALARM_SERVICE_NAMESPACE}'
+                value: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: 98d3f64416f746639055abdda6dfc374
@@ -1604,18 +1604,18 @@ zabbix_export:
               parameters:
                 - name: AccessKeyId
                   value: '{$AWS.ACCESS.KEY.ID}'
-                - name: SecretAccessKey
-                  value: '{$AWS.SECRET.ACCESS.KEY}'
                 - name: auth_type
                   value: '{$AWS.AUTH_TYPE}'
-                - name: region
-                  value: '{$AWS.REGION}'
                 - name: cluster_name
                   value: '{$AWS.ECS.CLUSTER.NAME}'
-                - name: service_name
-                  value: '{#AWS.ECS.SERVICE.NAME}'
                 - name: proxy
                   value: '{$AWS.PROXY}'
+                - name: region
+                  value: '{$AWS.REGION}'
+                - name: SecretAccessKey
+                  value: '{$AWS.SECRET.ACCESS.KEY}'
+                - name: service_name
+                  value: '{#AWS.ECS.SERVICE.NAME}'
               tags:
                 - tag: component
                   value: raw
@@ -1932,64 +1932,11 @@ zabbix_export:
           pages:
             - name: Cluster
               widgets:
-                - type: GRAPH_CLASSIC
-                  'y': '15'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'AWS ECS Cluster by HTTP'
-                        name: 'AWS ECS Cluster: Network'
-                - type: GRAPH_CLASSIC
-                  'y': '10'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'AWS ECS Cluster by HTTP'
-                        name: 'AWS ECS Cluster: Memory Utilization'
-                - type: GRAPH_CLASSIC
-                  'y': '5'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'AWS ECS Cluster by HTTP'
-                        name: 'AWS ECS Cluster: CPU Utilization'
-                - type: ITEM
-                  name: 'Container instance count'
-                  x: '16'
-                  width: '8'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'AWS ECS Cluster by HTTP'
-                        key: aws.ecs.container_instance_count
                 - type: ITEM
                   name: 'Service count'
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: INTEGER
                       name: adv_conf
                       value: '1'
@@ -2001,15 +1948,45 @@ zabbix_export:
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.service_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: GRAPH_CLASSIC
+                  'y': '5'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'AWS ECS Cluster by HTTP'
+                        name: 'AWS ECS Cluster: CPU Utilization'
+                - type: GRAPH_CLASSIC
+                  'y': '10'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'AWS ECS Cluster by HTTP'
+                        name: 'AWS ECS Cluster: Memory Utilization'
+                - type: GRAPH_CLASSIC
+                  'y': '15'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'AWS ECS Cluster by HTTP'
+                        name: 'AWS ECS Cluster: Network'
                 - type: ITEM
                   name: 'Task count'
                   x: '8'
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: INTEGER
                       name: adv_conf
                       value: '1'
@@ -2021,6 +1998,29 @@ zabbix_export:
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         key: aws.ecs.task_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: ITEM
+                  name: 'Container instance count'
+                  x: '16'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'AWS ECS Cluster by HTTP'
+                        key: aws.ecs.container_instance_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
             - name: Services
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -2030,14 +2030,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: CPU Utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2046,14 +2046,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory Utilization'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -2062,14 +2062,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS ECS Cluster by HTTP'
                         name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: 6b0f40b56f1c49f0beb66ffb85009c15
           name: 'Alarm state'

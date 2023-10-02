@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-22T08:20:28Z'
+  date: '2023-10-02T12:47:33Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -227,14 +227,14 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.BILLING.REGION}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.BILLING.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -478,16 +478,16 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
-            - name: region
-              value: '{$AWS.BILLING.REGION}'
             - name: month
               value: '{$AWS.BILLING.MONTH}'
             - name: proxy
               value: '{$AWS.PROXY}'
+            - name: region
+              value: '{$AWS.BILLING.REGION}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           tags:
             - tag: component
               value: raw
@@ -548,12 +548,12 @@ zabbix_export:
           master_item:
             key: aws.get.monthly.costs
           lld_macro_paths:
+            - lld_macro: '{#AWS.BILLING.MONTH}'
+              path: $..month.first()
             - lld_macro: '{#AWS.BILLING.SERVICE.NAME}'
               path: $..Keys.first().first()
             - lld_macro: '{#AWS.BILLING.UNIT}'
               path: $..Metrics.BlendedCost.Unit.first()
-            - lld_macro: '{#AWS.BILLING.MONTH}'
-              path: $..month.first()
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -710,14 +710,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '6'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Monthly blended cost'
+                    - type: INTEGER
+                      name: rows
+                      value: '6'
             - name: 'Monthly costs by service'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -727,14 +727,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '6'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
+                    - type: INTEGER
+                      name: rows
+                      value: '6'
             - name: 'Daily costs by service'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -744,11 +744,11 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '2'
-                    - type: INTEGER
-                      name: rows
-                      value: '5'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'AWS Cost Explorer by HTTP'
                         name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
+                    - type: INTEGER
+                      name: rows
+                      value: '5'

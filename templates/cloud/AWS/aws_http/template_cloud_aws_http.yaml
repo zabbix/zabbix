@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-09-22T08:20:24Z'
+  date: '2023-10-02T12:47:31Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -321,8 +321,6 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
             - name: proxy
@@ -331,6 +329,8 @@ zabbix_export:
               value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
             - lld_macro: '{#AWS.EC2.INSTANCE.ID}'
               path: $.instanceId
@@ -603,13 +603,6 @@ zabbix_export:
                 value: '{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#AWS.ECS.CLUSTER.STATUS}'
-                value: '{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}'
-                formulaid: E
-              - macro: '{#AWS.ECS.CLUSTER.STATUS}'
-                value: '{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
               - macro: '{#AWS.ECS.CLUSTER.REGION}'
                 value: '{$AWS.ECS.LLD.FILTER.REGION.MATCHES}'
                 formulaid: C
@@ -617,6 +610,13 @@ zabbix_export:
                 value: '{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
+              - macro: '{#AWS.ECS.CLUSTER.STATUS}'
+                value: '{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}'
+                formulaid: E
+              - macro: '{#AWS.ECS.CLUSTER.STATUS}'
+                value: '{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Get ECS clusters.'
           host_prototypes:
             - uuid: 71072e5a149e45b293946866f8220c07
@@ -643,8 +643,6 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
             - name: proxy
@@ -653,15 +651,17 @@ zabbix_export:
               value: '{$AWS.EC2.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
-            - lld_macro: '{#AWS.ECS.CLUSTER.NAME}'
-              path: $.clusterName
-            - lld_macro: '{#AWS.ECS.CLUSTER.STATUS}'
-              path: $.status
             - lld_macro: '{#AWS.ECS.CLUSTER.INFRASTRUCTURE}'
               path: $.infrastructure
+            - lld_macro: '{#AWS.ECS.CLUSTER.NAME}'
+              path: $.clusterName
             - lld_macro: '{#AWS.ECS.CLUSTER.REGION}'
               path: $.region
+            - lld_macro: '{#AWS.ECS.CLUSTER.STATUS}'
+              path: $.status
           overrides:
             - name: Serverless
               step: '1'
@@ -955,8 +955,6 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
             - name: proxy
@@ -965,6 +963,8 @@ zabbix_export:
               value: '{$AWS.RDS.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
             - lld_macro: '{#AWS.RDS.INSTANCE.ID}'
               path: $.DBInstanceIdentifier
@@ -1254,8 +1254,6 @@ zabbix_export:
           parameters:
             - name: AccessKeyId
               value: '{$AWS.ACCESS.KEY.ID}'
-            - name: SecretAccessKey
-              value: '{$AWS.SECRET.ACCESS.KEY}'
             - name: auth_type
               value: '{$AWS.AUTH_TYPE}'
             - name: proxy
@@ -1264,6 +1262,8 @@ zabbix_export:
               value: '{$AWS.S3.LLD.FILTER.REGION.MATCHES}'
             - name: region_not_match
               value: '{$AWS.S3.LLD.FILTER.REGION.NOT_MATCHES}'
+            - name: SecretAccessKey
+              value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
             - lld_macro: '{#AWS.S3.NAME}'
               path: $.Name
