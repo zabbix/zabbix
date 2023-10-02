@@ -20,6 +20,8 @@
 
 require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * @backup items
@@ -38,7 +40,17 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
 	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
+	}
 
 	public function getItemPreprocessingPrometheusData() {
 		return array_merge($this->getPrometheusData(), [

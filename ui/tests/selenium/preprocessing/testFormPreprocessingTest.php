@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  *
@@ -28,9 +28,16 @@ require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
  */
 class testFormPreprocessingTest extends CWebTest {
 
-	const HOST_ID = 40001;		//'Simple form test host'
+	/**
+	 * Attach PreprocessingBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CPreprocessingBehavior::class];
+	}
 
-	use PreprocessingTrait;
+	const HOST_ID = 40001;		//'Simple form test host'
 
 	public $change_types = [
 		'Discard unchanged with heartbeat',

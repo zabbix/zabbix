@@ -19,17 +19,25 @@
 **/
 
 require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 
 /**
  * @backup hosts
  */
 class testFormMacrosHostPrototype extends testFormMacros {
 
+	/**
+	 * Attach MacrosBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMacroBehavior::class];
+	}
+
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
 	const LLD_ID		= 90001;
 	const IS_PROTOTYPE	= true;
-
-	use MacrosTrait;
 
 	/**
 	 * The name of the host for updating macros, id=99200.

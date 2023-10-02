@@ -19,18 +19,27 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/FilterTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CFilterBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @dataSource TagFilter
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Template OS Linux by Zabbix agent';
+	/**
+	 * Attach FilterBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CFilterBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
-	use FilterTrait;
-	use TableTrait;
+	public $templateName = 'Template OS Linux by Zabbix agent';
 
 	public static function allTemplates() {
 		return CDBHelper::getRandomizedDataProvider('SELECT * FROM hosts WHERE status IN ('.HOST_STATUS_TEMPLATE.')', 25);

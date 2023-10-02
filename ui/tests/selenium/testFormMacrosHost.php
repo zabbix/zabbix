@@ -19,13 +19,21 @@
 **/
 
 require_once dirname(__FILE__).'/common/testFormMacros.php';
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 
 /**
  * @backup hosts
  */
 class testFormMacrosHost extends testFormMacros {
 
-	use MacrosTrait;
+	/**
+	 * Attach MacrosBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMacroBehavior::class];
+	}
 
 	/**
 	 * The name of the host for updating macros, id=20006.

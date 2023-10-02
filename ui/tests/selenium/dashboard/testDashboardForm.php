@@ -20,7 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard, profiles
@@ -31,7 +32,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testDashboardForm extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Dashboard ids grouped by name.
@@ -67,15 +78,6 @@ class testDashboardForm extends CWebTest {
 		'Owner' => 'guest',
 		'Name' => 'Dashboard to test properties changes'
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [

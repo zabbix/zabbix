@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/FilterTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CFilterBehavior.php';
 
 /**
  * @backup widget
@@ -29,7 +29,14 @@ require_once dirname(__FILE__).'/../traits/FilterTrait.php';
  */
 class testDashboardGraphWidget extends CWebTest {
 
-	use FilterTrait;
+	/**
+	 * Attach FilterBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CFilterBehavior::class];
+	}
 
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
