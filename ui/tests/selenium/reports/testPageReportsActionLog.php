@@ -25,36 +25,424 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 /**
  * @backup alerts
  *
- * @onBefore prepareInsertActionsData
+ * @onBefore prepareActionsData
  */
 class testPageReportsActionLog extends CWebTest {
 
 	use TableTrait;
 
-	public static function prepareInsertActionsData() {
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (130, 13, 1, 1, ".
-				"1329724870, 10, 'test.test@zabbix.com', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
+	public static function prepareActionsData() {
+		CDataHelper::call('action.create', [
+			[
+				'name' => 'Simple action',
+				'esc_period' => '60s',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'operator' => CONDITION_OPERATOR_NO
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => [
+							'mediatypeid' => 1
+						],
+						'opmessage_grp' => [
+							[
+								'usrgrpid' => 7
+							]
+						]
+					]
+				]
+			],
+			[
+				'name' => 'Trigger action 2',
+				'esc_period' => '60s',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_NOT_LIKE,
+							'value' => 'PostgreSQL',
+							'value2' => 'Database'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_LIKE,
+							'value' => 'MYSQL',
+							'value2' => 'Database'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value2' => 'MySQL'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'operator' => CONDITION_OPERATOR_YES
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TEMPLATE,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 10081
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TEMPLATE,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 10001
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
+							'operator' => CONDITION_OPERATOR_NOT_IN,
+							'value' => '6-7,08:00-18:00'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
+							'operator' => CONDITION_OPERATOR_IN,
+							'value' => '1-7,00:00-24:00'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_LESS_EQUAL,
+							'value' => 4
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_MORE_EQUAL,
+							'value' => 3
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 2
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 5
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 1
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+							'operator' => CONDITION_OPERATOR_NOT_LIKE,
+							'value' => 'DB2'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+							'operator' => CONDITION_OPERATOR_LIKE,
+							'value' => 'Oracle'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 13485
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 99252
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 10084
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 99134
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 4
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 2
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => [
+							'mediatypeid' => 0
+						],
+						'opmessage_grp' => [
+							[
+								'usrgrpid' => 7
+							]
+						]
+					]
+				]
+			],
+			[
+				'name' => 'Trigger action 3',
+				'esc_period' => '60s',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_NOT_LIKE,
+							'value' => 'PostgreSQL',
+							'value2' => 'Database'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_LIKE,
+							'value' => 'MYSQL',
+							'value2' => 'Database'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TAG_VALUE,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value2' => 'MySQL'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_SUPPRESSED,
+							'operator' => CONDITION_OPERATOR_YES
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TEMPLATE,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 10081
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TEMPLATE,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 10001
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
+							'operator' => CONDITION_OPERATOR_NOT_IN,
+							'value' => '6-7,08:00-18:00'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
+							'operator' => CONDITION_OPERATOR_IN,
+							'value' => '1-7,00:00-24:00'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_LESS_EQUAL,
+							'value' => 4
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_MORE_EQUAL,
+							'value' => 3
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 2
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 5
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 1
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+							'operator' => CONDITION_OPERATOR_NOT_LIKE,
+							'value' => 'DB2'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+							'operator' => CONDITION_OPERATOR_LIKE,
+							'value' => 'Oracle'
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 13485
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 99252
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 10084
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 99134
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL,
+							'value' => 4
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_HOST_GROUP,
+							'operator' => CONDITION_OPERATOR_EQUAL,
+							'value' => 2
+						]
+					]
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => [
+							'mediatypeid' => 0
+						],
+						'opmessage_grp' => [
+							[
+								'usrgrpid' => 7
+							]
+						]
+					],
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'esc_period' => 3600,
+						'esc_step_from' => 2,
+						'esc_step_to' => 2,
+						'opconditions' => [
+							[
+								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'value' => "0"
+							],
+							[
+								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'value' => "1"
+							]
+						],
+						'opmessage' => [
+							'mediatypeid' => 1
+						],
+						'opmessage_grp' => [
+							[
+								'usrgrpid' => 7
+							]
+						]
+					],
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'esc_step_from' => 5,
+						'esc_step_to' => 6,
+						'opconditions' => [
+							[
+								'conditiontype' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
+								'operator' => CONDITION_OPERATOR_EQUAL,
+								'value' => "0"
+							]
+						],
+						'opmessage' => [
+							'default_msg' => 0,
+							'subject' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}',
+							'message' => 'Custom: {TRIGGER.NAME}: {TRIGGER.STATUS}Last value: {ITEM.LASTVALUE}{TRIGGER.URL}',
+							'mediatypeid' => 1
+						],
+						'opmessage_usr' => [
+							[
+								'userid' => 1
+							]
+						]
+					]
+				]
+			]
+		]);
+
+		$actionids = CDataHelper::getIds('name');
+		DBexecute("INSERT INTO events (eventid, source, object, objectid, clock, value, acknowledged, ns) VALUES ".
+				" (1, 0, 0, 13545, 1329724790, 1, 0, 0);"
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (131, 13, 1, 9, ".
-				"1329724880, 3, '77777777', 'subject here', 'message here', 1, 0, '', 1, 0, '');"
+				" message, status, retries, error, esc_step, alerttype, parameters) VALUES (1, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724800, 1, 'igor.danoshaites@zabbix.com',".
+				" 'PROBLEM: Value of item key1 > 5', 'Event at 2012.02.20 10:00:00 Hostname: H1 Value of item key1 > 5: ".
+				" PROBLEM Last value: 6', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+				" message, status, retries, error, esc_step, alerttype, parameters) VALUES (2, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724810, 1, 'igor.danoshaites@zabbix.com', ".
+				" 'PROBLEM: Value of item key1 > 6','Event at 2012.02.20 10:00:10 Hostname: H1 Value of item key1 > 6: ".
+				"PROBLEM', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,"
+				." message, status, retries, error, esc_step, alerttype, parameters) VALUES (3, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724820, 1, 'igor.danoshaites@zabbix.com',".
+				" 'PROBLEM: Value of item key1 > 7', 'Event at 2012.02.20 10:00:20 Hostname: H1 Value of item key1 > 7:".
+				" PROBLEM', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+				" message, status, retries, error, esc_step, alerttype, parameters) VALUES (4, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724830, 1, 'igor.danoshaites@zabbix.com',".
+				" 'PROBLEM: Value of item key1 > 10', 'Event at 2012.02.20 10:00:30 Hostname: H1 Value of item key1 > 10: ".
+				"PROBLEM', 2, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused',".
+				" 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,".
+				" message, status, retries, error, esc_step, alerttype, parameters) VALUES (5, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, 1, 1329724840, 1, 'igor.danoshaites@zabbix.com', ".
+				" 'PROBLEM: Value of item key1 > 20', 'Event at 2012.02.20 10:00:40 Hostname: H1 Value of item key1 > 20: ".
+				"PROBLEM', 0, 0, 'Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: ".
+				"[111] Connection refused', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,".
+				" message, status, retries, error, esc_step, alerttype, parameters) VALUES (6, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, NULL, 1329724850, NULL, '', '',".
+				" 'Command: H1:ls -la', 1, 0, '', 1, 1, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject,".
+				" message, status, retries, error, esc_step, alerttype, parameters) VALUES (7, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, NULL, 1329724860, NULL, '', '',".
+				" 'Command: H1:ls -la', 1, 0, '', 1, 1, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (134, ".
+				zbx_dbstr($actionids['Trigger action 2']).", 1, 9, 1597440000, 3, 'igor.danoshaites@zabbix.com',".
+				"'time_subject_2', 'time_message_', 1, 0, '', 1, 0, '');"
+		);
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (130, ".
+				zbx_dbstr($actionids['Trigger action 3']).", 1, 1, 1329724870, 10, 'test.test@zabbix.com',".
+				"'subject here', 'message here', 1, 0, '', 1, 0, '');"
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (132, 13, 1, 9, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (131, ".
+				zbx_dbstr($actionids['Trigger action 3']).", 1, 9, 1329724880, 3, '77777777', 'subject here',".
+				"'message here', 1, 0, '', 1, 0, '');"
+		);
+
+		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (132, ".
+				zbx_dbstr($actionids['Trigger action 3']).", 1, 9, ".
 				"1329724890, 3, '77777777', 'subject_no_space', 'message_no_space', 1, 0, '', 1, 0, '');"
 		);
 
 		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (133, 13, 1, 1, ".
-				"1597439400, 3, 'igor.danoshaites@zabbix.com', 'time_subject_1', 'time_message_1', 1, 0, '', 1, 0, '');"
-		);
-
-		DBexecute("INSERT INTO alerts (alertid, actionid, eventid, userid, clock, mediatypeid, sendto, subject, ".
-				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (134, 12, 1, 9, ".
-				"1597440000, 3, 'igor.danoshaites@zabbix.com', 'time_subject_2', 'time_message_', 1, 0, '', 1, 0, '');"
+				"message, status, retries, error, esc_step, alerttype, parameters) VALUES (133, ".
+				zbx_dbstr($actionids['Trigger action 3']).", 1, 1, 1597439400, 3, 'igor.danoshaites@zabbix.com',".
+				"'time_subject_1', 'time_message_1', 1, 0, '', 1, 0, '');"
 		);
 	}
 
