@@ -3951,24 +3951,50 @@ div.dashboard-widget-gauge {
 div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
   border: 0; }
 
-div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
+div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
+  padding-top: 5px;
+  border-top: 1px solid #888888; }
+div.dashboard-widget-hostavail .host-avail-table th {
+  width: 15%;
+  min-width: 100px;
+  color: #333333; }
+div.dashboard-widget-hostavail .host-avail-table td {
+  min-width: 95px;
   border-left: 1px dotted #888888; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-true {
-  background: #86cc89; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-false {
-  background: #e45959; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown {
-  background: #97aab3; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
-  background: transparent; }
+div.dashboard-widget-hostavail .host-avail-table th:last-child,
+div.dashboard-widget-hostavail .host-avail-table td:last-child {
+  padding-right: 5px; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-true {
+  color: #000000;
+  background-color: #34af67; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-false {
+  color: #000000;
+  background-color: #d64e4e; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed {
+  color: #000000;
+  background-color: #f1a50b; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown {
+  color: #000000;
+  background-color: #acbbc2; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
+  color: #000000;
+  background-color: transparent; }
 
-div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
+div.dashboard-widget-hostavail .host-avail-table thead th {
+  color: #000000; }
+div.dashboard-widget-hostavail .host-avail-table thead .host-avail-total {
+  padding-top: 6px;
+  border-top: none; }
+div.dashboard-widget-hostavail .host-avail-table th {
+  color: #000000; }
+div.dashboard-widget-hostavail .host-avail-table td {
   border-left: 1px solid #9f9f9f; }
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-true,
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-false,
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown,
-div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
-  background: transparent; }
+div.dashboard-widget-hostavail .host-avail-table .host-avail-true,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-false,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-mixed,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-unknown,
+div.dashboard-widget-hostavail .host-avail-table .host-avail-total {
+  background-color: transparent; }
 
 .dashboard-widget-inaccessible {
   display: grid;

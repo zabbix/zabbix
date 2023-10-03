@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,11 +19,20 @@
 **/
 
 
-class CWidgetHostAvail extends CWidget {
+?>
 
-	hasPadding() {
-		return this.getViewMode() === ZBX_WIDGET_VIEW_MODE_NORMAL
-			&& this.getFields().only_totals == 0
-			&& this.getFields().interface_type.length != 1;
+window.widget_host_availability_form = new class {
+
+	init() {
+		for (const element of document.querySelectorAll('[name="interface_type[]"]')) {
+			element.addEventListener('change', () => this.#updateForm());
+		}
+
+		this.#updateForm();
+	}
+
+	#updateForm() {
+		document.getElementById('only_totals')
+			.disabled = document.querySelectorAll('[name="interface_type[]"]:checked').length === 1;
 	}
 }
