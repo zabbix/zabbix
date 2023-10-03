@@ -660,7 +660,13 @@ window.trigger_edit_popup = new class {
 			return true;
 		}
 
-		let form_fields = this.#getFormFields();
+		let form_fields = {
+			dependencies: [],
+			discover: String(<?= TRIGGER_NO_DISCOVER ?>),
+			manual_close: String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>),
+			status: String(<?= TRIGGER_STATUS_DISABLED ?>),
+			...this.#getFormFields()
+		}
 
 		// Values are modified to match this.db_trigger values.
 		if (form_fields.tags) {
@@ -677,22 +683,6 @@ window.trigger_edit_popup = new class {
 
 		delete form_fields.context;
 		delete form_fields._csrf_token;
-
-		if (!form_fields.dependencies) {
-			form_fields.dependencies = [];
-		}
-
-		if (!form_fields.discover) {
-			form_fields.discover = String(<?= TRIGGER_NO_DISCOVER ?>);
-		}
-
-		if (!form_fields.manual_close) {
-			form_fields.manual_close = String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>);
-		}
-
-		if (!form_fields.status) {
-			form_fields.status = String(<?= TRIGGER_STATUS_DISABLED ?>);
-		}
 
 		this.db_trigger.dependencies = [];
 
