@@ -20,6 +20,7 @@
 
 require_once dirname(__FILE__) . '/common/testFormMacros.php';
 require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup hosts
@@ -27,12 +28,15 @@ require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 class testFormMacrosTemplate extends testFormMacros {
 
 	/**
-	 * Attach MacrosBehavior to the test.
+	 * Attach MacrosBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacrosBehavior::class];
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
 	}
 
 	/**
