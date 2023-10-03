@@ -406,9 +406,14 @@ zabbix_export:
                 device = [],
                 uplinksLL = [];
             
-            function checkNumb(string) {
-                if (typeof string !== "string" || isNaN(string)) {
-                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be number';
+            function isFloat(n) {
+                n = parseFloat(n);
+                return Number(n) === n && n % 1 !== 0;
+            };
+            
+            function checkNumber(string) {
+                if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
+                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
                 }
                 return string;
             };
@@ -459,7 +464,7 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                timespan = checkNumb('{$MERAKI.UPLINK.LL.TIMESPAN}');
+                timespan = checkNumber('{$MERAKI.UPLINK.LL.TIMESPAN}');
             
                 if (timespan > 86400 || timespan < 1) {
                     throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
@@ -1005,12 +1010,17 @@ zabbix_export:
                 vpnStats = [],
                 result = [];
             
-            function checkNumb(string) {
-                if (typeof string !== "string" || isNaN(string)) {
-                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be number';
+            function isFloat(n) {
+                n = parseFloat(n);
+                return Number(n) === n && n % 1 !== 0;
+            };
+            
+            function checkNumber(string) {
+                if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
+                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
                 }
                 return string;
-            }
+            };
             
             function getHttpData(url) {
                 response = request.get(url);
@@ -1058,7 +1068,7 @@ zabbix_export:
                     request.setProxy(params.httpproxy);
                 }
             
-                timespan = checkNumb('{$MERAKI.VPN.STATS.TIMESPAN}');
+                timespan = checkNumber('{$MERAKI.VPN.STATS.TIMESPAN}');
             
                 if (timespan > 86400 || timespan < 1) {
                     throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
