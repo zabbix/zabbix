@@ -31,32 +31,39 @@ abstract class CControllerItemPrototype extends CController {
 			: $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
+	/**
+	 * Validate form input.
+	 *
+	 * @param array $required_fields  Array of fields to be set as required when validating.
+	 *
+	 * @return bool  is form input valid.
+	 */
 	protected function validateFormInput(array $required_fields): bool {
 		$fields = [
 			'name'					=> 'db items.name',
-			'type'					=> 'db items.type',
+			'type'					=> 'in '.implode(',', array_keys(item_type2str())),
 			'key'					=> 'db items.key_',
-			'value_type'			=> 'db items.value_type',
+			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
 			'url'					=> 'db items.url',
 			'query_fields'			=> 'array',
 			'parameters'			=> 'array',
 			'script'				=> 'db items.params',
-			'request_method'		=> 'db items.request_method',
+			'request_method'		=> 'in '.implode(',', [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD]),
 			'custom_timeout'		=> 'in '.implode(',', [ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED, ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]),
 			'timeout'				=> 'db items.timeout',
-			'post_type'				=> 'db items.post_type',
+			'post_type'				=> 'in '.implode(',', [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]),
 			'posts'					=> 'db items.posts',
 			'headers'				=> 'array',
 			'status_codes'			=> 'db items.status_codes',
-			'follow_redirects'		=> 'db items.follow_redirects',
+			'follow_redirects'		=> 'in '.implode(',', [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]),
 			'retrieve_mode'			=> 'db items.retrieve_mode',
-			'output_format'			=> 'db items.output_format',
+			'output_format'			=> 'in '.implode(',', [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON]),
 			'http_proxy'			=> 'db items.http_proxy',
-			'http_authtype'			=> 'db items.authtype',
+			'http_authtype'			=> 'in '.implode(',', array_keys(httptest_authentications())),
 			'http_username'			=> 'db items.username',
 			'http_password'			=> 'db items.password',
-			'verify_peer'			=> 'db items.verify_peer',
-			'verify_host'			=> 'db items.verify_host',
+			'verify_peer'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON]),
+			'verify_host'			=> 'in '.implode(',', [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON]),
 			'ssl_cert_file'			=> 'db items.ssl_cert_file',
 			'ssl_key_file'			=> 'db items.ssl_key_file',
 			'ssl_key_password'		=> 'db items.ssl_key_password',
@@ -64,7 +71,7 @@ abstract class CControllerItemPrototype extends CController {
 			'interfaceid'			=> 'id',
 			'snmp_oid'				=> 'db items.snmp_oid',
 			'ipmi_sensor'			=> 'db items.ipmi_sensor',
-			'authtype'				=> 'db items.authtype',
+			'authtype'				=> 'in '.implode(',', [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY]),
 			'jmx_endpoint'			=> 'db items.jmx_endpoint',
 			'username'				=> 'db items.username',
 			'publickey'				=> 'db items.publickey',
@@ -82,10 +89,10 @@ abstract class CControllerItemPrototype extends CController {
 			'trends'				=> 'db items.trends',
 			'logtimefmt'			=> 'db items.logtimefmt',
 			'valuemapid'			=> 'id',
-			'allow_traps'			=> 'db items.allow_traps',
+			'allow_traps'			=> 'in '.implode(',', [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON]),
 			'trapper_hosts'			=> 'db items.trapper_hosts',
 			'description'			=> 'db items.description',
-			'status'				=> 'db items.status',
+			'status'				=> 'in '.implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
 			'discover'				=> 'db items.discover',
 			'show_inherited_tags'	=> 'in 0,1',
 			'tags'					=> 'array',
