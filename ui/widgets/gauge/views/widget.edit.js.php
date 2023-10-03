@@ -33,7 +33,7 @@ window.widget_gauge_form = new class {
 	init({thresholds_colors}) {
 		this.#form = document.getElementById('widget-dialogue-form');
 
-		this.#form.addEventListener('change', () => this.#updateForm());
+		this.#form.addEventListener('change', (e) => this.#updateForm(e.target));
 
 		$thresholds_table.on('afterremove.dynamicRows', () => this.#updateForm());
 
