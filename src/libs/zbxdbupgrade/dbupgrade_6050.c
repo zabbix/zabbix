@@ -26,6 +26,7 @@
 #include "zbxdbhigh.h"
 #include "zbxtypes.h"
 #include "zbxregexp.h"
+#include "zbxstr.h"
 
 /*
  * 7.0 development database patches
@@ -1635,8 +1636,8 @@ static int	DBpatch_6050139(void)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
+	char		*sql = NULL, *buf = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0, buf_alloc;
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1648,15 +1649,12 @@ static int	DBpatch_6050139(void)
 		goto clean;
 	}
 
-	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*ptr;
-		char		*buf, *tmp, *param = NULL;
-		size_t		param_pos, param_len, sep_pos, buf_alloc, buf_offset = 0;
+		char		*tmp, *param = NULL;
 		int		quoted;
-
-		buf_alloc  = strlen(row[1]);
-		buf = zbx_malloc(NULL, buf_alloc);
+		size_t		param_pos, param_len, sep_pos, buf_offset = 0;
 
 		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
 		{
@@ -1668,18 +1666,20 @@ static int	DBpatch_6050139(void)
 				{
 					if ('{' == ptr[param_pos])
 					{
-						size_t	arg_end;
-						int	bracket_count = 1;
+						zbx_token_t	token;
 
-						for (arg_end = param_pos + 1; 0 < bracket_count; arg_end++)
+						if (SUCCEED == zbx_token_find(ptr, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
+								0 == token.loc.l )
 						{
-							if ('}' == ptr[arg_end])
-								bracket_count--;
-							else if ('{' == ptr[arg_end])
-								bracket_count++;
+							sep_pos = param_pos + token.loc.r + 1;
 						}
-
-						sep_pos = arg_end;
+						else
+						{
+							zabbix_log(LOG_LEVEL_WARNING, "Failed to parse parameters"
+							" \"%s\" for trigger with id %s", row[1], row[3]);
+							buf_offset = 0;
+							break;
+						}
 					}
 
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos,
@@ -1709,14 +1709,16 @@ static int	DBpatch_6050139(void)
 			zbx_free(param);
 		}
 
+		if (0 == buf_offset)
+			continue;
+
 		tmp = zbx_db_dyn_escape_string(buf);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"update functions set parameter='%s' where functionid=%s;\n", tmp, row[0]);
 		zbx_free(tmp);
-		zbx_free(buf);
 
-		if (SUCCEED == ret)
-			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			break;
 	}
 
 	zbx_db_free_result(result);
@@ -1728,6 +1730,7 @@ static int	DBpatch_6050139(void)
 			ret = FAIL;
 	}
 clean:
+	zbx_free(buf);
 	zbx_free(sql);
 
 	return ret;
@@ -1764,7 +1767,7 @@ static int	DBpatch_6050140(void)
 	if (NULL == (result = zbx_db_select("select itemid,params from items where type=15")))
 		goto clean;
 
-	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		char	*substitute = NULL, *tmp = NULL;
 		if (SUCCEED == update_escaping_in_expression(row[1], &substitute, &error))
@@ -1782,7 +1785,8 @@ static int	DBpatch_6050140(void)
 			zbx_free(error);
 		}
 
-		ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+			break;
 	}
 
 	zbx_db_free_result(result);
@@ -1813,7 +1817,7 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 	if (NULL == (result = zbx_db_select("%s", select)))
 		goto clean;
 
-	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		const char	*command = row[1];
 		char		*buf = NULL, *error = NULL, *tmp = NULL;;
@@ -1824,7 +1828,7 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 
 		cmd_len = strlen(command);
 
-		while (SUCCEED == zbx_token_find(command, pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) &&
+		while (SUCCEED == zbx_token_find(command, (int)pos, &token, ZBX_TOKEN_SEARCH_EXPRESSION_MACRO) &&
 				cmd_len >= pos)
 		{
 			if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
@@ -1869,7 +1873,9 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 			zbx_free(buf);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, update, tmp, row[0]);
 			zbx_free(tmp);
-			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+
+			if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				break;
 		}
 		else
 			zbx_free(buf);

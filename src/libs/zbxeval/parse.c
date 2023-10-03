@@ -1085,7 +1085,7 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 				zbx_eval_token_t	*hist_param;
 
 				hist_param = (zbx_eval_token_t *)hist_func_params.values[i];
-				str_len = hist_param->loc.r - hist_param->loc.l + 1;
+				str_len = (int)(hist_param->loc.r - hist_param->loc.l) + 1;
 				zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ctx->expression + hist_param->loc.l,
 						str_len);
 
