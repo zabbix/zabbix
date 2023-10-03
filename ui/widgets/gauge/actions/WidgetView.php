@@ -198,13 +198,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if (array_key_exists(Widget::SHOW_DESCRIPTION, $show)) {
 			$widget_description = $this->fields_values['description'];
 
-		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
-			[[
-				'widget_description' => $widget_description
-			]] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item + [
-				'widget_description' => $widget_description
-			]]);
-		}
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				[[
+					'widget_description' => $widget_description
+				]] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item + [
+					'widget_description' => $widget_description
+				]]);
+			}
 
 			$config['description'] = [
 				'show' => true,
@@ -241,7 +241,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$config['value']['show'] = false;
-
 			$config['units']['show'] = false;
 		}
 
