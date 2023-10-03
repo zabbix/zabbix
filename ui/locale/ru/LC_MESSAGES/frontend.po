@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-08-09 03:14+0000\n"
+"PO-Revision-Date: 2023-09-29 06:01+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -903,7 +903,7 @@ msgstr "Добавить несколько карт"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr "Добавить новый набор данных"
+msgstr "Новый набор данных"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
@@ -2879,8 +2879,8 @@ msgstr "Нельзя иметь не пустое значение тега пр
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] "Не удалось импортировать шаблон \"%1$s\", соединенный шаблон \"%2$s\" не существует."
-msgstr[1] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
+msgstr[0] "Не удалось импортировать шаблон \"%1$s\", присоединенный шаблон \"%2$s\" не существует."
+msgstr[1] "Не удалось импортировать шаблон \"%1$s\", присоединенные шаблоны \"%2$s\" не существуют."
 msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
@@ -3063,7 +3063,7 @@ msgstr "Невозможно массово обновить видимое им
 #: include/classes/api/services/CHostBase.php:1080
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
-msgstr "Невозможно передать дубликаты ID шаблонов для соединения: %1$s."
+msgstr "Невозможно передать дубликаты ID шаблонов для присоединения: %1$s."
 
 #: include/classes/db/DB.php:958
 #, c-format
@@ -3692,15 +3692,15 @@ msgstr "Проверьте часть выражения начиная с \"%1$
 
 #: include/items.inc.php:1877
 msgid "Check for error in JSON"
-msgstr "Проверьте на ошибку в JSON"
+msgstr "Проверка на ошибку в JSON"
 
 #: include/items.inc.php:1881
 msgid "Check for error in XML"
-msgstr "Проверьте на ошибку в XML"
+msgstr "Проверка на ошибку в XML"
 
 #: include/items.inc.php:1885
 msgid "Check for error using regular expression"
-msgstr "Проверьте на ошибку при использовании регулярного выражения"
+msgstr "Проверка на ошибку при использовании регулярного выражения"
 
 #: include/items.inc.php:1889
 msgid "Check for not supported value"
@@ -11153,7 +11153,7 @@ msgstr "Присоединенные шаблоны"
 
 #: include/views/configuration.template.list.php:127
 msgid "Linked to templates"
-msgstr "Соединения с шаблонам"
+msgstr "Присоединения к шаблонам"
 
 #: include/views/js/monitoring.sysmaps.js.php:733
 #: include/views/js/monitoring.sysmaps.js.php:744
@@ -17682,7 +17682,7 @@ msgstr "Группа шаблона"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
-msgstr "Соединения с шаблонами"
+msgstr "Присоединение шаблонов"
 
 #: include/views/configuration.template.edit.php:192
 msgid "Template macros"
@@ -17762,7 +17762,7 @@ msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети 
 
 #: app/partials/configuration.host.edit.html.php:215
 msgid "Templates linked by host discovery cannot be unlinked."
-msgstr "Шаблоны присоединенные обнаружением узлов сети нельзя отсоединить."
+msgstr "Шаблоны, присоединенные обнаружением узлов сети, нельзя отсоединить."
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
@@ -22475,6 +22475,10 @@ msgstr "now() - Количество секунд начиная с Epoch"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "число"
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr "объект не существует или принадлежит другому объекту"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

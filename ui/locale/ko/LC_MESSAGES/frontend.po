@@ -22194,6 +22194,10 @@ msgstr "now() - Epoch를 기준으로 한 경과 시간 (초단위)"
 msgid "number"
 msgstr "수치"
 
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr ""
+
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
 msgid "of"

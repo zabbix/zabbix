@@ -372,7 +372,7 @@ class testSlaReport extends CWebTest {
 		);
 
 		if (CTestArrayHelper::get($data, 'check_sorting')) {
-			$this->assertEquals([], $table->getSortableHeaders());
+			$this->assertEquals([], $table->getSortableHeaders()->asText());
 		}
 
 		// This test is written taking into account that only SLA with daily reporting period has ongoing downtimes.
@@ -558,7 +558,7 @@ class testSlaReport extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'check_sorting')) {
 			// Only "Service" column is sortable.
-			$this->assertEquals($widget ? [] : ['Service'], $table->getSortableHeaders());
+			$this->assertEquals($widget ? [] : ['Service'], $table->getSortableHeaders()->asText());
 		}
 
 		foreach ($data['expected']['services'] as $service) {
