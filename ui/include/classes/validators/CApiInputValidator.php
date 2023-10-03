@@ -4183,6 +4183,12 @@ class CApiInputValidator {
 					];
 				}
 				break;
+
+			case ZBX_PREPROC_SNMP_GET_VALUE:
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+					'1' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ZBX_PREPROC_SNMP_UTF8_FROM_HEX, ZBX_PREPROC_SNMP_MAC_FROM_HEX, ZBX_PREPROC_SNMP_INT_FROM_BITS])]
+				]];
+				break;
 		}
 
 		if (self::validate($api_input_rules, $params, $path, $error)) {

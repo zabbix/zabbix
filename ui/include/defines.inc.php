@@ -181,7 +181,7 @@ define('ZBX_DB_EXTENSION_TIMESCALEDB', 'timescaledb');
 
 define('ZBX_EXT_ERR_UNDEFINED',							0);
 define('ZBX_EXT_SUCCEED',								1);
-define('ZBX_TIMESCALEDB_POSTGRES_TOO_OLD',				2);
+//define('ZBX_TIMESCALEDB_POSTGRES_TOO_OLD',				2); obsoleted since Zabbix 7.0
 define('ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE',	3);
 define('ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM',	4);
 define('ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED',			5);
@@ -680,6 +680,7 @@ define('ZBX_PREPROC_VALIDATE_NOT_SUPPORTED',	26);
 define('ZBX_PREPROC_XML_TO_JSON',				27);
 define('ZBX_PREPROC_SNMP_WALK_VALUE',			28);
 define('ZBX_PREPROC_SNMP_WALK_TO_JSON',			29);
+define('ZBX_PREPROC_SNMP_GET_VALUE',			30);
 
 // Item pre-processing error handlers.
 define('ZBX_PREPROC_FAIL_DEFAULT',			0);
