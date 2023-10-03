@@ -234,7 +234,7 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
  * Return value: unindexed macro from the allowed list or NULL.               *
  *                                                                            *
  ******************************************************************************/
-const char	*func_get_macro(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+const char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
 {
 	char	*ptr_l = (char *)str + fm->macro.l, *ptr_r;
 

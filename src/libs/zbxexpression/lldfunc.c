@@ -566,7 +566,7 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 					pos = token.loc.r;
 					break;
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (NULL != func_get_macro(*data, &token.data.func_macro, NULL))
+					if (NULL != func_get_macro_from_func(*data, &token.data.func_macro, NULL))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, lld_macro_paths,
 								error, max_error_len);
