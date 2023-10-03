@@ -1658,30 +1658,12 @@ static int	DBpatch_6050139(void)
 
 		for (ptr = row[1]; ptr < row[1] + strlen(row[1]); ptr += sep_pos + 1)
 		{
-			zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+			zbx_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 			if (param_pos < sep_pos)
 			{
 				if ('"' != ptr[param_pos])
 				{
-					if ('{' == ptr[param_pos])
-					{
-						zbx_token_t	token;
-
-						if (SUCCEED == zbx_token_find(ptr, 0, &token, ZBX_TOKEN_SEARCH_BASIC) &&
-								0 == token.loc.l )
-						{
-							sep_pos = param_pos + token.loc.r + 1;
-						}
-						else
-						{
-							zabbix_log(LOG_LEVEL_WARNING, "Failed to parse parameters"
-							" \"%s\" for trigger with id %s", row[1], row[3]);
-							buf_offset = 0;
-							break;
-						}
-					}
-
 					zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos,
 							sep_pos - param_pos);
 				}
