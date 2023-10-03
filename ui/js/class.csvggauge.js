@@ -756,7 +756,7 @@ class CSVGGauge {
 			? this.#elements.value_and_units.value.container.textContent
 			: '';
 
-		const units_text = this.#config.units.show
+		const units_text = this.#config.value.show && this.#config.units.show
 			? this.#elements.value_and_units.units.container.textContent
 			: '';
 
@@ -764,27 +764,24 @@ class CSVGGauge {
 
 		if (this.#config.value.show) {
 			this.#elements.value_and_units.value.container.innerHTML = '&block;';
+
+			if (this.#config.units.show) {
+				this.#elements.value_and_units.units.container.innerHTML = '&block;';
+			}
 		}
 
-		if (this.#config.units.show) {
-			this.#elements.value_and_units.units.container.innerHTML = '&block;';
-		}
-
-		if (!this.#config.value.show && this.#elements.no_data.container.textContent === '') {
-			this.#elements.no_data.container.innerHTML = '';
-		}
-		else {
-			this.#elements.no_data.container.innerHTML = '&block;';
-		}
+		this.#elements.no_data.container.innerHTML = this.#elements.no_data.container.textContent !== ''
+			? '&block;'
+			: '';
 
 		const scalable_bbox = this.#g_scalable.getBBox();
 
 		if (this.#config.value.show) {
 			this.#elements.value_and_units.value.container.textContent = value_text;
-		}
 
-		if (this.#config.units.show) {
-			this.#elements.value_and_units.units.container.textContent = units_text;
+			if (this.#config.units.show) {
+				this.#elements.value_and_units.units.container.textContent = units_text;
+			}
 		}
 
 		this.#elements.no_data.container.textContent = no_data_text;
@@ -796,8 +793,8 @@ class CSVGGauge {
 	 * Adjust X, Y position and scale of scalable group.
 	 */
 	#adjustScalableGroup() {
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc?.show)
-			&& this.#config.angle === 270)
+		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value_arc.show)
+				&& this.#config.angle === 270)
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
