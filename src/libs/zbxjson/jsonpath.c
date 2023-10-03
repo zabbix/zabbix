@@ -1940,6 +1940,7 @@ static void	jsonpath_index_append_result(zbx_hashset_t *index, const char *name,
 		zbx_jsonobj_t *value)
 {
 #if defined(__hpux)
+	/* fix for compiling with HP-UX bundled cc compiler */
 	zbx_jsonobj_index_el_t	el_local = {NULL}, *el;
 #else
 	zbx_jsonobj_index_el_t	el_local = {.value = NULL}, *el;

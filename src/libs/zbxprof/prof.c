@@ -60,6 +60,7 @@ void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope)
 	{
 		int			i;
 #if defined(__hpux)
+		/* fix for compiling with HP-UX bundled cc compiler */
 		zbx_func_profile_t	*func_profile, func_profile_local = {func_name, 0};
 #else
 		zbx_func_profile_t	*func_profile, func_profile_local = {.func_name = func_name};
