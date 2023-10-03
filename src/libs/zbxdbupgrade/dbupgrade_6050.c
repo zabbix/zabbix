@@ -1746,6 +1746,7 @@ static int	update_escaping_in_expression(const char *expression, char **substitu
 
 	ctx.rules ^= ZBX_EVAL_PARSE_STR_V64_COMPAT;
 	zbx_eval_compose_expression(&ctx, substitute);
+	zbx_eval_clear(&ctx);
 
 	return SUCCEED;
 }
@@ -1873,6 +1874,9 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 		else
 			zbx_free(buf);
 	}
+
+	zbx_db_free_result(result);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (SUCCEED == ret && 16 < sql_offset)
 	{
