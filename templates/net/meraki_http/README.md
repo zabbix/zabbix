@@ -77,9 +77,21 @@ Set filters with macros if you want to override default filter parameters.
 |{$MERAKI.TOKEN}|<p>Cisco Meraki dashboard API token.</p>||
 |{$MERAKI.API.URL}|<p>Cisco Meraki dashboard API URL, e.g., api.meraki.com/api/v1</p>|`api.meraki.com/api/v1`|
 |{$MERAKI.LICENSE.EXPIRE}|<p>Time in seconds for license to expire.</p>|`86400`|
-|{$MERAKI.VPN.LOSS.PERCENTIL}|<p>Average VPN connection loss percentage. Used in the trigger expression</p>|`90`|
+|{$MERAKI.VPN.LOSS.PERCENTILE}|<p>Average VPN connection loss percentage. Used in the trigger expression</p>|`90`|
 |{$MERAKI.CONFIG.CHANGE.TIMESPAN}|<p>Timespan in seconds for gathering configuration change log. Used in the metric configuration and in the URL query.</p>|`1200`|
 |{$MERAKI.VPN.STATS.TIMESPAN}|<p>Timespan in seconds for get organization appliance VPN stats. Used in the metric configuration and in the JavaScript api query. Must be between 1 and 86400 seconds.</p>|`180`|
+|{$MERAKI.LICENSE.TYPE.MATCHES}|<p>Filter of discoverable license.</p>|`.*`|
+|{$MERAKI.LICENSE.TYPE.NOT_MATCHES}|<p>Filter to exclude discovered license.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.LICENSE.STATE.MATCHES}|<p>Filter of discoverable license.</p>|`.*`|
+|{$MERAKI.LICENSE.STATE.NOT_MATCHES}|<p>Filter to exclude discovered license.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.SAML.ORG.ACCESS.MATCHES}|<p>Filter of discoverable SAML role.</p>|`.*`|
+|{$MERAKI.SAML.ORG.ACCESS.NOT_MATCHES}|<p>Filter to exclude discovered SAML role.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.SAML.ROLE.MATCHES}|<p>Filter of discoverable SAML role.</p>|`.*`|
+|{$MERAKI.SAML.ROLE.NOT_MATCHES}|<p>Filter to exclude discovered SAML role.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.ADMIN.NAME.MATCHES}|<p>Filter of discoverable admin's in organization.</p>|`.*`|
+|{$MERAKI.ADMIN.NAME.NOT_MATCHES}|<p>Filter to exclude discovered admin's in organization.</p>|`CHANGE_IF_NEEDED`|
+|{$MERAKI.ADMIN.ORG.ACCESS.MATCHES}|<p>Filter of discoverable admin's in organization.</p>|`.*`|
+|{$MERAKI.ADMIN.ORG.ACCESS.NOT_MATCHES}|<p>Filter to exclude discovered admin's in organization.</p>|`CHANGE_IF_NEEDED`|
 |{$MERAKI.HTTP_PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$MERAKI.LLD.UPLINK.NETWORK.NAME.NOT_MATCHES}|<p>This macro is used in uplinks discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
@@ -109,9 +121,24 @@ Set filters with macros if you want to override default filter parameters.
 |Meraki: Policies|<p>Meraki adaptive policies count.</p>|Dependent item|meraki.policies<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.policies`</p></li></ul>|
 |Meraki: Allow policies|<p>Meraki adaptive allow policies count.</p>|Dependent item|meraki.policies.allow<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.allowPolicies`</p></li></ul>|
 |Meraki: Deny policies|<p>Meraki adaptive deny policies count.</p>|Dependent item|meraki.policies.deny<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.counts.denyPolicies`</p></li></ul>|
-|Meraki: Get licenses info|<p>Return an overview of the license state for an organization.</p>|HTTP agent|meraki.get.licenses|
+|Meraki: Get licenses overview|<p>Return an overview of the license state for an organization.</p>|HTTP agent|meraki.get.licenses|
 |Meraki: License status|<p>Meraki license status.</p>|Dependent item|meraki.license.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Meraki: License expire|<p>Meraki license expire time, in seconds left.</p>|Dependent item|meraki.license.expire<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expirationDate`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Meraki: Get list licenses|<p>Return an list the licenses for an organization.</p>|Script|meraki.get.list.licenses|
+|Meraki: Get SAML SSO|<p>Returns The SAML SSO Enabled Settings For An Organization.</p>|HTTP agent|meraki.get.saml<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enabled`</p></li><li>Boolean to decimal</li></ul>|
+|Meraki: Get SAML roles|<p>Get list the SAML roles for this organization.</p>|HTTP agent|meraki.get.saml.roles|
+|Meraki: Get admin's account|<p>Get list the dashboard administrators in this organization.</p>|HTTP agent|meraki.get.admins|
+|Meraki: Get login security|<p>Returns The Login Security Settings For An Organization.</p>|HTTP agent|meraki.get.login.security|
+|Meraki: Account Lockout Attempts|<p>Number of consecutive failed login attempts after which users' accounts will be locked.</p>|Dependent item|meraki.account.lockout.attempts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accountLockoutAttempts`</p></li></ul>|
+|Meraki: Idle timeout minutes|<p>Number of minutes users can remain idle before being logged out of their accounts.</p>|Dependent item|meraki.idle.timeout.minutes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idleTimeoutMinutes`</p></li></ul>|
+|Meraki: Number different passwords|<p>Number of minutes users can remain idle before being logged out of their accounts.</p>|Dependent item|meraki.login.num.different.passwords<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.numDifferentPasswords`</p></li></ul>|
+|Meraki: Password expiration days|<p>Number of days after which users will be forced to change their password.</p>|Dependent item|meraki.login.password.expiration.days<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.passwordExpirationDays`</p></li></ul>|
+|Meraki: Enforce account lockout|<p>Boolean indicating whether users' Dashboard accounts will be locked out after a specified number of consecutive failed login attempts.</p>|Dependent item|meraki.login.enforce.account.lockout<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceAccountLockout`</p></li><li>Boolean to decimal</li></ul>|
+|Meraki: Enforce different passwords|<p>Boolean indicating whether users, when setting a new password, are forced to choose a new password that is different from any past passwords.</p>|Dependent item|meraki.login.enforce.different.passwords<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceDifferentPasswords`</p></li><li>Boolean to decimal</li></ul>|
+|Meraki: Enforce idle timeout|<p>Boolean indicating whether users will be logged out after being idle for the specified number of minutes.</p>|Dependent item|meraki.login.enforce.idle.timeout<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceIdleTimeout`</p></li><li>Boolean to decimal</li></ul>|
+|Meraki: Enforce login ip ranges|<p>Boolean indicating whether organization will restrict access to Dashboard (including the API) from certain IP addresses.</p>|Dependent item|meraki.login.enforce.login.ip.ranges<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceLoginIpRanges`</p></li><li>Boolean to decimal</li></ul>|
+|Meraki: Enforce password expiration|<p>Boolean indicating whether users are forced to change their password every X number of days.</p>|Dependent item|meraki.login.enforce.password.expiration<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforcePasswordExpiration`</p></li><li>Boolean to decimal</li></ul>|
+|Meraki: Enforce 2FA|<p>Boolean indicating whether users in this organization will be required to use an extra verification code when logging in to Dashboard. This code will be sent to their mobile phone via SMS, or can be generated by the authenticator application.</p>|Dependent item|meraki.login.enforce.two.factor.auth<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.enforceTwoFactorAuth`</p></li><li>Boolean to decimal</li></ul>|
 
 ### Triggers
 
@@ -134,12 +161,47 @@ Set filters with macros if you want to override default filter parameters.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: status|<p>Network uplink status.</p>|Dependent item|meraki.uplink.status[{#NETWORK.NAME}, {#INTERFACE}, {#UPLINK.ROLE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: interface|<p>Network uplink interface.</p>|Dependent item|meraki.uplink.interface[{#NETWORK.NAME}, {#INTERFACE}, {#UPLINK.ROLE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: Public ip|<p>Network uplink public ip.</p>|Dependent item|meraki.uplink.public.ip[{#NETWORK.NAME}, {#INTERFACE}, {#UPLINK.ROLE}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Uplinks discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: status is failed||`last(/Cisco Meraki organization by HTTP/meraki.uplink.status[{#NETWORK.NAME}, {#INTERFACE}, {#UPLINK.ROLE}])=0`|Warning||
+
+### LLD rule Networks discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Networks discovery||Dependent item|meraki.networks.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.networks`</p></li></ul>|
+
+### Item prototypes for Networks discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Network [{#NETWORK.NAME}]: TimeZone|<p>Timezone of the network.</p>|Dependent item|meraki.network.timezone[{#NETWORK.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+
+### LLD rule VPN statuses discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|VPN statuses discovery||Dependent item|meraki.vpn.statuses.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vpnStatuses`</p></li></ul>|
+
+### Item prototypes for VPN statuses discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|VPN [{#NETWORK.NAME}]: statuses raw|<p>VPN Statuses raw.</p>|Dependent item|meraki.vpn.statuses.raw[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Mode|<p>VPN network Mode.</p>|Dependent item|meraki.vpn.statuses.mode[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vpnMode`</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Peers network name|<p>VPN network name Meraki Vpn Peers.</p>|Dependent item|meraki.vpn.statuses.peers.network.name[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..networkName.first()`</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Peers network id|<p>VPN network Id.</p>|Dependent item|meraki.vpn.statuses.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..networkId.first()`</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Peers network reachability|<p>VPN network Meraki Vpn Peers reachability.</p>|Dependent item|meraki.vpn.statuses.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.merakiVpnPeers..reachability.first()`</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Third party peers network name|<p>Return network name the third party VPN peers for an organization.</p>|Dependent item|meraki.vpn.statuses.third.party.peers.network.name[{#NETWORK.ID},  {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.thirdPartyVpnPeers..networkName.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Third party peers network id|<p>Return network Id the third party VPN peers for an organization.</p>|Dependent item|meraki.vpn.statuses.third.party.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.thirdPartyVpnPeers..networkId.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Third party peers network reachability|<p>Return network reachability the third party VPN peers for an organization.</p>|Dependent item|meraki.vpn.statuses.third.party.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.thirdPartyVpnPeers..reachability.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Device serial|<p>VPN network device serial.</p>|Dependent item|meraki.vpn.statuses.device.serial[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceSerial`</p></li></ul>|
+|VPN [{#NETWORK.NAME}]: Device status|<p>VPN network device status.</p>|Dependent item|meraki.vpn.statuses.device.status[{#NETWORK.ID}, {#NETWORK.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceStatus`</p></li></ul>|
 
 ### LLD rule VPN stats discovery
 
@@ -169,7 +231,55 @@ Set filters with macros if you want to override default filter parameters.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: High average VPN connection loss (over >= {$MERAKI.VPN.LOSS.PERCENTIL%)||`count(/Cisco Meraki organization by HTTP/meraki.vpn.stat.loss.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}],#3,,"{$MERAKI.VPN.LOSS.PERCENTIL}")>=3`|Average||
+|VPN [{#NETWORK.NAME}][{#SENDER.UPLINK}]=>[{#PEER.NETWORK.NAME}][{#RECEIVER.UPLINK}]: High average VPN connection loss (over >= {$MERAKI.VPN.LOSS.PERCENTILE%)||`count(/Cisco Meraki organization by HTTP/meraki.vpn.stat.loss.avg[{#NETWORK.ID}, {#SENDER.UPLINK}, {#PEER.NETWORK.ID}, {#RECEIVER.UPLINK}],#3,,"{$MERAKI.VPN.LOSS.PERCENTILE}")>=3`|Average||
+
+### LLD rule License discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|License discovery||Dependent item|meraki.license.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.licenses`</p></li></ul>|
+
+### Item prototypes for License discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Meraki: License [{#LICENSE.ID}] get data|<p>Raw data for a license.</p>|Dependent item|meraki.license.get[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.licenses.[?(@.id == "{#LICENSE.ID}")].first()`</p></li></ul>|
+|Meraki: License [{#LICENSE.ID}] activation date|<p>The date the license started burning.</p>|Dependent item|meraki.license.activation.date[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.activationDate`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Meraki: License [{#LICENSE.ID}] expiration date|<p>The date the license will expire.</p>|Dependent item|meraki.license.expiration.date[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.expirationDate`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Meraki: License [{#LICENSE.ID}] total duration in days|<p>The duration of the license plus all permanently queued licenses associated with it.</p>|Dependent item|meraki.license.totalDurationInDays[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalDurationInDays`</p></li><li><p>JavaScript: `return days = Math.floor(value) || -1;`</p></li></ul>|
+|Meraki: License [{#LICENSE.ID}] device serial|<p>Serial number of the device the license is assigned to.</p>|Dependent item|meraki.license.deviceSerial[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceSerial`</p></li></ul>|
+|Meraki: License [{#LICENSE.ID}] device name|<p>Name of the device the license is assigned to.</p>|Dependent item|meraki.license.deviceName[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.deviceName`</p></li></ul>|
+|Meraki: License [{#LICENSE.ID}] key|<p>License key.</p>|Dependent item|meraki.license.key[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.licenseKey`</p></li></ul>|
+|Meraki: License [{#LICENSE.ID}] state|<p>The state of the license. All queued licenses have a status of recentlyQueued.</p>|Dependent item|meraki.license.state[{#LICENSE.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p></li></ul>|
+
+### LLD rule SAML roles discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|SAML roles discovery||Dependent item|meraki.saml.roles.discovery|
+
+### Item prototypes for SAML roles discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Meraki: SAML role [{#SAML.ROLE}] get data|<p>Raw data for a SAML roles.</p>|Dependent item|meraki.saml.get[{#SAML.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.id == "{#SAML.ID}")].first()`</p></li></ul>|
+|Meraki: SAML role [{#SAML.ROLE}] organization access|<p>The privilege of the SAML administrator on the organization.</p>|Dependent item|meraki.saml.orgAccess[{#SAML.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.orgAccess`</p></li></ul>|
+
+### LLD rule Administrators discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Administrators discovery||Dependent item|meraki.admins.discovery|
+
+### Item prototypes for Administrators discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Meraki: Admin [{#ADMIN.NAME}] get data|<p>Raw data for a admin in this organization.</p>|Dependent item|meraki.admin.get[{#ADMIN.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@.id == "{#ADMIN.ID}")].first()`</p></li></ul>|
+|Meraki: Admin [{#ADMIN.NAME}] account status|<p>Status of the admin's account.</p>|Dependent item|meraki.admin.account.status[{#ADMIN.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.accountStatus`</p></li></ul>|
+|Meraki: Admin [{#ADMIN.NAME}] authentication method|<p>Admin's authentication method.</p>|Dependent item|meraki.admin.account.authentication.method[{#ADMIN.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.authenticationMethod`</p></li></ul>|
+|Meraki: Admin [{#ADMIN.NAME}] organization access|<p>Admin's level of access to the organization.</p>|Dependent item|meraki.admin.account.org.access[{#ADMIN.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.orgAccess`</p></li></ul>|
+|Meraki: Admin [{#ADMIN.NAME}] 2FA enabled|<p>Indicates whether two-factor authentication is enabled.</p>|Dependent item|meraki.admin.account.two.factor.auth[{#ADMIN.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.twoFactorAuthEnabled`</p></li><li>Boolean to decimal</li></ul>|
 
 # Cisco Meraki device by HTTP
 
