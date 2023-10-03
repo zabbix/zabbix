@@ -33,10 +33,17 @@ window.widget_gauge_form = new class {
 	init({thresholds_colors}) {
 		this.#form = document.getElementById('widget-dialogue-form');
 
-		jQuery(this.#form)
-			.on('change', 'input', (e) => this.#updateForm(e.target));
+		this.#form.addEventListener('change', () => this.#updateForm());
 
 		$thresholds_table.on('afterremove.dynamicRows', () => this.#updateForm());
+
+		this._thresholds_table = $thresholds_table[0];
+
+		this._thresholds_table.addEventListener('input', (e) => {
+			if (e.target.matches('input[name$="[threshold]"')) {
+				this.#updateForm();
+			}
+		});
 
 		for (const colorpicker of this.#form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
@@ -133,7 +140,7 @@ window.widget_gauge_form = new class {
 	#countFilledThresholds() {
 		let count = 0;
 
-		for (const threshold of $thresholds_table[0].querySelectorAll('.form_row input[name$="[threshold]"')) {
+		for (const threshold of this._thresholds_table.querySelectorAll('.form_row input[name$="[threshold]"')) {
 			if (threshold.value.trim() !== '') {
 				count++;
 			}
