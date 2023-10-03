@@ -48,7 +48,7 @@ var (
 	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "3306"}
 
 	// Common params: [URI|Session][,User][,Password]
-	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
+	paramURI = metric.NewConnParam(uriParam, "URI to connect or session name.").
 			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
 			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
 	paramUsername    = metric.NewConnParam("User", "MySQL user.").WithDefault("root")
