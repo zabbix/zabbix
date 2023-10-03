@@ -70,6 +70,13 @@ window.trigger_edit_popup = new class {
 			this.name.dispatchEvent(new Event('input'));
 		});
 
+		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
+		this.form.querySelector('[name="event_name"]').addEventListener('keyup', e => {
+			if (e.key === 'Enter') {
+				$(this.form).submit();
+			}
+		});
+
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
 			.forEach(o => o.addEventListener('change', e => this.#toggleInheritedTags()));
@@ -265,20 +272,17 @@ window.trigger_edit_popup = new class {
 			recovery_fields.forEach((field) => {
 				field.style.display = '';
 			})
-			this.#toggleRecoveryExpressionConstructor('close-recovery-expression-constructor');
 		}
 		else if (recovery_mode == <?= ZBX_RECOVERY_MODE_NONE ?>) {
 			recovery_fields.forEach((field) => {
 				field.style.display = 'none';
 			})
-			this.#toggleRecoveryExpressionConstructor('close-recovery-expression-constructor');
 		}
 		else {
 			recovery_expression_row.style.display = 'none';
 			recovery_expression_row.previousElementSibling.style.display = 'none';
 			ok_event_closes.style.display = '';
 			ok_event_closes.previousElementSibling.style.display = '';
-			this.#toggleRecoveryExpressionConstructor('close-recovery-expression-constructor');
 		}
 	}
 
@@ -423,7 +427,7 @@ window.trigger_edit_popup = new class {
 			insert_recovery_expression.textContent = <?= json_encode(_('Edit')) ?>;
 			this.recovery_expression_constructor_active = true;
 
-			if (recovery_expression.value === '') {
+			if (this.recovery_expression.value === '') {
 				this.#showRecoveryConstructorAddButton();
 			}
 			else {
@@ -438,11 +442,11 @@ window.trigger_edit_popup = new class {
 			});
 
 			recovery_expression_constructor.style.display = '';
-			recovery_expr_temp.readOnly = this.readonly;
 			this.recovery_expression.name = 'recovery_expression';
 			this.recovery_expression.id = 'recovery_expression';
 			this.recovery_expr_temp.name = 'recovery_expr_temp';
 			this.recovery_expr_temp.id = 'recovery_expr_temp';
+			this.recovery_expression.readOnly = this.readonly;
 			insert_recovery_expression.textContent = <?= json_encode(_('Add')) ?>;
 			this.recovery_expression.value = this.recovery_expr_temp.value;
 			this.recovery_expression_constructor_active = false;
@@ -474,6 +478,7 @@ window.trigger_edit_popup = new class {
 			}
 
 			this.expression.value = '';
+			this.expression.dispatchEvent(new Event('change'));
 		}
 		else {
 			if (Object.keys(fields).length === 0 || fields.add_expression) {
@@ -487,6 +492,7 @@ window.trigger_edit_popup = new class {
 			}
 
 			this.recovery_expression.value = '';
+			this.recovery_expression.dispatchEvent(new Event('change'));
 		}
 
 		fields.readonly = this.readonly;
@@ -511,8 +517,6 @@ window.trigger_edit_popup = new class {
 					table.innerHTML = response.body;
 					this.expr_temp.value = response.expression;
 
-					this.expression.dispatchEvent(new Event('change'));
-
 					if (table.querySelector('tbody').innerHTML !== '') {
 						this.#showConstructorAddButton(false);
 					}
@@ -524,8 +528,6 @@ window.trigger_edit_popup = new class {
 					const table = this.form.querySelector('#recovery-expression-table');
 					table.innerHTML = response.body;
 					this.recovery_expr_temp.value = response.expression;
-
-					this.recovery_expression.dispatchEvent(new Event('change'));
 
 					if (table.querySelector('tbody').innerHTML !== '') {
 						this.#showRecoveryConstructorAddButton(false);
@@ -658,7 +660,13 @@ window.trigger_edit_popup = new class {
 			return true;
 		}
 
-		let form_fields = this.#getFormFields();
+		let form_fields = {
+			dependencies: [],
+			discover: String(<?= TRIGGER_NO_DISCOVER ?>),
+			manual_close: String(<?= ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED ?>),
+			status: String(<?= TRIGGER_STATUS_DISABLED ?>),
+			...this.#getFormFields()
+		}
 
 		// Values are modified to match this.db_trigger values.
 		if (form_fields.tags) {
@@ -675,10 +683,6 @@ window.trigger_edit_popup = new class {
 
 		delete form_fields.context;
 		delete form_fields._csrf_token;
-
-		if (!form_fields.dependencies) {
-			form_fields.dependencies = [];
-		}
 
 		this.db_trigger.dependencies = [];
 
