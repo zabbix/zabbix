@@ -32,6 +32,17 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 	use TableTrait;
 
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
+
+	private static $media_name = 'Email';
+
 	public static function prepareActionData() {
 		CDataHelper::call('action.create', [
 			[
@@ -51,17 +62,6 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			]
 		]);
 	}
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
-
-	private static $media_name = 'Email';
 
 	/**
 	 * Check basic elements on page.

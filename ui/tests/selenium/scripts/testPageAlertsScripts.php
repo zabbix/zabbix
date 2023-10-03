@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  *
  * @dataSource HostTemplateGroups
  *
- * @onBefore prepareScriptData
+ * @onBefore prepareActionData, prepareScriptData
  */
 class testPageAlertsScripts extends CWebTest {
 
@@ -55,6 +55,26 @@ class testPageAlertsScripts extends CWebTest {
 	private static $script_for_filter = 'Script для фильтра - $¢Řĩ₱₮';
 	private static $script_scope_event = 'Manual event action for filter check';
 	private static $custom_action = 'Trigger action for Scripts page testing';
+
+	public static function prepareActionData() {
+		CDataHelper::call('action.create', [
+			[
+				'name' => 'Action with Reboot script',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => []
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_COMMAND,
+						'opcommand' => ['scriptid' => 4],
+						'opcommand_hst' => [['hostid' => 0]]
+					]
+				]
+			]
+		]);
+	}
 
 	public function prepareScriptData() {
 		CDataHelper::call('script.create', [
@@ -157,7 +177,7 @@ class testPageAlertsScripts extends CWebTest {
 					[
 						'Name' => 'Reboot',
 						'Scope' => 'Action operation',
-						'Used in actions' => 'Autoregistration action 1, Autoregistration action 2, Trigger action 4',
+						'Used in actions' => 'Action with Reboot script',
 						'Type' => 'Script',
 						'Execute on' => 'Server (proxy)',
 						'Commands' => '/sbin/shutdown -r',
@@ -539,7 +559,7 @@ class testPageAlertsScripts extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'error' => 'Cannot delete scripts. Script "Reboot" is used in action operation "Trigger action 4".'
+					'error' => 'Cannot delete scripts. Script "Reboot" is used in action operation "Action with Reboot script".'
 				]
 			],
 			[
