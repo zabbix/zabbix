@@ -34,7 +34,7 @@ func Test_getTLSDetails(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    tlsconfig.Details
+		want    *tlsconfig.Details
 		wantErr bool
 	}{
 		{
@@ -46,7 +46,7 @@ func Test_getTLSDetails(t *testing.T) {
 					uriParam:            "127.0.0.1",
 				},
 			},
-			tlsconfig.Details{
+			&tlsconfig.Details{
 				SessionName:        "test",
 				TlsConnect:         "required",
 				RawUri:             "127.0.0.1",
@@ -64,7 +64,7 @@ func Test_getTLSDetails(t *testing.T) {
 					uriParam:            "127.0.0.1",
 				},
 			},
-			tlsconfig.Details{
+			&tlsconfig.Details{
 				SessionName:        "test",
 				TlsConnect:         "verify_ca",
 				TlsCaFile:          "path/to/ca",
@@ -85,7 +85,7 @@ func Test_getTLSDetails(t *testing.T) {
 					uriParam:            "127.0.0.1",
 				},
 			},
-			tlsconfig.Details{
+			&tlsconfig.Details{
 				SessionName:        "test",
 				TlsConnect:         "verify_ca",
 				TlsCaFile:          "path/to/ca",
@@ -105,7 +105,7 @@ func Test_getTLSDetails(t *testing.T) {
 					uriParam:            "127.0.0.1",
 				},
 			},
-			tlsconfig.Details{},
+			nil,
 			true,
 		},
 		{
@@ -119,7 +119,7 @@ func Test_getTLSDetails(t *testing.T) {
 					uriParam:            "127.0.0.1",
 				},
 			},
-			tlsconfig.Details{},
+			nil,
 			true,
 		},
 		{
@@ -133,7 +133,7 @@ func Test_getTLSDetails(t *testing.T) {
 					uriParam:            "127.0.0.1",
 				},
 			},
-			tlsconfig.Details{},
+			nil,
 			true,
 		},
 	}
