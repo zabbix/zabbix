@@ -23,6 +23,8 @@
 #include "zbxdiscovery.h"
 #include "zbxip.h"
 
+#define DISCOVERER_JOB_TASKS_INPROGRESS_MAX	1000
+
 ZBX_VECTOR_DECL(iprange, zbx_iprange_t)
 
 typedef struct
