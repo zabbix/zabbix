@@ -28,8 +28,6 @@
 
 $form = new CWidgetFormView($data);
 
-$value_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($data['fields']['value_arc_size']));
-
 $form
 	->addField(
 		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
@@ -64,17 +62,10 @@ $form
 				getValueFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value')
 			)
 			->addFieldsGroup(
-				(new CWidgetFieldsGroupView(_('Value arc')))
-					->addItem([
-						$value_arc_size_field->getLabel(),
-						(new CFormField([$value_arc_size_field->getView(), '%']))->addClass('field-size')
-					])->addRowClass('fields-group-value-arc')
+				getValueArcFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value-arc')
 			)
 			->addFieldsGroup(
-				(new CWidgetFieldsGroupView(_('Needle')))
-					->addField(
-						new CWidgetFieldColorView($data['fields']['needle_color'])
-					)->addRowClass('fields-group-needle')
+				getNeedleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-needle')
 			)
 			->addFieldsGroup(
 				getScaleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-scale')
@@ -189,6 +180,23 @@ function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetF
 		)
 		->addField(
 			(new CWidgetFieldColorView($fields['units_color']))->addLabelClass('offset-3')
+		);
+}
+
+function getValueArcFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$value_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_arc_size']));
+
+	return (new CWidgetFieldsGroupView(_('Value arc')))
+		->addItem([
+			$value_arc_size_field->getLabel(),
+			(new CFormField([$value_arc_size_field->getView(), '%']))->addClass('field-size')
+		]);
+}
+
+function getNeedleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	return (new CWidgetFieldsGroupView(_('Needle')))
+		->addField(
+			new CWidgetFieldColorView($fields['needle_color'])
 		);
 }
 
