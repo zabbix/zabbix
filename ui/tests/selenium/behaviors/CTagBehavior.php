@@ -18,21 +18,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CBehavior.php';
 
 /**
- * Trait for tag related tests.
+ * Behavior for tag related tests.
  */
-trait TagTrait {
+class CTagBehavior extends CBehavior {
 
-	protected $tag_selector = 'id:filter-tags';
+	public $tag_selector = 'id:filter-tags';
 
 	/**
 	 * Set custom selector for tag table.
 	 *
 	 * @param string $selector    tag table selector
 	 */
-	public function setTagSelector($selector) {
+	protected function setTagSelector($selector) {
 		$this->tag_selector = $selector;
 	}
 
@@ -42,7 +42,7 @@ trait TagTrait {
 	 * @return CMultifieldTable
 	 */
 	protected function getTagTable() {
-		return $this->query($this->tag_selector)->asMultifieldTable([
+		return $this->test->query($this->tag_selector)->asMultifieldTable([
 			'mapping' => [
 				[
 					'name' => 'name',
@@ -109,6 +109,6 @@ trait TagTrait {
 			];
 		}
 
-		$this->assertEquals($rows, $this->getTags(), 'Tags on a page does not match tags in data provider.');
+		$this->test->assertEquals($rows, $this->getTags(), 'Tags on a page does not match tags in data provider.');
 	}
 }

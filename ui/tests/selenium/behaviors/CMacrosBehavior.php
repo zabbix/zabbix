@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CBehavior.php';
 
 /**
- * Trait for Macros in form related tests.
+ * Behavior for Macros in form related tests.
  */
-trait MacrosTrait {
+class CMacrosBehavior extends CBehavior {
 
 	protected $table_selector = 'id:tbl_macros';
 
@@ -46,7 +46,7 @@ trait MacrosTrait {
 	 * @return CMultifieldTable
 	 */
 	protected function getMacrosTable($value_column = 'Value') {
-		return $this->query($this->table_selector)->asMultifieldTable([
+		return $this->test->query($this->table_selector)->asMultifieldTable([
 			'mapping' => [
 				'Macro' => [
 					'name' => 'macro',
@@ -120,7 +120,7 @@ trait MacrosTrait {
 	 */
 	public function removeMacro($macros) {
 		foreach ($macros as $macro) {
-			$this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro['macro']).
+			$this->test->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro['macro']).
 				']/../..//button[text()="Remove"]')->waitUntilPresent()->one()->click();
 		}
 	}
@@ -150,7 +150,7 @@ trait MacrosTrait {
 			];
 		}
 
-		$this->assertEquals($rows, $this->getMacros(), 'Macros on a page does not match macros in data provider.');
+		$this->test->assertEquals($rows, $this->getMacros(), 'Macros on a page does not match macros in data provider.');
 	}
 
 	/**
@@ -161,7 +161,7 @@ trait MacrosTrait {
 	 * @return CElement
 	 */
 	public function getValueField($macro) {
-		return $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
+		return $this->test->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
 				']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
 	}
 }

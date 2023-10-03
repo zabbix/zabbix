@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 require_once dirname(__FILE__).'/common/testFormMacros.php';
 
 /**
@@ -25,7 +26,14 @@ require_once dirname(__FILE__).'/common/testFormMacros.php';
  */
 class testFormMacrosHost extends testFormMacros {
 
-	use MacrosTrait;
+	/**
+	 * Attach MacrosBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMacrosBehavior::class];
+	}
 
 	/**
 	 * The name of the host for updating macros, id=20006.

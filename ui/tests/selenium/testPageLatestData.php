@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup history_uint, profiles
@@ -29,7 +29,14 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  */
 class testPageLatestData extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	private function getTableSelector() {
 		return 'xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']';
