@@ -68,6 +68,7 @@ type ConnManager struct {
 	callTimeout    time.Duration
 	Destroy        context.CancelFunc
 	queryStorage   yarn.Yarn
+	log            log.Logger
 }
 
 // Query wraps DB.QueryRowContext.
@@ -117,8 +118,9 @@ func (c *ConnManager) GetConnection(uri uri.URI, params map[string]string) (*MyC
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, connectTimeout, callTimeout,
-	hkInterval time.Duration, queryStorage yarn.Yarn) *ConnManager {
+func NewConnManager(
+	keepAlive, connectTimeout, callTimeout, hkInterval time.Duration, queryStorage yarn.Yarn, logger log.Logger,
+) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
@@ -128,6 +130,7 @@ func NewConnManager(keepAlive, connectTimeout, callTimeout,
 		callTimeout:    callTimeout,
 		Destroy:        cancel, // Destroy stops originated goroutines and closes connections.
 		queryStorage:   queryStorage,
+		log:            logger,
 	}
 
 	go connMgr.housekeeper(ctx, hkInterval)
@@ -189,7 +192,7 @@ func (c *ConnManager) create(uri uri.URI, params map[string]string) (*MyConn, er
 		return nil, err
 	}
 
-	tlsConfig, err := getTLSConfig(details)
+	tlsConfig, err := c.getTLSConfig(details)
 	if err != nil {
 		return nil, err
 	}
@@ -238,19 +241,21 @@ func getMySQLConfig(uri uri.URI, tls *tls.Config, connectTimeout, callTimeout ti
 	config.ReadTimeout = callTimeout
 	config.InterpolateParams = true
 
-	if tls != nil {
-		err := mysql.RegisterTLSConfig(uri.String(), tls)
-		if err != nil {
-			return nil, zbxerr.New("failed to register TLS config").Wrap(err)
-		}
-
-		config.TLSConfig = uri.String()
+	if tls == nil {
+		return config, nil
 	}
+
+	err := mysql.RegisterTLSConfig(uri.String(), tls)
+	if err != nil {
+		return nil, zbxerr.New("failed to register TLS config").Wrap(err)
+	}
+
+	config.TLSConfig = uri.String()
 
 	return config, nil
 }
 
-func getTLSConfig(details tlsconfig.Details) (*tls.Config, error) {
+func (c *ConnManager) getTLSConfig(details *tlsconfig.Details) (*tls.Config, error) {
 	var (
 		tlsConf *tls.Config
 		err     error
@@ -258,7 +263,10 @@ func getTLSConfig(details tlsconfig.Details) (*tls.Config, error) {
 
 	switch details.TlsConnect {
 	case "required":
-		tlsConf = &tls.Config{InsecureSkipVerify: true}
+		tlsConf, err = c.getRequiredTLSConfig(details)
+		if err != nil {
+			return nil, zbxerr.New("failed to get TLS config for required connection").Wrap(err)
+		}
 	case "verify_ca":
 		tlsConf, err = details.GetTLSConfig(true)
 		if err != nil {
@@ -280,7 +288,20 @@ func getTLSConfig(details tlsconfig.Details) (*tls.Config, error) {
 	return tlsConf, nil
 }
 
-func getTLSDetails(params map[string]string) (tlsconfig.Details, error) {
+func (c *ConnManager) getRequiredTLSConfig(details *tlsconfig.Details) (*tls.Config, error) {
+	if details.TlsCaFile != "" {
+		c.log.Warningf("server CA will not be verified for %s", details.TlsConnect)
+	}
+
+	clientCerts, err := details.LoadCertificates()
+	if err != nil {
+		return nil, err
+	}
+
+	return &tls.Config{Certificates: clientCerts, InsecureSkipVerify: true}, nil
+}
+
+func getTLSDetails(params map[string]string) (*tlsconfig.Details, error) {
 	var (
 		validateCA     = true
 		validateClient = false
@@ -314,8 +335,8 @@ func getTLSDetails(params map[string]string) (tlsconfig.Details, error) {
 
 	err := details.Validate(validateCA, validateClient, validateClient)
 	if err != nil {
-		return tlsconfig.Details{}, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
 	}
 
-	return details, nil
+	return &details, nil
 }

@@ -100,6 +100,7 @@ func (p *Plugin) Start() {
 		time.Duration(p.options.CallTimeout)*time.Second,
 		hkInterval*time.Second,
 		p.setCustomQuery(),
+		p.Logger,
 	)
 }
 
