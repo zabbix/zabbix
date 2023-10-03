@@ -32,7 +32,7 @@ class testFormMacrosHostPrototype extends testFormMacros {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacroBehavior::class];
+		return [CMacrosBehavior::class];
 	}
 
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.

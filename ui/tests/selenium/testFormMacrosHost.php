@@ -32,7 +32,7 @@ class testFormMacrosHost extends testFormMacros {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacroBehavior::class];
+		return [CMacrosBehavior::class];
 	}
 
 	/**

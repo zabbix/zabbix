@@ -34,7 +34,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacroBehavior::class];
+		return [CMacrosBehavior::class];
 	}
 
 	/**

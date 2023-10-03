@@ -195,7 +195,7 @@ class CTableBehavior extends CBehavior {
 	 * @param string $selector		Table selector
 	 */
 	public function getTableColumnData($column, $selector = 'class:list-table') {
-		$table = $this->query($selector)->asTable()->one();
+		$table = $this->test->query($selector)->asTable()->one();
 		$result = [];
 		foreach ($table->getRows() as $row) {
 			$result[] = $row->getColumn($column)->getText();

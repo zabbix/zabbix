@@ -34,7 +34,7 @@ class testFormAdministrationGeneralMacro extends CLegacyWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMacroBehavior::class];
+		return [CMacrosBehavior::class];
 	}
 
 	private $macroMaxLength = 255;
