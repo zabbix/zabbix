@@ -43,10 +43,8 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
 		int max_error_len);
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
-char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
-int	zbx_function_param_quote(char **param, int forced);
-char	*zbx_function_param_unescape_dyn(const char *param, size_t len, int *quoted);
-int	zbx_function_param_escape(char **param, int forced);
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted, int esc_bs);
+int	zbx_function_param_quote(char **param, int forced, int esc_bs);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
 
 typedef enum

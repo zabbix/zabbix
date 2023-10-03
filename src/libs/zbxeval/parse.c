@@ -1089,7 +1089,7 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 				zbx_strncpy_alloc(&str, &str_alloc, &str_offset, ctx->expression + hist_param->loc.l,
 						str_len);
 
-				substitute = zbx_function_param_unquote_dyn(str, str_len, &quoted);
+				substitute = zbx_function_param_unquote_dyn(str, str_len, &quoted, 0);
 				zbx_variant_set_str(&(hist_param->value), substitute);
 
 				zbx_free(str);

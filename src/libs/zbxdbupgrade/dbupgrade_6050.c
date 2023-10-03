@@ -1688,9 +1688,9 @@ static int	DBpatch_6050139(void)
 				else
 				{
 					param = zbx_function_param_unquote_dyn(
-							ptr + param_pos, sep_pos - param_pos, &quoted);
+							ptr + param_pos, sep_pos - param_pos, &quoted, 0);
 
-					if (SUCCEED == zbx_function_param_escape(&param, quoted))
+					if (SUCCEED == zbx_function_param_quote(&param, quoted, 1))
 					{
 						zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 					}
@@ -1809,7 +1809,7 @@ static int	fix_expression_macro_escaping(const char *select, const char *update,
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-	if (NULL == (result = zbx_db_select(select)))
+	if (NULL == (result = zbx_db_select("%s", select)))
 		goto clean;
 
 	while (SUCCEED == ret && NULL != (row = zbx_db_fetch(result)))

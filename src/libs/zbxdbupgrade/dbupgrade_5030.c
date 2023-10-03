@@ -5177,7 +5177,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 
 			zbx_function_param_parse(ptr + par_l + 1, &param_pos, &param_len, &sep_pos);
 
-			arg0 = zbx_function_param_unquote_dyn(ptr + par_l + 1 + param_pos, param_len, &quoted);
+			arg0 = zbx_function_param_unquote_dyn(ptr + par_l + 1 + param_pos, param_len, &quoted, 0);
 			arg0_len = strlen(arg0);
 			zbx_remove_chars(arg0, "\t\n\r");
 			if (strlen(arg0) != arg0_len)
