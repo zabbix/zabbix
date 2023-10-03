@@ -1,5 +1,5 @@
-git.zabbix.com/ap/plugin-support v1.2.2-0.20231003111404-90b18e1e630d h1:dlCa8WE8voTw22VxOdxhgac4ivQjvAEwVurWtZFC03E=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20231003111404-90b18e1e630d/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20231003125607-23cef0bccc0d h1:bQXDpbFslMerh43cocOj5Tm5Oht80Vuoz6bdrNiOU5Q=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20231003125607-23cef0bccc0d/go.mod h1:B+HpVBZbBMBttTFc0NuChmMkWepNj7yFPCefmggo+0U=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69/go.mod h1:L1AbZdiDllfyYH5l5OkAaZtk7VkWe89bPJFmnDBNHxg=
 github.com/Microsoft/go-winio v0.6.1 h1:9/kr64B9VUZrLm5YYwbGtUJnMgqWVOdUAXu6Migciow=
