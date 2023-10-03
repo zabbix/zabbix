@@ -205,11 +205,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$widget_description = $this->fields_values['description'];
 
 		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
-			[[
-				'widget_description' => $widget_description
-			]] = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item + [
+			$items = CMacrosResolverHelper::resolveItemWidgetDescriptions([$item['itemid'] => $item + [
 				'widget_description' => $widget_description
 			]]);
+			$widget_description = $items[$item['itemid']]['widget_description'];
 		}
 
 		$config['description'] = [
