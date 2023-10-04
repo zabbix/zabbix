@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-03T15:06:35Z'
+  date: '2023-10-04T19:05:22Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -759,7 +759,7 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: 495f3a6047644dadadbbc676ba6900f9
-          name: 'Meraki: Account Lockout Attempts'
+          name: 'Meraki: Account lockout attempts'
           type: DEPENDENT
           key: meraki.account.lockout.attempts
           delay: '0'
@@ -1742,9 +1742,9 @@ zabbix_export:
                 formulaid: D
           item_prototypes:
             - uuid: d4d450d2788c4e83af247b647951314b
-              name: 'Meraki: Admin [{#ADMIN.NAME}] authentication method'
+              name: 'Admin [{#ADMIN.NAME}]: authentication method'
               type: DEPENDENT
-              key: 'meraki.admin.account.authentication.method[{#ADMIN.ID}]'
+              key: 'meraki.admin.account.auth.method[{#ADMIN.ID}]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1762,7 +1762,7 @@ zabbix_export:
                 - tag: component
                   value: security
             - uuid: 7efd859bb84e47bd84a099686f42ee8b
-              name: 'Meraki: Admin [{#ADMIN.NAME}] organization access'
+              name: 'Admin [{#ADMIN.NAME}]: organization access'
               type: DEPENDENT
               key: 'meraki.admin.account.org.access[{#ADMIN.ID}]'
               delay: '0'
@@ -1782,7 +1782,7 @@ zabbix_export:
                 - tag: component
                   value: security
             - uuid: 58a07f56495943dc9cb58352d919de61
-              name: 'Meraki: Admin [{#ADMIN.NAME}] account status'
+              name: 'Admin [{#ADMIN.NAME}]: account status'
               type: DEPENDENT
               key: 'meraki.admin.account.status[{#ADMIN.ID}]'
               delay: '0'
@@ -1802,7 +1802,7 @@ zabbix_export:
                 - tag: component
                   value: security
             - uuid: edfa03da4a694111920146d2744884bb
-              name: 'Meraki: Admin [{#ADMIN.NAME}] 2FA enabled'
+              name: 'Admin [{#ADMIN.NAME}]: 2FA enabled'
               type: DEPENDENT
               key: 'meraki.admin.account.two.factor.auth[{#ADMIN.ID}]'
               delay: '0'
@@ -1827,7 +1827,7 @@ zabbix_export:
                 - tag: component
                   value: security
             - uuid: 6d075eb822f94d8285e358fa330b67fc
-              name: 'Meraki: Admin [{#ADMIN.NAME}] get data'
+              name: 'Admin [{#ADMIN.NAME}]: get data'
               type: DEPENDENT
               key: 'meraki.admin.get[{#ADMIN.ID}]'
               delay: '0'
@@ -1881,7 +1881,7 @@ zabbix_export:
                 formulaid: D
           item_prototypes:
             - uuid: 87672962b9e14e69ad63f4d790fd11ad
-              name: 'Meraki: License [{#LICENSE.ID}] activation date'
+              name: 'License [{#LICENSE.ID}]: activation date'
               type: DEPENDENT
               key: 'meraki.license.activation.date[{#LICENSE.ID}]'
               delay: '0'
@@ -1906,9 +1906,9 @@ zabbix_export:
                 - tag: license-type
                   value: '{#LICENSE.TYPE}'
             - uuid: dd9c1d50a4cc448e82affb7de442af8e
-              name: 'Meraki: License [{#LICENSE.ID}] device name'
+              name: 'License [{#LICENSE.ID}]: device name'
               type: DEPENDENT
-              key: 'meraki.license.deviceName[{#LICENSE.ID}]'
+              key: 'meraki.license.device.name[{#LICENSE.ID}]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1926,9 +1926,9 @@ zabbix_export:
                 - tag: license-type
                   value: '{#LICENSE.TYPE}'
             - uuid: dc550872241f49ab930aa9bc34614308
-              name: 'Meraki: License [{#LICENSE.ID}] device serial'
+              name: 'License [{#LICENSE.ID}]: device serial'
               type: DEPENDENT
-              key: 'meraki.license.deviceSerial[{#LICENSE.ID}]'
+              key: 'meraki.license.device.serial[{#LICENSE.ID}]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1946,7 +1946,7 @@ zabbix_export:
                 - tag: license-type
                   value: '{#LICENSE.TYPE}'
             - uuid: d8504a68e79344228c612b6afc362cde
-              name: 'Meraki: License [{#LICENSE.ID}] expiration date'
+              name: 'License [{#LICENSE.ID}]: expiration date'
               type: DEPENDENT
               key: 'meraki.license.expiration.date[{#LICENSE.ID}]'
               delay: '0'
@@ -1971,7 +1971,7 @@ zabbix_export:
                 - tag: license-type
                   value: '{#LICENSE.TYPE}'
             - uuid: 544eb99d23134448afd1ea4ff267ef13
-              name: 'Meraki: License [{#LICENSE.ID}] get data'
+              name: 'License [{#LICENSE.ID}]: get data'
               type: DEPENDENT
               key: 'meraki.license.get[{#LICENSE.ID}]'
               delay: '0'
@@ -1991,7 +1991,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: dde68e22656c4e9e88f89a97984704a8
-              name: 'Meraki: License [{#LICENSE.ID}] key'
+              name: 'License [{#LICENSE.ID}]: key'
               type: DEPENDENT
               key: 'meraki.license.key[{#LICENSE.ID}]'
               delay: '0'
@@ -2011,7 +2011,7 @@ zabbix_export:
                 - tag: license-type
                   value: '{#LICENSE.TYPE}'
             - uuid: b616fcfc6cd740ec8ec52578d7bc2f8c
-              name: 'Meraki: License [{#LICENSE.ID}] state'
+              name: 'License [{#LICENSE.ID}]: state'
               type: DEPENDENT
               key: 'meraki.license.state[{#LICENSE.ID}]'
               delay: '0'
@@ -2031,9 +2031,9 @@ zabbix_export:
                 - tag: license-type
                   value: '{#LICENSE.TYPE}'
             - uuid: cb07d887e5dc407e91208323394e61a7
-              name: 'Meraki: License [{#LICENSE.ID}] total duration in days'
+              name: 'License [{#LICENSE.ID}]: total duration in days'
               type: DEPENDENT
-              key: 'meraki.license.totalDurationInDays[{#LICENSE.ID}]'
+              key: 'meraki.license.total.duration[{#LICENSE.ID}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2090,7 +2090,7 @@ zabbix_export:
           delay: '0'
           item_prototypes:
             - uuid: fca3d0675bdb42158c20db24a8d2d4ee
-              name: 'Network [{#NETWORK.NAME}]: TimeZone'
+              name: 'Network [{#NETWORK.NAME}]: time zone'
               type: DEPENDENT
               key: 'meraki.network.timezone[{#NETWORK.ID}]'
               delay: '0'
@@ -2145,7 +2145,7 @@ zabbix_export:
                 formulaid: D
           item_prototypes:
             - uuid: d0f48c88f8c64f8ab1fd1d77aed7f08e
-              name: 'Meraki: SAML role [{#SAML.ROLE}] get data'
+              name: 'SAML role [{#SAML.ROLE}]: get data'
               type: DEPENDENT
               key: 'meraki.saml.get[{#SAML.ID}]'
               delay: '0'
@@ -2163,9 +2163,9 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: f4bf93217d10424fb56d3ff8965d2495
-              name: 'Meraki: SAML role [{#SAML.ROLE}] organization access'
+              name: 'SAML role [{#SAML.ROLE}]: organization access'
               type: DEPENDENT
-              key: 'meraki.saml.orgAccess[{#SAML.ID}]'
+              key: 'meraki.saml.org.access[{#SAML.ID}]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -2239,7 +2239,7 @@ zabbix_export:
                 - tag: serial-number
                   value: '{#UPLINK.DEVICE.SERIAL}'
             - uuid: a4026ab15ff34c43a23605b27146376d
-              name: 'Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: Public ip'
+              name: 'Uplink [{#INTERFACE}]: [{#UPLINK.ROLE}]: [{#NETWORK.NAME}]: public ip'
               type: DEPENDENT
               key: 'meraki.uplink.public.ip[{#NETWORK.NAME}, {#INTERFACE}, {#UPLINK.ROLE}]'
               delay: '0'
@@ -2690,7 +2690,7 @@ zabbix_export:
           delay: '0'
           item_prototypes:
             - uuid: 33586435a87a4151b089cd3671e278ec
-              name: 'VPN [{#NETWORK.NAME}]: Device serial'
+              name: 'VPN [{#NETWORK.NAME}]: device serial'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.device.serial[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
@@ -2708,7 +2708,7 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: 795e7163e5ec498fbef00aa6f90b5d13
-              name: 'VPN [{#NETWORK.NAME}]: Device status'
+              name: 'VPN [{#NETWORK.NAME}]: device status'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.device.status[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
@@ -2726,7 +2726,7 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: 73e90efe0f0b427a909e0a8bef4d5d38
-              name: 'VPN [{#NETWORK.NAME}]: Mode'
+              name: 'VPN [{#NETWORK.NAME}]: mode'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.mode[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
@@ -2744,7 +2744,7 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: baf0b63913564499a81065ea62cc8d53
-              name: 'VPN [{#NETWORK.NAME}]: Peers network id'
+              name: 'VPN [{#NETWORK.NAME}]: peers network id'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
@@ -2762,7 +2762,7 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: e6c461828bbd4177a755adba16b2b53b
-              name: 'VPN [{#NETWORK.NAME}]: Peers network name'
+              name: 'VPN [{#NETWORK.NAME}]: peers network name'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.peers.network.name[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
@@ -2780,7 +2780,7 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: 712082be91af4e84a7300bd680fc7d41
-              name: 'VPN [{#NETWORK.NAME}]: Peers network reachability'
+              name: 'VPN [{#NETWORK.NAME}]: peers network reachability'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
@@ -2816,7 +2816,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 2efc18211e414114a0301c6e8b8beda9
-              name: 'VPN [{#NETWORK.NAME}]: Third party peers network id'
+              name: 'VPN [{#NETWORK.NAME}]: third party peers network id'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.third.party.peers.network.id[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
@@ -2835,7 +2835,7 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: 0b5fd0a0419e4a38bb27a0b5b3b73301
-              name: 'VPN [{#NETWORK.NAME}]: Third party peers network name'
+              name: 'VPN [{#NETWORK.NAME}]: third party peers network name'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.third.party.peers.network.name[{#NETWORK.ID},  {#NETWORK.NAME}]'
               delay: '0'
@@ -2854,7 +2854,7 @@ zabbix_export:
                 - tag: component
                   value: vpn
             - uuid: 45e79c2918094fa5860d425d99e82201
-              name: 'VPN [{#NETWORK.NAME}]: Third party peers network reachability'
+              name: 'VPN [{#NETWORK.NAME}]: third party peers network reachability'
               type: DEPENDENT
               key: 'meraki.vpn.statuses.third.party.peers.reachability[{#NETWORK.ID}, {#NETWORK.NAME}]'
               delay: '0'
