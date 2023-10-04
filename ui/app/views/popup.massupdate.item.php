@@ -344,26 +344,24 @@ $item_form_list->addRow(
 if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data['discovered_host'])) {
 	$item_form_list->addRow(
 		(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
-		(new CDiv([
-			(new CMultiSelect([
-				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
-				'multiple' => false,
-				'data' => [],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'valuemaps',
-						'srcfld1' => 'valuemapid',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'valuemapid',
-						'hostids' => [$data['hostid']],
-						'context' => $data['context'],
-						'editable' => true
-					]
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => 'valuemaps',
+			'container_id' => 'valuemapid_div',
+			'multiple' => false,
+			'data' => [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => [$data['hostid']],
+					'context' => $data['context'],
+					'editable' => true
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('valuemapid_div')
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 }
 
@@ -382,10 +380,12 @@ $item_form_list->addRow(
 // Append master item select to form list.
 if ($data['single_host_selected']) {
 	if (!$data['prototype']) {
-		$master_item = (new CDiv([
+		$item_form_list->addRow(
+			(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
 			(new CMultiSelect([
 				'name' => 'master_itemid',
 				'object_name' => 'items',
+				'container_id' => 'master_item',
 				'multiple' => false,
 				'data' => [],
 				'popup' => [
@@ -402,7 +402,7 @@ if ($data['single_host_selected']) {
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(true)
-		]))->setId('master_item');
+		);
 	}
 	else {
 		$master_item = [
@@ -445,15 +445,15 @@ if ($data['single_host_selected']) {
 					'parent_discoveryid' => $data['parent_discoveryid']
 				]).', {dialogue_class: "modal-popup-generic"});'
 			);
-	}
 
-	$item_form_list->addRow(
-		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
-		(new CDiv([
-			(new CVar('master_itemname')),
-			$master_item
-		]))->setId('master_item')
-	);
+		$item_form_list->addRow(
+			(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
+			(new CDiv([
+				(new CVar('master_itemname')),
+				$master_item
+			]))->setId('master_item')
+		);
+	}
 }
 
 // Append description to form list.
