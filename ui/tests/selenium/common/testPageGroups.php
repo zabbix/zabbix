@@ -21,22 +21,23 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * Base class for Host and Template groups page.
  */
 class testPageGroups extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -117,10 +118,6 @@ class testPageGroups extends CWebTest {
 		);
 
 		// Check table headers.
-		$set_headers = ($this->object === 'host')
-			? ['' , 'Name', 'Count', 'Hosts', 'Info']
-			: ['' , 'Name', 'Count', 'Templates'];
-		$this->setColumnNames($set_headers);
 		$table = $this->getTable();
 		$headers = ($this->object === 'host') ? ['', 'Name', 'Hosts', 'Info'] : ['', 'Name', 'Templates'];
 		$this->assertEquals($headers, $table->getHeadersText());

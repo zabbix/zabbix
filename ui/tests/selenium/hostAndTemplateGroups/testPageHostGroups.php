@@ -20,6 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../common/testPageGroups.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup hosts
@@ -29,6 +31,21 @@ require_once dirname(__FILE__).'/../common/testPageGroups.php';
  * @dataSource DiscoveredHosts, HostTemplateGroups
  */
 class testPageHostGroups extends testPageGroups {
+
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			[
+				'class' => CTableBehavior::class,
+				'column_names' => ['', 'Name', 'Count', 'Hosts', 'Info']
+			]
+		];
+	}
 
 	protected $link = 'zabbix.php?action=hostgroup.list';
 	protected $object = 'host';
@@ -278,7 +295,6 @@ class testPageHostGroups extends testPageGroups {
 			'host' => self::HOST2
 		];
 		$this->page->login()->open($this->link)->waitUntilReady();
-		$this->setColumnNames(['', 'Name', 'Count', 'Hosts', 'Info']);
 		$table = $this->getTable();
 		$hosts = $table->findRow('Name', $data['group'])->getColumn('Hosts');
 
@@ -370,7 +386,6 @@ class testPageHostGroups extends testPageGroups {
 		}
 
 		$this->page->login()->open($this->link)->waitUntilReady();
-		$this->setColumnNames(['', 'Name', 'Count', 'Hosts', 'Info']);
 		$table = $this->getTable();
 		$this->selectTableRows(array_keys($data));
 		$this->assertSelectedCount(count($data));

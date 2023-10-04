@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../common/testFormMacros.php';
@@ -32,12 +32,15 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormMacrosAdministrationGeneral extends testFormMacros {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and MacrosBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
 	}
 
 	private $macroMaxLength = 255;
