@@ -20,7 +20,7 @@
 #ifndef ZABBIX_EVALFUNC_H
 #define ZABBIX_EVALFUNC_H
 
-#include "zbxexpression.h"
+#include "zbxeval.h"
 
 #include "zbxtypes.h"
 #include "zbxcacheconfig.h"

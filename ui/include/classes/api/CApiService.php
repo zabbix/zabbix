@@ -1295,4 +1295,13 @@ class CApiService {
 	protected static function checkAccess(string $rule_name): bool {
 		return (self::$userData && CRoleHelper::checkAccess($rule_name, self::$userData['roleid']));
 	}
+
+	/**
+	 * Return user session ID or user API token.
+	 *
+	 * @return string
+	 */
+	public static function getAuthIdentifier(): string {
+		return array_key_exists('sessionid', self::$userData) ? self::$userData['sessionid'] : self::$userData['token'];
+	}
 }

@@ -1218,7 +1218,7 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 					"select h.dhostid"
 					" from drules r,dhosts h"
 					" where r.druleid=h.druleid"
-						"%s r.proxy_hostid=" ZBX_FS_UI64
+						"%s r.proxyid=" ZBX_FS_UI64
 						" and",
 					operation_and,
 					condition_value);
@@ -1233,7 +1233,7 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 					" from drules r,dhosts h,dservices s"
 					" where r.druleid=h.druleid"
 						" and h.dhostid=s.dhostid"
-						"%s r.proxy_hostid=" ZBX_FS_UI64
+						"%s r.proxyid=" ZBX_FS_UI64
 						" and",
 					operation_and,
 					condition_value);
@@ -1917,7 +1917,7 @@ static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, z
 	get_object_ids(esc_events, &objectids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select autoreg_hostid,proxy_hostid"
+			"select autoreg_hostid,proxyid"
 			" from autoreg_host"
 			" where");
 
@@ -3261,7 +3261,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		int		j;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-					"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+					"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
 		for (j = 0; j < new_escalations.values_num; j++)
 		{
@@ -3452,7 +3452,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ptr_t *ack_tasks)
 		zbx_db_insert_t	db_insert;
 
 		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-						"itemid", "eventid", "r_eventid", "acknowledgeid", NULL);
+						"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
 		zbx_vector_ptr_sort(&ack_escalations, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 

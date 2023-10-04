@@ -6235,6 +6235,55 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => [3], 'name' => [2], 'value' => ['1', 2.5, '3', '4', '1']]
 			],
 			[
+				['type' => API_VALUE],
+				null,
+				'/1/value',
+				'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_VALUE],
+				true,
+				'/1/value',
+				'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_VALUE],
+				[],
+				'/1/value',
+				'Invalid parameter "/1/value": a character string, integer or floating point value is expected.'
+			],
+			[
+				['type' => API_VALUE],
+				'',
+				'/1/value',
+				''
+			],
+			[
+				['type' => API_VALUE],
+				'abc',
+				'/1/value',
+				'abc'
+			],
+			[
+				['type' => API_VALUE],
+				1,
+				'/1/value',
+				1
+			],
+			[
+				['type' => API_VALUE],
+				0.5,
+				'/1/value',
+				0.5
+			],
+			[
+				['type' => API_VALUE],
+				// broken UTF-8 byte sequence
+				"\xd1".'12345',
+				'/1/value',
+				'Invalid parameter "/1/value": invalid byte sequence in UTF-8.'
+			],
+			[
 				['type' => API_ITEM_KEY],
 				'key',
 				'/1/item_key',
@@ -7643,6 +7692,66 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/1/params": unexpected parameter "3".'
 			],
 			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"-1",
+				'/1/params',
+				"-1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"0\nregexp",
+				'/1/params',
+				"0\nregexp"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"1\nregexp",
+				'/1/params',
+				"1\nregexp"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"2",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of -1, 0, 1.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"-1...",
+				'/1/params',
+				'Invalid parameter "/1/params/1": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"-1\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"-1\nregexp",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"0\n",
+				'/1/params',
+				'Invalid parameter "/1/params/2": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"1\n",
+				'/1/params',
+				'Invalid parameter "/1/params/2": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED]],
+				"0\nregexp\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "3".'
+			],
+			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_WALK_VALUE]],
 				"1.3.1.6.2.1\n0",
 				'/1/params',
@@ -7839,6 +7948,60 @@ class CApiInputValidatorTest extends TestCase {
 				"{#FIELD}\n1.3.1.6.2.1\n0\n{#FIELD2}\n1.2.3.4.5.1\n1\n",
 				'/1/params',
 				'Invalid parameter "/1/params/7": cannot be empty.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"",
+				'/1/params',
+				'Invalid parameter "/1/params/1": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"abc",
+				'/1/params',
+				'Invalid parameter "/1/params/1": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"0",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"1",
+				'/1/params',
+				"1"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"2",
+				'/1/params',
+				"2"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"3",
+				'/1/params',
+				"3"
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"4",
+				'/1/params',
+				'Invalid parameter "/1/params/1": value must be one of 1, 2, 3.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"1\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_SNMP_GET_VALUE]],
+				"\n",
+				'/1/params',
+				'Invalid parameter "/1/params": unexpected parameter "2".'
 			],
 			[
 				['type' => API_PROMETHEUS_PATTERN],
@@ -8256,6 +8419,181 @@ class CApiInputValidatorTest extends TestCase {
 				'{$MACRO: '."\xd1".'ontext}',
 				'/1/secret',
 				'Invalid parameter "/1/secret": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				'',
+				'/1/address',
+				''
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_NOT_EMPTY],
+				'',
+				'/1/address',
+				'Invalid parameter "/1/address": cannot be empty.'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				[],
+				'/1/address',
+				'Invalid parameter "/1/address": a character string is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				true,
+				'/1/address',
+				'Invalid parameter "/1/address": a character string is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				null,
+				'/1/address',
+				'Invalid parameter "/1/address": a character string is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
+				// Broken UTF-8 byte sequence.
+				'{$MACRO: "'."\xd1".'"}',
+				'/1/address',
+				'Invalid parameter "/1/address": invalid byte sequence in UTF-8.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO: "context"}',
+				'/1/address',
+				'{$MACRO: "context"}'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				'%%%',
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				'3.3.3.3',
+				'/1/address',
+				'3.3.3.3'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'length' => 15],
+				'www.example.com',
+				'/1/address',
+				'www.example.com'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'length' => 14],
+				'www.example.com',
+				'/1/address',
+				'Invalid parameter "/1/address": value is too long.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$}',
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO2}',
+				'/1/address',
+				'{$MACRO2}'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#}',
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO2}',
+				'/1/address',
+				'{#MACRO2}'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO3}{#MACRO4}',
+				'/1/address',
+				'{#MACRO3}{#MACRO4}'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
+				'{HOST.IP}',
+				'/1/address',
+				'{HOST.IP}'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO3}{$MACRO4}',
+				'/1/address',
+				'{$MACRO3}{$MACRO4}'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
+				'{$MACRO}',
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
+				'{HOST.HOST}',
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO | API_ALLOW_MACRO],
+				'a{HOST.HOST}b{$MACRO5}c{#MACRO5}d{HOST.NAME}e{$MACRO6}',
+				'/1/address',
+				'a{HOST.HOST}b{$MACRO5}c{#MACRO5}d{HOST.NAME}e{$MACRO6}'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_MACRO],
+				'a{HOST.HOST}b{HOST.IP}c',
+				'/1/address',
+				'a{HOST.HOST}b{HOST.IP}c'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO | API_ALLOW_LLD_MACRO],
+				'a{$MACRO7}b{#MACRO6}c{HOST.NAME}d{$MACRO8}',
+				'/1/address',
+				'Invalid parameter "/1/address": an IP or DNS is expected.'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				'0.0.0.x',
+				'/1/address',
+				'0.0.0.x'
+			],
+			[
+				['type' => API_HOST_ADDRESS],
+				'1.1.1.1',
+				'/1/address',
+				'1.1.1.1'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'length' => 11],
+				'192.168.3.5',
+				'/1/address',
+				'192.168.3.5'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'length' => 10],
+				'192.168.3.5',
+				'/1/address',
+				'Invalid parameter "/1/address": value is too long.'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO],
+				'{$MACRO1}',
+				'/1/address',
+				'{$MACRO1}'
+			],
+			[
+				['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_LLD_MACRO],
+				'{#MACRO1}',
+				'/1/address',
+				'{#MACRO1}'
 			]
 		];
 	}

@@ -303,7 +303,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if ($ret && $hostid != 0) {
 			$hosts = API::Host()->get([
-				'output' => ['hostid', 'host', 'name', 'status', 'proxy_hostid', 'tls_subject', 'maintenance_status',
+				'output' => ['hostid', 'host', 'name', 'status', 'proxyid', 'tls_subject', 'maintenance_status',
 					'maintenance_type', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 					'tls_issuer', 'tls_connect'
 				],
@@ -336,14 +336,14 @@ abstract class CControllerPopupItemTest extends CController {
 	 */
 	protected function getHostProxies() {
 		$proxies = API::Proxy()->get([
-			'output' => ['host'],
+			'output' => ['name'],
 			'preservekeys' => true
 		]);
 
-		CArrayHelper::sort($proxies, [['field' => 'host', 'order' => ZBX_SORT_UP]]);
+		CArrayHelper::sort($proxies, [['field' => 'name', 'order' => ZBX_SORT_UP]]);
 
 		foreach ($proxies as &$proxy) {
-			$proxy = $proxy['host'];
+			$proxy = $proxy['name'];
 		}
 		unset($proxy);
 
@@ -415,17 +415,17 @@ abstract class CControllerPopupItemTest extends CController {
 
 		// Set proxy.
 		if (in_array($this->item_type, $this->items_support_proxy)) {
-			if (array_key_exists('data', $input) && array_key_exists('proxy_hostid', $input['data'])) {
-				$data['proxy_hostid'] = $input['data']['proxy_hostid'];
+			if (array_key_exists('data', $input) && array_key_exists('proxyid', $input['data'])) {
+				$data['proxyid'] = $input['data']['proxyid'];
 			}
-			elseif (array_key_exists('proxy_hostid', $input)) {
-				$data['proxy_hostid'] = $input['proxy_hostid'];
+			elseif (array_key_exists('proxyid', $input)) {
+				$data['proxyid'] = $input['proxyid'];
 			}
-			elseif (array_key_exists('proxy_hostid', $this->host)) {
-				$data['proxy_hostid'] = $this->host['proxy_hostid'];
+			elseif (array_key_exists('proxyid', $this->host)) {
+				$data['proxyid'] = $this->host['proxyid'];
 			}
 			else {
-				$data['proxy_hostid'] = 0;
+				$data['proxyid'] = 0;
 			}
 		}
 
@@ -433,6 +433,7 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_ZABBIX:
 				$data += [
 					'key' => array_key_exists('key', $input) ? $input['key'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
@@ -495,6 +496,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 				$data += [
 					'snmp_oid' => array_key_exists('snmp_oid', $input) ? $input['snmp_oid'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'flags' => $item_flag,
 					'host' => [
 						'host' => $this->host['host']
@@ -523,7 +525,8 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_EXTERNAL:
 				$data += [
-					'key' => $input['key']
+					'key' => $input['key'],
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null
 				];
 				break;
 
@@ -532,7 +535,8 @@ abstract class CControllerPopupItemTest extends CController {
 					'key' => $input['key'],
 					'params_ap' => array_key_exists('params_ap', $input) ? $input['params_ap'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null
 				];
 				break;
 
@@ -606,6 +610,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : ITEM_AUTHTYPE_PASSWORD,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 
@@ -623,6 +628,7 @@ abstract class CControllerPopupItemTest extends CController {
 					'params_es' => array_key_exists('params_es', $input) ? $input['params_es'] : null,
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
 					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
 					'interface' => $this->getHostInterface($interface_input)
 				];
 				break;
@@ -649,9 +655,10 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SIMPLE:
 				$data += [
 					'key' => $input['key'],
-					'interface' => $this->getHostInterface($interface_input),
 					'username' => array_key_exists('username', $input) ? $input['username'] : null,
-					'password' => array_key_exists('password', $input) ? $input['password'] : null
+					'password' => array_key_exists('password', $input) ? $input['password'] : null,
+					'timeout' => array_key_exists('timeout', $input) ? $input['timeout'] : null,
+					'interface' => $this->getHostInterface($interface_input)
 				];
 
 				unset($data['interface']['useip'], $data['interface']['interfaceid'], $data['interface']['ip'],
@@ -1119,6 +1126,11 @@ abstract class CControllerPopupItemTest extends CController {
 												$macros_posted
 											);
 											$expression[] = CFilterParser::quoteString($string);
+											break;
+
+										case CFilterParser::TOKEN_TYPE_KEYWORD:
+										case CFilterParser::TOKEN_TYPE_OPERATOR:
+											$expression[] = $filter_token['match'];
 											break;
 									}
 								}

@@ -557,10 +557,10 @@ zabbix_export:
           master_item:
             key: kube.pods
           lld_macro_paths:
-            - lld_macro: '{#NAME}'
-              path: $.metadata.name
             - lld_macro: '{#NAMESPACE}'
               path: $.metadata.namespace
+            - lld_macro: '{#NAME}'
+              path: $.metadata.name
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -859,11 +859,11 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
-                      name: graphid
+                      name: graphid.0
                       value:
                         host: 'Kubernetes Kubelet by HTTP'
                         name: 'Kubernetes: [{#OP_TYPE}] Operations latency'
+                    - type: STRING
+                      name: reference
+                      value: AAAAA

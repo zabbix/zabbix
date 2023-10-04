@@ -61,6 +61,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 								'Dynamic widgets H1I2' => '12'
 							]
 						],
+						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
+						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I1'],
 						[
 							'type' => 'URL',
 							'header' => 'Dynamic URL',
@@ -115,6 +117,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 								'Dynamic widgets H1I2' => '12'
 							]
 						],
+						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I2'],
+						['type' => 'Gauge', 'header' => 'Dynamic widgets H1: Dynamic widgets H1I1'],
 						[
 							'type' => 'URL',
 							'header' => 'Dynamic URL',
@@ -162,6 +166,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 							'header' => 'Dynamic widgets H2: Dynamic widgets H2I1',
 							'expected' => ['Dynamic widgets H2I1' => '21']
 						],
+						['type' => 'Gauge', 'header' => 'Gauge'],
+						['type' => 'Gauge', 'header' => 'Dynamic widgets H2: Dynamic widgets H2I1'],
 						[
 							'type' => 'URL',
 							'header' => 'Dynamic URL',
@@ -209,6 +215,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 							'header' => 'Dynamic widgets H3: Dynamic widgets H3I1',
 							'expected' => ['Dynamic widgets H3I1' => '31']
 						],
+						['type' => 'Gauge', 'header' => 'Gauge'],
+						['type' => 'Gauge', 'header' => 'Dynamic widgets H3: Dynamic widgets H3I1'],
 						[
 							'type' => 'URL',
 							'header' => 'Dynamic URL',
@@ -254,6 +262,8 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 							'type' => 'Plain text',
 							'header' => 'Plain text'
 						],
+						['type' => 'Gauge', 'header' => 'Gauge'],
+						['type' => 'Gauge', 'header' => 'Gauge'],
 						[
 							'type' => 'URL',
 							'header' => 'Dynamic URL',

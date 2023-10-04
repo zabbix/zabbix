@@ -171,10 +171,14 @@ window.drule_edit_popup = new class {
 	_addCheck(input, row = null, update = false) {
 		delete input.dchecks;
 
+		const available_device_types = [<?= SVC_AGENT ?>, <?= SVC_SNMPv1 ?>, <?= SVC_SNMPv2c ?>, <?= SVC_SNMPv3 ?>];
+
 		if (update === false) {
 			if (typeof input.host_source === 'undefined') {
 				const checked_host_source = document.querySelector('[name="host_source"]:checked:not([data-id])');
-				input.host_source = checked_host_source === null ? '<?= ZBX_DISCOVERY_DNS ?>' : checked_host_source.value;
+				input.host_source = checked_host_source === null
+					? '<?= ZBX_DISCOVERY_DNS ?>'
+					: checked_host_source.value;
 			}
 
 			if (typeof input.name_source === 'undefined') {
@@ -185,9 +189,11 @@ window.drule_edit_popup = new class {
 			}
 		}
 		else {
-			input.host_source = document.querySelector('input[name=host_source]:checked').value;
-			input.name_source = document.querySelector('input[name=name_source]:checked').value;
-			input.uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked').value;
+			if (available_device_types.includes(parseInt(input.type))) {
+				input.host_source = document.querySelector('input[name=host_source]:checked').value;
+				input.name_source = document.querySelector('input[name=name_source]:checked').value;
+				input.uniqueness_criteria = document.querySelector('input[name=uniqueness_criteria]:checked').value;
+			}
 		}
 
 		if (input.type == <?= SVC_ICMPPING ?>) {
@@ -320,7 +326,7 @@ window.drule_edit_popup = new class {
 		this._post(curl.getUrl(), {druleids: [this.druleid]}, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 

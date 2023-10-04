@@ -167,29 +167,26 @@ class testPageGroups extends CWebTest {
 
 		// Check link to the host or template edit form.
 		$row->getColumn(ucfirst($this->object).'s')->query('link', $links['host_template'])->one()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+
 		if ($this->object === 'host') {
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$this->assertStringContainsString('zabbix.php?action=host.edit&hostid='.$id, $this->page->getCurrentUrl());
-			$this->assertEquals('Host', $dialog->getTitle());
-			$dialog->asForm()->checkValue(['Host name' => $links['host_template']]);
-			$dialog->close();
 		}
 		else {
-			$this->assertStringContainsString('templates.php?form=update&templateid='.$id, $this->page->getCurrentUrl());
-			$this->page->assertHeader('Templates');
-			$this->query('id:templates-form')->asForm(['normalized' => true])->waitUntilVisible()->one()
-					->checkValue(['Template name' => $links['host_template']]);
-			$this->query('button:Cancel')->one()->click();
-			$this->assertStringContainsString('templates.php', $this->page->getCurrentUrl());
-			$this->page->open($this->link)->waitUntilReady();
+			$this->assertStringContainsString($this->link, $this->page->getCurrentUrl());
 		}
+
+		$this->assertEquals(ucfirst($this->object), $dialog->getTitle());
+		$dialog->asForm()->checkValue([ucfirst($this->object).' name' => $links['host_template']]);
+		$dialog->close();
+		$dialog->ensureNotPresent();
 
 		// Check link to hosts or templates page with selected group in filer.
 		$group_id = CDBHelper::getValue('SELECT groupid FROM hstgrp WHERE name='.zbx_dbstr($links['name']));
 		$row->getColumn('Count')->query('link', $links['count'])->one()->click();
 		$this->assertStringContainsString((($this->object === 'host')
 			? 'zabbix.php?action=host.list&'
-			: 'templates.php?').'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
+			: 'zabbix.php?action=template.list&').'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
 		);
 		$this->page->assertHeader(ucfirst($this->object).'s');
 		CFilterElement::find()->one()->getForm()->checkValue([ucfirst($this->object).' groups' => $links['name']]);

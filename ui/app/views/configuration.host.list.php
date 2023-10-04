@@ -163,7 +163,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'proxies',
 								'srcfld1' => 'proxyid',
-								'srcfld2' => 'host',
+								'srcfld2' => 'name',
 								'dstfrm' => 'zbx_filter',
 								'dstfld1' => 'filter_proxyids_'
 							]
@@ -333,11 +333,9 @@ foreach ($data['hosts'] as $host) {
 		if (array_key_exists($template['templateid'], $data['writable_templates'])
 				&& $data['allowed_ui_conf_templates']) {
 			$caption = [
-				(new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))
+				(new CLink($template['name']))
+					->addClass('js-edit-template')
+					->setAttribute('data-templateid', $template['templateid'])
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
 			];
@@ -358,11 +356,9 @@ foreach ($data['hosts'] as $host) {
 			foreach ($parent_templates as $parent_template) {
 				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
 						&& $data['allowed_ui_conf_templates']) {
-					$caption[] = (new CLink($parent_template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $parent_template['templateid'])
-					))
+					$caption[] = (new CLink($parent_template['name']))
+						->addClass('js-edit-template')
+						->setAttribute('data-templateid', $parent_template['templateid'])
 						->addClass(ZBX_STYLE_LINK_ALT)
 						->addClass(ZBX_STYLE_GREY);
 				}
@@ -441,8 +437,8 @@ foreach ($data['hosts'] as $host) {
 	$monitored_by = null;
 
 	if ($show_monitored_by) {
-		$monitored_by = ($host['proxy_hostid'] != 0)
-			? $data['proxies'][$host['proxy_hostid']]['host']
+		$monitored_by = ($host['proxyid'] != 0)
+			? $data['proxies'][$host['proxyid']]['name']
 			: '';
 	}
 
@@ -460,7 +456,8 @@ foreach ($data['hosts'] as $host) {
 		],
 		[
 			new CLink(_('Triggers'),
-				(new CUrl('triggers.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
 					->setArgument('context', 'host')

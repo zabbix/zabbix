@@ -328,7 +328,8 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 		if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 		{
 			zbx_recv_proxyconfig(sock, config_comms->config_tls, config_vault, config_comms->config_timeout,
-					config_comms->config_source_ip, config_comms->server);
+					config_comms->config_trapper_timeout, config_comms->config_source_ip,
+					config_comms->server);
 			return SUCCEED;
 		}
 		else if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))

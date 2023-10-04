@@ -23,7 +23,9 @@ libzbxtrapper_server_a_SOURCES = \
 	trapper_server.c \
 	trapper_request.h \
 	proxydata.c \
-	proxydata.h
+	proxydata.h \
+	trapper_history_push.c \
+	trapper_history_push.h
 
 libzbxtrapper_proxy_a_SOURCES = \
 	trapper_proxy.c \

@@ -122,7 +122,7 @@
 #define ZBX_PROTO_TAG_INTERFACE			"interface"
 #define ZBX_PROTO_TAG_FLAGS			"flags"
 #define ZBX_PROTO_TAG_PARAMETERS		"parameters"
-#define ZBX_PROTO_TAG_PROXY_HOSTID		"proxy_hostid"
+#define ZBX_PROTO_TAG_PROXYID			"proxyid"
 #define ZBX_PROTO_TAG_INTERFACE_ID		"interfaceid"
 #define ZBX_PROTO_TAG_USEIP			"useip"
 #define ZBX_PROTO_TAG_ADDRESS			"address"
@@ -198,7 +198,7 @@
 #define ZBX_PROTO_TAG_PROXY_ACTIVE_AVAIL_DATA	"host data"
 #define ZBX_PROTO_TAG_PROXY_NAME		"proxy_name"
 #define ZBX_PROTO_TAG_PROXY_NAMES		"proxy_names"
-#define ZBX_PROTO_TAG_PROXY_HOSTIDS		"proxy_hostids"
+#define ZBX_PROTO_TAG_PROXYIDS			"proxyids"
 #define ZBX_PROTO_TAG_SUPPRESS_UNTIL		"suppress_until"
 #define ZBX_PROTO_TAG_CONFIG_REVISION		"config_revision"
 #define ZBX_PROTO_TAG_FULL_SYNC			"full_sync"
@@ -207,6 +207,7 @@
 #define ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS	"del_macro_hostids"
 #define ZBX_PROTO_TAG_ACKNOWLEDGEID		"acknowledgeid"
 #define ZBX_PROTO_TAG_WAIT			"wait"
+#define ZBX_PROTO_TAG_RUNTIME_ERROR		"runtime_error"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
@@ -244,6 +245,8 @@
 #define ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED	"disabled"
 
 #define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
+
+#define ZBX_PROTO_VALUE_HISTORY_PUSH		"history.push"
 
 #define ZBX_PROTO_VALUE_SUPPRESSION_SUPPRESS	"suppress"
 #define ZBX_PROTO_VALUE_SUPPRESSION_UNSUPPRESS	"unsuppress"

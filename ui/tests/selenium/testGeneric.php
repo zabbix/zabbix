@@ -59,7 +59,7 @@ class testGeneric extends CLegacyWebTest {
 			// configuration
 			['zabbix.php?action=hostgroup.list',		'Configuration of host groups'],
 			['zabbix.php?action=templategroup.list',	'Configuration of template groups'],
-			['templates.php',					'Configuration of templates'],
+			['zabbix.php?action=template.list',			'Configuration of templates'],
 			[self::HOST_LIST_PAGE,				'Configuration of hosts'],
 			['zabbix.php?action=maintenance.list',		'Configuration of maintenance periods'],
 			['httpconf.php',					'Configuration of web monitoring'],

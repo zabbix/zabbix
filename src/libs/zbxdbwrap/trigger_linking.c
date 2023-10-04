@@ -460,7 +460,8 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != insert_num)
 	{
-		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
+				(char *)NULL);
 		tagid = zbx_db_get_maxid_num("trigger_tag", insert_num);
 	}
 
@@ -1295,11 +1296,12 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 			&sql_update_triggers_expr_offset);
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
-			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode", "correlation_mode",
-			"correlation_tag", "manual_close", "opdata", "discover", "event_name", NULL);
+			"url", "url_name", "type", "value", "state", "templateid", "flags", "recovery_mode",
+			"correlation_mode", "correlation_tag", "manual_close", "opdata", "discover", "event_name",
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_funcs, "functions", "functionid", "itemid", "triggerid", "name",
-			"parameter", NULL);
+			"parameter", (char *)NULL);
 
 	triggerid = triggerid2 = zbx_db_get_maxid_num("triggers", trigger_copies_insert->values_num);
 	functionid = zbx_db_get_maxid_num("functions", *funcs_insert_count);

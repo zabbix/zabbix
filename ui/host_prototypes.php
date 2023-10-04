@@ -91,7 +91,7 @@ if (getRequest('parent_discoveryid')) {
 		$hostPrototype = API::HostPrototype()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => ['groupid'],
-			'selectGroupPrototypes' => ['name'],
+			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
 			'selectTemplates' => ['templateid', 'name'],
 			'selectParentHost' => ['hostid'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
@@ -142,6 +142,13 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
+
+	if (hasRequest('group_prototypes')) {
+		foreach ($_REQUEST['group_prototypes'] as &$group_prototype) {
+			unset($group_prototype['group_prototypeid']);
+		}
+		unset($group_prototype);
+	}
 
 	$warnings = [];
 
@@ -385,7 +392,7 @@ if (hasRequest('form')) {
 
 	// add parent host
 	$parentHost = API::Host()->get([
-		'output' => ['hostid', 'proxy_hostid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+		'output' => ['hostid', 'proxyid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 			'ipmi_password', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_subject'
 		],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -405,10 +412,10 @@ if (hasRequest('form')) {
 		]);
 	}
 
-	if ($parentHost['proxy_hostid']) {
+	if ($parentHost['proxyid']) {
 		$proxy = API::Proxy()->get([
-			'output' => ['host', 'proxyid'],
-			'proxyids' => $parentHost['proxy_hostid'],
+			'output' => ['proxyid', 'name'],
+			'proxyids' => $parentHost['proxyid'],
 			'limit' => 1
 		]);
 		$data['proxy'] = reset($proxy);
@@ -513,7 +520,6 @@ if (hasRequest('form')) {
 	}
 	unset($macro);
 
-	// This data is used in common.template.edit.js.php.
 	$data['macros_tab'] = [
 		'linked_templates' => array_map('strval', $templateids),
 		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))

@@ -135,16 +135,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=create',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'create'
 				]
 			],
 			// #7 Template update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
-					'link' => 'templates.php?form=update&templateid=10169',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=template.list',
+					'overlay' => 'update'
 				]
 			],
 			// #8 Host create.
@@ -181,16 +181,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'triggers.php?form=update&triggerid=100034&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
+					'overlay' => 'trigger_update'
 				]
 			],
 			// #13 Trigger create.
 			[
 				[
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'triggers.php?hostid=50011&form=create&context=host',
-					'incorrect_request' => true
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
+					'overlay' => 'create'
 				]
 			],
 			// #14 Graph update.
@@ -365,7 +365,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
-					'link' => 'zabbix.php?action=regex.edit&regexid=20',
+					'link' => 'zabbix.php?action=regex.edit&regexid=2',
 					'return_button' => true
 				]
 			],
@@ -658,6 +658,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			$selectors = [
 				'create' => "//div[@class=\"header-controls\"]//button",
 				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
+				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[4]/a",
 				'problem' => '//table[@class="list-table"]//tr[1]//a[text()="Update"]',
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];

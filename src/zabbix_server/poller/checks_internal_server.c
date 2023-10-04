@@ -64,7 +64,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 	}
 	else if (0 == strcmp(param1, "proxy"))			/* zabbix["proxy",<hostname>,"lastaccess" OR "delay"] */
 	{							/* zabbix["proxy","discovery"]                        */
-		int	value, res;
+		int	res;
 		char	*error = NULL;
 
 		/* this item is always processed by server */
@@ -99,6 +99,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 		else
 		{
+			time_t		value;
 			const char	*param3 = get_rparam(request, 2);
 
 			if (0 == strcmp(param3, "lastaccess"))
@@ -107,15 +108,16 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			}
 			else if (0 == strcmp(param3, "delay"))
 			{
-				int	lastaccess;
+				time_t	lastaccess;
+				int	tmp;
 
 				param2 = get_rparam(request, 1);
 
-				if (SUCCEED == (res = zbx_dc_get_proxy_delay_by_name(param2, &value, &error)) &&
+				if (SUCCEED == (res = zbx_dc_get_proxy_delay_by_name(param2, &tmp, &error)) &&
 						SUCCEED == (res = zbx_dc_get_proxy_lastaccess_by_name(param2, &lastaccess,
 						&error)))
 				{
-					value += zbx_time() - lastaccess;
+					value = tmp + time(NULL) - lastaccess;
 				}
 			}
 			else

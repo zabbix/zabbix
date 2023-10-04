@@ -145,7 +145,7 @@ foreach ($data['items'] as $item) {
 	// Hide zeros for trapper, SNMP trap and dependent items.
 	if ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
 			|| $item['type'] == ITEM_TYPE_DEPENDENT
-			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) === 0)) {
+			|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_'], 'mqtt.get', 8) == 0)) {
 		$item['delay'] = '';
 	}
 	elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -235,6 +235,15 @@ $itemForm->addItem([
 		$data['parent_discoveryid']
 	)
 ]);
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'context' => $data['context'],
+		'checkbox_hash' => $data['parent_discoveryid']
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();
 
 $html_page
 	->addItem($itemForm)

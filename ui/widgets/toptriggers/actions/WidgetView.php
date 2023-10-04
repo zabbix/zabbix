@@ -24,8 +24,7 @@ namespace Widgets\TopTriggers\Actions;
 use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
-	CControllerResponseData,
-	CRangeTimeParser;
+	CControllerResponseData;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -33,22 +32,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'from' => 'string',
-			'to' => 'string',
-			'dynamic_hostid' => 'db hosts.hostid'
+			'has_custom_time_period' => 'in 1'
 		]);
 	}
 
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
+			'info' => $this->makeWidgetInfo(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
 		// Editing template dashboard?
-		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->fields_values['override_hostid']) {
 			$data['error'] = _('No data.');
 		}
 		else {
@@ -65,19 +63,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			: null;
 
 		if ($this->isTemplateDashboard()) {
-			$hostids = [$this->getInput('dynamic_hostid')];
+			$hostids = $this->fields_values['override_hostid'];
 		}
 		else {
 			$hostids = $this->fields_values['hostids'] ?: null;
 		}
-
-		$range_time_parser = new CRangeTimeParser();
-
-		$range_time_parser->parse($this->getInput('from'));
-		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
-
-		$range_time_parser->parse($this->getInput('to'));
-		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
 		$db_problems = API::Event()->get([
 			'countOutput' => true,
@@ -87,8 +77,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
-			'time_from' => $time_from,
-			'time_till' => $time_to,
+			'time_from' => $this->fields_values['time_period']['from_ts'],
+			'time_till' => $this->fields_values['time_period']['to_ts'],
 			'search' => [
 				'name' => $this->fields_values['problem'] !== '' ? $this->fields_values['problem'] : null
 			],
@@ -97,7 +87,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'tags' => $this->fields_values['tags'] ?: null,
 			'sortfield' => ['rowscount'],
 			'sortorder' => ZBX_SORT_DOWN,
-			'limit' => $this->fields_values['show_lines']
+			'limit' => ZBX_MAX_WIDGET_LINES
 		]);
 
 		if (!$db_problems) {
@@ -125,6 +115,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'description'
 		]);
 
+		$db_triggers = array_slice($db_triggers, 0, $this->fields_values['show_lines'], true);
+
 		return $db_triggers;
+	}
+
+	/**
+	 * Make widget specific info to show in widget's header.
+	 */
+	private function makeWidgetInfo(): array {
+		$info = [];
+
+		if ($this->hasInput('has_custom_time_period')) {
+			$info[] = [
+				'icon' => ZBX_ICON_TIME_PERIOD,
+				'hint' => relativeDateToText($this->fields_values['time_period']['from'],
+					$this->fields_values['time_period']['to']
+				)
+			];
+		}
+
+		return $info;
 	}
 }

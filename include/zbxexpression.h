@@ -126,18 +126,6 @@ typedef struct
 }
 zbx_expression_eval_t;
 
-typedef struct
-{
-	int			op;
-	int			numeric_search;
-	char			*pattern2;
-	zbx_uint64_t		pattern_ui64;
-	zbx_uint64_t		pattern2_ui64;
-	double			pattern_dbl;
-	zbx_vector_expression_t	regexps;
-}
-zbx_eval_count_pattern_data_t;
-
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event,
 		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
 		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
@@ -198,11 +186,4 @@ int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const 
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
-
-int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
-		int limit, int *count, char **error);
-
-int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
-		zbx_eval_count_pattern_data_t *pdata, char **error);
-void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
 #endif

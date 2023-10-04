@@ -61,6 +61,7 @@ class CControllerServiceDelete extends CController {
 
 		if ($result) {
 			$output['success']['title'] = _n('Service deleted', 'Services deleted', count($serviceids));
+			$output['success']['action'] = 'delete';
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');

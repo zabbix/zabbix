@@ -54,6 +54,7 @@ DIST_SUBDIRS = \
 	zbxproxybuffer \
 	zbxregexp \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
@@ -110,6 +111,7 @@ SERVER_SUBDIRS = \
 	zbxprometheus \
 	zbxproxybuffer \
 	zbxrtc \
+	zbxscripts \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
@@ -163,6 +165,7 @@ PROXY_SUBDIRS = \
 	zbxself \
 	zbxserialize \
 	zbxexpression \
+	zbxscripts \
 	zbxshmem \
 	zbxstats \
 	zbxstr \
@@ -208,6 +211,7 @@ SUBDIRS = \
 	zbxodbc \
 	zbxparam \
 	zbxregexp \
+	zbxscripts \
 	zbxsysinfo \
 	zbxstr \
 	zbxthreads \

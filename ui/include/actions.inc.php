@@ -241,7 +241,7 @@ function actionConditionValueToString(array $actions) {
 
 	if ($proxyIds) {
 		$proxies = API::Proxy()->get([
-			'output' => ['host'],
+			'output' => ['name'],
 			'proxyids' => $proxyIds,
 			'preservekeys' => true
 		]);
@@ -305,7 +305,7 @@ function actionConditionValueToString(array $actions) {
 
 					case CONDITION_TYPE_PROXY:
 						if (array_key_exists($id, $proxies)) {
-							$result[$i][$j] = $proxies[$id]['host'];
+							$result[$i][$j] = $proxies[$id]['name'];
 						}
 						break;
 

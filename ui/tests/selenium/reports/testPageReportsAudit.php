@@ -67,7 +67,7 @@ class testPageReportsAudit extends CWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$table = $this->query('class:list-table')->asTable()->one();
 		$filter_actions = ['Add', 'Configuration refresh', 'Delete', 'Execute', 'Failed login', 'History clear',
-				'Login', 'Logout', 'Update'];
+				'Login', 'Logout', 'Push', 'Update'];
 
 		// Check filter buttons.
 		foreach (['Apply', 'Reset'] as $button) {
@@ -103,6 +103,7 @@ class testPageReportsAudit extends CWebTest {
 			'Graph' => ['Add', 'Delete', 'Update'],
 			'Graph prototype' => ['Add', 'Delete', 'Update'],
 			'High availability node' => ['Add', 'Delete', 'Update'],
+			'History' => ['Push'],
 			'Host' => ['Add', 'Delete', 'Update'],
 			'Host group' => ['Add', 'Delete', 'Update'],
 			'Host prototype' => ['Add', 'Delete', 'Update'],

@@ -23,6 +23,7 @@
 #include "zbxcommon.h"
 #include "zbxtime.h"
 #include "zbxproxybuffer.h"
+#include "zbxpreproc.h"
 
 #define ZBX_DIAG_PROXYBUFFER_MEMORY	0x00000001
 

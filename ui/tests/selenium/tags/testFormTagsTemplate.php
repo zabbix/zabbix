@@ -29,8 +29,7 @@ class testFormTagsTemplate extends testFormTags {
 	public $update_name = '2 template with tags for updating';
 	public $clone_name = '1 template with tags for cloning';
 	public $remove_name = '1 template for removing tags';
-	public $link = 'templates.php';
-	public $saved_link = 'templates.php?form=update&templateid=';
+	public $link = 'zabbix.php?action=template.list';
 
 	/**
 	 * Test creating of Template with tags

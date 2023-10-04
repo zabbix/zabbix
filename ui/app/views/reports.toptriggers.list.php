@@ -37,7 +37,9 @@ $filter = (new CFilter())
 	)
 	->setProfile($data['filter']['timeline']['profileIdx'])
 	->setActiveTab($data['filter']['active_tab'])
-	->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], true, ZBX_DATE_TIME)
+	->addTimeSelector($data['filter']['timeline']['from'], $data['filter']['timeline']['to'], true,
+		'web.toptriggers.filter', ZBX_DATE_TIME
+	)
 	->addFilterTab(_('Filter'), [
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)

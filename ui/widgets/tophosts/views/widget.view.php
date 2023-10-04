@@ -94,7 +94,14 @@ else {
 				case CWidgetFieldColumnsList::DATA_HOST_NAME:
 					$row[] = (new CCol(
 						(new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']))
-					))->addStyle($color !== '' ? 'background-color: #' . $color : null);
+					))
+						->addStyle($color !== '' ? 'background-color: #' . $color : null)
+						->addItem($column['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
+							? makeMaintenanceIcon($column['maintenance_type'], $column['maintenance_name'],
+								$column['maintenance_description']
+							)
+							: null
+						);
 
 					break;
 

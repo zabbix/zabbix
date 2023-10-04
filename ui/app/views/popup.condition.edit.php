@@ -530,7 +530,7 @@ switch ($data['type']) {
 						'parameters' => [
 							'srctbl' => 'proxies',
 							'srcfld1' => 'proxyid',
-							'srcfld2' => 'host',
+							'srcfld2' => 'name',
 							'dstfrm' => $form->getName(),
 							'dstfld1' => 'proxy_new_condition'
 						]
