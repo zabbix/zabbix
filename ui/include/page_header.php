@@ -42,83 +42,84 @@ if (!defined('ZBX_PAGE_NO_THEME')) {
 switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
+
 		break;
+
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
+
 		break;
+
 	case PAGE_TYPE_JSON:
 		header('Content-Type: application/json');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
+
 		break;
+
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
+
 		if(!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
+
 		break;
+
 	case PAGE_TYPE_CSS:
 		header('Content-Type: text/css; charset=UTF-8');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
+
 		break;
+
 	case PAGE_TYPE_TEXT:
 	case PAGE_TYPE_TEXT_RETURN_JSON:
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
+
 		break;
+
 	case PAGE_TYPE_HTML:
 	default:
 		header('Content-Type: text/html; charset=UTF-8');
 		header('X-Content-Type-Options: nosniff');
 		header('X-XSS-Protection: 1; mode=block');
 
-		if (strcasecmp(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS), 'null') != 0) {
-			if (strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'SAMEORIGIN') == 0
-					|| strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'DENY') == 0) {
-				header('X-Frame-Options: '.CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
-			}
-			else {
-				$x_frame_options = 'SAMEORIGIN';
-				$allowed_urls = explode(',', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
-				$url_to_check = array_key_exists('HTTP_REFERER', $_SERVER)
-					? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST)
-					: null;
+		if (strcasecmp(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS), 'null') !== 0) {
+			switch (true) {
+				case strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'SAMEORIGIN') === 0:
+				case strcasecmp(trim(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS)), '') === 0:
+					header('X-Frame-Options: SAMEORIGIN');
+					break;
 
-				if ($url_to_check) {
-					if ($url_to_check == $_SERVER['HTTP_HOST']) {
-						$allowed_urls[] = $_SERVER['HTTP_HOST'];
-						$x_frame_options = implode(' ', $allowed_urls);
-					} else {
-						foreach ($allowed_urls as $allowed_url) {
-							if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
-								$x_frame_options = $allowed_url;
-								break;
-							}
-						}
-					}
-				}
+				case strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'DENY') === 0:
+					header('X-Frame-Options: DENY');
+					break;
 
-				if ($x_frame_options == 'SAMEORIGIN') {
-					header('X-Frame-Options: '.$x_frame_options);
-				}
-				else {
-					header('Content-Security-Policy: frame-ancestors '.$x_frame_options);
-				}
+				default:
+					$allowed_urls = explode(',', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
+					$allowed_urls[] = $_SERVER['HTTP_HOST'];
+
+					header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
 			}
 		}
-		break;
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {

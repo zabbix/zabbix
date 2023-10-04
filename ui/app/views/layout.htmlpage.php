@@ -28,38 +28,22 @@ function local_showHeader(array $data): void {
 	header('X-Content-Type-Options: nosniff');
 	header('X-XSS-Protection: 1; mode=block');
 
-	if (strcasecmp($data['config']['x_frame_options'], 'null') != 0) {
-		if (strcasecmp($data['config']['x_frame_options'], 'SAMEORIGIN') == 0
-				|| strcasecmp($data['config']['x_frame_options'], 'DENY') == 0) {
-			header('X-Frame-Options: '.$data['config']['x_frame_options']);
-		}
-		else {
-			$x_frame_options = 'SAMEORIGIN';
-			$allowed_urls = explode(',', $data['config']['x_frame_options']);
-			$url_to_check = array_key_exists('HTTP_REFERER', $_SERVER)
-				? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST)
-				: null;
+	if (strcasecmp($data['config']['x_frame_options'], 'null') !== 0) {
+		switch (true) {
+			case strcasecmp($data['config']['x_frame_options'], 'SAMEORIGIN') === 0:
+			case strcasecmp(trim($data['config']['x_frame_options']), '') === 0:
+				header('X-Frame-Options: SAMEORIGIN');
+				break;
 
-			if ($url_to_check) {
-				if ($url_to_check == $_SERVER['HTTP_HOST']) {
-					$allowed_urls[] = $_SERVER['HTTP_HOST'];
-					$x_frame_options = implode(' ', $allowed_urls);
-				} else {
-					foreach ($allowed_urls as $allowed_url) {
-						if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
-							$x_frame_options = $allowed_url;
-							break;
-						}
-					}
-				}
-			}
+			case strcasecmp($data['config']['x_frame_options'], 'DENY') === 0:
+				header('X-Frame-Options: DENY');
+				break;
 
-			if ($x_frame_options == 'SAMEORIGIN') {
-				header('X-Frame-Options: '.$x_frame_options);
-			}
-			else {
-				header('Content-Security-Policy: frame-ancestors '.$x_frame_options);
-			}
+			default:
+				$allowed_urls = explode(',', $data['config']['x_frame_options']);
+				$allowed_urls[] = $_SERVER['HTTP_HOST'];
+
+				header('Content-Security-Policy: frame-ancestors '.implode(' ', $allowed_urls));
 		}
 	}
 
