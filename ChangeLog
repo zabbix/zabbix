@@ -1,15 +1,15 @@
 Changes for 7.0.0alpha6
 
 New features:
-..F....... [ZBXNEXT-8453] fixed navigation confirmation window for trigger edit form, check permission, error messages for tag tab (epulke)
-..F.I..... [ZBXNEXT-7736] added support for active checks, show only totals option and added Total Hosts column/row in Host Availability widget (dfofanovs, dgoloscapov)
-.........T [ZBXNEXT-8283] implemented role based authentication for AWS monitoring (abakaldin)
+..F....... [ZBXNEXT-8453] fixed navigation confirmation window for trigger edit form, permission check, error messages for tag tab (epulke)
+..F.I..... [ZBXNEXT-7736] added support for active checks, "show only totals" option and host total column/row in Host availability widget (dfofanovs, dgoloscapov)
+.........T [ZBXNEXT-8283] implemented role-based authentication for AWS monitoring (abakaldin)
 .........T [ZBXNEXT-8575] added Nextcloud template (abakaldin)
 A.F....PS. [ZBXNEXT-8645] added get[oid] to retrieve single value asynchronously (agriscenko, vso)
 
 Bug fixes:
 .........T [ZBX-23164] added timespan parameter in JavaScript Cisco Meraki template (egordymov)
-..F....... [ZBX-23288] fixed top triggers widget showing incorrect entries when custom trigger count is set (Ivo)
+..F....... [ZBX-23288] fixed Top triggers widget showing incorrect entries when custom trigger count is set (Ivo)
 ..F....... [ZBX-23465] fixed alignment of tag badges (dpetra)
 ..F....... [ZBX-23455] fixed inconsistency in button naming, confirmation messages, success and error messages in item and web scenario list pages (dpetra)
 ...G...... [ZBX-20038] fixed master host parameter for MySQL replication.get_slave_status key in Zabbix agent 2 (esneiders)
