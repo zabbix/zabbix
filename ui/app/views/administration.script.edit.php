@@ -170,6 +170,7 @@ $form_list = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setMaxLength(DB::getFieldLength('scripts', 'command'))
 			->setAriaRequired()
+			->disableSpellcheck()
 	)
 	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
 		(new CTextBox('commandipmi', $data['commandipmi'], false, DB::getFieldLength('scripts', 'command')))

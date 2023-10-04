@@ -166,8 +166,11 @@ class CControllerPopupImport extends CController {
 			}
 			else {
 				CMessageHelper::setErrorTitle(_('Import failed'));
-				$output['errors'] = makeMessageBox(ZBX_STYLE_MSG_BAD, filter_messages(), CMessageHelper::getTitle())
-					->toString();
+
+				$output['errors'] = [
+					'title' => CMessageHelper::getTitle(),
+					'messages' => array_column(filter_messages(), 'message')
+				];
 			}
 
 			$this->setResponse(

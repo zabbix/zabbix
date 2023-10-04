@@ -308,6 +308,7 @@ $item_tab
 		(new CLabel(_('Request body'), 'posts'))->setId('js-item-posts-label'),
 		(new CFormField((new CTextArea('posts', $data['posts'], ['readonly' =>  $data['limited']]))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 		))->setId('js-item-posts-field')
 	]);
 
@@ -632,6 +633,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 		))->setId('js-item-executed-script-field')
 	])
 	->addItem([
@@ -642,6 +644,7 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
+			->disableSpellcheck()
 		))->setId('js-item-sql-query-field')
 	])
 	->addItem([
@@ -775,20 +778,6 @@ $condition_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
-$conditions = $data['conditions'];
-
-if (!$conditions) {
-	$conditions = [[
-		'macro' => '',
-		'operator' => CONDITION_OPERATOR_REGEXP,
-		'value' => '',
-		'formulaid' => num2letter(0)
-	]];
-}
-else {
-	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
-}
-
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
@@ -796,8 +785,7 @@ $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
 ]);
 
-// fields
-foreach ($conditions as $i => $condition) {
+foreach ($data['conditions'] as $i => $condition) {
 	// formula id
 	$formulaid = [
 		new CSpan($condition['formulaid']),
@@ -897,14 +885,16 @@ foreach ($lld_macro_paths as $i => $lld_macro_path) {
 	]))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
-		->setAttribute('placeholder', '{#MACRO}');
+		->setAttribute('placeholder', '{#MACRO}')
+		->disableSpellcheck();
 
 	$path = (new CTextAreaFlexible('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], [
 		'readonly' => $templated,
 		'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
 	]))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		->setAttribute('placeholder', _('$.path.to.node'));
+		->setAttribute('placeholder', _('$.path.to.node'))
+		->disableSpellcheck();
 
 	$remove = [
 		(new CButton('lld_macro_paths['.$i.'][remove]', _('Remove')))

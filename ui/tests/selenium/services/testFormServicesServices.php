@@ -27,6 +27,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  * @backup services
  *
  * @dataSource Services
+ * @dataSource EntitiesTags
  *
  * @onBefore prepareServicesData
  */
@@ -330,8 +331,8 @@ class testFormServicesServices extends CWebTest {
 		$children_dialog->waitUntilReady();
 
 		// Check possible children count in table.
-		$this->assertEquals(count(self::$serviceids), $children_dialog->query('class:list-table')->asTable()->one()
-				->getRows()->count()
+		$this->assertEquals(CDBHelper::getCount('SELECT null FROM services'), $children_dialog->query('class:list-table')
+				->asTable()->one()->getRows()->count()
 		);
 
 		foreach (['Add', 'Cancel'] as $button) {

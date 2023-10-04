@@ -1884,6 +1884,34 @@ out:
 	return ret;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mpoints_free                                                 *
+ *                                                                            *
+ * Purpose: frees previously allocated mount-point structure                  *
+ *                                                                            *
+ * Parameters: mpoint - [IN] pointer to structure from vector                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
+{
+	zbx_free(mpoint);
+}
+
+int	zbx_fsname_compare(const void *fs1, const void *fs2)
+{
+	int			res;
+	const zbx_mpoint_t	*f1 = *((const zbx_mpoint_t * const *)fs1);
+	const zbx_fsname_t	*f2 = *((const zbx_fsname_t * const *)fs2);
+
+	if (0 != (res = strcmp(f1->fsname, f2->mpoint)))
+		return res;
+
+	return strcmp(f1->fstype, f2->type);
+}
 #else
 
 static ZBX_THREAD_LOCAL zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
@@ -2028,20 +2056,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees previously allocated mount-point structure                  *
- *                                                                            *
- * Parameters: mpoint - [IN] pointer to structure from vector                 *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
-{
-	zbx_free(mpoint);
-}
 
 #ifndef _WINDOWS
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)

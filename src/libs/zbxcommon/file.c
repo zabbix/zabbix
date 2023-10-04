@@ -83,7 +83,7 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  * Purpose: Read one text line from a file descriptor into buffer             *
  *                                                                            *
  * Parameters: fd       - [IN] file descriptor to read from                   *
- *             buf      - [IN] buffer to read into                            *
+ *             buf      - [OUT] buffer to read into                           *
  *             count    - [IN] buffer size in bytes                           *
  *             encoding - [IN] pointer to a text string describing encoding.  *
  *                        See function find_cr_lf_szbyte() for supported      *
@@ -92,13 +92,16 @@ void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, s
  *                                                                            *
  * Return value: On success, the number of bytes read is returned (0 (zero)   *
  *               indicates end of file).                                      *
- *               On error, -1 is returned and errno is set appropriately.     *
+ *               On error, -1 (ZBX_READ_ERR) is returned and errno is set     *
+ *               appropriately.                                               *
+ *               If the wrong decoding is detected, -2                        *
+ *               (ZBX_READ_WRONG_ENCODING) is returned.                       *
  *                                                                            *
  * Comments: Reading stops after a newline. If the newline is read, it is     *
  *           stored into the buffer.                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
+int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding)
 {
 	size_t		i, szbyte;
 	ssize_t		nbytes;
@@ -106,12 +109,18 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	zbx_offset_t	offset;
 
 	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
-		return -1;
+		return ZBX_READ_ERR;
 
 	if (0 >= (nbytes = read(fd, buf, count)))
 		return (int)nbytes;
 
 	find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
+
+	/* nbytes can be smaller than szbyte. If the target file was encoded in UTF-8 and contained a single */
+	/* character, but the target encoding was mistakenly set to UTF-32. Then nbytes will be 1 and szbyte */
+	/* will be 4.                                                                                        */
+	if ((size_t)nbytes < szbyte)
+		return ZBX_READ_WRONG_ENCODING;
 
 	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
 	{
@@ -133,7 +142,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	}
 
 	if ((zbx_offset_t)-1 == zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET))
-		return -1;
+		return ZBX_READ_ERR;
 
 	return (int)i;
 }

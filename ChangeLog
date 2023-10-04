@@ -1,21 +1,193 @@
+Changes for 6.0.23rc1
+
+New features:
+.........T [ZBXNEXT-8283] implemented role based authentication for AWS monitoring (abakaldin)
+.........T [ZBXNEXT-8575] added Nextcloud template (abakaldin)
+.......PS. [ZBXNEXT-8469] increased PostgreSQL maximum supported version to 16 (mprihodko)
+.......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
+
+Bug fixes:
+.........T [ZBX-23164] added timespan parameter in JavaScript Cisco Meraki template (egordymov)
+..F....... [ZBX-23455] fixed inconsistency in button naming, confirmation messages, success and error messages in item and web scenario list pages (dpetra)
+...G...... [ZBX-20038] fixed master host parameter for MySQL replication.get_slave_status key in Zabbix agent 2 (esneiders)
+..F.....S. [ZBX-23301] removed checks for PostgreSQL-TimescaleDB versions combination (dimir)
+..F....... [ZBX-23211] fixed host dashboard view for multi page dashboard where the first page is empty (dpetra)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.22
+
+6.0.22rc1 was released as 6.0.22 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.22rc1
+
+New features:
+.........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
+..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
+.........T [ZBXNEXT-8610] added MantisBT template (abiba)
+.......PS. [ZBXNEXT-8358] improved items configuration sync on PostgreSQL by selecting using equal condition instead of not equal (vso)
+.........T [ZBXNEXT-8429] added HashiCorp Nomad template (igorbach)
+.........T [ZBXNEXT-8649] fixed time period params in JavaScript (egordymov)
+
+Bug fixes:
+...G...... [ZBX-23417] fixed possible memory leak when checking modbus.get[] item (Andris)
+A......... [ZBX-23338] improved performance of templatedashboard.get method for non super-admin users (Sasha)
+...G...... [ZBX-23110] fixed possible crash on Windows 11 by removing concurrent Win API call for update perfCounters list (MVekslers)
+A......... [ZBX-23284] prevented deletion of the discovered group as a result of renaming its group prototype (vmaksimovs)
+..F....... [ZBX-21094] fixed graphs not displaying values when items do not have trends and trend storage period is overridden in configuration (Ivo)
+.........T [ZBX-23162] fixed variable in JavaScript for Cisco Meraki template (egordymov)
+..F....... [ZBX-23066] expanded ui/composer.json to describe the project (jxl)
+..F....... [ZBX-23261] removed kiosk mode button from host inventory form (apoga)
+..F....... [ZBX-23253] added static units support to graph widget legend and hint box (ashubin)
+..F....... [ZBX-21898] fixed expression validation, history function parser to accept backslash without escaping (epulke)
+...G...... [ZBX-22943] fixed various memory leaks in Zabbix agent 2 (arimdjonoks)
+.........T [ZBX-23244] added escaping for special characters in HTML mode of Telegram mediatype (aiantsen)
+..F....... [ZBX-22818] fixed some aggregation functions not working with last_foreach() (agriscenko)
+..F....... [ZBX-21636] fixed Oracle DB update query error mishandled as success (jfreibergs)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+........S. [ZBX-15210] added housekeeping and handling in remove action operation of autoreg_host table (dimir)
+..F....... [ZBX-22685] fixed issue of error message details not being expanded by default in various forms (esekace)
+..F....... [ZBX-22166] fixed item value widget not showing decimal places properly with seconds (dfofanovs)
+..F....... [ZBX-23035] fixed disappearing filter group in host, item, trigger, graph, discovery rule, web and template lists (dpetra)
+....I..... [ZBX-23105] added missing database indices (dimir)
+..F....... [ZBX-22640] fixed inability to add unique SNMPv3 checks in discovery rules (apoga)
+.D........ [ZBX-21952] fixed and improved documentation for Oracle by ODBC template (knaglis)
+..F....... [ZBX-22724] fixed inconsistencies in ordering of objects in template configuration export (jfreibergs)
+..F....... [ZBX-22980] fixed host prototype displaying inherited macros in a non-inherited macro tab (Ivo)
+..F....... [ZBX-17279] fixed graph widget loading (apoga)
+A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
+.........T [ZBX-22060] added notes about encryption in PostgreSQL templates, renamed database instance URI macro to connection string in PostgreSQL by Zabbix agent 2 template, updated PostgreSQL by ODBC template to use connection string (drasikhov)
+..F....... [ZBX-23246] fixed classic graph preview not working if more than 10 items are assigned to it (jfreibergs)
+...G...... [ZBX-22758] fixed Zabbix agent 2 startup error on domain controllers by increasing go-winio version (asestakovs)
+..F....... [ZBX-22451] fixed resolving of calculated item formula in test popup (miks)
+.........T [ZBX-22620] added header in items for Meraki template (egordymov)
+.........T [ZBX-23051] changed content of resolved alerts to be more compatible with Event Orchestration in PagerDuty (aiantsen)
+.........T [ZBX-23272] fixed naming for tenant item prototypes in OpenStack Nova by HTTP template (knaglis)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.21
+
+6.0.21rc1 was released as 6.0.21 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.21rc1
+
+New features:
+.........T [ZBXNEXT-8581] added support for HTTP proxy in Azure templates (egordymov)
+.........T [ZBXNEXT-8558] added MantisBT webhook (abiba)
+.........T [ZBXNEXT-8589] updated documentation, unified metric names and descriptions in PostgreSQL templates, removed unused macros, user parameters and queries in PostgreSQL by Zabbix agent (drasikhov)
+.........T [ZBXNEXT-8528] added AWS Cost Explorer template (egordymov)
+..F....PS. [ZBXNEXT-8190] increased MariaDB maximum supported version to 11.0 (mprihodko)
+..F....PS. [ZBXNEXT-8582] increased MySQL maximum supported version to 8.1 (mprihodko)
+
+Bug fixes:
+........S. [ZBX-22771] fixed handling of large unsigned integers in jsonpath (dgoloscapov)
+...G...... [ZBX-22871] fixed regular expression crash with invalid utf-8 sequences when pcre2 is used (wiper)
+.......PS. [ZBX-23141] fixed crash when maintenance is enabled and unexpected event exists for trigger prototype (vso)
+..F....... [ZBX-21255] added support of the fmtnum() function for {ITEM.VALUE}, {ITEM.LASTVALUE} and expression macros (Sasha)
+........S. [ZBX-21695] fixed {TIME} macro not being resolved during scheduled report test (vso)
+...G...PS. [ZBX-23221] fixed memory leaks when using certificate-based encryption in Zabbix Agent 1 and Agent 2; thanks to Masato Hirahata for the patch (akozlovs, Andris)
+.......PS. [ZBX-22864] fixed calculation of max_repetitions sent out to device in SNMP PDUs (mprihodko)
+.........T [ZBX-21574] optimized Asterisk by HTTP template (egordymov)
+...G...PS. [ZBX-18168] added regexp runtime error logging for log*[] items (Andris)
+..F....... [ZBX-22677] adjusted font colors for placeholders, disabled and readonly fields (dfofanovs)
+..F....... [ZBX-22972] fixed displaying of dashboard pages when scrolling is enabled (apoga)
+..F....... [ZBX-22528] fixed draggable element position (ashubin, dpetra)
+........S. [ZBX-23067] enhanced audit logging with reason of switching of HA node to active mode (arimdjonoks)
+A......... [ZBX-22613] fixed script execution with API token as authentication (epulke)
+.........T [ZBX-23060] removed unused endpoints in JavaScript for Veeam Backup and Replication template (egordymov)
+........S. [ZBX-22772] added trends cleanup for non-numeric value types (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.20
+
+6.0.20rc1 was released as 6.0.20 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.20rc1
+
+New features:
+.........T [ZBXNEXT-8481] added PostgreSQL by ODBC template (drasikhov)
+.........T [ZBXNEXT-8561] added nodata trigger to remote Zabbix proxy and server health templates (drasikhov)
+.........T [ZBXNEXT-8482] added integration with OpenStack Nova (knaglis)
+..F....... [ZBXNEXT-8451] disabled spell checking for nondescriptive textareas (dfofanovs)
+.........T [ZBXNEXT-8505] added Cisco SD-WAN templates (aiantsen)
+.........T [ZBXNEXT-7944] excluded edgeupdate service from services discovery in Windows by Zabbix agent templates (drasikhov)
+.........T [ZBXNEXT-8422] added AWS ECS templates (egordymov)
+
+Bug fixes:
+..F....... [ZBX-22822] fixed displaying the correct threshold color in "Top hosts" widget when value exceeds maximum (Ivo)
+..F....... [ZBX-22777] fixed item test form sending incorrectly resolved macros to server if item uses SNMP interface (Ivo)
+...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
+A......... [ZBX-23112] fixed runtime errors in the inheritance of the trigger and trigger prototype dependencies (Sasha)
+A......... [ZBX-22539] fixed SLI calculation for days with daylight-saving-time transitions (averza)
+A......... [ZBX-22814] fixed PHP runtime errors in API trigger.get method when using "expandComment" option (Ivo)
+........S. [ZBX-23049] fixed default condition for log item macro resolution (kprutkovs)
+.........T [ZBX-21909] updated setup section in README for PHP-FPM templates to include configuration example for Apache (drasikhov)
+...G...... [ZBX-21547] fixed reading of non-UTF-8 encoded files in Zabbix agent 2 (arimdjonoks)
+........S. [ZBX-20148] fixed the issue with housekeeper failing to delete some of the events that required deletion (mprihodko)
+..F....... [ZBX-21970] fixed console error in "Map navigation tree" widget; disabled add button on a 10th depth level (acikuns, ashubin)
+A......... [ZBX-19393] fixed undefined index errors in configuration.importcompare (agriscenko)
+..F....... [ZBX-22290] fixed generation of double page headers when general warning appears (epulke)
+...G...... [ZBX-21845] fixed Zabbix agent 2 systemd plugin failing with newer dbus (esneiders)
+...G...... [ZBX-22830] fixed free bytes calculation for temporary tablespace in Oracle Zabbix agent 2 plugin (esneiders)
+..F....... [ZBX-22912] fixed not being able to save an event correlation when custom formula was selected but only one condition remained (Ivo)
+.........T [ZBX-21571] updated pod crash loop trigger expressions in Kubernetes nodes and cluster state templates (drasikhov)
+..F....... [ZBX-22369] fixed suffix interpretation in threshold values for "Top hosts" widget (esekace)
+..F....... [ZBX-22825] fixed Zabbix access to the first page for user with specific page access (dpetra)
+..F....... [ZBX-22867] fixed import popup showing circle animation even if PHP code failed (dfofanovs)
+..F....... [ZBX-22711] fixed incorrectly displayed simple graphs with non-numeric items in Host graphs page (kkuzmina)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.19
+
+6.0.19rc1 was released as 6.0.19 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.19rc1
 
 New features:
+.........T [ZBXNEXT-8497] removed unnecessary JavaScript preprocessing in discovery rules in Kubernetes templates (drasikhov)
+.........T [ZBXNEXT-8465] updated JavaScript scripts in Kubernetes templates (egordymov)
+........S. [ZBXNEXT-8467] updated max supported TimescaleDB version to 2.11 (mprihodko)
+..F....... [ZBXNEXT-7072] fixed hintbox to be automatically closed when target element disappears (miks)
 .........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
+...G...... [ZBX-21859] fixed active checks occasionally not being executed on Zabbix agent 2 if checks for a plugin have long and short update intervals (vso)
+...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems with identical mount point (asestakovs)
+A......... [ZBX-22941] prevented clearing of the user macro secret values on inherited host prototypes as the result of user macros modifications on the parent host prototype of a template (vmaksimovs)
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
+..F....... [ZBX-22903] fixed scale calculation for Graph and Graph (classic) widgets (averza)
+.......PS. [ZBX-22148] fixed the crash when updating a webhook to JavaScript that cannot be compiled (vso)
+...G...... [ZBX-22868] fixed Zabbix agent 2 plugin Defaults when hardcoded value is provided (esneiders)
+...G...... [ZBX-22399] added TLS and Default parameters support to MQTT plugin for Zabbix agent 2 (esneiders)
+..F....... [ZBX-20280] fixed page selection in a dashboard after refresh (apoga)
+...G...... [ZBX-22883] fixed occasional crash of user parameters on Windows when using Zabbix agent 2 with UserParameterDir defined (MVekslers)
+.......PS. [ZBX-22805] increased memory allocation limit for JavaScript execution from 64M to 512M (akozlovs)
+...G...... [ZBX-22798] fixed incorrect output of vfs.file.contents when reading frequently modified file (dgoloscapov, vso)
+.........T [ZBX-21573] optimized preprocessing steps in the AWS EC2 by HTTP template (aiantsen)
+..F....... [ZBX-16326] fixed displaying of the first and last data points on the graphs (Sasha)
+.........T [ZBX-22467] fixed missing bracket in a trigger event name in Windows templates (drasikhov)
+..F....... [ZBX-22738] fixed flickering debug info while editing empty dashboards (averza)
+..F....... [ZBX-22231] removed host and interface macros resolution from HTTP proxy fields in items, item prototype and discovery rule test dialogues (epulke)
+..F....... [ZBX-21194] fixed filter form submission upon pressing Enter key in Safari (acikuns)
+...G...... [ZBX-22762] fixed race condition in Zabbix agent 2 when reading filesystem (arimdjonoks)
+A.F....... [ZBX-21804] removed requirement for write permissions on hosts, host groups, triggers, discovery rules, discovery checks and proxies when creating or updating actions (gcalenko)
+..F....... [ZBX-22243] fixed navigation away from edited dashboard without user confirmation (averza)
 ..F....... [ZBX-22418] fixed popup form fields overlapping labels when textarea width is resized (agriscenko)
 ........S. [ZBX-19590] changed count_foreach to add 0 when no data are in the requested period (wiper)
-..F....... [ZBX-22681] fixed wrongly displayed revert button for text macros in host, template and host prototype clone form (miks)
-..F....... [ZBX-22594] fixed fatal error when requests contains invalid authentication parameters (miks)
-..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
-.........T [ZBX-21593] optimised preprocessing steps in both templates PostgreSQL by Zabbix agent and PostgreSQL by Zabbix agent 2 (aiantsen)
+..F....... [ZBX-22681] fixed wrongly displayed Revert button for text macros in host, template and host prototype clone forms (miks)
+..F....... [ZBX-22594] fixed fatal error when a request contains invalid authentication parameters (miks)
+..F....... [ZBX-22397] fixed disabled input field text color in Safari (miks)
+.........T [ZBX-21593] optimized preprocessing steps in the templates PostgreSQL by Zabbix agent and PostgreSQL by Zabbix agent 2 (aiantsen)
 ...G...... [ZBX-22470] fixed hang on logging when establishing an encrypted connection in Zabbix agent 2 (kprutkovs)
 A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template; improved the check for double template linkage and related error messages (epulke, jfreibergs, vmaksimovs)
-........S. [ZBX-22571] fixed service not equal action condition not working as expected (vso)
-..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
-.........T [ZBX-22698] fixed spelling mistakes in templates (egordymov)
-..F....... [ZBX-21883] changed map widgets select map field to multiselect (agriscenko, Sasha)
+........S. [ZBX-22571] fixed "service not equal" action condition not working as expected (vso)
+..F....... [ZBX-22644] fixed Graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
+.........T [ZBX-22698] fixed spelling mistakes in the templates (egordymov)
+..F....... [ZBX-21883] changed Select map field of the Map widget to multiselect (agriscenko, Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.18
@@ -37,6 +209,8 @@ A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
 .........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
 .........T [ZBX-22475] fixed regex in preprocessing parameter for Jenkins template (egordymov)
 .........T [ZBX-21910] fixed JavaScript in Kubernetes nodes template (egordymov)
@@ -212,6 +386,9 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+.......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out of bounds access with JSONPath on invalid unicode character (vso)
 ........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
 ........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
 ........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
@@ -2576,14 +2753,49 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
-Changes for 5.0.36rc1
+Changes for 5.0.38
 
-New features:
+5.0.38rc1 was released as 5.0.38 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.38rc1
 
 Bug fixes:
-..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
-A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, vmaksimovs)
-..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
+........S. [ZBX-23303] fixed syntax of message identifier in the In-Reply-To e-mail header field (asitals)
+...G...... [ZBX-20442] fixed Ceph plugin not returning percent_used in Zabbix agent 2 (rzvejs)
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
+..F....... [ZBX-17279] fixed graph widget loading (apoga)
+A......... [ZBX-21644] fixed state of "allow manual close" setting of trigger prototype getting lost on template cloning (jfreibergs)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37
+
+5.0.37rc1 was released as 5.0.37 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.37rc1
+
+Bug fixes:
+...G...PS. [ZBX-23097] fixed use of uninitialised value when verifying subject and issuer with TLS (vso)
+...G...... [ZBX-22830] fixed free bytes calculation for temporary tablespace in Oracle Zabbix agent 2 plugin (esneiders)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.36
+
+5.0.36rc1 was released as 5.0.36 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.36rc1
+
+Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
+...G...... [ZBX-21859] fixed active checks occasionally not being executed on Zabbix agent 2 if checks for a plugin have long and short update intervals (vso)
+...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems with identical mount point (asestakovs)
+.......PS. [ZBX-22148] fixed the crash when updating a webhook to JavaScript that cannot be compiled (vso)
+...G...... [ZBX-22798] fixed incorrect output of vfs.file.contents when reading frequently modified file (dgoloscapov, vso)
+..F....... [ZBX-22397] fixed disabled input field text color in Safari (miks)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, jfreibergs, vmaksimovs)
+..F....... [ZBX-22644] fixed Graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.35
@@ -2597,7 +2809,8 @@ New features:
 ...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
 
 Bug fixes:
-...G...... [ZBX-22797] fixed Zabbix agent 2 PostgresSQL plugin memory leak (esneiders)
+.......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
+...G...... [ZBX-22797] fixed Zabbix agent 2 PostgreSQL plugin memory leak (esneiders)
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
 ..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
@@ -2668,6 +2881,8 @@ Bug fixes:
 Changes for 5.0.32rc1
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
@@ -5389,11 +5604,36 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.47rc1
+Changes for 4.0.49
 
-New features:
+4.0.49rc1 was released as 4.0.49 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.49rc1
 
 Bug fixes:
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48
+
+4.0.48rc1 was released as 4.0.48 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48rc1
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.47
+
+4.0.47rc1 was released as 4.0.47 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.47rc1
+
+Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.46

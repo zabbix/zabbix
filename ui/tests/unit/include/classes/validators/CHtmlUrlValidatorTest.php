@@ -100,7 +100,8 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['http://{{{$USER_URL_MACRO}',								[],															true],
 			['http://{$MACRO{$MACRO}}',									[],															true],
 			['{$MACRO{',												[],															true],
-			["h\tt\rt\nps://zabbix.com",								[],															true], // CR, LF and TAB characters are ingored by browsers.
+			["\x00\x20https://zabbix.com\x1F\x20",						[],															true], // Leading and trailing C0 control and space characters are ignored by browsers.
+			["h\tt\rt\nps://zabbix.com",								[],															true], // CR, LF and TAB characters are ignored by browsers.
 			['ht tps://zabbix.com',										[],															true], // URL with spaces in schema is treated as a path.
 			// Inventory macros are going to be considered as "path".
 			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
@@ -127,7 +128,8 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['http:///',												[],															false], // url_parse() returns false.
 			['http:',													[],															false], // Scheme with no host.
 			['http://?',												[],															false], // url_parse() returns false.
-			["ja\tva\rsc\nript:alert(1)",								[],															false], // Invalid scheme. CR, LF and TAB characters are ingored by browsers.
+			["\x00\x20javascript:alert(1)\x1F\x20",						[],															false], // Invalid scheme. Leading and trailing C0 control and space characters are ignored by browsers.
+			["ja\tva\rsc\nript:alert(1)",								[],															false], // Invalid scheme. CR, LF and TAB characters are ignored by browsers.
 			['javascript:alert(]',										[],															false], // Invalid scheme.
 			['protocol://{$INVALID!MACRO}',								[],															false], // Invalid scheme. Also macro is not valid, but that's secondary.
 			['',														[],															false], // Cannot be empty.

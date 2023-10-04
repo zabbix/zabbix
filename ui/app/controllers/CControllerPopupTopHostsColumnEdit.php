@@ -131,7 +131,11 @@ class CControllerPopupTopHostsColumnEdit extends CController {
 		}
 
 		if ($thresholds) {
-			CArrayHelper::sort($thresholds, ['order_threshold']);
+			uasort($thresholds,
+				static function (array $threshold_1, array $threshold_2): int {
+					return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
+				}
+			);
 
 			$input['thresholds'] = [];
 

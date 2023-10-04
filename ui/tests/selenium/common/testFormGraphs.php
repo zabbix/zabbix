@@ -638,7 +638,7 @@ class testFormGraphs extends CWebTest {
 			foreach ($data['items'] as $i => $item) {
 				$items_container->query('button', CTestArrayHelper::get($item, 'prototype', false) ? 'Add prototype' : 'Add')
 						->waitUntilClickable()->one()->click();
-				$dialog = COverlayDialogElement::find()->one();
+				$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 				$dialog->query('link', $item['item'])->waitUntilClickable()->one()->click();
 				$dialog->ensureNotPresent();
 
@@ -766,8 +766,8 @@ class testFormGraphs extends CWebTest {
 						'id:ymax_type' => CFormElement::RELOADABLE_FILL('Item')
 					],
 					'yaxis_items' => [
-						'min' => 'Failed step of scenario "testFormWeb3".',
-						'max' => 'Download speed for scenario "testFormWeb4".'
+						'min' => 'Failed step of scenario "Scenario for Update".',
+						'max' => 'Download speed for scenario "Scenario for Delete".'
 					],
 					'items' => [
 						[

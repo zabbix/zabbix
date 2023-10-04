@@ -33,8 +33,8 @@ class CMessageElement extends CElement {
 	 * @return CMessageElement
 	 */
 	public static function find($selector = null, $strict = false) {
-		$preffix = 'xpath:./'.(!$strict ? '/' : '');
-		$query = new CElementQuery($preffix.'output[@role="contentinfo" or '.CXPathHelper::fromClass('msg-global').']');
+		$prefix = 'xpath:./'.(!$strict ? '/' : '');
+		$query = new CElementQuery($prefix.'output[@role="contentinfo" or '.CXPathHelper::fromClass('msg-global').']');
 		if ($selector) {
 			if (!$selector instanceof CElement) {
 				$selector = (new CElementQuery($selector))->waitUntilPresent()->one();

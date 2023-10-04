@@ -471,14 +471,13 @@ class testDashboardPages extends CWebTest {
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		$tab = $this->query('class:selected-tab')->one();
 
-		// If next page button exists press next tab buttun until the required tab is selected.
-		if ($next_page->isVisible()) {
-			while ($tab->getText() !== $data['fields']['Name'] && $next_page->isClickable()) {
+		// If next page button exists and enabled press next tab buttun until the required tab is selected.
+		if ($next_page->isClickable()) {
+			while ($tab->getText() !== $title && $next_page->isClickable()) {
 				$next_page->click();
 				$tab->waitUntilAttributesNotPresent(['class' => 'selected-tab']);
 				$tab->reload();
 			}
-
 		}
 
 		$index = CTestArrayHelper::get($data, 'duplicate', false) ? 2 : 1;
@@ -559,7 +558,7 @@ class testDashboardPages extends CWebTest {
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
 
 		// Press Escape key to close page menu before saving the dashboard.
-		$this->page->keyPress(WebDriverKeys::ESCAPE);
+		$this->page->pressKey(WebDriverKeys::ESCAPE);
 		$page_menu->waitUntilNotVisible();
 
 		$dashboard->save();
@@ -628,7 +627,7 @@ class testDashboardPages extends CWebTest {
 			foreach ($widget_name as $widget) {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($direction).')]')
-						->one()->click();
+						->one()->hoverMouse()->click();
 			}
 		}
 

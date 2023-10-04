@@ -1279,7 +1279,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, array $db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTemplates(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hosts_templates = [];
@@ -1342,7 +1342,7 @@ abstract class CHostBase extends CApiService {
 					$upd_hostids[$i] = $host[$id_field_name];
 				}
 				else {
-					unset($host['templates']);
+					unset($host['templates'], $host['templates_clear'], $db_hosts[$host[$id_field_name]]['templates']);
 				}
 			}
 		}
@@ -1376,7 +1376,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTagsNew(array &$hosts, array $db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTagsNew(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_tags = [];
@@ -1419,7 +1419,7 @@ abstract class CHostBase extends CApiService {
 					$upd_hostids[$i] = $host[$id_field_name];
 				}
 				else {
-					unset($host['tags']);
+					unset($host['tags'], $db_hosts[$host[$id_field_name]]['tags']);
 				}
 			}
 		}
@@ -1453,7 +1453,7 @@ abstract class CHostBase extends CApiService {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateMacros(array &$hosts, array $db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateMacros(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		$ins_hostmacros = [];
@@ -1499,7 +1499,7 @@ abstract class CHostBase extends CApiService {
 					$upd_hostids[$i] = $host[$id_field_name];
 				}
 				else {
-					unset($host['macros']);
+					unset($host['macros'], $db_hosts[$host[$id_field_name]]['macros']);
 				}
 			}
 		}

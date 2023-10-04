@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-07T11:30:04Z'
+  date: '2023-09-20T10:46:41Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -217,20 +217,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: E
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
-              - macro: '{#FSNAME}'
-                value: '{$VFS.FS.FSNAME.MATCHES}'
-                formulaid: C
-              - macro: '{#FSNAME}'
-                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#FSDRIVETYPE}'
                 value: '{$VFS.FS.FSDRIVETYPE.MATCHES}'
                 formulaid: A
@@ -238,6 +224,20 @@ zabbix_export:
                 value: '{$VFS.FS.FSDRIVETYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.MATCHES}'
+                formulaid: C
+              - macro: '{#FSNAME}'
+                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.MATCHES}'
+                formulaid: E
+              - macro: '{#FSTYPE}'
+                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Discovery of file systems of different types.'
           item_prototypes:
             - uuid: 84c999eefbdd43319d0b992aff43f3c5
@@ -380,14 +380,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Windows filesystems by Zabbix agent'
                         name: '{#FSLABEL}({#FSNAME}): Disk space usage'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
     - uuid: 95c4026f8ade4fa7b72f8140fc152aea
       template: 'Windows generic by Zabbix agent'
       name: 'Windows generic by Zabbix agent'
@@ -524,27 +524,27 @@ zabbix_export:
                   width: '24'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'Windows generic by Zabbix agent'
                         key: 'proc.num[]'
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '24'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'Windows generic by Zabbix agent'
                         key: 'perf_counter_en["\System\Threads"]'
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
     - uuid: 539b4b98f6fb4e12bbdf3bcdb85df2d1
       template: 'Windows memory by Zabbix agent'
       name: 'Windows memory by Zabbix agent'
@@ -805,20 +805,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.MATCHES}'
-                formulaid: E
-              - macro: '{#IFNAME}'
-                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: F
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.MATCHES}'
-                formulaid: C
-              - macro: '{#IFDESCR}'
-                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#IFALIAS}'
                 value: '{$NET.IF.IFALIAS.MATCHES}'
                 formulaid: A
@@ -826,6 +812,20 @@ zabbix_export:
                 value: '{$NET.IF.IFALIAS.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.MATCHES}'
+                formulaid: C
+              - macro: '{#IFDESCR}'
+                value: '{$NET.IF.IFDESCR.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.MATCHES}'
+                formulaid: E
+              - macro: '{#IFNAME}'
+                value: '{$NET.IF.IFNAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: F
           description: 'Discovery of installed network interfaces.'
           item_prototypes:
             - uuid: 9e9fdb17beee45ef9bc0eac67c512da4
@@ -1195,14 +1195,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Windows network by Zabbix agent'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
       valuemaps:
         - uuid: dd37c51d4ded48ceb449fa633dd707e2
           name: 'Win32_NetworkAdapter::AdapterTypeId'
@@ -1509,14 +1509,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk average queue length'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1525,14 +1525,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk average waiting time'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -1541,14 +1541,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk read/write rates'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -1557,14 +1557,14 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'Windows physical disks by Zabbix agent'
                         name: '{#DEVNAME}: Disk utilization and queue'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
     - uuid: dfd6f32510a840c29f9cb4b974977770
       template: 'Windows services by Zabbix agent'
       name: 'Windows services by Zabbix agent'
@@ -1626,7 +1626,7 @@ zabbix_export:
           value: '^.*$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv|edgeupdate)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.STARTUPNAME.MATCHES}'
           value: '^(?:automatic|automatic delayed)$'

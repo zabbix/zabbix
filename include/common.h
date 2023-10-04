@@ -110,7 +110,7 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_ZBX_DNSNAME_LEN	255	/* maximum host DNS name length from RFC 1035 (without terminating '\0') */
-#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
+#define MAX_EXECUTE_OUTPUT_LEN	(16 * ZBX_MEBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
@@ -1389,7 +1389,9 @@ zbx_file_time_t;
 
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
 void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
-int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
+#define ZBX_READ_ERR		-1
+#define ZBX_READ_WRONG_ENCODING	-2
+int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
 int	zbx_write_all(int fd, const char *buf, size_t n);

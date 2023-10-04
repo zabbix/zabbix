@@ -333,7 +333,7 @@ class testDashboardForm extends CWebTest {
 	 * @param array					$data			data provider
 	 * @param string				$action			action that should be checked, create or update dashboard
 	 * @param CDashboardElement		$dashboard		dashboard element
-	 * @param COverlayDialogElement	$dialog			dasboard properties overlay dialog
+	 * @param COverlayDialogElement	$dialog			dashboard properties overlay dialog
 	 * @param array					$old_hash		hashes values before form submit
 	 */
 	private function checkProperties($data, $action, $dashboard, $dialog, $old_hash = null) {

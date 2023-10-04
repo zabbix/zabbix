@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -134,7 +134,7 @@ begemotSnmpdModulePath."pf"     = "/usr/lib/snmp_pf.so"
 |OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High output error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/OPNsense by SNMP/net.if.out.errors[{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Depends on**:<br><ul><li>OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</li></ul>|
 |OPNsense: Interface [{#IFNAME}({#IFALIAS})]: High outbound bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/OPNsense by SNMP/net.if.out[{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])) and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0`|Warning|**Depends on**:<br><ul><li>OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</li></ul>|
 |OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])<0 and last(/OPNsense by SNMP/net.if.speed[{#SNMPINDEX}])>0 and ( last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=6 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=7 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=11 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=62 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=69 or last(/OPNsense by SNMP/net.if.type[{#SNMPINDEX}])=117 ) and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])<>2)`|Info|**Depends on**:<br><ul><li>OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down</li></ul>|
-|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down|<p>This trigger expression works as follows:1. It can be triggered if the operations status is down.2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)`|Average||
+|OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Link down|<p>This trigger expression works as follows:<br>1. It can be triggered if the operations status is down.<br>2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and (last(/OPNsense by SNMP/net.if.status[{#SNMPINDEX}])=2)`|Average||
 
 ## Feedback
 

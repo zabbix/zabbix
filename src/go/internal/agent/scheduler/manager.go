@@ -294,8 +294,12 @@ func (m *Manager) processFinishRequest(task performer) {
 			p.enqueueTask(task)
 		}
 	}
-	if !p.queued() && p.hasCapacity() {
-		heap.Push(&m.pluginQueue, p)
+	if !p.queued() {
+		if p.hasCapacity() {
+			heap.Push(&m.pluginQueue, p)
+		}
+	} else {
+		m.pluginQueue.Update(p)
 	}
 }
 

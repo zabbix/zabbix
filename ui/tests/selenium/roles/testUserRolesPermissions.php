@@ -354,6 +354,7 @@ class testUserRolesPermissions extends CWebTest {
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 				$row->getColumn('Ack')->query('link:No')->waitUntilCLickable()->one()->click();
+				COverlayDialogElement::find()->waitUntilReady()->one();
 
 				if ($data['activityid'] === 'message') {
 					$dialog->query('id:message')->one()->fill('test_text');

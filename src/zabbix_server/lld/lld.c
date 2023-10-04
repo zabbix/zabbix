@@ -392,7 +392,7 @@ out:
 static int	filter_evaluate_expression(const lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **info)
 {
-	int			i, ret = FAIL, res, error_num = 0;
+	int			i, ret, res, error_num = 0;
 	char			*expression = NULL, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256], value[16],
 				*errmsg = NULL;
 	double			result;
@@ -412,7 +412,7 @@ static int	filter_evaluate_expression(const lld_filter_t *filter, const struct z
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		if (SUCCEED == (ret = filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg)))
+		if (SUCCEED == filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg))
 		{
 			zbx_snprintf(value, sizeof(value), "%d", res);
 		}

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-24T09:24:40Z'
+  date: '2023-09-20T10:45:20Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -49,7 +49,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 GCP: Authorization has failed. 
-                Check the authorization parameters and GCP API availability from network segment, where Zabbix-server/proxy is located.
+                Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.
                 
               tags:
                 - tag: scope
@@ -173,15 +173,15 @@ zabbix_export:
           description: |
             Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.
             The necessary scopes are pre-defined.
-            Returns a signed authorization token with 1 hour lifetime; required only once and used for all the dependent script items.
+            Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.
             Check the template documentation for the details.
             
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
-            - name: pkey_id
-              value: '{$GCP.PRIVATE.KEY.ID}'
             - name: email
               value: '{$GCP.CLIENT.EMAIL}'
+            - name: pkey_id
+              value: '{$GCP.PRIVATE.KEY.ID}'
             - name: private_key
               value: '{$GCP.PRIVATE.KEY}'
           tags:
@@ -195,7 +195,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'GCP Cloud SQL: Instances Get.'
+          description: 'GCP Cloud SQL: Instances get.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -212,6 +212,20 @@ zabbix_export:
                           data = data[step];
                       }
                       return data;
+                  }
+                  
+                  function getFieldBool(data, path) {
+                      var steps = path.split('.');
+                  
+                      for (var i = 0; i < steps.length; i++) {
+                          var step = steps[i];
+                  
+                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                              return false;
+                          }
+                          data = data[step];
+                      }
+                      return true;
                   }
                   
                   function getHttpData(url, token) {
@@ -284,13 +298,21 @@ zabbix_export:
                       }
                   
                       if (Array.isArray(sql_inst.ipAddresses)) {
-                          var addresses = sql_inst.ipAddresses.filter(function (addr) {
+                          var int_addresses = sql_inst.ipAddresses.filter(function (addr) {
+                              return addr.type === 'PRIVATE';
+                          });
+                  
+                          var ext_addresses = sql_inst.ipAddresses.filter(function (addr) {
                               return addr.type === 'PRIMARY';
                           });
                   
-                          obj.ip = addresses[0].ipAddress;
+                          obj.ip = getFieldBool(int_addresses,'0.ipAddress') ? int_addresses[0].ipAddress : '0.0.0.0';
+                          obj.ext_ip = getFieldBool(ext_addresses, '0.ipAddress') ? ext_addresses[0].ipAddress : '0.0.0.0';
                       }
-                      else obj.ip = '0.0.0.0';
+                      else {
+                          obj.ip = '0.0.0.0';
+                          obj.ext_ip = '0.0.0.0';
+                      }
                   
                       return obj;
                   }));
@@ -444,19 +466,8 @@ zabbix_export:
                                   integrity: getField(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring')
                               };
                   
-                              if (getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP')) {
-                                  obj.ext_ip = inst.networkInterfaces[0].accessConfigs[0].natIP;
-                              }
-                              else {
-                                  obj.ext_ip = '0.0.0.0';
-                              }
-                  
-                              if (getFieldBool(inst, 'labels.container-vm')) {
-                                  obj.i_type = 'container-optimized';
-                              }
-                              else {
-                                  obj.i_type = 'regular';
-                              }
+                              obj.ext_ip = getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP') ? inst.networkInterfaces[0].accessConfigs[0].natIP : '0.0.0.0';
+                              obj.i_type = getFieldBool(inst, 'labels.container-vm') ? 'container-optimized' : 'regular';
                               return obj;
                           });
                           arr = arr.concat(vm_prop);
@@ -669,13 +680,6 @@ zabbix_export:
                 value: '{$GCP.MSSQL.INST.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
-                value: '{$GCP.MSSQL.ZONE.MATCHES}'
-                formulaid: F
-              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
-                value: '{$GCP.MSSQL.ZONE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.MSSQL.INST.TYPE.MATCHES}'
                 formulaid: D
@@ -683,6 +687,13 @@ zabbix_export:
                 value: '{$GCP.MSSQL.INST.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: E
+              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
+                value: '{$GCP.MSSQL.ZONE.MATCHES}'
+                formulaid: F
+              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
+                value: '{$GCP.MSSQL.ZONE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           lifetime: 7d
           description: 'GCP Cloud SQL: MSSQL instances discovery.'
           host_prototypes:
@@ -697,13 +708,13 @@ zabbix_export:
               macros:
                 - macro: '{$CLOUD_SQL.HIGH.AVAILABILITY}'
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-                  description: 'GCP Cloud SQL Instance High Availability definition. Required for metrics filtration.'
+                  description: 'GCP Cloud SQL instance high availability definition. Required for metrics filtration.'
                 - macro: '{$CLOUD_SQL.MSSQL.AUDITED}'
                   value: '{#MSSQL.AUDITED}'
-                  description: 'GCP Cloud SQL MSSQL Audit Enabled Definition. Required for metrics filtration.'
+                  description: 'GCP Cloud SQL MSSQL audit enabled definition. Required for metrics filtration.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  value: '{#GCP.AUTH.TOKEN}'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
                   description: 'GCP Project Id.'
@@ -730,13 +741,18 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.ZONE}'
               custom_interfaces: 'YES'
               interfaces:
+                - default: 'NO'
+                  ip: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+                  dns: external.ip
                 - ip: '{#CLOUD_SQL.INSTANCE.IP}'
-                  dns: primary.ip
+                  dns: internal.ip
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
             - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
               path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
               path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
@@ -798,13 +814,6 @@ zabbix_export:
                 value: '{$GCP.MYSQL.INST.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
-                value: '{$GCP.MYSQL.ZONE.MATCHES}'
-                formulaid: F
-              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
-                value: '{$GCP.MYSQL.ZONE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.MYSQL.INST.TYPE.MATCHES}'
                 formulaid: D
@@ -812,6 +821,13 @@ zabbix_export:
                 value: '{$GCP.MYSQL.INST.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: E
+              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
+                value: '{$GCP.MYSQL.ZONE.MATCHES}'
+                formulaid: F
+              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
+                value: '{$GCP.MYSQL.ZONE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           lifetime: 7d
           description: 'GCP Cloud SQL: MySQL instances discovery.'
           host_prototypes:
@@ -826,10 +842,10 @@ zabbix_export:
               macros:
                 - macro: '{$CLOUD_SQL.HIGH.AVAILABILITY}'
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-                  description: 'GCP Cloud SQL Instance High Availability definition.'
+                  description: 'GCP Cloud SQL instance high availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  value: '{#GCP.AUTH.TOKEN}'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
                   description: 'GCP Project Id.'
@@ -854,13 +870,18 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.ZONE}'
               custom_interfaces: 'YES'
               interfaces:
+                - default: 'NO'
+                  ip: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+                  dns: external.ip
                 - ip: '{#CLOUD_SQL.INSTANCE.IP}'
-                  dns: primary.ip
+                  dns: internal.ip
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
             - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
               path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
               path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
@@ -920,13 +941,6 @@ zabbix_export:
                 value: '{$GCP.PGSQL.INST.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: C
-              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
-                value: '{$GCP.PGSQL.ZONE.MATCHES}'
-                formulaid: F
-              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
-                value: '{$GCP.PGSQL.ZONE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: G
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.PGSQL.INST.TYPE.MATCHES}'
                 formulaid: D
@@ -934,6 +948,13 @@ zabbix_export:
                 value: '{$GCP.PGSQL.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: E
+              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
+                value: '{$GCP.PGSQL.ZONE.MATCHES}'
+                formulaid: F
+              - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
+                value: '{$GCP.PGSQL.ZONE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: G
           lifetime: 7d
           description: 'GCP Cloud SQL: PostgreSQL instances discovery.'
           host_prototypes:
@@ -948,13 +969,13 @@ zabbix_export:
               macros:
                 - macro: '{$CLOUD_SQL.HIGH.AVAILABILITY}'
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-                  description: 'GCP Cloud SQL Instance High Availability definition.'
+                  description: 'GCP Cloud SQL instance high availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  value: '{#GCP.AUTH.TOKEN}'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
-                  description: 'GCP Project Id.'
+                  description: 'GCP project id.'
               tags:
                 - tag: db-version
                   value: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
@@ -976,13 +997,18 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.ZONE}'
               custom_interfaces: 'YES'
               interfaces:
+                - default: 'NO'
+                  ip: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+                  dns: external.ip
                 - ip: '{#CLOUD_SQL.INSTANCE.IP}'
-                  dns: primary.ip
+                  dns: internal.ip
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
             - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
               path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
               path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
@@ -1068,8 +1094,8 @@ zabbix_export:
                   value: '{#GCE.MACHINE.TYPE}'
                   description: 'Instance machine type.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  value: '{#GCP.AUTH.TOKEN}'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
                   description: 'GCP project id.'
@@ -1297,7 +1323,7 @@ zabbix_export:
         - macro: '{$GCP.AUTH.FREQUENCY}'
           value: 45m
           description: |
-            The update interval for the GCP Authorization item, which also equals to the access token regeneration requests frequency.
+            The update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency. 
             Check the template documentation notes carefully for more details.
             
         - macro: '{$GCP.CLIENT.EMAIL}'
@@ -1406,171 +1432,11 @@ zabbix_export:
           pages:
             - name: 'Project resources'
               widgets:
-                - type: GRAPH_PROTOTYPE
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'GCP by HTTP'
-                        name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage'
-                - type: GRAPH_PROTOTYPE
-                  x: '12'
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: INTEGER
-                      name: source_type
-                      value: '3'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid
-                      value:
-                        host: 'GCP by HTTP'
-                        key: 'gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]'
-                - type: ITEM
-                  name: 'Cloud SQL MSSQL'
-                  x: '18'
-                  'y': '5'
-                  width: '6'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP by HTTP'
-                        key: gcp.gce.instances.mssql_count
-                - type: ITEM
-                  name: 'Cloud SQL MySQL'
-                  x: '6'
-                  'y': '5'
-                  width: '6'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP by HTTP'
-                        key: gcp.gce.instances.mysql_count
-                - type: ITEM
-                  name: 'Cloud SQL PostgreSQL'
-                  x: '12'
-                  'y': '5'
-                  width: '6'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP by HTTP'
-                        key: gcp.gce.instances.pgsql_count
-                - type: ITEM
-                  name: 'Cloud SQL total'
-                  'y': '5'
-                  width: '6'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP by HTTP'
-                        key: gcp.cloudsql.instances.total
-                - type: ITEM
-                  name: 'GCE COS instances'
-                  x: '16'
-                  width: '8'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_places
-                      value: '0'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP by HTTP'
-                        key: gcp.gce.instances.cos_count
                 - type: ITEM
                   name: 'GCE instances total'
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
                     - type: INTEGER
                       name: adv_conf
                       value: '1'
@@ -1582,18 +1448,81 @@ zabbix_export:
                       value:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.total
-                - type: ITEM
-                  name: 'GCE regular instances'
-                  x: '8'
-                  width: '8'
-                  height: '5'
-                  fields:
                     - type: INTEGER
                       name: show
                       value: '2'
                     - type: INTEGER
                       name: show
                       value: '4'
+                - type: ITEM
+                  name: 'Cloud SQL total'
+                  'y': '5'
+                  width: '6'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP by HTTP'
+                        key: gcp.cloudsql.instances.total
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: GRAPH_PROTOTYPE
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'GCP by HTTP'
+                        name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: ITEM
+                  name: 'Cloud SQL MySQL'
+                  x: '6'
+                  'y': '5'
+                  width: '6'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP by HTTP'
+                        key: gcp.gce.instances.mysql_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'GCE regular instances'
+                  x: '8'
+                  width: '8'
+                  height: '5'
+                  fields:
                     - type: INTEGER
                       name: adv_conf
                       value: '1'
@@ -1605,12 +1534,109 @@ zabbix_export:
                       value:
                         host: 'GCP by HTTP'
                         key: gcp.gce.instances.regular_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Cloud SQL PostgreSQL'
+                  x: '12'
+                  'y': '5'
+                  width: '6'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP by HTTP'
+                        key: gcp.gce.instances.pgsql_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: ITEM_PROTOTYPE
+                      name: itemid
+                      value:
+                        host: 'GCP by HTTP'
+                        key: 'gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                    - type: INTEGER
+                      name: source_type
+                      value: '3'
+                - type: ITEM
+                  name: 'GCE COS instances'
+                  x: '16'
+                  width: '8'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP by HTTP'
+                        key: gcp.gce.instances.cos_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Cloud SQL MSSQL'
+                  x: '18'
+                  'y': '5'
+                  width: '6'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP by HTTP'
+                        key: gcp.gce.instances.mssql_count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
     - uuid: 507d70db18554a4e9ee5e09bb29bc85f
       template: 'GCP Cloud SQL MSSQL by HTTP'
       name: 'GCP Cloud SQL MSSQL by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -1635,6 +1661,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.base_audits_size
+              error_handler: DISCARD_VALUE
           master_item:
             key: gcp.cloudsql.mssql.metrics.get
           tags:
@@ -1916,12 +1943,12 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -1945,7 +1972,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -1973,13 +2000,13 @@ zabbix_export:
               dependencies:
                 - name: 'GCP Cloud SQL MSSQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in Failed state'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
                 - name: 'GCP Cloud SQL MSSQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2'
@@ -2130,6 +2157,9 @@ zabbix_export:
                       'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -2157,10 +2187,10 @@ zabbix_export:
                   value: availability
             - uuid: 3d7e054340e94b09b085e508b9b76841
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
-              name: 'GCP Cloud SQL MSSQL: Instance is in Failed state'
+              name: 'GCP Cloud SQL MSSQL: Instance is in failed state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The instance creation failed, or an operation left the instance in an own bad state.
                 
               tags:
                 - tag: scope
@@ -2178,15 +2208,15 @@ zabbix_export:
               name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state. 
-                It is not available, for example due to problems with billing. 
+                The instance is in suspended state. 
+                It is not available, for example, due to problems with billing. 
                 
               tags:
                 - tag: scope
                   value: availability
             - uuid: 378b4d62582d416db7cb7fd6ed099ac9
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
-              name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
+              name: 'GCP Cloud SQL MSSQL: Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -2446,7 +2476,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MSSQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
-              description: 'The RAM utilization is too high. The system might be slow to respond.'
+              description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -2655,16 +2685,16 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: audited
+              value: '{$CLOUD_SQL.MSSQL.AUDITED}'
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
-            - name: audited
-              value: '{$CLOUD_SQL.MSSQL.AUDITED}'
           tags:
             - tag: component
               value: raw
@@ -2835,12 +2865,12 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -2950,12 +2980,12 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -3110,7 +3140,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'Total number of log bytes flushed  for the [{#DB.NAME}] database.'
+              description: 'Total number of log bytes flushed for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3291,7 +3321,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
-          description: 'Databases discovery.'
+          description: 'Schedulers discovery.'
           item_prototypes:
             - uuid: 67bde61c128e4dfe9e47d8a3a6e3ceec
               name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers'
@@ -3301,7 +3331,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of active workers associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of active workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.
                 
               preprocessing:
@@ -3323,7 +3353,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of current tasks associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of present tasks associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).
                 
               preprocessing:
@@ -3345,7 +3375,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of workers associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 It includes workers that are not assigned any task.
                 
               preprocessing:
@@ -3367,7 +3397,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of pending I/Os waiting to be completed that are associated with the scheduler with ID [{#SCHEDULER.ID}]. 
+                Current number of pending I/Os waiting to be completed that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}]. 
                 Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. 
                 The count is incremented when the request is inserted. 
                 This count is decremented when the request is completed. 
@@ -3392,7 +3422,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Data in raw format associated with the scheduler with ID [{#SCHEDULER.ID}].'
+              description: 'Data in raw format associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3411,7 +3441,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Current number of workers that are associated with the scheduler with ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.'
+              description: 'Current number of workers that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3431,7 +3461,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of tasks in the pending queue associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of tasks in the pending queue associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 These tasks are waiting for a worker to pick them up.
                 
               preprocessing:
@@ -3517,27 +3547,14 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MSSQL by HTTP'
                         key: gcp.cloudsql.mssql.cpu.usage_time
-                - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
                     - type: INTEGER
                       name: source_type
                       value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL MSSQL by HTTP'
-                        key: gcp.cloudsql.mssql.cpu.utilization
                 - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
@@ -3549,32 +3566,75 @@ zabbix_export:
                         host: 'GCP Cloud SQL MSSQL by HTTP'
                         name: 'GCP Cloud SQL MSSQL: Memory usage'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL MSSQL by HTTP'
-                        key: gcp.cloudsql.mssql.memory.utilization
-                - type: GRAPH_CLASSIC
                   'y': '10'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MSSQL by HTTP'
                         key: gcp.cloudsql.mssql.disk.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL MSSQL by HTTP'
+                        name: 'GCP Cloud SQL MSSQL: Network traffic'
+                - type: GRAPH_CLASSIC
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL MSSQL by HTTP'
+                        name: 'GCP Cloud SQL MSSQL: Transactions'
+                - type: GRAPH_CLASSIC
+                  'y': '25'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL MSSQL by HTTP'
+                        name: 'GCP Cloud SQL MSSQL: Memory workflow'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL MSSQL by HTTP'
+                        key: gcp.cloudsql.mssql.cpu.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL MSSQL by HTTP'
+                        key: gcp.cloudsql.mssql.memory.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '10'
@@ -3587,63 +3647,33 @@ zabbix_export:
                         host: 'GCP Cloud SQL MSSQL by HTTP'
                         name: 'GCP Cloud SQL MSSQL: Disk read/write operations'
                 - type: GRAPH_CLASSIC
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL MSSQL by HTTP'
-                        name: 'GCP Cloud SQL MSSQL: Network traffic'
-                - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '15'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MSSQL by HTTP'
                         key: gcp.cloudsql.mssql.network.connections
-                - type: GRAPH_CLASSIC
-                  'y': '20'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL MSSQL by HTTP'
-                        name: 'GCP Cloud SQL MSSQL: Transactions'
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '20'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MSSQL by HTTP'
                         key: gcp.cloudsql.mssql.memory.buffer_cache_hit_ratio
-                - type: GRAPH_CLASSIC
-                  'y': '25'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL MSSQL by HTTP'
-                        name: 'GCP Cloud SQL MSSQL: Memory workflow'
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '25'
@@ -3687,7 +3717,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MSSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -3856,19 +3886,19 @@ zabbix_export:
             }
             
             return JSON.stringify(obj);
-          description: 'MSSQL Replica metrics data in raw format.'
+          description: 'MSSQL replica metrics data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -3978,20 +4008,20 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MSSQL Replica by HTTP'
                         key: gcp.cloudsql.mssql.repl.log_apply_pending_queue
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
     - uuid: 38456af4aedd4b168ec3fa4ad2acb256
       template: 'GCP Cloud SQL MySQL by HTTP'
       name: 'GCP Cloud SQL MySQL by HTTP'
       description: |
         Get GCP Cloud SQL MySQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -4087,7 +4117,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -4115,13 +4145,13 @@ zabbix_export:
               dependencies:
                 - name: 'GCP Cloud SQL MySQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10'
-                - name: 'GCP Cloud SQL MySQL: Instance is in Failed state'
+                - name: 'GCP Cloud SQL MySQL: Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
-                - name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
+                - name: 'GCP Cloud SQL MySQL: Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
                 - name: 'GCP Cloud SQL MySQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2'
@@ -4405,6 +4435,9 @@ zabbix_export:
                       'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -4432,10 +4465,10 @@ zabbix_export:
                   value: availability
             - uuid: 65831fed3d19425c86933db4034ed565
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
-              name: 'GCP Cloud SQL MySQL: Instance is in Failed state'
+              name: 'GCP Cloud SQL MySQL: Instance is in failed state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The instance creation failed, or an operation left the instance in an own bad state.
                 
               tags:
                 - tag: scope
@@ -4453,15 +4486,15 @@ zabbix_export:
               name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state. 
-                It is not available, for example due to problems with billing. 
+                The instance is in suspended state. 
+                It is not available, for example, due to problems with billing. 
                 
               tags:
                 - tag: scope
                   value: availability
             - uuid: 1387f9a2ef194d5bb5d1e548fc4eb8d3
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
-              name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
+              name: 'GCP Cloud SQL MySQL: Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -4568,7 +4601,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MySQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
-              description: 'The RAM utilization is too high. The system might be slow to respond.'
+              description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -4717,19 +4750,19 @@ zabbix_export:
             obj.base_ram_pused = Math.floor(getField(obj, 'base_usage') / getField(obj, 'base_quota') * 100);
             
             return JSON.stringify(obj);
-          description: 'MySQL Metrics in raw format.'
+          description: 'MySQL metrics in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -4947,27 +4980,14 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MySQL by HTTP'
                         key: gcp.cloudsql.mysql.cpu.usage_time
-                - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
                     - type: INTEGER
                       name: source_type
                       value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL MySQL by HTTP'
-                        key: gcp.cloudsql.mysql.cpu.utilization
                 - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
@@ -4979,32 +4999,65 @@ zabbix_export:
                         host: 'GCP Cloud SQL MySQL by HTTP'
                         name: 'GCP Cloud SQL MySQL: Memory usage'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL MySQL by HTTP'
-                        key: gcp.cloudsql.mysql.memory.utilization
-                - type: GRAPH_CLASSIC
                   'y': '10'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MySQL by HTTP'
                         key: gcp.cloudsql.mysql.disk.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL MySQL by HTTP'
+                        name: 'GCP Cloud SQL MySQL: Network traffic'
+                - type: GRAPH_CLASSIC
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL MySQL by HTTP'
+                        name: 'GCP Cloud SQL MySQL: pages'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL MySQL by HTTP'
+                        key: gcp.cloudsql.mysql.cpu.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL MySQL by HTTP'
+                        key: gcp.cloudsql.mysql.memory.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '10'
@@ -5017,39 +5070,19 @@ zabbix_export:
                         host: 'GCP Cloud SQL MySQL by HTTP'
                         name: 'GCP Cloud SQL MySQL: Disk read/write operations'
                 - type: GRAPH_CLASSIC
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL MySQL by HTTP'
-                        name: 'GCP Cloud SQL MySQL: Network traffic'
-                - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '15'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL MySQL by HTTP'
                         key: gcp.cloudsql.mysql.network.connections
-                - type: GRAPH_CLASSIC
-                  'y': '20'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL MySQL by HTTP'
-                        name: 'GCP Cloud SQL MySQL: pages'
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '20'
@@ -5093,7 +5126,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MySQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL MySQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -5264,12 +5297,12 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -5440,15 +5473,26 @@ zabbix_export:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         name: 'GCP Cloud SQL MySQL: Lags'
                 - type: ITEM
+                  name: 'I/O Thread State'
+                  'y': '5'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL MySQL Replica by HTTP'
+                        key: gcp.cloudsql.mysql.repl.slave_io_running
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: ITEM
                   name: 'I/O Thread Error'
                   x: '6'
                   'y': '5'
                   width: '6'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: INTEGER
                       name: adv_conf
                       value: '1'
@@ -5460,41 +5504,9 @@ zabbix_export:
                       value:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         key: gcp.cloudsql.mysql.repl.last_io_errno
-                - type: ITEM
-                  name: 'I/O Thread State'
-                  'y': '5'
-                  width: '6'
-                  height: '3'
-                  fields:
                     - type: INTEGER
                       name: show
                       value: '2'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL MySQL Replica by HTTP'
-                        key: gcp.cloudsql.mysql.repl.slave_io_running
-                - type: ITEM
-                  name: 'SQL Thread Error'
-                  x: '18'
-                  'y': '5'
-                  width: '6'
-                  height: '3'
-                  fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: adv_conf
-                      value: '1'
-                    - type: INTEGER
-                      name: decimal_size
-                      value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL MySQL Replica by HTTP'
-                        key: gcp.cloudsql.mysql.repl.last_sql_errno
                 - type: ITEM
                   name: 'SQL Thread State'
                   x: '12'
@@ -5502,9 +5514,6 @@ zabbix_export:
                   width: '6'
                   height: '3'
                   fields:
-                    - type: INTEGER
-                      name: show
-                      value: '2'
                     - type: INTEGER
                       name: adv_conf
                       value: '1'
@@ -5516,6 +5525,30 @@ zabbix_export:
                       value:
                         host: 'GCP Cloud SQL MySQL Replica by HTTP'
                         key: gcp.cloudsql.mysql.repl.slave_sql_running
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: ITEM
+                  name: 'SQL Thread Error'
+                  x: '18'
+                  'y': '5'
+                  width: '6'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_size
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL MySQL Replica by HTTP'
+                        key: gcp.cloudsql.mysql.repl.last_sql_errno
+                    - type: INTEGER
+                      name: show
+                      value: '2'
       valuemaps:
         - uuid: ea83090a16d94eb3bb643009c784d820
           name: 'Replication state'
@@ -5548,7 +5581,7 @@ zabbix_export:
       name: 'GCP Cloud SQL PostgreSQL by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -5644,7 +5677,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -5672,13 +5705,13 @@ zabbix_export:
               dependencies:
                 - name: 'GCP Cloud SQL PostgreSQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Failed state'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2'
@@ -5829,6 +5862,9 @@ zabbix_export:
                       'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -5856,10 +5892,10 @@ zabbix_export:
                   value: availability
             - uuid: 1a2efb6f755444c0bab85d2778018eb1
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in Failed state'
+              name: 'GCP Cloud SQL PostgreSQL: Instance is in failed state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The instance creation failed, or an operation left the instance in an own bad state.
                 
               tags:
                 - tag: scope
@@ -5877,15 +5913,15 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state. 
-                It is not available, for example due to problems with billing. 
+                The instance is in suspended state. 
+                It is not available, for example, due to problems with billing. 
                 
               tags:
                 - tag: scope
                   value: availability
             - uuid: 5f1084f744b444f3b803110baf703973
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
+              name: 'GCP Cloud SQL PostgreSQL: Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -5992,7 +6028,7 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
-              description: 'The RAM utilization is too high. The system might be slow to respond.'
+              description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -6157,12 +6193,12 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -6582,16 +6618,16 @@ zabbix_export:
                     - ''
               timeout: '{$GCP.DATA.TIMEOUT}'
               parameters:
+                - name: database_id
+                  value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
+                - name: database_name
+                  value: '{#PGSQL.DB.NAME}'
                 - name: project_id
                   value: '{$GCP.PROJECT.ID}'
                 - name: time_window
                   value: '{$GCP.TIME.WINDOW}'
-                - name: database_id
-                  value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
                 - name: token
                   value: '{$GCP.AUTH.TOKEN}'
-                - name: database_name
-                  value: '{#PGSQL.DB.NAME}'
               tags:
                 - tag: component
                   value: raw
@@ -6636,13 +6672,13 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 4751ef5e498e4ce184bd07aadc831d2b
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled back transactions'
+              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled-back transactions'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]'
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Delta count of number of rolled back transactions in the [{#PGSQL.DB.NAME}] database.'
+              description: 'Delta count of number of rolled-back transactions in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6831,7 +6867,7 @@ zabbix_export:
                 - $.items
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 12h
+                - 3h
       tags:
         - tag: class
           value: cloud
@@ -6883,27 +6919,14 @@ zabbix_export:
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL PostgreSQL by HTTP'
                         key: gcp.cloudsql.pgsql.cpu.usage_time
-                - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
                     - type: INTEGER
                       name: source_type
                       value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
-                        key: gcp.cloudsql.pgsql.cpu.utilization
                 - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
@@ -6915,32 +6938,81 @@ zabbix_export:
                         host: 'GCP Cloud SQL PostgreSQL by HTTP'
                         name: 'GCP Cloud SQL PostgreSQL: Memory usage'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
-                        key: gcp.cloudsql.pgsql.memory.utilization
-                - type: GRAPH_CLASSIC
                   'y': '10'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL PostgreSQL by HTTP'
                         key: gcp.cloudsql.pgsql.disk.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  'y': '15'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
+                        name: 'GCP Cloud SQL PostgreSQL: Network traffic'
+                - type: GRAPH_CLASSIC
+                  'y': '20'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
+                        name: 'GCP Cloud SQL PostgreSQL: Transactions count'
+                - type: GRAPH_PROTOTYPE
+                  'y': '25'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
+                        name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
+                        key: gcp.cloudsql.pgsql.cpu.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
+                        key: gcp.cloudsql.pgsql.memory.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '10'
@@ -6953,39 +7025,19 @@ zabbix_export:
                         host: 'GCP Cloud SQL PostgreSQL by HTTP'
                         name: 'GCP Cloud SQL PostgreSQL: Disk read/write operations'
                 - type: GRAPH_CLASSIC
-                  'y': '15'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
-                        name: 'GCP Cloud SQL PostgreSQL: Network traffic'
-                - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '15'
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Cloud SQL PostgreSQL by HTTP'
                         key: gcp.cloudsql.pgsql.transaction_id_utilization
-                - type: GRAPH_CLASSIC
-                  'y': '20'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
-                        name: 'GCP Cloud SQL PostgreSQL: Transactions count'
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   'y': '20'
@@ -6998,22 +7050,6 @@ zabbix_export:
                         host: 'GCP Cloud SQL PostgreSQL by HTTP'
                         name: 'GCP Cloud SQL PostgreSQL: Transaction age'
                 - type: GRAPH_PROTOTYPE
-                  'y': '25'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
-                        name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Tuples'
-                - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '25'
                   width: '12'
@@ -7022,17 +7058,17 @@ zabbix_export:
                     - type: INTEGER
                       name: columns
                       value: '1'
+                    - type: ITEM_PROTOTYPE
+                      name: itemid
+                      value:
+                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
+                        key: 'gcp.cloudsql.pgsql.deadlock_count[{#PGSQL.DB.NAME}]'
                     - type: INTEGER
                       name: rows
                       value: '1'
                     - type: INTEGER
                       name: source_type
                       value: '3'
-                    - type: ITEM_PROTOTYPE
-                      name: itemid
-                      value:
-                        host: 'GCP Cloud SQL PostgreSQL by HTTP'
-                        key: 'gcp.cloudsql.pgsql.deadlock_count[{#PGSQL.DB.NAME}]'
       valuemaps:
         - uuid: c783556dfa214e73b676ca187648c5df
           name: 'Database availability'
@@ -7065,7 +7101,7 @@ zabbix_export:
       name: 'GCP Cloud SQL PostgreSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL  monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -7252,12 +7288,12 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: database_id
+              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: database_id
-              value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -7459,7 +7495,7 @@ zabbix_export:
       name: 'GCP Compute Engine Instance by HTTP'
       description: |
         Discover GCP Compute Engine instances by HTTP with script item usage.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -7586,8 +7622,8 @@ zabbix_export:
           triggers:
             - uuid: fb8e28649b4947e9a11d891e3126a3a1
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}'
-              name: 'GCP Compute Engine: High CPU Utilization'
-              event_name: 'GCP Compute Engine: High CPU Utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
+              name: 'GCP Compute Engine: High CPU utilization'
+              event_name: 'GCP Compute Engine: High CPU utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               manual_close: 'YES'
@@ -7693,19 +7729,19 @@ zabbix_export:
                 arr.push(data);
             }
             return JSON.stringify(arr);
-          description: 'Disk entities and metrics related to particular instance.'
+          description: 'Disk entities and metrics related to a particular instance.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: instance_id
+              value: '{HOST.HOST}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: instance_id
-              value: '{HOST.HOST}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
           tags:
@@ -7780,7 +7816,7 @@ zabbix_export:
                   return idx !== -1 ? idx : 10;
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://compute.googleapis.com/compute/v1/projects/{$GCP.PROJECT.ID}/zones/{$GCE.INSTANCE.ZONE}/instances/{HOST.NAME}'
           status_codes: ''
@@ -7948,7 +7984,7 @@ zabbix_export:
             - uuid: fa918889bcb84d3886254f00f0df288c
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}'
               name: 'GCP Compute Engine: High memory utilization'
-              event_name: 'GCP Compute Engine:High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
+              event_name: 'GCP Compute Engine: High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
@@ -8260,18 +8296,18 @@ zabbix_export:
                 - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
+            - name: instance_id
+              value: '{HOST.HOST}'
+            - name: integrity
+              value: '{$GCE.INTEGRITY.STATE}'
+            - name: machine_type
+              value: '{$GCE.MACHINE.TYPE}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
-            - name: instance_id
-              value: '{HOST.HOST}'
             - name: token
               value: '{$GCP.AUTH.TOKEN}'
-            - name: machine_type
-              value: '{$GCE.MACHINE.TYPE}'
-            - name: integrity
-              value: '{$GCE.INTEGRITY.STATE}'
           tags:
             - tag: component
               value: raw
@@ -8565,13 +8601,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#GCE.DISK.NAME}'
-                value: '{$GCE.DISK.NAME.MATCHES}'
-                formulaid: C
-              - macro: '{#GCE.DISK.NAME}'
-                value: '{$GCE.DISK.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#GCE.DISK.DEV_TYPE}'
                 value: '{$GCE.DISK.DEV_TYPE.MATCHES}'
                 formulaid: A
@@ -8579,6 +8608,13 @@ zabbix_export:
                 value: '{$GCE.DISK.DEV_TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#GCE.DISK.NAME}'
+                value: '{$GCE.DISK.NAME.MATCHES}'
+                formulaid: C
+              - macro: '{#GCE.DISK.NAME}'
+                value: '{$GCE.DISK.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
               - macro: '{#GCE.DISK.STOR_TYPE}'
                 value: '{$GCE.DISK.STOR_TYPE.MATCHES}'
                 formulaid: E
@@ -8806,19 +8842,6 @@ zabbix_export:
                         host: 'GCP Compute Engine Instance by HTTP'
                         name: 'GCP Compute Engine: CPU usage'
                 - type: GRAPH_CLASSIC
-                  x: '12'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'GCP Compute Engine Instance by HTTP'
-                        key: gcp.gce.cpu.utilization
-                - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '8'
                   height: '5'
@@ -8828,20 +8851,76 @@ zabbix_export:
                       value:
                         host: 'GCP Compute Engine Instance by HTTP'
                         name: 'GCP Compute Engine: Memory usage'
+                - type: GRAPH_PROTOTYPE
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'GCP Compute Engine Instance by HTTP'
+                        name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read/Write bytes'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  'y': '15'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'GCP Compute Engine Instance by HTTP'
+                        name: 'GCP Compute Engine: Network traffic'
                 - type: GRAPH_CLASSIC
                   x: '8'
                   'y': '5'
                   width: '8'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
                     - type: ITEM
                       name: itemid
                       value:
                         host: 'GCP Compute Engine Instance by HTTP'
                         key: gcp.gce.memory.ram_pused
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'GCP Compute Engine Instance by HTTP'
+                        key: gcp.gce.cpu.utilization
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                - type: GRAPH_PROTOTYPE
+                  x: '12'
+                  'y': '10'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: columns
+                      value: '1'
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'GCP Compute Engine Instance by HTTP'
+                        name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read/Write operations'
+                    - type: INTEGER
+                      name: rows
+                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '16'
                   'y': '5'
@@ -8853,49 +8932,6 @@ zabbix_export:
                       value:
                         host: 'GCP Compute Engine Instance by HTTP'
                         name: 'GCP Compute Engine: Memory swapping'
-                - type: GRAPH_PROTOTYPE
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'GCP Compute Engine Instance by HTTP'
-                        name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read/Write bytes'
-                - type: GRAPH_PROTOTYPE
-                  x: '12'
-                  'y': '10'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'GCP Compute Engine Instance by HTTP'
-                        name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read/Write operations'
-                - type: GRAPH_CLASSIC
-                  'y': '15'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'GCP Compute Engine Instance by HTTP'
-                        name: 'GCP Compute Engine: Network traffic'
       valuemaps:
         - uuid: d5f19327f8b74b44a40950d9d4f9410f
           name: 'Instance state'

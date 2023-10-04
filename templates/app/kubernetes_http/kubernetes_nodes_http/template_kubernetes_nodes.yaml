@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-07T13:26:47Z'
+  date: '2023-09-20T10:43:43Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -373,22 +373,22 @@ zabbix_export:
           description: 'Collecting and processing cluster nodes data via Kubernetes API.'
           timeout: 10s
           parameters:
+            - name: api_token
+              value: '{$KUBE.API.TOKEN}'
             - name: api_url
               value: '{$KUBE.API.URL}'
             - name: endpoint_name
               value: '{$KUBE.NODES.ENDPOINT.NAME}'
-            - name: api_token
-              value: '{$KUBE.API.TOKEN}'
-            - name: pod_filter_labels
-              value: '{$KUBE.POD.FILTER.LABELS}'
-            - name: pod_filter_annotations
-              value: '{$KUBE.POD.FILTER.ANNOTATIONS}'
-            - name: node_filter_labels
-              value: '{$KUBE.NODE.FILTER.LABELS}'
-            - name: node_filter_annotations
-              value: '{$KUBE.NODE.FILTER.ANNOTATIONS}'
             - name: http_proxy
               value: '{$KUBE.HTTP.PROXY}'
+            - name: node_filter_annotations
+              value: '{$KUBE.NODE.FILTER.ANNOTATIONS}'
+            - name: node_filter_labels
+              value: '{$KUBE.NODE.FILTER.LABELS}'
+            - name: pod_filter_annotations
+              value: '{$KUBE.POD.FILTER.ANNOTATIONS}'
+            - name: pod_filter_labels
+              value: '{$KUBE.POD.FILTER.LABELS}'
           tags:
             - tag: component
               value: raw
@@ -1289,20 +1289,20 @@ zabbix_export:
           master_item:
             key: kube.nodes
           lld_macro_paths:
-            - lld_macro: '{#NAME}'
-              path: $.metadata.name
-            - lld_macro: '{#IP}'
-              path: $.internalIP
-            - lld_macro: '{#ROLES}'
-              path: $.status.roles
-            - lld_macro: '{#ENDPOINT}'
-              path: $.status.agent
             - lld_macro: '{#ARCH}'
               path: '$.metadata.labels[''kubernetes.io/arch'']'
-            - lld_macro: '{#OS}'
-              path: '$.metadata.labels[''kubernetes.io/os'']'
             - lld_macro: '{#CLUSTER_HOSTNAME}'
               path: $.clusterhostname
+            - lld_macro: '{#ENDPOINT}'
+              path: $.status.agent
+            - lld_macro: '{#IP}'
+              path: $.internalIP
+            - lld_macro: '{#NAME}'
+              path: $.metadata.name
+            - lld_macro: '{#OS}'
+              path: '$.metadata.labels[''kubernetes.io/os'']'
+            - lld_macro: '{#ROLES}'
+              path: $.status.roles
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1328,13 +1328,6 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#NODE}'
-                value: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
-                formulaid: C
-              - macro: '{#NODE}'
-                value: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
               - macro: '{#NAMESPACE}'
                 value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
                 formulaid: A
@@ -1342,6 +1335,13 @@ zabbix_export:
                 value: '{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
+              - macro: '{#NODE}'
+                value: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
+                formulaid: C
+              - macro: '{#NODE}'
+                value: '{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: D
           lifetime: '0'
           item_prototypes:
             - uuid: ed4ea3dbbce74404a5039aa9918b8e2b
@@ -1493,10 +1493,10 @@ zabbix_export:
                   value: '{#POD}'
               trigger_prototypes:
                 - uuid: 8f1808cd67614cda959ec70e92a59235
-                  expression: '(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],3m))>2'
+                  expression: '(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],15m))>1'
                   name: 'Node [{#NODE}] Pod [{#POD}]: Pod is crash looping'
                   priority: WARNING
-                  description: 'Pos restarts more than 2 times in the last 3 minutes.'
+                  description: 'Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.'
                   tags:
                     - tag: scope
                       value: availability
@@ -1592,12 +1592,12 @@ zabbix_export:
           master_item:
             key: kube.nodes
           lld_macro_paths:
+            - lld_macro: '{#NAMESPACE}'
+              path: $.namespace
             - lld_macro: '{#NODE}'
               path: $.hostname
             - lld_macro: '{#POD}'
               path: $.name
-            - lld_macro: '{#NAMESPACE}'
-              path: $.namespace
           preprocessing:
             - type: JSONPATH
               parameters:
