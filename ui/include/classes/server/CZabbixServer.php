@@ -198,18 +198,12 @@ class CZabbixServer {
 	/**
 	 * Request server to test item.
 	 *
-	 * @param array  $data    Array of item properties to test.
-	 * @param string $sid     User session ID.
+	 * @param array  $data  Array of item properties to test.
+	 * @param string $sid   User session ID.
 	 *
-	 * @return array
+	 * @return array|bool
 	 */
-	public function testItem(array $data, $sid) {
-		/*
-		 * Timeout for 'item.test' request is increased because since message can be forwarded from server to proxy and
-		 * later to agent, it might take more time due network latency.
-		 */
-		$this->timeout = 60;
-
+	public function testItem(array $data, string $sid) {
 		return $this->request([
 			'request' => 'item.test',
 			'data' => $data,
